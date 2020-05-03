@@ -10,60 +10,74 @@ const (
 	LEAKYRELU uint8 = 4 // Leaky ReLu - leaky rectified linear unit
 )
 
+type Activator interface {
+	Get() float32
+}
+
+type Activation struct {
+	Value float32
+	Mode  uint8
+}
+
+type Derivative struct {
+	Value float32
+	Mode  uint8
+}
+
 // Activation function
-func GetActivation(value float32, mode uint8) float32 {
-	switch mode {
+func (a *Activation) Get() float32 {
+	switch a.Mode {
 	default:
 		fallthrough
 	case IDENTITY:
-		return value
+		return a.Value
 	case SIGMOID:
-		return float32(1 / (1 + math.Pow(math.E, float64(-value))))
+		return float32(1 / (1 + math.Pow(math.E, float64(-a.Value))))
 	case TANH:
-		value = float32(math.Pow(math.E, float64(2*value)))
-		return (value - 1) / (value + 1)
+		a.Value = float32(math.Pow(math.E, float64(2*a.Value)))
+		return (a.Value - 1) / (a.Value + 1)
 	case RELU:
 		switch {
-		case value < 0:
+		case a.Value < 0:
 			return 0
-		case value > 1:
+		case a.Value > 1:
 			return 1
 		default:
-			return value
+			return a.Value
 		}
 	case LEAKYRELU:
 		switch {
-		case value < 0:
-			return .01 * value
-		case value > 1:
-			return 1 + .01*(value-1)
+		case a.Value < 0:
+			return .01 * a.Value
+		case a.Value > 1:
+			return 1 + .01*(a.Value-1)
 		default:
-			return value
+			return a.Value
 		}
 	}
 }
 
 // Derivative activation function
-func GetDerivative(value float32, mode uint8) float32 {
-	switch mode {
+func (d *Derivative) Get() float32 {
+	switch d.Mode {
 	default:
 		fallthrough
 	case IDENTITY:
 		return 1
 	case SIGMOID:
-		return value * (1 - value)
+		return d.Value * (1 - d.Value)
 	case TANH:
-		return 1 - float32(math.Pow(float64(value), 2))
+		return 1 - float32(math.Pow(float64(d.Value), 2))
 	case RELU:
 		switch {
-		case value <= 0:
+		case d.Value <= 0:
 			return 0
 		default:
 			return 1
 		}
 	case LEAKYRELU:
 		switch {
-		case value < 0:
+		case d.Value < 0:
 			return .01
 		default:
 			return 1

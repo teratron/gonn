@@ -1,15 +1,12 @@
 package nn
 
 type NN interface {
-	Set(Setter)
+	Set()
 	Get() Getter
 }
 
-type Setter interface {
-}
-
-type Getter interface {
-}
+type Setter interface{}
+type Getter interface{}
 
 type Checker interface {
 	Check()
@@ -21,6 +18,8 @@ type Processor interface {
 	Query()
 	Test()
 }
+
+type Settings interface{}
 
 // Collection of neural network matrix parameters
 type Matrix struct {
