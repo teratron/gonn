@@ -3,11 +3,11 @@ package nn
 import "math"
 
 const (
-	IDENTITY  uint8 = 0 // Identity (тождественная)
-	SIGMOID   uint8 = 1 // Logistic, a.k.a. sigmoid or soft step (логистическая, сигмоида или гладкая ступенька)
-	TANH      uint8 = 2 // TanH - hyperbolic (гиперболический тангенс)
-	RELU      uint8 = 3 // ReLu - rectified linear unit (линейный выпрямитель)
-	LEAKYRELU uint8 = 4 // Leaky ReLu - leaky rectified linear unit (линейный выпрямитель с «утечкой»)
+	IDENTITY  uint8 = 0 // Identity
+	SIGMOID   uint8 = 1 // Logistic, a.k.a. sigmoid or soft step
+	TANH      uint8 = 2 // TanH - hyperbolic
+	RELU      uint8 = 3 // ReLu - rectified linear unit
+	LEAKYRELU uint8 = 4 // Leaky ReLu - leaky rectified linear unit
 )
 
 // Activation function
