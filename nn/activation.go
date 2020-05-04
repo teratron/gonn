@@ -11,73 +11,75 @@ const (
 )
 
 type Activator interface {
-	Get() float32
+	Get(float32) float32
 }
 
 type Activation struct {
-	Value float32
-	Mode  uint8
+	Mode uint8
 }
 
 type Derivative struct {
-	Value float32
-	Mode  uint8
+	Mode uint8
 }
 
-// Activation function
-func (a *Activation) Get() float32 {
+//+-------------------------------------------------------------+
+//|	Activation function											|
+//+-------------------------------------------------------------+
+func (a *Activation) Get(value float32) float32 {
 	switch a.Mode {
 	default:
 		fallthrough
 	case IDENTITY:
-		return a.Value
+		return value
 	case SIGMOID:
-		return float32(1 / (1 + math.Pow(math.E, float64(-a.Value))))
+		return float32(1 / (1 + math.Pow(math.E, float64(-value))))
 	case TANH:
-		a.Value = float32(math.Pow(math.E, float64(2*a.Value)))
-		return (a.Value - 1) / (a.Value + 1)
+		value = float32(math.Pow(math.E, float64(2*value)))
+		return (value - 1) / (value + 1)
 	case RELU:
 		switch {
-		case a.Value < 0:
+		case value < 0:
 			return 0
-		case a.Value > 1:
+		case value > 1:
 			return 1
 		default:
-			return a.Value
+			return value
 		}
 	case LEAKYRELU:
 		switch {
-		case a.Value < 0:
-			return .01 * a.Value
-		case a.Value > 1:
-			return 1 + .01*(a.Value-1)
+		case value < 0:
+			return .01 * value
+		case value > 1:
+			return 1 + .01*(value-1)
 		default:
-			return a.Value
+			return value
 		}
 	}
 }
 
-// Derivative activation function
-func (d *Derivative) Get() float32 {
+//+-------------------------------------------------------------+
+//|	Derivative activation function								|
+//+-------------------------------------------------------------+
+func (d *Derivative) Get(value float32) float32 {
 	switch d.Mode {
 	default:
 		fallthrough
 	case IDENTITY:
 		return 1
 	case SIGMOID:
-		return d.Value * (1 - d.Value)
+		return value * (1 - value)
 	case TANH:
-		return 1 - float32(math.Pow(float64(d.Value), 2))
+		return 1 - float32(math.Pow(float64(value), 2))
 	case RELU:
 		switch {
-		case d.Value <= 0:
+		case value <= 0:
 			return 0
 		default:
 			return 1
 		}
 	case LEAKYRELU:
 		switch {
-		case d.Value < 0:
+		case value < 0:
 			return .01
 		default:
 			return 1
