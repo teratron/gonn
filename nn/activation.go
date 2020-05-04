@@ -23,7 +23,7 @@ type Derivative struct {
 }
 
 //+-------------------------------------------------------------+
-//|	Activation function											|
+//| Activation function                                         |
 //+-------------------------------------------------------------+
 func (a *Activation) Get(value float32) float32 {
 	switch a.Mode {
@@ -50,7 +50,7 @@ func (a *Activation) Get(value float32) float32 {
 		case value < 0:
 			return .01 * value
 		case value > 1:
-			return 1 + .01*(value-1)
+			return 1 + .01 * (value - 1)
 		default:
 			return value
 		}
@@ -58,7 +58,7 @@ func (a *Activation) Get(value float32) float32 {
 }
 
 //+-------------------------------------------------------------+
-//|	Derivative activation function								|
+//| Derivative activation function                              |
 //+-------------------------------------------------------------+
 func (d *Derivative) Get(value float32) float32 {
 	switch d.Mode {
