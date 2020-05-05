@@ -22,6 +22,8 @@ type Derivative struct {
 	Mode uint8
 }
 
+
+
 //+-------------------------------------------------------------+
 //| Activation function                                         |
 //+-------------------------------------------------------------+
@@ -50,7 +52,7 @@ func (a *Activation) Get(value float32) float32 {
 		case value < 0:
 			return .01 * value
 		case value > 1:
-			return 1 + .01 * (value - 1)
+			return 1 + (value - 1) * .01
 		default:
 			return value
 		}

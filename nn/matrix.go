@@ -14,48 +14,61 @@ const (
 // Collection of neural network matrix parameters
 type Matrix struct {
 	Init    bool      // Matrix initialization flag
-	Size    int       // Количество слоёв в нейросети (Input + Hidden + Output)
-	Index   int       // Индекс выходного (последнего) слоя нейросети
-	Mode    uint8     // Идентификатор функции активации
-	Bias    float32   // Нейрон смещения: от 0 до 1
-	Rate    float32   // Коэффициент обучения, от 0 до 1
-	Limit   float32   // Минимальный (достаточный) уровень средней квадратичной суммы ошибки при обучения
-	Hidden  []int     // Массив количеств нейронов в каждом скрытом слое
-	Layer   []Layer   // Коллекция слоя
-	Synapse []Synapse // Коллекция весов связей
+
+	Mode    uint8     // Activation function mode
+	Bias    float32   // The neuron bias, 0 or 1
+	Rate    float32   // Learning coefficient, from 0 to 1
+	Limit   float32   // Minimum (sufficient) level of the average quadratic sum of the error during training
+
+	Size    int       // Number of layers in the neural network (Input + Hidden + Output)
+	Index   int       // Index of the output (last) layer of the neural network
+	Layer   []Layer	  // Layer of the neural network
+	Synapse	[]Synapse // The layer weights of connections
+
+	Neuron  [][]Neuron  //
+	Error   [][]Error	//
 }
 
 // Collection of neural layer parameters
 type Layer struct {
-	X      int      // Индекс слоя в матрице
-	Size   int      // Number of neurons in the layer
-	Neuron []Neuron //
-	Error  []Error  //
-}
-
-type Neuron struct {
-	X, Y       int     // X - индекс слоя в матрице, Y - индекс нейрона в слое
-	Value      float32 // Neuron value
-	Activation         //
-}
-
-type Error struct {
-	X, Y  int     //
-	Size  int     //
-	Value float32 // Neuron value
+	X		int      // Индекс слоя нейронов в матрице
+	Size	int      // Number of neurons in the layer
 }
 
 // Collection of weight parameters
 type Synapse struct {
-	Size   []int // Number of weight relationships {X, Y}, X-input (previous) layer, Y-output (next) layer
-	Weight       // Weight value
+	X		int		// Index of the weight layer in the matrix
+	Size	[]int	// Number of neurons in the layer
+}
+
+type Neuron struct {
+	X, Y	int					// X-index of the layer in the matrix, Y-index of the neuron in the layer
+	Value	float32				// Neuron value
+	N		*PrevNeuronLayer	//
+	W		*PrevWeightLayer	//
+}
+
+type Error struct {
+	X, Y	int					//
+	Value	float32				// Error value
+	E		*NextErrorLayer		//
+	W		*NextWeightLayer	//
+}
+
+type Weight struct {
+
 }
 
 type (
-	//Neuron []float32
-	//Error  []float32
-	Weight [][]float32
+	PrevNeuronLayer []float32
+	PrevWeightLayer []float32
+	NextErrorLayer  []float32
+	NextWeightLayer []float32
 )
+
+func (s *Neuron) Get() float32 {
+	return s.Value * 2
+}
 
 //+-------------------------------------------------------------+
 //| Synapse                                                     |
@@ -86,13 +99,13 @@ func (s *Synapse) Get() float32 {
 //| Weight                                                      |
 //+-------------------------------------------------------------+
 //
-func (w *Weight) Set() {
+/*func (w *Weight) Set() {
 }
 
 // Weights update function
 func (w *Weight) Get() float32 {
 	return 0
-}
+}*/
 
 //+-------------------------------------------------------------+
 //| Layer                                                       |
