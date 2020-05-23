@@ -3,7 +3,7 @@ package nn
 import "math"
 
 const (
-	IDENTITY  uint8 = 0 // Identity
+	LINEAR	  uint8 = 0 // Linear/Identity
 	SIGMOID   uint8 = 1 // Logistic, a.k.a. sigmoid or soft step
 	TANH      uint8 = 2 // TanH - hyperbolic
 	RELU      uint8 = 3 // ReLu - rectified linear unit
@@ -11,7 +11,7 @@ const (
 )
 
 type Activator interface {
-	Get(float32) float32
+	Get(float64) float64
 }
 
 type Activation struct {
@@ -22,28 +22,31 @@ type Derivative struct {
 	Mode uint8
 }
 
-
+func GetActivation(value float64, a Activator) float64 {
+	return a.Get(value)
+}
 
 //+-------------------------------------------------------------+
 //| Activation function                                         |
 //+-------------------------------------------------------------+
-func (a *Activation) Get(value float32) float32 {
+func (a *Activation) Get(value float64) float64 {
 	switch a.Mode {
 	default:
 		fallthrough
-	case IDENTITY:
+	case LINEAR:
 		return value
 	case SIGMOID:
-		return float32(1 / (1 + math.Pow(math.E, float64(-value))))
+		return 1 / (1 + math.Exp(-value))
 	case TANH:
-		value = float32(math.Pow(math.E, float64(2*value)))
+		value = math.Exp(2 * value)
+		if math.IsInf(value, 1) {
+			return 1
+		}
 		return (value - 1) / (value + 1)
 	case RELU:
 		switch {
 		case value < 0:
 			return 0
-		case value > 1:
-			return 1
 		default:
 			return value
 		}
@@ -51,8 +54,6 @@ func (a *Activation) Get(value float32) float32 {
 		switch {
 		case value < 0:
 			return .01 * value
-		case value > 1:
-			return 1 + (value - 1) * .01
 		default:
 			return value
 		}
@@ -62,19 +63,19 @@ func (a *Activation) Get(value float32) float32 {
 //+-------------------------------------------------------------+
 //| Derivative activation function                              |
 //+-------------------------------------------------------------+
-func (d *Derivative) Get(value float32) float32 {
+func (d *Derivative) Get(value float64) float64 {
 	switch d.Mode {
 	default:
 		fallthrough
-	case IDENTITY:
+	case LINEAR:
 		return 1
 	case SIGMOID:
 		return value * (1 - value)
 	case TANH:
-		return 1 - float32(math.Pow(float64(value), 2))
+		return 1 - math.Pow(value, 2)
 	case RELU:
 		switch {
-		case value <= 0:
+		case value < 0:
 			return 0
 		default:
 			return 1

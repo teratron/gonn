@@ -1,24 +1,77 @@
 package nn
 
 import (
-	_ "math/rand"
-	_ "time"
+	"math/rand"
+	"time"
 )
 
-const (
-	DEFRATE float32 = .3      // Default rate
-	MINLOSS float32 = .001    // The minimum value of the sum of the average square error at which the training is forcibly terminated
-	MAXITER int     = 1000000 // The maximum number of iterations after which training is forcibly terminated
+type Neuroner interface {
+	Set()
+}
+
+type Matrix struct {
+	isInit	bool
+	Neuron	[]Neuron
+	Axon	[]Axon
+	Bias
+	Neuroner
+}
+
+type Neuron struct {
+	Index	uint
+	Value	float64
+	Error	float64
+	Axon	[]float64
+}
+
+type Axon struct {
+	Index	uint
+	Weight	float64
+	Synapse	map[string]Neuroner // map["bias"]Neuroner, map["input"]Neuroner, map["output"]Neuroner
+}
+
+type (
+	Bias  float64
+	Input []float64
 )
+
+func (b *Bias) Set() {}
+
+// The function fills all weights with random numbers from -0.5 to 0.5
+func (m *Matrix) setWeight() {
+	rand.Seed(time.Now().UTC().UnixNano())
+	randWeight := func() float64 {
+		r := 0.
+		for r == 0 {
+			r = rand.Float64() - .5
+		}
+		return r
+	}
+	for _, a := range m.Axon {
+		if b, ok := a.Synapse["bias"]; !ok || (ok && *b.(*Bias) > 0) {
+			a.Weight = randWeight()
+		}
+	}
+}
+
+/*func (m *Matrix) Get() {
+	for i, v := range m.Neuron {
+
+	}
+}*/
+
+/*func (n *Neuron) Get() {
+	n.Value = n.Weight[n.Index] * 1
+}*/
 
 // Collection of neural network matrix parameters
-type Matrix struct {
+/*type Matrix struct {
 	isInit	bool      // Matrix initialization flag
 
 	Mode	uint8     // Activation function mode
-	Bias    float32   // The neuron bias, 0 or 1
-	Rate    float32   // Learning coefficient, from 0 to 1
-	Limit   float32   // Minimum (sufficient) level of the average quadratic sum of the error during training
+	Bias    float64   // The neuron bias, 0 or 1
+	Rate    float64   // Learning coefficient, from 0 to 1
+	Limit   float64   // Minimum (sufficient) level of the average quadratic sum of the error during training
 
 	//Size    int       // Number of layers in the neural network (Input + Hidden + Output)
 	//Index   int       // Index of the output (last) layer of the neural network
@@ -33,17 +86,24 @@ type Matrix struct {
 	//Error   [][]Error	//
 }
 
+type Setting struct {
+	Mode	uint8     // Activation function mode
+	Bias    float64   // The neuron bias, 0 or 1
+	Rate    float64   // Learning coefficient, from 0 to 1
+	Limit   float64   // Minimum (sufficient) level of the average quadratic sum of the error during training
+}
+
 // Collection of neural layer parameters
 type Input struct {
 	Size	int
-	Neuron	[]float32
+	Neuron	[]float64
 }
 
 type Output struct {
 	Size	int
-	Data	[]float32
-	Neuron	[]float32
-	Error	[]float32
+	Data	[]float64
+	Neuron	[]float64
+	Error	[]float64
 }
 
 type Hidden struct {
@@ -60,14 +120,14 @@ type Layer []struct {
 
 type Neuron struct {
 	X, Y	int					// X-index of the layer in the matrix, Y-index of the neuron in the layer
-	Value	float32				// Neuron value
+	Value	float64				// Neuron value
 	N		*PrevNeuronLayer	//
 	W		*PrevWeightLayer	//
 }
 
 type Error struct {
 	X, Y	int					//
-	Value	float32				// Error value
+	Value	float64				// Error value
 	E		*NextErrorLayer		//
 	W		*NextWeightLayer	//
 }
@@ -83,15 +143,15 @@ type Weight struct {
 }
 
 type (
-	PrevNeuronLayer []float32
-	PrevWeightLayer []float32
-	NextErrorLayer  []float32
-	NextWeightLayer []float32
-)
+	PrevNeuronLayer []float64
+	PrevWeightLayer []float64
+	NextErrorLayer  []float64
+	NextWeightLayer []float64
+)*/
 
-func (n *Neuron) Get() float32 {
+/*func (n *Neuron) Get() float64 {
 	return n.Value * 2
-}
+}*/
 
 //+-------------------------------------------------------------+
 //| Synapse                                                     |
@@ -114,9 +174,9 @@ func (n *Neuron) Get() float32 {
 }*/
 
 // Weights update function
-func (s *Synapse) Get() float32 {
+/*func (s *Synapse) Get() float64 {
 	return 0
-}
+}*/
 
 //+-------------------------------------------------------------+
 //| Weight                                                      |
@@ -126,7 +186,7 @@ func (s *Synapse) Get() float32 {
 }
 
 // Weights update function
-func (w *Weight) Get() float32 {
+func (w *Weight) Get() float64 {
 	return 0
 }*/
 
@@ -134,11 +194,11 @@ func (w *Weight) Get() float32 {
 //| Layer                                                       |
 //+-------------------------------------------------------------+
 //
-/*func (l *Layer) Get() float32 {
+/*func (l *Layer) Get() float64 {
 	for i := 1; i < m.Size; i++ {
 		n := i - 1
 		for j := 0; j < m.Layer[i].Size; j++ {
-			var sum float32 = 0
+			var sum float64 = 0
 			for k, v := range m.Layer[n].Neuron {
 				sum += v * m.Synapse[n].Weight[k][j]
 			}
@@ -156,8 +216,8 @@ func (w *Weight) Get() float32 {
 //| Neuron                                                      |
 //+-------------------------------------------------------------+
 // Function for calculating the values of neurons in a layer
-/*func (n *Neuron) Get() float32 {
-	var sum float32 = 0
+/*func (n *Neuron) Get() float64 {
+	var sum float64 = 0
 	x := n.X - 1
 	for k, v := range m.Layer[x].Neuron {
 		sum += v * m.Synapse[x].Weight[k][n.Y]
@@ -178,6 +238,6 @@ func (w *Weight) Get() float32 {
 }*/
 
 //
-func (e *Error) Get() float32 {
+/*func (e *Error) Get() float64 {
 	return 0
-}
+}*/

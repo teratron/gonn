@@ -5,12 +5,12 @@ type NN interface {
 	Train()
 	Query()
 	Test()
-	Getter
-	Setter
+	//Getter
+	//Setter
 }
 
-type Getter interface {
-	Get() float32
+/*type Getter interface {
+	Get() float64
 }
 
 type Setter interface {
@@ -21,5 +21,8 @@ type Checker interface {
 	Check()
 }
 
-type Processor interface{}
-type Settings interface{}
+type Settings interface{
+	Bias() Checker
+}
+
+type Processor interface{}*/
