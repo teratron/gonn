@@ -44,16 +44,37 @@ func main() {
 	fmt.Println(clr)*/
 
 
-	var mx nn.Matrix
+	/*var mx nn.Matrix
 	mx.Axon = make([]nn.Axon, 1)
 	mx.Axon[0].Synapse = make(map[string]nn.Neuroner)
 
-	a := nn.Bias(0)
-	fmt.Printf("%T %v %v\n", a, a, a + 1)
+	a := nn.Bias(4)
+	fmt.Printf("%T %v\n", a, a)
 	mx.Axon[0].Synapse["bias"] = &a
 
-	if b, ok := mx.Axon[0].Synapse["bias"]; ok && *b.(*nn.Bias) == 0 {
+	if b, ok := mx.Axon[0].Synapse["bias"]; ok && *b.(*nn.Bias) == 4 {
 		fmt.Printf("%T, %v\n", b, *b.(*nn.Bias))
 	}
 
+	n := nn.Neuron{Value: .5}
+	fmt.Printf("%T %v\n", n, n)
+
+	mx.Axon[0].Synapse["input"] = n
+	fmt.Printf("%T %v\n", mx.Axon[0].Synapse["input"], mx.Axon[0].Synapse["input"])
+
+	c := nn.Axon{
+		Synapse: map[string]nn.Neuroner{
+			"input": n,
+			"bias": &a,
+		},
+	}
+	fmt.Printf("%T %v\n", c, c)
+
+	in := c.Synapse["input"]
+	fmt.Printf("%T %v\n", in, in.(*nn.Neuron).Value) // method
+	//fmt.Printf("%T %v\n", in, in.(nn.Neuron).Value) // struct {Neuroner}*/
+
+
+	matrix := nn.New()
+	fmt.Println(matrix)
 }

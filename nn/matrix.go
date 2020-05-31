@@ -5,14 +5,15 @@ import (
 	"time"
 )
 
-type Neuroner interface {
-	Set()
+type Perceptron struct {
+
 }
 
 type Matrix struct {
 	isInit	bool
 	Neuron	[]Neuron
 	Axon	[]Axon
+	Loss
 	Bias
 	Neuroner
 }
@@ -21,7 +22,8 @@ type Neuron struct {
 	Index	uint
 	Value	float64
 	Error	float64
-	Axon	[]float64
+	Axon	[]Axon
+	//Neuroner
 }
 
 type Axon struct {
@@ -32,10 +34,37 @@ type Axon struct {
 
 type (
 	Bias  float64
+	Loss  float64
 	Input []float64
 )
 
+func (m Matrix) Init() {
+	panic("implement me")
+}
+
+func (m *Matrix) Train() {
+	panic("implement me")
+}
+
+func (m *Matrix) Query() {
+	panic("implement me")
+}
+
+func (m *Matrix) Test() {
+	panic("implement me")
+}
+
+func (n *Neuron) Set() {}
+func (b *Loss) Set() {}
 func (b *Bias) Set() {}
+
+func New() NN {
+	n := Matrix{
+		Loss:     .00001,
+		Bias:     0,
+	}
+	return &n
+}
 
 // The function fills all weights with random numbers from -0.5 to 0.5
 func (m *Matrix) setWeight() {
@@ -54,15 +83,23 @@ func (m *Matrix) setWeight() {
 	}
 }
 
+//
+/*func (m *Matrix) getNeuron() {
+	for _, n := range m.Neuron {
+		for _, a := range n.Axon {
+			n.Value += a.Weight * a.Synapse["input"].
+		}
+
+	}
+}*/
+
 /*func (m *Matrix) Get() {
 	for i, v := range m.Neuron {
 
 	}
 }*/
 
-/*func (n *Neuron) Get() {
-	n.Value = n.Weight[n.Index] * 1
-}*/
+
 
 // Collection of neural network matrix parameters
 /*type Matrix struct {

@@ -9,6 +9,10 @@ type NN interface {
 	//Setter
 }
 
+type Neuroner interface {
+	Set()
+}
+
 /*type Getter interface {
 	Get() float64
 }
