@@ -74,7 +74,15 @@ func main() {
 	fmt.Printf("%T %v\n", in, in.(*nn.Neuron).Value) // method
 	//fmt.Printf("%T %v\n", in, in.(nn.Neuron).Value) // struct {Neuroner}*/
 
+	/*var mx nn.Matrix
+	fmt.Println(mx.IsInit)*/
 
 	matrix := nn.New()
-	fmt.Println(matrix)
+	fmt.Printf("%T %v\n", matrix, matrix)
+
+	feedForward := nn.New().FeedForward()
+	fmt.Printf("%T %v\n", feedForward, feedForward)
+
+	perceptron  := nn.New().Perceptron()
+	fmt.Printf("%T %v\n", perceptron, perceptron)
 }

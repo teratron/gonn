@@ -5,15 +5,26 @@ type NN interface {
 	Train()
 	Query()
 	Test()
-	//Getter
-	//Setter
+}
+
+type Typer interface {
+	Perceptron()  NeuralNetwork
+	FeedForward() NeuralNetwork
+	RadialBasis() NeuralNetwork
+	Hopfield()    NeuralNetwork
 }
 
 type Neuroner interface {
 	Set()
 }
 
-/*type Getter interface {
+/*
+type GetterSetter interface {
+	Get() float64
+	Set()
+}
+
+type Getter interface {
 	Get() float64
 }
 
@@ -29,4 +40,5 @@ type Settings interface{
 	Bias() Checker
 }
 
-type Processor interface{}*/
+type Processor interface{}
+*/

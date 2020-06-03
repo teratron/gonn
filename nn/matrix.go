@@ -5,21 +5,34 @@ import (
 	"time"
 )
 
-type Perceptron struct {
+const (
+	DEFAULTRATE  float32 = .3		// Default rate
+	MINLOSSLIMIT float32 = 10e-33	// Минимальная величина средней квадратичной суммы ошибки при достижении которой обучение прекращается принудительно
+	MAXITER		 int     = 10e+05	// Максимальная количество итреаций по достижению которой обучение прекращается принудительно
 
-}
+	MSE			 uint8   = 0		// Mean Squared Error
+	RMSE		 uint8   = 1		// Root Mean Squared Error
+	ARCTAN		 uint8   = 2		// Arctan
+)
 
-type Matrix struct {
-	isInit	bool
+type NeuralNetwork struct {
+	Architecture	Typer // Type of neural network (configuration)
+	IsInit			bool
+	Rate			float32
+	LossMode		uint8
+	LossLimit
+
 	Neuron	[]Neuron
 	Axon	[]Axon
-	Loss
-	Bias
+
 	Neuroner
+	//Typer
+	//NN
 }
 
 type Neuron struct {
 	Index	uint
+	ModeActivation uint8
 	Value	float64
 	Error	float64
 	Axon	[]Axon
@@ -33,41 +46,33 @@ type Axon struct {
 }
 
 type (
-	Bias  float64
-	Loss  float64
-	Input []float64
+	Bias		float64
+	LossLimit	float64
+	Input		[]float64
 )
 
-func (m Matrix) Init() {
-	panic("implement me")
-}
+func (n *NeuralNetwork) Init()  {}
+func (n *NeuralNetwork) Train() {}
+func (n *NeuralNetwork) Query() {}
+func (n *NeuralNetwork) Test()  {}
 
-func (m *Matrix) Train() {
-	panic("implement me")
-}
+func (n *Neuron) Set()    {}
+func (l *LossLimit) Set() {}
+func (b *Bias) Set()      {}
 
-func (m *Matrix) Query() {
-	panic("implement me")
-}
-
-func (m *Matrix) Test() {
-	panic("implement me")
-}
-
-func (n *Neuron) Set() {}
-func (b *Loss) Set() {}
-func (b *Bias) Set() {}
-
-func New() NN {
-	n := Matrix{
-		Loss:     .00001,
-		Bias:     0,
+//
+func New() NeuralNetwork {
+	return NeuralNetwork{
+		IsInit:			false,
+		Rate:			.3,
+		LossMode:		MSE,
+		LossLimit:		.0001,
+		Architecture:	FeedForward{},
 	}
-	return &n
 }
 
 // The function fills all weights with random numbers from -0.5 to 0.5
-func (m *Matrix) setWeight() {
+func (n *NeuralNetwork) setWeight() {
 	rand.Seed(time.Now().UTC().UnixNano())
 	randWeight := func() float64 {
 		r := 0.
@@ -76,7 +81,7 @@ func (m *Matrix) setWeight() {
 		}
 		return r
 	}
-	for _, a := range m.Axon {
+	for _, a := range n.Axon {
 		if b, ok := a.Synapse["bias"]; !ok || (ok && *b.(*Bias) > 0) {
 			a.Weight = randWeight()
 		}
