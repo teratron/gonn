@@ -1,9 +1,10 @@
+//
 package nn
 
 import "math"
 
 const (
-	LINEAR	  uint8 = 0 // Linear/Identity
+	LINEAR    uint8 = 0 // Linear/Identity
 	SIGMOID   uint8 = 1 // Logistic, a.k.a. sigmoid or soft step
 	TANH      uint8 = 2 // TanH - hyperbolic
 	RELU      uint8 = 3 // ReLu - rectified linear unit

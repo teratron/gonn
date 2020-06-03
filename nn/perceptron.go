@@ -1,3 +1,4 @@
+//
 package nn
 
 type Perceptron struct {

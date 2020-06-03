@@ -6,24 +6,23 @@ import (
 )
 
 const (
-	DEFAULTRATE  float32 = .3		// Default rate
-	MINLOSSLIMIT float32 = 10e-33	// Минимальная величина средней квадратичной суммы ошибки при достижении которой обучение прекращается принудительно
-	MAXITER		 int     = 10e+05	// Максимальная количество итреаций по достижению которой обучение прекращается принудительно
-
-	MSE			 uint8   = 0		// Mean Squared Error
-	RMSE		 uint8   = 1		// Root Mean Squared Error
-	ARCTAN		 uint8   = 2		// Arctan
+	DEFAULTRATE  float32 = .3     // Default rate
+	MINLOSSLIMIT float32 = 10e-33 // Минимальная величина средней квадратичной суммы ошибки при достижении которой обучение прекращается принудительно
+	MAXITER      int     = 10e+05 // Максимальная количество итреаций по достижению которой обучение прекращается принудительно
+	MSE          uint8   = 0      // Mean Squared Error
+	RMSE         uint8   = 1      // Root Mean Squared Error
+	ARCTAN       uint8   = 2      // Arctan
 )
 
 type NeuralNetwork struct {
-	Architecture	Typer // Type of neural network (configuration)
-	IsInit			bool
-	Rate			float32
-	LossMode		uint8
+	Architecture Typer // Type of neural network (configuration)
+	IsInit       bool
+	Rate         float32
+	LossMode     uint8
 	LossLimit
 
-	Neuron	[]Neuron
-	Axon	[]Axon
+	Neuron []Neuron
+	Axon   []Axon
 
 	Neuroner
 	//Typer
@@ -31,24 +30,24 @@ type NeuralNetwork struct {
 }
 
 type Neuron struct {
-	Index	uint
+	Index          uint
 	ModeActivation uint8
-	Value	float64
-	Error	float64
-	Axon	[]Axon
+	Value          float64
+	Error          float64
+	Axon           []Axon
 	//Neuroner
 }
 
 type Axon struct {
-	Index	uint
-	Weight	float64
-	Synapse	map[string]Neuroner // map["bias"]Neuroner, map["input"]Neuroner, map["output"]Neuroner
+	Index   uint
+	Weight  float64
+	Synapse map[string]Neuroner // map["bias"]Neuroner, map["input"]Neuroner, map["output"]Neuroner
 }
 
 type (
-	Bias		float64
-	LossLimit	float64
-	Input		[]float64
+	Bias      float64
+	LossLimit float64
+	Input     []float64
 )
 
 func (n *NeuralNetwork) Init()  {}
@@ -63,11 +62,11 @@ func (b *Bias) Set()      {}
 //
 func New() NeuralNetwork {
 	return NeuralNetwork{
-		IsInit:			false,
-		Rate:			.3,
-		LossMode:		MSE,
-		LossLimit:		.0001,
-		Architecture:	FeedForward{},
+		IsInit:       false,
+		Rate:         .3,
+		LossMode:     MSE,
+		LossLimit:    .0001,
+		Architecture: FeedForward{},
 	}
 }
 
@@ -103,8 +102,6 @@ func (n *NeuralNetwork) setWeight() {
 
 	}
 }*/
-
-
 
 // Collection of neural network matrix parameters
 /*type Matrix struct {
