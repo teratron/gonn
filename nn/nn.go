@@ -8,10 +8,10 @@ type NN interface {
 }
 
 type Typer interface {
-	Perceptron()  NeuralNetwork
+	Perceptron() NeuralNetwork
 	FeedForward() NeuralNetwork
 	RadialBasis() NeuralNetwork
-	Hopfield()    NeuralNetwork
+	Hopfield() NeuralNetwork
 }
 
 type Neuroner interface {
@@ -40,5 +40,6 @@ type Settings interface{
 	Bias() Checker
 }
 
-type Processor interface{}
+type Processor interface{
+}
 */
