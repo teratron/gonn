@@ -7,8 +7,8 @@ import (
 
 const (
 	DEFAULTRATE  float32 = .3     // Default rate
-	MINLOSSLIMIT float32 = 10e-33 // Минимальная величина средней квадратичной суммы ошибки при достижении которой обучение прекращается принудительно
-	MAXITER      int     = 10e+05 // Максимальная количество итреаций по достижению которой обучение прекращается принудительно
+	MINLOSSLIMIT float32 = 10e-33 // The minimum value of the error limit at which training is forcibly terminated
+	MAXITERATION int     = 10e+05 // The maximum number of iterations after which training is forcibly terminated
 	MSE          uint8   = 0      // Mean Squared Error
 	RMSE         uint8   = 1      // Root Mean Squared Error
 	ARCTAN       uint8   = 2      // Arctan
@@ -20,6 +20,7 @@ type NeuralNetwork struct {
 	Rate         float32
 	LossMode     uint8
 	LossLimit
+	LossFunc func() float64
 
 	Neuron []Neuron
 	Axon   []Axon
@@ -63,7 +64,7 @@ func (b *Bias) Set()      {}
 func New() NeuralNetwork {
 	return NeuralNetwork{
 		IsInit:       false,
-		Rate:         .3,
+		Rate:         DEFAULTRATE,
 		LossMode:     MSE,
 		LossLimit:    .0001,
 		Architecture: FeedForward{},

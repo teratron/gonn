@@ -36,10 +36,10 @@ type Checker interface {
 	Check()
 }
 
-type Settings interface{
+type Settings interface {
 	Bias() Checker
 }
 
-type Processor interface{
+type Processor interface {
 }
 */
