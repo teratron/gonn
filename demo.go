@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/zigenzoog/gonn/nn"
-	_"image/color"
+	_ "image/color"
 )
 
 type Layer []Layer
@@ -42,7 +42,6 @@ func main() {
 
 	clr := color.Color(rgba)
 	fmt.Println(clr)*/
-
 
 	/*var mx nn.Matrix
 	mx.Axon = make([]nn.Axon, 1)
@@ -83,6 +82,6 @@ func main() {
 	feedForward := nn.New().FeedForward()
 	fmt.Printf("%T %v\n", feedForward, feedForward)
 
-	perceptron  := nn.New().Perceptron()
+	perceptron := nn.New().Perceptron()
 	fmt.Printf("%T %v\n", perceptron, perceptron)
 }
