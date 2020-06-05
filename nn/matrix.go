@@ -1,35 +1,41 @@
+//
 package nn
 
 import (
-	"math/rand"
-	"time"
+	"fmt"
+	_ "math/rand"
+	_ "time"
 )
 
 const (
-	DEFAULTRATE  float32 = .3     // Default rate
-	MINLOSSLIMIT float32 = 10e-33 // The minimum value of the error limit at which training is forcibly terminated
-	MAXITERATION int     = 10e+05 // The maximum number of iterations after which training is forcibly terminated
-	MSE          uint8   = 0      // Mean Squared Error
-	RMSE         uint8   = 1      // Root Mean Squared Error
-	ARCTAN       uint8   = 2      // Arctan
+	DefaultRate  float32 = .3     // Default rate
+	MinLossLimit float32 = 10e-33 // The minimum value of the error limit at which training is forcibly terminated
+	MaxIteration int     = 10e+05 // The maximum number of iterations after which training is forcibly terminated
+	ModeMSE      uint8   = 0      // Mean Squared Error
+	ModeRMSE     uint8   = 1      // Root Mean Squared Error
+	ModeARCTAN   uint8   = 2      // Arctan
 )
 
+//
 type NeuralNetwork struct {
-	Architecture Typer // Type of neural network (configuration)
+	Architecture // Type of neural network (configuration)
 	IsInit       bool
 	Rate         float32
-	LossMode     uint8
+
+	LossMode uint8
 	LossLimit
 	LossFunc func() float64
+
+	UpperLimit float64
+	LowerLimit float64
 
 	Neuron []Neuron
 	Axon   []Axon
 
-	Neuroner
-	//Typer
-	//NN
+	//Neuroner
 }
 
+//
 type Neuron struct {
 	Index          uint
 	ModeActivation uint8
@@ -39,15 +45,16 @@ type Neuron struct {
 	//Neuroner
 }
 
+//
 type Axon struct {
-	Index   uint
-	Weight  float64
-	Synapse map[string]Neuroner // map["bias"]Neuroner, map["input"]Neuroner, map["output"]Neuroner
+	Index  uint
+	Weight float64
+	//Synapse map[string]Neuroner // map["bias"]Neuroner, map["input"]Neuroner, map["output"]Neuroner
 }
 
 type (
-	Bias      float64
-	LossLimit float64
+	Bias      float32
+	LossLimit float32
 	Input     []float64
 )
 
@@ -56,23 +63,57 @@ func (n *NeuralNetwork) Train() {}
 func (n *NeuralNetwork) Query() {}
 func (n *NeuralNetwork) Test()  {}
 
-func (n *Neuron) Set()    {}
-func (l *LossLimit) Set() {}
-func (b *Bias) Set()      {}
+//
+func (n *NeuralNetwork) Set(s Setter) {
+	s.Set(n)
+}
+
+//
+func (b Bias) Set(s Setter) {
+	/*if n, ok := s.(*NeuralNetwork); ok {
+		//n.Architecture = FeedForward{Bias: b}
+		//fmt.Printf("1 %T %v\n", n.Architecture, n.Architecture)
+
+		b.Set(n.Architecture.(Setter))
+	}*/
+	if a, ok := s.(*NeuralNetwork).Architecture.(Setter); ok {
+		a = FeedForward{Bias: b}
+		fmt.Printf("2 %T %v\n", a, a)
+	}
+	//fmt.Printf("%T %v\n", s, s)
+}
+
+//
+func (n *NeuralNetwork) SetBias(bias Bias) {}
+
+//
+func (b Bias) Check() float32 {
+	switch {
+	case b < 0:
+		return 0
+	case b > 1:
+		return 1
+	default:
+		return float32(b)
+	}
+}
+
+//func (n *Neuron) Set() {}
+func (l LossLimit) Set(s Setter) {}
 
 //
 func New() NeuralNetwork {
 	return NeuralNetwork{
-		IsInit:       false,
-		Rate:         DEFAULTRATE,
-		LossMode:     MSE,
-		LossLimit:    .0001,
 		Architecture: FeedForward{},
+		IsInit:       false,
+		Rate:         DefaultRate,
+		LossMode:     ModeMSE,
+		LossLimit:    .0001,
 	}
 }
 
 // The function fills all weights with random numbers from -0.5 to 0.5
-func (n *NeuralNetwork) setWeight() {
+/*func (n *NeuralNetwork) setWeight() {
 	rand.Seed(time.Now().UTC().UnixNano())
 	randWeight := func() float64 {
 		r := 0.
@@ -86,7 +127,7 @@ func (n *NeuralNetwork) setWeight() {
 			a.Weight = randWeight()
 		}
 	}
-}
+}*/
 
 //
 /*func (m *Matrix) getNeuron() {

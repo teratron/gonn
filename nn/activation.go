@@ -4,11 +4,11 @@ package nn
 import "math"
 
 const (
-	LINEAR    uint8 = 0 // Linear/Identity
-	SIGMOID   uint8 = 1 // Logistic, a.k.a. sigmoid or soft step
-	TANH      uint8 = 2 // TanH - hyperbolic
-	RELU      uint8 = 3 // ReLu - rectified linear unit
-	LEAKYRELU uint8 = 4 // Leaky ReLu - leaky rectified linear unit
+	ModeLINEAR    uint8 = 0 // Linear/Identity
+	ModeSIGMOID   uint8 = 1 // Logistic, a.k.a. sigmoid or soft step
+	ModeTANH      uint8 = 2 // TanH - hyperbolic
+	ModeRELU      uint8 = 3 // ReLu - rectified linear unit
+	ModeLEAKYRELU uint8 = 4 // Leaky ReLu - leaky rectified linear unit
 )
 
 type Activator interface {
@@ -34,24 +34,24 @@ func (a *Activation) Get(value float64) float64 {
 	switch a.Mode {
 	default:
 		fallthrough
-	case LINEAR:
+	case ModeLINEAR:
 		return value
-	case SIGMOID:
+	case ModeSIGMOID:
 		return 1 / (1 + math.Exp(-value))
-	case TANH:
+	case ModeTANH:
 		value = math.Exp(2 * value)
 		if math.IsInf(value, 1) {
 			return 1
 		}
 		return (value - 1) / (value + 1)
-	case RELU:
+	case ModeRELU:
 		switch {
 		case value < 0:
 			return 0
 		default:
 			return value
 		}
-	case LEAKYRELU:
+	case ModeLEAKYRELU:
 		switch {
 		case value < 0:
 			return .01 * value
@@ -68,20 +68,20 @@ func (d *Derivative) Get(value float64) float64 {
 	switch d.Mode {
 	default:
 		fallthrough
-	case LINEAR:
+	case ModeLINEAR:
 		return 1
-	case SIGMOID:
+	case ModeSIGMOID:
 		return value * (1 - value)
-	case TANH:
+	case ModeTANH:
 		return 1 - math.Pow(value, 2)
-	case RELU:
+	case ModeRELU:
 		switch {
 		case value < 0:
 			return 0
 		default:
 			return 1
 		}
-	case LEAKYRELU:
+	case ModeLEAKYRELU:
 		switch {
 		case value < 0:
 			return .01

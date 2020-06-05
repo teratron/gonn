@@ -76,12 +76,20 @@ func main() {
 	/*var mx nn.Matrix
 	fmt.Println(mx.IsInit)*/
 
-	matrix := nn.New()
-	fmt.Printf("%T %v\n", matrix, matrix)
+	//mx := nn.New()
+	//fmt.Printf("%T %v\n", mx, mx)
 
-	feedForward := nn.New().FeedForward()
-	fmt.Printf("%T %v\n", feedForward, feedForward)
+	ff := nn.New().FeedForward()
+	//fmt.Printf("%T %v\n", ff, ff.Architecture.(nn.FeedForward).Bias)
 
-	perceptron := nn.New().Perceptron()
-	fmt.Printf("%T %v\n", perceptron, perceptron)
+	//p := nn.New().Perceptron()
+	//fmt.Printf("%T %v\n", p, p)
+
+	ff.Architecture = nn.FeedForward{Bias: 2}
+	fmt.Printf("%T %v\n", ff.Architecture.(nn.FeedForward).Bias, ff.Architecture.(nn.FeedForward).Bias)
+
+	ff.Set(nn.Bias(5))
+	//fmt.Printf("%T %v\n", ff.Architecture.(nn.FeedForward).Bias, ff.Architecture.(nn.FeedForward).Bias)
+
+	//ff.SetBias(5)
 }

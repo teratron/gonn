@@ -2,7 +2,7 @@
 package nn
 
 type Perceptron struct {
-	Typer
+	Architecture
 }
 
 func (n NeuralNetwork) Perceptron() NeuralNetwork {

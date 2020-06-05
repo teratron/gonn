@@ -1,3 +1,4 @@
+//
 package nn
 
 type NN interface {
@@ -7,31 +8,31 @@ type NN interface {
 	Test()
 }
 
-type Typer interface {
+type Architecture interface {
 	Perceptron() NeuralNetwork
 	FeedForward() NeuralNetwork
 	RadialBasis() NeuralNetwork
 	Hopfield() NeuralNetwork
 }
 
-type Neuroner interface {
+/*type Neuroner interface {
 	Set()
 }
-
-/*
+*/
 type GetterSetter interface {
-	Get() float64
-	Set()
+	Getter
+	Setter
 }
 
 type Getter interface {
-	Get() float64
+	Get() Getter
 }
 
 type Setter interface {
-	Set()
+	Set(Setter)
 }
 
+/*
 type Checker interface {
 	Check()
 }

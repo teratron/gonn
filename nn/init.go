@@ -9,10 +9,8 @@ func (m *Matrix) Init() {
 	//l := h.Layer
 	//n := m.Hidden.Layer[0].Neuron[0]
 }
-
 func (l *Synapse) Init() {
 }
-
 func (n *Neuron) Init() {
 }
 */
