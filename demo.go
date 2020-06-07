@@ -6,9 +6,25 @@ import (
 	_ "image/color"
 )
 
-type Layer []Layer
+/*type Parent struct {
+	child Child
+}
+type Child struct {
+	num int
+}
+
+func (p Parent) print() {
+	fmt.Println(p.child.num)
+}
+func (c Child) print() {
+	fmt.Println(c.num + 1)
+}*/
+
+//type Layer []Layer
 
 func main() {
+	/*parent := Parent{Child{2}}
+	defer parent.print()*/
 
 	/*var i interface{}
 	fmt.Printf("(%v, %T)\n", i, i)
@@ -77,19 +93,13 @@ func main() {
 	fmt.Println(mx.IsInit)*/
 
 	//mx := nn.New()
-	//fmt.Printf("%T %v\n", mx, mx)
-
 	ff := nn.New().FeedForward()
-	//fmt.Printf("%T %v\n", ff, ff.Architecture.(nn.FeedForward).Bias)
-
+	fmt.Println(ff.Specifier)
 	//p := nn.New().Perceptron()
-	//fmt.Printf("%T %v\n", p, p)
-
-	ff.Architecture = nn.FeedForward{Bias: 2}
-	fmt.Printf("%T %v\n", ff.Architecture.(nn.FeedForward).Bias, ff.Architecture.(nn.FeedForward).Bias)
 
 	ff.Set(nn.Bias(5))
-	//fmt.Printf("%T %v\n", ff.Architecture.(nn.FeedForward).Bias, ff.Architecture.(nn.FeedForward).Bias)
+	fmt.Println(ff.Specifier)
 
-	//ff.SetBias(5)
+	ff.SetBias(10)
+	fmt.Println(ff.Specifier)
 }

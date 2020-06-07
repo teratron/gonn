@@ -1,16 +1,12 @@
 package nn
 
-/*
-func (f FloatType) Init()  {
+//
+func New() NeuralNetwork {
+	return NeuralNetwork{
+		Specifier: &FeedForward{},
+		IsInit:    false,
+		Rate:      DefaultRate,
+		LossMode:  ModeMSE,
+		LossLimit: .0001,
+	}
 }
-func (m *Matrix) Init() {
-
-	//h := m.Hidden
-	//l := h.Layer
-	//n := m.Hidden.Layer[0].Neuron[0]
-}
-func (l *Synapse) Init() {
-}
-func (n *Neuron) Init() {
-}
-*/

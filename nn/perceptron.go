@@ -2,10 +2,13 @@
 package nn
 
 type Perceptron struct {
-	Architecture
+	Specifier
 }
 
 func (n NeuralNetwork) Perceptron() NeuralNetwork {
-	n.Architecture = Perceptron{}
+	n.Specifier = &Perceptron{}
 	return n
+}
+
+func (f *Perceptron) Set(setter Setter) {
 }

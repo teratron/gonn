@@ -2,7 +2,6 @@
 package nn
 
 import (
-	"fmt"
 	_ "math/rand"
 	_ "time"
 )
@@ -18,9 +17,9 @@ const (
 
 //
 type NeuralNetwork struct {
-	Architecture // Type of neural network (configuration)
-	IsInit       bool
-	Rate         float32
+	Specifier // Type of neural network (configuration)
+	IsInit    bool
+	Rate      float32
 
 	LossMode uint8
 	LossLimit
@@ -28,6 +27,8 @@ type NeuralNetwork struct {
 
 	UpperLimit float64
 	LowerLimit float64
+
+	Language string
 
 	Neuron []Neuron
 	Axon   []Axon
@@ -58,58 +59,53 @@ type (
 	Input     []float64
 )
 
-func (n *NeuralNetwork) Init()  {}
-func (n *NeuralNetwork) Train() {}
-func (n *NeuralNetwork) Query() {}
-func (n *NeuralNetwork) Test()  {}
-
 //
-func (n *NeuralNetwork) Set(s Setter) {
-	s.Set(n)
+func (n *NeuralNetwork) Set(setter Setter) {
+	setter.Set(n)
 }
 
-//
-func (b Bias) Set(s Setter) {
-	/*if n, ok := s.(*NeuralNetwork); ok {
-		//n.Architecture = FeedForward{Bias: b}
-		//fmt.Printf("1 %T %v\n", n.Architecture, n.Architecture)
+// Initialization Bias
+func (n *NeuralNetwork) SetBias(bias Bias) {
+	bias.Set(n)
+}
 
-		b.Set(n.Architecture.(Setter))
-	}*/
-	if a, ok := s.(*NeuralNetwork).Architecture.(Setter); ok {
-		a = FeedForward{Bias: b}
-		fmt.Printf("2 %T %v\n", a, a)
+func (b Bias) Set(setter Setter) {
+	b.Check()
+
+	if n, ok := setter.(*NeuralNetwork); ok {
+		n.Specifier.Set(b)
 	}
-	//fmt.Printf("%T %v\n", s, s)
 }
 
-//
-func (n *NeuralNetwork) SetBias(bias Bias) {}
-
-//
-func (b Bias) Check() float32 {
+// Checking Bias
+func (b Bias) Check() Checker {
 	switch {
 	case b < 0:
-		return 0
+		return Bias(0)
 	case b > 1:
-		return 1
+		return Bias(1)
 	default:
-		return float32(b)
+		return b
 	}
 }
 
 //func (n *Neuron) Set() {}
 func (l LossLimit) Set(s Setter) {}
 
-//
-func New() NeuralNetwork {
-	return NeuralNetwork{
-		Architecture: FeedForward{},
-		IsInit:       false,
-		Rate:         DefaultRate,
-		LossMode:     ModeMSE,
-		LossLimit:    .0001,
-	}
+func (n *NeuralNetwork) Initializing() {
+
+}
+
+func (n *NeuralNetwork) Training() {
+
+}
+
+func (n *NeuralNetwork) Querying() {
+
+}
+
+func (n *NeuralNetwork) Testing() {
+
 }
 
 // The function fills all weights with random numbers from -0.5 to 0.5
