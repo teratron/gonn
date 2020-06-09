@@ -94,12 +94,23 @@ func main() {
 
 	//mx := nn.New()
 	ff := nn.New().FeedForward()
-	fmt.Println(ff.Specifier)
+	fmt.Println(ff)
 	//p := nn.New().Perceptron()
 
-	ff.Set(nn.Bias(5))
+	ff.Set(nn.Bias(.5))
 	fmt.Println(ff.Specifier)
 
 	ff.SetBias(10)
 	fmt.Println(ff.Specifier)
+
+	ff2 := ff.Get()
+	fmt.Println(ff2)
+
+	b := ff.GetBias()
+	fmt.Println(b)
+
+	c := ff.Bias()
+	fmt.Printf("%T %v\n", c, c)
+
+
 }

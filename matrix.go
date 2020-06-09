@@ -1,5 +1,5 @@
 //
-package nn
+package main
 
 import (
 	_ "math/rand"
@@ -7,29 +7,41 @@ import (
 )
 
 const (
-	DefaultRate  float32 = .3     // Default rate
-	MinLossLimit float32 = 10e-33 // The minimum value of the error limit at which training is forcibly terminated
-	MaxIteration int     = 10e+05 // The maximum number of iterations after which training is forcibly terminated
-	ModeMSE      uint8   = 0      // Mean Squared Error
-	ModeRMSE     uint8   = 1      // Root Mean Squared Error
-	ModeARCTAN   uint8   = 2      // Arctan
+	DefaultRate  Rate      = .3     // Default rate
+	MinLossLimit LossLimit = 10e-33 // The minimum value of the error limit at which training is forcibly terminated
+	MaxIteration uint32    = 10e+05 // The maximum number of iterations after which training is forcibly terminated
+	ModeMSE      uint8     = 0      // Mean Squared Error
+	ModeRMSE     uint8     = 1      // Root Mean Squared Error
+	ModeARCTAN   uint8     = 2      // Arctan
+)
+
+type (
+	Rate      float32
+	Bias      float32
+	FloatType float32
+	LossLimit FloatType
+	Input     []FloatType
+
+	Coef		func() float32
 )
 
 //
 type NeuralNetwork struct {
 	Specifier // Type of neural network (configuration)
-	IsInit    bool
-	Rate      float32
-
+	isInit    bool
+	Rate
 	LossMode uint8
 	LossLimit
-	LossFunc func() float64
+	LossFunc func() LossLimit
 
-	UpperLimit float64
-	LowerLimit float64
+	//
+	UpperRange FloatType // Range, Bound, Limit, Scope
+	LowerRange FloatType
 
+	//
 	Language string
 
+	//
 	Neuron []Neuron
 	Axon   []Axon
 
@@ -38,46 +50,62 @@ type NeuralNetwork struct {
 
 //
 type Neuron struct {
-	Index          uint
-	ModeActivation uint8
-	Value          float64
-	Error          float64
+	Index          uint32
+	ActivationMode uint8
+	Value          FloatType
+	Error          FloatType
 	Axon           []Axon
 	//Neuroner
 }
 
 //
 type Axon struct {
-	Index  uint
-	Weight float64
+	Index  uint32
+	Weight FloatType
 	//Synapse map[string]Neuroner // map["bias"]Neuroner, map["input"]Neuroner, map["output"]Neuroner
 }
 
-type (
-	Bias      float32
-	LossLimit float32
-	Input     []float64
-)
-
-//
+//+-------------------------------------------------------------+
+//| Neural network                                              |
+//+-------------------------------------------------------------+
 func (n *NeuralNetwork) Set(setter Setter) {
 	setter.Set(n)
 }
 
-// Initialization Bias
+func (n *NeuralNetwork) Get() Getter {
+	return n
+}
+
+//+-------------------------------------------------------------+
+//| Neuron bias                                                 |
+//+-------------------------------------------------------------+
+// Initializing bias
 func (n *NeuralNetwork) SetBias(bias Bias) {
 	bias.Set(n)
 }
 
 func (b Bias) Set(setter Setter) {
-	b.Check()
-
 	if n, ok := setter.(*NeuralNetwork); ok {
-		n.Specifier.Set(b)
+		if bias, ok := b.Check().(Bias); ok {
+			n.Specifier.Set(bias)
+		}
 	}
 }
 
-// Checking Bias
+// Getting bias
+func (n *NeuralNetwork) GetBias() Bias {
+	return n.Specifier.(*FeedForward).Bias
+}
+
+func (n *NeuralNetwork) Bias() Bias {
+	return n.GetBias()
+}
+
+func (b Bias) Get() Getter {
+	return b
+}
+
+// Checking bias
 func (b Bias) Check() Checker {
 	switch {
 	case b < 0:
@@ -89,21 +117,40 @@ func (b Bias) Check() Checker {
 	}
 }
 
-//func (n *Neuron) Set() {}
-func (l LossLimit) Set(s Setter) {}
+//+-------------------------------------------------------------+
+//| Learning rate                                               |
+//+-------------------------------------------------------------+
+// Checking learning rate
+func (r Rate) Check() Checker {
+	switch {
+	case r < 0 || r > 1:
+		return DefaultRate
+	default:
+		return r
+	}
+}
 
+//
+func (l LossLimit) Set(setter Setter) {}
+
+//func (n *Neuron) Set() {}
+
+//
 func (n *NeuralNetwork) Initializing() {
 
 }
 
+//
 func (n *NeuralNetwork) Training() {
 
 }
 
+//
 func (n *NeuralNetwork) Querying() {
 
 }
 
+//
 func (n *NeuralNetwork) Testing() {
 
 }

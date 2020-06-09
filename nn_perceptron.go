@@ -1,5 +1,5 @@
 //
-package nn
+package main
 
 type Perceptron struct {
 	Specifier
@@ -10,5 +10,9 @@ func (n NeuralNetwork) Perceptron() NeuralNetwork {
 	return n
 }
 
-func (f *Perceptron) Set(setter Setter) {
+func (p *Perceptron) Set(setter Setter) {
+}
+
+func (p *Perceptron) Get() Getter {
+	return p
 }

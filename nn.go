@@ -1,11 +1,11 @@
 //
-package nn
+package main
 
 type NN interface {
 	Initializing()
 	Training()
 	Querying()
-	Testing()
+	Verifying()
 }
 
 type Specifier interface {
@@ -13,7 +13,6 @@ type Specifier interface {
 	FeedForward() NeuralNetwork
 	RadialBasis() NeuralNetwork
 	Hopfield() NeuralNetwork
-
 	GetterSetter
 }
 
@@ -33,6 +32,10 @@ type Setter interface {
 type Checker interface {
 	Check() Checker
 }
+
+/*type Parameter interface {
+	Bias() Bias
+}*/
 
 /*
 
