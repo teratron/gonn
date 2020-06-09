@@ -1,18 +1,18 @@
 //
 package nn
 
-type Perceptron struct {
-	Specifier
+type perceptron struct {
+	NeuralNetwork
 }
 
-func (n NeuralNetwork) Perceptron() NeuralNetwork {
-	n.Specifier = &Perceptron{}
+func (n *neuralNetwork) Perceptron() NeuralNetwork {
+	n.NeuralNetwork = &perceptron{}
 	return n
 }
 
-func (p *Perceptron) Set(setter Setter) {
+func (p *perceptron) Set(setter Setter) {
 }
 
-func (p *Perceptron) Get() Getter {
+func (p *perceptron) Get() Getter {
 	return p
 }

@@ -1,19 +1,36 @@
 //
 package nn
 
-type NN interface {
-	Initializing()
-	Training()
-	Querying()
-	Verifying()
+//
+type NeuralNetwork interface {
+	//
+	Perceptron() NeuralNetwork
+
+	//
+	FeedForward() NeuralNetwork
+
+	//
+	RadialBasis() NeuralNetwork
+
+	//
+	Hopfield() NeuralNetwork
+
+	GetterSetter
 }
 
-type Specifier interface {
-	Perceptron() NeuralNetwork
-	FeedForward() NeuralNetwork
-	RadialBasis() NeuralNetwork
-	Hopfield() NeuralNetwork
-	GetterSetter
+//
+type NN interface {
+	// Initializing
+	Init()
+
+	// Training
+	Train()
+
+	// Querying
+	Query()
+
+	// Verifying
+	Verify()
 }
 
 type GetterSetter interface {
@@ -33,12 +50,12 @@ type Checker interface {
 	Check() Checker
 }
 
-/*type Parameter interface {
-	Bias() Bias
-}*/
-
 /*
-
+type Parameter interface {
+	Bias() bias
+}
+*/
+/*
 type Neuroner interface {
 	Set()
 }
@@ -46,6 +63,6 @@ type Settings interface {
 	Bias() Checker
 }
 
-type Processor interface {
+type Processor interface { //manipulator
 }
 */

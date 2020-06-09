@@ -1,3 +1,4 @@
+//
 package lang
 
 var languages map[string]string

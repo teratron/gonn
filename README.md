@@ -33,23 +33,24 @@ func main() {
     n = nn.New().FeedForward()
     
     // Set
-    n.Set(nn.Bias(0))
-    // or
     n.SetBias(1)
+    // or
+    n.Set(nn.Bias(0))
 
     // Get
     b := n.GetBias()
     // or
-    b = n.Bias()}
+    b = n.Bias()
+}
 ```
 
 # Getting Started
 And you can run that simply as:
 
-    go run main.go
+    $ go run main.go
 
 # Documentation
 
 
 # Examples
-You can find examples of neural networks in the [examples repository](https://github.com/zigenzoog/gonn-example/).
+You can find examples of neural networks in the [examples repository](https://github.com/zigenzoog/gonn-examples/).

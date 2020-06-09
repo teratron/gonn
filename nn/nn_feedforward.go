@@ -1,31 +1,31 @@
 //
 package nn
 
-type FeedForward struct {
-	Bias
+type feedForward struct {
+	bias
 
 	HiddenLayer []uint32
 
-	Specifier // чтобы не создавать методы для всех типов нн
+	NeuralNetwork // чтобы не создавать методы для всех типов нн
 }
 
-func (n NeuralNetwork) FeedForward() NeuralNetwork {
-	n.Specifier = &FeedForward{
-		Bias: 1,
+func (n *neuralNetwork) FeedForward() NeuralNetwork {
+	n.NeuralNetwork = &feedForward{
+		bias: 1,
 		//HiddenLayer:
 	}
-	//n.Specifier.(*FeedForward).Bias = 1
+	//n.Architecture.(*feedForward).Bias = 1
 	return n
 }
 
-func (f *FeedForward) Set(setter Setter) {
+func (f *feedForward) Set(setter Setter) {
 	switch v := setter.(type) {
-	case Bias:
-		f.Bias = v
+	case bias:
+		f.bias = v
 	default:
 	}
 }
 
-func (f *FeedForward) Get() Getter {
+func (f *feedForward) Get() Getter {
 	return f
 }

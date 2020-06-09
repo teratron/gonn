@@ -1,3 +1,4 @@
+//
 package nn
 
 func init() {
@@ -5,14 +6,15 @@ func init() {
 
 //
 func New() NeuralNetwork {
-	return NeuralNetwork{
-		Specifier: &FeedForward{},
-		isInit:    false,
-		Rate:      DefaultRate,
-		LossMode:  ModeMSE,
-		LossLimit: .0001,
+	return &neuralNetwork{
+		NeuralNetwork: &feedForward{},
 
-		UpperRange: 1,
-		LowerRange: 0,
+		isInit:    false,
+		rate:      DefaultRate,
+		lossMode:  ModeMSE,
+		lossLimit: .0001,
+
+		upperRange: 1,
+		lowerRange: 0,
 	}
 }
