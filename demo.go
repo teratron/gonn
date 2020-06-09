@@ -100,11 +100,19 @@ func main() {
 	ff2 := ff.Get()
 	fmt.Println(ff2)
 
+	ff.Set(nn.Bias(.5))
+
+	b := ff.Bias()
+	b := ff.Get().Bias()
+	b := ff.Get(nn.Bias())
+
+	fmt.Printf("%T %v\n", b, b)
+
 	//ff.Set(nn.Bias(.5))
-	//fmt.Println(ff.Architecture)
+	//fmt.Println(ff.NeuralNetwork)
 
 	/*ff.SetBias(10)
-	fmt.Println(ff.Architecture)
+	fmt.Println(ff.NeuralNetwork)
 
 	b := ff.GetBias()
 	fmt.Println(b)

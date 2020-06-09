@@ -25,34 +25,35 @@ type (
 
 //
 type neuralNetwork struct {
-	NeuralNetwork // Architecture/type of neural network (configuration)
-	isInit    bool
+	network		NeuralNetwork // Architecture/type of neural network (configuration)
+
+	isInit		bool
 	rate
-	lossMode uint8
+	lossMode	uint8
 	lossLimit
-	lossFunc func() lossLimit
+	lossFunc	func() lossLimit
 
 	//
-	upperRange floatType // Range, Bound, Limit, Scope
-	lowerRange floatType
+	upperRange	floatType // Range, Bound, Limit, Scope
+	lowerRange	floatType
 
 	//
-	language string
+	language	string
 
 	//
-	neuron []neuron
-	axon   []axon
+	neuron		[]neuron
+	axon		[]axon
 
 	//Neuroner
 }
 
 //
 type neuron struct {
-	index          uint32
-	activationMode uint8
-	value          floatType
-	error          floatType
-	axon           []axon
+	index			uint32
+	activationMode	uint8
+	value			floatType
+	error			floatType
+	axon			[]axon
 	//Neuroner
 }
 
@@ -85,7 +86,7 @@ func (n *neuralNetwork) SetBias(bias bias) {
 func (b bias) Set(setter Setter) {
 	if n, ok := setter.(*neuralNetwork); ok {
 		if bias, ok := b.Check().(bias); ok {
-			n.NeuralNetwork.Set(bias)
+			n.network.Set(bias)
 		}
 	}
 }
@@ -96,12 +97,12 @@ func (b bias) Set(setter Setter) {
 }*/
 
 /*func (n *neuralNetwork) Bias() bias {
-	fmt.Printf("+++ %T %v\n", n.NeuralNetwork.Get(), n.NeuralNetwork.Get())
-	//return n.NeuralNetwork.Get().Bias()
-	return n.NeuralNetwork.(*feedForward).bias
+	fmt.Printf("+++ %T %v\n", n.network.Get(), n.network.Get())
+	//return n.network.Get().Bias()
+	return n.network.(*feedForward).bias
 }*/
 
-func Bias() {
+func (n *neuralNetwork) Bias() bias {
 }
 
 /*func (b Bias) Get() Getter {

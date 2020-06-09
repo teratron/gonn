@@ -10,10 +10,10 @@ type NeuralNetwork interface {
 	FeedForward() NeuralNetwork
 
 	//
-	RadialBasis() NeuralNetwork
+	//RadialBasis() NeuralNetwork
 
 	//
-	Hopfield() NeuralNetwork
+	//Hopfield() NeuralNetwork
 
 	GetterSetter
 }
@@ -50,11 +50,12 @@ type Checker interface {
 	Check() Checker
 }
 
-/*
 type Parameter interface {
 	Bias() bias
+
+	Getter
 }
-*/
+
 /*
 type Neuroner interface {
 	Set()

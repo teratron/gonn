@@ -6,7 +6,7 @@ type perceptron struct {
 }
 
 func (n *neuralNetwork) Perceptron() NeuralNetwork {
-	n.NeuralNetwork = &perceptron{}
+	n.network = &perceptron{}
 	return n
 }
 

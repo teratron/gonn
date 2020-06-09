@@ -10,7 +10,7 @@ type feedForward struct {
 }
 
 func (n *neuralNetwork) FeedForward() NeuralNetwork {
-	n.NeuralNetwork = &feedForward{
+	n.network = &feedForward{
 		bias: 1,
 		//HiddenLayer:
 	}
