@@ -1,5 +1,5 @@
 //
-package main
+package nn
 
 type Perceptron struct {
 	Specifier

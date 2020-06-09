@@ -1,5 +1,5 @@
 //
-package main
+package nn
 
 type NN interface {
 	Initializing()

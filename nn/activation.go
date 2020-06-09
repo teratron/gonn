@@ -1,5 +1,5 @@
 //
-package main
+package nn
 
 import "math"
 

@@ -1,5 +1,5 @@
 //
-package main
+package nn
 
 type FeedForward struct {
 	Bias
