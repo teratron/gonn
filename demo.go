@@ -92,21 +92,27 @@ func main() {
 	/*var mx nn.Matrix
 	fmt.Println(mx.IsInit)*/
 
-	//mx := nn.New()
-	ff := nn.New().FeedForward()
-	fmt.Println(ff)
+	//n := nn.New()
+	n := nn.New().FeedForward()
+	fmt.Println(n)
 	//p := nn.New().Perceptron()
-
-	ff2 := ff.Get()
+	//nn.Arguments(nn.Bias(.1), nn.Rate(.25))
+	//n.Set(nn.Arguments(nn.Bias(.1), nn.Rate(.33)))
+	fmt.Println(n.Bias())
+	n.Set(nn.Bias(.5))
+	fmt.Println(n.GetBias())
+	//fmt.Println(n.Get().Bias())
+	/*ff2 := ff.Get()
 	fmt.Println(ff2)
 
 	ff.Set(nn.Bias(.5))
 
-	b := ff.Bias()
-	b := ff.Get().Bias()
-	b := ff.Get(nn.Bias())
+	b := ff.Bias()*/
 
-	fmt.Printf("%T %v\n", b, b)
+	//b := ff.Get().Bias()
+	//b := ff.Get(nn.Bias())
+
+	//fmt.Printf("%T %v\n", b, b)
 
 	//ff.Set(nn.Bias(.5))
 	//fmt.Println(ff.NeuralNetwork)
@@ -117,7 +123,7 @@ func main() {
 	b := ff.GetBias()
 	fmt.Println(b)
 
-	b = ff.Bias()
+	b = n.Bias()
 	fmt.Printf("%T %v\n", b, b)*/
 
 	//b = ff.Get(nn.Bias())

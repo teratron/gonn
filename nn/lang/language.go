@@ -1,7 +1,7 @@
 //
 package lang
 
-var languages map[string]string
+/*var languages map[string]string
 
 func init() {
 	languages = make(map[string]string)
@@ -21,4 +21,4 @@ func Add(key, value string) {
 
 func GetAll() map[string]string {
 	return languages
-}
+}*/

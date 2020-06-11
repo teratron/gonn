@@ -38,9 +38,9 @@ func main() {
     n.Set(nn.Bias(0))
 
     // Get
-    b := n.GetBias()
+    b := n.Bias()
     // or
-    b = n.Bias()
+    b = n.GetBias()
 }
 ```
 

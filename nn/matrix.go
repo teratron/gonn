@@ -6,72 +6,14 @@ import (
 	_ "time"
 )
 
-const (
-	DefaultRate  rate      = .3     // Default rate
-	MinLossLimit lossLimit = 10e-33 // The minimum value of the error limit at which training is forcibly terminated
-	MaxIteration uint32    = 10e+05 // The maximum number of iterations after which training is forcibly terminated
-	ModeMSE      uint8     = 0      // Mean Squared Error
-	ModeRMSE     uint8     = 1      // Root Mean Squared Error
-	ModeARCTAN   uint8     = 2      // Arctan
-)
-
-type (
-	rate      float32
-	bias      float32
-	floatType float32
-	lossLimit floatType
-	inputSet  []floatType
-)
-
-//
-type neuralNetwork struct {
-	network		NeuralNetwork // Architecture/type of neural network (configuration)
-
-	isInit		bool
-	rate
-	lossMode	uint8
-	lossLimit
-	lossFunc	func() lossLimit
-
-	//
-	upperRange	floatType // Range, Bound, Limit, Scope
-	lowerRange	floatType
-
-	//
-	language	string
-
-	//
-	neuron		[]neuron
-	axon		[]axon
-
-	//Neuroner
-}
-
-//
-type neuron struct {
-	index			uint32
-	activationMode	uint8
-	value			floatType
-	error			floatType
-	axon			[]axon
-	//Neuroner
-}
-
-//
-type axon struct {
-	index  uint32
-	weight floatType
-	//Synapse map[string]Neuroner // map["bias"]Neuroner, map["input"]Neuroner, map["output"]Neuroner
-}
-
 //+-------------------------------------------------------------+
 //| Neural network                                              |
 //+-------------------------------------------------------------+
-func (n *neuralNetwork) Set(setter Setter) {
+func (n *zzNN) Set(setter Setter) {
 	setter.Set(n)
 }
 
-func (n *neuralNetwork) Get() Getter {
+func (n *zzNN) Get() Getter {
 	return n
 }
 
@@ -79,43 +21,37 @@ func (n *neuralNetwork) Get() Getter {
 //| Neuron bias                                                 |
 //+-------------------------------------------------------------+
 // Initializing bias
-func (n *neuralNetwork) SetBias(bias bias) {
-	bias.Set(n)
-}
-
-func (b bias) Set(setter Setter) {
-	if n, ok := setter.(*neuralNetwork); ok {
-		if bias, ok := b.Check().(bias); ok {
-			n.network.Set(bias)
+func (b Bias) Set(setter Setter) {
+	if n, ok := setter.(*zzNN); ok {
+		if bias, ok := b.Check().(Bias); ok {
+			n.architecture.Set(bias)
 		}
 	}
 }
 
-// Getting bias
-/*func (n *neuralNetwork) GetBias() bias {
-	return n.Bias()
-}*/
-
-/*func (n *neuralNetwork) Bias() bias {
-	fmt.Printf("+++ %T %v\n", n.network.Get(), n.network.Get())
-	//return n.network.Get().Bias()
-	return n.network.(*feedForward).bias
-}*/
-
-func (n *neuralNetwork) Bias() bias {
+func (n *zzNN) SetBias(bias Bias) {
+	bias.Set(n)
 }
 
-/*func (b Bias) Get() Getter {
-	return b
-}*/
+// Getting bias
+func (n *zzNN) Bias() (bias Bias) {
+	if v, ok := n.architecture.(NeuralNetwork); ok {
+		bias = v.Bias()
+	}
+	return
+}
+
+func (n *zzNN) GetBias() Bias {
+	return n.Bias()
+}
 
 // Checking bias
-func (b bias) Check() Checker {
+func (b Bias) Check() Checker {
 	switch {
 	case b < 0:
-		return bias(0)
+		return Bias(0)
 	case b > 1:
-		return bias(1)
+		return Bias(1)
 	default:
 		return b
 	}
@@ -125,7 +61,7 @@ func (b bias) Check() Checker {
 //| Learning rate                                               |
 //+-------------------------------------------------------------+
 // Checking learning rate
-func (r rate) Check() Checker {
+func (r Rate) Check() Checker {
 	switch {
 	case r < 0 || r > 1:
 		return DefaultRate
@@ -134,25 +70,29 @@ func (r rate) Check() Checker {
 	}
 }
 
+func (n *zzNN) Rate() Rate {
+	return n.rate
+}
+
 //
-func (l lossLimit) Set(setter Setter) {}
+func (l Loss) Set(setter Setter) {}
 
 //func (n *neuron) Set() {}
 
 //
-func (n *neuralNetwork) Init() {
+func (n *zzNN) Init() {
 }
 
 //
-func (n *neuralNetwork) Train() {
+func (n *zzNN) Train() {
 }
 
 //
-func (n *neuralNetwork) Query() {
+func (n *zzNN) Query() {
 }
 
 //
-func (n *neuralNetwork) Verify() {
+func (n *zzNN) Verify() {
 }
 
 // The function fills all weights with random numbers from -0.5 to 0.5

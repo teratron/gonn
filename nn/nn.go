@@ -3,6 +3,13 @@ package nn
 
 //
 type NeuralNetwork interface {
+	GetterSetter
+	Architecture
+	Parameter
+}
+
+//
+type Architecture interface {
 	//
 	Perceptron() NeuralNetwork
 
@@ -14,22 +21,20 @@ type NeuralNetwork interface {
 
 	//
 	//Hopfield() NeuralNetwork
-
-	GetterSetter
 }
 
 //
-type NN interface {
+type Processor interface {
 	// Initializing
 	Init()
 
 	// Training
 	Train()
 
-	// Querying
+	// Querying / forecast / prediction
 	Query()
 
-	// Verifying
+	// Verifying / validation
 	Verify()
 }
 
@@ -51,19 +56,58 @@ type Checker interface {
 }
 
 type Parameter interface {
-	Bias() bias
-
-	Getter
+	//Rate() Rate
+	Bias() Bias
+	GetBias() Bias
+	//GetterSetter
 }
 
+type Vertex interface {
+}
 /*
-type Neuroner interface {
-	Set()
-}
 type Settings interface {
 	Bias() Checker
 }
-
-type Processor interface { //manipulator
-}
 */
+
+type (
+	Float		float32
+	Rate		float32
+	Bias		float32
+	Loss		Float
+	//inputSet	[]Float
+)
+
+//
+type zzNN struct {
+	architecture	NeuralNetwork // Architecture/type of neural network (configuration)
+	isInit			bool
+	rate			Rate
+	modeLoss		uint8
+	limitLoss		Loss
+	upperRange		Float // Range, Bound, Limit, Scope
+	lowerRange		Float
+
+	//
+	language string
+
+	//
+	neuron []neuron
+	axon   []axon
+}
+
+//
+type neuron struct {
+	index			uint32
+	modeActivation	uint8
+	value			Float
+	error			Float
+	axon			[]axon
+}
+
+//
+type axon struct {
+	index	uint32
+	weight	Float
+	synapse	map[string]Vertex // map["bias"]Vertex, map["input"]Vertex, map["output"]Vertex
+}

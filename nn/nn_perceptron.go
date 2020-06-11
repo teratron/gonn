@@ -2,11 +2,12 @@
 package nn
 
 type perceptron struct {
-	NeuralNetwork
+	Architecture
+	Parameter
 }
 
-func (n *neuralNetwork) Perceptron() NeuralNetwork {
-	n.network = &perceptron{}
+func (n *zzNN) Perceptron() NeuralNetwork {
+	n.architecture = &perceptron{}
 	return n
 }
 
