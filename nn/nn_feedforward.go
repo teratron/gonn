@@ -7,7 +7,8 @@ type feedForward struct {
 	Architecture // чтобы не создавать методы для всех типов нн
 }
 
-func (n *zzNN) FeedForward() NeuralNetwork {
+// Initializing Feed Forward Neural Network
+func (n *NN) FeedForward() NeuralNetwork {
 	n.architecture = &feedForward{
 		bias: .1,
 	}
@@ -15,16 +16,21 @@ func (n *zzNN) FeedForward() NeuralNetwork {
 	return n
 }
 
-func (f *feedForward) Set(setter Setter) {
-	switch v := setter.(type) {
+func (f *feedForward) Set(arg GetterSetter) {
+	switch v := arg.(type) {
 	case Bias:
 		f.bias = v
 	default:
 	}
 }
 
-func (f *feedForward) Get() Getter {
+func (f *feedForward) Get() GetterSetter {
 	return f
+}
+
+// Bias
+func (f *feedForward) SetBias(bias Bias) {
+	f.Set(bias)
 }
 
 func (f *feedForward) Bias() Bias {
@@ -33,4 +39,17 @@ func (f *feedForward) Bias() Bias {
 
 func (f *feedForward) GetBias() Bias {
 	return f.Bias()
+}
+
+// Rate
+func (f *feedForward) Rate() Rate {
+	panic("implement me")
+}
+
+func (f *feedForward) GetRate() Rate {
+	panic("implement me")
+}
+
+func (f *feedForward) SetRate(Rate) {
+	panic("implement me")
 }

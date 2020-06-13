@@ -1,11 +1,14 @@
 //
 package nn
 
+// Declare conformity with NeuralNetwork interface
+var _ NeuralNetwork = (*NN)(nil)
+
 //
 type NeuralNetwork interface {
-	GetterSetter
 	Architecture
 	Parameter
+	//Processor
 }
 
 //
@@ -44,22 +47,27 @@ type GetterSetter interface {
 }
 
 type Getter interface {
-	Get() Getter
+	Get() GetterSetter
 }
 
 type Setter interface {
-	Set(Setter)
+	Set(GetterSetter)
 }
 
 type Checker interface {
-	Check() Checker
+	Check() GetterSetter
 }
 
 type Parameter interface {
-	//Rate() Rate
+	Rate() Rate
+	GetRate() Rate
+	SetRate(Rate)
+
 	Bias() Bias
 	GetBias() Bias
-	//GetterSetter
+	SetBias(Bias)
+
+	GetterSetter
 }
 
 type Vertex interface {
@@ -79,7 +87,7 @@ type (
 )
 
 //
-type zzNN struct {
+type NN struct {
 	architecture	NeuralNetwork // Architecture/type of neural network (configuration)
 	isInit			bool
 	rate			Rate

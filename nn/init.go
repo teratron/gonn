@@ -11,11 +11,12 @@ const (
 )
 
 func init() {
+	// log
 }
 
 // New returns a new neural network instance with the default parameters
 func New() NeuralNetwork {
-	return &zzNN{
+	return &NN{
 		architecture:	&feedForward{},
 		isInit:			false,
 		rate:			DefaultRate,
@@ -26,7 +27,7 @@ func New() NeuralNetwork {
 	}
 }
 
-func Arguments(param ...Parameter) /*Setter*/ {
+func Arguments(param ...GetterSetter) /*Setter*/ {
 	/*for _, p := range param {
 		if b, ok := p.(Bias); ok {
 			fmt.Println(b + 1)

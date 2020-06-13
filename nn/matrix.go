@@ -9,11 +9,11 @@ import (
 //+-------------------------------------------------------------+
 //| Neural network                                              |
 //+-------------------------------------------------------------+
-func (n *zzNN) Set(setter Setter) {
-	setter.Set(n)
+func (n *NN) Set(arg GetterSetter) {
+	arg.Set(n)
 }
 
-func (n *zzNN) Get() Getter {
+func (n *NN) Get() GetterSetter {
 	return n
 }
 
@@ -21,32 +21,36 @@ func (n *zzNN) Get() Getter {
 //| Neuron bias                                                 |
 //+-------------------------------------------------------------+
 // Initializing bias
-func (b Bias) Set(setter Setter) {
-	if n, ok := setter.(*zzNN); ok {
+func (b Bias) Set(arg GetterSetter) {
+	if n, ok := arg.(*NN); ok {
 		if bias, ok := b.Check().(Bias); ok {
 			n.architecture.Set(bias)
 		}
 	}
 }
 
-func (n *zzNN) SetBias(bias Bias) {
+func (n *NN) SetBias(bias Bias) {
 	bias.Set(n)
 }
 
 // Getting bias
-func (n *zzNN) Bias() (bias Bias) {
+func (n *NN) Bias() (bias Bias) {
 	if v, ok := n.architecture.(NeuralNetwork); ok {
 		bias = v.Bias()
 	}
 	return
 }
 
-func (n *zzNN) GetBias() Bias {
+func (n *NN) GetBias() Bias {
 	return n.Bias()
 }
 
+func (b Bias) Get() GetterSetter {
+	return b
+}
+
 // Checking bias
-func (b Bias) Check() Checker {
+func (b Bias) Check() GetterSetter {
 	switch {
 	case b < 0:
 		return Bias(0)
@@ -60,8 +64,28 @@ func (b Bias) Check() Checker {
 //+-------------------------------------------------------------+
 //| Learning rate                                               |
 //+-------------------------------------------------------------+
+func (r Rate) Get() GetterSetter {
+	panic("implement me")
+}
+
+func (r Rate) Set(GetterSetter) {
+	panic("implement me")
+}
+
+func (n *NN) Rate() Rate {
+	return n.rate
+}
+
+func (n *NN) GetRate() Rate {
+	panic("implement me")
+}
+
+func (n *NN) SetRate(Rate) {
+	panic("implement me")
+}
+
 // Checking learning rate
-func (r Rate) Check() Checker {
+func (r Rate) Check() GetterSetter {
 	switch {
 	case r < 0 || r > 1:
 		return DefaultRate
@@ -70,29 +94,25 @@ func (r Rate) Check() Checker {
 	}
 }
 
-func (n *zzNN) Rate() Rate {
-	return n.rate
-}
-
 //
-func (l Loss) Set(setter Setter) {}
+//func (l Loss) Set(setter Setter) {}
 
 //func (n *neuron) Set() {}
 
 //
-func (n *zzNN) Init() {
+func (n *NN) Init() {
 }
 
 //
-func (n *zzNN) Train() {
+func (n *NN) Train() {
 }
 
 //
-func (n *zzNN) Query() {
+func (n *NN) Query() {
 }
 
 //
-func (n *zzNN) Verify() {
+func (n *NN) Verify() {
 }
 
 // The function fills all weights with random numbers from -0.5 to 0.5

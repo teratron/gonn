@@ -6,14 +6,14 @@ type perceptron struct {
 	Parameter
 }
 
-func (n *zzNN) Perceptron() NeuralNetwork {
+func (n *NN) Perceptron() NeuralNetwork {
 	n.architecture = &perceptron{}
 	return n
 }
 
-func (p *perceptron) Set(setter Setter) {
+func (p *perceptron) Set(arg GetterSetter) {
 }
 
-func (p *perceptron) Get() Getter {
+func (p *perceptron) Get() GetterSetter {
 	return p
 }
