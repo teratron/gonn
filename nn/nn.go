@@ -9,6 +9,7 @@ type NeuralNetwork interface {
 	Architecture
 	Parameter
 	//Processor
+	Setter
 }
 
 //
@@ -47,15 +48,15 @@ type GetterSetter interface {
 }
 
 type Getter interface {
-	Get() GetterSetter
+	Get(...Getter) Setter
 }
 
 type Setter interface {
-	Set(GetterSetter)
+	Set(...Setter)
 }
 
 type Checker interface {
-	Check() GetterSetter
+	Check() Setter
 }
 
 type Parameter interface {
@@ -67,7 +68,6 @@ type Parameter interface {
 	GetBias() Bias
 	SetBias(Bias)
 
-	GetterSetter
 }
 
 type Vertex interface {

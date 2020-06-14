@@ -26,14 +26,3 @@ func New() NeuralNetwork {
 		lowerRange:		0,
 	}
 }
-
-func Arguments(param ...GetterSetter) /*Setter*/ {
-	/*for _, p := range param {
-		if b, ok := p.(Bias); ok {
-			fmt.Println(b + 1)
-		}
-		//fmt.Printf("%T %v\n", p, p)
-	}*/
-	//fmt.Printf("%T %v\n", param, param)
-	//return param
-}

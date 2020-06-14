@@ -2,6 +2,7 @@
 package nn
 
 import (
+	"fmt"
 	_ "math/rand"
 	_ "time"
 )
@@ -9,22 +10,28 @@ import (
 //+-------------------------------------------------------------+
 //| Neural network                                              |
 //+-------------------------------------------------------------+
-func (n *NN) Set(arg GetterSetter) {
-	arg.Set(n)
-}
-
-func (n *NN) Get() GetterSetter {
-	return n
+func (n *NN) Set(args ...Setter) {
+	if len(args) == 0 {
+		fmt.Printf("--- %T %v\n", args, args)
+	} else {
+		for _, v := range args {
+			if s, ok := v.(Setter); ok {
+				//fmt.Printf("--- %T %v\n", s, s)
+				s.Set(n)
+			}
+		}
+	}
 }
 
 //+-------------------------------------------------------------+
 //| Neuron bias                                                 |
 //+-------------------------------------------------------------+
 // Initializing bias
-func (b Bias) Set(arg GetterSetter) {
-	if n, ok := arg.(*NN); ok {
+func (b Bias) Set(args ...Setter) {
+	if n, ok := args[0].(*NN); ok {
 		if bias, ok := b.Check().(Bias); ok {
 			n.architecture.Set(bias)
+			//fmt.Printf("--- %T %v\n", s, s)
 		}
 	}
 }
@@ -45,12 +52,8 @@ func (n *NN) GetBias() Bias {
 	return n.Bias()
 }
 
-func (b Bias) Get() GetterSetter {
-	return b
-}
-
 // Checking bias
-func (b Bias) Check() GetterSetter {
+func (b Bias) Check() Setter {
 	switch {
 	case b < 0:
 		return Bias(0)
@@ -64,28 +67,30 @@ func (b Bias) Check() GetterSetter {
 //+-------------------------------------------------------------+
 //| Learning rate                                               |
 //+-------------------------------------------------------------+
-func (r Rate) Get() GetterSetter {
-	panic("implement me")
+// Initializing learning rate
+func (r Rate) Set(args ...Setter) {
+	if n, ok := args[0].(*NN); ok {
+		if rate, ok := r.Check().(Rate); ok {
+			n.rate = rate
+		}
+	}
 }
 
-func (r Rate) Set(GetterSetter) {
-	panic("implement me")
+func (n *NN) SetRate(rate Rate) {
+	rate.Set(n)
 }
 
+// Getting learning rate
 func (n *NN) Rate() Rate {
 	return n.rate
 }
 
 func (n *NN) GetRate() Rate {
-	panic("implement me")
-}
-
-func (n *NN) SetRate(Rate) {
-	panic("implement me")
+	return n.Rate()
 }
 
 // Checking learning rate
-func (r Rate) Check() GetterSetter {
+func (r Rate) Check() Setter {
 	switch {
 	case r < 0 || r > 1:
 		return DefaultRate

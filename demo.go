@@ -99,11 +99,14 @@ func main() {
 	//nn.Arguments(nn.Bias(.1), nn.Rate(.25))
 	//n.Set(nn.Arguments(nn.Bias(.1), nn.Rate(.33)))
 	fmt.Println(n.Bias()) //get
-	n.Set(nn.Bias(.5)) //set
+	n.Set(nn.Bias(.555), nn.Rate(.333)) //set
 	fmt.Println(n.GetBias()) //get
+	fmt.Println(n.Rate()) //get
+
 	n.SetBias(.4) //set
-	//fmt.Println(n.Get(nn.Bias())) //get
-	fmt.Printf("%T %v\n", n.Get(), n.Get())
+	fmt.Println(n.Bias())
+	n.Set()
+	//fmt.Printf("%T %v\n", n.Get(), n.Get())
 	/*ff2 := ff.Get()
 	fmt.Println(ff2)
 

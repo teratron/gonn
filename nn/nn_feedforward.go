@@ -5,6 +5,7 @@ type feedForward struct {
 	bias		Bias
 	hiddenLayer	[]uint32
 	Architecture // чтобы не создавать методы для всех типов нн
+	Parameter
 }
 
 // Initializing Feed Forward Neural Network
@@ -16,16 +17,14 @@ func (n *NN) FeedForward() NeuralNetwork {
 	return n
 }
 
-func (f *feedForward) Set(arg GetterSetter) {
-	switch v := arg.(type) {
+func (f *feedForward) Set(args ...Setter) {
+	switch v := args[0].(type) {
 	case Bias:
 		f.bias = v
+	/*case Rate:
+		f.rate = v*/
 	default:
 	}
-}
-
-func (f *feedForward) Get() GetterSetter {
-	return f
 }
 
 // Bias
@@ -39,17 +38,4 @@ func (f *feedForward) Bias() Bias {
 
 func (f *feedForward) GetBias() Bias {
 	return f.Bias()
-}
-
-// Rate
-func (f *feedForward) Rate() Rate {
-	panic("implement me")
-}
-
-func (f *feedForward) GetRate() Rate {
-	panic("implement me")
-}
-
-func (f *feedForward) SetRate(Rate) {
-	panic("implement me")
 }

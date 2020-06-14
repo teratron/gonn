@@ -11,9 +11,5 @@ func (n *NN) Perceptron() NeuralNetwork {
 	return n
 }
 
-func (p *perceptron) Set(arg GetterSetter) {
-}
-
-func (p *perceptron) Get() GetterSetter {
-	return p
+func (p *perceptron) Set(args ...Setter) {
 }
