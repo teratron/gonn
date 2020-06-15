@@ -3,6 +3,7 @@ package nn
 
 import (
 	"fmt"
+	"log"
 	_ "math/rand"
 	_ "time"
 )
@@ -12,7 +13,7 @@ import (
 //+-------------------------------------------------------------+
 func (n *NN) Set(args ...Setter) {
 	if len(args) == 0 {
-		fmt.Printf("--- %T %v\n", args, args)
+		log.Printf("Empty set %T\n", args)
 	} else {
 		for _, v := range args {
 			if s, ok := v.(Setter); ok {
@@ -23,6 +24,23 @@ func (n *NN) Set(args ...Setter) {
 	}
 }
 
+func (n *NN) Get(args ...Getter) Getter {
+	if len(args) == 0 {
+		log.Printf("%T %v\n", args, args)
+		return n
+	} else {
+		fmt.Printf("--- %T %v\n", args[0], args[0])
+		/*for _, v := range args {
+			if s, ok := v.(Setter); ok {
+				//fmt.Printf("--- %T %v\n", s, s)
+				//s.Set(n)
+			}
+		}*/
+	}
+	//panic("implement me")
+	return nil
+}
+
 //+-------------------------------------------------------------+
 //| Neuron bias                                                 |
 //+-------------------------------------------------------------+
@@ -31,7 +49,6 @@ func (b Bias) Set(args ...Setter) {
 	if n, ok := args[0].(*NN); ok {
 		if bias, ok := b.Check().(Bias); ok {
 			n.architecture.Set(bias)
-			//fmt.Printf("--- %T %v\n", s, s)
 		}
 	}
 }
@@ -52,8 +69,14 @@ func (n *NN) GetBias() Bias {
 	return n.Bias()
 }
 
+func (b Bias) Get(args ...Getter) Getter {
+	//panic("implement me")
+	fmt.Printf("--- %T %v\n", args, args)
+	return args[0]
+}
+
 // Checking bias
-func (b Bias) Check() Setter {
+func (b Bias) Check() Checker {
 	switch {
 	case b < 0:
 		return Bias(0)
@@ -90,7 +113,7 @@ func (n *NN) GetRate() Rate {
 }
 
 // Checking learning rate
-func (r Rate) Check() Setter {
+func (r Rate) Check() Checker {
 	switch {
 	case r < 0 || r > 1:
 		return DefaultRate
@@ -118,6 +141,14 @@ func (n *NN) Query() {
 
 //
 func (n *NN) Verify() {
+}
+
+//
+func forwardPropagation() {
+}
+
+//
+func backwardPropagation() {
 }
 
 // The function fills all weights with random numbers from -0.5 to 0.5

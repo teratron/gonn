@@ -17,12 +17,15 @@ func init() {
 // New returns a new neural network instance with the default parameters
 func New() NeuralNetwork {
 	return &NN{
-		architecture:	&feedForward{},
+		architecture:	&perceptron{},
 		isInit:			false,
 		rate:			DefaultRate,
 		modeLoss:		ModeMSE,
 		limitLoss:		.0001,
 		upperRange:		1,
 		lowerRange:		0,
+
+		language:		"en",
+		logging: 		true,
 	}
 }

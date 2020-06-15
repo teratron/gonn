@@ -30,7 +30,7 @@ func main() {
     // or
     n = nn.New().Perceptron()
     // or
-    n = nn.New().FeedForward()
+    n = nn.New().RadialBasis()
     
     // Set
     n.SetBias(1)

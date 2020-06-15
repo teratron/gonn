@@ -93,43 +93,19 @@ func main() {
 	fmt.Println(mx.IsInit)*/
 
 	//n := nn.New()
-	n := nn.New().FeedForward()
+	n := nn.New().Perceptron()
 	fmt.Println(n)
-	//p := nn.New().Perceptron()
-	//nn.Arguments(nn.Bias(.1), nn.Rate(.25))
-	//n.Set(nn.Arguments(nn.Bias(.1), nn.Rate(.33)))
+	//n := nn.New().RadialBasis()
+
 	fmt.Println(n.Bias()) //get
-	n.Set(nn.Bias(.555), nn.Rate(.333)) //set
+	n.Set() //empty set
+	n.Set(nn.Bias(.55), nn.Rate(.33)) //set
 	fmt.Println(n.GetBias()) //get
 	fmt.Println(n.Rate()) //get
 
-	n.SetBias(.4) //set
+	n.SetBias(1.4) //set
 	fmt.Println(n.Bias())
-	n.Set()
-	//fmt.Printf("%T %v\n", n.Get(), n.Get())
-	/*ff2 := ff.Get()
-	fmt.Println(ff2)
 
-	ff.Set(nn.Bias(.5))
-
-	b := ff.Bias()*/
-
-	//b := ff.Get().Bias()
-	//b := ff.Get(nn.Bias())
-
-	//fmt.Printf("%T %v\n", b, b)
-
-	//ff.Set(nn.Bias(.5))
-	//fmt.Println(ff.NeuralNetwork)
-
-	/*ff.SetBias(10)
-	fmt.Println(ff.NeuralNetwork)
-
-	b := ff.GetBias()
-	fmt.Println(b)
-
-	b = n.Bias()
-	fmt.Printf("%T %v\n", b, b)*/
-
-	//b = ff.Get(nn.Bias())
+	fmt.Println(n.Get()) //get
+	fmt.Println(n.Get(n.Bias())) //get
 }

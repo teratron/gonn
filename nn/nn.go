@@ -8,8 +8,9 @@ var _ NeuralNetwork = (*NN)(nil)
 type NeuralNetwork interface {
 	Architecture
 	Parameter
+	//Setter
+	GetterSetter
 	//Processor
-	Setter
 }
 
 //
@@ -18,13 +19,10 @@ type Architecture interface {
 	Perceptron() NeuralNetwork
 
 	//
-	FeedForward() NeuralNetwork
+	RadialBasis() NeuralNetwork
 
 	//
-	//RadialBasis() NeuralNetwork
-
-	//
-	//Hopfield() NeuralNetwork
+	Hopfield() NeuralNetwork
 }
 
 //
@@ -48,7 +46,7 @@ type GetterSetter interface {
 }
 
 type Getter interface {
-	Get(...Getter) Setter
+	Get(...Getter) Getter
 }
 
 type Setter interface {
@@ -56,7 +54,7 @@ type Setter interface {
 }
 
 type Checker interface {
-	Check() Setter
+	Check() Checker
 }
 
 type Parameter interface {
@@ -67,23 +65,16 @@ type Parameter interface {
 	Bias() Bias
 	GetBias() Bias
 	SetBias(Bias)
-
 }
 
 type Vertex interface {
 }
-/*
-type Settings interface {
-	Bias() Checker
-}
-*/
 
 type (
 	Float		float32
 	Rate		float32
 	Bias		float32
 	Loss		Float
-	//inputSet	[]Float
 )
 
 //
@@ -97,7 +88,8 @@ type NN struct {
 	lowerRange		Float
 
 	//
-	language string
+	language		string
+	logging			bool
 
 	//
 	neuron []neuron
