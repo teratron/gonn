@@ -2,7 +2,6 @@
 package nn
 
 import (
-	"fmt"
 	"log"
 	_ "math/rand"
 	_ "time"
@@ -29,7 +28,7 @@ func (n *NN) Get(args ...Getter) Getter {
 		log.Printf("%T %v\n", args, args)
 		return n
 	} else {
-		fmt.Printf("--- %T %v\n", args[0], args[0])
+		//fmt.Printf("--- %T %v\n", args[0], args[0])
 		/*for _, v := range args {
 			if s, ok := v.(Setter); ok {
 				//fmt.Printf("--- %T %v\n", s, s)
@@ -37,7 +36,6 @@ func (n *NN) Get(args ...Getter) Getter {
 			}
 		}*/
 	}
-	//panic("implement me")
 	return nil
 }
 
@@ -70,8 +68,7 @@ func (n *NN) GetBias() Bias {
 }
 
 func (b Bias) Get(args ...Getter) Getter {
-	//panic("implement me")
-	fmt.Printf("--- %T %v\n", args, args)
+	//fmt.Printf("--- %T %v\n", args, args)
 	return args[0]
 }
 
@@ -94,7 +91,8 @@ func (b Bias) Check() Checker {
 func (r Rate) Set(args ...Setter) {
 	if n, ok := args[0].(*NN); ok {
 		if rate, ok := r.Check().(Rate); ok {
-			n.rate = rate
+			//n.rate = rate
+			n.architecture.Set(rate)
 		}
 	}
 }
@@ -104,12 +102,19 @@ func (n *NN) SetRate(rate Rate) {
 }
 
 // Getting learning rate
-func (n *NN) Rate() Rate {
-	return n.rate
+func (n *NN) Rate() (rate Rate) {
+	if v, ok := n.architecture.(NeuralNetwork); ok {
+		rate = v.Rate()
+	}
+	return
 }
 
 func (n *NN) GetRate() Rate {
 	return n.Rate()
+}
+
+func (r Rate) Get(args ...Getter) Getter {
+	return args[0]
 }
 
 // Checking learning rate
@@ -119,6 +124,23 @@ func (r Rate) Check() Checker {
 		return DefaultRate
 	default:
 		return r
+	}
+}
+
+//+-------------------------------------------------------------+
+//| Limit loss                                        			|
+//+-------------------------------------------------------------+
+// Initializing limit loss
+
+// Getting limit loss
+
+// Checking limit loss
+func (l Loss) Check() Checker {
+	switch {
+	case l < 0:
+		return MinLimitLoss
+	default:
+		return l
 	}
 }
 

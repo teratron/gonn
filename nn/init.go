@@ -19,7 +19,7 @@ func New() NeuralNetwork {
 	return &NN{
 		architecture:	&perceptron{},
 		isInit:			false,
-		rate:			DefaultRate,
+		isTrain:		false,
 		modeLoss:		ModeMSE,
 		limitLoss:		.0001,
 		upperRange:		1,

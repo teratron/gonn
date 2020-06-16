@@ -3,15 +3,16 @@ package nn
 
 type perceptron struct {
 	bias		Bias
+	rate		Rate
 	hiddenLayer	[]uint32
 	Architecture // чтобы не создавать методы для всех типов нн
-	Parameter
 }
 
 // Initializing Feed Forward Neural Network
 func (n *NN) Perceptron() NeuralNetwork {
 	n.architecture = &perceptron{
-		bias: .1,
+		bias: 1,
+		rate: DefaultRate,
 	}
 	//n.network.(*perceptron).Bias = 1
 	return n
@@ -21,8 +22,8 @@ func (p *perceptron) Set(args ...Setter) {
 	switch v := args[0].(type) {
 	case Bias:
 		p.bias = v
-	/*case Rate:
-	f.rate = v*/
+	case Rate:
+		p.rate = v
 	default:
 	}
 }
@@ -41,5 +42,18 @@ func (p *perceptron) Bias() Bias {
 }
 
 func (p *perceptron) GetBias() Bias {
-	return p.Bias()
+	return p.bias
+}
+
+// Learning rate
+func (p *perceptron) SetRate(rate Rate) {
+	p.Set(rate)
+}
+
+func (p *perceptron) Rate() Rate {
+	return p.rate
+}
+
+func (p *perceptron) GetRate() Rate {
+	return p.rate
 }

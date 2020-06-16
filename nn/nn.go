@@ -8,7 +8,6 @@ var _ NeuralNetwork = (*NN)(nil)
 type NeuralNetwork interface {
 	Architecture
 	Parameter
-	//Setter
 	GetterSetter
 	//Processor
 }
@@ -58,13 +57,13 @@ type Checker interface {
 }
 
 type Parameter interface {
-	Rate() Rate
-	GetRate() Rate
-	SetRate(Rate)
-
 	Bias() Bias
 	GetBias() Bias
 	SetBias(Bias)
+
+	Rate() Rate
+	GetRate() Rate
+	SetRate(Rate)
 }
 
 type Vertex interface {
@@ -75,16 +74,20 @@ type (
 	Rate		float32
 	Bias		float32
 	Loss		Float
+	bias		*Bias
+	input		*neuron
+	output		*neuron
 )
 
 //
 type NN struct {
-	architecture	NeuralNetwork // Architecture/type of neural network (configuration)
-	isInit			bool
-	rate			Rate
+	architecture	NeuralNetwork	// Architecture/type of neural network (configuration)
+	isInit			bool			// Neural network initialization flag
+	isTrain			bool
+
 	modeLoss		uint8
-	limitLoss		Loss
-	upperRange		Float // Range, Bound, Limit, Scope
+	limitLoss		Loss			// Minimum (sufficient) level of the average of the error during training
+	upperRange		Float			// Range, Bound, Limit, Scope
 	lowerRange		Float
 
 	//
@@ -92,22 +95,20 @@ type NN struct {
 	logging			bool
 
 	//
-	neuron []neuron
-	axon   []axon
-}
-
-//
-type neuron struct {
-	index			uint32
-	modeActivation	uint8
-	value			Float
-	error			Float
+	neuron			[]neuron
 	axon			[]axon
 }
 
 //
+type neuron struct {
+	modeActivation	uint8
+	value			Float
+	error			Float
+	axon			*[...]axon
+}
+
+//
 type axon struct {
-	index	uint32
-	weight	Float
-	synapse	map[string]Vertex // map["bias"]Vertex, map["input"]Vertex, map["output"]Vertex
+	weight			Float				//
+	synapse			map[string]Vertex	// map["bias"]Vertex, map["input"]Vertex, map["output"]Vertex
 }
