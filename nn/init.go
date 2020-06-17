@@ -1,8 +1,6 @@
 //
 package nn
 
-import "log"
-
 const (
 	DefaultRate  Rate	= .3     // Default rate
 	MinLimitLoss Loss	= 10e-33 // The minimum value of the error limit at which training is forcibly terminated
@@ -13,7 +11,7 @@ const (
 )
 
 func init() {
-	log.Println("Start")
+	Log("Start", false)
 }
 
 // New returns a new neural network instance with the default parameters

@@ -2,8 +2,6 @@
 package nn
 
 import (
-	"fmt"
-	"log"
 	"math/rand"
 	"time"
 )
@@ -13,11 +11,10 @@ import (
 //+-------------------------------------------------------------+
 func (n *NN) Set(args ...Setter) {
 	if len(args) == 0 {
-		log.Printf("Empty set %T\n", args)
+		Log("Empty set", true)
 	} else {
 		for _, v := range args {
 			if s, ok := v.(Setter); ok {
-				fmt.Printf("--- %T %v\n", s, s)
 				s.Set(n)
 			}
 		}
@@ -26,7 +23,8 @@ func (n *NN) Set(args ...Setter) {
 
 func (n *NN) Get(args ...Getter) Getter {
 	if len(args) == 0 {
-		log.Printf("%T %v\n", args, args)
+		//log.Printf("Return %T %v\n", args, args)
+		Log("Return NN struct", true)
 		return n
 	} else {
 		//fmt.Printf("--- %T %v\n", args[0], args[0])
@@ -46,9 +44,7 @@ func (n *NN) Get(args ...Getter) Getter {
 // Initializing bias
 func (b Bias) Set(args ...Setter) {
 	if n, ok := args[0].(*NN); ok {
-		if bias, ok := b.Check().(Bias); ok {
-			n.architecture.Set(bias)
-		}
+		n.architecture.Set(b)
 	}
 }
 
@@ -74,7 +70,7 @@ func (b Bias) Get(args ...Getter) Getter {
 }
 
 // Checking bias
-func (b Bias) Check() Checker {
+/*func (b Bias) Check() Checker {
 	switch {
 	case b < 0:
 		return Bias(0)
@@ -83,7 +79,7 @@ func (b Bias) Check() Checker {
 	default:
 		return b
 	}
-}
+}*/
 
 //+-------------------------------------------------------------+
 //| Learning rate                                               |
@@ -92,7 +88,6 @@ func (b Bias) Check() Checker {
 func (r Rate) Set(args ...Setter) {
 	if n, ok := args[0].(*NN); ok {
 		if rate, ok := r.Check().(Rate); ok {
-			//n.rate = rate
 			n.architecture.Set(rate)
 		}
 	}
@@ -145,34 +140,38 @@ func (l Loss) Check() Checker {
 	}
 }
 
-
 //+-------------------------------------------------------------+
 //| Number of neurons in each hidden layer                      |
 //+-------------------------------------------------------------+
-/*func (h hidden) Set(args ...Setter) {
-	panic("implement me")
-}*/
-
-func (n *NN) SetHidden(args ...uint16) {
-	if v, ok := n.architecture.(NeuralNetwork); ok {
-		//fmt.Printf("--- %T %v\n", v, v)
-		v.SetHidden(args...)
+func (h Hidden) Set(args ...Setter) {
+	if n, ok := args[0].(*NN); ok {
+		if v, ok := n.architecture.(NeuralNetwork); ok {
+			v.Set(h)
+		}
 	}
 }
 
-func (n *NN) GetHidden() []uint16 {
+func (n *NN) SetHiddenLayer(args ...hidden) {
+	if v, ok := n.architecture.(NeuralNetwork); ok {
+		v.SetHiddenLayer(args...)
+	}
+}
+
+func (h Hidden) Get(args ...Getter) Getter {
+	panic("implement me")
+}
+
+func (n *NN) GetHiddenLayer() Hidden {
 	if v, ok := n.architecture.(NeuralNetwork); ok {
 		//fmt.Printf("--- %T %v\n", v, v)
-		return v.GetHidden()
+		return v.GetHiddenLayer()
 	}
 	return nil
 }
 
-//func Hidden(args ...uint16) hidden {
-//	return nil
-//}
-
-
+func HiddenLayer(args ...hidden) Hidden {
+	return args
+}
 
 //
 //func (l Loss) Set(setter Setter) {}
@@ -210,7 +209,7 @@ func (n *NN) setWeight() {
 		return Float(r)
 	}
 	for _, a := range n.axon {
-		if b, ok := a.synapse["bias"]; !ok || (ok && *b.(*Bias) > 0) {
+		if b, ok := a.synapse["bias"]; !ok || (ok && b.(Bias) == true) {
 			a.weight = randWeight()
 		}
 	}

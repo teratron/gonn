@@ -1,15 +1,13 @@
 //
 package nn
 
-import "fmt"
-
 type perceptron struct {
 	bias			Bias
 	rate			Rate
 	modeLoss		uint8
 	limitLoss		Loss		// Minimum (sufficient) level of the average of the error during training
 	numHidden		uint16		// Number of hidden layers in the neural network
-	numNeuronHidden	[]uint16		// Array of the number of neurons in each hidden layer
+	numNeuronHidden	Hidden		// Array of the number of neurons in each hidden layer
 	lastIndexNeuron uint32		// Index of the output (last) layer of the neural network
 	lastIndexAxon	uint32		//
 
@@ -26,11 +24,11 @@ func (n *NN) Perceptron() NeuralNetwork {
 		//numHidden:			0,
 		//numNeuronHidden:	nil, //[]uint16{},
 	}
-	if a, ok := n.architecture.(*perceptron); ok {
+	/*if a, ok := n.architecture.(*perceptron); ok {
 		//a.numNeuronHidden = make([]uint16, 0)
 		//a.numHidden = uint16(len(a.numNeuronHidden))
-		fmt.Println("*****", a.numHidden, a.numNeuronHidden)
-	}
+		//fmt.Println("*****", a.numHidden, a.numNeuronHidden)
+	}*/
 
 	return n
 }
@@ -41,9 +39,8 @@ func (p *perceptron) Set(args ...Setter) {
 		p.bias = v
 	case Rate:
 		p.rate = v
-	/*case hidden:
-		p.numNeuronHidden = v*/
-
+	case Hidden:
+		p.numNeuronHidden = v
 	default:
 	}
 }
@@ -54,7 +51,7 @@ func (p *perceptron) Get(args ...Getter) Getter {
 
 // Bias
 func (p *perceptron) SetBias(bias Bias) {
-	p.Set(bias)
+	p.bias = bias
 }
 
 func (p *perceptron) Bias() Bias {
@@ -67,7 +64,7 @@ func (p *perceptron) GetBias() Bias {
 
 // Learning rate
 func (p *perceptron) SetRate(rate Rate) {
-	p.Set(rate)
+	p.rate = rate
 }
 
 func (p *perceptron) Rate() Rate {
@@ -81,10 +78,10 @@ func (p *perceptron) GetRate() Rate {
 // Limit loss
 
 // Number of neurons in each hidden layer
-func (p *perceptron) SetHidden(args ...uint16) {
+func (p *perceptron) SetHiddenLayer(args ...hidden) {
 	p.numNeuronHidden = args
 }
 
-func (p *perceptron) GetHidden() []uint16 {
+func (p *perceptron) GetHiddenLayer() Hidden {
 	return p.numNeuronHidden
 }

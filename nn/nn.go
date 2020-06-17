@@ -65,8 +65,8 @@ type Parameter interface {
 	GetRate() Rate
 	SetRate(Rate)
 
-	GetHidden() []uint16
-	SetHidden(...uint16)
+	GetHiddenLayer() Hidden
+	SetHiddenLayer(...hidden)
 }
 
 type Vertex interface {
@@ -74,12 +74,12 @@ type Vertex interface {
 
 type (
 	Float			float32
+	Bias			bool
 	Rate			float32
-	Bias			float32
 	Loss			Float
 
-	//hidden			func(...uint16) hidden
-	//hidden			[]uint16
+	hidden			uint16
+	Hidden			[]hidden
 
 	bias			*Bias
 	input			*neuron

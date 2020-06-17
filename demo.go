@@ -99,18 +99,19 @@ func main() {
 
 	fmt.Println(n.Bias()) //get
 	n.Set() //empty set
-	n.Set(nn.Bias(.55), nn.Rate(.33)) //set
+	n.Set(nn.Bias(true), nn.Rate(.33), nn.HiddenLayer(1, 5, 9)) //set
 	fmt.Println(n.GetBias()) //get
 	fmt.Println(n.Rate()) //get
 
-	n.SetBias(1.4) //set
+	n.SetBias(false) //set
 	fmt.Println(n.Bias())
 
 	fmt.Println(n.Get()) //get
-	fmt.Println(n.Get(n.Bias())) //get
+	fmt.Println("+",n.Get(n.Bias())) //get
 
-	//n.Set(nn.Hidden(3, 5, 9))
-	//fmt.Println(n.Get(nn.Hidden())) //get
-	n.SetHidden(9, 5, 3)
-	fmt.Println(n.GetHidden()) //get
+	n.Set(nn.HiddenLayer(3, 5, 7))
+	fmt.Println(n.GetHiddenLayer()) //get
+	fmt.Println(n.Get(nn.HiddenLayer())) //get
+	n.SetHiddenLayer(7, 5, 3)
+	fmt.Println(n.GetHiddenLayer()) //get
 }

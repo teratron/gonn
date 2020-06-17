@@ -1,4 +1,4 @@
-//
+// under construction
 package nn
 
 type hopfield struct {
