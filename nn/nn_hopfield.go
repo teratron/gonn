@@ -6,6 +6,7 @@ type hopfield struct {
 	Parameter
 }
 
+// Initializing Hopfield Neural Network
 func (n *NN) Hopfield() NeuralNetwork {
 	n.architecture = &hopfield{}
 	return n

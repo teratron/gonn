@@ -2,9 +2,10 @@
 package nn
 
 import (
+	"fmt"
 	"log"
-	_ "math/rand"
-	_ "time"
+	"math/rand"
+	"time"
 )
 
 //+-------------------------------------------------------------+
@@ -16,7 +17,7 @@ func (n *NN) Set(args ...Setter) {
 	} else {
 		for _, v := range args {
 			if s, ok := v.(Setter); ok {
-				//fmt.Printf("--- %T %v\n", s, s)
+				fmt.Printf("--- %T %v\n", s, s)
 				s.Set(n)
 			}
 		}
@@ -144,14 +145,39 @@ func (l Loss) Check() Checker {
 	}
 }
 
+
+//+-------------------------------------------------------------+
+//| Number of neurons in each hidden layer                      |
+//+-------------------------------------------------------------+
+/*func (h hidden) Set(args ...Setter) {
+	panic("implement me")
+}*/
+
+func (n *NN) SetHidden(args ...uint16) {
+	if v, ok := n.architecture.(NeuralNetwork); ok {
+		//fmt.Printf("--- %T %v\n", v, v)
+		v.SetHidden(args...)
+	}
+}
+
+func (n *NN) GetHidden() []uint16 {
+	if v, ok := n.architecture.(NeuralNetwork); ok {
+		//fmt.Printf("--- %T %v\n", v, v)
+		return v.GetHidden()
+	}
+	return nil
+}
+
+//func Hidden(args ...uint16) hidden {
+//	return nil
+//}
+
+
+
 //
 //func (l Loss) Set(setter Setter) {}
 
 //func (n *neuron) Set() {}
-
-//
-func (n *NN) Init() {
-}
 
 //
 func (n *NN) Train() {
@@ -174,34 +200,28 @@ func backwardPropagation() {
 }
 
 // The function fills all weights with random numbers from -0.5 to 0.5
-/*func (n *neuralNetwork) setWeight() {
+func (n *NN) setWeight() {
 	rand.Seed(time.Now().UTC().UnixNano())
-	randWeight := func() float64 {
+	randWeight := func() Float {
 		r := 0.
 		for r == 0 {
 			r = rand.Float64() - .5
 		}
-		return r
+		return Float(r)
 	}
-	for _, a := range n.Axon {
-		if b, ok := a.Synapse["bias"]; !ok || (ok && *b.(*Bias) > 0) {
-			a.Weight = randWeight()
+	for _, a := range n.axon {
+		if b, ok := a.synapse["bias"]; !ok || (ok && *b.(*Bias) > 0) {
+			a.weight = randWeight()
 		}
 	}
-}*/
+}
 
 //
-/*func (m *Matrix) getNeuron() {
+/*func (m *NN) getNeuron() {
 	for _, n := range m.Neuron {
 		for _, a := range n.Axon {
 			n.Value += a.Weight * a.Synapse["input"].
 		}
-
-	}
-}*/
-
-/*func (m *Matrix) Get() {
-	for i, v := range m.Neuron {
 
 	}
 }*/

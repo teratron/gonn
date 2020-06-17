@@ -6,6 +6,7 @@ type radialBasis struct {
 	Parameter
 }
 
+// Initializing Radial Basis Neural Network
 func (n *NN) RadialBasis() NeuralNetwork {
 	n.architecture = &radialBasis{}
 	return n

@@ -64,19 +64,26 @@ type Parameter interface {
 	Rate() Rate
 	GetRate() Rate
 	SetRate(Rate)
+
+	GetHidden() []uint16
+	SetHidden(...uint16)
 }
 
 type Vertex interface {
 }
 
 type (
-	Float		float32
-	Rate		float32
-	Bias		float32
-	Loss		Float
-	bias		*Bias
-	input		*neuron
-	output		*neuron
+	Float			float32
+	Rate			float32
+	Bias			float32
+	Loss			Float
+
+	//hidden			func(...uint16) hidden
+	//hidden			[]uint16
+
+	bias			*Bias
+	input			*neuron
+	output			*neuron
 )
 
 //
@@ -85,8 +92,6 @@ type NN struct {
 	isInit			bool			// Neural network initialization flag
 	isTrain			bool
 
-	modeLoss		uint8
-	limitLoss		Loss			// Minimum (sufficient) level of the average of the error during training
 	upperRange		Float			// Range, Bound, Limit, Scope
 	lowerRange		Float
 
@@ -104,7 +109,7 @@ type neuron struct {
 	modeActivation	uint8
 	value			Float
 	error			Float
-	axon			*[...]axon
+	axon			[]axon
 }
 
 //

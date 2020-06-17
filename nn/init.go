@@ -1,6 +1,8 @@
 //
 package nn
 
+import "log"
+
 const (
 	DefaultRate  Rate	= .3     // Default rate
 	MinLimitLoss Loss	= 10e-33 // The minimum value of the error limit at which training is forcibly terminated
@@ -11,7 +13,7 @@ const (
 )
 
 func init() {
-	// log
+	log.Println("Start")
 }
 
 // New returns a new neural network instance with the default parameters
@@ -20,12 +22,15 @@ func New() NeuralNetwork {
 		architecture:	&perceptron{},
 		isInit:			false,
 		isTrain:		false,
-		modeLoss:		ModeMSE,
-		limitLoss:		.0001,
 		upperRange:		1,
 		lowerRange:		0,
 
 		language:		"en",
 		logging: 		true,
 	}
+}
+
+//
+func (n *NN) Init(input, target []Float) bool {
+	return true
 }

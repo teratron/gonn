@@ -108,4 +108,9 @@ func main() {
 
 	fmt.Println(n.Get()) //get
 	fmt.Println(n.Get(n.Bias())) //get
+
+	//n.Set(nn.Hidden(3, 5, 9))
+	//fmt.Println(n.Get(nn.Hidden())) //get
+	n.SetHidden(9, 5, 3)
+	fmt.Println(n.GetHidden()) //get
 }
