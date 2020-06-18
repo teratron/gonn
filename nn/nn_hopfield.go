@@ -7,7 +7,7 @@ type hopfield struct {
 }
 
 // Initializing Hopfield Neural Network
-func (n *NN) Hopfield() NeuralNetwork {
+func (n *nn) Hopfield() NeuralNetwork {
 	n.architecture = &hopfield{}
 	return n
 }

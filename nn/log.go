@@ -14,7 +14,7 @@ type logs struct {
 
 //
 func Log(reason string, info bool) {
-	if info {
+	if !info {
 		log.Println(reason)
 	} else if _, file, line, ok := runtime.Caller(1); ok {
 		log.Printf("%v, at: %s:%d\n", reason, file, line)
@@ -29,7 +29,6 @@ func LogError(reason string, err error) {
 	if err != nil {
 		log.Println("\tCause:", err)
 	}
-
 	if _, file, line, ok := runtime.Caller(1); ok {
 		log.Printf("\tAt: %s:%d", file, line)
 	}

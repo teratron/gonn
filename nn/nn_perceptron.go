@@ -4,10 +4,13 @@ package nn
 type perceptron struct {
 	bias			Bias
 	rate			Rate
+
 	modeLoss		uint8
-	limitLoss		Loss		// Minimum (sufficient) level of the average of the error during training
-	numHidden		uint16		// Number of hidden layers in the neural network
+	levelLoss		Loss		// Minimum (sufficient) level of the average of the error during training
+
+	numHidden		hidden		// Number of hidden layers in the neural network
 	numNeuronHidden	Hidden		// Array of the number of neurons in each hidden layer
+
 	lastIndexNeuron uint32		// Index of the output (last) layer of the neural network
 	lastIndexAxon	uint32		//
 
@@ -15,12 +18,12 @@ type perceptron struct {
 }
 
 // Initializing Perceptron Neural Network
-func (n *NN) Perceptron() NeuralNetwork {
+func (n *nn) Perceptron() NeuralNetwork {
 	n.architecture = &perceptron{
 		//bias:				0,
 		rate:				DefaultRate,
 		modeLoss:			ModeMSE,
-		limitLoss:			.0001,
+		levelLoss:			.0001,
 		//numHidden:			0,
 		//numNeuronHidden:	nil, //[]uint16{},
 	}
@@ -75,13 +78,17 @@ func (p *perceptron) GetRate() Rate {
 	return p.rate
 }
 
-// Limit loss
+// Level loss
 
-// Number of neurons in each hidden layer
+// Hidden layers
 func (p *perceptron) SetHiddenLayer(args ...hidden) {
 	p.numNeuronHidden = args
 }
 
 func (p *perceptron) GetHiddenLayer() Hidden {
 	return p.numNeuronHidden
+}
+
+func (p *perceptron) GetNumHiddenLayer() hidden {
+	return p.numHidden
 }

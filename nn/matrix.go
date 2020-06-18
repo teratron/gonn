@@ -6,188 +6,16 @@ import (
 	"time"
 )
 
-//+-------------------------------------------------------------+
-//| Neural network                                              |
-//+-------------------------------------------------------------+
-func (n *NN) Set(args ...Setter) {
-	if len(args) == 0 {
-		Log("Empty set", true)
-	} else {
-		for _, v := range args {
-			if s, ok := v.(Setter); ok {
-				s.Set(n)
-			}
-		}
-	}
-}
-
-func (n *NN) Get(args ...Getter) Getter {
-	if len(args) == 0 {
-		//log.Printf("Return %T %v\n", args, args)
-		Log("Return NN struct", true)
-		return n
-	} else {
-		//fmt.Printf("--- %T %v\n", args[0], args[0])
-		/*for _, v := range args {
-			if s, ok := v.(Setter); ok {
-				//fmt.Printf("--- %T %v\n", s, s)
-				//s.Set(n)
-			}
-		}*/
-	}
-	return nil
-}
-
-//+-------------------------------------------------------------+
-//| Neuron bias                                                 |
-//+-------------------------------------------------------------+
-// Initializing bias
-func (b Bias) Set(args ...Setter) {
-	if n, ok := args[0].(*NN); ok {
-		n.architecture.Set(b)
-	}
-}
-
-func (n *NN) SetBias(bias Bias) {
-	bias.Set(n)
-}
-
-// Getting bias
-func (n *NN) Bias() (bias Bias) {
-	if v, ok := n.architecture.(NeuralNetwork); ok {
-		bias = v.Bias()
-	}
-	return
-}
-
-func (n *NN) GetBias() Bias {
-	return n.Bias()
-}
-
-func (b Bias) Get(args ...Getter) Getter {
-	//fmt.Printf("--- %T %v\n", args, args)
-	return args[0]
-}
-
-// Checking bias
-/*func (b Bias) Check() Checker {
-	switch {
-	case b < 0:
-		return Bias(0)
-	case b > 1:
-		return Bias(1)
-	default:
-		return b
-	}
-}*/
-
-//+-------------------------------------------------------------+
-//| Learning rate                                               |
-//+-------------------------------------------------------------+
-// Initializing learning rate
-func (r Rate) Set(args ...Setter) {
-	if n, ok := args[0].(*NN); ok {
-		if rate, ok := r.Check().(Rate); ok {
-			n.architecture.Set(rate)
-		}
-	}
-}
-
-func (n *NN) SetRate(rate Rate) {
-	rate.Set(n)
-}
-
-// Getting learning rate
-func (n *NN) Rate() (rate Rate) {
-	if v, ok := n.architecture.(NeuralNetwork); ok {
-		rate = v.Rate()
-	}
-	return
-}
-
-func (n *NN) GetRate() Rate {
-	return n.Rate()
-}
-
-func (r Rate) Get(args ...Getter) Getter {
-	return args[0]
-}
-
-// Checking learning rate
-func (r Rate) Check() Checker {
-	switch {
-	case r < 0 || r > 1:
-		return DefaultRate
-	default:
-		return r
-	}
-}
-
-//+-------------------------------------------------------------+
-//| Limit loss                                        			|
-//+-------------------------------------------------------------+
-// Initializing limit loss
-
-// Getting limit loss
-
-// Checking limit loss
-func (l Loss) Check() Checker {
-	switch {
-	case l < 0:
-		return MinLimitLoss
-	default:
-		return l
-	}
-}
-
-//+-------------------------------------------------------------+
-//| Number of neurons in each hidden layer                      |
-//+-------------------------------------------------------------+
-func (h Hidden) Set(args ...Setter) {
-	if n, ok := args[0].(*NN); ok {
-		if v, ok := n.architecture.(NeuralNetwork); ok {
-			v.Set(h)
-		}
-	}
-}
-
-func (n *NN) SetHiddenLayer(args ...hidden) {
-	if v, ok := n.architecture.(NeuralNetwork); ok {
-		v.SetHiddenLayer(args...)
-	}
-}
-
-func (h Hidden) Get(args ...Getter) Getter {
-	panic("implement me")
-}
-
-func (n *NN) GetHiddenLayer() Hidden {
-	if v, ok := n.architecture.(NeuralNetwork); ok {
-		//fmt.Printf("--- %T %v\n", v, v)
-		return v.GetHiddenLayer()
-	}
-	return nil
-}
-
-func HiddenLayer(args ...hidden) Hidden {
-	return args
+//
+func (n *nn) Train() {
 }
 
 //
-//func (l Loss) Set(setter Setter) {}
-
-//func (n *neuron) Set() {}
-
-//
-func (n *NN) Train() {
+func (n *nn) Query() {
 }
 
 //
-func (n *NN) Query() {
-}
-
-//
-func (n *NN) Verify() {
+func (n *nn) Verify() {
 }
 
 //
@@ -199,7 +27,7 @@ func backwardPropagation() {
 }
 
 // The function fills all weights with random numbers from -0.5 to 0.5
-func (n *NN) setWeight() {
+func (n *nn) setWeight() {
 	rand.Seed(time.Now().UTC().UnixNano())
 	randWeight := func() Float {
 		r := 0.
