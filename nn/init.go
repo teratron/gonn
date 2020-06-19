@@ -2,8 +2,6 @@
 package nn
 
 const (
-	DefaultRate  Rate	= .3     // Default rate
-	MinLevelLoss Loss	= 10e-33 // The minimum value of the error limit at which training is forcibly terminated
 	MaxIteration uint32	= 10e+05 // The maximum number of iterations after which training is forcibly terminated
 
 	ModeMSE      uint8	= 0      // Mean Squared Error
@@ -21,6 +19,7 @@ func New() NeuralNetwork {
 		architecture:	&perceptron{},
 		isInit:			false,
 		isTrain:		false,
+
 		upperRange:		1,
 		lowerRange:		0,
 

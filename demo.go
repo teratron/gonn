@@ -92,29 +92,35 @@ func main() {
 	/*var mx nn.Matrix
 	fmt.Println(mx.IsInit)*/
 
+	// Neural Network
 	//n := nn.New()
 	n := nn.New().Perceptron()
 	fmt.Println(n)
 	//n := nn.New().RadialBasis()
 
-	fmt.Println(n.Bias()) //get
+	// Common initializing
 	n.Set() //empty set
-	n.Set(nn.Bias(true), nn.Rate(.33), nn.HiddenLayer(1, 5, 9)) //set
+	n.Set(nn.Bias(true),
+		  nn.Rate(.33),
+		  nn.HiddenLayer(1, 5, 9)) //set
+
+	// Bias
+	fmt.Println(n.Bias()) //get
 	fmt.Println(n.GetBias()) //get
 	fmt.Println(n.Rate()) //get
 
 	n.SetBias(false) //set
 	fmt.Println(n.Bias())
 
+	// Rate
+
 	fmt.Println(n.Get()) //get
 	fmt.Println("+",n.Get(n.Bias())) //get
 
-	//n.Set(nn.Hidden([]uint16{3, 5, 7}))
+	// Hidden layers
 	n.Set(nn.HiddenLayer(3, 5, 7))
-	fmt.Println(n.GetHiddenLayer()) //get
+	fmt.Println(n.GetHidden()) //get
 	fmt.Println("n.Get(nn.HiddenLayer()):", n.Get(nn.HiddenLayer())) //get
-	fmt.Println("n.Get(nn.NumHiddenLayer()):", n.Get(nn.NumHiddenLayer())) //get
-	n.SetHiddenLayer(7, 5, 3)
-	fmt.Println(n.GetHiddenLayer()) //get
-	fmt.Println(n.GetNumHiddenLayer()) //get
+	n.SetHidden(7, 5, 3)
+	fmt.Println(n.GetHidden()) //get
 }

@@ -43,7 +43,7 @@ type Vertex interface {
 }
 
 type (
-	Float			float32
+	Float		float32
 
 	bias			*Bias
 	input			*neuron
