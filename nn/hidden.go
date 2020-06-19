@@ -29,14 +29,14 @@ func (h Hidden) Get(args ...Getter) Getter {
 	return nil
 }
 
-// Initializing hidden layers
+// Initializing
 func (n *nn) SetHidden(args ...hidden) {
 	if v, ok := n.architecture.(NeuralNetwork); ok {
 		v.SetHidden(args...)
 	}
 }
 
-// Return hidden layers
+// Return
 func (n *nn) GetHidden() Hidden {
 	if v, ok := n.architecture.(NeuralNetwork); ok {
 		return v.GetHidden()

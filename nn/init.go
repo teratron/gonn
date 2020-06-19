@@ -17,8 +17,6 @@ func init() {
 func New() NeuralNetwork {
 	return &nn{
 		architecture:	&perceptron{},
-		isInit:			false,
-		isTrain:		false,
 
 		upperRange:		1,
 		lowerRange:		0,

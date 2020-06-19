@@ -1,4 +1,4 @@
-//
+// Perceptron  Neural Network
 package nn
 
 type perceptron struct {
@@ -19,15 +19,10 @@ type perceptron struct {
 // Initializing Perceptron Neural Network
 func (n *nn) Perceptron() NeuralNetwork {
 	n.architecture = &perceptron{
-		rate:				DefaultRate,
-		modeLoss:			ModeMSE,
-		levelLoss:			.0001,
+		rate:		DefaultRate,
+		modeLoss:	ModeMSE,
+		levelLoss:	.0001,
 	}
-	/*if a, ok := n.architecture.(*perceptron); ok {
-		//a.numNeuronHidden = make([]uint16, 0)
-		//a.numHidden = uint16(len(a.numNeuronHidden))
-		//fmt.Println("*****", a.numHidden, a.numNeuronHidden)
-	}*/
 
 	return n
 }

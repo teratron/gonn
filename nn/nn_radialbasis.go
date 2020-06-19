@@ -1,4 +1,4 @@
-// under construction
+// Radial Basis Neural Network - under construction
 package nn
 
 type radialBasis struct {

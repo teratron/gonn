@@ -1,4 +1,4 @@
-// under construction
+// Hopfield Neural Network under - construction
 package nn
 
 type hopfield struct {
