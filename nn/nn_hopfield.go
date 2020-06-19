@@ -12,9 +12,11 @@ func (n *nn) Hopfield() NeuralNetwork {
 	return n
 }
 
+// Setter
 func (h *hopfield) Set(args ...Setter) {
 }
 
+// Getter
 func (h *hopfield) Get(args ...Getter) Getter {
-	panic("implement me")
+	return args[0]
 }

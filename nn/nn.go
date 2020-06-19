@@ -44,12 +44,6 @@ type Vertex interface {
 
 type (
 	Float			float32
-	Bias			bool
-	Rate			float32
-	Loss			Float
-
-	hidden			uint16
-	Hidden			[]hidden
 
 	bias			*Bias
 	input			*neuron

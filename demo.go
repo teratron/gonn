@@ -109,9 +109,12 @@ func main() {
 	fmt.Println(n.Get()) //get
 	fmt.Println("+",n.Get(n.Bias())) //get
 
+	//n.Set(nn.Hidden([]uint16{3, 5, 7}))
 	n.Set(nn.HiddenLayer(3, 5, 7))
 	fmt.Println(n.GetHiddenLayer()) //get
-	fmt.Println(n.Get(nn.HiddenLayer())) //get
+	fmt.Println("n.Get(nn.HiddenLayer()):", n.Get(nn.HiddenLayer())) //get
+	fmt.Println("n.Get(nn.NumHiddenLayer()):", n.Get(nn.NumHiddenLayer())) //get
 	n.SetHiddenLayer(7, 5, 3)
 	fmt.Println(n.GetHiddenLayer()) //get
+	fmt.Println(n.GetNumHiddenLayer()) //get
 }

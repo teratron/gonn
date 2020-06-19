@@ -12,9 +12,11 @@ func (n *nn) RadialBasis() NeuralNetwork {
 	return n
 }
 
+// Setter
 func (r *radialBasis) Set(args ...Setter) {
 }
 
+// Getter
 func (r *radialBasis) Get(args ...Getter) Getter {
-	panic("implement me")
+	return args[0]
 }

@@ -31,9 +31,18 @@ type Checker interface {
 	Check() Checker
 }
 
+type (
+	Bias			bool
+	Rate			float32
+	Loss			Float
+	hidden			uint16
+	Hidden			[]hidden
+)
+
 //+-------------------------------------------------------------+
 //| Neural network                                              |
 //+-------------------------------------------------------------+
+// Setter
 func (n *nn) Set(args ...Setter) {
 	if len(args) == 0 {
 		Log("Empty set", true)
@@ -46,19 +55,16 @@ func (n *nn) Set(args ...Setter) {
 	}
 }
 
+// Getter
 func (n *nn) Get(args ...Getter) Getter {
 	if len(args) == 0 {
-		//log.Printf("Return %T %v\n", args, args)
-		Log("Return NN struct", true)
 		return n
 	} else {
-		//fmt.Printf("--- %T %v\n", args[0], args[0])
-		/*for _, v := range args {
-			if s, ok := v.(Setter); ok {
-				//fmt.Printf("--- %T %v\n", s, s)
-				//s.Set(n)
+		for _, v := range args {
+			if g, ok := v.(Getter); ok {
+				return g.Get(n)
 			}
-		}*/
+		}
 	}
 	return nil
 }
@@ -66,18 +72,24 @@ func (n *nn) Get(args ...Getter) Getter {
 //+-------------------------------------------------------------+
 //| Neuron bias                                                 |
 //+-------------------------------------------------------------+
-// Initializing bias
+// Setter
 func (b Bias) Set(args ...Setter) {
 	if n, ok := args[0].(*nn); ok {
 		n.architecture.Set(b)
 	}
 }
 
+// Getter
+func (b Bias) Get(args ...Getter) Getter {
+	return args[0]
+}
+
+// Initializing bias
 func (n *nn) SetBias(bias Bias) {
 	bias.Set(n)
 }
 
-// Getting bias
+// Return bias
 func (n *nn) Bias() (bias Bias) {
 	if v, ok := n.architecture.(NeuralNetwork); ok {
 		bias = v.Bias()
@@ -89,27 +101,10 @@ func (n *nn) GetBias() Bias {
 	return n.Bias()
 }
 
-func (b Bias) Get(args ...Getter) Getter {
-	//fmt.Printf("--- %T %v\n", args, args)
-	return args[0]
-}
-
-// Checking bias
-/*func (b Bias) Check() Checker {
-	switch {
-	case b < 0:
-		return Bias(0)
-	case b > 1:
-		return Bias(1)
-	default:
-		return b
-	}
-}*/
-
 //+-------------------------------------------------------------+
 //| Learning rate                                               |
 //+-------------------------------------------------------------+
-// Initializing learning rate
+// Setter
 func (r Rate) Set(args ...Setter) {
 	if n, ok := args[0].(*nn); ok {
 		if rate, ok := r.Check().(Rate); ok {
@@ -118,11 +113,17 @@ func (r Rate) Set(args ...Setter) {
 	}
 }
 
+// Getter
+func (r Rate) Get(args ...Getter) Getter {
+	return args[0]
+}
+
+// Initializing learning rate
 func (n *nn) SetRate(rate Rate) {
 	rate.Set(n)
 }
 
-// Getting learning rate
+// Return learning rate
 func (n *nn) Rate() (rate Rate) {
 	if v, ok := n.architecture.(NeuralNetwork); ok {
 		rate = v.Rate()
@@ -132,10 +133,6 @@ func (n *nn) Rate() (rate Rate) {
 
 func (n *nn) GetRate() Rate {
 	return n.Rate()
-}
-
-func (r Rate) Get(args ...Getter) Getter {
-	return args[0]
 }
 
 // Checking learning rate
@@ -151,9 +148,13 @@ func (r Rate) Check() Checker {
 //+-------------------------------------------------------------+
 //| Level loss                                        			|
 //+-------------------------------------------------------------+
+// Setter
+
+// Getter
+
 // Initializing level loss
 
-// Getting level loss
+// Return level loss
 
 // Checking level loss
 func (l Loss) Check() Checker {
@@ -168,6 +169,15 @@ func (l Loss) Check() Checker {
 //+-------------------------------------------------------------+
 //| Hidden layers							                    |
 //+-------------------------------------------------------------+
+func HiddenLayer(args ...hidden) Hidden {
+	return args
+}
+
+func NumHiddenLayer(args ...hidden) hidden {
+	return args[0]
+}
+
+// Setter
 func (h Hidden) Set(args ...Setter) {
 	if n, ok := args[0].(*nn); ok {
 		if v, ok := n.architecture.(NeuralNetwork); ok {
@@ -176,16 +186,33 @@ func (h Hidden) Set(args ...Setter) {
 	}
 }
 
+// Getter
+func (h Hidden) Get(args ...Getter) Getter {
+	if n, ok := args[0].(*nn); ok {
+		if v, ok := n.architecture.(NeuralNetwork); ok {
+			return v.Get(h)
+		}
+	}
+	return nil
+}
+
+func (h hidden) Get(args ...Getter) Getter {
+	if n, ok := args[0].(*nn); ok {
+		if v, ok := n.architecture.(NeuralNetwork); ok {
+			return v.Get(h)
+		}
+	}
+	return nil
+}
+
+// Initializing hidden layers
 func (n *nn) SetHiddenLayer(args ...hidden) {
 	if v, ok := n.architecture.(NeuralNetwork); ok {
 		v.SetHiddenLayer(args...)
 	}
 }
 
-func (h Hidden) Get(args ...Getter) Getter {
-	panic("implement me")
-}
-
+// Return hidden layers
 func (n *nn) GetHiddenLayer() Hidden {
 	if v, ok := n.architecture.(NeuralNetwork); ok {
 		return v.GetHiddenLayer()
@@ -199,8 +226,3 @@ func (n *nn) GetNumHiddenLayer() hidden {
 	}
 	return 0
 }
-
-func HiddenLayer(args ...hidden) Hidden {
-	return args
-}
-
