@@ -37,7 +37,7 @@ func (n *nn) setWeight() {
 		return FloatType(r)
 	}
 	for _, a := range n.axon {
-		if b, ok := a.synapse["bias"]; !ok || (ok && b.(Bias) == true) {
+		if b, ok := a.synapse["bias"]; !ok || (ok && b.(biasType) == true) {
 			a.weight = randWeight()
 		}
 	}

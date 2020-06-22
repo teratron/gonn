@@ -41,6 +41,8 @@ func main() {
     b := n.Bias()
     // or
     b = n.GetBias()
+//Log("Parameter not specified for Bias", false)
+
 }
 ```
 

@@ -1,46 +1,38 @@
 // Learning rate
 package nn
 
-type RateType float32
+type rateType float32
 
 // Default learning rate
-const DefaultRate RateType = .3
+const DefaultRate rateType = .3
 
-func Rate(rate ...RateType) RateType {
-	return rate[0]
+func Rate(rate ...rateType) Setter {
+	if len(rate) == 0 {
+		return rateType(0)
+	} else {
+		return rate[0]
+	}
 }
 
 // Setter
-func (r RateType) Set(rate ...Setter) {
-	if n, ok := rate[0].(*nn); ok {
-		if rate, ok := r.Check().(RateType); ok {
-			n.architecture.Set(rate)
+func (r rateType) Set(set ...Setter) {
+	if v, ok := getArchitecture(set[0]); ok {
+		if c, ok := r.Check().(rateType); ok {
+			v.Set(c)
 		}
 	}
 }
 
 // Getter
-func (r RateType) Get(rate ...Getter) Getter {
-	return rate[0]
-}
-
-// Initializing
-func (n *nn) SetRate(rate RateType) {
-	if v, ok := n.architecture.(NeuralNetwork); ok {
-		v.SetRate(rate)
+func (r rateType) Get(set ...Setter) Getter {
+	if v, ok := getArchitecture(set[0]); ok {
+		return v.Get(r)
 	}
+	return nil
 }
 
-// Return
-func (n *nn) GetRate() (rate RateType) {
-	if v, ok := n.architecture.(NeuralNetwork); ok {
-		rate = v.GetRate()
-	}
-	return
-}
-
-// Checking
-func (r RateType) Check() Checker {
+// Checker
+func (r rateType) Check() Getter {
 	switch {
 	case r < 0 || r > 1:
 		return DefaultRate

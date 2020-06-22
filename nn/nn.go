@@ -11,7 +11,6 @@ type NeuralNetwork interface {
 
 	//Parameter
 	//Processor
-
 }
 
 //
@@ -49,7 +48,7 @@ type Vertex interface {
 type (
 	FloatType	float32
 
-	bias		*Bias
+	bias		*biasType
 	input		*neuron
 	output		*neuron
 )

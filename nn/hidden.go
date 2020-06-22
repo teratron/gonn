@@ -2,44 +2,25 @@
 package nn
 
 type (
-	hidden uint16
-	Hidden []hidden
+	hiddenType uint16
+	HiddenType []hiddenType
 )
 
-func HiddenLayer(nums ...hidden) Hidden {
+func HiddenLayer(nums ...hiddenType) HiddenType {
 	return nums
 }
 
 // Setter
-func (h Hidden) Set(args ...Setter) {
-	if n, ok := args[0].(*nn); ok {
-		//if v, ok := n.architecture.(NeuralNetwork); ok {
-			n.architecture.Set(h)
-		//}
+func (h HiddenType) Set(set ...Setter) {
+	if v, ok := getArchitecture(set[0]); ok {
+		v.Set(h)
 	}
 }
 
 // Getter
-func (h Hidden) Get(args ...Getter) Getter {
-	if n, ok := args[0].(*nn); ok {
-		//if v, ok := n.architecture.(NeuralNetwork); ok {
-			return n.architecture.Get(h)
-		//}
+func (h HiddenType) Get(set ...Setter) Getter {
+	if v, ok := getArchitecture(set[0]); ok {
+		return v.Get(h)
 	}
 	return nil
-}
-
-// Initializing
-func (n *nn) SetHidden(args ...hidden) {
-	//if v, ok := n.architecture.(NeuralNetwork); ok {
-		n.architecture.SetHidden(args...)
-	//}
-}
-
-// Return
-func (n *nn) GetHidden() Hidden {
-	//if v, ok := n.architecture.(NeuralNetwork); ok {
-		return n.architecture.GetHidden()
-	//}
-	//return nil
 }

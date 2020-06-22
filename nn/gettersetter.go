@@ -1,29 +1,12 @@
 package nn
 
-type Parameter interface {
-
-/*	//
-	Bias() Bias
-	GetBias() Bias
-	SetBias(Bias)
-
-	//
-	Rate() Rate
-	GetRate() Rate
-	SetRate(Rate)
-
-	//
-	GetHidden() Hidden
-	SetHidden(...hidden)*/
-}
-
 type GetterSetter interface {
 	Getter
 	Setter
 }
 
 type Getter interface {
-	Get(...Getter) Getter
+	Get(...Setter) Getter
 }
 
 type Setter interface {
@@ -31,13 +14,13 @@ type Setter interface {
 }
 
 type Checker interface {
-	Check() Checker
+	Check() Getter
 }
 
 // Setter
 func (n *nn) Set(args ...Setter) {
 	if len(args) == 0 {
-		Log("Empty set", true)
+		Log("Empty set", false)
 	} else {
 		for _, v := range args {
 			if s, ok := v.(Setter); ok {
@@ -48,7 +31,7 @@ func (n *nn) Set(args ...Setter) {
 }
 
 // Getter
-func (n *nn) Get(args ...Getter) Getter {
+func (n *nn) Get(args ...Setter) Getter {
 	if len(args) == 0 {
 		return n
 	} else {
@@ -59,4 +42,13 @@ func (n *nn) Get(args ...Getter) Getter {
 		}
 	}
 	return nil
+}
+
+func getArchitecture(set Setter) (NeuralNetwork, bool) {
+	if n, ok := set.(*nn); ok {
+		if v, ok := n.architecture.(NeuralNetwork); ok {
+			return v, ok
+		}
+	}
+	return nil, false
 }

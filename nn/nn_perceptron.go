@@ -3,32 +3,21 @@ package nn
 
 type Perceptron interface {
 	Perceptron() NeuralNetwork
-	//BiasInt
-
-	//
-	GetRate() RateType
-	SetRate(RateType)
-
-	//
-	GetHidden() Hidden
-	SetHidden(...hidden)
 }
 
 type perceptron struct {
-	bias Bias
-	rate RateType
+	bias biasType
+	rate rateType
 
-	modeLoss		uint8		//
-	levelLoss		Loss		// Minimum (sufficient) level of the average of the error during training
+	modeLoss  uint8    //
+	levelLoss lossType // Minimum (sufficient) level of the average of the error during training
 
-	hiddenLayer		Hidden		// Array of the number of neurons in each hidden layer
+	hiddenLayer HiddenType // Array of the number of neurons in each hidden layer
 
 	lastIndexNeuron uint32		// Index of the output (last) layer of the neural network
 	lastIndexAxon	uint32		//
 
 	Architecture // чтобы не создавать методы для всех типов нн
-	//Parameter
-	//Perceptron
 }
 
 // Initializing Perceptron Neural Network
@@ -38,66 +27,38 @@ func (n *nn) Perceptron() NeuralNetwork {
 		modeLoss:	ModeMSE,
 		levelLoss:	.0001,
 	}
-
 	return n
 }
 
 // Setter
-func (p *perceptron) Set(args ...Setter) {
-	switch v := args[0].(type) {
-	case Bias:
+func (p *perceptron) Set(set ...Setter) {
+	switch v := set[0].(type) {
+	case biasType:
 		p.bias = v
-	case RateType:
+	case rateType:
 		p.rate = v
-	case Hidden:
+	case lossType:
+		p.levelLoss = v
+	case HiddenType:
 		p.hiddenLayer = v
 	default:
+		Log("This type of variable is missing for Perceptron Neural Network", false)
 	}
 }
 
 // Getter
-func (p *perceptron) Get(args ...Getter) Getter {
-	switch args[0].(type) {
-	case Bias:
+func (p *perceptron) Get(set ...Setter) Getter {
+	switch set[0].(type) {
+	case biasType:
 		return p.bias
-	case RateType:
+	case rateType:
 		return p.rate
-	case Hidden:
+	case lossType:
+		return p.levelLoss
+	case HiddenType:
 		return p.hiddenLayer
 	default:
+		Log("This type of variable is missing for Perceptron Neural Network", false)
 		return nil
 	}
-}
-
-// Bias
-func (p *perceptron) SetBias(bias Bias) {
-	p.bias = bias
-}
-
-func (p *perceptron) Bias() Bias {
-	return p.bias
-}
-
-func (p *perceptron) GetBias() Bias {
-	return p.bias
-}
-
-// Learning rate
-func (p *perceptron) SetRate(rate RateType) {
-	p.rate = rate
-}
-
-func (p *perceptron) GetRate() RateType {
-	return p.rate
-}
-
-// Level loss
-
-// Hidden layers
-func (p *perceptron) SetHidden(args ...hidden) {
-	p.hiddenLayer = args
-}
-
-func (p *perceptron) GetHidden() Hidden {
-	return p.hiddenLayer
 }

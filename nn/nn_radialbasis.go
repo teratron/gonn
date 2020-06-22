@@ -1,6 +1,8 @@
 // Radial Basis Neural Network - under construction
 package nn
 
+import "fmt"
+
 type RadialBasis interface {
 	RadialBasis() NeuralNetwork
 }
@@ -20,12 +22,23 @@ func (n *nn) RadialBasis() NeuralNetwork {
 }
 
 // Setter
-func (r *radialBasis) Set(args ...Setter) {
+func (r *radialBasis) Set(set ...Setter) {
+	switch v := set[0].(type) {
+	/*case BiasType:
+		r.bias = v
+	case RateType:
+		r.rate = v
+	case HiddenType:
+		r.hiddenLayer = v*/
+	default:
+		fmt.Printf("%T %v\n", v, v)
+		Log("This type of variable is missing for Radial Basis Neural Network", false)
+	}
 }
 
 // Getter
-func (r *radialBasis) Get(args ...Getter) Getter {
-	switch args[0].(type) {
+func (r *radialBasis) Get(set ...Setter) Getter {
+	switch set[0].(type) {
 	/*case Bias:
 		return r.bias
 	case Rate:
@@ -33,6 +46,7 @@ func (r *radialBasis) Get(args ...Getter) Getter {
 	case Hidden:
 		return r.hiddenLayer*/
 	default:
+		Log("This type of variable is missing for Perceptron Neural Network", false)
 		return nil
 	}
 }
