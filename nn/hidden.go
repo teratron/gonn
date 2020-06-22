@@ -6,40 +6,40 @@ type (
 	Hidden []hidden
 )
 
-func HiddenLayer(args ...hidden) Hidden {
-	return args
+func HiddenLayer(nums ...hidden) Hidden {
+	return nums
 }
 
 // Setter
 func (h Hidden) Set(args ...Setter) {
 	if n, ok := args[0].(*nn); ok {
-		if v, ok := n.architecture.(NeuralNetwork); ok {
-			v.Set(h)
-		}
+		//if v, ok := n.architecture.(NeuralNetwork); ok {
+			n.architecture.Set(h)
+		//}
 	}
 }
 
 // Getter
 func (h Hidden) Get(args ...Getter) Getter {
 	if n, ok := args[0].(*nn); ok {
-		if v, ok := n.architecture.(NeuralNetwork); ok {
-			return v.Get(h)
-		}
+		//if v, ok := n.architecture.(NeuralNetwork); ok {
+			return n.architecture.Get(h)
+		//}
 	}
 	return nil
 }
 
 // Initializing
 func (n *nn) SetHidden(args ...hidden) {
-	if v, ok := n.architecture.(NeuralNetwork); ok {
-		v.SetHidden(args...)
-	}
+	//if v, ok := n.architecture.(NeuralNetwork); ok {
+		n.architecture.SetHidden(args...)
+	//}
 }
 
 // Return
 func (n *nn) GetHidden() Hidden {
-	if v, ok := n.architecture.(NeuralNetwork); ok {
-		return v.GetHidden()
-	}
-	return nil
+	//if v, ok := n.architecture.(NeuralNetwork); ok {
+		return n.architecture.GetHidden()
+	//}
+	//return nil
 }

@@ -1,9 +1,22 @@
-// Perceptron  Neural Network
+// Perceptron Neural Network
 package nn
 
+type Perceptron interface {
+	Perceptron() NeuralNetwork
+	//BiasInt
+
+	//
+	GetRate() RateType
+	SetRate(RateType)
+
+	//
+	GetHidden() Hidden
+	SetHidden(...hidden)
+}
+
 type perceptron struct {
-	bias			Bias
-	rate			Rate
+	bias Bias
+	rate RateType
 
 	modeLoss		uint8		//
 	levelLoss		Loss		// Minimum (sufficient) level of the average of the error during training
@@ -14,6 +27,8 @@ type perceptron struct {
 	lastIndexAxon	uint32		//
 
 	Architecture // чтобы не создавать методы для всех типов нн
+	//Parameter
+	//Perceptron
 }
 
 // Initializing Perceptron Neural Network
@@ -32,7 +47,7 @@ func (p *perceptron) Set(args ...Setter) {
 	switch v := args[0].(type) {
 	case Bias:
 		p.bias = v
-	case Rate:
+	case RateType:
 		p.rate = v
 	case Hidden:
 		p.hiddenLayer = v
@@ -45,7 +60,7 @@ func (p *perceptron) Get(args ...Getter) Getter {
 	switch args[0].(type) {
 	case Bias:
 		return p.bias
-	case Rate:
+	case RateType:
 		return p.rate
 	case Hidden:
 		return p.hiddenLayer
@@ -68,15 +83,11 @@ func (p *perceptron) GetBias() Bias {
 }
 
 // Learning rate
-func (p *perceptron) SetRate(rate Rate) {
+func (p *perceptron) SetRate(rate RateType) {
 	p.rate = rate
 }
 
-func (p *perceptron) Rate() Rate {
-	return p.rate
-}
-
-func (p *perceptron) GetRate() Rate {
+func (p *perceptron) GetRate() RateType {
 	return p.rate
 }
 

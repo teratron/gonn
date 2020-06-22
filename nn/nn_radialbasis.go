@@ -1,14 +1,21 @@
 // Radial Basis Neural Network - under construction
 package nn
 
+type RadialBasis interface {
+	RadialBasis() NeuralNetwork
+}
+
 type radialBasis struct {
+	cup int
 	Architecture
-	Parameter
+	//Parameter
 }
 
 // Initializing Radial Basis Neural Network
 func (n *nn) RadialBasis() NeuralNetwork {
-	n.architecture = &radialBasis{}
+	n.architecture = &radialBasis{
+		cup: 1,
+	}
 	return n
 }
 
@@ -18,5 +25,14 @@ func (r *radialBasis) Set(args ...Setter) {
 
 // Getter
 func (r *radialBasis) Get(args ...Getter) Getter {
-	return args[0]
+	switch args[0].(type) {
+	/*case Bias:
+		return r.bias
+	case Rate:
+		return r.rate
+	case Hidden:
+		return r.hiddenLayer*/
+	default:
+		return nil
+	}
 }

@@ -29,12 +29,12 @@ func backwardPropagation() {
 // The function fills all weights with random numbers from -0.5 to 0.5
 func (n *nn) setWeight() {
 	rand.Seed(time.Now().UTC().UnixNano())
-	randWeight := func() Float {
+	randWeight := func() FloatType {
 		r := 0.
 		for r == 0 {
 			r = rand.Float64() - .5
 		}
-		return Float(r)
+		return FloatType(r)
 	}
 	for _, a := range n.axon {
 		if b, ok := a.synapse["bias"]; !ok || (ok && b.(Bias) == true) {

@@ -27,6 +27,6 @@ func New() NeuralNetwork {
 }
 
 //
-func (n *nn) Init(input, target []Float) bool {
+func (n *nn) Init(input, target []FloatType) bool {
 	return true
 }

@@ -7,21 +7,25 @@ var _ NeuralNetwork = (*nn)(nil)
 //
 type NeuralNetwork interface {
 	Architecture
-	Parameter
 	GetterSetter
+
+	//Parameter
 	//Processor
+
 }
 
 //
 type Architecture interface {
 	//
-	Perceptron() NeuralNetwork
+	//Perceptron() NeuralNetwork
+	Perceptron
+	//
+	//RadialBasis() NeuralNetwork
+	RadialBasis
 
 	//
-	RadialBasis() NeuralNetwork
-
-	//
-	Hopfield() NeuralNetwork
+	//Hopfield() NeuralNetwork
+	Hopfield
 }
 
 //
@@ -43,11 +47,11 @@ type Vertex interface {
 }
 
 type (
-	Float		float32
+	FloatType	float32
 
-	bias			*Bias
-	input			*neuron
-	output			*neuron
+	bias		*Bias
+	input		*neuron
+	output		*neuron
 )
 
 //
@@ -56,8 +60,8 @@ type nn struct {
 	isInit			bool			// Neural network initialization flag
 	isTrain			bool
 
-	upperRange		Float			// Range, Bound, Limit, Scope
-	lowerRange		Float
+	upperRange		FloatType // Range, Bound, Limit, Scope
+	lowerRange		FloatType
 
 	//
 	language		string
@@ -70,14 +74,14 @@ type nn struct {
 
 //
 type neuron struct {
-	modeActivation	uint8
-	value			Float
-	error			Float
-	axon			[]axon
+	modeActivation uint8
+	value          FloatType
+	error          FloatType
+	axon           []axon
 }
 
 //
 type axon struct {
-	weight			Float				//
-	synapse			map[string]Vertex	// map["bias"]Vertex, map["input"]Vertex, map["output"]Vertex
+	weight  FloatType         //
+	synapse map[string]Vertex // map["bias"]Vertex, map["input"]Vertex, map["output"]Vertex
 }

@@ -93,8 +93,8 @@ func main() {
 	fmt.Println(mx.IsInit)*/
 
 	// Neural Network
-	n := nn.New()	// same n := nn.New().Perceptron()
-	//n := nn.New().RadialBasis()
+	//n := nn.New()	// same n := nn.New().Perceptron()
+	n := nn.New().RadialBasis()
 	//n := nn.New().Hopfield()
 	fmt.Println(n)
 
@@ -109,7 +109,7 @@ func main() {
 	// Bias
 	n.Set(nn.Bias(true)) //set
 	fmt.Println(n.Get(n.Bias())) //get
-	n.SetBias(false) //set
+	/*n.SetBias(false) //set
 	fmt.Println(n.Bias()) //get
 	fmt.Println(n.GetBias()) //get
 
@@ -124,5 +124,5 @@ func main() {
 	n.Set(nn.HiddenLayer(3, 5, 7)) //set
 	fmt.Println(n.Get(nn.HiddenLayer())) //get
 	n.SetHidden(7, 5, 3) //set
-	fmt.Println(n.GetHidden()) //get
+	fmt.Println(n.GetHidden()) //get*/
 }

@@ -1,7 +1,17 @@
 // Neuron bias
 package nn
 
+import "fmt"
+
 type Bias bool
+
+type BiasInt interface {
+	//Perceptron
+	//
+	Bias() Bias
+	GetBias() Bias
+	SetBias(Bias)
+}
 
 // Setter
 func (b Bias) Set(args ...Setter) {
@@ -12,6 +22,7 @@ func (b Bias) Set(args ...Setter) {
 
 // Getter
 func (b Bias) Get(args ...Getter) Getter {
+
 	return args[0]
 }
 
@@ -22,10 +33,16 @@ func (n *nn) SetBias(bias Bias) {
 
 // Return
 func (n *nn) Bias() (bias Bias) {
-	if v, ok := n.architecture.(NeuralNetwork); ok {
-		bias = v.Bias()
+	fmt.Printf("%T %v\n", n.architecture.(BiasInt), n.architecture.(BiasInt))
+	if v, ok := n.architecture.(BiasInt); ok {
+		fmt.Printf("ttttt %T %v\n", v, v)
+
+		return v.Bias()
+
+		//return v.Get(v.Bias())
+
 	}
-	return
+	return false
 }
 
 func (n *nn) GetBias() Bias {

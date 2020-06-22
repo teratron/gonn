@@ -1,7 +1,8 @@
 package nn
 
 type Parameter interface {
-	//
+
+/*	//
 	Bias() Bias
 	GetBias() Bias
 	SetBias(Bias)
@@ -13,7 +14,7 @@ type Parameter interface {
 
 	//
 	GetHidden() Hidden
-	SetHidden(...hidden)
+	SetHidden(...hidden)*/
 }
 
 type GetterSetter interface {
