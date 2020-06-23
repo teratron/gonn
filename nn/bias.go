@@ -5,7 +5,7 @@ type biasType bool
 
 func Bias(bias ...biasType) Setter {
 	if len(bias) == 0 {
-		return biasType(true)
+		return biasType(false)
 	} else {
 		return bias[0]
 	}

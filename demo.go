@@ -122,6 +122,6 @@ func main() {
 
 
 	// Hidden layers
-	n.Set(nn.HiddenLayer(3, 5, 7)) //set
+	n.Set(nn.HiddenLayer(3, 4, 3)) //set
 	fmt.Println("n.Get(nn.HiddenLayer()):", n.Get(nn.HiddenLayer())) //get
 }

@@ -46,7 +46,7 @@ type Vertex interface {
 }
 
 type (
-	FloatType	float32
+	floatType	float32
 
 	bias		*biasType
 	input		*neuron
@@ -59,9 +59,6 @@ type nn struct {
 	isInit			bool			// Neural network initialization flag
 	isTrain			bool
 
-	upperRange		FloatType // Range, Bound, Limit, Scope
-	lowerRange		FloatType
-
 	//
 	language		string
 	logging			bool
@@ -73,14 +70,13 @@ type nn struct {
 
 //
 type neuron struct {
-	modeActivation uint8
-	value          FloatType
-	error          FloatType
+	value          floatType
+	error          floatType
 	axon           []axon
 }
 
 //
 type axon struct {
-	weight  FloatType         //
+	weight  floatType         //
 	synapse map[string]Vertex // map["bias"]Vertex, map["input"]Vertex, map["output"]Vertex
 }

@@ -1,48 +1,6 @@
 //
 package nn
 
-import (
-	"math/rand"
-	"time"
-)
-
-//
-func (n *nn) Train() {
-}
-
-//
-func (n *nn) Query() {
-}
-
-//
-func (n *nn) Verify() {
-}
-
-//
-func forwardPropagation() {
-}
-
-//
-func backwardPropagation() {
-}
-
-// The function fills all weights with random numbers from -0.5 to 0.5
-func (n *nn) setWeight() {
-	rand.Seed(time.Now().UTC().UnixNano())
-	randWeight := func() FloatType {
-		r := 0.
-		for r == 0 {
-			r = rand.Float64() - .5
-		}
-		return FloatType(r)
-	}
-	for _, a := range n.axon {
-		if b, ok := a.synapse["bias"]; !ok || (ok && b.(biasType) == true) {
-			a.weight = randWeight()
-		}
-	}
-}
-
 //
 /*func (m *NN) getNeuron() {
 	for _, n := range m.Neuron {

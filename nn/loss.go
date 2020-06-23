@@ -1,7 +1,7 @@
 // Level loss
 package nn
 
-type lossType FloatType
+type lossType floatType
 
 // The minimum value of the error limit at which training is forcibly terminated
 const MinLevelLoss lossType = 10e-33
