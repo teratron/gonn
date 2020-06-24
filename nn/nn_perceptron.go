@@ -1,27 +1,29 @@
 // Perceptron Neural Network
 package nn
 
-import "fmt"
-
 type Perceptron interface {
 	Perceptron() NeuralNetwork
 }
 
 type perceptron struct {
-	bias			biasType
-	rate			rateType
-	modeActivation	uint8
+	bias			biasType			//
+	rate			rateType			//
+	modeActivation	modeActivationType	//
 
-	modeLoss		uint8		//
-	levelLoss		lossType	// Minimum (sufficient) level of the average of the error during training
+	modeLoss		modeLossType		//
+	levelLoss		lossType			// Minimum (sufficient) level of the average of the error during training
 
-	hiddenLayer		HiddenType	// Array of the number of neurons in each hidden layer
+	hiddenLayer		HiddenType			// Array of the number of neurons in each hidden layer
 
-	upperRange		floatType	// Range, Bound, Limit, Scope
+	upperRange		floatType			// Range, Bound, Limit, Scope
 	lowerRange		floatType
 
-	lastNeuron		uint32		// Index of the last neuron of the neural network
-	lastAxon		uint32		// Index of the last axon of the neural network
+	lastNeuron		uint32				// Index of the last neuron of the neural network
+	lastAxon		uint32				// Index of the last axon of the neural network
+
+	neuron struct {
+		error		floatType
+	}
 
 	Architecture // чтобы не создавать методы для всех типов нн
 }
@@ -40,6 +42,7 @@ func (n *nn) Perceptron() NeuralNetwork {
 		lastNeuron:		0,
 		lastAxon:		0,
 	}
+	//n.neuron[0].architecture =
 	return n
 }
 
@@ -48,12 +51,14 @@ func (p *perceptron) Preset(name string) {
 	switch name {
 	default:
 		fallthrough
-	case "simple":
+	case "default":
 		p.Set(
 			Bias(false),
 			Rate(DefaultRate),
+			Activation(ModeSIGMOID),
+			Loss(ModeMSE),
 			LevelLoss(.0001),
-			HiddenLayer(3))
+			HiddenLayer())
 	}
 }
 
@@ -64,18 +69,21 @@ func (p *perceptron) Set(set ...Setter) {
 		p.bias = v
 	case rateType:
 		p.rate = v
+	case modeActivationType:
+		p.modeActivation = v
 	case lossType:
 		p.levelLoss = v
 	case HiddenType:
 		p.hiddenLayer = v
-
-		fmt.Println("***", func(d uint32) (h hiddenType) {
+		//fmt.Println(*p)
+		//p.initHidden()
+		/*fmt.Println("***", func(d uint32) (h hiddenType) {
 			h = 1
 			for _, value := range p.hiddenLayer {
 				h *= value
 			}
 			return h + hiddenType(d)
-		}(4))
+		}(4))*/
 	default:
 		Log("This type of variable is missing for Perceptron Neural Network", false)
 	}
@@ -88,6 +96,8 @@ func (p *perceptron) Get(set ...Setter) Getter {
 		return p.bias
 	case rateType:
 		return p.rate
+	case modeActivationType:
+		return p.modeActivation
 	case lossType:
 		return p.levelLoss
 	case HiddenType:
@@ -96,4 +106,7 @@ func (p *perceptron) Get(set ...Setter) Getter {
 		Log("This type of variable is missing for Perceptron Neural Network", false)
 		return nil
 	}
+}
+
+func (p *perceptron) initHidden() {
 }

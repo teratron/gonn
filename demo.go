@@ -101,10 +101,13 @@ func main() {
 
 	// Common
 	n.Set() //empty set
-	n.Set(nn.Bias(true),
-		  nn.Rate(.33),
-		  nn.LevelLoss(.0005),
-		  nn.HiddenLayer(1, 5, 9)) //set
+	n.Set(
+		nn.Bias(true),
+		nn.Rate(.33),
+		nn.Activation(nn.ModeSIGMOID),
+		nn.Loss(nn.ModeMSE),
+		nn.LevelLoss(.0005),
+		nn.HiddenLayer(1, 5, 9)) //set
 
 	fmt.Println("n.Get():", n.Get()) //get
 
@@ -115,6 +118,14 @@ func main() {
 	// Rate
 	n.Set(nn.Rate(.1)) //set
 	fmt.Println("n.Get(nn.Rate()):", n.Get(nn.Rate())) //get
+
+	// Activation
+	n.Set(nn.Activation(nn.ModeTANH)) //set
+	fmt.Println("n.Get(nn.Activation()):", n.Get(nn.Activation())) //get
+
+	// Loss
+	n.Set(nn.Loss(nn.ModeARCTAN)) //set
+	fmt.Println("n.Get(nn.Loss()):", n.Get(nn.Loss())) //get
 
 	// Level loss
 	n.Set(nn.LevelLoss(.004)) //set

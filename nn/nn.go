@@ -46,11 +46,11 @@ type Vertex interface {
 }
 
 type (
-	floatType	float32
+	floatType		float32
 
-	bias		*biasType
-	input		*neuron
-	output		*neuron
+	bias			*biasType
+	input			*neuron
+	output			*neuron
 )
 
 //
@@ -60,23 +60,23 @@ type nn struct {
 	isTrain			bool
 
 	//
-	language		string
-	logging			bool
-
-	//
 	neuron			[]neuron
 	axon			[]axon
+
+	//
+	language		string
+	logging			bool
 }
 
 //
 type neuron struct {
-	value          floatType
-	error          floatType
-	axon           []axon
+	architecture	Architecture	// feature
+	value			floatType
+	axon			[]axon
 }
 
 //
 type axon struct {
-	weight  floatType         //
-	synapse map[string]Vertex // map["bias"]Vertex, map["input"]Vertex, map["output"]Vertex
+	weight			floatType			//
+	synapse			map[string]Vertex	// map["bias"]Vertex, map["input"]Vertex, map["output"]Vertex
 }

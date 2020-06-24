@@ -6,13 +6,7 @@ import (
 	"time"
 )
 
-const (
-	MaxIteration uint32	= 10e+05 // The maximum number of iterations after which training is forcibly terminated
-
-	ModeMSE      uint8	= 0      // Mean Squared Error
-	ModeRMSE     uint8	= 1      // Root Mean Squared Error
-	ModeARCTAN   uint8	= 2      // Arctan
-)
+const MaxIteration uint32 = 10e+05	// The maximum number of iterations after which training is forcibly terminated
 
 func init() {
 	Log("Start", false)
@@ -22,6 +16,8 @@ func init() {
 func New() NeuralNetwork {
 	return &nn{
 		architecture:	&perceptron{},
+		isInit:			false,
+		isTrain:		false,
 		language:		"en",
 		logging: 		true,
 	}

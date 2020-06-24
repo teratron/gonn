@@ -7,7 +7,6 @@ type Hopfield interface {
 
 type hopfield struct {
 	Architecture
-	//Parameter
 }
 
 // Initializing Hopfield Neural Network

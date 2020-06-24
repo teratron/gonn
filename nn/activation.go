@@ -3,34 +3,69 @@ package nn
 
 import "math"
 
+type modeActivationType uint8
+
 const (
-	ModeLINEAR    uint8 = 0 // Linear/Identity
-	ModeRELU      uint8 = 1 // ReLu - rectified linear unit
-	ModeLEAKYRELU uint8 = 2 // Leaky ReLu - leaky rectified linear unit
-	ModeSIGMOID   uint8 = 3 // Logistic, a.k.a. sigmoid or soft step
-	ModeTANH      uint8 = 4 // TanH - hyperbolic
+	ModeLINEAR    modeActivationType = 0 // Linear/identity
+	ModeRELU      modeActivationType = 1 // ReLu - rectified linear unit
+	ModeLEAKYRELU modeActivationType = 2 // Leaky ReLu - leaky rectified linear unit
+	ModeSIGMOID   modeActivationType = 3 // Logistic, a.k.a. sigmoid or soft step
+	ModeTANH      modeActivationType = 4 // TanH - hyperbolic
 )
+
+func Activation(mode ...modeActivationType) Setter {
+	if len(mode) == 0 {
+		return modeActivationType(0)
+	} else {
+		return mode[0]
+	}
+}
+
+// Setter
+func (m modeActivationType) Set(set ...Setter) {
+	if v, ok := getArchitecture(set[0]); ok {
+		if c, ok := m.Check().(modeActivationType); ok {
+			v.Set(c)
+		}
+	}
+}
+
+// Getter
+func (m modeActivationType) Get(set ...Setter) Getter {
+	if v, ok := getArchitecture(set[0]); ok {
+		return v.Get(m)
+	}
+	return nil
+}
+
+// Checker
+func (m modeActivationType) Check() Getter {
+	switch {
+	case m < 0 || m > ModeTANH:
+		return ModeSIGMOID
+	default:
+		return m
+	}
+}
 
 type Activator interface {
 	Get(float64) float64
 }
 
-type Activation struct {
-	Mode uint8
+type activation struct {
+	Mode modeActivationType
 }
 
-type Derivative struct {
-	Mode uint8
+type derivative struct {
+	Mode modeActivationType
 }
 
-func GetActivation(value float64, a Activator) float64 {
+func getActivation(value float64, a Activator) float64 {
 	return a.Get(value)
 }
 
-//+-------------------------------------------------------------+
-//| Activation function                                         |
-//+-------------------------------------------------------------+
-func (a *Activation) Get(value float64) float64 {
+// Activation function
+func (a *activation) Get(value float64) float64 {
 	switch a.Mode {
 	default:
 		fallthrough
@@ -61,10 +96,8 @@ func (a *Activation) Get(value float64) float64 {
 	}
 }
 
-//+-------------------------------------------------------------+
-//| Derivative activation function                              |
-//+-------------------------------------------------------------+
-func (d *Derivative) Get(value float64) float64 {
+// Derivative activation function
+func (d *derivative) Get(value float64) float64 {
 	switch d.Mode {
 	default:
 		fallthrough

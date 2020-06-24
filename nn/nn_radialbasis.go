@@ -9,8 +9,12 @@ type RadialBasis interface {
 
 type radialBasis struct {
 	cup int
+
+	neuron struct {
+		error		floatType
+	}
+
 	Architecture
-	//Parameter
 }
 
 // Initializing Radial Basis Neural Network
