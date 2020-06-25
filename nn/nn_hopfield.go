@@ -7,6 +7,7 @@ type Hopfield interface {
 
 type hopfield struct {
 	Architecture
+	Processor
 }
 
 // Initializing Hopfield Neural Network
@@ -43,3 +44,13 @@ func (h *hopfield) Get(set ...Setter) Getter {
 		return nil
 	}
 }
+
+// Train
+/*func (h *hopfield) Train(input, target []float64) (loss float64, count int) {
+	return
+}
+
+// Query
+func (h *hopfield) Query(input []float64) []float64 {
+	panic("implement me")
+}*/

@@ -97,7 +97,7 @@ func main() {
 	n := nn.New()	// same n := nn.New().Perceptron()
 	//n := nn.New().RadialBasis()
 	//n := nn.New().Hopfield()
-	fmt.Println("nn.New():", n)
+/*	fmt.Println("nn.New():", n)
 
 	// Common
 	n.Set() //empty set
@@ -108,7 +108,6 @@ func main() {
 		nn.Loss(nn.ModeMSE),
 		nn.LevelLoss(.0005),
 		nn.HiddenLayer(1, 5, 9)) //set
-
 	fmt.Println("n.Get():", n.Get()) //get
 
 	// Bias
@@ -130,9 +129,13 @@ func main() {
 	// Level loss
 	n.Set(nn.LevelLoss(.004)) //set
 	fmt.Println("n.Get(nn.LevelLoss()):", n.Get(nn.LevelLoss())) //get
-
-
+*/
 	// Hidden layers
 	n.Set(nn.HiddenLayer(3, 4, 3)) //set
 	fmt.Println("n.Get(nn.HiddenLayer()):", n.Get(nn.HiddenLayer())) //get
+
+	input := []float64{2, 3}
+	fmt.Println(n.Query(input))
+	train := []float64{3, 2}
+	fmt.Println(n.Train(input, train))
 }

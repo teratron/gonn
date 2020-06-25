@@ -8,9 +8,7 @@ var _ NeuralNetwork = (*nn)(nil)
 type NeuralNetwork interface {
 	Architecture
 	GetterSetter
-
-	//Parameter
-	//Processor
+	Processor
 }
 
 //
@@ -30,16 +28,16 @@ type Architecture interface {
 //
 type Processor interface {
 	// Initializing
-	Init()
+	//Init()
 
 	// Training
-	Train()
+	Train([]float64, []float64) (float64, int)
 
 	// Querying / forecast / prediction
-	Query()
+	Query([]float64) []float64
 
 	// Verifying / validation
-	Verify()
+	//Verify()
 }
 
 type Vertex interface {

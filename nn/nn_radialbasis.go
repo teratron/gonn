@@ -15,6 +15,7 @@ type radialBasis struct {
 	}
 
 	Architecture
+	Processor
 }
 
 // Initializing Radial Basis Neural Network
@@ -54,3 +55,13 @@ func (r *radialBasis) Get(set ...Setter) Getter {
 		return nil
 	}
 }
+
+// Train
+/*func (r *radialBasis) Train(input, target []float64) (loss float64, count int) {
+	return
+}
+
+// Query
+func (r *radialBasis) Query(input []float64) []float64 {
+	panic("implement me")
+}*/

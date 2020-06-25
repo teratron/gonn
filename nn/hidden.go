@@ -1,12 +1,16 @@
 // Hidden layers
 package nn
 
-import "fmt"
-
 type (
 	hiddenType uint16
 	HiddenType []hiddenType
+	
+	//cH chan bool
 )
+
+/*func (c cH) Set(...Setter) {
+	panic("implement me")
+}*/
 
 func HiddenLayer(nums ...hiddenType) HiddenType {
 	return nums
@@ -14,10 +18,19 @@ func HiddenLayer(nums ...hiddenType) HiddenType {
 
 // Setter
 func (h HiddenType) Set(set ...Setter) {
-	fmt.Printf("%T %v\n", set[0], set[0])
-	if v, ok := getArchitecture(set[0]); ok {
+	//ch := make(cH)
+	//fmt.Printf("%T %v\n", set[0], set[0])
+	/*if v, ok := getArchitecture(set[0]); ok {
 		//fmt.Printf("%T %v\n", v, v)
-		v.Set(h)
+		fmt.Println("1 go", ch)
+		go v.Set(h, ch)
+		fmt.Println("2 go", <-ch)
+	}*/
+
+	if n, ok := set[0].(*nn); ok {
+		if v, ok := n.architecture.(NeuralNetwork); ok {
+			v.Set(h, n)
+		}
 	}
 }
 

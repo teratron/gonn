@@ -2,15 +2,15 @@
 package nn
 
 type (
-	modeLossType uint8		//
-	lossType     floatType	// Level loss
+	modeLossType  uint8     //
+	levelLossType floatType // Level loss
 )
 
 const (
-	ModeMSE      modeLossType = 0		// Mean Squared Error
-	ModeRMSE     modeLossType = 1		// Root Mean Squared Error
-	ModeARCTAN   modeLossType = 2		// Arctan
-	MinLevelLoss lossType     = 10e-33	// The minimum value of the error limit at which training is forcibly terminated
+	ModeMSE      modeLossType  = 0      // Mean Squared Error
+	ModeRMSE     modeLossType  = 1      // Root Mean Squared Error
+	ModeARCTAN   modeLossType  = 2      // Arctan
+	MinLevelLoss levelLossType = 10e-33 // The minimum value of the error limit at which training is forcibly terminated
 )
 
 func Loss(mode ...modeLossType) Setter {
@@ -21,9 +21,9 @@ func Loss(mode ...modeLossType) Setter {
 	}
 }
 
-func LevelLoss(level ...lossType) Setter {
+func LevelLoss(level ...levelLossType) Setter {
 	if len(level) == 0 {
-		return lossType(0)
+		return levelLossType(0)
 	} else {
 		return level[0]
 	}
@@ -38,9 +38,9 @@ func (m modeLossType) Set(set ...Setter) {
 	}
 }
 
-func (l lossType) Set(set ...Setter) {
+func (l levelLossType) Set(set ...Setter) {
 	if v, ok := getArchitecture(set[0]); ok {
-		if c, ok := l.Check().(lossType); ok {
+		if c, ok := l.Check().(levelLossType); ok {
 			v.Set(c)
 		}
 	}
@@ -54,7 +54,7 @@ func (m modeLossType) Get(set ...Setter) Getter {
 	return nil
 }
 
-func (l lossType) Get(set ...Setter) Getter {
+func (l levelLossType) Get(set ...Setter) Getter {
 	if v, ok := getArchitecture(set[0]); ok {
 		return v.Get(l)
 	}
@@ -71,7 +71,7 @@ func (m modeLossType) Check() Getter {
 	}
 }
 
-func (l lossType) Check() Getter {
+func (l levelLossType) Check() Getter {
 	switch {
 	case l < 0:
 		return MinLevelLoss
