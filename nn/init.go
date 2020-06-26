@@ -23,11 +23,23 @@ func New() NeuralNetwork {
 	}
 }
 
+// Init
+// data[0] - input data
+// data[1] - target data
+// ... - any data
+func (n *nn) Init(data ...[]float64) bool {
+
+
+
+	n.isInit = true
+	return true
+}
+
 // The function fills all weights with random numbers from -0.5 to 0.5
 func (n *nn) setRandWeight() {
 	rand.Seed(time.Now().UTC().UnixNano())
 	randWeight := func() (r floatType) {
-		r = 0.
+		r = 0
 		for r == 0 {
 			r = floatType(rand.Float64() - .5)
 		}
@@ -40,7 +52,3 @@ func (n *nn) setRandWeight() {
 	}
 }
 
-//
-func (n *nn) Init(input, target []floatType) bool {
-	return true
-}

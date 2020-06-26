@@ -6,17 +6,17 @@ import (
 	"log"
 )
 
-type Perceptron interface {
+/*type Perceptron interface {
 	Perceptron() NeuralNetwork
-}
+}*/
 
 type perceptron struct {
 	bias			biasType			//
 	rate			rateType			//
 	modeActivation	modeActivationType	//
 
-	modeLoss  modeLossType  //
-	levelLoss levelLossType // Minimum (sufficient) level of the average of the error during training
+	modeLoss		modeLossType		//
+	levelLoss		levelLossType		// Minimum (sufficient) level of the average of the error during training
 
 	hiddenLayer		HiddenType			// Array of the number of neurons in each hidden layer
 
@@ -133,6 +133,14 @@ func (p *perceptron) Get(set ...Setter) Getter {
 		log.Printf("\tget: %T %v\n", set[0], set[0])
 		return nil
 	}
+}
+
+// Init
+func (p *perceptron) Init(data ...[]float64) bool {
+
+
+
+	return true
 }
 
 // Train

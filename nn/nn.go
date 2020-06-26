@@ -14,27 +14,32 @@ type NeuralNetwork interface {
 //
 type Architecture interface {
 	//
-	//Perceptron() NeuralNetwork
-	Perceptron
+	Perceptron() NeuralNetwork
+	//Perceptron
 	//
-	//RadialBasis() NeuralNetwork
-	RadialBasis
-
+	RadialBasis() NeuralNetwork
+	//RadialBasis
 	//
-	//Hopfield() NeuralNetwork
-	Hopfield
+	Hopfield() NeuralNetwork
+	//Hopfield
 }
 
 //
 type Processor interface {
 	// Initializing
-	//Init()
-
-	// Training
-	Train([]float64, []float64) (float64, int)
+	Init(...[]float64) bool
 
 	// Querying / forecast / prediction
 	Query([]float64) []float64
+
+	//
+	Loss([]float64) float64
+
+	// Training
+	Train(...[]float64) (float64, int)
+
+	//
+	Copy([]float64) []float64
 
 	// Verifying / validation
 	//Verify()
@@ -55,7 +60,7 @@ type (
 type nn struct {
 	architecture	NeuralNetwork	// Architecture/type of neural network (configuration)
 	isInit			bool			// Neural network initialization flag
-	isTrain			bool
+	isTrain			bool			//
 
 	//
 	neuron			[]neuron

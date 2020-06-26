@@ -1,9 +1,9 @@
 // Hopfield Neural Network - under construction
 package nn
 
-type Hopfield interface {
+/*type Hopfield interface {
 	Hopfield() NeuralNetwork
-}
+}*/
 
 type hopfield struct {
 	Architecture

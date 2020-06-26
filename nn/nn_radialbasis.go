@@ -3,9 +3,9 @@ package nn
 
 import "fmt"
 
-type RadialBasis interface {
+/*type RadialBasis interface {
 	RadialBasis() NeuralNetwork
-}
+}*/
 
 type radialBasis struct {
 	cup int

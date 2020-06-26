@@ -3,14 +3,14 @@ package nn
 
 import "math"
 
-type modeActivationType uint8
+type modeActivationType uint8	// Activation function mode
 
 const (
-	ModeLINEAR    modeActivationType = 0 // Linear/identity
-	ModeRELU      modeActivationType = 1 // ReLu - rectified linear unit
-	ModeLEAKYRELU modeActivationType = 2 // Leaky ReLu - leaky rectified linear unit
-	ModeSIGMOID   modeActivationType = 3 // Logistic, a.k.a. sigmoid or soft step
-	ModeTANH      modeActivationType = 4 // TanH - hyperbolic
+	ModeLINEAR    modeActivationType = 0	// Linear/identity
+	ModeRELU      modeActivationType = 1	// ReLu - rectified linear unit
+	ModeLEAKYRELU modeActivationType = 2	// Leaky ReLu - leaky rectified linear unit
+	ModeSIGMOID   modeActivationType = 3	// Logistic, a.k.a. sigmoid or soft step
+	ModeTANH      modeActivationType = 4	// TanH - hyperbolic tangent
 )
 
 func Activation(mode ...modeActivationType) Setter {

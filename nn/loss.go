@@ -2,7 +2,7 @@
 package nn
 
 type (
-	modeLossType  uint8     //
+	modeLossType  uint8     // Average error mode
 	levelLossType floatType // Level loss
 )
 
@@ -12,6 +12,15 @@ const (
 	ModeARCTAN   modeLossType  = 2      // Arctan
 	MinLevelLoss levelLossType = 10e-33 // The minimum value of the error limit at which training is forcibly terminated
 )
+
+func (n *nn) Loss(target []float64) (loss float64) {
+	if n.isInit {
+		//copy(m.Layer[0].Neuron, input)
+	} else {
+		Log("An uninitialized neural network", true)
+	}
+	return
+}
 
 func Loss(mode ...modeLossType) Setter {
 	if len(mode) == 0 {

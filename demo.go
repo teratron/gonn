@@ -134,8 +134,13 @@ func main() {
 	n.Set(nn.HiddenLayer(3, 4, 3)) //set
 	fmt.Println("n.Get(nn.HiddenLayer()):", n.Get(nn.HiddenLayer())) //get
 
-	input := []float64{2, 3}
+	//
+	input := []float64{2, 3, 4}
 	fmt.Println(n.Query(input))
-	train := []float64{3, 2}
-	fmt.Println(n.Train(input, train))
+
+	//
+	target := []float64{3, 2}
+	fmt.Println(n.Train(input, target))
+
+	fmt.Println(n.Loss(target))
 }
