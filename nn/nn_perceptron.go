@@ -2,7 +2,6 @@
 package nn
 
 import (
-	"fmt"
 	"log"
 )
 
@@ -11,6 +10,9 @@ import (
 }*/
 
 type perceptron struct {
+	Architecture
+	Processor
+
 	bias			biasType			//
 	rate			rateType			//
 	modeActivation	modeActivationType	//
@@ -23,20 +25,18 @@ type perceptron struct {
 	upperRange		floatType			// Range, Bound, Limit, Scope
 	lowerRange		floatType
 
-	lastNeuron		uint32				// Index of the last neuron of the neural network
-	lastAxon		uint32				// Index of the last axon of the neural network
+	lastNeuron		uint				// Index of the last neuron of the neural network
+	lastAxon		uint				// Index of the last axon of the neural network
 
 	neuron struct {
 		error		floatType
 	}
-
-	Architecture // чтобы не создавать методы для всех типов нн
-	Processor
 }
 
 // Initializing Perceptron Neural Network
 func (n *nn) Perceptron() NeuralNetwork {
 	n.architecture = &perceptron{
+		Architecture:	n,
 		bias:			false,
 		rate:			DefaultRate,
 		modeActivation:	ModeSIGMOID,
@@ -48,6 +48,7 @@ func (n *nn) Perceptron() NeuralNetwork {
 		lastNeuron:		0,
 		lastAxon:		0,
 	}
+	//fmt.Println(n.architecture)
 	//n.neuron[0].architecture =
 	return n
 }
@@ -83,30 +84,6 @@ func (p *perceptron) Set(set ...Setter) {
 		p.levelLoss = v
 	case HiddenType:
 		p.hiddenLayer = v
-		//fmt.Printf("%T %v\n", set[1].(*nn).neuron, set[1].(*nn).neuron)
-		if len(p.hiddenLayer) > 0 {
-			var n hiddenType = 0
-			for _, h := range p.hiddenLayer {
-				n += h /** hiddenType(i + 1)*/
-
-			}
-			set[1].(*nn).neuron = make([]neuron, n)
-			fmt.Println(len(set[1].(*nn).neuron), cap(set[1].(*nn).neuron))
-			set[1].(*nn).neuron = append(set[1].(*nn).neuron, neuron{})
-			fmt.Println(len(set[1].(*nn).neuron), cap(set[1].(*nn).neuron))
-		}
-		//neurons := set[1].(*nn).neuron
-		//set[1].(cH) <- true
-		//fmt.Printf("3 go %T\n", set[1])
-		//fmt.Println(*p)
-		//p.initHidden()
-		/*fmt.Println("***", func(d uint32) (h hiddenType) {
-			h = 1
-			for _, value := range p.hiddenLayer {
-				h *= value
-			}
-			return h + hiddenType(d)
-		}(4))*/
 	default:
 		Log("This type of variable is missing for Perceptron Neural Network", false)
 		log.Printf("\tset: %T %v\n", v, v)
@@ -136,9 +113,39 @@ func (p *perceptron) Get(set ...Setter) Getter {
 }
 
 // Init
-func (p *perceptron) Init(data ...[]float64) bool {
+// data[0] - input data
+// data[1] - target data
+// ... - any data
+func (p *perceptron) init(data ...[]float64) bool {
+//func (p *perceptron) init(input, target []float64) bool {
+	lenHidden := len(p.hiddenLayer)
+	lenInput  := len(data[0])
+	lenTarget := len(data[1])
+	var s int
+	var n hiddenType = 0
 
+	if lenHidden > 0 {
+		for i, h := range p.hiddenLayer {
+			n += h
+			if i == 0 {
+				s = lenInput * int(h)
+			} else {
+				s += int(p.hiddenLayer[i - 1] * h)
+			}
+		}
+		s += int(p.hiddenLayer[lenHidden - 1]) * lenTarget
+	} else {
+		s = lenInput * lenTarget
+	}
+	m := int(n) + lenTarget
 
+	if a, ok := p.Architecture.(*nn); ok {
+		a.neuron = make([]neuron, m)
+		a.axon   = make([]axon, s)
+	}
+	p.lastNeuron = uint(m - 1)
+	p.lastAxon   = uint(s - 1)
+	//fmt.Println(m, s)
 
 	return true
 }

@@ -6,30 +6,33 @@ import (
 	"time"
 )
 
-const MaxIteration uint32 = 10e+05	// The maximum number of iterations after which training is forcibly terminated
-
 func init() {
 	Log("Start", false)
 }
 
 // New returns a new neural network instance with the default parameters
 func New() NeuralNetwork {
-	return &nn{
+	n := &nn{
 		architecture:	&perceptron{},
 		isInit:			false,
 		isTrain:		false,
 		language:		"en",
 		logging: 		true,
 	}
+	n.Perceptron()
+	return n
 }
 
 // Init
 // data[0] - input data
 // data[1] - target data
 // ... - any data
-func (n *nn) Init(data ...[]float64) bool {
+func (n *nn) init(data ...[]float64) bool {
+//func (n *nn) Init(input, target []float64) bool {
 
-
+	if v, ok := getArchitecture(n); ok {
+		v.init(data...)
+	}
 
 	n.isInit = true
 	return true
@@ -51,4 +54,3 @@ func (n *nn) setRandWeight() {
 		}
 	}
 }
-

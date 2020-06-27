@@ -7,8 +7,18 @@ var _ NeuralNetwork = (*nn)(nil)
 //
 type NeuralNetwork interface {
 	Architecture
+		//Perceptron() NeuralNetwork
+		//RadialBasis() NeuralNetwork
+		//Hopfield() NeuralNetwork
 	GetterSetter
+		//Get(...Setter) Getter
+		//Set(...Setter)
 	Processor
+		//init(...[]float64)
+		//Query([]float64) []float64
+		//Loss([]float64) float64
+		//Train(...[]float64) (float64, int)
+		//Copy([]float64) []float64
 }
 
 //
@@ -27,7 +37,8 @@ type Architecture interface {
 //
 type Processor interface {
 	// Initializing
-	Init(...[]float64) bool
+	init(...[]float64) bool
+	//Init([]float64, []float64) bool
 
 	// Querying / forecast / prediction
 	Query([]float64) []float64
@@ -37,9 +48,10 @@ type Processor interface {
 
 	// Training
 	Train(...[]float64) (float64, int)
+	//Train([]float64, []float64) (float64, int)
 
 	//
-	Copy([]float64) []float64
+	//Copy([]float64) []float64
 
 	// Verifying / validation
 	//Verify()
@@ -67,13 +79,13 @@ type nn struct {
 	axon			[]axon
 
 	//
-	language		string
-	logging			bool
+	language		langType
+	logging			logType
 }
 
 //
 type neuron struct {
-	architecture	Architecture	// feature
+	Architecture	// feature
 	value			floatType
 	axon			[]axon
 }

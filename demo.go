@@ -95,19 +95,21 @@ func main() {
 
 	// Neural Network
 	n := nn.New()	// same n := nn.New().Perceptron()
+	//n := nn.New().Perceptron()
 	//n := nn.New().RadialBasis()
 	//n := nn.New().Hopfield()
-/*	fmt.Println("nn.New():", n)
+	fmt.Println("nn.New():", n)
 
 	// Common
-	n.Set() //empty set
-	n.Set(
+	/*n.Set() //empty set
+		n.Set(
 		nn.Bias(true),
 		nn.Rate(.33),
 		nn.Activation(nn.ModeSIGMOID),
 		nn.Loss(nn.ModeMSE),
 		nn.LevelLoss(.0005),
-		nn.HiddenLayer(1, 5, 9)) //set
+		nn.HiddenLayer(1, 5, 9)
+	    nn.Language("ru")) //set
 	fmt.Println("n.Get():", n.Get()) //get
 
 	// Bias
@@ -129,18 +131,25 @@ func main() {
 	// Level loss
 	n.Set(nn.LevelLoss(.004)) //set
 	fmt.Println("n.Get(nn.LevelLoss()):", n.Get(nn.LevelLoss())) //get
-*/
+	*/
 	// Hidden layers
 	n.Set(nn.HiddenLayer(3, 4, 3)) //set
 	fmt.Println("n.Get(nn.HiddenLayer()):", n.Get(nn.HiddenLayer())) //get
 
-	//
-	input := []float64{2, 3, 4}
-	fmt.Println(n.Query(input))
+	// Language
+	n.Set(nn.Language("ru")) //set
+	fmt.Println("n.Get(nn.Language()):", n.Get(nn.Language())) //get
 
 	//
-	target := []float64{3, 2}
+	input  := []float64{2.3, 3, 4}
+	target := []float64{3, 2.3}
+
+	//
+	//fmt.Println(n.Query(input))
+
+	//
 	fmt.Println(n.Train(input, target))
 
+	//
 	fmt.Println(n.Loss(target))
 }

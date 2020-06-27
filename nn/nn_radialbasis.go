@@ -8,20 +8,20 @@ import "fmt"
 }*/
 
 type radialBasis struct {
+	Architecture
+	Processor
+
 	cup int
 
 	neuron struct {
 		error		floatType
 	}
-
-	Architecture
-	Processor
 }
 
 // Initializing Radial Basis Neural Network
 func (n *nn) RadialBasis() NeuralNetwork {
 	n.architecture = &radialBasis{
-		cup: 1,
+		Architecture:	n,
 	}
 	return n
 }

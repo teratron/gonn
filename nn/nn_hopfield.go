@@ -12,7 +12,9 @@ type hopfield struct {
 
 // Initializing Hopfield Neural Network
 func (n *nn) Hopfield() NeuralNetwork {
-	n.architecture = &hopfield{}
+	n.architecture = &hopfield{
+		Architecture:	n,
+	}
 	return n
 }
 

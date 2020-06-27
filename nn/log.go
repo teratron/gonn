@@ -5,6 +5,8 @@ import (
 	"runtime"
 )
 
+type logType bool
+
 type Logger interface {
 }
 
