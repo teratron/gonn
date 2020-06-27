@@ -8,6 +8,8 @@
   <a href='https://sourcegraph.com/github.com/zigenzoog/gonn?badge'><img src='https://sourcegraph.com/github.com/zigenzoog/gonn/-/badge.svg' alt='Used By' /></a>
 </p>
 
+# under construction
+
 # About
 gonn - Neural Network for Golang
 
@@ -33,14 +35,10 @@ func main() {
     n = nn.New().RadialBasis()
     
     // Set
-    n.SetBias(1)
-    // or
-    n.Set(nn.Bias(0))
+    n.Set(nn.Bias(false))
 
     // Get
-    b := n.Bias()
-    // or
-    b = n.GetBias()
+    b := n.Get(nn.Bias())
 //Log("Parameter not specified for Bias", false)
 
 }
