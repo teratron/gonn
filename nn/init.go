@@ -2,6 +2,7 @@
 package nn
 
 import (
+	"fmt"
 	"math/rand"
 	"time"
 )
@@ -16,6 +17,8 @@ func New() NeuralNetwork {
 		architecture:	&perceptron{},
 		isInit:			false,
 		isTrain:		false,
+		lastNeuron:		0,
+		lastAxon:		0,
 		language:		"en",
 		logging: 		true,
 	}
@@ -31,10 +34,9 @@ func (n *nn) init(data ...[]float64) bool {
 //func (n *nn) Init(input, target []float64) bool {
 
 	if v, ok := getArchitecture(n); ok {
-		v.init(data...)
+		n.isInit = v.init(data...)
 	}
 
-	n.isInit = true
 	return true
 }
 
@@ -48,9 +50,19 @@ func (n *nn) setRandWeight() {
 		}
 		return
 	}
-	for _, a := range n.axon {
-		if b, ok := a.synapse["bias"]; !ok || (ok && b.(biasType) == true) {
-			a.weight = randWeight()
+	for i, a := range n.axon {
+		//if b, ok := a.synapse["bias"]; !ok || (ok && b.(biasType) == true) {
+		//a.weight = randWeight()
+		//}
+		if i == 0 {
+			fmt.Printf("%T %v\n", a, &a.weight)
+			fmt.Printf("%T %v\n", n.axon, &n.axon[i].weight)
 		}
 	}
+	for i := 0; i <= n.lastAxon; i++ {
+		n.axon[i].weight = randWeight()
+	}
+	//n.axon[0].weight = randWeight()
+	//fmt.Printf("%T %v\n", n.axon[0], n.axon[0])
+	//fmt.Println(n.axon[0].weight)
 }

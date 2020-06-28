@@ -25,9 +25,6 @@ type perceptron struct {
 	upperRange		floatType			// Range, Bound, Limit, Scope
 	lowerRange		floatType
 
-	lastNeuron		uint				// Index of the last neuron of the neural network
-	lastAxon		uint				// Index of the last axon of the neural network
-
 	neuron struct {
 		error		floatType
 	}
@@ -45,8 +42,6 @@ func (n *nn) Perceptron() NeuralNetwork {
 		hiddenLayer:	HiddenType{},
 		upperRange:		1,
 		lowerRange:		0,
-		lastNeuron:		0,
-		lastAxon:		0,
 	}
 	//fmt.Println(n.architecture)
 	//n.neuron[0].architecture =
@@ -118,34 +113,44 @@ func (p *perceptron) Get(set ...Setter) Getter {
 // ... - any data
 func (p *perceptron) init(data ...[]float64) bool {
 //func (p *perceptron) init(input, target []float64) bool {
+	var numAxon int
+	numNeuron := 0
 	lenHidden := len(p.hiddenLayer)
 	lenInput  := len(data[0])
 	lenTarget := len(data[1])
-	var s int
-	var n hiddenType = 0
-
+	b := 0
+	if p.bias {
+		b = 1
+	}
 	if lenHidden > 0 {
 		for i, h := range p.hiddenLayer {
-			n += h
+			numNeuron += int(h)
 			if i == 0 {
-				s = lenInput * int(h)
+				numAxon = (lenInput + b) * int(h)
 			} else {
-				s += int(p.hiddenLayer[i - 1] * h)
+				numAxon += (int(p.hiddenLayer[i - 1]) + b) * int(h)
 			}
 		}
-		s += int(p.hiddenLayer[lenHidden - 1]) * lenTarget
+		numAxon += (int(p.hiddenLayer[lenHidden - 1]) + b) * lenTarget
 	} else {
-		s = lenInput * lenTarget
+		numAxon = (lenInput + b) * lenTarget
 	}
-	m := int(n) + lenTarget
+	numNeuron += lenTarget
 
-	if a, ok := p.Architecture.(*nn); ok {
-		a.neuron = make([]neuron, m)
-		a.axon   = make([]axon, s)
+	if n, ok := p.Architecture.(*nn); ok {
+		n.neuron     = make([]neuron, numNeuron)
+		n.axon       = make([]axon, numAxon)
+		n.lastNeuron = numNeuron - 1
+		n.lastAxon   = numAxon - 1
+
+		// Fills all weights with random numbers
+		n.setRandWeight()
+		//fmt.Printf("************************%T %v\n", n, n)
+		/*for _, a := range n.axon {
+			fmt.Printf("************************ %T %v\n", a, a)
+		}*/
 	}
-	p.lastNeuron = uint(m - 1)
-	p.lastAxon   = uint(s - 1)
-	//fmt.Println(m, s)
+	//fmt.Println(numNeuron, numAxon)
 
 	return true
 }

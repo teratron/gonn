@@ -101,17 +101,17 @@ func main() {
 	fmt.Println("nn.New():", n)
 
 	// Common
-	/*n.Set() //empty set
-		n.Set(
+	n.Set() //empty set
+	n.Set(
 		nn.Bias(true),
 		nn.Rate(.33),
 		nn.Activation(nn.ModeSIGMOID),
 		nn.Loss(nn.ModeMSE),
 		nn.LevelLoss(.0005),
-		nn.HiddenLayer(1, 5, 9)
+		nn.HiddenLayer(1, 5, 9),
 	    nn.Language("ru")) //set
 	fmt.Println("n.Get():", n.Get()) //get
-
+	/*
 	// Bias
 	n.Set(nn.Bias(false)) //set
 	fmt.Println("n.Get(nn.Bias()):", n.Get(nn.Bias())) //get
