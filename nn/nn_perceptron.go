@@ -2,6 +2,7 @@
 package nn
 
 import (
+	"fmt"
 	"log"
 )
 
@@ -138,17 +139,17 @@ func (p *perceptron) init(data ...[]float64) bool {
 	numNeuron += lenTarget
 
 	if n, ok := p.Architecture.(*nn); ok {
-		n.neuron     = make([]neuron, numNeuron)
-		n.axon       = make([]axon, numAxon)
+		n.neuron     = make([]*neuron, numNeuron)
+		n.axon       = make([]*axon, numAxon)
 		n.lastNeuron = numNeuron - 1
 		n.lastAxon   = numAxon - 1
 
+		for i := 0; i < numAxon; i++ {
+			n.axon[i] = &axon{}
+		}
 		// Fills all weights with random numbers
 		n.setRandWeight()
-		//fmt.Printf("************************%T %v\n", n, n)
-		/*for _, a := range n.axon {
-			fmt.Printf("************************ %T %v\n", a, a)
-		}*/
+		fmt.Printf("************************ %T %v\n", n, n)
 	}
 	//fmt.Println(numNeuron, numAxon)
 

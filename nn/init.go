@@ -2,7 +2,6 @@
 package nn
 
 import (
-	"fmt"
 	"math/rand"
 	"time"
 )
@@ -50,19 +49,9 @@ func (n *nn) setRandWeight() {
 		}
 		return
 	}
-	for i, a := range n.axon {
+	for _, a := range n.axon {
 		//if b, ok := a.synapse["bias"]; !ok || (ok && b.(biasType) == true) {
-		//a.weight = randWeight()
+		a.weight = randWeight()
 		//}
-		if i == 0 {
-			fmt.Printf("%T %v\n", a, &a.weight)
-			fmt.Printf("%T %v\n", n.axon, &n.axon[i].weight)
-		}
 	}
-	for i := 0; i <= n.lastAxon; i++ {
-		n.axon[i].weight = randWeight()
-	}
-	//n.axon[0].weight = randWeight()
-	//fmt.Printf("%T %v\n", n.axon[0], n.axon[0])
-	//fmt.Println(n.axon[0].weight)
 }
