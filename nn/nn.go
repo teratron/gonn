@@ -14,7 +14,7 @@ type NeuralNetwork interface {
 		//Get(...Setter) Getter
 		//Set(...Setter)
 	Processor
-		//init(...[]float64)
+		//init(...[]float64) bool
 		//Query([]float64) []float64
 		//Loss([]float64) float64
 		//Train(...[]float64) (float64, int)
@@ -57,15 +57,9 @@ type Processor interface {
 	//Verify()
 }
 
-type Vertex interface {
-}
-
 type (
 	floatType		float32
-
-	bias			*biasType
-	input			*neuron
-	output			*neuron
+	//output			*neuron
 )
 
 //
@@ -95,5 +89,5 @@ type neuron struct {
 //
 type axon struct {
 	weight			floatType			//
-	synapse			map[string]Vertex	// map["bias"]Vertex, map["input"]Vertex, map["output"]Vertex
+	synapse			map[string]Setter	// map["bias"]Vertex, map["input"]Vertex, map["output"]Vertex
 }

@@ -11,8 +11,6 @@ type radialBasis struct {
 	Architecture
 	Processor
 
-	cup int
-
 	neuron struct {
 		error		floatType
 	}

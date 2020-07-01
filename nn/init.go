@@ -1,11 +1,6 @@
 //
 package nn
 
-import (
-	"math/rand"
-	"time"
-)
-
 func init() {
 	Log("Start", false)
 }
@@ -31,27 +26,8 @@ func New() NeuralNetwork {
 // ... - any data
 func (n *nn) init(data ...[]float64) bool {
 //func (n *nn) Init(input, target []float64) bool {
-
 	if v, ok := getArchitecture(n); ok {
 		n.isInit = v.init(data...)
 	}
-
 	return true
-}
-
-// The function fills all weights with random numbers from -0.5 to 0.5
-func (n *nn) setRandWeight() {
-	rand.Seed(time.Now().UTC().UnixNano())
-	randWeight := func() (r floatType) {
-		r = 0
-		for r == 0 {
-			r = floatType(rand.Float64() - .5)
-		}
-		return
-	}
-	for _, a := range n.axon {
-		//if b, ok := a.synapse["bias"]; !ok || (ok && b.(biasType) == true) {
-		a.weight = randWeight()
-		//}
-	}
 }
