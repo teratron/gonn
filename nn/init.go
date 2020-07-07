@@ -1,7 +1,13 @@
 //
 package nn
 
+import (
+	"math/rand"
+	"time"
+)
+
 func init() {
+	rand.Seed(time.Now().UTC().UnixNano())
 	Log("Start", false)
 }
 

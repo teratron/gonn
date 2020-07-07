@@ -2,7 +2,6 @@ package nn
 
 import (
 	"math/rand"
-	"time"
 )
 
 type GetterSetter interface {
@@ -50,9 +49,7 @@ func (n *nn) Get(args ...Setter) Getter {
 }
 
 func  (f floatType) Set(set ...Setter) {
-	if v, ok := getArchitecture(set[0]); ok {
-		v.Set(f)
-	}
+	Log("", false)
 }
 
 //
@@ -67,7 +64,6 @@ func getArchitecture(set Setter) (NeuralNetwork, bool) {
 
 // Return random number from -0.5 to 0.5
 func getRand() (r floatType) {
-	rand.Seed(time.Now().UTC().UnixNano())
 	r = 0
 	for r == 0 {
 		r = floatType(rand.Float64() - .5)

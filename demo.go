@@ -142,7 +142,7 @@ func main() {
 
 	//
 	input  := []float64{2.3, 3.1}
-	target := []float64{3.6}
+	target := []float64{3.6/*, 2*/}
 
 	//
 	//fmt.Println(n.Query(input))

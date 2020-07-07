@@ -69,8 +69,8 @@ type nn struct {
 	isTrain			bool			//
 
 	//
-	neuron			[]neuron
-	axon			[]axon
+	neuron			[]*neuron
+	axon			[]*axon
 	lastNeuron		int				// Index of the last neuron of the neural network
 	lastAxon		int				// Index of the last axon of the neural network
 
@@ -82,12 +82,14 @@ type nn struct {
 //
 type neuron struct {
 	Architecture	// feature
+	//index			int
 	value			floatType
-	axon			[]axon
+	axon			[]*axon
 }
 
 //
 type axon struct {
+	//index			int
 	weight			floatType			//
 	synapse			map[string]Setter	// map["bias"]Vertex, map["input"]Vertex, map["output"]Vertex
 }
