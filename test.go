@@ -19,11 +19,11 @@ func (t *Test) Testing() {
 	}
 }
 
-func main() {
+/*func main() {
 	t := Test{}
 	t.array = make([]*Array, 5)
 	for i := 0; i < 5; i++ {
 		t.array[i] = &Array{}
 	}
 	t.Testing()
-}
+}*/
