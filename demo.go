@@ -111,11 +111,11 @@ func main() {
 		nn.HiddenLayer(1, 5, 9),
 	    nn.Language("ru")) //set
 	fmt.Println("n.Get():", n.Get()) //get
-	/*
-	// Bias
-	n.Set(nn.Bias(false)) //set
-	fmt.Println("n.Get(nn.Bias()):", n.Get(nn.Bias())) //get
 
+	// Bias
+	//n.Set(nn.Bias(false)) //set
+	fmt.Println("n.Get(nn.Bias()):", n.Get(nn.Bias())) //get
+	/*
 	// Rate
 	n.Set(nn.Rate(.1)) //set
 	fmt.Println("n.Get(nn.Rate()):", n.Get(nn.Rate())) //get

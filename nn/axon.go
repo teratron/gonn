@@ -6,8 +6,7 @@ import (
 )
 
 // Setter
-func (n *axon) Set(set ...Setter)  {
-
+func (n *axon) Set(set ...Setter) {
 }
 
 // The function fills all weights with random numbers from -0.5 to 0.5

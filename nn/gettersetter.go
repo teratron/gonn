@@ -49,8 +49,10 @@ func (n *nn) Get(args ...Setter) Getter {
 	return nil
 }
 
-//
-func  (f floatType) Set(args ...Setter) {
+func  (f floatType) Set(set ...Setter) {
+	if v, ok := getArchitecture(set[0]); ok {
+		v.Set(f)
+	}
 }
 
 //
