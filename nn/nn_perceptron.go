@@ -2,6 +2,7 @@
 package nn
 
 import (
+	"fmt"
 	"log"
 )
 
@@ -161,11 +162,12 @@ func (p *perceptron) init(args ...Setter) bool {
 
 		}
 
+
 		func(index int) {
+			sumAxonLayer, sumNeuronLayer, prevAxonLayer, prevNeuronLayer := 0, 0, 0, 0
 			var numNeuronLayer int
 			var layer HiddenType
 			layer = append(p.hiddenLayer, hiddenType(lenTarget))
-			sumAxonLayer, sumNeuronLayer, prevAxonLayer, prevNeuronLayer := 0, 0, 0, 0
 			for i, v := range layer {
 				if i == 0 {
 					numNeuronLayer = lenInput + b
@@ -178,7 +180,23 @@ func (p *perceptron) init(args ...Setter) bool {
 						delta := index - prevAxonLayer
 						if delta < numNeuronLayer * (j + 1) {
 							n.axon[index].synapse["output"] = n.neuron[j + sumNeuronLayer]
-							n.axon[index].synapse["input"]  = n.neuron[prevNeuronLayer + delta - numNeuronLayer * j]
+							delta -= numNeuronLayer * j
+							if i == 0 {
+								if delta < lenInput {
+									if g, ok := args[0].(FloatType); ok {
+										n.axon[index].synapse["input"] = floatType(g[delta])
+									}
+								} else {
+									if p.bias {
+										n.axon[index].synapse["bias"] = biasType(true)
+									} else {
+										panic("error") // !!!
+									}
+								}
+							} else {
+								n.axon[index].synapse["input"] = n.neuron[prevNeuronLayer + delta]
+							}
+							fmt.Println("-", n.axon[index])
 							break
 						}
 					}
@@ -188,10 +206,11 @@ func (p *perceptron) init(args ...Setter) bool {
 				prevNeuronLayer = sumNeuronLayer
 				sumNeuronLayer += int(v)
 			}
-		}(18)
+		}(1)
+
 
 		//
-		if lenHidden > 0 { // если есть скрытые слои
+		/*if lenHidden > 0 { // если есть скрытые слои
 			var m int
 			c, d, e := 0, 0, 0
 			for i, v := range p.hiddenLayer { // проходим по скрытым слоям
@@ -251,9 +270,7 @@ func (p *perceptron) init(args ...Setter) bool {
 				c = d
 			}
 		} else { // если скрытые слои отсутсвуют
-		}
-
-
+		}*/
 
 		// Fills all weights with random numbers
 		//n.setRandWeight()
