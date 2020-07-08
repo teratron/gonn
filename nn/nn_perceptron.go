@@ -2,7 +2,6 @@
 package nn
 
 import (
-	"fmt"
 	"log"
 )
 
@@ -111,15 +110,14 @@ func (p *perceptron) Get(set ...Setter) Getter {
 }
 
 // Init
-// data[0] - input data
-// data[1] - target data
-func (p *perceptron) init(data ...[]float64) bool {
-//func (p *perceptron) init(input, target []float64) bool {
+// args[0] - input data
+// args[1] - target data
+func (p *perceptron) init(args ...Setter) bool {
 	var numAxon int
 	numNeuron := 0
 	lenHidden := len(p.hiddenLayer)
-	lenInput  := len(data[0])
-	lenTarget := len(data[1])
+	lenInput  := len(args[0].(FloatType))
+	lenTarget := len(args[1].(FloatType))
 	b := 0
 	if p.bias {
 		b = 1
@@ -159,7 +157,38 @@ func (p *perceptron) init(data ...[]float64) bool {
 				synapse: map[string]Setter{},
 			}
 			//n.axon[i].synapse = make(map[string]Setter, 3)
+
+
 		}
+
+		func(index int) {
+			var numNeuronLayer int
+			var layer HiddenType
+			layer = append(p.hiddenLayer, hiddenType(lenTarget))
+			sumAxonLayer, sumNeuronLayer, prevAxonLayer, prevNeuronLayer := 0, 0, 0, 0
+			for i, v := range layer {
+				if i == 0 {
+					numNeuronLayer = lenInput + b
+				} else {
+					numNeuronLayer = int(layer[i - 1]) + b
+				}
+				sumAxonLayer += numNeuronLayer * int(v)
+				if index < sumAxonLayer {
+					for j := 0; j < int(v); j++ {
+						delta := index - prevAxonLayer
+						if delta < numNeuronLayer * (j + 1) {
+							n.axon[index].synapse["output"] = n.neuron[j + sumNeuronLayer]
+							n.axon[index].synapse["input"]  = n.neuron[prevNeuronLayer + delta - numNeuronLayer * j]
+							break
+						}
+					}
+					break
+				}
+				prevAxonLayer = sumAxonLayer
+				prevNeuronLayer = sumNeuronLayer
+				sumNeuronLayer += int(v)
+			}
+		}(18)
 
 		//
 		if lenHidden > 0 { // если есть скрытые слои
@@ -170,54 +199,54 @@ func (p *perceptron) init(data ...[]float64) bool {
 					if i == 0 { // первый скрытый слой
 						m  = lenInput
 						d += lenBias
-						fmt.Println("--", i, e, c, d)
-						for k, in := range data[0] { // проходим по входным нейронам
+						//fmt.Println("--", i, e, c, d)
+						for k, in := range args[0].(FloatType) { // проходим по входным нейронам
 							n.axon[k + c].synapse["input"]  = floatType(in)
 							n.axon[k + c].synapse["output"] = n.neuron[j]
-							fmt.Println("-", c + k, n.axon[k + c])
+							//fmt.Println("-", c + k, n.axon[k + c])
 						}
 					} else { // последующие скрытые слои
 						m  = int(p.hiddenLayer[i - 1])
 						d += m + b
-						fmt.Println("--", i, e, c, d)
+						//fmt.Println("--", i, e, c, d)
 						for k := 0; k < m; k++ { // проходим по нейронам предыдущего скрытого слоя
 							n.axon[k + c].synapse["input"]  = n.neuron[k + e - m]
 							n.axon[k + c].synapse["output"] = n.neuron[j + e]
-							fmt.Println("-", c + k, n.axon[k + c])
+							//fmt.Println("-", c + k, n.axon[k + c])
 						}
 					}
 					if p.bias {
 						n.axon[m + c].synapse["bias"]   = biasType(true)
 						n.axon[m + c].synapse["output"] = n.neuron[j + e]
-						fmt.Println("-", c + m, n.axon[c + m])
+						//fmt.Println("-", c + m, n.axon[c + m])
 					}
 					n.neuron[j + e].axon = n.axon[c:d]
-					fmt.Println("-+-", n.neuron[j + e].axon)
+					//fmt.Println("-+-", n.neuron[j + e].axon)
 					c = d
 				}
 				e += int(v)
 			}
-			fmt.Println("-+-+-", e, c, d)
+			//fmt.Println("-+-+-", e, c, d)
 			m = int(p.hiddenLayer[len(p.hiddenLayer) - 1])
-			for i := range data[1] { // проходим по выходным нейронам
+			for i := 0; i < lenTarget; i++ { // проходим по выходным нейронам
 				for j := 0; j < m; j++ { // проходим по нейронам последнего скрытого слоя
 					n.axon[j + c].synapse["input"]  = n.neuron[j + e - m]
 					n.axon[j + c].synapse["output"] = n.neuron[i + e]
-					fmt.Println("-", c + j, n.axon[c + j])
+					//fmt.Println("-", c + j, n.axon[c + j])
 				}
 				if p.bias {
 					n.axon[m + c].synapse["bias"]   = biasType(true)
 					n.axon[m + c].synapse["output"] = n.neuron[i + e]
-					fmt.Println("-", c + m, n.axon[c + m])
+					//fmt.Println("-", c + m, n.axon[c + m])
 				}
 				d += m + b
-				fmt.Println("-", i, i +e, c, d)
+				//fmt.Println("-", i, i +e, c, d)
 				if d == numAxon {
 					n.neuron[i + e].axon = n.axon[c:]
-					fmt.Println("-+-", n.neuron[i + e].axon)
+					//fmt.Println("-+-", n.neuron[i + e].axon)
 				} else {
 					n.neuron[i + e].axon = n.axon[c:d]
-					fmt.Println("-+-", n.neuron[i + e].axon)
+					//fmt.Println("-+-", n.neuron[i + e].axon)
 				}
 				c = d
 			}

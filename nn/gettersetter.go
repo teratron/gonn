@@ -48,7 +48,15 @@ func (n *nn) Get(args ...Setter) Getter {
 	return nil
 }
 
+func  (i intType) Set(set ...Setter) {
+	Log("", false)
+}
+
 func  (f floatType) Set(set ...Setter) {
+	Log("", false)
+}
+
+func  (f FloatType) Set(set ...Setter) {
 	Log("", false)
 }
 

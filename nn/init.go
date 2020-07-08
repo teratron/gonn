@@ -27,13 +27,9 @@ func New() NeuralNetwork {
 }
 
 // Init
-// data[0] - input data
-// data[1] - target data
-// ... - any data
-func (n *nn) init(data ...[]float64) bool {
-//func (n *nn) Init(input, target []float64) bool {
+func (n *nn) init(args ...Setter) bool {
 	if v, ok := getArchitecture(n); ok {
-		n.isInit = v.init(data...)
+		n.isInit = v.init(args...)
 	}
 	return true
 }

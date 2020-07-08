@@ -6,3 +6,9 @@ func (a *axon) Set(set ...Setter) {
 		v.Set(a)
 	}
 }
+
+/*func (s *synapse) Set(set ...Setter) {
+	if v, ok := getArchitecture(set[0]); ok {
+		v.Set(s)
+	}
+}*/

@@ -14,7 +14,7 @@ type NeuralNetwork interface {
 		//Get(...Setter) Getter
 		//Set(...Setter)
 	Processor
-		//init(...[]float64) bool
+		//init(...Setter) bool
 		//Query([]float64) []float64
 		//Loss([]float64) float64
 		//Train(...[]float64) (float64, int)
@@ -37,7 +37,7 @@ type Architecture interface {
 //
 type Processor interface {
 	// Initializing
-	init(...[]float64) bool
+	init(...Setter) bool
 	//Init([]float64, []float64) bool
 
 	// Querying / forecast / prediction
@@ -58,8 +58,9 @@ type Processor interface {
 }
 
 type (
+	intType			int
 	floatType		float32
-	//output			*neuron
+	FloatType		[]float64
 )
 
 //
