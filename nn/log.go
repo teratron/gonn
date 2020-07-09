@@ -5,13 +5,36 @@ import (
 	"runtime"
 )
 
-type logType bool
+type logType uint8
 
 type Logger interface {
 }
 
 type logs struct {
 	reason string
+}
+
+func Logging(status ...logType) Setter {
+	if len(status) == 0 {
+		return modeLossType(0)
+	} else {
+		return status[0]
+	}
+}
+
+// Setter
+func (l logType) Set(set ...Setter) {
+	if n, ok := set[0].(*nn); ok {
+		n.logging = l
+	}
+}
+
+// Getter
+func (l logType) Get(set ...Setter) Getter {
+	if n, ok := set[0].(*nn); ok {
+		return n.logging
+	}
+	return nil
 }
 
 //

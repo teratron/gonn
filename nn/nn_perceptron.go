@@ -2,6 +2,7 @@
 package nn
 
 import (
+	"fmt"
 	"log"
 )
 
@@ -41,11 +42,7 @@ func (n *nn) Perceptron() NeuralNetwork {
 		hiddenLayer:	HiddenType{},
 		upperRange:		1,
 		lowerRange:		0,
-		//neuron:			struct{ error floatType }{error:.2},
 	}
-	//n.neuron[0].Architecture.neuron = make([]struct{}, 0)
-	//fmt.Println(n.architecture)
-	//n.neuron[0].architecture =
 	return n
 }
 
@@ -113,8 +110,6 @@ func (p *perceptron) Get(set ...Setter) Getter {
 // args[1] - target data
 func (p *perceptron) init(args ...Setter) bool {
 	var tmp HiddenType
-	//var numAxon int
-	//numNeuron := 0
 	lenHidden := len(p.hiddenLayer)
 	layer     := make(HiddenType, lenHidden + 1)
 	lenInput  := len(args[0].(FloatType))
@@ -126,42 +121,66 @@ func (p *perceptron) init(args ...Setter) bool {
 
 	b := 0
 	if p.bias { b = 1 }
-	//lenBias := lenInput + b
-
-	// Определяем количества нейронов и аксонов в матрице
-	/*if lenHidden > 0 {
-		for i, v := range p.hiddenLayer {
-			numNeuron += int(v)
-			if i == 0 {
-				numAxon = lenBias * int(v)
-			} else {
-				numAxon += (int(p.hiddenLayer[i - 1]) + b) * int(v)
-			}
-		}
-		numAxon += (int(p.hiddenLayer[lenHidden - 1]) + b) * lenTarget
-	} else {
-		numAxon = lenBias * lenTarget
-	}
-	numNeuron += lenTarget*/
 
 	//
 	p.neuron = make([][]*neuron, lenLayer)
 	p.axon   = make([][][]*axon, lenLayer)
-
 	for i, l := range layer {
 		p.neuron[i] = make([]*neuron, l)
 		p.axon[i]   = make([][]*axon, l)
-		//fmt.Println(i, l, p.neuron[i], p.axon[i])
 		for j := 0; j < int(l); j++ {
-			//fmt.Println(i, j)
 			if i == 0 {
 				p.axon[i][j] = make([]*axon, lenInput + b)
-				//fmt.Println("- ",i, j, lenInput + b)
 			} else {
 				p.axon[i][j] = make([]*axon, int(layer[i - 1]) + b)
-				//fmt.Println("- ",i, j, int(layer[i - 1]) + b)
 			}
+		}
+	}
 
+	//
+	for i, v := range p.neuron {
+		for j := range v {
+			p.neuron[i][j] = &neuron{
+				specific:	biasType(true),
+				axon:		p.axon[i][j],
+			}
+			//p.neuron[i][j].specific = p.axon[i][j]
+			//p.neuron[i][j].axon = p.axon[i][j]
+		}
+	}
+
+	//
+	for i, v := range p.axon {
+		for j, w := range v {
+			for k := range w {
+				p.axon[i][j][k] = &axon{
+					weight:	 getRand(),
+					synapse: map[string]Setter{},
+				}
+				if i == 0 {
+					if k < lenInput {
+						if in, ok := args[0].(FloatType); ok {
+							p.axon[i][j][k].synapse["input"] = floatType(in[k])
+						}
+					} else {
+						p.axon[i][j][k].synapse["input"] = biasType(true)
+					}
+				} else {
+					if k < len(p.axon[i - 1]) {
+						p.axon[i][j][k].synapse["input"] = p.neuron[i - 1][k]
+					} else {
+						p.axon[i][j][k].synapse["input"] = biasType(true)
+					}
+				}
+				p.axon[i][j][k].synapse["output"] = p.neuron[i][j]
+				fmt.Println("- ", i, j, k, p.axon[i][j][k])
+			}
+		}
+	}
+
+	for i, v := range p.neuron {
+		for j := range v {
+			fmt.Println("- ", i, j, p.neuron[i][j])
 		}
 	}
 

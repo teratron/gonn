@@ -18,7 +18,7 @@ func New() NeuralNetwork {
 		isInit:			false,
 		isTrain:		false,
 		language:		"en",
-		logging: 		true,
+		logging: 		1,
 	}
 	n.Perceptron()
 	return n

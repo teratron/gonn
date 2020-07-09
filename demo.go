@@ -108,8 +108,10 @@ func main() {
 		nn.Activation(nn.ModeSIGMOID),
 		nn.Loss(nn.ModeMSE),
 		nn.LevelLoss(.0005),
-		//nn.HiddenLayer(1, 5, 9),
-	    nn.Language("ru")) //set
+		nn.HiddenLayer(1, 5, 9),
+
+		nn.Language("ru"),
+		nn.Logging(1)) //set
 	fmt.Println("n.Get():", n.Get()) //get
 
 	// Bias
@@ -140,9 +142,14 @@ func main() {
 	n.Set(nn.Language("ru")) //set
 	fmt.Println("n.Get(nn.Language()):", n.Get(nn.Language())) //get
 
+	// Logging
+	n.Set(nn.Logging(0)) //set
+	fmt.Println("n.Get(nn.Logging()):", n.Get(nn.Logging())) //get
+
+
 	//
 	input  := []float64{2.3, 3.1}
-	target := []float64{3.6, 4}
+	target := []float64{3.6}
 
 	//
 	//fmt.Println(n.Query(input))

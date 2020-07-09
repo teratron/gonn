@@ -61,6 +61,7 @@ type (
 	intType			int
 	floatType		float32
 	FloatType		[]float64
+	miss			floatType
 )
 
 //
@@ -76,15 +77,13 @@ type nn struct {
 
 //
 type neuron struct {
-	Architecture	// feature
-	//index			int
+	specific		Setter			// feature
 	value			floatType
 	axon			[]*axon
 }
 
 //
 type axon struct {
-	//index			int
 	weight			floatType			//
 	synapse			map[string]Setter	// map["bias"]Vertex, map["input"]Vertex, map["output"]Vertex
 }
