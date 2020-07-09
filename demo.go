@@ -133,7 +133,7 @@ func main() {
 	fmt.Println("n.Get(nn.LevelLoss()):", n.Get(nn.LevelLoss())) //get
 	*/
 	// Hidden layers
-	//n.Set(nn.HiddenLayer(3, 2)) //set
+	n.Set(nn.HiddenLayer(3, 2)) //set
 	fmt.Println("n.Get(nn.HiddenLayer()):", n.Get(nn.HiddenLayer())) //get
 
 	// Language
@@ -142,7 +142,7 @@ func main() {
 
 	//
 	input  := []float64{2.3, 3.1}
-	target := []float64{3.6,4}
+	target := []float64{3.6, 4}
 
 	//
 	//fmt.Println(n.Query(input))

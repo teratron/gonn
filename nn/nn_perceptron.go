@@ -2,7 +2,6 @@
 package nn
 
 import (
-	"fmt"
 	"log"
 )
 
@@ -23,12 +22,11 @@ type perceptron struct {
 
 	hiddenLayer		HiddenType			// Array of the number of neurons in each hidden layer
 
+	neuron			[][]*neuron
+	axon			[][][]*axon
+
 	upperRange		floatType			// Range, Bound, Limit, Scope
 	lowerRange		floatType
-
-	neuron struct {
-		error		floatType
-	}
 }
 
 // Initializing Perceptron Neural Network
@@ -83,8 +81,8 @@ func (p *perceptron) Set(set ...Setter) {
 	case HiddenType:
 		p.hiddenLayer = v
 	default:
-		Log("This type of variable is missing for Perceptron Neural Network", false)
-		log.Printf("\tset: %T %v\n", v, v)
+		Log("This type of variable is missing for Perceptron Neural Network", false) // !!!
+		log.Printf("\tset: %T %v\n", v, v) // !!!
 	}
 }
 
@@ -104,8 +102,8 @@ func (p *perceptron) Get(set ...Setter) Getter {
 	case HiddenType:
 		return p.hiddenLayer
 	default:
-		Log("This type of variable is missing for Perceptron Neural Network", false)
-		log.Printf("\tget: %T %v\n", set[0], set[0])
+		Log("This type of variable is missing for Perceptron Neural Network", false) // !!!
+		log.Printf("\tget: %T %v\n", set[0], set[0]) // !!!
 		return nil
 	}
 }
@@ -114,19 +112,24 @@ func (p *perceptron) Get(set ...Setter) Getter {
 // args[0] - input data
 // args[1] - target data
 func (p *perceptron) init(args ...Setter) bool {
-	var numAxon int
-	numNeuron := 0
+	var tmp HiddenType
+	//var numAxon int
+	//numNeuron := 0
 	lenHidden := len(p.hiddenLayer)
+	layer     := make(HiddenType, lenHidden + 1)
 	lenInput  := len(args[0].(FloatType))
 	lenTarget := len(args[1].(FloatType))
+	tmp        = append(p.hiddenLayer, hiddenType(lenTarget))
+	lenLayer  := copy(layer, tmp)
+
+	defer func() { tmp = nil }()
+
 	b := 0
-	if p.bias {
-		b = 1
-	}
-	lenBias := lenInput + b
+	if p.bias { b = 1 }
+	//lenBias := lenInput + b
 
 	// Определяем количества нейронов и аксонов в матрице
-	if lenHidden > 0 {
+	/*if lenHidden > 0 {
 		for i, v := range p.hiddenLayer {
 			numNeuron += int(v)
 			if i == 0 {
@@ -139,29 +142,43 @@ func (p *perceptron) init(args ...Setter) bool {
 	} else {
 		numAxon = lenBias * lenTarget
 	}
-	numNeuron += lenTarget
+	numNeuron += lenTarget*/
 
 	//
-	if n, ok := p.Architecture.(*nn); ok {
-		n.neuron     = make([]*neuron, numNeuron)
-		n.axon       = make([]*axon, numAxon)
-		n.lastNeuron = numNeuron - 1
-		n.lastAxon   = numAxon - 1
+	p.neuron = make([][]*neuron, lenLayer)
+	p.axon   = make([][][]*axon, lenLayer)
 
-		for i := 0; i < numNeuron; i++ {
-			n.neuron[i] = &neuron{}
+	for i, l := range layer {
+		p.neuron[i] = make([]*neuron, l)
+		p.axon[i]   = make([][]*axon, l)
+		//fmt.Println(i, l, p.neuron[i], p.axon[i])
+		for j := 0; j < int(l); j++ {
+			//fmt.Println(i, j)
+			if i == 0 {
+				p.axon[i][j] = make([]*axon, lenInput + b)
+				//fmt.Println("- ",i, j, lenInput + b)
+			} else {
+				p.axon[i][j] = make([]*axon, int(layer[i - 1]) + b)
+				//fmt.Println("- ",i, j, int(layer[i - 1]) + b)
+			}
+
+		}
+	}
+
+		/*for i := 0; i < numNeuron; i++ {
+			p.neuron[i] = &neuron{}
 			//n.neuron[i].axon[0] = &axon{}
 		}
 		for i := 0; i < numAxon; i++ {
-			n.axon[i] = &axon{
+			p.axon[i] = &axon{
 				weight:	 getRand(),
 				synapse: map[string]Setter{},
 			}
 			//n.axon[i].synapse = make(map[string]Setter, 3)
-		}
+		}*/
 
 
-		func(index int) {
+		/*func(index int) {
 			sa, sn, pa, pn := 0, 0, 0, 0
 			var cn int
 			var layer HiddenType
@@ -174,17 +191,17 @@ func (p *perceptron) init(args ...Setter) bool {
 				}
 				sa += cn * int(v)
 				if index < sa {
-					for j := 0; j < int(v); j++ {
+					for j := 0; j < int(v); j++ { // проходим по нейронам в скрытых слоях
 						delta := index - pa
 						if delta < cn * (j + 1) {
 							n.axon[index].synapse["output"] = n.neuron[j + sn]
 							delta -= cn * j
-							if i == 0 {
+							if i == 0 { // первый скрытый слой
 								if delta < lenInput {
 									if in, ok := args[0].(FloatType); ok {
 										n.axon[index].synapse["input"] = floatType(in[delta])
 									}
-								} else {
+								} else { // последующие скрытые слои
 									if p.bias {
 										n.axon[index].synapse["bias"] = biasType(true)
 									} else {
@@ -193,7 +210,6 @@ func (p *perceptron) init(args ...Setter) bool {
 								}
 							} else {
 								n.axon[index].synapse["input"] = n.neuron[pn + delta]
-
 							}
 							fmt.Println("-", n.axon[index])
 							break
@@ -232,8 +248,8 @@ func (p *perceptron) init(args ...Setter) bool {
 		}(1)
 
 		// Fills all weights with random numbers
-		//n.setRandWeight()
-	}
+		//n.setRandWeight()*/
+
 	return true
 }
 

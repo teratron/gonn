@@ -17,8 +17,6 @@ func New() NeuralNetwork {
 		architecture:	&perceptron{},
 		isInit:			false,
 		isTrain:		false,
-		lastNeuron:		0,
-		lastAxon:		0,
 		language:		"en",
 		logging: 		true,
 	}
