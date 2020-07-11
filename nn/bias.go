@@ -27,6 +27,6 @@ func (b biasType) Get(set ...Setter) Getter {
 }
 
 // Initer
-func (b biasType) init(args ...Setter) bool {
+/*func (b biasType) init(args ...Setter) bool {
 	return true
-}
+}*/

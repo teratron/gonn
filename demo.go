@@ -103,7 +103,7 @@ func main() {
 	// Common
 	n.Set() //empty set
 	n.Set(
-		nn.Bias(true),
+		nn.Bias(false),
 		nn.Rate(.33),
 		nn.Activation(nn.ModeSIGMOID),
 		nn.Loss(nn.ModeMSE),
@@ -115,9 +115,9 @@ func main() {
 	fmt.Println("n.Get():", n.Get()) //get
 
 	// Bias
-	//n.Set(nn.Bias(false)) //set
+	n.Set(nn.Bias(true)) //set
 	fmt.Println("n.Get(nn.Bias()):", n.Get(nn.Bias())) //get
-	/*
+
 	// Rate
 	n.Set(nn.Rate(.1)) //set
 	fmt.Println("n.Get(nn.Rate()):", n.Get(nn.Rate())) //get
@@ -133,7 +133,7 @@ func main() {
 	// Level loss
 	n.Set(nn.LevelLoss(.004)) //set
 	fmt.Println("n.Get(nn.LevelLoss()):", n.Get(nn.LevelLoss())) //get
-	*/
+
 	// Hidden layers
 	n.Set(nn.HiddenLayer(3, 2)) //set
 	fmt.Println("n.Get(nn.HiddenLayer()):", n.Get(nn.HiddenLayer())) //get
@@ -146,7 +146,6 @@ func main() {
 	n.Set(nn.Logging(0)) //set
 	fmt.Println("n.Get(nn.Logging()):", n.Get(nn.Logging())) //get
 
-
 	//
 	input  := []float64{2.3, 3.1}
 	target := []float64{3.6}
@@ -158,5 +157,5 @@ func main() {
 	fmt.Println(n.Train(input, target))
 
 	//
-	fmt.Println(n.Loss(target))
+	//fmt.Println(n.Loss(target))
 }

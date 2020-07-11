@@ -48,25 +48,9 @@ func (m modeActivationType) check() Getter {
 	}
 }
 
-type Activator interface {
-	Get(float64) float64
-}
-
-type activation struct {
-	Mode modeActivationType
-}
-
-type derivative struct {
-	Mode modeActivationType
-}
-
-func getActivation(value float64, a Activator) float64 {
-	return a.Get(value)
-}
-
 // Activation function
-func (a *activation) Get(value float64) float64 {
-	switch a.Mode {
+func getActivation(value float64, mode modeActivationType) float64 {
+	switch mode {
 	default:
 		fallthrough
 	case ModeLINEAR:
@@ -97,8 +81,8 @@ func (a *activation) Get(value float64) float64 {
 }
 
 // Derivative activation function
-func (d *derivative) Get(value float64) float64 {
-	switch d.Mode {
+func getDerivative(value float64, mode modeActivationType) float64 {
+	switch mode {
 	default:
 		fallthrough
 	case ModeLINEAR:

@@ -15,13 +15,13 @@ type radialBasis struct {
 }
 
 type radialBasisNeuron struct {
-	error			floatType
+	error floatType
 }
 
-// Initializing Radial Basis Neural Network
+// Returns a new Radial Basis neural network instance with the default parameters
 func (n *nn) RadialBasis() NeuralNetwork {
 	n.architecture = &radialBasis{
-		Architecture:	n,
+		Architecture: n,
 	}
 	return n
 }
@@ -45,7 +45,7 @@ func (r *radialBasis) Get(set ...Setter) Getter {
 	}
 }
 
-// Initer
+// Initialization
 
 //
 func (r *radialBasisNeuron) calc(args ...Initer) {

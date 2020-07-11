@@ -16,13 +16,13 @@ type hopfield struct {
 }
 
 type hopfieldNeuron struct {
-	energy			floatType
+	energy floatType
 }
 
-// Initializing Hopfield Neural Network
+// Returns a new Hopfield neural network instance with the default parameters
 func (n *nn) Hopfield() NeuralNetwork {
 	n.architecture = &hopfield{
-		Architecture:	n,
+		Architecture: n,
 	}
 	return n
 }
@@ -46,7 +46,7 @@ func (h *hopfield) Get(set ...Setter) Getter {
 	}
 }
 
-// Initer
+// Initialization
 
 //
 func (h *hopfieldNeuron) calc(args ...Initer) {

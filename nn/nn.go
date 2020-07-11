@@ -39,6 +39,7 @@ type Processor interface {
 	// Initializing
 	//init(...Setter) bool
 	Initer
+	Calculator
 
 	// Querying / forecast / prediction
 	Query([]float64) []float64
@@ -47,8 +48,8 @@ type Processor interface {
 	Loss([]float64) float64
 
 	// Training
-	//Train(...[]float64) (float64, int)
-	Train([]float64, []float64) (float64, int)
+	Train(...[]float64) (float64, int)
+	//Train([]float64, []float64) (float64, int)
 
 	//
 	//Copy([]float64) []float64
@@ -65,9 +66,9 @@ type (
 
 //
 type nn struct {
-	architecture	NeuralNetwork	// Architecture/type of neural network (configuration)
-	isInit			bool			// Neural network initialization flag
-	isTrain			bool			//
+	architecture	NeuralNetwork			// Architecture/type of neural network (configuration)
+	isInit			bool					// Neural network initialization flag
+	isTrain			bool					//
 
 	//
 	language		langType
@@ -78,11 +79,11 @@ type nn struct {
 type neuron struct {
 	value			floatType
 	axon			[]*axon
-	specific		Calculator			// feature
+	specific		Calculator				// feature
 }
 
 //
 type axon struct {
-	weight			floatType			//
-	synapse			map[string]Initer	// map["bias"]Vertex, map["input"]Vertex, map["output"]Vertex
+	weight			floatType				//
+	synapse			map[string]GetterSetter	//
 }
