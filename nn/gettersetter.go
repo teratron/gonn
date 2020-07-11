@@ -18,7 +18,15 @@ type Setter interface {
 }
 
 type Checker interface {
-	Check() Getter
+	check() Getter
+}
+
+type Initer interface {
+	init(...Setter) bool
+}
+
+type Calculator interface {
+	calc(...Initer)
 }
 
 // Setter
@@ -48,16 +56,23 @@ func (n *nn) Get(args ...Setter) Getter {
 	return nil
 }
 
-func  (i intType) Set(set ...Setter) {
+//
+/*func  (i intType) Set(set ...Setter) {
 	Log("", false)
+}*/
+
+//
+func  (f floatType) Set(args ...Setter) {
+	Log("", false) // !!!
 }
 
-func  (f floatType) Set(set ...Setter) {
-	Log("", false)
+func (f floatType) init(args ...Setter) bool {
+	return true
 }
 
-func  (f FloatType) Set(set ...Setter) {
-	Log("", false)
+//
+func  (f FloatType) Set(args ...Setter) {
+	Log("", false) // !!!
 }
 
 //

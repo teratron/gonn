@@ -41,7 +41,7 @@ func LevelLoss(level ...levelLossType) Setter {
 // Setter
 func (m modeLossType) Set(set ...Setter) {
 	if v, ok := getArchitecture(set[0]); ok {
-		if c, ok := m.Check().(modeLossType); ok {
+		if c, ok := m.check().(modeLossType); ok {
 			v.Set(c)
 		}
 	}
@@ -49,7 +49,7 @@ func (m modeLossType) Set(set ...Setter) {
 
 func (l levelLossType) Set(set ...Setter) {
 	if v, ok := getArchitecture(set[0]); ok {
-		if c, ok := l.Check().(levelLossType); ok {
+		if c, ok := l.check().(levelLossType); ok {
 			v.Set(c)
 		}
 	}
@@ -71,7 +71,7 @@ func (l levelLossType) Get(set ...Setter) Getter {
 }
 
 // Checker
-func (m modeLossType) Check() Getter {
+func (m modeLossType) check() Getter {
 	switch {
 	case m < 0 || m > ModeARCTAN:
 		return ModeMSE
@@ -80,7 +80,7 @@ func (m modeLossType) Check() Getter {
 	}
 }
 
-func (l levelLossType) Check() Getter {
+func (l levelLossType) check() Getter {
 	switch {
 	case l < 0:
 		return MinLevelLoss

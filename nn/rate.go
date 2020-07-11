@@ -17,7 +17,7 @@ func Rate(rate ...rateType) Setter {
 // Setter
 func (r rateType) Set(set ...Setter) {
 	if v, ok := getArchitecture(set[0]); ok {
-		if c, ok := r.Check().(rateType); ok {
+		if c, ok := r.check().(rateType); ok {
 			v.Set(c)
 		}
 	}
@@ -32,7 +32,7 @@ func (r rateType) Get(set ...Setter) Getter {
 }
 
 // Checker
-func (r rateType) Check() Getter {
+func (r rateType) check() Getter {
 	switch {
 	case r < 0 || r > 1:
 		return DefaultRate

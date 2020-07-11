@@ -30,6 +30,10 @@ type perceptron struct {
 	lowerRange		floatType
 }
 
+type perceptronNeuron struct {
+	error			floatType
+}
+
 // Initializing Perceptron Neural Network
 func (n *nn) Perceptron() NeuralNetwork {
 	n.architecture = &perceptron{
@@ -105,7 +109,7 @@ func (p *perceptron) Get(set ...Setter) Getter {
 	}
 }
 
-// Init
+// Initer
 // args[0] - input data
 // args[1] - target data
 func (p *perceptron) init(args ...Setter) bool {
@@ -138,24 +142,27 @@ func (p *perceptron) init(args ...Setter) bool {
 	}
 
 	//
-	for i, v := range p.neuron {
+	p.initNeuron()
+	/*for i, v := range p.neuron {
 		for j := range v {
 			p.neuron[i][j] = &neuron{
-				specific:	biasType(true),
+				specific:	&perceptronNeuron{},
 				axon:		p.axon[i][j],
 			}
-			//p.neuron[i][j].specific = p.axon[i][j]
-			//p.neuron[i][j].axon = p.axon[i][j]
 		}
-	}
+	}*/
 
 	//
-	for i, v := range p.axon {
+	if in, ok := args[0].(FloatType); ok {
+		p.initAxon(in)
+	}
+
+	/*for i, v := range p.axon {
 		for j, w := range v {
 			for k := range w {
 				p.axon[i][j][k] = &axon{
 					weight:	 getRand(),
-					synapse: map[string]Setter{},
+					synapse: map[string]Initer{},
 				}
 				if i == 0 {
 					if k < lenInput {
@@ -176,101 +183,65 @@ func (p *perceptron) init(args ...Setter) bool {
 				fmt.Println("- ", i, j, k, p.axon[i][j][k])
 			}
 		}
-	}
+	}*/
 
 	for i, v := range p.neuron {
 		for j := range v {
-			fmt.Println("- ", i, j, p.neuron[i][j])
+			fmt.Println("+ ", i, j, p.neuron[i][j])
 		}
 	}
 
-		/*for i := 0; i < numNeuron; i++ {
-			p.neuron[i] = &neuron{}
-			//n.neuron[i].axon[0] = &axon{}
-		}
-		for i := 0; i < numAxon; i++ {
-			p.axon[i] = &axon{
-				weight:	 getRand(),
-				synapse: map[string]Setter{},
-			}
-			//n.axon[i].synapse = make(map[string]Setter, 3)
-		}*/
-
-
-		/*func(index int) {
-			sa, sn, pa, pn := 0, 0, 0, 0
-			var cn int
-			var layer HiddenType
-			layer = append(p.hiddenLayer, hiddenType(lenTarget))
-			for i, v := range layer {
-				if i == 0 {
-					cn = lenInput + b
-				} else {
-					cn = int(layer[i - 1]) + b
-				}
-				sa += cn * int(v)
-				if index < sa {
-					for j := 0; j < int(v); j++ { // проходим по нейронам в скрытых слоях
-						delta := index - pa
-						if delta < cn * (j + 1) {
-							n.axon[index].synapse["output"] = n.neuron[j + sn]
-							delta -= cn * j
-							if i == 0 { // первый скрытый слой
-								if delta < lenInput {
-									if in, ok := args[0].(FloatType); ok {
-										n.axon[index].synapse["input"] = floatType(in[delta])
-									}
-								} else { // последующие скрытые слои
-									if p.bias {
-										n.axon[index].synapse["bias"] = biasType(true)
-									} else {
-										panic("error") // !!!
-									}
-								}
-							} else {
-								n.axon[index].synapse["input"] = n.neuron[pn + delta]
-							}
-							fmt.Println("-", n.axon[index])
-							break
-						}
-					}
-					break
-				}
-				pa = sa
-				pn = sn
-				sn += int(v)
-			}
-		}(1)
-
-
-		func(index int) {
-			c, d, sn := 0, 0, 0
-			var layer HiddenType
-			layer = append(p.hiddenLayer, hiddenType(lenTarget))
-			for i, v := range layer {
-				for j := 0; j < int(v); j++ { // проходим по нейронам в скрытых слоях
-					if i == 0 { // первый скрытый слой
-						d += lenBias
-					} else { // последующие скрытые слои
-						d += int(p.hiddenLayer[i - 1]) + b
-					}
-					if d == numAxon {
-						n.neuron[j + sn].axon = n.axon[c:]
-					} else {
-						n.neuron[j + sn].axon = n.axon[c:d]
-					}
-					fmt.Println("-+-", n.neuron[j + sn].axon)
-					c = d
-				}
-				sn += int(v)
-			}
-		}(1)
-
-		// Fills all weights with random numbers
-		//n.setRandWeight()*/
-
 	return true
 }
+
+//
+func (p *perceptron) initNeuron() {
+	for i, v := range p.neuron {
+		for j := range v {
+			p.neuron[i][j] = &neuron{
+				specific:	&perceptronNeuron{},
+				axon:		p.axon[i][j],
+			}
+		}
+	}
+}
+
+//
+func (p *perceptron) initAxon(input FloatType) {
+	for i, v := range p.axon {
+		for j, w := range v {
+			for k := range w {
+				p.axon[i][j][k] = &axon{
+					weight:	 getRand(),
+					synapse: map[string]Initer{},
+				}
+				if i == 0 {
+					if k < len(input) {
+						p.axon[i][j][k].synapse["input"] = floatType(input[k])
+					} else {
+						p.axon[i][j][k].synapse["input"] = biasType(true)
+					}
+				} else {
+					if k < len(p.axon[i - 1]) {
+						p.axon[i][j][k].synapse["input"] = p.neuron[i - 1][k]
+					} else {
+						p.axon[i][j][k].synapse["input"] = biasType(true)
+					}
+				}
+				p.axon[i][j][k].synapse["output"] = p.neuron[i][j]
+				fmt.Println("- ", i, j, k, p.axon[i][j][k])
+			}
+		}
+	}
+}
+
+//
+func (n *perceptronNeuron) calc(args ...Initer) {
+	/*if v, ok := getArchitecture(set[0]); ok {
+		v.Set(n)
+	}*/
+}
+
 
 // Train
 /*func (p *perceptron) Train(input, target []float64) (loss float64, count int) {

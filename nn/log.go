@@ -14,11 +14,11 @@ type logs struct {
 	reason string
 }
 
-func Logging(status ...logType) Setter {
-	if len(status) == 0 {
+func Logging(mode ...logType) Setter {
+	if len(mode) == 0 {
 		return modeLossType(0)
 	} else {
-		return status[0]
+		return mode[0]
 	}
 }
 

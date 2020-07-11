@@ -1,6 +1,8 @@
 // Hopfield Neural Network - under construction
 package nn
 
+import "log"
+
 /*type Hopfield interface {
 	Hopfield() NeuralNetwork
 }*/
@@ -8,6 +10,13 @@ package nn
 type hopfield struct {
 	Architecture
 	Processor
+
+	neuron			[]*neuron
+	axon			[][]*axon
+}
+
+type hopfieldNeuron struct {
+	energy			floatType
 }
 
 // Initializing Hopfield Neural Network
@@ -20,32 +29,30 @@ func (n *nn) Hopfield() NeuralNetwork {
 
 // Setter
 func (h *hopfield) Set(set ...Setter) {
-	switch /*v :=*/ set[0].(type) {
-	/*case BiasType:
-		r.bias = v
-	case RateType:
-		r.rate = v
-	case HiddenType:
-		r.hiddenLayer = v*/
+	switch v := set[0].(type) {
 	default:
 		Log("This type of variable is missing for Hopfield Neural Network", false)
+		log.Printf("\tset: %T %v\n", v, v) // !!!
 	}
 }
 
 // Getter
 func (h *hopfield) Get(set ...Setter) Getter {
 	switch set[0].(type) {
-	/*case Bias:
-		return r.bias
-	case Rate:
-		return r.rate
-	case Hidden:
-		return r.hiddenLayer*/
 	default:
-		Log("This type of variable is missing for Perceptron Neural Network", false)
+		Log("This type of variable is missing for Hopfield Neural Network", false)
+		log.Printf("\tget: %T %v\n", set[0], set[0]) // !!!
 		return nil
 	}
 }
+
+// Initer
+
+//
+func (h *hopfieldNeuron) calc(args ...Initer) {
+}
+
+
 
 // Train
 /*func (h *hopfield) Train(input, target []float64) (loss float64, count int) {

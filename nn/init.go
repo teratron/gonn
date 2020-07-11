@@ -8,7 +8,7 @@ import (
 
 func init() {
 	rand.Seed(time.Now().UTC().UnixNano())
-	Log("Start", false)
+	Log("Start", false) // !!!
 }
 
 // New returns a new neural network instance with the default parameters

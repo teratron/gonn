@@ -25,3 +25,8 @@ func (b biasType) Get(set ...Setter) Getter {
 	}
 	return nil
 }
+
+// Initer
+func (b biasType) init(args ...Setter) bool {
+	return true
+}

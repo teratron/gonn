@@ -24,7 +24,7 @@ func Activation(mode ...modeActivationType) Setter {
 // Setter
 func (m modeActivationType) Set(set ...Setter) {
 	if v, ok := getArchitecture(set[0]); ok {
-		if c, ok := m.Check().(modeActivationType); ok {
+		if c, ok := m.check().(modeActivationType); ok {
 			v.Set(c)
 		}
 	}
@@ -39,7 +39,7 @@ func (m modeActivationType) Get(set ...Setter) Getter {
 }
 
 // Checker
-func (m modeActivationType) Check() Getter {
+func (m modeActivationType) check() Getter {
 	switch {
 	case m < 0 || m > ModeTANH:
 		return ModeSIGMOID
