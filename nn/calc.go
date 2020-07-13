@@ -2,22 +2,21 @@
 package nn
 
 type Calculator interface {
-	calc(...Initer)
+	calc(...Initer) GetterSetter
 	Initer
 }
 
-func (n *nn) calc(args ...Initer) {
-	if v, ok := getArchitecture(n); ok {
-		v.calc(args...)
-	}
-
+func (n *nn) calc(args ...Initer) (g GetterSetter) {
 	if len(args) == 0 {
 		Log("Empty calc()", false)
 	} else {
-		for _, v := range args {
-			if s, ok := v.(Initer); ok {
-				s.calc(args...)
+		if a, ok := getArchitecture(n); ok {
+			for _, v := range args {
+				if i, ok := v.(Initer); ok {
+					g = a.calc(i)
+				}
 			}
 		}
 	}
+	return
 }

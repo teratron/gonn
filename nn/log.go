@@ -23,15 +23,15 @@ func Logging(mode ...logType) Setter {
 }
 
 // Setter
-func (l logType) Set(set ...Setter) {
-	if n, ok := set[0].(*nn); ok {
+func (l logType) Set(args ...Setter) {
+	if n, ok := args[0].(*nn); ok {
 		n.logging = l
 	}
 }
 
 // Getter
-func (l logType) Get(set ...Setter) Getter {
-	if n, ok := set[0].(*nn); ok {
+func (l logType) Get(args ...Setter) Getter {
+	if n, ok := args[0].(*nn); ok {
 		return n.logging
 	}
 	return nil

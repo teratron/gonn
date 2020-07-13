@@ -12,21 +12,21 @@ func Bias(bias ...biasType) Setter {
 }
 
 // Setter
-func (b biasType) Set(set ...Setter) {
-	if v, ok := getArchitecture(set[0]); ok {
-		v.Set(b)
+func (b biasType) Set(args ...Setter) {
+	if a, ok := args[0].(Architecture); ok {
+		if v, ok := getArchitecture(a); ok {
+			v.Set(b)
+		}
 	}
+
 }
 
 // Getter
-func (b biasType) Get(set ...Setter) Getter {
-	if v, ok := getArchitecture(set[0]); ok {
-		return v.Get(b)
+func (b biasType) Get(args ...Setter) Getter {
+	if a, ok := args[0].(Architecture); ok {
+		if v, ok := getArchitecture(a); ok {
+			return v.Get(b)
+		}
 	}
 	return nil
 }
-
-// Initer
-/*func (b biasType) init(args ...Setter) bool {
-	return true
-}*/

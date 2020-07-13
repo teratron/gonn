@@ -67,8 +67,8 @@ func (p *perceptron) Preset(name string) {
 }
 
 // Setter
-func (p *perceptron) Set(set ...Setter) {
-	switch v := set[0].(type) {
+func (p *perceptron) Set(args ...Setter) {
+	switch v := args[0].(type) {
 	case biasType:
 		p.bias = v
 	case rateType:
@@ -88,8 +88,8 @@ func (p *perceptron) Set(set ...Setter) {
 }
 
 // Getter
-func (p *perceptron) Get(set ...Setter) Getter {
-	switch set[0].(type) {
+func (p *perceptron) Get(args ...Setter) Getter {
+	switch args[0].(type) {
 	case biasType:
 		return p.bias
 	case rateType:
@@ -104,7 +104,7 @@ func (p *perceptron) Get(set ...Setter) Getter {
 		return p.hiddenLayer
 	default:
 		Log("This type is missing for Perceptron Neural Network", false) // !!!
-		log.Printf("\tget: %T %v\n", set[0], set[0]) // !!!
+		log.Printf("\tget: %T %v\n", args[0], args[0]) // !!!
 		return nil
 	}
 }
@@ -190,7 +190,7 @@ func initPerceptronAxon(input FloatType, net Architecture) {
 }
 
 // Calculating
-func (p *perceptron) calc(args ...Initer) {
+func (p *perceptron) calc(args ...Initer) GetterSetter {
 	switch args[0].(type) {
 	case *neuron:
 		calcPerceptronNeuron(p)
@@ -200,16 +200,42 @@ func (p *perceptron) calc(args ...Initer) {
 		Log("This type is missing for Perceptron Neural Network", false) // !!!
 		log.Printf("\tget: %T %v\n", args[0], args[0]) // !!!
 	}
+	return nil
 }
+
+func getpers(net Architecture) *perceptron {
+	//fmt.Printf("&&&&&&& %T %v\n", p, p)
+	switch n := net.(type) {
+	case *perceptron:
+		//fmt.Printf("&&&&&&& %T %v\n", n, n.axon)
+		return n
+
+	}
+	return nil
+}
+
 
 // Function for calculating the values of neurons in a layers
 func calcPerceptronNeuron(net Architecture) {
-	/*fmt.Println("- ", network)
-	if n, ok := network.(*nn); ok {
-		if _, ok := n.architecture.(NeuralNetwork); ok {
+	//fmt.Println("1 ###################################")
+	//fmt.Printf("&&&&&&& %T %v\n", net, net.(Architecture))
+	/*if n, ok := net.(Architecture); ok {
+		fmt.Printf("&&&&&&& %T %v\n", n.(Architecture), n.(Architecture))
+		if a, ok := n.(NeuralNetwork); ok {
 			//return v, ok
+			fmt.Printf("&&&&&&& %T %v\n", a, a)
 		}
 	}*/
+	/*switch nnnnn := net.(type) {
+	case *perceptron:
+		fmt.Printf("&&&&&&& %T %v\n", nnnnn, nnnnn.axon)
+	default:
+	}*/
+	/*if v, ok := getArchitecture(net); ok {
+		fmt.Printf("&&&&&&& %T %v\n", v, v)
+	}*/
+	p := getpers(net)
+	fmt.Println("^^^^^^",p.axon)
 	if p, ok := net.(*perceptron); ok { // ???
 		var n floatType
 		for _, v := range p.neuron {
@@ -239,6 +265,7 @@ func calcPerceptronNeuron(net Architecture) {
 
 //
 func calcPerceptronAxon(net Architecture) {
+	//fmt.Println("2 ###################################")
 }
 
 //

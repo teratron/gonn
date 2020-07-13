@@ -1,22 +1,25 @@
 //
 package nn
 
-
 func Neuron() Initer {
 	return &neuron{}
 }
 
 // Setter
-func (n *neuron) Set(set ...Setter) {
-	if v, ok := getArchitecture(set[0]); ok {
-		v.Set(n)
+func (n *neuron) Set(args ...Setter) {
+	if a, ok := args[0].(Architecture); ok {
+		if v, ok := getArchitecture(a); ok {
+			v.Set(n)
+		}
 	}
 }
 
 // Getter
-func (n *neuron) Get(set ...Setter) Getter {
-	if v, ok := getArchitecture(set[0]); ok {
-		return v.Get(n)
+func (n *neuron) Get(args ...Setter) Getter {
+	if a, ok := args[0].(Architecture); ok {
+		if v, ok := getArchitecture(a); ok {
+			return v.Get(n)
+		}
 	}
 	return nil
 }
@@ -27,6 +30,6 @@ func (n *neuron) init(args ...GetterSetter) bool {
 }
 
 // Calculating
-func (n *neuron) calc(args ...Initer) {
-	//network.calc
+func (n *neuron) calc(args ...Initer) GetterSetter {
+	return nil
 }

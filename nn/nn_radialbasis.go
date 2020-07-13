@@ -27,8 +27,8 @@ func (n *nn) RadialBasis() NeuralNetwork {
 }
 
 // Setter
-func (r *radialBasis) Set(set ...Setter) {
-	switch v := set[0].(type) {
+func (r *radialBasis) Set(args ...Setter) {
+	switch v := args[0].(type) {
 	default:
 		Log("This type of variable is missing for Radial Basis Neural Network", false)
 		log.Printf("\tset: %T %v\n", v, v) // !!!
@@ -36,11 +36,11 @@ func (r *radialBasis) Set(set ...Setter) {
 }
 
 // Getter
-func (r *radialBasis) Get(set ...Setter) Getter {
-	switch set[0].(type) {
+func (r *radialBasis) Get(args ...Setter) Getter {
+	switch args[0].(type) {
 	default:
 		Log("This type of variable is missing for Radial Basis Neural Network", false)
-		log.Printf("\tget: %T %v\n", set[0], set[0]) // !!!
+		log.Printf("\tget: %T %v\n", args[0], args[0]) // !!!
 		return nil
 	}
 }
@@ -51,7 +51,8 @@ func (r *radialBasis) init(args ...GetterSetter) bool {
 }
 
 // Calculating
-func (r *radialBasis) calc(args ...Initer) {
+func (r *radialBasis) calc(args ...Initer) GetterSetter {
+	return nil
 }
 
 //

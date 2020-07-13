@@ -28,8 +28,8 @@ func (n *nn) Hopfield() NeuralNetwork {
 }
 
 // Setter
-func (h *hopfield) Set(set ...Setter) {
-	switch v := set[0].(type) {
+func (h *hopfield) Set(args ...Setter) {
+	switch v := args[0].(type) {
 	default:
 		Log("This type of variable is missing for Hopfield Neural Network", false)
 		log.Printf("\tset: %T %v\n", v, v) // !!!
@@ -37,22 +37,23 @@ func (h *hopfield) Set(set ...Setter) {
 }
 
 // Getter
-func (h *hopfield) Get(set ...Setter) Getter {
-	switch set[0].(type) {
+func (h *hopfield) Get(args ...Setter) Getter {
+	switch args[0].(type) {
 	default:
 		Log("This type of variable is missing for Hopfield Neural Network", false)
-		log.Printf("\tget: %T %v\n", set[0], set[0]) // !!!
+		log.Printf("\tget: %T %v\n", args[0], args[0]) // !!!
 		return nil
 	}
 }
 
 // Initialization
-func (r *hopfield) init(args ...GetterSetter) bool {
+func (h *hopfield) init(args ...GetterSetter) bool {
 	return true
 }
 
 // Calculating
-func (r *hopfield) calc(args ...Initer) {
+func (h *hopfield) calc(args ...Initer) GetterSetter {
+	return nil
 }
 
 //

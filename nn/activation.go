@@ -22,18 +22,22 @@ func Activation(mode ...modeActivationType) Setter {
 }
 
 // Setter
-func (m modeActivationType) Set(set ...Setter) {
-	if v, ok := getArchitecture(set[0]); ok {
-		if c, ok := m.check().(modeActivationType); ok {
-			v.Set(c)
+func (m modeActivationType) Set(args ...Setter) {
+	if a, ok := args[0].(Architecture); ok {
+		if v, ok := getArchitecture(a); ok {
+			if c, ok := m.check().(modeActivationType); ok {
+				v.Set(c)
+			}
 		}
 	}
 }
 
 // Getter
-func (m modeActivationType) Get(set ...Setter) Getter {
-	if v, ok := getArchitecture(set[0]); ok {
-		return v.Get(m)
+func (m modeActivationType) Get(args ...Setter) Getter {
+	if a, ok := args[0].(Architecture); ok {
+		if v, ok := getArchitecture(a); ok {
+			return v.Get(m)
+		}
 	}
 	return nil
 }

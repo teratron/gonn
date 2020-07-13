@@ -1,5 +1,7 @@
 package nn
 
+import "fmt"
+
 const MaxIteration uint32 = 10e+05	// The maximum number of iterations after which training is forcibly terminated
 
 //
@@ -17,10 +19,13 @@ func (n *nn) Train(data ...[]float64) (loss float64, count int) {
 	}
 
 	count = 1
-	n.calc(Neuron())
+	//a, b := n.calc(Neuron(), Axon())
+	fmt.Println("train ####", n.calc(Neuron(), Axon()))
+	//if err != nil { panic("!!!") }
 	//n.calc(Loss())
 	//n.calc(Error())
-	n.calc(Axon())
+	//err = n.calc(Axon())
+	//if err != nil { panic("!!!") }
 	/*for count <= int(MaxIteration) {
 		//
 		if loss = n.Loss(data[1]); loss <= float64(n.architecture.(*perceptron).levelLoss) || loss <= float64(MinLevelLoss) {

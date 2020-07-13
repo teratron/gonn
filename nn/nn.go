@@ -11,28 +11,16 @@ type NeuralNetwork interface {
 		//RadialBasis() NeuralNetwork
 		//Hopfield() NeuralNetwork
 	Calculator
-	//GetterSetter
-		//Get(...Setter) Getter
-		//Set(...Setter)
+		//calc(...Initer) GetterSetter
+		//init(...GetterSetter) bool
+		//GetterSetter
+			//Get(...Setter) Getter
+			//Set(...Setter)
 	Processor
-		//init(...Setter) bool
 		//Query([]float64) []float64
 		//Loss([]float64) float64
 		//Train(...[]float64) (float64, int)
 		//Copy([]float64) []float64
-}
-
-//
-type Architecture interface {
-	//
-	Perceptron() NeuralNetwork
-	//Perceptron
-	//
-	RadialBasis() NeuralNetwork
-	//RadialBasis
-	//
-	Hopfield() NeuralNetwork
-	//Hopfield
 }
 
 //
@@ -64,6 +52,7 @@ type (
 	//intType			int
 	floatType		float32
 	FloatType		[]float64
+	//err				error
 )
 
 //

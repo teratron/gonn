@@ -39,33 +39,41 @@ func LevelLoss(level ...levelLossType) Setter {
 }
 
 // Setter
-func (m modeLossType) Set(set ...Setter) {
-	if v, ok := getArchitecture(set[0]); ok {
-		if c, ok := m.check().(modeLossType); ok {
-			v.Set(c)
+func (m modeLossType) Set(args ...Setter) {
+	if a, ok := args[0].(Architecture); ok {
+		if v, ok := getArchitecture(a); ok {
+			if c, ok := m.check().(modeLossType); ok {
+				v.Set(c)
+			}
 		}
 	}
 }
 
-func (l levelLossType) Set(set ...Setter) {
-	if v, ok := getArchitecture(set[0]); ok {
-		if c, ok := l.check().(levelLossType); ok {
-			v.Set(c)
+func (l levelLossType) Set(args ...Setter) {
+	if a, ok := args[0].(Architecture); ok {
+		if v, ok := getArchitecture(a); ok {
+			if c, ok := l.check().(levelLossType); ok {
+				v.Set(c)
+			}
 		}
 	}
 }
 
 // Getter
-func (m modeLossType) Get(set ...Setter) Getter {
-	if v, ok := getArchitecture(set[0]); ok {
-		return v.Get(m)
+func (m modeLossType) Get(args ...Setter) Getter {
+	if a, ok := args[0].(Architecture); ok {
+		if v, ok := getArchitecture(a); ok {
+			return v.Get(m)
+		}
 	}
 	return nil
 }
 
-func (l levelLossType) Get(set ...Setter) Getter {
-	if v, ok := getArchitecture(set[0]); ok {
-		return v.Get(l)
+func (l levelLossType) Get(args ...Setter) Getter {
+	if a, ok := args[0].(Architecture); ok {
+		if v, ok := getArchitecture(a); ok {
+			return v.Get(l)
+		}
 	}
 	return nil
 }

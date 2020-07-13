@@ -11,15 +11,15 @@ func Language(lang ...langType) Setter {
 }
 
 // Setter
-func (l langType) Set(set ...Setter) {
-	if n, ok := set[0].(*nn); ok {
+func (l langType) Set(args ...Setter) {
+	if n, ok := args[0].(*nn); ok {
 		n.language = l
 	}
 }
 
 // Getter
-func (l langType) Get(set ...Setter) Getter {
-	if n, ok := set[0].(*nn); ok {
+func (l langType) Get(args ...Setter) Getter {
+	if n, ok := args[0].(*nn); ok {
 		return n.language
 	}
 	return nil

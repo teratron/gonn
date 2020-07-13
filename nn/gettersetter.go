@@ -45,36 +45,22 @@ func (n *nn) Get(args ...Setter) Getter {
 }
 
 //
-/*func  (i intType) Set(set ...Setter) {
+/*func (i intType) Set(args ...Setter) {
 	Log("", false)
 }*/
 
-func  (f floatType) Set(args ...Setter) {
-	Log("", false) // !!!
+func (f floatType) Set(args ...Setter) {
 }
 
-func  (f floatType) Get(args ...Setter) Getter {
-	Log("", false) // !!!
+func (f floatType) Get(args ...Setter) Getter {
 	return nil
 }
 
-func  (f FloatType) Set(args ...Setter) {
-	Log("", false) // !!!
+func (f FloatType) Set(args ...Setter) {
 }
 
-func  (f FloatType) Get(args ...Setter) Getter {
-	Log("", false) // !!!
+func (f FloatType) Get(args ...Setter) Getter {
 	return nil
-}
-
-//
-func getArchitecture(net Setter) (NeuralNetwork, bool) {
-	if n, ok := net.(*nn); ok {
-		if v, ok := n.architecture.(NeuralNetwork); ok {
-			return v, ok
-		}
-	}
-	return nil, false
 }
 
 // Return random number from -0.5 to 0.5

@@ -15,18 +15,22 @@ func Rate(rate ...rateType) Setter {
 }
 
 // Setter
-func (r rateType) Set(set ...Setter) {
-	if v, ok := getArchitecture(set[0]); ok {
-		if c, ok := r.check().(rateType); ok {
-			v.Set(c)
+func (r rateType) Set(args ...Setter) {
+	if a, ok := args[0].(Architecture); ok {
+		if v, ok := getArchitecture(a); ok {
+			if c, ok := r.check().(rateType); ok {
+				v.Set(c)
+			}
 		}
 	}
 }
 
 // Getter
-func (r rateType) Get(set ...Setter) Getter {
-	if v, ok := getArchitecture(set[0]); ok {
-		return v.Get(r)
+func (r rateType) Get(args ...Setter) Getter {
+	if a, ok := args[0].(Architecture); ok {
+		if v, ok := getArchitecture(a); ok {
+			return v.Get(r)
+		}
 	}
 	return nil
 }
