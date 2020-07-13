@@ -10,7 +10,8 @@ type NeuralNetwork interface {
 		//Perceptron() NeuralNetwork
 		//RadialBasis() NeuralNetwork
 		//Hopfield() NeuralNetwork
-	GetterSetter
+	Calculator
+	//GetterSetter
 		//Get(...Setter) Getter
 		//Set(...Setter)
 	Processor
@@ -38,8 +39,9 @@ type Architecture interface {
 type Processor interface {
 	// Initializing
 	//init(...Setter) bool
-	Initer
-	Calculator
+
+	//Initer
+	//Calculator
 
 	// Querying / forecast / prediction
 	Query([]float64) []float64
@@ -79,7 +81,7 @@ type nn struct {
 type neuron struct {
 	value			floatType
 	axon			[]*axon
-	specific		Calculator				// feature
+	specific		GetterSetter			// feature
 }
 
 //

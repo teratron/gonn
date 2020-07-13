@@ -17,7 +17,10 @@ func (n *nn) Train(data ...[]float64) (loss float64, count int) {
 	}
 
 	count = 1
-	n.calc()
+	n.calc(Neuron())
+	//n.calc(Loss())
+	//n.calc(Error())
+	n.calc(Axon())
 	/*for count <= int(MaxIteration) {
 		//
 		if loss = n.Loss(data[1]); loss <= float64(n.architecture.(*perceptron).levelLoss) || loss <= float64(MinLevelLoss) {

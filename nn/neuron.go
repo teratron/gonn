@@ -1,4 +1,10 @@
+//
 package nn
+
+
+func Neuron() Initer {
+	return &neuron{}
+}
 
 // Setter
 func (n *neuron) Set(set ...Setter) {
@@ -16,6 +22,11 @@ func (n *neuron) Get(set ...Setter) Getter {
 }
 
 // Initialization
-/*func (n *neuron) init(args ...Setter) bool {
+func (n *neuron) init(args ...GetterSetter) bool {
 	return true
-}*/
+}
+
+// Calculating
+func (n *neuron) calc(args ...Initer) {
+	//network.calc
+}

@@ -47,11 +47,24 @@ func (h *hopfield) Get(set ...Setter) Getter {
 }
 
 // Initialization
-
-//
-func (h *hopfieldNeuron) calc(args ...Initer) {
+func (r *hopfield) init(args ...GetterSetter) bool {
+	return true
 }
 
+// Calculating
+func (r *hopfield) calc(args ...Initer) {
+}
+
+//
+/*func (h *hopfieldNeuron) calc(args ...Initer) {
+}*/
+
+func (h *hopfieldNeuron) Set(args ...Setter) {
+}
+
+func (h *hopfieldNeuron) Get(args ...Setter) Getter {
+	return nil
+}
 
 
 // Train

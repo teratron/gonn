@@ -46,9 +46,23 @@ func (r *radialBasis) Get(set ...Setter) Getter {
 }
 
 // Initialization
+func (r *radialBasis) init(args ...GetterSetter) bool {
+	return true
+}
+
+// Calculating
+func (r *radialBasis) calc(args ...Initer) {
+}
 
 //
-func (r *radialBasisNeuron) calc(args ...Initer) {
+/*func (r *radialBasisNeuron) calc(args ...Initer) {
+}*/
+
+func (r *radialBasisNeuron) Set(args ...Setter) {
+}
+
+func (r *radialBasisNeuron) Get(args ...Setter) Getter {
+	return nil
 }
 
 // Train

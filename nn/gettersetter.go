@@ -20,7 +20,7 @@ type Setter interface {
 // Setter
 func (n *nn) Set(args ...Setter) {
 	if len(args) == 0 {
-		Log("Empty set", false)
+		Log("Empty Set()", false)
 	} else {
 		for _, v := range args {
 			if s, ok := v.(Setter); ok {
@@ -62,9 +62,14 @@ func  (f FloatType) Set(args ...Setter) {
 	Log("", false) // !!!
 }
 
+func  (f FloatType) Get(args ...Setter) Getter {
+	Log("", false) // !!!
+	return nil
+}
+
 //
-func getArchitecture(set Setter) (NeuralNetwork, bool) {
-	if n, ok := set.(*nn); ok {
+func getArchitecture(net Setter) (NeuralNetwork, bool) {
+	if n, ok := net.(*nn); ok {
 		if v, ok := n.architecture.(NeuralNetwork); ok {
 			return v, ok
 		}

@@ -82,7 +82,7 @@ func (p *perceptron) Set(set ...Setter) {
 	case HiddenType:
 		p.hiddenLayer = v
 	default:
-		Log("This type of variable is missing for Perceptron Neural Network", false) // !!!
+		Log("This type is missing for Perceptron Neural Network", false) // !!!
 		log.Printf("\tset: %T %v\n", v, v) // !!!
 	}
 }
@@ -103,7 +103,7 @@ func (p *perceptron) Get(set ...Setter) Getter {
 	case HiddenType:
 		return p.hiddenLayer
 	default:
-		Log("This type of variable is missing for Perceptron Neural Network", false) // !!!
+		Log("This type is missing for Perceptron Neural Network", false) // !!!
 		log.Printf("\tget: %T %v\n", set[0], set[0]) // !!!
 		return nil
 	}
@@ -112,7 +112,7 @@ func (p *perceptron) Get(set ...Setter) Getter {
 // Initialization
 // args[0] - input data
 // args[1] - target data
-func (p *perceptron) init(args ...Setter) bool {
+func (p *perceptron) init(args ...GetterSetter) bool {
 	var tmp HiddenType
 	defer func() { tmp = nil }()
 
@@ -138,49 +138,52 @@ func (p *perceptron) init(args ...Setter) bool {
 			}
 		}
 	}
-	p.initNeuron()
-	if in, ok := args[0].(FloatType); ok {
-		p.initAxon(in)
-	}
+	initPerceptronNeuron(p)
+	initPerceptronAxon(args[0].(FloatType), p)
+
 	return true
 }
 
 //
-func (p *perceptron) initNeuron() {
-	for i, v := range p.neuron {
-		for j := range v {
-			p.neuron[i][j] = &neuron{
-				specific: &perceptronNeuron{},
-				axon:     p.axon[i][j],
+func initPerceptronNeuron(net Architecture) {
+	if p, ok := net.(*perceptron); ok { // ???
+		for i, v := range p.neuron {
+			for j := range v {
+				p.neuron[i][j] = &neuron{
+					specific: &perceptronNeuron{},
+					axon:     p.axon[i][j],
+				}
 			}
 		}
 	}
 }
 
 //
-func (p *perceptron) initAxon(input FloatType) {
-	for i, v := range p.axon {
-		for j, w := range v {
-			for k := range w {
-				p.axon[i][j][k] = &axon{
-					weight:	 getRand(),
-					synapse: map[string]GetterSetter{},
-				}
-				if i == 0 {
-					if k < len(input) {
-						p.axon[i][j][k].synapse["input"] = floatType(input[k])
-					} else {
-						p.axon[i][j][k].synapse["input"] = biasType(true)
+func initPerceptronAxon(input FloatType, net Architecture) {
+	if p, ok := net.(*perceptron); ok { // ???
+		for i, v := range p.axon {
+			for j, w := range v {
+				for k := range w {
+					p.axon[i][j][k] = &axon{
+						weight:  getRand(),
+						synapse: map[string]GetterSetter{},
 					}
-				} else {
-					if k < len(p.axon[i - 1]) {
-						p.axon[i][j][k].synapse["input"] = p.neuron[i - 1][k]
+					if i == 0 {
+						if k < len(input) {
+							p.axon[i][j][k].synapse["input"] = floatType(input[k])
+						} else {
+							p.axon[i][j][k].synapse["input"] = biasType(true)
+						}
 					} else {
-						p.axon[i][j][k].synapse["input"] = biasType(true)
+						if k < len(p.axon[i-1]) {
+							p.axon[i][j][k].synapse["input"] = p.neuron[i-1][k]
+						} else {
+							p.axon[i][j][k].synapse["input"] = biasType(true)
+						}
 					}
+					p.axon[i][j][k].synapse["output"] = p.neuron[i][j]
+					//fmt.Println("- ", i, j, k, p.axon[i][j][k])
 				}
-				p.axon[i][j][k].synapse["output"] = p.neuron[i][j]
-				//fmt.Println("- ", i, j, k, p.axon[i][j][k])
 			}
 		}
 	}
@@ -188,41 +191,65 @@ func (p *perceptron) initAxon(input FloatType) {
 
 // Calculating
 func (p *perceptron) calc(args ...Initer) {
-	p.calcNeuron()
+	switch args[0].(type) {
+	case *neuron:
+		calcPerceptronNeuron(p)
+	case *axon:
+		calcPerceptronAxon(p)
+	default:
+		Log("This type is missing for Perceptron Neural Network", false) // !!!
+		log.Printf("\tget: %T %v\n", args[0], args[0]) // !!!
+	}
 }
 
 // Function for calculating the values of neurons in a layers
-func (p *perceptron) calcNeuron() {
-	var n floatType
-	for _, v := range p.neuron {
-		for _, w := range v {
-			go func() {
-				w.value = 0
-				for _, a := range w.axon {
-					switch s := a.synapse["input"].(type) {
-					case floatType:
-						n = s
-					case biasType:
-						if s { n = 1 }
-					case *neuron:
-						n = s.value
-					default:
-						panic("error!!!")
+func calcPerceptronNeuron(net Architecture) {
+	/*fmt.Println("- ", network)
+	if n, ok := network.(*nn); ok {
+		if _, ok := n.architecture.(NeuralNetwork); ok {
+			//return v, ok
+		}
+	}*/
+	if p, ok := net.(*perceptron); ok { // ???
+		var n floatType
+		for _, v := range p.neuron {
+			for _, w := range v {
+				go func() {
+					w.value = 0
+					for _, a := range w.axon {
+						switch s := a.synapse["input"].(type) {
+						case floatType:
+							n = s
+						case biasType:
+							if s { n = 1 }
+						case *neuron:
+							n = s.value
+						default:
+							panic("error!!!")
+						}
+						w.value += n * a.weight
 					}
-					w.value += n * a.weight
-				}
-				w.value = floatType(getActivation(float64(w.value), p.modeActivation))
-				fmt.Println("- ",w.value)
-			}()
+					w.value = floatType(getActivation(float64(w.value), p.modeActivation))
+					fmt.Println("- ",w.value)
+				}()
+			}
 		}
 	}
 }
 
 //
-func (n *perceptronNeuron) calc(args ...Initer) {
-	/*if v, ok := getArchitecture(set[0]); ok {
-		v.Set(n)
-	}*/
+func calcPerceptronAxon(net Architecture) {
+}
+
+//
+/*func (p *perceptronNeuron) calc(args ...Initer) {
+}*/
+
+func (p *perceptronNeuron) Set(args ...Setter) {
+}
+
+func (p *perceptronNeuron) Get(args ...Setter) Getter {
+	return nil
 }
 
 // Training

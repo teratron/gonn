@@ -7,7 +7,8 @@ import (
 )
 
 type Initer interface {
-	init(...Setter) bool
+	init(...GetterSetter) bool
+	GetterSetter
 }
 
 func init() {
@@ -28,7 +29,7 @@ func New() NeuralNetwork {
 	return n
 }
 
-func (n *nn) init(args ...Setter) bool {
+func (n *nn) init(args ...GetterSetter) bool {
 	if v, ok := getArchitecture(n); ok {
 		n.isInit = v.init(args...)
 	}
