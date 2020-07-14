@@ -7,7 +7,7 @@ import (
 )
 
 type Initer interface {
-	init(...GetterSetter) bool
+	init(...Setter) bool
 	GetterSetter
 }
 
@@ -19,17 +19,18 @@ func init() {
 // New returns a new neural network instance with the default parameters
 func New() NeuralNetwork {
 	n := &nn{
-		Architecture: &perceptron{},
-		isInit:       false,
-		isTrain:      false,
-		language:     "en",
-		logging:      1,
+		Architecture:	&perceptron{},
+		isInit:			false,
+		isQuery:		false,
+		isTrain:		false,
+		language:		"en",
+		logging:		1,
 	}
 	n.Perceptron()
 	return n
 }
 
-func (n *nn) init(args ...GetterSetter) bool {
+func (n *nn) init(args ...Setter) bool {
 	if v, ok := getArchitecture(n); ok {
 		n.isInit = v.init(args...)
 	}

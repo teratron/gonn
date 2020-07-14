@@ -106,7 +106,7 @@ func main() {
 		nn.Bias(false),
 		nn.Rate(.33),
 		nn.Activation(nn.ModeSIGMOID),
-		nn.Loss(nn.ModeMSE),
+		nn.ModeLoss(nn.ModeMSE),
 		nn.LevelLoss(.0005),
 		nn.HiddenLayer(1, 5, 9),
 
@@ -127,8 +127,8 @@ func main() {
 	fmt.Println("n.Get(nn.Activation()):", n.Get(nn.Activation())) //get
 
 	// Loss
-	n.Set(nn.Loss(nn.ModeARCTAN)) //set
-	fmt.Println("n.Get(nn.Loss()):", n.Get(nn.Loss())) //get
+	n.Set(nn.ModeLoss(nn.ModeARCTAN))                      //set
+	fmt.Println("n.Get(nn.ModeLoss()):", n.Get(nn.ModeLoss())) //get
 
 	// Level loss
 	n.Set(nn.LevelLoss(.004)) //set
@@ -157,5 +157,5 @@ func main() {
 	fmt.Println(n.Train(input, target))
 
 	//
-	//fmt.Println(n.Loss(target))
+	fmt.Println(n.Loss(target))
 }

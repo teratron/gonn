@@ -5,7 +5,6 @@ import "log"
 
 type Hopfield interface {
 	Hopfield() NeuralNetwork
-	//hopfield() *hopfield
 }
 
 type hopfield struct {
@@ -48,12 +47,12 @@ func (h *hopfield) Get(args ...Setter) Getter {
 }
 
 // Initialization
-func (h *hopfield) init(args ...GetterSetter) bool {
+func (h *hopfield) init(args ...Setter) bool {
 	return true
 }
 
 // Calculating
-func (h *hopfield) calc(args ...Initer) GetterSetter {
+func (h *hopfield) calc(args ...Initer) Getter {
 	return nil
 }
 

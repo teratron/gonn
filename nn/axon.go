@@ -1,8 +1,8 @@
 package nn
 
 type axon struct {
-	weight			floatType				//
-	synapse			map[string]GetterSetter	//
+	weight  floatType				//
+	synapse map[string]GetterSetter	//
 }
 
 func Axon() Initer {
@@ -37,11 +37,11 @@ func (a *axon) Get(args ...Setter) Getter {
 }
 
 // Initialization
-func (a *axon) init(args ...GetterSetter) bool {
+func (a *axon) init(args ...Setter) bool {
 	return true
 }
 
 // Calculating
-func (a *axon) calc(args ...Initer) GetterSetter {
+func (a *axon) calc(args ...Initer) Getter {
 	return nil
 }

@@ -14,15 +14,21 @@ const (
 )
 
 func (n *nn) Loss(target []float64) (loss float64) {
-	if n.isInit {
-		//copy(m.Layer[0].Neuron, input)
+	if n.isInit && n.isQuery {
+		if a, ok := getArchitecture(n); ok {
+			loss = a.Loss(target)
+		}
 	} else {
 		Log("An uninitialized neural network", true)
 	}
 	return
 }
 
-func Loss(mode ...modeLossType) Setter {
+/*func Loss(target []float64) Initer {
+	return FloatType(target)
+}*/
+
+func ModeLoss(mode ...modeLossType) Setter {
 	if len(mode) == 0 {
 		return modeLossType(0)
 	} else {

@@ -63,6 +63,10 @@ func (f FloatType) Get(args ...Setter) Getter {
 	return nil
 }
 
+/*func (f FloatType) init(...Setter) bool {
+	return true
+}*/
+
 // Return random number from -0.5 to 0.5
 func getRand() (r floatType) {
 	r = 0

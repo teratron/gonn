@@ -2,9 +2,9 @@
 package nn
 
 type neuron struct {
-	value			floatType
-	axon			[]*axon
-	specific		GetterSetter			// feature
+	value    floatType
+	axon     []*axon
+	specific GetterSetter	// feature
 }
 
 func Neuron() Initer {
@@ -31,11 +31,11 @@ func (n *neuron) Get(args ...Setter) Getter {
 }
 
 // Initialization
-func (n *neuron) init(args ...GetterSetter) bool {
+func (n *neuron) init(args ...Setter) bool {
 	return true
 }
 
 // Calculating
-func (n *neuron) calc(args ...Initer) GetterSetter {
+func (n *neuron) calc(args ...Initer) Getter {
 	return nil
 }

@@ -53,7 +53,7 @@ func (m modeActivationType) check() Getter {
 }
 
 // Activation function
-func getActivation(value float64, mode modeActivationType) float64 {
+func calcActivation(value float64, mode modeActivationType) float64 {
 	switch mode {
 	default:
 		fallthrough
@@ -85,7 +85,7 @@ func getActivation(value float64, mode modeActivationType) float64 {
 }
 
 // Derivative activation function
-func getDerivative(value float64, mode modeActivationType) float64 {
+func calcDerivative(value float64, mode modeActivationType) float64 {
 	switch mode {
 	default:
 		fallthrough

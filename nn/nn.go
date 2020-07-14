@@ -11,8 +11,8 @@ type NeuralNetwork interface {
 		//RadialBasis() NeuralNetwork
 		//Hopfield() NeuralNetwork
 	Calculator
-		//calc(...Initer) GetterSetter
-		//init(...GetterSetter) bool
+		//calc(...Initer) Getter
+		//init(...Setter) bool
 		//GetterSetter
 			//Get(...Setter) Getter
 			//Set(...Setter)
@@ -30,6 +30,7 @@ type Processor interface {
 
 	//
 	Loss([]float64) float64
+	//loss(FloatType) floatType
 
 	// Training
 	Train(...[]float64) (float64, int)
@@ -51,8 +52,9 @@ type (
 //
 type nn struct {
 	Architecture			// Architecture/type of neural network (configuration)
-	isInit       bool		// Neural network initialization flag
-	isTrain      bool		//
+	isInit		bool		// Neural network initialization flag
+	isQuery		bool		//
+	isTrain		bool		//
 
 	//
 	language	langType

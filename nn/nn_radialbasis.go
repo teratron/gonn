@@ -7,7 +7,6 @@ import (
 
 type RadialBasis interface {
 	RadialBasis() NeuralNetwork
-	//radialBasis() *radialBasis
 }
 
 type radialBasis struct {
@@ -27,13 +26,9 @@ func (n *nn) RadialBasis() NeuralNetwork {
 	return n
 }
 
-/*func (r *radialBasis) radialBasis() *radialBasis {
+func (r *radialBasis) architecture() *radialBasis {
 	return r
-}*/
-
-/*func (r *radialBasis) perceptron() *radialBasis {
-	return r
-}*/
+}
 
 // Setter
 func (r *radialBasis) Set(args ...Setter) {
@@ -55,12 +50,12 @@ func (r *radialBasis) Get(args ...Setter) Getter {
 }
 
 // Initialization
-func (r *radialBasis) init(args ...GetterSetter) bool {
+func (r *radialBasis) init(args ...Setter) bool {
 	return true
 }
 
 // Calculating
-func (r *radialBasis) calc(args ...Initer) GetterSetter {
+func (r *radialBasis) calc(args ...Initer) Getter {
 	return nil
 }
 

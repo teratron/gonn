@@ -24,5 +24,3 @@ func getArchitecture(net Architecture) (NeuralNetwork, bool) {
 	}
 	return nil, false
 }
-
-//func returnP()

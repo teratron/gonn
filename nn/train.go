@@ -19,8 +19,11 @@ func (n *nn) Train(data ...[]float64) (loss float64, count int) {
 	}
 
 	count = 1
-	//a, b := n.calc(Neuron(), Axon())
+	//var l GetterSetter
+	_ = n.calc(Neuron())
 	fmt.Println("train ####", n.calc(Neuron(), Axon()))
+	loss = n.Loss(data[1])
+	//n.calc(Loss())
 	//if err != nil { panic("!!!") }
 	//n.calc(Loss())
 	//n.calc(Error())
@@ -38,6 +41,7 @@ func (n *nn) Train(data ...[]float64) (loss float64, count int) {
 	/*forwardPass(input)
 	totalLoss(target)
 	n.backwardPass()*/
+	n.isQuery = true
 	return
 }
 
