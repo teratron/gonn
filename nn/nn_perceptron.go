@@ -6,9 +6,10 @@ import (
 	"log"
 )
 
-/*type Perceptron interface {
+type Perceptron interface {
 	Perceptron() NeuralNetwork
-}*/
+	//perceptron() *perceptron
+}
 
 type perceptron struct {
 	Architecture
@@ -36,7 +37,7 @@ type perceptronNeuron struct {
 
 // Returns a new Perceptron neural network instance with the default parameters
 func (n *nn) Perceptron() NeuralNetwork {
-	n.architecture = &perceptron{
+	n.Architecture = &perceptron{
 		Architecture:	n,
 		bias:			false,
 		rate:			DefaultRate,
@@ -48,6 +49,10 @@ func (n *nn) Perceptron() NeuralNetwork {
 		lowerRange:		0,
 	}
 	return n
+}
+
+func (p *perceptron) perceptron() *perceptron {
+	return p
 }
 
 // Preset
@@ -203,39 +208,17 @@ func (p *perceptron) calc(args ...Initer) GetterSetter {
 	return nil
 }
 
-func getpers(net Architecture) *perceptron {
-	//fmt.Printf("&&&&&&& %T %v\n", p, p)
-	switch n := net.(type) {
-	case *perceptron:
-		//fmt.Printf("&&&&&&& %T %v\n", n, n.axon)
-		return n
-
-	}
-	return nil
-}
-
-
 // Function for calculating the values of neurons in a layers
 func calcPerceptronNeuron(net Architecture) {
-	//fmt.Println("1 ###################################")
-	//fmt.Printf("&&&&&&& %T %v\n", net, net.(Architecture))
-	/*if n, ok := net.(Architecture); ok {
-		fmt.Printf("&&&&&&& %T %v\n", n.(Architecture), n.(Architecture))
-		if a, ok := n.(NeuralNetwork); ok {
-			//return v, ok
-			fmt.Printf("&&&&&&& %T %v\n", a, a)
-		}
-	}*/
-	/*switch nnnnn := net.(type) {
+	/*switch p := net.(type) {
+	case *radialBasis:
+		fmt.Printf("&&&&&&& %T %v\n", p, p)
 	case *perceptron:
-		fmt.Printf("&&&&&&& %T %v\n", nnnnn, nnnnn.axon)
+		fmt.Printf("&&&&&&& %T %v\n", p, p.neuron)
 	default:
+		Log("This type is missing for Perceptron Neural Network", false) // !!!
+		log.Printf("\tget: %T %v\n", net, net) // !!!
 	}*/
-	/*if v, ok := getArchitecture(net); ok {
-		fmt.Printf("&&&&&&& %T %v\n", v, v)
-	}*/
-	p := getpers(net)
-	fmt.Println("^^^^^^",p.axon)
 	if p, ok := net.(*perceptron); ok { // ???
 		var n floatType
 		for _, v := range p.neuron {

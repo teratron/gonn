@@ -28,7 +28,7 @@ func (h HiddenType) Set(args ...Setter) {
 	}*/
 
 	if n, ok := args[0].(*nn); ok {
-		if v, ok := n.architecture.(NeuralNetwork); ok {
+		if v, ok := n.Architecture.(NeuralNetwork); ok {
 			v.Set(h, n)
 		}
 	}

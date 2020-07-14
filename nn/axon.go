@@ -1,5 +1,10 @@
 package nn
 
+type axon struct {
+	weight			floatType				//
+	synapse			map[string]GetterSetter	//
+}
+
 func Axon() Initer {
 	return &axon{}
 }

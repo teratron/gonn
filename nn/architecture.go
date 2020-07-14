@@ -3,20 +3,22 @@ package nn
 
 type Architecture interface {
 	//
-	Perceptron() NeuralNetwork
-	//Perceptron
+	//Perceptron() NeuralNetwork
+	Perceptron
+
 	//
-	RadialBasis() NeuralNetwork
-	//RadialBasis
+	//RadialBasis() NeuralNetwork
+	RadialBasis
+
 	//
-	Hopfield() NeuralNetwork
-	//Hopfield
+	//Hopfield() NeuralNetwork
+	Hopfield
 }
 
 //
 func getArchitecture(net Architecture) (NeuralNetwork, bool) {
 	if n, ok := net.(*nn); ok {
-		if v, ok := n.architecture.(NeuralNetwork); ok {
+		if v, ok := n.Architecture.(NeuralNetwork); ok {
 			return v, ok
 		}
 	}

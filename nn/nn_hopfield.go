@@ -3,9 +3,10 @@ package nn
 
 import "log"
 
-/*type Hopfield interface {
+type Hopfield interface {
 	Hopfield() NeuralNetwork
-}*/
+	//hopfield() *hopfield
+}
 
 type hopfield struct {
 	Architecture
@@ -21,7 +22,7 @@ type hopfieldNeuron struct {
 
 // Returns a new Hopfield neural network instance with the default parameters
 func (n *nn) Hopfield() NeuralNetwork {
-	n.architecture = &hopfield{
+	n.Architecture = &hopfield{
 		Architecture: n,
 	}
 	return n

@@ -25,12 +25,6 @@ type NeuralNetwork interface {
 
 //
 type Processor interface {
-	// Initializing
-	//init(...Setter) bool
-
-	//Initer
-	//Calculator
-
 	// Querying / forecast / prediction
 	Query([]float64) []float64
 
@@ -52,29 +46,15 @@ type (
 	//intType			int
 	floatType		float32
 	FloatType		[]float64
-	//err				error
 )
 
 //
 type nn struct {
-	architecture	NeuralNetwork			// Architecture/type of neural network (configuration)
-	isInit			bool					// Neural network initialization flag
-	isTrain			bool					//
+	Architecture			// Architecture/type of neural network (configuration)
+	isInit       bool		// Neural network initialization flag
+	isTrain      bool		//
 
 	//
-	language		langType
-	logging			logType
-}
-
-//
-type neuron struct {
-	value			floatType
-	axon			[]*axon
-	specific		GetterSetter			// feature
-}
-
-//
-type axon struct {
-	weight			floatType				//
-	synapse			map[string]GetterSetter	//
+	language	langType
+	logging		logType
 }

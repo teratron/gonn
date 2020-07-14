@@ -19,11 +19,11 @@ func init() {
 // New returns a new neural network instance with the default parameters
 func New() NeuralNetwork {
 	n := &nn{
-		architecture:	&perceptron{},
-		isInit:			false,
-		isTrain:		false,
-		language:		"en",
-		logging: 		1,
+		Architecture: &perceptron{},
+		isInit:       false,
+		isTrain:      false,
+		language:     "en",
+		logging:      1,
 	}
 	n.Perceptron()
 	return n

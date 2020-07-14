@@ -1,6 +1,12 @@
 //
 package nn
 
+type neuron struct {
+	value			floatType
+	axon			[]*axon
+	specific		GetterSetter			// feature
+}
+
 func Neuron() Initer {
 	return &neuron{}
 }

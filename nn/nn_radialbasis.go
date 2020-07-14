@@ -5,9 +5,10 @@ import (
 	"log"
 )
 
-/*type RadialBasis interface {
+type RadialBasis interface {
 	RadialBasis() NeuralNetwork
-}*/
+	//radialBasis() *radialBasis
+}
 
 type radialBasis struct {
 	Architecture
@@ -20,11 +21,19 @@ type radialBasisNeuron struct {
 
 // Returns a new Radial Basis neural network instance with the default parameters
 func (n *nn) RadialBasis() NeuralNetwork {
-	n.architecture = &radialBasis{
+	n.Architecture = &radialBasis{
 		Architecture: n,
 	}
 	return n
 }
+
+/*func (r *radialBasis) radialBasis() *radialBasis {
+	return r
+}*/
+
+/*func (r *radialBasis) perceptron() *radialBasis {
+	return r
+}*/
 
 // Setter
 func (r *radialBasis) Set(args ...Setter) {
