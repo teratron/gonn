@@ -12,10 +12,11 @@ type NeuralNetwork interface {
 		//Hopfield() NeuralNetwork
 	Calculator
 		//calc(...Initer) Getter
+	Initer
 		//init(...Setter) bool
-		//GetterSetter
-			//Get(...Setter) Getter
-			//Set(...Setter)
+	GetterSetter
+		//Get(...Setter) Getter
+		//Set(...Setter)
 	Processor
 		//Query([]float64) []float64
 		//Loss([]float64) float64
@@ -44,9 +45,8 @@ type Processor interface {
 }
 
 type (
-	//intType			int
-	floatType		float32
-	FloatType		[]float64
+	floatType      float32
+	floatArrayType []float64
 )
 
 //

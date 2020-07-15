@@ -10,7 +10,7 @@ func (n *nn) Train(data ...[]float64) (loss float64, count int) {
 	if n.isInit {
 		//copy(m.Layer[0].Neuron, input)
 	} else {
-		n.isInit = n.init(FloatType(data[0]), FloatType(data[1]))
+		n.isInit = n.init(floatArrayType(data[0]), floatArrayType(data[1]))
 		//n.isInit = n.init(FloatType(input), FloatType(target))
 		if !n.isInit {
 			Log("Error initialization", false) // !!!
@@ -19,9 +19,13 @@ func (n *nn) Train(data ...[]float64) (loss float64, count int) {
 	}
 
 	count = 1
-	//var l GetterSetter
-	_ = n.calc(Neuron())
-	fmt.Println("train ####", n.calc(Neuron(), Axon()))
+	//l, ok := n.calc(Neuron(), Loss(data[1])).(floatType)
+	/*if ok && (l <= floatType(n.Get().Get(LevelLoss())) || l <= floatType(MinLevelLoss)) {
+		//break
+	}*/
+	d := n.Get().Get(LevelLoss())
+	//fmt.Println("train ####", n.calc(Neuron(), Loss(data[1]), Axon()), " + + + + + ",n.Get().Get(LevelLoss()))
+	fmt.Printf("%T %v\n", d, d.Get())
 	loss = n.Loss(data[1])
 	//n.calc(Loss())
 	//if err != nil { panic("!!!") }

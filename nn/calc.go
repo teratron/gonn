@@ -3,7 +3,7 @@ package nn
 
 type Calculator interface {
 	calc(...Initer) Getter
-	Initer
+	//Initer
 }
 
 func (n *nn) calc(args ...Initer) (get Getter) {
@@ -13,7 +13,8 @@ func (n *nn) calc(args ...Initer) (get Getter) {
 		if a, ok := getArchitecture(n); ok {
 			for _, v := range args {
 				if i, ok := v.(Initer); ok {
-					get = a.calc(i)
+					g := a.calc(i)
+					if g != nil { get = g }
 				}
 			}
 		}

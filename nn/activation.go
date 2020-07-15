@@ -13,7 +13,7 @@ const (
 	ModeTANH      modeActivationType = 4	// TanH - hyperbolic tangent
 )
 
-func Activation(mode ...modeActivationType) Setter {
+func ModeActivation(mode ...modeActivationType) Setter {
 	if len(mode) == 0 {
 		return modeActivationType(0)
 	} else {

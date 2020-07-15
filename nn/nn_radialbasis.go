@@ -15,7 +15,7 @@ type radialBasis struct {
 }
 
 type radialBasisNeuron struct {
-	error floatType
+	miss floatType
 }
 
 // Returns a new Radial Basis neural network instance with the default parameters
@@ -43,6 +43,7 @@ func (r *radialBasis) Set(args ...Setter) {
 func (r *radialBasis) Get(args ...Setter) Getter {
 	switch args[0].(type) {
 	default:
+		if len(args) == 0 { return r }
 		Log("This type of variable is missing for Radial Basis Neural Network", false)
 		log.Printf("\tget: %T %v\n", args[0], args[0]) // !!!
 		return nil

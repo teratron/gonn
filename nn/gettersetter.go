@@ -1,6 +1,7 @@
 package nn
 
 import (
+	"fmt"
 	"math/rand"
 )
 
@@ -33,7 +34,8 @@ func (n *nn) Set(args ...Setter) {
 // Getter
 func (n *nn) Get(args ...Setter) Getter {
 	if len(args) == 0 {
-		return n
+		fmt.Printf("%T %v\n", n.Architecture.(NeuralNetwork), n.Architecture.(NeuralNetwork))
+		return n.Architecture.(NeuralNetwork)
 	} else {
 		for _, v := range args {
 			if g, ok := v.(Getter); ok {
@@ -44,28 +46,17 @@ func (n *nn) Get(args ...Setter) Getter {
 	return nil
 }
 
-//
-/*func (i intType) Set(args ...Setter) {
-	Log("", false)
-}*/
+func (f floatType) Set(...Setter) {}
 
-func (f floatType) Set(args ...Setter) {
-}
-
-func (f floatType) Get(args ...Setter) Getter {
+func (f floatType) Get(...Setter) Getter {
 	return nil
 }
 
-func (f FloatType) Set(args ...Setter) {
-}
+func (f floatArrayType) Set(...Setter) {}
 
-func (f FloatType) Get(args ...Setter) Getter {
+func (f floatArrayType) Get(...Setter) Getter {
 	return nil
 }
-
-/*func (f FloatType) init(...Setter) bool {
-	return true
-}*/
 
 // Return random number from -0.5 to 0.5
 func getRand() (r floatType) {

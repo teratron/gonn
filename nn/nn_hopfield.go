@@ -11,8 +11,8 @@ type hopfield struct {
 	Architecture
 	Processor
 
-	neuron			[]*neuron
-	axon			[][]*axon
+	neuron []*neuron
+	axon   [][]*axon
 }
 
 type hopfieldNeuron struct {
@@ -40,6 +40,7 @@ func (h *hopfield) Set(args ...Setter) {
 func (h *hopfield) Get(args ...Setter) Getter {
 	switch args[0].(type) {
 	default:
+		if len(args) == 0 { return h }
 		Log("This type of variable is missing for Hopfield Neural Network", false)
 		log.Printf("\tget: %T %v\n", args[0], args[0]) // !!!
 		return nil

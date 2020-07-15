@@ -8,7 +8,7 @@ import (
 
 type Initer interface {
 	init(...Setter) bool
-	GetterSetter
+	//GetterSetter
 }
 
 func init() {
@@ -37,6 +37,10 @@ func (n *nn) init(args ...Setter) bool {
 	return n.isInit
 }
 
-/*func (f floatType) init(args ...Setter) bool {
+/*func (f floatType) init(...Setter) bool {
 	return true
-}*/
+}
+ */
+func (f floatArrayType) init(...Setter) bool {
+	panic("implement me")
+}

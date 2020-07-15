@@ -31,7 +31,7 @@ type perceptron struct {
 }
 
 type perceptronNeuron struct {
-	error			floatType
+	miss			floatType
 }
 
 // Returns a new Perceptron neural network instance with the default parameters
@@ -63,7 +63,7 @@ func (p *perceptron) Preset(name string) {
 		p.Set(
 			Bias(false),
 			Rate(DefaultRate),
-			Activation(ModeSIGMOID),
+			ModeActivation(ModeSIGMOID),
 			ModeLoss(ModeMSE),
 			LevelLoss(.0001),
 			HiddenLayer())
@@ -94,6 +94,8 @@ func (p *perceptron) Set(args ...Setter) {
 // Getter
 func (p *perceptron) Get(args ...Setter) Getter {
 	switch args[0].(type) {
+	case *perceptron:
+		return p
 	case biasType:
 		return p.bias
 	case rateType:
@@ -107,7 +109,7 @@ func (p *perceptron) Get(args ...Setter) Getter {
 	case HiddenType:
 		return p.hiddenLayer
 	default:
-		if len(args) == 0 { return p }
+		//if len(args) == 0 { return p }
 		Log("This type is missing for Perceptron Neural Network", false) // !!!
 		log.Printf("\tget: %T %v\n", args[0], args[0]) // !!!
 		return nil
@@ -123,8 +125,8 @@ func (p *perceptron) init(args ...Setter) bool {
 
 	lenHidden := len(p.hiddenLayer)
 	layer     := make(HiddenType, lenHidden + 1)
-	lenInput  := len(args[0].(FloatType))
-	tmp        = append(p.hiddenLayer, hiddenType(len(args[1].(FloatType))))
+	lenInput  := len(args[0].(floatArrayType))
+	tmp        = append(p.hiddenLayer, hiddenType(len(args[1].(floatArrayType))))
 	lenLayer  := copy(layer, tmp)
 
 	b := 0
@@ -144,7 +146,7 @@ func (p *perceptron) init(args ...Setter) bool {
 		}
 	}
 	p.initNeuron()
-	p.initAxon(args[0].(FloatType))
+	p.initAxon(args[0].(floatArrayType))
 
 	return true
 }
@@ -162,7 +164,7 @@ func (p *perceptron) initNeuron() {
 }
 
 //
-func (p *perceptron) initAxon(input FloatType) {
+func (p *perceptron) initAxon(input floatArrayType) {
 	for i, v := range p.axon {
 		for j, w := range v {
 			for k := range w {
@@ -192,13 +194,15 @@ func (p *perceptron) initAxon(input FloatType) {
 
 // Calculating
 func (p *perceptron) calc(args ...Initer) Getter {
-	switch args[0].(type) {
+	switch v := args[0].(type) {
 	case *neuron:
 		p.calcNeuron()
+	case lossType:
+		return p.calcLoss(v)
 	case *axon:
 		p.calcAxon()
 	default:
-		Log("This type is missing for Perceptron Neural Network", false) // !!!
+		Log("This type is missing for Perceptron Neural Network", true) // !!!
 		log.Printf("\tcalc: %T %v\n", args[0], args[0]) // !!!
 	}
 	return nil
@@ -233,7 +237,6 @@ func (p *perceptron) calcNeuron() {
 
 //
 func (p *perceptron) calcAxon() {
-	//fmt.Println("2 ###################################")
 }
 
 // Loosing
@@ -241,23 +244,21 @@ func (p *perceptron) Loss(target []float64) float64 {
 	return float64(p.calcLoss(target))
 }
 
-func (p *perceptron) calcLoss(target FloatType) (loss floatType) {
+func (p *perceptron) calcLoss(target lossType) (loss floatType) {
 	for i, v := range p.neuron[len(p.neuron) - 1] {
 		if s, ok := v.specific.(*perceptronNeuron); ok {
-			s.error = floatType(target[i]) - v.value
-
+			s.miss = floatType(target[i]) - v.value
 			switch p.modeLoss {
 			default: fallthrough
 			case ModeMSE, ModeRMSE:
-				loss += floatType(math.Pow(float64(s.error), 2))
+				loss += floatType(math.Pow(float64(s.miss), 2))
 			case ModeARCTAN:
-				loss += floatType(math.Pow(math.Atan(float64(s.error)), 2))
+				loss += floatType(math.Pow(math.Atan(float64(s.miss)), 2))
 			}
-			s.error *= floatType(calcDerivative(float64(v.value), p.modeActivation))
+			s.miss *= floatType(calcDerivative(float64(v.value), p.modeActivation))
 		}
 	}
 	loss /= floatType(len(p.neuron[len(p.neuron) - 1]))
-
 	switch p.modeLoss {
 	default: fallthrough
 	case ModeMSE, ModeARCTAN:
@@ -267,26 +268,23 @@ func (p *perceptron) calcLoss(target FloatType) (loss floatType) {
 	}
 }
 
-//
+// Specific neuron
 /*func (p *perceptronNeuron) calc(args ...Initer) {
 }*/
 
-func (p *perceptronNeuron) Set(args ...Setter) {
+func (p *perceptronNeuron) Set(...Setter) {
 }
 
-func (p *perceptronNeuron) Get(args ...Setter) Getter {
+func (p *perceptronNeuron) Get(...Setter) Getter {
 	return nil
 }
 
 // Training
-/*func (p *perceptron) Train(input, target []float64) (loss float64, count int) {
-	return
+func (p *perceptron) Train(data ...[]float64) (loss float64, count int) {
+	return .1, 0
 }
-
+/*
 // Query
 func (p *perceptron) Query(input []float64) []float64 {
 	panic("implement me")
-}*/
-
-/*func (p *perceptron) initHidden() {
 }*/

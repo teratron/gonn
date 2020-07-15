@@ -2,6 +2,7 @@
 package nn
 
 type (
+	lossType      floatArrayType
 	modeLossType  uint8     // Average error mode
 	levelLossType floatType // Level loss
 )
@@ -15,18 +16,19 @@ const (
 
 func (n *nn) Loss(target []float64) (loss float64) {
 	if n.isInit && n.isQuery {
-		if a, ok := getArchitecture(n); ok {
-			loss = a.Loss(target)
-		}
+		//if a, ok := getArchitecture(n); ok {
+			//loss = n.Get().Loss(target)
+			//fmt.Println(n.Get())
+		//}
 	} else {
 		Log("An uninitialized neural network", true)
 	}
 	return
 }
 
-/*func Loss(target []float64) Initer {
-	return FloatType(target)
-}*/
+func Loss(target []float64) Initer {
+	return lossType(target)
+}
 
 func ModeLoss(mode ...modeLossType) Setter {
 	if len(mode) == 0 {
@@ -67,18 +69,26 @@ func (l levelLossType) Set(args ...Setter) {
 
 // Getter
 func (m modeLossType) Get(args ...Setter) Getter {
-	if a, ok := args[0].(Architecture); ok {
-		if v, ok := getArchitecture(a); ok {
-			return v.Get(m)
+	if len(args) == 0 {
+		return m
+	} else {
+		if a, ok := args[0].(Architecture); ok {
+			if v, ok := getArchitecture(a); ok {
+				return v.Get(m)
+			}
 		}
 	}
 	return nil
 }
 
 func (l levelLossType) Get(args ...Setter) Getter {
-	if a, ok := args[0].(Architecture); ok {
-		if v, ok := getArchitecture(a); ok {
-			return v.Get(l)
+	if len(args) == 0 {
+		return floatType(l)
+	} else {
+		if a, ok := args[0].(Architecture); ok {
+			if v, ok := getArchitecture(a); ok {
+				return v.Get(l)
+			}
 		}
 	}
 	return nil
@@ -101,4 +111,9 @@ func (l levelLossType) check() Getter {
 	default:
 		return l
 	}
+}
+
+// Initer
+func (l lossType) init(...Setter) bool {
+	return true
 }
