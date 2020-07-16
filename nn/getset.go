@@ -1,7 +1,6 @@
 package nn
 
 import (
-	"fmt"
 	"math/rand"
 )
 
@@ -11,7 +10,7 @@ type GetterSetter interface {
 }
 
 type Getter interface {
-	Get(...Setter) Getter
+	Get(...Getter) GetterSetter
 }
 
 type Setter interface {
@@ -21,7 +20,7 @@ type Setter interface {
 // Setter
 func (n *nn) Set(args ...Setter) {
 	if len(args) == 0 {
-		Log("Empty Set()", false)
+		Log("Empty Set()", true) // !!!
 	} else {
 		for _, v := range args {
 			if s, ok := v.(Setter); ok {
@@ -32,10 +31,11 @@ func (n *nn) Set(args ...Setter) {
 }
 
 // Getter
-func (n *nn) Get(args ...Setter) Getter {
+func (n *nn) Get(args ...Getter) GetterSetter {
 	if len(args) == 0 {
-		fmt.Printf("%T %v\n", n.Architecture.(NeuralNetwork), n.Architecture.(NeuralNetwork))
-		return n.Architecture.(NeuralNetwork)
+		if a, ok := n.Architecture.(GetterSetter); ok {
+			return a
+		}
 	} else {
 		for _, v := range args {
 			if g, ok := v.(Getter); ok {
@@ -48,13 +48,13 @@ func (n *nn) Get(args ...Setter) Getter {
 
 func (f floatType) Set(...Setter) {}
 
-func (f floatType) Get(...Setter) Getter {
+func (f floatType) Get(...Getter) GetterSetter {
 	return nil
 }
 
 func (f floatArrayType) Set(...Setter) {}
 
-func (f floatArrayType) Get(...Setter) Getter {
+func (f floatArrayType) Get(...Getter) GetterSetter {
 	return nil
 }
 

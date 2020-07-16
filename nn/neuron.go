@@ -13,18 +13,22 @@ func Neuron() Initer {
 
 // Setter
 func (n *neuron) Set(args ...Setter) {
-	if a, ok := args[0].(Architecture); ok {
-		if v, ok := getArchitecture(a); ok {
-			v.Set(n)
+	if len(args) == 0 {
+		Log("Empty Set()", true) // !!!
+	} else {
+		if a, ok := args[0].(NeuralNetwork); ok {
+			a.Get().Set(n)
 		}
 	}
 }
 
 // Getter
-func (n *neuron) Get(args ...Setter) Getter {
-	if a, ok := args[0].(Architecture); ok {
-		if v, ok := getArchitecture(a); ok {
-			return v.Get(n)
+func (n *neuron) Get(args ...Getter) GetterSetter {
+	if len(args) == 0 {
+		return n
+	} else {
+		if a, ok := args[0].(NeuralNetwork); ok {
+			return a.Get().Get(n)
 		}
 	}
 	return nil

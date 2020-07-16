@@ -16,11 +16,9 @@ type Architecture interface {
 }
 
 //
-func getArchitecture(net Architecture) (NeuralNetwork, bool) {
-	if n, ok := net.(*nn); ok {
-		if v, ok := n.Architecture.(NeuralNetwork); ok {
-			return v, ok
-		}
+/*func getArchitecture(net Architecture) (NeuralNetwork, bool) {
+	if n, ok := net.(*nn).Architecture.(NeuralNetwork); ok {
+		return n, ok
 	}
 	return nil, false
-}
+}*/

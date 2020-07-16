@@ -30,7 +30,7 @@ func Loss(target []float64) Initer {
 	return lossType(target)
 }
 
-func ModeLoss(mode ...modeLossType) Setter {
+func ModeLoss(mode ...modeLossType) GetterSetter {
 	if len(mode) == 0 {
 		return modeLossType(0)
 	} else {
@@ -38,7 +38,7 @@ func ModeLoss(mode ...modeLossType) Setter {
 	}
 }
 
-func LevelLoss(level ...levelLossType) Setter {
+func LevelLoss(level ...levelLossType) GetterSetter {
 	if len(level) == 0 {
 		return levelLossType(0)
 	} else {
@@ -48,54 +48,54 @@ func LevelLoss(level ...levelLossType) Setter {
 
 // Setter
 func (m modeLossType) Set(args ...Setter) {
-	if a, ok := args[0].(Architecture); ok {
-		if v, ok := getArchitecture(a); ok {
+	if len(args) == 0 {
+		Log("Empty Set()", true) // !!!
+	} else {
+		if a, ok := args[0].(NeuralNetwork); ok {
 			if c, ok := m.check().(modeLossType); ok {
-				v.Set(c)
+				a.Get().Set(c)
 			}
 		}
 	}
 }
 
 func (l levelLossType) Set(args ...Setter) {
-	if a, ok := args[0].(Architecture); ok {
-		if v, ok := getArchitecture(a); ok {
+	if len(args) == 0 {
+		Log("Empty Set()", true) // !!!
+	} else {
+		if a, ok := args[0].(NeuralNetwork); ok {
 			if c, ok := l.check().(levelLossType); ok {
-				v.Set(c)
+				a.Get().Set(c)
 			}
 		}
 	}
 }
 
 // Getter
-func (m modeLossType) Get(args ...Setter) Getter {
+func (m modeLossType) Get(args ...Getter) GetterSetter {
 	if len(args) == 0 {
 		return m
 	} else {
-		if a, ok := args[0].(Architecture); ok {
-			if v, ok := getArchitecture(a); ok {
-				return v.Get(m)
-			}
+		if a, ok := args[0].(NeuralNetwork); ok {
+			return a.Get().Get(m)
 		}
 	}
 	return nil
 }
 
-func (l levelLossType) Get(args ...Setter) Getter {
+func (l levelLossType) Get(args ...Getter) GetterSetter {
 	if len(args) == 0 {
 		return floatType(l)
 	} else {
-		if a, ok := args[0].(Architecture); ok {
-			if v, ok := getArchitecture(a); ok {
-				return v.Get(l)
-			}
+		if a, ok := args[0].(NeuralNetwork); ok {
+			return a.Get().Get(l)
 		}
 	}
 	return nil
 }
 
 // Checker
-func (m modeLossType) check() Getter {
+func (m modeLossType) check() GetterSetter {
 	switch {
 	case m < 0 || m > ModeARCTAN:
 		return ModeMSE
@@ -104,7 +104,7 @@ func (m modeLossType) check() Getter {
 	}
 }
 
-func (l levelLossType) check() Getter {
+func (l levelLossType) check() GetterSetter {
 	switch {
 	case l < 0:
 		return MinLevelLoss

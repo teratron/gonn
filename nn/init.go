@@ -8,7 +8,6 @@ import (
 
 type Initer interface {
 	init(...Setter) bool
-	//GetterSetter
 }
 
 func init() {
@@ -31,8 +30,12 @@ func New() NeuralNetwork {
 }
 
 func (n *nn) init(args ...Setter) bool {
-	if v, ok := getArchitecture(n); ok {
-		n.isInit = v.init(args...)
+	if len(args) == 0 {
+		Log("Empty init()", true) // !!!
+	} else {
+		if a, ok := n.Get().(NeuralNetwork); ok {
+			n.isInit = a.init(args...)
+		}
 	}
 	return n.isInit
 }
@@ -42,5 +45,5 @@ func (n *nn) init(args ...Setter) bool {
 }
  */
 func (f floatArrayType) init(...Setter) bool {
-	panic("implement me")
+	return true
 }

@@ -26,8 +26,8 @@ type perceptron struct {
 	neuron			[][]*neuron
 	axon			[][][]*axon
 
-	upperRange		floatType			// Range, Bound, Limit, Scope
-	lowerRange		floatType
+	lowerRange		floatType			// Range, Bound, Limit, Scope
+	upperRange		floatType
 }
 
 type perceptronNeuron struct {
@@ -44,8 +44,8 @@ func (n *nn) Perceptron() NeuralNetwork {
 		modeLoss:		ModeMSE,
 		levelLoss:		.0001,
 		hiddenLayer:	HiddenType{},
-		upperRange:		1,
 		lowerRange:		0,
+		upperRange:		1,
 	}
 	return n
 }
@@ -66,7 +66,9 @@ func (p *perceptron) Preset(name string) {
 			ModeActivation(ModeSIGMOID),
 			ModeLoss(ModeMSE),
 			LevelLoss(.0001),
-			HiddenLayer())
+			HiddenLayer(),
+			LowerRange(0),
+			UpperRange(1))
 	}
 }
 
@@ -92,10 +94,8 @@ func (p *perceptron) Set(args ...Setter) {
 }
 
 // Getter
-func (p *perceptron) Get(args ...Setter) Getter {
+func (p *perceptron) Get(args ...Getter) GetterSetter {
 	switch args[0].(type) {
-	case *perceptron:
-		return p
 	case biasType:
 		return p.bias
 	case rateType:
@@ -275,7 +275,7 @@ func (p *perceptron) calcLoss(target lossType) (loss floatType) {
 func (p *perceptronNeuron) Set(...Setter) {
 }
 
-func (p *perceptronNeuron) Get(...Setter) Getter {
+func (p *perceptronNeuron) Get(...Getter) GetterSetter {
 	return nil
 }
 

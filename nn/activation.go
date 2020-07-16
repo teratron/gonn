@@ -13,7 +13,7 @@ const (
 	ModeTANH      modeActivationType = 4	// TanH - hyperbolic tangent
 )
 
-func ModeActivation(mode ...modeActivationType) Setter {
+func ModeActivation(mode ...modeActivationType) GetterSetter {
 	if len(mode) == 0 {
 		return modeActivationType(0)
 	} else {
@@ -23,27 +23,31 @@ func ModeActivation(mode ...modeActivationType) Setter {
 
 // Setter
 func (m modeActivationType) Set(args ...Setter) {
-	if a, ok := args[0].(Architecture); ok {
-		if v, ok := getArchitecture(a); ok {
+	if len(args) == 0 {
+		Log("Empty Set()", true) // !!!
+	} else {
+		if a, ok := args[0].(NeuralNetwork); ok {
 			if c, ok := m.check().(modeActivationType); ok {
-				v.Set(c)
+				a.Get().Set(c)
 			}
 		}
 	}
 }
 
 // Getter
-func (m modeActivationType) Get(args ...Setter) Getter {
-	if a, ok := args[0].(Architecture); ok {
-		if v, ok := getArchitecture(a); ok {
-			return v.Get(m)
+func (m modeActivationType) Get(args ...Getter) GetterSetter {
+	if len(args) == 0 {
+		return m
+	} else {
+		if a, ok := args[0].(NeuralNetwork); ok {
+			return a.Get().Get(m)
 		}
 	}
 	return nil
 }
 
 // Checker
-func (m modeActivationType) check() Getter {
+func (m modeActivationType) check() GetterSetter {
 	switch {
 	case m < 0 || m > ModeTANH:
 		return ModeSIGMOID

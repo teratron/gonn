@@ -2,5 +2,5 @@
 package nn
 
 type Checker interface {
-	check() Getter
+	check() GetterSetter
 }

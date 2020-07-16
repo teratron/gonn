@@ -11,18 +11,22 @@ func Axon() Initer {
 
 // Setter
 func (a *axon) Set(args ...Setter) {
-	if n, ok := args[0].(Architecture); ok {
-		if v, ok := getArchitecture(n); ok {
-			v.Set(a)
+	if len(args) == 0 {
+		Log("Empty Set()", true) // !!!
+	} else {
+		if n, ok := args[0].(NeuralNetwork); ok {
+			n.Get().Set(a)
 		}
 	}
 }
 
 // Getter
-func (a *axon) Get(args ...Setter) Getter {
-	if n, ok := args[0].(Architecture); ok {
-		if v, ok := getArchitecture(n); ok {
-			return v.Get(a)
+func (a *axon) Get(args ...Getter) GetterSetter {
+	if len(args) == 0 {
+		return a
+	} else {
+		if n, ok := args[0].(NeuralNetwork); ok {
+			return n.Get().Get(a)
 		}
 	}
 	return nil

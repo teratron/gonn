@@ -26,10 +26,6 @@ func (n *nn) RadialBasis() NeuralNetwork {
 	return n
 }
 
-func (r *radialBasis) architecture() *radialBasis {
-	return r
-}
-
 // Setter
 func (r *radialBasis) Set(args ...Setter) {
 	switch v := args[0].(type) {
@@ -40,7 +36,7 @@ func (r *radialBasis) Set(args ...Setter) {
 }
 
 // Getter
-func (r *radialBasis) Get(args ...Setter) Getter {
+func (r *radialBasis) Get(args ...Getter) GetterSetter {
 	switch args[0].(type) {
 	default:
 		if len(args) == 0 { return r }
@@ -67,7 +63,7 @@ func (r *radialBasis) calc(args ...Initer) Getter {
 func (r *radialBasisNeuron) Set(args ...Setter) {
 }
 
-func (r *radialBasisNeuron) Get(args ...Setter) Getter {
+func (r *radialBasisNeuron) Get(args ...Getter) GetterSetter {
 	return nil
 }
 

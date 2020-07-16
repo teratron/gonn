@@ -57,6 +57,6 @@ type nn struct {
 	isTrain		bool		//
 
 	//
-	language	langType
-	logging		logType
+	language langType
+	logging  modeLogType
 }

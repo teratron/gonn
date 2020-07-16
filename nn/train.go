@@ -2,6 +2,8 @@ package nn
 
 import "fmt"
 
+//import "fmt"
+
 const MaxIteration uint32 = 10e+05	// The maximum number of iterations after which training is forcibly terminated
 
 //
@@ -13,7 +15,7 @@ func (n *nn) Train(data ...[]float64) (loss float64, count int) {
 		n.isInit = n.init(floatArrayType(data[0]), floatArrayType(data[1]))
 		//n.isInit = n.init(FloatType(input), FloatType(target))
 		if !n.isInit {
-			Log("Error initialization", false) // !!!
+			Log("Error initialization", true) // !!!
 			return 0, 0
 		}
 	}
@@ -23,9 +25,9 @@ func (n *nn) Train(data ...[]float64) (loss float64, count int) {
 	/*if ok && (l <= floatType(n.Get().Get(LevelLoss())) || l <= floatType(MinLevelLoss)) {
 		//break
 	}*/
-	d := n.Get().Get(LevelLoss())
-	//fmt.Println("train ####", n.calc(Neuron(), Loss(data[1]), Axon()), " + + + + + ",n.Get().Get(LevelLoss()))
-	fmt.Printf("%T %v\n", d, d.Get())
+	//d := n.Get().Get(LevelLoss())
+	fmt.Println("train ####", n.calc(Neuron(), Loss(data[1]), Axon()), " + + + + + ",n.Get().Get(LevelLoss()))
+	//fmt.Printf("%T %v\n", d, d.Get())
 	loss = n.Loss(data[1])
 	//n.calc(Loss())
 	//if err != nil { panic("!!!") }

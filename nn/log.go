@@ -5,16 +5,12 @@ import (
 	"runtime"
 )
 
-type logType uint8
+type modeLogType uint8
 
 type Logger interface {
 }
 
-type logs struct {
-	reason string
-}
-
-func Logging(mode ...logType) Setter {
+func Logging(mode ...modeLogType) GetterSetter {
 	if len(mode) == 0 {
 		return modeLossType(0)
 	} else {
@@ -23,16 +19,24 @@ func Logging(mode ...logType) Setter {
 }
 
 // Setter
-func (l logType) Set(args ...Setter) {
-	if n, ok := args[0].(*nn); ok {
-		n.logging = l
+func (l modeLogType) Set(args ...Setter) {
+	if len(args) == 0 {
+		Log("Empty Set()", true) // !!!
+	} else {
+		if n, ok := args[0].(*nn); ok {
+			n.logging = l
+		}
 	}
 }
 
 // Getter
-func (l logType) Get(args ...Setter) Getter {
-	if n, ok := args[0].(*nn); ok {
-		return n.logging
+func (l modeLogType) Get(args ...Getter) GetterSetter {
+	if len(args) == 0 {
+		return l
+	} else {
+		if n, ok := args[0].(*nn); ok {
+			return n.logging
+		}
 	}
 	return nil
 }

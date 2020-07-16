@@ -37,7 +37,7 @@ func (h *hopfield) Set(args ...Setter) {
 }
 
 // Getter
-func (h *hopfield) Get(args ...Setter) Getter {
+func (h *hopfield) Get(args ...Getter) GetterSetter {
 	switch args[0].(type) {
 	default:
 		if len(args) == 0 { return h }
@@ -64,7 +64,7 @@ func (h *hopfield) calc(args ...Initer) Getter {
 func (h *hopfieldNeuron) Set(args ...Setter) {
 }
 
-func (h *hopfieldNeuron) Get(args ...Setter) Getter {
+func (h *hopfieldNeuron) Get(args ...Getter) GetterSetter {
 	return nil
 }
 

@@ -6,7 +6,7 @@ type rateType float32
 // Default learning rate
 const DefaultRate rateType = .3
 
-func Rate(rate ...rateType) Setter {
+func Rate(rate ...rateType) GetterSetter {
 	if len(rate) == 0 {
 		return rateType(0)
 	} else {
@@ -16,27 +16,31 @@ func Rate(rate ...rateType) Setter {
 
 // Setter
 func (r rateType) Set(args ...Setter) {
-	if a, ok := args[0].(Architecture); ok {
-		if v, ok := getArchitecture(a); ok {
+	if len(args) == 0 {
+		Log("Empty Set()", true) // !!!
+	} else {
+		if a, ok := args[0].(NeuralNetwork); ok {
 			if c, ok := r.check().(rateType); ok {
-				v.Set(c)
+				a.Get().Set(c)
 			}
 		}
 	}
 }
 
 // Getter
-func (r rateType) Get(args ...Setter) Getter {
-	if a, ok := args[0].(Architecture); ok {
-		if v, ok := getArchitecture(a); ok {
-			return v.Get(r)
+func (r rateType) Get(args ...Getter) GetterSetter {
+	if len(args) == 0 {
+		return floatType(r)
+	} else {
+		if a, ok := args[0].(NeuralNetwork); ok {
+			return a.Get().Get(r)
 		}
 	}
 	return nil
 }
 
 // Checker
-func (r rateType) check() Getter {
+func (r rateType) check() GetterSetter {
 	switch {
 	case r < 0 || r > 1:
 		return DefaultRate

@@ -3,7 +3,7 @@ package nn
 
 type biasType bool
 
-func Bias(bias ...biasType) Setter {
+func Bias(bias ...biasType) GetterSetter {
 	if len(bias) == 0 {
 		return biasType(false)
 	} else {
@@ -13,19 +13,22 @@ func Bias(bias ...biasType) Setter {
 
 // Setter
 func (b biasType) Set(args ...Setter) {
-	if a, ok := args[0].(Architecture); ok {
-		if v, ok := getArchitecture(a); ok {
-			v.Set(b)
+	if len(args) == 0 {
+		Log("Empty Set()", true) // !!!
+	} else {
+		if a, ok := args[0].(NeuralNetwork); ok {
+			a.Get().Set(b)
 		}
 	}
-
 }
 
 // Getter
-func (b biasType) Get(args ...Setter) Getter {
-	if a, ok := args[0].(Architecture); ok {
-		if v, ok := getArchitecture(a); ok {
-			return v.Get(b)
+func (b biasType) Get(args ...Getter) GetterSetter {
+	if len(args) == 0 {
+		return b
+	} else {
+		if a, ok := args[0].(NeuralNetwork); ok {
+			return a.Get().Get(b)
 		}
 	}
 	return nil

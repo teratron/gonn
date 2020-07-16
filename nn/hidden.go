@@ -4,13 +4,7 @@ package nn
 type (
 	hiddenType uint16
 	HiddenType []hiddenType
-	
-	//cH chan bool
 )
-
-/*func (c cH) Set(...Setter) {
-	panic("implement me")
-}*/
 
 func HiddenLayer(nums ...hiddenType) HiddenType {
 	return nums
@@ -18,27 +12,22 @@ func HiddenLayer(nums ...hiddenType) HiddenType {
 
 // Setter
 func (h HiddenType) Set(args ...Setter) {
-	//ch := make(cH)
-	//fmt.Printf("%T %v\n", set[0], set[0])
-	/*if v, ok := getArchitecture(set[0]); ok {
-		//fmt.Printf("%T %v\n", v, v)
-		fmt.Println("1 go", ch)
-		go v.Set(h, ch)
-		fmt.Println("2 go", <-ch)
-	}*/
-
-	if n, ok := args[0].(*nn); ok {
-		if v, ok := n.Architecture.(NeuralNetwork); ok {
-			v.Set(h, n)
+	if len(args) == 0 {
+		Log("Empty Set()", true) // !!!
+	} else {
+		if a, ok := args[0].(NeuralNetwork); ok {
+			a.Get().Set(h)
 		}
 	}
 }
 
 // Getter
-func (h HiddenType) Get(args ...Setter) Getter {
-	if a, ok := args[0].(Architecture); ok {
-		if v, ok := getArchitecture(a); ok {
-			return v.Get(h)
+func (h HiddenType) Get(args ...Getter) GetterSetter {
+	if len(args) == 0 {
+		return h
+	} else {
+		if a, ok := args[0].(NeuralNetwork); ok {
+			return a.Get().Get(h)
 		}
 	}
 	return nil
