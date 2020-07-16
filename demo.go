@@ -101,7 +101,6 @@ func main() {
 	fmt.Println("nn.New():", n)
 
 	// Common
-	n.Set() //empty set
 	n.Set(
 		nn.Bias(false),
 		nn.Rate(.33),

@@ -24,22 +24,22 @@ func UpperRange(upper ...upperRangeType) GetterSetter {
 
 // Setter
 func (l lowerRangeType) Set(args ...Setter) {
-	if len(args) == 0 {
-		Log("Empty Set()", true) // !!!
-	} else {
+	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
 			a.Get().Set(l)
 		}
+	} else {
+		Log("Empty Set()", true) // !!!
 	}
 }
 
 func (u upperRangeType) Set(args ...Setter) {
-	if len(args) == 0 {
-		Log("Empty Set()", true) // !!!
-	} else {
+	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
 			a.Get().Set(u)
 		}
+	} else {
+		Log("Empty Set()", true) // !!!
 	}
 }
 

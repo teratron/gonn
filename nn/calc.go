@@ -6,9 +6,7 @@ type Calculator interface {
 }
 
 func (n *nn) calc(args ...Initer) (get Getter) {
-	if len(args) == 0 {
-		Log("Empty calc()", true)
-	} else {
+	if len(args) > 0 {
 		if a, ok := n.Get().(NeuralNetwork); ok {
 			for _, v := range args {
 				if i, ok := v.(Initer); ok {
@@ -17,6 +15,8 @@ func (n *nn) calc(args ...Initer) (get Getter) {
 				}
 			}
 		}
+	} else {
+		Log("Empty calc()", true)
 	}
 	return
 }

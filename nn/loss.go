@@ -3,8 +3,8 @@ package nn
 
 type (
 	lossType      floatArrayType
-	modeLossType  uint8     // Average error mode
-	levelLossType floatType // Level loss
+	modeLossType  uint8					// Average error mode
+	levelLossType floatType				// Level loss
 )
 
 const (
@@ -48,26 +48,26 @@ func LevelLoss(level ...levelLossType) GetterSetter {
 
 // Setter
 func (m modeLossType) Set(args ...Setter) {
-	if len(args) == 0 {
-		Log("Empty Set()", true) // !!!
-	} else {
+	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
 			if c, ok := m.check().(modeLossType); ok {
 				a.Get().Set(c)
 			}
 		}
+	} else {
+		Log("Empty Set()", true) // !!!
 	}
 }
 
 func (l levelLossType) Set(args ...Setter) {
-	if len(args) == 0 {
-		Log("Empty Set()", true) // !!!
-	} else {
+	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
 			if c, ok := l.check().(levelLossType); ok {
 				a.Get().Set(c)
 			}
 		}
+	} else {
+		Log("Empty Set()", true) // !!!
 	}
 }
 

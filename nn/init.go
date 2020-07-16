@@ -30,12 +30,12 @@ func New() NeuralNetwork {
 }
 
 func (n *nn) init(args ...Setter) bool {
-	if len(args) == 0 {
-		Log("Empty init()", true) // !!!
-	} else {
+	if len(args) > 0 {
 		if a, ok := n.Get().(NeuralNetwork); ok {
 			n.isInit = a.init(args...)
 		}
+	} else {
+		Log("Empty init()", true) // !!!
 	}
 	return n.isInit
 }

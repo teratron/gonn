@@ -53,4 +53,4 @@ And you can run that simply as:
 
 
 # Examples
-You can find examples of neural networks in the [examples repository](https://github.com/zigenzoog/gonn-examples/).
+You can find examples of neural networks in the [examples directory](https://github.com/zigenzoog/gonn/examples/).

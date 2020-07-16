@@ -19,14 +19,14 @@ type Setter interface {
 
 // Setter
 func (n *nn) Set(args ...Setter) {
-	if len(args) == 0 {
-		Log("Empty Set()", true) // !!!
-	} else {
+	if len(args) > 0 {
 		for _, v := range args {
 			if s, ok := v.(Setter); ok {
 				s.Set(n)
 			}
 		}
+	} else {
+		Log("Empty Set()", true) // !!!
 	}
 }
 

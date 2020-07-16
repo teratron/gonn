@@ -56,7 +56,6 @@ type nn struct {
 	isQuery		bool		//
 	isTrain		bool		//
 
-	//
-	language langType
-	logging  modeLogType
+	language	langType
+	logging		modeLogType
 }
