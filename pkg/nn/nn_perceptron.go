@@ -296,10 +296,10 @@ func (p *perceptron) calcLoss(target lossType) (loss floatType) {
 
 // Training
 func (p *perceptron) Train(data ...[]float64) (loss float64, count int) {
-	for count <= int(MaxIteration) {
-		if l, ok := p.calc(Neuron(), Loss(data[1])).(levelLossType); ok && (l <= p.levelLoss || l <= MinLevelLoss) {
-			loss = float64(l)
-			break
+	for count < int(MaxIteration) {
+		l, ok := p.calc(Neuron(), Loss(data[1])).(levelLossType)
+		if ok && l <= p.levelLoss || l <= MinLevelLoss {
+			return float64(l), count
 		}
 		p.calc(/*Miss(),*/ Axon())
 		count++

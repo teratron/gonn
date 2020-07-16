@@ -3,8 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/zigenzoog/gonn/nn"
-	_ "image/color"
+	"github.com/zigenzoog/gonn/pkg/nn"
 )
 
 /*type Parent struct {
@@ -132,7 +131,7 @@ func main() {
 	fmt.Println("n.Get(nn.ModeLoss()):", n.Get(nn.ModeLoss())) //get
 
 	// Level loss
-	n.Set(nn.LevelLoss(.004)) //set
+	n.Set(nn.LevelLoss(.04)) //set
 	fmt.Println("n.Get(nn.LevelLoss()):", n.Get(nn.LevelLoss())) //get
 
 	// Hidden layers

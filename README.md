@@ -23,7 +23,7 @@ gonn - Neural Network for Golang
 package main
 
 import (
-    "github.com/zigenzoog/gonn/nn"
+    "github.com/zigenzoog/gonn/pkg/nn"
 )
 
 func main() {
@@ -53,4 +53,4 @@ And you can run that simply as:
 
 
 # Examples
-You can find examples of neural networks in the [examples directory](https://github.com/zigenzoog/gonn/examples/).
+You can find examples of neural networks in the [examples directory](https://github.com/zigenzoog/gonn/tree/master/examples/).
