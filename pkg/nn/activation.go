@@ -14,40 +14,38 @@ const (
 )
 
 func ModeActivation(mode ...modeActivationType) GetterSetter {
-	if len(mode) == 0 {
-		return modeActivationType(0)
-	} else {
+	if len(mode) > 0 {
 		return mode[0]
+	} else {
+		return modeActivationType(0)
 	}
 }
 
 // Setter
 func (m modeActivationType) Set(args ...Setter) {
-	if len(args) == 0 {
-		Log("Empty Set()", true) // !!!
-	} else {
+	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
-			if c, ok := m.check().(modeActivationType); ok {
-				a.Get().Set(c)
-			}
+			a.Get().Set(m.check())
 		}
+	} else {
+		Log("Empty Set()", true) // !!!
 	}
 }
 
 // Getter
 func (m modeActivationType) Get(args ...Getter) GetterSetter {
-	if len(args) == 0 {
-		return m
-	} else {
+	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
 			return a.Get().Get(m)
 		}
+	} else {
+		return m
 	}
 	return nil
 }
 
-// Checker
-func (m modeActivationType) check() GetterSetter {
+// Checking
+func (m modeActivationType) check() modeActivationType {
 	switch {
 	case m < 0 || m > ModeTANH:
 		return ModeSIGMOID

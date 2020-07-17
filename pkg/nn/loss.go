@@ -2,7 +2,7 @@
 package nn
 
 type (
-	lossType      floatArrayType
+	lossType      []float64
 	modeLossType  uint8					// Average error mode
 	levelLossType floatType				// Level loss
 )
@@ -16,43 +16,39 @@ const (
 
 func (n *nn) Loss(target []float64) (loss float64) {
 	if n.isInit && n.isQuery {
-		//if a, ok := getArchitecture(n); ok {
-			//loss = n.Get().Loss(target)
-			//fmt.Println(n.Get())
-		//}
 	} else {
 		Log("An uninitialized neural network", true)
 	}
 	return
 }
 
-func Loss(target []float64) Initer {
+func Loss(target []float64) GetterSetter {
 	return lossType(target)
 }
 
 func ModeLoss(mode ...modeLossType) GetterSetter {
-	if len(mode) == 0 {
-		return modeLossType(0)
-	} else {
+	if len(mode) > 0 {
 		return mode[0]
+	} else {
+		return modeLossType(0)
 	}
 }
 
 func LevelLoss(level ...levelLossType) GetterSetter {
-	if len(level) == 0 {
-		return levelLossType(0)
-	} else {
+	if len(level) > 0 {
 		return level[0]
+	} else {
+		return levelLossType(0)
 	}
 }
 
 // Setter
+func (l lossType) Set(args ...Setter) {}
+
 func (m modeLossType) Set(args ...Setter) {
 	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
-			if c, ok := m.check().(modeLossType); ok {
-				a.Get().Set(c)
-			}
+			a.Get().Set(m.check())
 		}
 	} else {
 		Log("Empty Set()", true) // !!!
@@ -62,9 +58,7 @@ func (m modeLossType) Set(args ...Setter) {
 func (l levelLossType) Set(args ...Setter) {
 	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
-			if c, ok := l.check().(levelLossType); ok {
-				a.Get().Set(c)
-			}
+			a.Get().Set(l.check())
 		}
 	} else {
 		Log("Empty Set()", true) // !!!
@@ -72,30 +66,34 @@ func (l levelLossType) Set(args ...Setter) {
 }
 
 // Getter
+func (l lossType) Get(args ...Getter) GetterSetter {
+	return nil
+}
+
 func (m modeLossType) Get(args ...Getter) GetterSetter {
-	if len(args) == 0 {
-		return m
-	} else {
+	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
 			return a.Get().Get(m)
 		}
+	} else {
+		return m
 	}
 	return nil
 }
 
 func (l levelLossType) Get(args ...Getter) GetterSetter {
-	if len(args) == 0 {
-		return floatType(l)
-	} else {
+	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
 			return a.Get().Get(l)
 		}
+	} else {
+		return floatType(l)
 	}
 	return nil
 }
 
-// Checker
-func (m modeLossType) check() GetterSetter {
+// Checking
+func (m modeLossType) check() modeLossType {
 	switch {
 	case m < 0 || m > ModeARCTAN:
 		return ModeMSE
@@ -104,16 +102,11 @@ func (m modeLossType) check() GetterSetter {
 	}
 }
 
-func (l levelLossType) check() GetterSetter {
+func (l levelLossType) check() levelLossType {
 	switch {
 	case l < 0:
 		return MinLevelLoss
 	default:
 		return l
 	}
-}
-
-// Initer
-func (l lossType) init(...Setter) bool {
-	return true
 }

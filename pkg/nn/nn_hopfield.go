@@ -3,10 +3,6 @@ package nn
 
 import "log"
 
-type Hopfield interface {
-	Hopfield() NeuralNetwork
-}
-
 type hopfield struct {
 	Architecture
 	Processor
@@ -29,21 +25,28 @@ func (n *nn) Hopfield() NeuralNetwork {
 
 // Setter
 func (h *hopfield) Set(args ...Setter) {
-	switch v := args[0].(type) {
-	default:
-		Log("This type of variable is missing for Hopfield Neural Network", false)
-		log.Printf("\tset: %T %v\n", v, v) // !!!
+	if len(args) > 0 {
+		switch v := args[0].(type) {
+		default:
+			Log("This type of variable is missing for Hopfield Neural Network", false)
+			log.Printf("\tset: %T %v\n", v, v) // !!!
+		}
+	} else {
+		Log("Empty Set()", true) // !!!
 	}
 }
 
 // Getter
 func (h *hopfield) Get(args ...Getter) GetterSetter {
-	switch args[0].(type) {
-	default:
-		if len(args) == 0 { return h }
-		Log("This type of variable is missing for Hopfield Neural Network", false)
-		log.Printf("\tget: %T %v\n", args[0], args[0]) // !!!
-		return nil
+	if len(args) > 0 {
+		switch args[0].(type) {
+		default:
+			Log("This type of variable is missing for Hopfield Neural Network", false)
+			log.Printf("\tget: %T %v\n", args[0], args[0]) // !!!
+			return nil
+		}
+	} else {
+		return h
 	}
 }
 
@@ -53,7 +56,7 @@ func (h *hopfield) init(args ...Setter) bool {
 }
 
 // Calculating
-func (h *hopfield) calc(args ...Initer) Getter {
+func (h *hopfield) calc(args ...GetterSetter) Getter {
 	return nil
 }
 

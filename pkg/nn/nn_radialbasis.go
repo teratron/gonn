@@ -5,10 +5,6 @@ import (
 	"log"
 )
 
-type RadialBasis interface {
-	RadialBasis() NeuralNetwork
-}
-
 type radialBasis struct {
 	Architecture
 	Processor
@@ -28,21 +24,28 @@ func (n *nn) RadialBasis() NeuralNetwork {
 
 // Setter
 func (r *radialBasis) Set(args ...Setter) {
-	switch v := args[0].(type) {
-	default:
-		Log("This type of variable is missing for Radial Basis Neural Network", false)
-		log.Printf("\tset: %T %v\n", v, v) // !!!
+	if len(args) > 0 {
+		switch v := args[0].(type) {
+		default:
+			Log("This type of variable is missing for Radial Basis Neural Network", false)
+			log.Printf("\tset: %T %v\n", v, v) // !!!
+		}
+	} else {
+		Log("Empty Set()", true) // !!!
 	}
 }
 
 // Getter
 func (r *radialBasis) Get(args ...Getter) GetterSetter {
-	switch args[0].(type) {
-	default:
-		if len(args) == 0 { return r }
-		Log("This type of variable is missing for Radial Basis Neural Network", false)
-		log.Printf("\tget: %T %v\n", args[0], args[0]) // !!!
-		return nil
+	if len(args) > 0 {
+		switch args[0].(type) {
+		default:
+			Log("This type of variable is missing for Radial Basis Neural Network", false)
+			log.Printf("\tget: %T %v\n", args[0], args[0]) // !!!
+			return nil
+		}
+	} else {
+		return r
 	}
 }
 
@@ -52,7 +55,7 @@ func (r *radialBasis) init(args ...Setter) bool {
 }
 
 // Calculating
-func (r *radialBasis) calc(args ...Initer) Getter {
+func (r *radialBasis) calc(args ...GetterSetter) Getter {
 	return nil
 }
 

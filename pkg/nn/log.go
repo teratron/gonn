@@ -11,32 +11,32 @@ type Logger interface {
 }
 
 func Logging(mode ...modeLogType) GetterSetter {
-	if len(mode) == 0 {
-		return modeLossType(0)
-	} else {
+	if len(mode) > 0 {
 		return mode[0]
+	} else {
+		return modeLossType(0)
 	}
 }
 
 // Setter
 func (l modeLogType) Set(args ...Setter) {
-	if len(args) == 0 {
-		Log("Empty Set()", true) // !!!
-	} else {
+	if len(args) > 0 {
 		if n, ok := args[0].(*nn); ok {
 			n.logging = l
 		}
+	} else {
+		Log("Empty Set()", true) // !!!
 	}
 }
 
 // Getter
 func (l modeLogType) Get(args ...Getter) GetterSetter {
-	if len(args) == 0 {
-		return l
-	} else {
+	if len(args) > 0 {
 		if n, ok := args[0].(*nn); ok {
 			return n.logging
 		}
+	} else {
+		return l
 	}
 	return nil
 }

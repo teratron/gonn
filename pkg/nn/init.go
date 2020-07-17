@@ -6,10 +6,6 @@ import (
 	"time"
 )
 
-type Initer interface {
-	init(...Setter) bool
-}
-
 func init() {
 	rand.Seed(time.Now().UTC().UnixNano())
 	Log("Start", false) // !!!
@@ -29,7 +25,7 @@ func New() NeuralNetwork {
 	return n
 }
 
-func (n *nn) init(args ...Setter) bool {
+func (n *nn) init(args ...[]float64) bool {
 	if len(args) > 0 {
 		if a, ok := n.Get().(NeuralNetwork); ok {
 			n.isInit = a.init(args...)
@@ -38,12 +34,4 @@ func (n *nn) init(args ...Setter) bool {
 		Log("Empty init()", true) // !!!
 	}
 	return n.isInit
-}
-
-/*func (f floatType) init(...Setter) bool {
-	return true
-}
- */
-func (f floatArrayType) init(...Setter) bool {
-	return true
 }

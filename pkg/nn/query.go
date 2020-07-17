@@ -13,17 +13,5 @@ func (n *nn) Query(input []float64) []float64 {
 	if n.calc(Neuron()) == nil {
 		n.isQuery = true
 	}
-	/*if a, ok := n.Architecture.(*perceptron); ok {
-		//a.neuron
-	}*/
-
 	return nil//[]float64(n.Architecture.(*perceptron).neuron[len(p.neuron) - 1])
-}
-
-//
-func forwardPass(input []float64) []float64 {
-	/*
-	m.CalcNeuron()
-	return m.Layer[m.Index].Neuron*/
-	return []float64{0}
 }

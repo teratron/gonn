@@ -32,15 +32,15 @@ func (n *nn) Set(args ...Setter) {
 
 // Getter
 func (n *nn) Get(args ...Getter) GetterSetter {
-	if len(args) == 0 {
-		if a, ok := n.Architecture.(GetterSetter); ok {
-			return a
-		}
-	} else {
+	if len(args) > 0 {
 		for _, v := range args {
 			if g, ok := v.(Getter); ok {
 				return g.Get(n)
 			}
+		}
+	} else {
+		if a, ok := n.Architecture.(NeuralNetwork); ok {
+			return a
 		}
 	}
 	return nil
@@ -52,11 +52,11 @@ func (f floatType) Get(...Getter) GetterSetter {
 	return nil
 }
 
-func (f floatArrayType) Set(...Setter) {}
+//func (f floatArrayType) Set(...Setter) {}
 
-func (f floatArrayType) Get(...Getter) GetterSetter {
+/*func (f floatArrayType) Get(...Getter) GetterSetter {
 	return nil
-}
+}*/
 
 // Return random number from -0.5 to 0.5
 func getRand() (r floatType) {

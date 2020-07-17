@@ -7,7 +7,7 @@ type neuron struct {
 	specific Getter
 }
 
-func Neuron() Initer {
+func Neuron() GetterSetter {
 	return &neuron{}
 }
 
@@ -24,22 +24,12 @@ func (n *neuron) Set(args ...Setter) {
 
 // Getter
 func (n *neuron) Get(args ...Getter) GetterSetter {
-	if len(args) == 0 {
-		return n
-	} else {
+	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
 			return a.Get().Get(n)
 		}
+	} else {
+		return n
 	}
-	return nil
-}
-
-// Initialization
-func (n *neuron) init(...Setter) bool {
-	return true
-}
-
-// Calculating
-func (n *neuron) calc(...Initer) Getter {
 	return nil
 }

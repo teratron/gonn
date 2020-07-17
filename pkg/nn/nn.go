@@ -10,22 +10,22 @@ type NeuralNetwork interface {
 		//Perceptron() NeuralNetwork
 		//RadialBasis() NeuralNetwork
 		//Hopfield() NeuralNetwork
-	Calculator
-		//calc(...Initer) Getter
-	Initer
-		//init(...Setter) bool
-	GetterSetter
-		//Get(...Setter) Getter
-		//Set(...Setter)
 	Processor
 		//Query([]float64) []float64
 		//Loss([]float64) float64
 		//Train(...[]float64) (float64, int)
 		//Copy([]float64) []float64
+	GetterSetter
+		//Get(...Setter) Getter
+		//Set(...Setter)
 }
 
 //
 type Processor interface {
+	init(...[]float64) bool
+
+	calc(...GetterSetter) Getter
+
 	// Querying / forecast / prediction
 	Query([]float64) []float64
 
@@ -46,12 +46,13 @@ type Processor interface {
 
 type (
 	floatType      float32
-	floatArrayType []float64
+	//floatArrayType []float64
 )
 
 //
 type nn struct {
 	Architecture			// Architecture/type of neural network (configuration)
+
 	isInit		bool		// Neural network initialization flag
 	isQuery		bool		//
 	isTrain		bool		//

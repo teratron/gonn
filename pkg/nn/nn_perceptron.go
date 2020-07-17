@@ -6,10 +6,6 @@ import (
 	"math"
 )
 
-type Perceptron interface {
-	Perceptron() NeuralNetwork
-}
-
 type perceptron struct {
 	Architecture
 	Processor
@@ -45,10 +41,6 @@ func (n *nn) Perceptron() NeuralNetwork {
 		upperRange:		1,
 	}
 	return n
-}
-
-func (p *perceptron) architecture() *perceptron {
-	return p
 }
 
 // Preset
@@ -100,9 +92,7 @@ func (p *perceptron) Set(args ...Setter) {
 
 // Getter
 func (p *perceptron) Get(args ...Getter) GetterSetter {
-	if len(args) == 0 {
-		return p
-	} else {
+	if len(args) > 0 {
 		switch args[0].(type) {
 		case biasType:
 			return p.bias
@@ -125,12 +115,13 @@ func (p *perceptron) Get(args ...Getter) GetterSetter {
 			log.Printf("\tget: %T %v\n", args[0], args[0])                   // !!!
 			return nil
 		}
+	} else {
+		return p
 	}
 }
 
 // Specific neuron
-func (p *perceptronNeuron) Set(...Setter) {
-}
+func (p *perceptronNeuron) Set(...Setter) {}
 
 func (p *perceptronNeuron) Get(...Getter) GetterSetter {
 	return nil
@@ -139,14 +130,14 @@ func (p *perceptronNeuron) Get(...Getter) GetterSetter {
 // Initialization
 // args[0] - input data
 // args[1] - target data
-func (p *perceptron) init(args ...Setter) bool {
+func (p *perceptron) init(args ...[]float64) bool {
 	var tmp HiddenType
 	defer func() { tmp = nil }()
 
 	lenHidden := len(p.hiddenLayer)
 	layer     := make(HiddenType, lenHidden + 1)
-	lenInput  := len(args[0].(floatArrayType))
-	tmp        = append(p.hiddenLayer, hiddenType(len(args[1].(floatArrayType))))
+	lenInput  := len(args[0])
+	tmp        = append(p.hiddenLayer, hiddenType(len(args[1])))
 	lenLayer  := copy(layer, tmp)
 
 	b := 0
@@ -166,7 +157,7 @@ func (p *perceptron) init(args ...Setter) bool {
 		}
 	}
 	p.initNeuron()
-	p.initAxon(args[0].(floatArrayType))
+	p.initAxon(args[0])
 
 	return true
 }
@@ -184,7 +175,7 @@ func (p *perceptron) initNeuron() {
 }
 
 //
-func (p *perceptron) initAxon(input floatArrayType) {
+func (p *perceptron) initAxon(input []float64) {
 	for i, v := range p.axon {
 		for j, w := range v {
 			for k := range w {
@@ -213,7 +204,7 @@ func (p *perceptron) initAxon(input floatArrayType) {
 }
 
 // Calculating
-func (p *perceptron) calc(args ...Initer) Getter {
+func (p *perceptron) calc(args ...GetterSetter) Getter {
 	if len(args) > 0 {
 		for _, a := range args {
 			switch v := a.(type) {
