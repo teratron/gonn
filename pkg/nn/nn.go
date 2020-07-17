@@ -6,15 +6,20 @@ var _ NeuralNetwork = (*nn)(nil)
 
 //
 type NeuralNetwork interface {
+	//
 	Architecture
 		//Perceptron() NeuralNetwork
 		//RadialBasis() NeuralNetwork
 		//Hopfield() NeuralNetwork
+
+	//
 	Processor
 		//Query([]float64) []float64
 		//Loss([]float64) float64
 		//Train(...[]float64) (float64, int)
 		//Copy([]float64) []float64
+
+	//
 	GetterSetter
 		//Get(...Setter) Getter
 		//Set(...Setter)
