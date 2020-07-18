@@ -40,3 +40,19 @@ func (n *nn) init(args ...[]float64) bool {
 	}
 	return n.isInit
 }
+
+/*func (n *nn) IsInit() bool {
+	return n.isInit
+}*/
+
+func (f floatType) Set(...Setter) {}
+
+func (f floatType) Get(...Getter) GetterSetter {
+	return nil
+}
+
+/*func (f floatArrayType) Set(...Setter) {}
+
+func (f floatArrayType) Get(...Getter) GetterSetter {
+	return nil
+}*/

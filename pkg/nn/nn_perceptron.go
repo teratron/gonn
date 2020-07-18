@@ -2,14 +2,12 @@
 package nn
 
 import (
-	"fmt"
 	"log"
 	"math"
 )
 
 type perceptron struct {
 	Architecture
-	Processor
 
 	bias			biasType			//
 	rate			rateType			//
@@ -202,7 +200,7 @@ func (p *perceptron) calc(args ...GetterSetter) Getter {
 			case *axon:
 				p.calcAxon()
 			case lossType:
-				return p.calcLoss(v)
+				return levelLossType(p.calcLoss(v))
 			default:
 				Log("This type is missing for Perceptron Neural Network", true) // !!!
 				log.Printf("\tcalc: %T %v\n", args[0], args[0]) // !!!
@@ -247,45 +245,46 @@ func (p *perceptron) calcAxon() {
 
 // Loosing
 func (p *perceptron) Loss(target []float64) float64 {
-	return float64(p.calcLoss(target))
+	return p.calcLoss(target)
 }
 
-func (p *perceptron) calcLoss(target lossType) (loss floatType) {
+func (p *perceptron) calcLoss(target lossType) (loss float64) {
 	for i, v := range p.neuron[len(p.neuron) - 1] {
 		if s, ok := v.specific.(*perceptronNeuron); ok {
 			s.miss = floatType(target[i]) - v.value
 			switch p.modeLoss {
 			default: fallthrough
 			case ModeMSE, ModeRMSE:
-				loss += floatType(math.Pow(float64(s.miss), 2))
+				loss += math.Pow(float64(s.miss), 2)
 			case ModeARCTAN:
-				loss += floatType(math.Pow(math.Atan(float64(s.miss)), 2))
+				loss += math.Pow(math.Atan(float64(s.miss)), 2)
 			}
 			s.miss *= floatType(calcDerivative(float64(v.value), p.modeActivation))
 		}
 	}
-	loss /= floatType(len(p.neuron[len(p.neuron) - 1]))
+	loss /= float64(len(p.neuron[len(p.neuron) - 1]))
 	if p.modeLoss == ModeRMSE {
-		loss = floatType(math.Sqrt(float64(loss)))
+		loss = math.Sqrt(loss)
 	}
 	return
 }
 
 // Training
 func (p *perceptron) Train(data ...[]float64) (loss float64, count int) {
-	fmt.Printf("++++ Act: %.4f\n", 100*calcActivation(1, ModeSIGMOID))
+	var l levelLossType
+	var ok bool
 	for count < int(MaxIteration) {
-		l, ok := p.calc(Neuron(), Loss(data[1])).(levelLossType)
-		if ok && l <= p.levelLoss || l <= MinLevelLoss {
-			return float64(l), count
+		if l, ok = p.calc(Neuron(), Loss(data[1])).(levelLossType); ok && (l <= p.levelLoss || l <= MinLevelLoss) {
+			break
 		}
 		p.calc(/*Miss(),*/ Axon())
 		count++
 	}
+	loss = float64(l)
 	return
 }
 
 // Querying
-/*func (p *perceptron) Query(input []float64) []float64 {
-	panic("implement me")
-}*/
+func (p *perceptron) Query(input []float64) (output []float64) {
+	return
+}

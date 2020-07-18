@@ -1,7 +1,7 @@
 package nn
 
 //
-func (n *nn) Query(input []float64) []float64 {
+func (n *nn) Query(input []float64) (output []float64) {
 	if n.isInit {
 		//copy(m.Layer[0].Neuron, input)
 	} else {

@@ -18,11 +18,11 @@ type NeuralNetwork interface {
 
 //
 type nn struct {
-	Architecture			// Architecture/type of neural network (configuration)
+	Architecture			// Architecture of neural network
 
-	isInit		bool		// Neural network initialization flag
-	isQuery		bool		//
-	isTrain		bool		//
+	isInit		bool		// Neural network initializing flag
+	isQuery		bool		// Neural network querying flag
+	isTrain		bool		// Neural network training flag
 
 	language	langType
 	logging		modeLogType

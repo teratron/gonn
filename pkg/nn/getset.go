@@ -46,18 +46,6 @@ func (n *nn) Get(args ...Getter) GetterSetter {
 	return nil
 }
 
-func (f floatType) Set(...Setter) {}
-
-func (f floatType) Get(...Getter) GetterSetter {
-	return nil
-}
-
-//func (f floatArrayType) Set(...Setter) {}
-
-/*func (f floatArrayType) Get(...Getter) GetterSetter {
-	return nil
-}*/
-
 // Return random number from -0.5 to 0.5
 func getRand() (r floatType) {
 	r = 0

@@ -42,6 +42,10 @@ func LevelLoss(level ...levelLossType) GetterSetter {
 	}
 }
 
+func Miss() GetterSetter {
+	return levelLossType(0)
+}
+
 // Setter
 func (l lossType) Set(args ...Setter) {}
 
@@ -104,7 +108,7 @@ func (m modeLossType) check() modeLossType {
 
 func (l levelLossType) check() levelLossType {
 	switch {
-	case l < 0:
+	case l < 0 || l < MinLevelLoss:
 		return MinLevelLoss
 	default:
 		return l

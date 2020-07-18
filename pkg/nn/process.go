@@ -2,22 +2,22 @@
 package nn
 
 type Processor interface {
+	// Initializing
 	init(...[]float64) bool
 
+	// Calculating
 	calc(...GetterSetter) Getter
 
 	// Querying / forecast / prediction
-	Query([]float64) []float64
+	Query(input []float64) (output []float64)
 
 	//
-	Loss([]float64) float64
-	//loss(FloatType) floatType
+	Loss(target []float64) (loss float64)
 
 	// Training
-	Train(...[]float64) (float64, int)
-	//Train([]float64, []float64) (float64, int)
+	Train(...[]float64) (loss float64, count int)
 
-	//
+	// Copying
 	//Copy([]float64) []float64
 
 	// Verifying / validation

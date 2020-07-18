@@ -158,4 +158,5 @@ func main() {
 	//fmt.Println(n.Loss(target))
 
 	//fmt.Println(n.Get(nn.Neuron()))
+	//fmt.Printf("++++ Act: %.4f\n", 100*calcActivation(1, ModeSIGMOID))
 }

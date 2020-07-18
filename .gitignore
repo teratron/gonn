@@ -24,7 +24,7 @@
 .glide/
 
 # Dependency directories (remove the comment below to include it)
-# vendor/
+vendor/
 
 ### Godot template
 
