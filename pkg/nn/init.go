@@ -6,6 +6,11 @@ import (
 	"time"
 )
 
+type (
+	floatType      float32
+	//floatArrayType []float64
+)
+
 func init() {
 	rand.Seed(time.Now().UTC().UnixNano())
 	Log("Start", false) // !!!

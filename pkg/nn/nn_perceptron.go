@@ -2,6 +2,7 @@
 package nn
 
 import (
+	"fmt"
 	"log"
 	"math"
 )
@@ -16,8 +17,6 @@ type perceptron struct {
 	modeLoss		modeLossType		//
 	levelLoss		levelLossType		// Minimum (sufficient) level of the average of the error during training
 	hiddenLayer		HiddenType			// Array of the number of neurons in each hidden layer
-	lowerRange		lowerRangeType		// Range, Bound, Limit, Scope
-	upperRange		upperRangeType
 
 	neuron			[][]*neuron
 	axon			[][][]*axon
@@ -37,8 +36,6 @@ func (n *nn) Perceptron() NeuralNetwork {
 		modeLoss:		ModeMSE,
 		levelLoss:		.0001,
 		hiddenLayer:	HiddenType{},
-		lowerRange:		0,
-		upperRange:		1,
 	}
 	return n
 }
@@ -55,9 +52,7 @@ func (p *perceptron) Preset(name string) {
 			ModeActivation(ModeSIGMOID),
 			ModeLoss(ModeMSE),
 			LevelLoss(.0001),
-			HiddenLayer(),
-			LowerRange(0),
-			UpperRange(1))
+			HiddenLayer())
 	}
 }
 
@@ -77,10 +72,6 @@ func (p *perceptron) Set(args ...Setter) {
 			p.levelLoss = v
 		case HiddenType:
 			p.hiddenLayer = v
-		case lowerRangeType:
-			p.lowerRange = v
-		case upperRangeType:
-			p.upperRange = v
 		default:
 			Log("This type is missing for Perceptron Neural Network", false) // !!!
 			log.Printf("\tset: %T %v\n", v, v) // !!!
@@ -106,13 +97,11 @@ func (p *perceptron) Get(args ...Getter) GetterSetter {
 			return p.levelLoss
 		case HiddenType:
 			return p.hiddenLayer
-		case lowerRangeType:
-			return p.lowerRange
-		case upperRangeType:
-			return p.upperRange
+		case *neuron:
+			return nil //&p.neuron
 		default:
 			Log("This type is missing for Perceptron Neural Network", false) // !!!
-			log.Printf("\tget: %T %v\n", args[0], args[0])                   // !!!
+			log.Printf("\tget: %T %v\n", args[0], args[0]) // !!!
 			return nil
 		}
 	} else {
@@ -276,17 +265,15 @@ func (p *perceptron) calcLoss(target lossType) (loss floatType) {
 		}
 	}
 	loss /= floatType(len(p.neuron[len(p.neuron) - 1]))
-	switch p.modeLoss {
-	default: fallthrough
-	case ModeMSE, ModeARCTAN:
-		return loss
-	case ModeRMSE:
-		return floatType(math.Sqrt(float64(loss)))
+	if p.modeLoss == ModeRMSE {
+		loss = floatType(math.Sqrt(float64(loss)))
 	}
+	return
 }
 
 // Training
 func (p *perceptron) Train(data ...[]float64) (loss float64, count int) {
+	fmt.Printf("++++ Act: %.4f\n", 100*calcActivation(1, ModeSIGMOID))
 	for count < int(MaxIteration) {
 		l, ok := p.calc(Neuron(), Loss(data[1])).(levelLossType)
 		if ok && l <= p.levelLoss || l <= MinLevelLoss {

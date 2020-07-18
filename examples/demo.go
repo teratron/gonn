@@ -103,12 +103,10 @@ func main() {
 	n.Set(
 		nn.Bias(false),
 		nn.Rate(.33),
-		nn.ModeActivation(nn.ModeSIGMOID),
-		nn.ModeLoss(nn.ModeMSE),
+		nn.ModeActivation(nn.ModeTANH),
+		nn.ModeLoss(nn.ModeARCTAN),
 		nn.LevelLoss(.0005),
 		nn.HiddenLayer(1, 5, 9),
-		nn.LowerRange(0),
-		nn.UpperRange(1),
 
 		nn.Language("ru"),
 		nn.Logging(1)) //set
@@ -123,11 +121,11 @@ func main() {
 	fmt.Println("n.Get(nn.Rate()):", n.Get(nn.Rate())) //get
 
 	// Activation
-	n.Set(nn.ModeActivation(nn.ModeTANH)) //set
+	n.Set(nn.ModeActivation(nn.ModeSIGMOID)) //set
 	fmt.Println("n.Get(nn.ModeActivation()):", n.Get(nn.ModeActivation())) //get
 
 	// Loss
-	n.Set(nn.ModeLoss(nn.ModeARCTAN)) //set
+	n.Set(nn.ModeLoss(nn.ModeMSE)) //set
 	fmt.Println("n.Get(nn.ModeLoss()):", n.Get(nn.ModeLoss())) //get
 
 	// Level loss
@@ -137,14 +135,6 @@ func main() {
 	// Hidden layers
 	n.Set(nn.HiddenLayer(3, 2)) //set
 	fmt.Println("n.Get(nn.HiddenLayer()):", n.Get(nn.HiddenLayer())) //get
-
-	// Loss
-	n.Set(nn.LowerRange(0)) //set
-	fmt.Println("n.Get(nn.LowerRange()):", n.Get(nn.LowerRange())) //get
-
-	// Loss
-	n.Set(nn.UpperRange(1)) //set
-	fmt.Println("n.Get(nn.UpperRange()):", n.Get(nn.UpperRange())) //get
 
 	// Language
 	n.Set(nn.Language("ru")) //set
@@ -165,6 +155,7 @@ func main() {
 	fmt.Println(n.Train(input, target))
 
 	//
-	fmt.Println(n.Loss(target))
+	//fmt.Println(n.Loss(target))
 
+	//fmt.Println(n.Get(nn.Neuron()))
 }

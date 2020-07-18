@@ -1,6 +1,8 @@
 //
 package nn
 
+//type neuronType [][]*neuron
+
 type neuron struct {
 	value    floatType
 	axon     []*axon
@@ -22,6 +24,9 @@ func (n *neuron) Set(args ...Setter) {
 	}*/
 }
 
+/*func (n *neuronType) Set(args ...Setter) {
+}*/
+
 // Getter
 func (n *neuron) Get(args ...Getter) GetterSetter {
 	/*if len(args) > 0 {
@@ -33,3 +38,7 @@ func (n *neuron) Get(args ...Getter) GetterSetter {
 	}*/
 	return nil
 }
+
+/*func (n *neuronType) Get(args ...Getter) GetterSetter {
+	return nil
+}*/
