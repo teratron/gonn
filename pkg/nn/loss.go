@@ -2,16 +2,16 @@
 package nn
 
 type (
-	lossType      []float64
+	//lossType      []float64
 	modeLossType  uint8					// Average error mode
-	levelLossType floatType				// Level loss
+	levelLossType float64				// Level loss
 )
 
 const (
-	ModeMSE      modeLossType  = 0      // Mean Squared Error
-	ModeRMSE     modeLossType  = 1      // Root Mean Squared Error
-	ModeARCTAN   modeLossType  = 2      // Arctan
-	MinLevelLoss levelLossType = 10e-33 // The minimum value of the error limit at which training is forcibly terminated
+	MinLevelLoss float64	  = 10e-33 // The minimum value of the error limit at which training is forcibly terminated
+	ModeMSE      modeLossType = 0      // Mean Squared Error
+	ModeRMSE     modeLossType = 1      // Root Mean Squared Error
+	ModeARCTAN   modeLossType = 2      // Arctan
 )
 
 func (n *nn) Loss(target []float64) (loss float64) {
@@ -22,9 +22,9 @@ func (n *nn) Loss(target []float64) (loss float64) {
 	return
 }
 
-func Loss(target []float64) GetterSetter {
+/*func Loss(target []float64) GetterSetter {
 	return lossType(target)
-}
+}*/
 
 func ModeLoss(mode ...modeLossType) GetterSetter {
 	if len(mode) > 0 {
@@ -42,12 +42,8 @@ func LevelLoss(level ...levelLossType) GetterSetter {
 	}
 }
 
-func Miss() GetterSetter {
-	return levelLossType(0)
-}
-
 // Setter
-func (l lossType) Set(args ...Setter) {}
+//func (l lossType) Set(args ...Setter) {}
 
 func (m modeLossType) Set(args ...Setter) {
 	if len(args) > 0 {
@@ -70,9 +66,9 @@ func (l levelLossType) Set(args ...Setter) {
 }
 
 // Getter
-func (l lossType) Get(args ...Getter) GetterSetter {
+/*func (l lossType) Get(args ...Getter) GetterSetter {
 	return nil
-}
+}*/
 
 func (m modeLossType) Get(args ...Getter) GetterSetter {
 	if len(args) > 0 {
@@ -108,8 +104,8 @@ func (m modeLossType) check() modeLossType {
 
 func (l levelLossType) check() levelLossType {
 	switch {
-	case l < 0 || l < MinLevelLoss:
-		return MinLevelLoss
+	case l < 0 || l < levelLossType(MinLevelLoss):
+		return levelLossType(MinLevelLoss)
 	default:
 		return l
 	}

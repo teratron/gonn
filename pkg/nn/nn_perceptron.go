@@ -13,7 +13,7 @@ type perceptron struct {
 	rate			rateType			//
 	modeActivation	modeActivationType	//
 	modeLoss		modeLossType		//
-	levelLoss		levelLossType		// Minimum (sufficient) level of the average of the error during training
+	levelLoss		float64				// Minimum (sufficient) level of the average of the error during training
 	hiddenLayer		HiddenType			// Array of the number of neurons in each hidden layer
 
 	neuron			[][]*neuron
@@ -67,7 +67,7 @@ func (p *perceptron) Set(args ...Setter) {
 		case modeLossType:
 			p.modeLoss = v
 		case levelLossType:
-			p.levelLoss = v
+			p.levelLoss = float64(v)
 		case HiddenType:
 			p.hiddenLayer = v
 		default:
@@ -92,11 +92,11 @@ func (p *perceptron) Get(args ...Getter) GetterSetter {
 		case modeLossType:
 			return p.modeLoss
 		case levelLossType:
-			return p.levelLoss
+			return levelLossType(p.levelLoss)
 		case HiddenType:
 			return p.hiddenLayer
-		case *neuron:
-			return nil //&p.neuron
+		//case *neuron:
+			//return nil //&p.neuron
 		default:
 			Log("This type is missing for Perceptron Neural Network", false) // !!!
 			log.Printf("\tget: %T %v\n", args[0], args[0]) // !!!
@@ -190,28 +190,6 @@ func (p *perceptron) initAxon(input []float64) {
 	}
 }
 
-// Calculating
-func (p *perceptron) calc(args ...GetterSetter) Getter {
-	if len(args) > 0 {
-		for _, a := range args {
-			switch v := a.(type) {
-			case *neuron:
-				p.calcNeuron()
-			case *axon:
-				p.calcAxon()
-			case lossType:
-				return levelLossType(p.calcLoss(v))
-			default:
-				Log("This type is missing for Perceptron Neural Network", true) // !!!
-				log.Printf("\tcalc: %T %v\n", args[0], args[0]) // !!!
-			}
-		}
-	} else {
-		Log("Empty calc()", true)
-	}
-	return nil
-}
-
 // Function for calculating the values of neurons in a layers
 func (p *perceptron) calcNeuron() {
 	var n floatType
@@ -243,12 +221,16 @@ func (p *perceptron) calcNeuron() {
 func (p *perceptron) calcAxon() {
 }
 
+//
+func (p *perceptron) calcMiss() {
+}
+
 // Loosing
-func (p *perceptron) Loss(target []float64) float64 {
+func (p *perceptron) Loss(target []float64) (loss float64) {
 	return p.calcLoss(target)
 }
 
-func (p *perceptron) calcLoss(target lossType) (loss float64) {
+func (p *perceptron) calcLoss(target []float64) (loss float64) {
 	for i, v := range p.neuron[len(p.neuron) - 1] {
 		if s, ok := v.specific.(*perceptronNeuron); ok {
 			s.miss = floatType(target[i]) - v.value
@@ -271,16 +253,13 @@ func (p *perceptron) calcLoss(target lossType) (loss float64) {
 
 // Training
 func (p *perceptron) Train(data ...[]float64) (loss float64, count int) {
-	var l levelLossType
-	var ok bool
 	for count < int(MaxIteration) {
-		if l, ok = p.calc(Neuron(), Loss(data[1])).(levelLossType); ok && (l <= p.levelLoss || l <= MinLevelLoss) {
-			break
-		}
-		p.calc(/*Miss(),*/ Axon())
+		p.calcNeuron()
+		if loss = p.calcLoss(data[1]); loss <= p.levelLoss || loss <= MinLevelLoss { break }
+		p.calcMiss()
+		p.calcAxon()
 		count++
 	}
-	loss = float64(l)
 	return
 }
 

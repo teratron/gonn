@@ -9,36 +9,36 @@ type neuron struct {
 	specific Getter
 }
 
-func Neuron() GetterSetter {
+/*func Neuron() GetterSetter {
 	return &neuron{}
-}
+}*/
 
 // Setter
 func (n *neuron) Set(args ...Setter) {
-	/*if len(args) > 0 {
+	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
 			a.Get().Set(n)
 		}
 	} else {
 		Log("Empty Set()", true) // !!!
-	}*/
+	}
 }
-
-/*func (n *neuronType) Set(args ...Setter) {
-}*/
 
 // Getter
 func (n *neuron) Get(args ...Getter) GetterSetter {
-	/*if len(args) > 0 {
+	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
 			return a.Get().Get(n)
 		}
 	} else {
 		return n
-	}*/
+	}
 	return nil
 }
 
-/*func (n *neuronType) Get(args ...Getter) GetterSetter {
+/*func (n *neuronType) Set(args ...Setter) {
+}
+
+func (n *neuronType) Get(args ...Getter) GetterSetter {
 	return nil
 }*/

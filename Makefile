@@ -16,6 +16,3 @@ compile:
 
 all:
 	hello build
-
-
-

@@ -55,22 +55,12 @@ func (h *hopfield) init(args ...Setter) bool {
 	return true
 }
 
-// Calculating
-func (h *hopfield) calc(args ...GetterSetter) Getter {
-	return nil
-}
-
 //
-/*func (h *hopfieldNeuron) calc(args ...Initer) {
-}*/
-
-func (h *hopfieldNeuron) Set(args ...Setter) {
-}
+func (h *hopfieldNeuron) Set(args ...Setter) {}
 
 func (h *hopfieldNeuron) Get(args ...Getter) GetterSetter {
 	return nil
 }
-
 
 // Train
 /*func (h *hopfield) Train(input, target []float64) (loss float64, count int) {

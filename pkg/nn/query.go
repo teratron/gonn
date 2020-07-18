@@ -10,8 +10,8 @@ func (n *nn) Query(input []float64) (output []float64) {
 	}
 	///fmt.Println(floatType(input[0]))
 	//forwardPass(input)
-	if n.calc(Neuron()) == nil {
+	/*if n.calc(Neuron()) == nil {
 		n.isQuery = true
-	}
+	}*/
 	return nil//[]float64(n.Architecture.(*perceptron).neuron[len(p.neuron) - 1])
 }

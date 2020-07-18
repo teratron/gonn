@@ -54,17 +54,8 @@ func (r *radialBasis) init(args ...Setter) bool {
 	return true
 }
 
-// Calculating
-func (r *radialBasis) calc(args ...GetterSetter) Getter {
-	return nil
-}
-
 //
-/*func (r *radialBasisNeuron) calc(args ...Initer) {
-}*/
-
-func (r *radialBasisNeuron) Set(args ...Setter) {
-}
+func (r *radialBasisNeuron) Set(args ...Setter) {}
 
 func (r *radialBasisNeuron) Get(args ...Getter) GetterSetter {
 	return nil

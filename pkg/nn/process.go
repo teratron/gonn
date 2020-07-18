@@ -5,9 +5,6 @@ type Processor interface {
 	// Initializing
 	init(...[]float64) bool
 
-	// Calculating
-	calc(...GetterSetter) Getter
-
 	// Querying / forecast / prediction
 	Query(input []float64) (output []float64)
 
