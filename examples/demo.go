@@ -110,7 +110,7 @@ func main() {
 
 		nn.Language("ru"),
 		nn.Logging(1)) //set
-	fmt.Println("n.Get():", n.Get()) //get
+	fmt.Printf("n.Get(): %T %v\n", n.Get(), n.Get()) //get
 
 	// Bias
 	n.Set(nn.Bias(true)) //set

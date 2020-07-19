@@ -15,13 +15,13 @@ type neuron struct {
 
 // Setter
 func (n *neuron) Set(args ...Setter) {
-	if len(args) > 0 {
+	/*if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
 			a.Get().Set(n)
 		}
 	} else {
 		Log("Empty Set()", true) // !!!
-	}
+	}*/
 }
 
 // Getter
