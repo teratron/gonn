@@ -23,7 +23,4 @@ type nn struct {
 	isInit		bool		// Neural network initializing flag
 	isQuery		bool		// Neural network querying flag
 	isTrain		bool		// Neural network training flag
-
-	language	langType
-	logging		modeLogType
 }

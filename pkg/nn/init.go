@@ -23,8 +23,6 @@ func New() NeuralNetwork {
 		isInit:			false,
 		isQuery:		false,
 		isTrain:		false,
-		language:		"en",
-		logging:		1,
 	}
 	n.Perceptron()
 	return n
@@ -40,10 +38,6 @@ func (n *nn) init(args ...[]float64) bool {
 	}
 	return n.isInit
 }
-
-/*func (n *nn) IsInit() bool {
-	return n.isInit
-}*/
 
 func (f floatType) Set(...Setter) {}
 

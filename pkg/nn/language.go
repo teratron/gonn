@@ -2,7 +2,7 @@ package nn
 
 type langType string
 
-func Language(lang ...langType) GetterSetter {
+/*func Language(lang ...langType) GetterSetter {
 	if len(lang) > 0 {
 		return lang[0]
 	} else {
@@ -31,4 +31,4 @@ func (l langType) Get(args ...Getter) GetterSetter {
 		return l
 	}
 	return nil
-}
+}*/

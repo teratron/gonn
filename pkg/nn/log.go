@@ -10,7 +10,7 @@ type modeLogType uint8
 type Logger interface {
 }
 
-func Logging(mode ...modeLogType) GetterSetter {
+/*func Logging(mode ...modeLogType) GetterSetter {
 	if len(mode) > 0 {
 		return mode[0]
 	} else {
@@ -39,7 +39,7 @@ func (l modeLogType) Get(args ...Getter) GetterSetter {
 		return l
 	}
 	return nil
-}
+}*/
 
 //
 func Log(reason string, info bool) {

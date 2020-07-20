@@ -108,8 +108,8 @@ func main() {
 		nn.LevelLoss(.0005),
 		nn.HiddenLayer(1, 5, 9),
 
-		nn.Language("ru"),
-		nn.Logging(1)) //set
+		/*nn.Language("ru"),
+		nn.Logging(1)*/) //set
 	fmt.Printf("n.Get(): %T %v\n", n.Get(), n.Get()) //get
 
 	// Bias
@@ -137,12 +137,12 @@ func main() {
 	fmt.Println("n.Get(nn.HiddenLayer()):", n.Get(nn.HiddenLayer())) //get
 
 	// Language
-	n.Set(nn.Language("ru")) //set
-	fmt.Println("n.Get(nn.Language()):", n.Get(nn.Language())) //get
+	//n.Set(nn.Language("ru")) //set
+	//fmt.Println("n.Get(nn.Language()):", n.Get(nn.Language())) //get
 
 	// Logging
-	n.Set(nn.Logging(0)) //set
-	fmt.Println("n.Get(nn.Logging()):", n.Get(nn.Logging())) //get
+	//n.Set(nn.Logging(0)) //set
+	//fmt.Println("n.Get(nn.Logging()):", n.Get(nn.Logging())) //get
 
 	//
 	input  := []float64{2.3, 3.1}

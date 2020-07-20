@@ -1,9 +1,5 @@
 package nn
 
-import (
-	"math/rand"
-)
-
 type GetterSetter interface {
 	Getter
 	Setter
@@ -44,13 +40,4 @@ func (n *nn) Get(args ...Getter) GetterSetter {
 		}
 	}
 	return nil
-}
-
-// Return random number from -0.5 to 0.5
-func getRand() (r floatType) {
-	r = 0
-	for r == 0 {
-		r = floatType(rand.Float64() - .5)
-	}
-	return
 }

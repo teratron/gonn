@@ -1,12 +1,12 @@
 // Learning rate
 package nn
 
-type rateType float32
+type rateType floatType
 
 // Default learning rate
-const DefaultRate rateType = .3
+const DefaultRate floatType = .3
 
-func Rate(rate ...rateType) GetterSetter {
+func Rate(rate ...floatType) GetterSetter {
 	if len(rate) > 0 {
 		return rate[0]
 	} else {
@@ -38,11 +38,11 @@ func (r rateType) Get(args ...Getter) GetterSetter {
 }
 
 // Checking
-func (r rateType) check() rateType {
+func (r rateType) check() floatType {
 	switch {
 	case r < 0 || r > 1:
 		return DefaultRate
 	default:
-		return r
+		return floatType(r)
 	}
 }
