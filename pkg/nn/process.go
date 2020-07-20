@@ -9,10 +9,10 @@ type Processor interface {
 	Query(input []float64) (output []float64)
 
 	//
-	Loss(target []float64) (loss float64)
+	//Loss(target []float64) (loss float64)
 
 	// Training
-	Train(...[]float64) (loss float64, count int)
+	Train(...[]float64) (loss float64, count uint)
 
 	// Copying
 	//Copy([]float64) []float64

@@ -12,6 +12,7 @@ type radialBasis struct {
 
 type radialBasisNeuron struct {
 	miss floatType
+	GetterSetter
 }
 
 // Returns a new Radial Basis neural network instance with the default parameters
@@ -55,11 +56,11 @@ func (r *radialBasis) init(args ...Setter) bool {
 }
 
 //
-func (r *radialBasisNeuron) Set(args ...Setter) {}
+/*func (r *radialBasisNeuron) Set(args ...Setter) {}
 
 func (r *radialBasisNeuron) Get(args ...Getter) GetterSetter {
 	return nil
-}
+}*/
 
 // Train
 /*func (r *radialBasis) Train(input, target []float64) (loss float64, count int) {

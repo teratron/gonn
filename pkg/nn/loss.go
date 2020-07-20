@@ -14,18 +14,6 @@ const (
 	ModeARCTAN   modeLossType = 2      // Arctan
 )
 
-func (n *nn) Loss(target []float64) (loss float64) {
-	if n.isInit && n.isQuery {
-	} else {
-		Log("An uninitialized neural network", true)
-	}
-	return
-}
-
-/*func Loss(target []float64) GetterSetter {
-	return lossType(target)
-}*/
-
 func ModeLoss(mode ...modeLossType) GetterSetter {
 	if len(mode) > 0 {
 		return mode[0]
@@ -43,8 +31,6 @@ func LevelLoss(level ...levelLossType) GetterSetter {
 }
 
 // Setter
-//func (l lossType) Set(args ...Setter) {}
-
 func (m modeLossType) Set(args ...Setter) {
 	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
@@ -66,10 +52,6 @@ func (l levelLossType) Set(args ...Setter) {
 }
 
 // Getter
-/*func (l lossType) Get(args ...Getter) GetterSetter {
-	return nil
-}*/
-
 func (m modeLossType) Get(args ...Getter) GetterSetter {
 	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {

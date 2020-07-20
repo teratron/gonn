@@ -2,7 +2,6 @@
 package nn
 
 import (
-	"fmt"
 	"log"
 	"math"
 )
@@ -22,7 +21,8 @@ type perceptron struct {
 }
 
 type perceptronNeuron struct {
-	miss			floatType
+	miss floatType
+	GetterSetter
 }
 
 // Returns a new Perceptron neural network instance with the default parameters
@@ -109,11 +109,11 @@ func (p *perceptron) Get(args ...Getter) GetterSetter {
 }
 
 // Specific neuron
-func (p *perceptronNeuron) Set(...Setter) {}
+/*func (p *perceptronNeuron) Set(...Setter) {}
 
 func (p *perceptronNeuron) Get(...Getter) GetterSetter {
 	return nil
-}
+}*/
 
 // Initialization
 // args[0] - input data
@@ -145,7 +145,7 @@ func (p *perceptron) init(args ...[]float64) bool {
 		}
 	}
 	p.initNeuron()
-	p.initAxon(args[0])
+	p.initAxon(lenInput)
 
 	return true
 }
@@ -163,7 +163,7 @@ func (p *perceptron) initNeuron() {
 }
 
 //
-func (p *perceptron) initAxon(input []float64) {
+func (p *perceptron) initAxon(length int) {
 	for i, v := range p.axon {
 		for j, w := range v {
 			for k := range w {
@@ -172,8 +172,8 @@ func (p *perceptron) initAxon(input []float64) {
 					synapse: map[string]Getter{},
 				}
 				if i == 0 {
-					if k < len(input) {
-						p.axon[i][j][k].synapse["input"] = floatType(input[k])
+					if k < length {
+						p.axon[i][j][k].synapse["input"] = floatType(0)
 					} else {
 						p.axon[i][j][k].synapse["input"] = biasType(true)
 					}
@@ -184,6 +184,7 @@ func (p *perceptron) initAxon(input []float64) {
 						p.axon[i][j][k].synapse["input"] = biasType(true)
 					}
 				}
+				//fmt.Printf("+++ %T %v\n", p.axon[i][j][k].synapse["input"], p.axon[i][j][k].synapse["input"])
 				p.axon[i][j][k].synapse["output"] = p.neuron[i][j]
 				//fmt.Println("- ", i, j, k, p.axon[i][j][k])
 			}
@@ -192,29 +193,16 @@ func (p *perceptron) initAxon(input []float64) {
 }
 
 //
-/*func (p *perceptron) initSynapse(input []float64) {
-	for i, v := range p.axon {
-		for j, w := range v {
-			for k := range w {
-				if i == 0 {
-					if k < len(input) {
-						p.axon[i][j][k].synapse["input"] = floatType(input[k])
-					} else {
-						p.axon[i][j][k].synapse["input"] = biasType(true)
-					}
-				} else {
-					if k < len(p.axon[i - 1]) {
-						p.axon[i][j][k].synapse["input"] = p.neuron[i - 1][k]
-					} else {
-						p.axon[i][j][k].synapse["input"] = biasType(true)
-					}
-				}
-				p.axon[i][j][k].synapse["output"] = p.neuron[i][j]
-				//fmt.Println("- ", i, j, k, p.axon[i][j][k])
+func (p *perceptron) initSynapse(input []float64) {
+	for j, w := range p.axon[0] {
+		for k := range w {
+			if k < len(input) {
+				p.axon[0][j][k].synapse["input"] = floatType(input[k])
 			}
+			//fmt.Println("- ", 0, j, k, p.axon[0][j][k])
 		}
 	}
-}*/
+}
 
 // Calculating the values of neurons in a layers
 func (p *perceptron) calcNeuron() {
@@ -288,7 +276,7 @@ func (p *perceptron) calcAxon() {
 					if n, ok := a.synapse["output"].(*neuron); ok {
 						if s, ok := n.specific.(*perceptronNeuron); ok {
 							a.weight += getSynapseInput(a) * s.miss * p.rate
-							fmt.Println("- ",a.weight)
+							//fmt.Println("- ",a.weight)
 						}
 					}
 				}()
@@ -298,10 +286,9 @@ func (p *perceptron) calcAxon() {
 }
 
 // Training
-func (p *perceptron) Train(data ...[]float64) (loss float64, count int) {
-
-	//for count < int(MaxIteration) {
-	for count < 1 {
+func (p *perceptron) Train(data ...[]float64) (loss float64, count uint) {
+	p.initSynapse(data[0])
+	for count < 1/*MaxIteration*/ {
 		p.calcNeuron()
 		if loss = p.calcLoss(data[1]); loss <= p.levelLoss || loss <= MinLevelLoss { break }
 		p.calcMiss()

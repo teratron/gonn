@@ -13,6 +13,7 @@ type hopfield struct {
 
 type hopfieldNeuron struct {
 	energy floatType
+	GetterSetter
 }
 
 // Returns a new Hopfield neural network instance with the default parameters
@@ -56,11 +57,11 @@ func (h *hopfield) init(args ...Setter) bool {
 }
 
 //
-func (h *hopfieldNeuron) Set(args ...Setter) {}
+/*func (h *hopfieldNeuron) Set(args ...Setter) {}
 
 func (h *hopfieldNeuron) Get(args ...Getter) GetterSetter {
 	return nil
-}
+}*/
 
 // Train
 /*func (h *hopfield) Train(input, target []float64) (loss float64, count int) {
