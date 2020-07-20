@@ -12,7 +12,7 @@ type Processor interface {
 	//Loss(target []float64) (loss float64)
 
 	// Training
-	Train(...[]float64) (loss float64, count uint)
+	Train(...[]float64) (loss float64, count int)
 
 	// Copying
 	//Copy([]float64) []float64

@@ -149,10 +149,10 @@ func main() {
 	target := []float64{3.6}
 
 	//
-	//fmt.Println(n.Query(input))
+	fmt.Println(n.Train(input, target))
 
 	//
-	fmt.Println(n.Train(input, target))
+	fmt.Println(n.Query(input))
 
 	//
 	//fmt.Println(n.Verify(target))

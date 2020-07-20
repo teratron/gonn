@@ -18,11 +18,14 @@ type perceptron struct {
 
 	neuron			[][]*neuron
 	axon			[][][]*axon
+
+	lastIndexLayer	int
+	lenInput		int
+	lenOutput		int
 }
 
 type perceptronNeuron struct {
 	miss floatType
-	GetterSetter
 }
 
 // Returns a new Perceptron neural network instance with the default parameters
@@ -110,10 +113,10 @@ func (p *perceptron) Get(args ...Getter) GetterSetter {
 
 // Specific neuron
 /*func (p *perceptronNeuron) Set(...Setter) {}
-
+*/
 func (p *perceptronNeuron) Get(...Getter) GetterSetter {
 	return nil
-}*/
+}
 
 // Initialization
 // args[0] - input data
@@ -122,11 +125,12 @@ func (p *perceptron) init(args ...[]float64) bool {
 	var tmp HiddenType
 	defer func() { tmp = nil }()
 
-	lenHidden := len(p.hiddenLayer)
-	layer     := make(HiddenType, lenHidden + 1)
-	lenInput  := len(args[0])
-	tmp        = append(p.hiddenLayer, hiddenType(len(args[1])))
-	lenLayer  := copy(layer, tmp)
+	p.lastIndexLayer = len(p.hiddenLayer)
+	p.lenInput       = len(args[0])
+	p.lenOutput      = len(args[1])
+	tmp              = append(p.hiddenLayer, hiddenType(p.lenOutput))
+	layer           := make(HiddenType, p.lastIndexLayer + 1)
+	lenLayer        := copy(layer, tmp)
 
 	b := 0
 	if p.bias { b = 1 }
@@ -138,15 +142,14 @@ func (p *perceptron) init(args ...[]float64) bool {
 		p.axon[i]   = make([][]*axon, l)
 		for j := 0; j < int(l); j++ {
 			if i == 0 {
-				p.axon[i][j] = make([]*axon, lenInput + b)
+				p.axon[i][j] = make([]*axon, p.lenInput + b)
 			} else {
 				p.axon[i][j] = make([]*axon, int(layer[i - 1]) + b)
 			}
 		}
 	}
 	p.initNeuron()
-	p.initAxon(lenInput)
-
+	p.initAxon()
 	return true
 }
 
@@ -163,7 +166,7 @@ func (p *perceptron) initNeuron() {
 }
 
 //
-func (p *perceptron) initAxon(length int) {
+func (p *perceptron) initAxon() {
 	for i, v := range p.axon {
 		for j, w := range v {
 			for k := range w {
@@ -172,7 +175,7 @@ func (p *perceptron) initAxon(length int) {
 					synapse: map[string]Getter{},
 				}
 				if i == 0 {
-					if k < length {
+					if k < p.lenInput {
 						p.axon[i][j][k].synapse["input"] = floatType(0)
 					} else {
 						p.axon[i][j][k].synapse["input"] = biasType(true)
@@ -196,7 +199,7 @@ func (p *perceptron) initAxon(length int) {
 func (p *perceptron) initSynapse(input []float64) {
 	for j, w := range p.axon[0] {
 		for k := range w {
-			if k < len(input) {
+			if k < p.lenInput {
 				p.axon[0][j][k].synapse["input"] = floatType(input[k])
 			}
 			//fmt.Println("- ", 0, j, k, p.axon[0][j][k])
@@ -220,15 +223,9 @@ func (p *perceptron) calcNeuron() {
 	}
 }
 
-// Loosing
-func (p *perceptron) Loss(target []float64) (loss float64) {
-	return p.calcLoss(target)
-}
-
 // Calculating the error of the output neuron
 func (p *perceptron) calcLoss(target []float64) (loss float64) {
-	n := len(p.neuron) - 1
-	for i, v := range p.neuron[n] {
+	for i, v := range p.neuron[p.lastIndexLayer] {
 		if s, ok := v.specific.(*perceptronNeuron); ok {
 			s.miss = floatType(target[i]) - v.value
 			switch p.modeLoss {
@@ -241,7 +238,7 @@ func (p *perceptron) calcLoss(target []float64) (loss float64) {
 			s.miss *= floatType(calcDerivative(float64(v.value), p.modeActivation))
 		}
 	}
-	loss /= float64(len(p.neuron[n]))
+	loss /= float64(p.lenOutput)
 	if p.modeLoss == ModeRMSE {
 		loss = math.Sqrt(loss)
 	}
@@ -250,7 +247,7 @@ func (p *perceptron) calcLoss(target []float64) (loss float64) {
 
 // Calculating the error of neurons in hidden layers
 func (p *perceptron) calcMiss() {
-	for i := len(p.neuron) - 2; i >= 0; i-- {
+	for i := p.lastIndexLayer - 1; i >= 0; i-- {
 		for j, v := range p.neuron[i] {
 			go func() {
 				if s, ok := v.specific.(*perceptronNeuron); ok {
@@ -286,7 +283,7 @@ func (p *perceptron) calcAxon() {
 }
 
 // Training
-func (p *perceptron) Train(data ...[]float64) (loss float64, count uint) {
+func (p *perceptron) Train(data ...[]float64) (loss float64, count int) {
 	p.initSynapse(data[0])
 	for count < 1/*MaxIteration*/ {
 		p.calcNeuron()
@@ -300,5 +297,12 @@ func (p *perceptron) Train(data ...[]float64) (loss float64, count uint) {
 
 // Querying
 func (p *perceptron) Query(input []float64) (output []float64) {
+	p.initSynapse(input)
+	p.calcNeuron()
+	//copy(output, p.neuron[len(p.neuron) - 1])
+	output = make([]float64, p.lenOutput)
+	for i, n := range p.neuron[p.lastIndexLayer] {
+		output[i] = float64(n.value)
+	}
 	return
 }
