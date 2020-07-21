@@ -3,20 +3,17 @@ package nn
 
 type Processor interface {
 	// Initializing
-	init(...[]float64) bool
+	init(input []float64, target ...[]float64) bool
 
-	// Querying / forecast / prediction
+	// Querying
 	Query(input []float64) (output []float64)
 
-	//
-	//Loss(target []float64) (loss float64)
+	// Verifying
+	Verify(input []float64, target ...[]float64) (loss float64, err error)
 
 	// Training
-	Train(...[]float64) (loss float64, count int)
+	Train(input []float64, target ...[]float64) (loss float64, count int)
 
 	// Copying
 	//Copy([]float64) []float64
-
-	// Verifying / validation
-	//Verify()
 }

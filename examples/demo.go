@@ -92,6 +92,10 @@ func main() {
 	/*var mx nn.Matrix
 	fmt.Println(mx.IsInit)*/
 
+	// Application
+	a := nn.App()
+	fmt.Println("nn.App():", a)
+
 	// Neural Network
 	n := nn.New()	// same n := nn.New().Perceptron()
 	//n := nn.New().Perceptron()
@@ -155,7 +159,7 @@ func main() {
 	fmt.Println(n.Query(input))
 
 	//
-	//fmt.Println(n.Verify(target))
+	fmt.Println(n.Verify(input, target))
 
 	//fmt.Println(n.Get(nn.Neuron()))
 	//fmt.Printf("++++ Act: %.4f\n", 100*calcActivation(1, ModeSIGMOID))

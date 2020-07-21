@@ -21,20 +21,15 @@ func New() NeuralNetwork {
 	n := &nn{
 		Architecture:	&perceptron{},
 		isInit:			false,
-		isQuery:		false,
 		isTrain:		false,
 	}
 	n.Perceptron()
 	return n
 }
 
-func (n *nn) init(args ...[]float64) bool {
-	if len(args) > 0 {
-		if a, ok := n.Get().(NeuralNetwork); ok {
-			n.isInit = a.init(args...)
-		}
-	} else {
-		Log("Empty init()", true) // !!!
+func (n *nn) init(input []float64, target ...[]float64) bool {
+	if a, ok := n.Get().(NeuralNetwork); ok {
+		n.isInit = a.init(input, target...)
 	}
 	return n.isInit
 }

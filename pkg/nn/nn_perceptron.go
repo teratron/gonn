@@ -119,15 +119,13 @@ func (p *perceptronNeuron) Get(...Getter) GetterSetter {
 }
 
 // Initialization
-// args[0] - input data
-// args[1] - target data
-func (p *perceptron) init(args ...[]float64) bool {
+func (p *perceptron) init(input []float64, target ...[]float64) bool {
 	var tmp HiddenType
 	defer func() { tmp = nil }()
 
 	p.lastIndexLayer = len(p.hiddenLayer)
-	p.lenInput       = len(args[0])
-	p.lenOutput      = len(args[1])
+	p.lenInput       = len(input)
+	p.lenOutput      = len(target[0])
 	tmp              = append(p.hiddenLayer, hiddenType(p.lenOutput))
 	layer           := make(HiddenType, p.lastIndexLayer + 1)
 	lenLayer        := copy(layer, tmp)
@@ -187,8 +185,8 @@ func (p *perceptron) initAxon() {
 						p.axon[i][j][k].synapse["input"] = biasType(true)
 					}
 				}
-				//fmt.Printf("+++ %T %v\n", p.axon[i][j][k].synapse["input"], p.axon[i][j][k].synapse["input"])
 				p.axon[i][j][k].synapse["output"] = p.neuron[i][j]
+				//fmt.Printf("+++ %T %v\n", p.axon[i][j][k].synapse["input"], p.axon[i][j][k].synapse["input"])
 				//fmt.Println("- ", i, j, k, p.axon[i][j][k])
 			}
 		}
@@ -283,11 +281,11 @@ func (p *perceptron) calcAxon() {
 }
 
 // Training
-func (p *perceptron) Train(data ...[]float64) (loss float64, count int) {
-	p.initSynapse(data[0])
+func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, count int) {
+	p.initSynapse(input)
 	for count < 1/*MaxIteration*/ {
 		p.calcNeuron()
-		if loss = p.calcLoss(data[1]); loss <= p.levelLoss || loss <= MinLevelLoss { break }
+		if loss = p.calcLoss(target[0]); loss <= p.levelLoss || loss <= MinLevelLoss { break }
 		p.calcMiss()
 		p.calcAxon()
 		count++
@@ -299,10 +297,17 @@ func (p *perceptron) Train(data ...[]float64) (loss float64, count int) {
 func (p *perceptron) Query(input []float64) (output []float64) {
 	p.initSynapse(input)
 	p.calcNeuron()
-	//copy(output, p.neuron[len(p.neuron) - 1])
 	output = make([]float64, p.lenOutput)
 	for i, n := range p.neuron[p.lastIndexLayer] {
 		output[i] = float64(n.value)
 	}
+	return
+}
+
+// Verifying
+func (p *perceptron) Verify(input []float64, target ...[]float64) (loss float64, err error) {
+	p.initSynapse(input)
+	p.calcNeuron()
+	loss = p.calcLoss(target[0])
 	return
 }

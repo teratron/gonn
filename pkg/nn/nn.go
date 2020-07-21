@@ -21,6 +21,9 @@ type nn struct {
 	Architecture			// Architecture of neural network
 
 	isInit		bool		// Neural network initializing flag
-	isQuery		bool		// Neural network querying flag
 	isTrain		bool		// Neural network training flag
+
+	json		string
+	csv			string
+	xml			string
 }
