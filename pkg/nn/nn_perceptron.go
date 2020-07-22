@@ -192,7 +192,6 @@ func (p *perceptron) initAxon() {
 					}
 				}
 				p.axon[i][j][k].synapse["output"] = p.neuron[i][j]
-				//fmt.Printf("+++ %T %v\n", p.axon[i][j][k].synapse["input"], p.axon[i][j][k].synapse["input"])
 				//fmt.Println("- ", i, j, k, p.axon[i][j][k])
 			}
 		}
@@ -206,32 +205,37 @@ func (p *perceptron) initSynapse(input []float64) {
 			if k < p.lenInput {
 				p.axon[0][j][k].synapse["input"] = floatType(input[k])
 			}
-			//fmt.Println("- ", 0, j, k, p.axon[0][j][k])
 		}
 	}
 }
 
 // Calculating the values of neurons in a layers
 func (p *perceptron) calcNeuron() {
-	wait := make(chan bool)
-	defer close(wait)
+	//wait := make(chan bool)
+	//defer close(wait)
 	for i, v := range p.neuron {
 		for j, w := range v {
-			go func(/*ch chan bool*/) {
-				w.value = 0
-				for _, a := range w.axon {
-					w.value += getSynapseInput(a) * a.weight
+			fmt.Println("n + ", i, j)
+			//fmt.Printf("%T %v\n", w, w)
+			go func(n *neuron, i, j int /*ch chan bool*/) {
+				//fmt.Println("n - ", i, j)
+				n.value = 0
+				for _, a := range n.axon {
+					n.value += getSynapseInput(a) * a.weight
 				}
-				w.value = floatType(calcActivation(float64(w.value), p.modeActivation))
-				fmt.Println("neuron - ", i, j, w.value)
-				wait <- true
-			}(/*wait*/)
-			//fmt.Println("neuron - ", i, j, w.value)
+				n.value = floatType(calcActivation(float64(n.value), p.modeActivation))
+				fmt.Println("neuron - ", i, j, n.value)
+				//wait <- true
+			}(w, i, j/*wait*/)
+			//fmt.Println("neuron + ", i, j, w.value)
 		}
-		for range v {
+		_, _ = fmt.Scanln()
+		/*for range v {
+			//fmt.Println("neuron - ", v)
 			<- wait
-		}
+		}*/
 	}
+	//fmt.Println("neuron - ", p.neuron)
 }
 
 // Calculating the error of the output neuron
