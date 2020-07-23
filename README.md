@@ -14,11 +14,9 @@
 gonn - Neural Network for Golang
 
 # Install
-
     $ go get -u github.com/zigenzoog/gonn
 
-# Initializing
-
+# Getting Started
 ```go
 package main
 
@@ -28,29 +26,29 @@ import (
 
 func main() {
     // Creat new Neural Network
-    n := nn.New()   // Default Feed Forward Neural Network, same f := nn.New().FeedForward()
+    // Default Perceptron Neural Network, same f := nn.New().Perceptron()
+    n := nn.New()
     // or
     n = nn.New().Perceptron()
     // or
     n = nn.New().RadialBasis()
-    
+    // or
+    n = nn.New().Hopfield()
+
     // Set
     n.Set(nn.Bias(false))
 
     // Get
-    b := n.Get(nn.Bias())
+    //b := n.Get(nn.Bias())
 //Log("Parameter not specified for Bias", false)
 
 }
 ```
-
-# Getting Started
 And you can run that simply as:
-
     $ go run main.go
 
 # Documentation
-
+More documentation is available at the [gonn website](https://zigenzoog.github.io/gonn/) or on [pkg.go.dev](https://pkg.go.dev/zigenzoog/gonn?tab=doc).
 
 # Examples
 You can find examples of neural networks in the [examples directory](https://github.com/zigenzoog/gonn/tree/master/examples/).
