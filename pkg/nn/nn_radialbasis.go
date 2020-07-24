@@ -27,7 +27,7 @@ func (r *radialBasis) Set(args ...Setter) {
 	if len(args) > 0 {
 		switch v := args[0].(type) {
 		default:
-			Log("This type of variable is missing for Radial Basis Neural Network", false)
+			Log("This type of variable is missing for Radial Basis Neural Network", true)
 			log.Printf("\tset: %T %v\n", v, v) // !!!
 		}
 	} else {
@@ -40,7 +40,7 @@ func (r *radialBasis) Get(args ...Getter) GetterSetter {
 	if len(args) > 0 {
 		switch args[0].(type) {
 		default:
-			Log("This type of variable is missing for Radial Basis Neural Network", false)
+			Log("This type of variable is missing for Radial Basis Neural Network", true)
 			log.Printf("\tget: %T %v\n", args[0], args[0]) // !!!
 			return nil
 		}

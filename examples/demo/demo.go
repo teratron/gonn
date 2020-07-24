@@ -13,57 +13,58 @@ func main() {
 	a := nn.App()
 	fmt.Println("nn.App():", a)
 
+	// Common
+	/*a.Set(nn.Language("ru"),
+		  nn.Logging(1))*/
+
+	// Language
+	//n.Set(nn.Language("ru"))
+	//fmt.Println("n.Get(nn.Language()):", n.Get(nn.Language()))
+
+	// Logging
+	//n.Set(nn.Logging(0)) //set
+	//fmt.Println("n.Get(nn.Logging()):", n.Get(nn.Logging()))
+
 	// Neural Network
 	n := nn.New()	// same n := nn.New().Perceptron()
 	//n := nn.New().Perceptron()
 	//n := nn.New().RadialBasis()
 	//n := nn.New().Hopfield()
-	fmt.Println("nn.New():", n)
+	//fmt.Println("nn.New():", n)
 
 	// Common
 	n.Set(
 		nn.Bias(false),
-		nn.Rate(.35),
+		nn.Rate(nn.DefaultRate),
 		nn.ModeActivation(nn.ModeTANH),
 		nn.ModeLoss(nn.ModeARCTAN),
 		nn.LevelLoss(.0005),
-		nn.HiddenLayer(1, 5, 9),
-
-		/*nn.Language("ru"),
-		nn.Logging(1)*/) //set
-	fmt.Printf("n.Get(): %T %v\n", n.Get(), n.Get()) //get
+		nn.HiddenLayer(1, 5, 9))
+	fmt.Printf("n.Get(): %T %v\n", n.Get(), n.Get())
 
 	// Bias
-	n.Set(nn.Bias(true)) //set
-	fmt.Println("n.Get(nn.Bias()):", n.Get(nn.Bias())) //get
+	n.Set(nn.Bias(true))
+	fmt.Println("n.Get(nn.Bias()):", n.Get(nn.Bias()))
 
 	// Rate
-	n.Set(nn.Rate(.1)) //set
-	fmt.Println("n.Get(nn.Rate()):", n.Get(nn.Rate())) //get
+	n.Set(nn.Rate(.1))
+	fmt.Println("n.Get(nn.Rate()):", n.Get(nn.Rate()))
 
 	// Activation
-	n.Set(nn.ModeActivation(nn.ModeSIGMOID)) //set
-	fmt.Println("n.Get(nn.ModeActivation()):", n.Get(nn.ModeActivation())) //get
+	n.Set(nn.ModeActivation(nn.ModeSIGMOID))
+	fmt.Println("n.Get(nn.ModeActivation()):", n.Get(nn.ModeActivation()))
 
 	// Loss
-	n.Set(nn.ModeLoss(nn.ModeMSE)) //set
-	fmt.Println("n.Get(nn.ModeLoss()):", n.Get(nn.ModeLoss())) //get
+	n.Set(nn.ModeLoss(nn.ModeARCTAN))
+	fmt.Println("n.Get(nn.ModeLoss()):", n.Get(nn.ModeLoss()))
 
 	// Level loss
-	n.Set(nn.LevelLoss(.04)) //set
-	fmt.Println("n.Get(nn.LevelLoss()):", n.Get(nn.LevelLoss())) //get
+	n.Set(nn.LevelLoss(.04))
+	fmt.Println("n.Get(nn.LevelLoss()):", n.Get(nn.LevelLoss()))
 
 	// Hidden layers
-	n.Set(nn.HiddenLayer(3, 2)) //set
-	fmt.Println("n.Get(nn.HiddenLayer()):", n.Get(nn.HiddenLayer())) //get
-
-	// Language
-	//n.Set(nn.Language("ru")) //set
-	//fmt.Println("n.Get(nn.Language()):", n.Get(nn.Language())) //get
-
-	// Logging
-	//n.Set(nn.Logging(0)) //set
-	//fmt.Println("n.Get(nn.Logging()):", n.Get(nn.Logging())) //get
+	n.Set(nn.HiddenLayer(3, 2))
+	fmt.Println("n.Get(nn.HiddenLayer()):", n.Get(nn.HiddenLayer()))
 
 	//
 	input  := []float64{2.3, 3.1}

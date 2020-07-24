@@ -8,10 +8,10 @@ type (
 )
 
 const (
-	MinLevelLoss float64	  = 10e-33 // The minimum value of the error limit at which training is forcibly terminated
-	ModeMSE      modeLossType = 0      // Mean Squared Error
-	ModeRMSE     modeLossType = 1      // Root Mean Squared Error
-	ModeARCTAN   modeLossType = 2      // Arctan
+	MinLevelLoss float64	  = 10e-33	// The minimum value of the error limit at which training is forcibly terminated
+	ModeMSE      modeLossType = iota	// Mean Squared Error
+	ModeRMSE							// Root Mean Squared Error
+	ModeARCTAN							// Arctan
 )
 
 func ModeLoss(mode ...modeLossType) GetterSetter {

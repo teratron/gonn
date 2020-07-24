@@ -2,7 +2,6 @@
 package nn
 
 import (
-	"fmt"
 	"log"
 	"math"
 )
@@ -12,7 +11,7 @@ type perceptron struct {
 
 	bias			biasType		// The neuron bias, false or true
 	rate			floatType		// Learning coefficient, from 0 to 1
-	modeActivation	uint8			//
+	modeActivation	uint8			// Activation function mode
 	modeLoss		modeLossType	//
 	levelLoss		float64			// Minimum (sufficient) level of the average of the error during training
 	hiddenLayer		HiddenType		// Array of the number of neurons in each hidden layer
@@ -34,7 +33,7 @@ func (n *nn) Perceptron() NeuralNetwork {
 	n.Architecture = &perceptron{
 		Architecture:	n,
 		bias:			false,
-		rate:			floatType(defaultRate),
+		rate:			floatType(DefaultRate),
 		modeActivation:	ModeSIGMOID,
 		modeLoss:		ModeMSE,
 		levelLoss:		.0001,
@@ -51,7 +50,7 @@ func (p *perceptron) Preset(name string) {
 	case "default":
 		p.Set(
 			Bias(false),
-			Rate(defaultRate),
+			Rate(DefaultRate),
 			ModeActivation(ModeSIGMOID),
 			ModeLoss(ModeMSE),
 			LevelLoss(.0001),
@@ -76,7 +75,7 @@ func (p *perceptron) Set(args ...Setter) {
 		case HiddenType:
 			p.hiddenLayer = v
 		default:
-			Log("This type is missing for Perceptron Neural Network", false) // !!!
+			Log("This type is missing for Perceptron Neural Network", true) // !!!
 			log.Printf("\tset: %T %v\n", v, v) // !!!
 		}
 	} else {
@@ -103,7 +102,7 @@ func (p *perceptron) Get(args ...Getter) GetterSetter {
 		//case *neuron:
 			//return nil //&p.neuron
 		default:
-			Log("This type is missing for Perceptron Neural Network", false) // !!!
+			Log("This type is missing for Perceptron Neural Network", true) // !!!
 			log.Printf("\tget: %T %v\n", args[0], args[0]) // !!!
 			return nil
 		}
@@ -211,31 +210,21 @@ func (p *perceptron) initSynapse(input []float64) {
 
 // Calculating the values of neurons in a layers
 func (p *perceptron) calcNeuron() {
-	//wait := make(chan bool)
-	//defer close(wait)
-	for i, v := range p.neuron {
-		for j, w := range v {
-			fmt.Println("n + ", i, j)
-			//fmt.Printf("%T %v\n", w, w)
-			go func(n *neuron, i, j int /*ch chan bool*/) {
-				//fmt.Println("n - ", i, j)
+	wait := make(chan bool)
+	defer close(wait)
+	for _, v := range p.neuron {
+		for _, w := range v {
+			go func(n *neuron) {
 				n.value = 0
 				for _, a := range n.axon {
 					n.value += getSynapseInput(a) * a.weight
 				}
 				n.value = floatType(calcActivation(float64(n.value), p.modeActivation))
-				fmt.Println("neuron - ", i, j, n.value)
-				//wait <- true
-			}(w, i, j/*wait*/)
-			//fmt.Println("neuron + ", i, j, w.value)
+				wait <- true
+			}(w)
 		}
-		_, _ = fmt.Scanln()
-		/*for range v {
-			//fmt.Println("neuron - ", v)
-			<- wait
-		}*/
+		for range v { <- wait }
 	}
-	//fmt.Println("neuron - ", p.neuron)
 }
 
 // Calculating the error of the output neuron
@@ -257,44 +246,49 @@ func (p *perceptron) calcLoss(target []float64) (loss float64) {
 	if p.modeLoss == ModeRMSE {
 		loss = math.Sqrt(loss)
 	}
-	fmt.Println("loss - ", loss)
 	return
 }
 
 // Calculating the error of neurons in hidden layers
 func (p *perceptron) calcMiss() {
+	wait := make(chan bool)
+	defer close(wait)
 	for i := p.lastIndexLayer - 1; i >= 0; i-- {
 		for j, v := range p.neuron[i] {
-			go func() {
-				if s, ok := v.specific.(*perceptronNeuron); ok {
+			go func(n *neuron) {
+				if s, ok := n.specific.(*perceptronNeuron); ok {
 					s.miss = 0
 					for _, w := range p.neuron[i + 1] {
 						if m, ok := w.specific.(*perceptronNeuron); ok {
 							s.miss += m.miss * w.axon[j].weight
 						}
 					}
-					s.miss *= floatType(calcDerivative(float64(v.value), p.modeActivation))
-					fmt.Println("miss - ", i, j, s.miss)
+					s.miss *= floatType(calcDerivative(float64(n.value), p.modeActivation))
 				}
-			}()
+				wait <- true
+			}(v)
 		}
+		for range p.neuron[i] { <- wait }
 	}
 }
 
 // Update weights
 func (p *perceptron) calcAxon() {
-	for i, v := range p.axon {
-		for j, w := range v {
-			for _, a := range w {
-				go func() {
+	wait := make(chan bool)
+	defer close(wait)
+	for _, u := range p.axon {
+		for _, v := range u {
+			for _, w := range v {
+				go func(a *axon) {
 					if n, ok := a.synapse["output"].(*neuron); ok {
 						if s, ok := n.specific.(*perceptronNeuron); ok {
 							a.weight += getSynapseInput(a) * s.miss * p.rate
-							fmt.Println("weight - ", i, j, a.weight)
 						}
 					}
-				}()
+					wait <- true
+				}(w)
 			}
+			for range v { <- wait }
 		}
 	}
 }

@@ -16,4 +16,7 @@ type Processor interface {
 
 	// Copying
 	//Copy([]float64) []float64
+
+	// Deleting
+	//Delete()
 }
