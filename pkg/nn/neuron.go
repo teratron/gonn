@@ -4,7 +4,7 @@ package nn
 //type neuronType [][]*neuron
 
 type neuron struct {
-	value    floatType
+	value    floatType	// Neuron value
 	axon     []*axon
 	specific Getter
 }

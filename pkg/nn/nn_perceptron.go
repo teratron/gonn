@@ -10,8 +10,8 @@ import (
 type perceptron struct {
 	Architecture
 
-	bias			biasType		//
-	rate			floatType		//
+	bias			biasType		// The neuron bias, false or true
+	rate			floatType		// Learning coefficient, from 0 to 1
 	modeActivation	uint8			//
 	modeLoss		modeLossType	//
 	levelLoss		float64			// Minimum (sufficient) level of the average of the error during training
@@ -26,7 +26,7 @@ type perceptron struct {
 }
 
 type perceptronNeuron struct {
-	miss floatType
+	miss floatType	// Error value
 }
 
 // Returns a new Perceptron neural network instance with the default parameters
