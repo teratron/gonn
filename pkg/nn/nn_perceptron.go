@@ -10,12 +10,12 @@ import (
 type perceptron struct {
 	Architecture
 
-	bias			biasType			//
-	rate			floatType			//
-	modeActivation	modeActivationType	//
-	modeLoss		modeLossType		//
-	levelLoss		float64				// Minimum (sufficient) level of the average of the error during training
-	hiddenLayer		HiddenType			// Array of the number of neurons in each hidden layer
+	bias			biasType		//
+	rate			floatType		//
+	modeActivation	uint8			//
+	modeLoss		modeLossType	//
+	levelLoss		float64			// Minimum (sufficient) level of the average of the error during training
+	hiddenLayer		HiddenType		// Array of the number of neurons in each hidden layer
 
 	neuron			[][]*neuron
 	axon			[][][]*axon
@@ -34,7 +34,7 @@ func (n *nn) Perceptron() NeuralNetwork {
 	n.Architecture = &perceptron{
 		Architecture:	n,
 		bias:			false,
-		rate:			DefaultRate,
+		rate:			floatType(defaultRate),
 		modeActivation:	ModeSIGMOID,
 		modeLoss:		ModeMSE,
 		levelLoss:		.0001,
@@ -51,7 +51,7 @@ func (p *perceptron) Preset(name string) {
 	case "default":
 		p.Set(
 			Bias(false),
-			Rate(DefaultRate),
+			Rate(defaultRate),
 			ModeActivation(ModeSIGMOID),
 			ModeLoss(ModeMSE),
 			LevelLoss(.0001),
@@ -68,7 +68,7 @@ func (p *perceptron) Set(args ...Setter) {
 		case rateType:
 			p.rate = floatType(v)
 		case modeActivationType:
-			p.modeActivation = v
+			p.modeActivation = uint8(v)
 		case modeLossType:
 			p.modeLoss = v
 		case levelLossType:
@@ -93,7 +93,7 @@ func (p *perceptron) Get(args ...Getter) GetterSetter {
 		case rateType:
 			return p.rate
 		case modeActivationType:
-			return p.modeActivation
+			return modeActivationType(p.modeActivation)
 		case modeLossType:
 			return p.modeLoss
 		case levelLossType:

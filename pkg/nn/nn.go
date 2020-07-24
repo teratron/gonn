@@ -25,5 +25,4 @@ type nn struct {
 
 	json		string
 	csv			string
-	xml			string
 }

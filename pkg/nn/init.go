@@ -17,7 +17,12 @@ func init() {
 }
 
 // New returns a new neural network instance with the default parameters
-func New() NeuralNetwork {
+func New(args ...*json) NeuralNetwork {
+	if len(args) > 0 {
+
+	} else {
+
+	}
 	n := &nn{
 		Architecture:	&perceptron{},
 		isInit:			false,

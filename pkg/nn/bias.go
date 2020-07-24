@@ -3,9 +3,9 @@ package nn
 
 type biasType bool
 
-func Bias(bias ...biasType) GetterSetter {
+func Bias(bias ...bool) GetterSetter {
 	if len(bias) > 0 {
-		return bias[0]
+		return biasType(bias[0])
 	} else {
 		return biasType(false)
 	}

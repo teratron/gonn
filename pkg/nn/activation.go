@@ -3,19 +3,20 @@ package nn
 
 import "math"
 
-type modeActivationType uint8	// Activation function mode
+// Activation function mode
+type modeActivationType uint8
 
 const (
-	ModeLINEAR    modeActivationType = 0	// Linear/identity
-	ModeRELU      modeActivationType = 1	// ReLu - rectified linear unit
-	ModeLEAKYRELU modeActivationType = 2	// Leaky ReLu - leaky rectified linear unit
-	ModeSIGMOID   modeActivationType = 3	// Logistic, a.k.a. sigmoid or soft step
-	ModeTANH      modeActivationType = 4	// TanH - hyperbolic tangent
+	ModeLINEAR    uint8 = 0	// Linear/identity
+	ModeRELU      uint8 = 1	// ReLu - rectified linear unit
+	ModeLEAKYRELU uint8 = 2	// Leaky ReLu - leaky rectified linear unit
+	ModeSIGMOID   uint8 = 3	// Logistic, a.k.a. sigmoid or soft step
+	ModeTANH      uint8 = 4	// TanH - hyperbolic tangent
 )
 
-func ModeActivation(mode ...modeActivationType) GetterSetter {
+func ModeActivation(mode ...uint8) GetterSetter {
 	if len(mode) > 0 {
-		return mode[0]
+		return modeActivationType(mode[0])
 	} else {
 		return modeActivationType(0)
 	}
@@ -47,15 +48,15 @@ func (m modeActivationType) Get(args ...Getter) GetterSetter {
 // Checking
 func (m modeActivationType) check() modeActivationType {
 	switch {
-	case m < 0 || m > ModeTANH:
-		return ModeSIGMOID
+	case m < 0 || m > modeActivationType(ModeTANH):
+		return modeActivationType(ModeSIGMOID)
 	default:
 		return m
 	}
 }
 
 // Activation function
-func calcActivation(value float64, mode modeActivationType) float64 {
+func calcActivation(value float64, mode uint8) float64 {
 	switch mode {
 	default:
 		fallthrough
@@ -87,7 +88,7 @@ func calcActivation(value float64, mode modeActivationType) float64 {
 }
 
 // Derivative activation function
-func calcDerivative(value float64, mode modeActivationType) float64 {
+func calcDerivative(value float64, mode uint8) float64 {
 	switch mode {
 	default:
 		fallthrough
