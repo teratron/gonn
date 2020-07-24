@@ -1,6 +1,6 @@
+//
 package nn
 
-//
 func (n *nn) Query(input []float64) (output []float64) {
 	if !n.isTrain {
 		Log("Neural network is not trained", true) // !!!

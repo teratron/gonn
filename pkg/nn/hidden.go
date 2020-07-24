@@ -1,12 +1,9 @@
 // Hidden layers
 package nn
 
-type (
-	hiddenType uint16
-	HiddenType []hiddenType
-)
+type HiddenType []uint
 
-func HiddenLayer(nums ...hiddenType) HiddenType {
+func HiddenLayer(nums ...uint) HiddenType {
 	return nums
 }
 

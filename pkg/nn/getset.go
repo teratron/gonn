@@ -1,3 +1,4 @@
+//
 package nn
 
 type GetterSetter interface {

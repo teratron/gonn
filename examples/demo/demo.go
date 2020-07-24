@@ -55,7 +55,7 @@ func main() {
 	fmt.Println("n.Get(nn.ModeActivation()):", n.Get(nn.ModeActivation()))
 
 	// Loss
-	n.Set(nn.ModeLoss(nn.ModeARCTAN))
+	n.Set(nn.ModeLoss(nn.ModeMSE))
 	fmt.Println("n.Get(nn.ModeLoss()):", n.Get(nn.ModeLoss()))
 
 	// Level loss
@@ -78,6 +78,9 @@ func main() {
 
 	//
 	//fmt.Println(n.Verify(input, target))
+
+
+	//n.Write(JSON("perceptron"))
 
 	//fmt.Println(n.Get(nn.Neuron()))
 	//fmt.Printf("++++ Act: %.4f\n", 100*calcActivation(1, ModeSIGMOID))

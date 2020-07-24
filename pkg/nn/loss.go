@@ -8,23 +8,23 @@ type (
 )
 
 const (
-	MinLevelLoss float64	  = 10e-33	// The minimum value of the error limit at which training is forcibly terminated
-	ModeMSE      modeLossType = iota	// Mean Squared Error
-	ModeRMSE							// Root Mean Squared Error
-	ModeARCTAN							// Arctan
+	ModeMSE uint8 = iota			// Mean Squared Error
+	ModeRMSE						// Root Mean Squared Error
+	ModeARCTAN						// Arctan
+	MinLevelLoss float64 = 10e-33	// The minimum value of the error limit at which training is forcibly terminated
 )
 
-func ModeLoss(mode ...modeLossType) GetterSetter {
+func ModeLoss(mode ...uint8) GetterSetter {
 	if len(mode) > 0 {
-		return mode[0]
+		return modeLossType(mode[0])
 	} else {
 		return modeLossType(0)
 	}
 }
 
-func LevelLoss(level ...levelLossType) GetterSetter {
+func LevelLoss(level ...float64) GetterSetter {
 	if len(level) > 0 {
-		return level[0]
+		return levelLossType(level[0])
 	} else {
 		return levelLossType(0)
 	}
@@ -69,7 +69,7 @@ func (l levelLossType) Get(args ...Getter) GetterSetter {
 			return a.Get().Get(l)
 		}
 	} else {
-		return floatType(l)
+		return l
 	}
 	return nil
 }
@@ -77,8 +77,8 @@ func (l levelLossType) Get(args ...Getter) GetterSetter {
 // Checking
 func (m modeLossType) check() modeLossType {
 	switch {
-	case m < 0 || m > ModeARCTAN:
-		return ModeMSE
+	case m < 0 || m > modeLossType(ModeARCTAN):
+		return modeLossType(ModeMSE)
 	default:
 		return m
 	}

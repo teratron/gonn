@@ -2,14 +2,12 @@
 package nn
 
 import (
+	"io"
 	"math/rand"
 	"time"
 )
 
-type (
-	floatType      float32
-	//floatArrayType []float64
-)
+type floatType float32
 
 func init() {
 	rand.Seed(time.Now().UTC().UnixNano())
@@ -17,16 +15,16 @@ func init() {
 }
 
 // New returns a new neural network instance with the default parameters
-func New(args ...*json) NeuralNetwork {
-	if len(args) > 0 {
+func New(init ...io.Reader) NeuralNetwork {
+	if len(init) > 0 {
 
 	} else {
 
 	}
 	n := &nn{
-		Architecture:	&perceptron{},
-		isInit:			false,
-		isTrain:		false,
+		Architecture: &perceptron{},
+		isInit:       false,
+		isTrain:      false,
 	}
 	n.Perceptron()
 	return n

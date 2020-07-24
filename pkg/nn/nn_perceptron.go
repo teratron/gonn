@@ -9,12 +9,12 @@ import (
 type perceptron struct {
 	Architecture
 
-	bias			biasType		// The neuron bias, false or true
-	rate			floatType		// Learning coefficient, from 0 to 1
-	modeActivation	uint8			// Activation function mode
-	modeLoss		modeLossType	//
-	levelLoss		float64			// Minimum (sufficient) level of the average of the error during training
-	hiddenLayer		HiddenType		// Array of the number of neurons in each hidden layer
+	bias			biasType	// The neuron bias, false or true
+	rate			floatType	// Learning coefficient, from 0 to 1
+	modeActivation	uint8		// Activation function mode
+	modeLoss		uint8		//
+	levelLoss		float64		// Minimum (sufficient) level of the average of the error during training
+	hiddenLayer		HiddenType	// Array of the number of neurons in each hidden layer
 
 	neuron			[][]*neuron
 	axon			[][][]*axon
@@ -69,7 +69,7 @@ func (p *perceptron) Set(args ...Setter) {
 		case modeActivationType:
 			p.modeActivation = uint8(v)
 		case modeLossType:
-			p.modeLoss = v
+			p.modeLoss = uint8(v)
 		case levelLossType:
 			p.levelLoss = float64(v)
 		case HiddenType:
@@ -94,7 +94,7 @@ func (p *perceptron) Get(args ...Getter) GetterSetter {
 		case modeActivationType:
 			return modeActivationType(p.modeActivation)
 		case modeLossType:
-			return p.modeLoss
+			return modeLossType(p.modeLoss)
 		case levelLossType:
 			return levelLossType(p.levelLoss)
 		case HiddenType:
@@ -127,7 +127,7 @@ func (p *perceptron) init(input []float64, target ...[]float64) bool {
 		p.lastIndexLayer = len(p.hiddenLayer)
 		p.lenInput       = len(input)
 		p.lenOutput      = len(target[0])
-		tmp              = append(p.hiddenLayer, hiddenType(p.lenOutput))
+		tmp              = append(p.hiddenLayer, uint(p.lenOutput))
 		layer           := make(HiddenType, p.lastIndexLayer+1)
 		lenLayer        := copy(layer, tmp)
 
@@ -191,7 +191,6 @@ func (p *perceptron) initAxon() {
 					}
 				}
 				p.axon[i][j][k].synapse["output"] = p.neuron[i][j]
-				//fmt.Println("- ", i, j, k, p.axon[i][j][k])
 			}
 		}
 	}

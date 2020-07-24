@@ -32,7 +32,7 @@ func (r rateType) Get(args ...Getter) GetterSetter {
 			return a.Get().Get(r)
 		}
 	} else {
-		return floatType(r)
+		return r
 	}
 	return nil
 }
