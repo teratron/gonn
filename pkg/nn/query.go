@@ -2,9 +2,9 @@
 package nn
 
 func (n *nn) Query(input []float64) (output []float64) {
-	if !n.isTrain {
+	if !n.IsTrain {
 		Log("Neural network is not trained", true) // !!!
-		if !n.isInit {
+		if !n.IsInit {
 			Log("Error initialization", true) // !!!
 			return nil
 		}

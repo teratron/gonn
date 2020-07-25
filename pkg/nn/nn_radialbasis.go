@@ -11,7 +11,7 @@ type radialBasis struct {
 }
 
 type radialBasisNeuron struct {
-	miss floatType
+	Miss floatType
 }
 
 // Returns a new Radial Basis neural network instance with the default parameters

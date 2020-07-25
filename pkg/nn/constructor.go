@@ -26,5 +26,11 @@ type Constructor interface {
 	//Delete()
 
 	//
+	Read(reader io.Reader)
+
+	//
+	Write(io.Writer)
+
+	//
 	Print(writer io.Writer, input []float64, args ...interface{})
 }

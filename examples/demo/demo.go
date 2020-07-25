@@ -90,7 +90,7 @@ func main() {
 	//fmt.Println(n.Verify(input, target))
 
 
-	//n.Write(JSON("perceptron"))
+	n.Write(nn.JSON("perceptron.json"))
 
 	//fmt.Println(n.Get(nn.Neuron()))
 	//fmt.Printf("++++ Act: %.4f\n", 100*calcActivation(1, ModeSIGMOID))

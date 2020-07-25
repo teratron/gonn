@@ -3,14 +3,16 @@ package nn
 
 import "io"
 
-type json struct {
-	fileName string
+type jsonType string
+
+func JSON(filename string) io.ReadWriter {
+	return jsonType(filename)
 }
 
-func JSON(filename string) io.Reader {
-	return nil
+func (j jsonType) Read(p []byte) (n int, err error) {
+	return
 }
 
-func (j json) Read(p []byte) (n int, err error) {
+func (j jsonType) Write(p []byte) (n int, err error) {
 	return
 }

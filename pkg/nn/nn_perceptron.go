@@ -2,6 +2,7 @@
 package nn
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -9,7 +10,7 @@ import (
 )
 
 type perceptron struct {
-	Architecture
+	Architecture	`json:"-"`
 
 	bias			biasType	// The neuron bias, false or true
 	rate			floatType	// Learning coefficient, from 0 to 1
@@ -18,16 +19,16 @@ type perceptron struct {
 	levelLoss		float64		// Minimum (sufficient) level of the average of the error during training
 	hiddenLayer		HiddenType	// Array of the number of neurons in each hidden layer
 
-	neuron			[][]*neuron
-	axon			[][][]*axon
+	neuron			[][]*neuron `json:"-"`
+	axon			[][][]*axon	`json:"-"`
 
-	lastIndexLayer	int
-	lenInput		int
-	lenOutput		int
+	lastIndexLayer	int	`json:"-"`
+	lenInput		int	`json:"-"`
+	lenOutput		int	`json:"-"`
 }
 
 type perceptronNeuron struct {
-	miss floatType	// Error value
+	Miss floatType // Error value
 }
 
 // Returns a new Perceptron neural network instance with the default parameters
@@ -232,15 +233,15 @@ func (p *perceptron) calcNeuron() {
 func (p *perceptron) calcLoss(target []float64) (loss float64) {
 	for i, v := range p.neuron[p.lastIndexLayer] {
 		if s, ok := v.specific.(*perceptronNeuron); ok {
-			s.miss = floatType(target[i]) - v.value
+			s.Miss = floatType(target[i]) - v.value
 			switch p.modeLoss {
 			default: fallthrough
 			case ModeMSE, ModeRMSE:
-				loss += math.Pow(float64(s.miss), 2)
+				loss += math.Pow(float64(s.Miss), 2)
 			case ModeARCTAN:
-				loss += math.Pow(math.Atan(float64(s.miss)), 2)
+				loss += math.Pow(math.Atan(float64(s.Miss)), 2)
 			}
-			s.miss *= floatType(calcDerivative(float64(v.value), p.modeActivation))
+			s.Miss *= floatType(calcDerivative(float64(v.value), p.modeActivation))
 		}
 	}
 	loss /= float64(p.lenOutput)
@@ -258,13 +259,13 @@ func (p *perceptron) calcMiss() {
 		for j, v := range p.neuron[i] {
 			go func(n *neuron) {
 				if s, ok := n.specific.(*perceptronNeuron); ok {
-					s.miss = 0
+					s.Miss = 0
 					for _, w := range p.neuron[i + 1] {
 						if m, ok := w.specific.(*perceptronNeuron); ok {
-							s.miss += m.miss * w.axon[j].weight
+							s.Miss += m.Miss * w.axon[j].weight
 						}
 					}
-					s.miss *= floatType(calcDerivative(float64(n.value), p.modeActivation))
+					s.Miss *= floatType(calcDerivative(float64(n.value), p.modeActivation))
 				}
 				wait <- true
 			}(v)
@@ -283,7 +284,7 @@ func (p *perceptron) calcAxon() {
 				go func(a *axon) {
 					if n, ok := a.synapse["output"].(*neuron); ok {
 						if s, ok := n.specific.(*perceptronNeuron); ok {
-							a.weight += getSynapseInput(a) * s.miss * p.rate
+							a.weight += getSynapseInput(a) * s.Miss * p.rate
 						}
 					}
 					wait <- true
@@ -338,21 +339,50 @@ func (p *perceptron) Verify(input []float64, target ...[]float64) (loss float64)
 	return
 }
 
+//
+func (p *perceptron) Read(reader io.Reader) {
+
+}
+
+//
+func (p *perceptron) Write(writer io.Writer) {
+	switch w := writer.(type) {
+	case jsonType:
+		p.writeJSON(w)
+	/*case xml:
+		p.writeXML(w)
+	case db:
+		p.writeDB(w)*/
+	default:
+		Log("This type is missing for write", true) // !!!
+		log.Printf("\tcalc: %T %v\n", writer, writer) // !!!
+	}
+}
+
+func (p *perceptron) writeJSON(filename jsonType) {
+
+	//fmt.Println(filename)
+
+	j, err := json.MarshalIndent(p.Architecture.(*nn), "", "\t")
+	if err != nil { panic("!!!") }
+	fmt.Println(string(j))
+}
+
 // Output of neural network training results in io.Writer
 func (p *perceptron) Print(writer io.Writer, input []float64, args ...interface{}) {
 	sep := func() {
-		_,_ = fmt.Fprintln(writer, "----------------------------------------------")
+		_, _ = fmt.Fprintln(writer, "----------------------------------------------")
 	}
 
 	// Input layer
 	sep()
-	_,_ = fmt.Fprintln(writer, "0 Input layer size: ", p.lenInput)
+	_, _ = fmt.Fprintln(writer, "0 Input layer size: ", p.lenInput)
 	sep()
-	_,_ = fmt.Fprint(writer, "Neurons:\t")
+	_, _ = fmt.Fprint(writer, "Neurons:\t")
 	for _, v := range input {
-		_,_ = fmt.Fprintf(writer, "  %v", v)
+		_, _ = fmt.Fprintf(writer, "  %v", v)
 	}
-	_,_ = fmt.Fprint(writer, "\n\n")
+	_, _ = fmt.Fprint(writer, "\n\n")
 
 	// Layers: neuron, miss
 	var t string
@@ -364,36 +394,36 @@ func (p *perceptron) Print(writer io.Writer, input []float64, args ...interface{
 			t = "Hidden layer"
 		}
 		sep()
-		_,_ = fmt.Fprintf(writer, "%d %s size: %d\n", i + 1, t, len(p.neuron[i]))
+		_, _ = fmt.Fprintf(writer, "%d %s size: %d\n", i + 1, t, len(p.neuron[i]))
 		sep()
-		_,_ = fmt.Fprint(writer, "Neurons:\t")
+		_, _ = fmt.Fprint(writer, "Neurons:\t")
 		for _, w := range v {
-			_,_ = fmt.Fprintf(writer, "  %11.8f", w.value)
+			_, _ = fmt.Fprintf(writer, "  %11.8f", w.value)
 		}
-		_,_ = fmt.Fprint(writer, "\nMiss:\t\t")
+		_, _ = fmt.Fprint(writer, "\nMiss:\t\t")
 		for _, w := range v {
-			_,_ = fmt.Fprintf(writer, "  %11.8f", w.specific.(*perceptronNeuron).miss)
+			_, _ = fmt.Fprintf(writer, "  %11.8f", w.specific.(*perceptronNeuron).Miss)
 		}
-		_,_ = fmt.Fprint(writer, "\n\n")
+		_, _ = fmt.Fprint(writer, "\n\n")
 	}
 
 	// Axons: weight
 	sep()
-	_,_ = fmt.Fprintln(writer, "Axons")
+	_, _ = fmt.Fprintln(writer, "Axons")
 	sep()
 	for _, u := range p.axon {
 		for i, v := range u {
-			_,_ = fmt.Fprint(writer, i + 1)
+			_, _ = fmt.Fprint(writer, i + 1)
 			for _, w := range v {
-				_,_ = fmt.Fprintf(writer, "\t%11.8f", w.weight)
+				_, _ = fmt.Fprintf(writer, "\t%11.8f", w.weight)
 			}
-			_,_ = fmt.Fprint(writer, "\n")
+			_, _ = fmt.Fprint(writer, "\n")
 		}
-		_,_ = fmt.Fprint(writer, "\n")
+		_, _ = fmt.Fprint(writer, "\n")
 	}
 
 	// Resume
 	sep()
-	_,_ = fmt.Fprintln(writer, "Number of iteration:\t", args[0])
-	_,_ = fmt.Fprintln(writer, "Total error:\t", args[1])
+	_, _ = fmt.Fprintln(writer, "Number of iteration:\t", args[0])
+	_, _ = fmt.Fprintln(writer, "Total error:\t", args[1])
 }

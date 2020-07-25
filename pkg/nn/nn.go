@@ -18,10 +18,10 @@ type NeuralNetwork interface {
 
 //
 type nn struct {
-	Architecture	`json:"architecture"`	// Architecture of neural network
+	Architecture	`json:"-"`	// Architecture of neural network
 
-	isInit  bool	// Neural network initializing flag
-	isTrain bool	// Neural network training flag
+	IsInit  bool	// Neural network initializing flag
+	IsTrain bool	// Neural network training flag
 
 	/*json	string
 	xml		string

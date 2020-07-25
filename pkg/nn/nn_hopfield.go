@@ -12,7 +12,7 @@ type hopfield struct {
 }
 
 type hopfieldNeuron struct {
-	energy floatType
+	Energy floatType
 }
 
 // Returns a new Hopfield neural network instance with the default parameters
