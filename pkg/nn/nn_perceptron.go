@@ -2,6 +2,8 @@
 package nn
 
 import (
+	"fmt"
+	"io"
 	"log"
 	"math"
 )
@@ -334,4 +336,64 @@ func (p *perceptron) Verify(input []float64, target ...[]float64) (loss float64)
 		return -1
 	}
 	return
+}
+
+// Output of neural network training results in io.Writer
+func (p *perceptron) Print(writer io.Writer, input []float64, args ...interface{}) {
+	sep := func() {
+		_,_ = fmt.Fprintln(writer, "----------------------------------------------")
+	}
+
+	// Input layer
+	sep()
+	_,_ = fmt.Fprintln(writer, "0 Input layer size: ", p.lenInput)
+	sep()
+	_,_ = fmt.Fprint(writer, "Neurons:\t")
+	for _, v := range input {
+		_,_ = fmt.Fprintf(writer, "  %v", v)
+	}
+	_,_ = fmt.Fprint(writer, "\n\n")
+
+	// Layers: neuron, miss
+	var t string
+	for i, v := range p.neuron {
+		switch i {
+		case p.lastIndexLayer:
+			t = "Output layer"
+		default:
+			t = "Hidden layer"
+		}
+		sep()
+		_,_ = fmt.Fprintf(writer, "%d %s size: %d\n", i + 1, t, len(p.neuron[i]))
+		sep()
+		_,_ = fmt.Fprint(writer, "Neurons:\t")
+		for _, w := range v {
+			_,_ = fmt.Fprintf(writer, "  %11.8f", w.value)
+		}
+		_,_ = fmt.Fprint(writer, "\nMiss:\t\t")
+		for _, w := range v {
+			_,_ = fmt.Fprintf(writer, "  %11.8f", w.specific.(*perceptronNeuron).miss)
+		}
+		_,_ = fmt.Fprint(writer, "\n\n")
+	}
+
+	// Axons: weight
+	sep()
+	_,_ = fmt.Fprintln(writer, "Axons")
+	sep()
+	for _, u := range p.axon {
+		for i, v := range u {
+			_,_ = fmt.Fprint(writer, i + 1)
+			for _, w := range v {
+				_,_ = fmt.Fprintf(writer, "\t%11.8f", w.weight)
+			}
+			_,_ = fmt.Fprint(writer, "\n")
+		}
+		_,_ = fmt.Fprint(writer, "\n")
+	}
+
+	// Resume
+	sep()
+	_,_ = fmt.Fprintln(writer, "Number of iteration:\t", args[0])
+	_,_ = fmt.Fprintln(writer, "Total error:\t", args[1])
 }

@@ -10,7 +10,7 @@ type NeuralNetwork interface {
 	Architecture
 
 	//
-	Processor
+	Constructor
 
 	//
 	GetterSetter
@@ -23,6 +23,7 @@ type nn struct {
 	isInit  bool	// Neural network initializing flag
 	isTrain bool	// Neural network training flag
 
-	json	string
-	csv		string
+	/*json	string
+	xml		string
+	csv		string*/
 }

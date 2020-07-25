@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/zigenzoog/gonn/pkg/nn"
 )
@@ -71,7 +72,16 @@ func main() {
 	target := []float64{3.6}
 
 	//
-	fmt.Println(n.Train(input, target))
+	loss, count := n.Train(input, target)
+
+	n.Print(os.Stdout, input, loss, count)
+
+	file, err := os.Create("print.txt")
+	if err != nil {
+		os.Exit(1)
+	}
+	defer func() { _ = file.Close() }()
+	n.Print(file, input, loss, count)
 
 	//
 	//fmt.Println(n.Query(input))
@@ -84,4 +94,7 @@ func main() {
 
 	//fmt.Println(n.Get(nn.Neuron()))
 	//fmt.Printf("++++ Act: %.4f\n", 100*calcActivation(1, ModeSIGMOID))
+
+
+
 }

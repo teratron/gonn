@@ -5,7 +5,7 @@ import "log"
 
 type hopfield struct {
 	Architecture
-	Processor
+	Constructor
 
 	neuron []*neuron
 	axon   [][]*axon

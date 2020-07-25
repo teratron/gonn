@@ -1,7 +1,9 @@
 //
 package nn
 
-type Processor interface {
+import "io"
+
+type Constructor interface {
 	// Initializing
 	init(input []float64, target ...[]float64) bool
 
@@ -22,4 +24,7 @@ type Processor interface {
 
 	// Deleting
 	//Delete()
+
+	//
+	Print(writer io.Writer, input []float64, args ...interface{})
 }

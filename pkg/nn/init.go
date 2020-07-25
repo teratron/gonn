@@ -15,11 +15,15 @@ func init() {
 }
 
 // New returns a new neural network instance with the default parameters
-func New(init ...io.Reader) NeuralNetwork {
-	if len(init) > 0 {
-
+func New(reader ...io.Reader) NeuralNetwork {
+	if len(reader) > 0 {
+		switch reader[0].(type) {
+		case json:
+		//case xml:
+		//case db:
+		default:
+		}
 	} else {
-
 	}
 	n := &nn{
 		Architecture: &perceptron{},

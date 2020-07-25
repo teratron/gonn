@@ -7,7 +7,7 @@ import (
 
 type radialBasis struct {
 	Architecture
-	Processor
+	Constructor
 }
 
 type radialBasisNeuron struct {
