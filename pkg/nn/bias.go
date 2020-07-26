@@ -15,7 +15,9 @@ func Bias(bias ...bool) GetterSetter {
 func (b biasType) Set(args ...Setter) {
 	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
-			a.Get().Set(b)
+			if n, ok := a.(*nn); ok && !n.IsInit {
+				a.Get().Set(b)
+			}
 		}
 	} else {
 		Log("Empty Set()", true) // !!!

@@ -35,13 +35,17 @@ func main() {
 
 	// Common
 	n.Set(
+		nn.HiddenLayer(1, 5, 9),
 		nn.Bias(false),
 		nn.Rate(nn.DefaultRate),
 		nn.ModeActivation(nn.ModeTANH),
 		nn.ModeLoss(nn.ModeARCTAN),
-		nn.LevelLoss(.0005),
-		nn.HiddenLayer(1, 5, 9))
+		nn.LevelLoss(.0005))
 	fmt.Printf("n.Get(): %T %v\n", n.Get(), n.Get())
+
+	// Hidden layers
+	n.Set(nn.HiddenLayer(3, 2))
+	fmt.Println("n.Get(nn.HiddenLayer()):", n.Get(nn.HiddenLayer()))
 
 	// Bias
 	n.Set(nn.Bias(true))
@@ -63,10 +67,6 @@ func main() {
 	n.Set(nn.LevelLoss(.04))
 	fmt.Println("n.Get(nn.LevelLoss()):", n.Get(nn.LevelLoss()))
 
-	// Hidden layers
-	n.Set(nn.HiddenLayer(3, 2))
-	fmt.Println("n.Get(nn.HiddenLayer()):", n.Get(nn.HiddenLayer()))
-
 	//
 	input  := []float64{2.3, 3.1}
 	target := []float64{3.6}
@@ -74,14 +74,13 @@ func main() {
 	//
 	loss, count := n.Train(input, target)
 
-	n.Print(os.Stdout, input, loss, count)
-
-	file, err := os.Create("print.txt")
+	file, err := os.Create("report.txt")
 	if err != nil {
 		os.Exit(1)
 	}
 	defer func() { _ = file.Close() }()
-	n.Print(file, input, loss, count)
+	//n.Print(file, input, loss, count)
+	//n.Print(os.Stdout, input, loss, count)
 
 	//
 	//fmt.Println(n.Query(input))
@@ -91,10 +90,10 @@ func main() {
 
 
 	n.Write(nn.JSON("perceptron.json"))
-
+	n.Set(nn.Bias(true))
 	//fmt.Println(n.Get(nn.Neuron()))
 	//fmt.Printf("++++ Act: %.4f\n", 100*calcActivation(1, ModeSIGMOID))
 
-
+	n.Write(nn.Report(input, loss, count), file, os.Stdout)
 
 }

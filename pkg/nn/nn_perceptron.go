@@ -2,29 +2,32 @@
 package nn
 
 import (
+	"bufio"
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"math"
+	"os"
 )
 
 type perceptron struct {
-	Architecture	`json:"-"`
+	Architecture
 
+	hiddenLayer		HiddenType	// Array of the number of neurons in each hidden layer
 	bias			biasType	// The neuron bias, false or true
 	rate			floatType	// Learning coefficient, from 0 to 1
 	modeActivation	uint8		// Activation function mode
 	modeLoss		uint8		//
 	levelLoss		float64		// Minimum (sufficient) level of the average of the error during training
-	hiddenLayer		HiddenType	// Array of the number of neurons in each hidden layer
 
-	neuron			[][]*neuron `json:"-"`
-	axon			[][][]*axon	`json:"-"`
+	neuron			[][]*neuron
+	axon			[][][]*axon
 
-	lastIndexLayer	int	`json:"-"`
-	lenInput		int	`json:"-"`
-	lenOutput		int	`json:"-"`
+	lastIndexLayer	int
+	lenInput		int
+	lenOutput		int
 }
 
 type perceptronNeuron struct {
@@ -35,12 +38,12 @@ type perceptronNeuron struct {
 func (n *nn) Perceptron() NeuralNetwork {
 	n.Architecture = &perceptron{
 		Architecture:	n,
+		hiddenLayer:	HiddenType{},
 		bias:			false,
 		rate:			floatType(DefaultRate),
 		modeActivation:	ModeSIGMOID,
 		modeLoss:		ModeMSE,
 		levelLoss:		.0001,
-		hiddenLayer:	HiddenType{},
 	}
 	return n
 }
@@ -52,12 +55,12 @@ func (p *perceptron) Preset(name string) {
 		fallthrough
 	case "default":
 		p.Set(
+			HiddenLayer(),
 			Bias(false),
 			Rate(DefaultRate),
 			ModeActivation(ModeSIGMOID),
 			ModeLoss(ModeMSE),
-			LevelLoss(.0001),
-			HiddenLayer())
+			LevelLoss(.0001))
 	}
 }
 
@@ -345,24 +348,53 @@ func (p *perceptron) Read(reader io.Reader) {
 }
 
 //
-func (p *perceptron) Write(writer io.Writer) {
-	switch w := writer.(type) {
-	case jsonType:
-		p.writeJSON(w)
-	/*case xml:
-		p.writeXML(w)
-	case db:
-		p.writeDB(w)*/
-	default:
-		Log("This type is missing for write", true) // !!!
-		log.Printf("\tcalc: %T %v\n", writer, writer) // !!!
+func (p *perceptron) Write(writer ...io.Writer) {
+	for _, w := range writer {
+		switch v := w.(type) {
+		case *os.File:
+			continue
+		case *reportType:
+			//fmt.Printf("report: %T %v\n", v, v.input)
+			for _, u := range writer {
+				if _, ok := u.(*reportType); !ok {
+					if f, ok := u.(*os.File); ok {
+						p.writeReport(f, v)
+						//fmt.Printf("report: %T %v\n", f, f)
+					}
+				}
+			}
+		case jsonType:
+			p.writeJSON(v)
+		/*case xml:
+			p.writeXML(v)
+		case db:
+			p.writeDB(v)*/
+		default:
+			Log("This type is missing for write", true) // !!!
+			log.Printf("\tWrite: %T %v\n", w, w) // !!!
+		}
 	}
 }
 
+//
+func (p *perceptron) writeReport(writer *os.File, report *reportType) {
+	var b bytes.Buffer
+	b.Write([]byte("Hello "))
+	_, _ = fmt.Fprintf(&b, "world!")
+	b.WriteTo(writer)
+	w := bufio.NewWriter(writer)
+
+	sep  := "----------------------------------------------\n"
+	line := "\n\n"
+
+	_, _ = w.WriteString(sep + line)
+	err := w.Flush()
+	if err != nil {} // !!!
+}
+
+//
 func (p *perceptron) writeJSON(filename jsonType) {
-
 	//fmt.Println(filename)
-
 	j, err := json.MarshalIndent(p.Architecture.(*nn), "", "\t")
 	if err != nil { panic("!!!") }
 	fmt.Println(string(j))
