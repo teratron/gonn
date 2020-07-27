@@ -1,31 +1,20 @@
 package nn
 
-import "math/rand"
-
-type axon struct {
-	weight  floatType			//
-	synapse map[string]Getter	//
+type Axon struct {
+	weight  FloatType         //
+	synapse map[string]Getter //
 }
 
-func getSynapseInput(axon *axon) (input floatType) {
+func getSynapseInput(axon *Axon) (input FloatType) {
 	switch s := axon.synapse["input"].(type) {
-	case floatType:
+	case FloatType:
 		input = s
 	case biasType:
 		if s { input = 1 }
-	case *neuron:
+	case *Neuron:
 		input = s.value
 	default:
 		panic("error!!!") // !!!
-	}
-	return
-}
-
-// Return random number from -0.5 to 0.5
-func getRand() (r floatType) {
-	r = 0
-	for r == 0 {
-		r = floatType(rand.Float64() - .5)
 	}
 	return
 }

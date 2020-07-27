@@ -1,7 +1,7 @@
 //
 package nn
 
-func (n *nn) Query(input []float64) (output []float64) {
+func (n *NN) Query(input []float64) (output []float64) {
 	if !n.IsTrain {
 		Log("Neural network is not trained", true) // !!!
 		if !n.IsInit {

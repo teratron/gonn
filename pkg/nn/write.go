@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-func (n *nn) Write(writer ...io.Writer) {
+func (n *NN) Write(writer ...io.Writer) {
 	lenWriter := len(writer)
 	if lenWriter > 0 {
 		i := 0

@@ -1,7 +1,7 @@
 // Learning rate
 package nn
 
-type rateType floatType
+type rateType FloatType
 
 // Default learning rate
 const DefaultRate float32 = .3

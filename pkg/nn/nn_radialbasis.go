@@ -11,11 +11,11 @@ type radialBasis struct {
 }
 
 type radialBasisNeuron struct {
-	Miss floatType
+	Miss FloatType
 }
 
 // Returns a new Radial Basis neural network instance with the default parameters
-func (n *nn) RadialBasis() NeuralNetwork {
+func (n *NN) RadialBasis() NeuralNetwork {
 	n.Architecture = &radialBasis{
 		Architecture: n,
 	}

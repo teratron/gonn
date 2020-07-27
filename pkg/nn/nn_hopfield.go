@@ -1,30 +1,32 @@
 // Hopfield Neural Network - under construction
 package nn
 
-import "log"
+import (
+	"log"
+)
 
-type hopfield struct {
+type Hopfield struct {
 	Architecture
 	Constructor
 
-	neuron []*neuron
-	axon   [][]*axon
+	neuron []*Neuron
+	axon   [][]*Axon
 }
 
 type hopfieldNeuron struct {
-	Energy floatType
+	Energy FloatType
 }
 
 // Returns a new Hopfield neural network instance with the default parameters
-func (n *nn) Hopfield() NeuralNetwork {
-	n.Architecture = &hopfield{
+func (n *NN) Hopfield() NeuralNetwork {
+	n.Architecture = &Hopfield{
 		Architecture: n,
 	}
-	return n
+	return n/*.Get().(*hopfield.Hopfield).Hopfield()*/
 }
 
 // Setter
-func (h *hopfield) Set(args ...Setter) {
+func (h *Hopfield) Set(args ...Setter) {
 	if len(args) > 0 {
 		switch v := args[0].(type) {
 		default:
@@ -37,7 +39,7 @@ func (h *hopfield) Set(args ...Setter) {
 }
 
 // Getter
-func (h *hopfield) Get(args ...Getter) GetterSetter {
+func (h *Hopfield) Get(args ...Getter) GetterSetter {
 	if len(args) > 0 {
 		switch args[0].(type) {
 		default:
@@ -51,7 +53,7 @@ func (h *hopfield) Get(args ...Getter) GetterSetter {
 }
 
 // Initialization
-func (h *hopfield) init(args ...Setter) bool {
+func (h *Hopfield) init(args ...Setter) bool {
 	return true
 }
 

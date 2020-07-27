@@ -5,7 +5,7 @@ import "io"
 
 type reportType struct {
 	input	[]float64
-	args	interface{}
+	args	[]interface{}
 }
 
 func Report(input []float64, args ...interface{}) io.Writer {

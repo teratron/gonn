@@ -30,7 +30,4 @@ type Constructor interface {
 
 	//
 	Write(...io.Writer)
-
-	//
-	Print(writer io.Writer, input []float64, args ...interface{})
 }

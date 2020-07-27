@@ -30,7 +30,7 @@ func main() {
 	n := nn.New()	// same n := nn.New().Perceptron()
 	//n := nn.New().Perceptron()
 	//n := nn.New().RadialBasis()
-	//n := nn.New().Hopfield()
+	//n := nn.New(nn.Hopfield())
 	//fmt.Println("nn.New():", n)
 
 	// Common

@@ -1,7 +1,7 @@
 //
 package nn
 
-func (n *nn) Verify(input []float64, target ...[]float64) (loss float64) {
+func (n *NN) Verify(input []float64, target ...[]float64) (loss float64) {
 	if !n.IsTrain {
 		Log("Neural network is not trained", true) // !!!
 		if !n.IsInit {

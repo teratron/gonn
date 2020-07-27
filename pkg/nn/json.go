@@ -5,8 +5,8 @@ import "io"
 
 type jsonType string
 
-func JSON(filename string) io.ReadWriter {
-	return jsonType(filename)
+func JSON(filename ...string) io.ReadWriter {
+	return jsonType(filename[0])
 }
 
 func (j jsonType) Read(p []byte) (n int, err error) {
