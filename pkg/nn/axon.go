@@ -1,13 +1,13 @@
 package nn
 
 type Axon struct {
-	weight  FloatType         //
+	weight  floatType         //
 	synapse map[string]Getter //
 }
 
-func getSynapseInput(axon *Axon) (input FloatType) {
+func getSynapseInput(axon *Axon) (input floatType) {
 	switch s := axon.synapse["input"].(type) {
-	case FloatType:
+	case floatType:
 		input = s
 	case biasType:
 		if s { input = 1 }

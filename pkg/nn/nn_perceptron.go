@@ -8,7 +8,6 @@ import (
 	"io"
 	"log"
 	"math"
-	"os"
 )
 
 type perceptron struct {
@@ -16,7 +15,7 @@ type perceptron struct {
 
 	hiddenLayer    HiddenType // Array of the number of neurons in each hidden layer
 	bias           biasType   // The neuron bias, false or true
-	rate           FloatType  // Learning coefficient, from 0 to 1
+	rate           floatType  // Learning coefficient, from 0 to 1
 	modeActivation uint8      // Activation function mode
 	modeLoss       uint8      //
 	levelLoss      float64    // Minimum (sufficient) level of the average of the error during training
@@ -30,7 +29,7 @@ type perceptron struct {
 }
 
 type perceptronNeuron struct {
-	Miss FloatType // Error value
+	Miss floatType // Error value
 }
 
 // Returns a new Perceptron neural network instance with the default parameters
@@ -39,7 +38,7 @@ func (n *NN) Perceptron() NeuralNetwork {
 		Architecture:   n,
 		hiddenLayer:    HiddenType{},
 		bias:           false,
-		rate:           FloatType(DefaultRate),
+		rate:           floatType(DefaultRate),
 		modeActivation: ModeSIGMOID,
 		modeLoss:       ModeMSE,
 		levelLoss:      .0001,
@@ -70,7 +69,7 @@ func (p *perceptron) Set(args ...Setter) {
 		case biasType:
 			p.bias = v
 		case rateType:
-			p.rate = FloatType(v)
+			p.rate = floatType(v)
 		case modeActivationType:
 			p.modeActivation = uint8(v)
 		case modeLossType:
@@ -179,12 +178,12 @@ func (p *perceptron) initAxon() {
 		for j, w := range v {
 			for k := range w {
 				p.axon[i][j][k] = &Axon{
-					weight:  getRand(),
+					weight:  .5,//getRand(),
 					synapse: map[string]Getter{},
 				}
 				if i == 0 {
 					if k < p.lenInput {
-						p.axon[i][j][k].synapse["input"] = FloatType(0)
+						p.axon[i][j][k].synapse["input"] = floatType(0)
 					} else {
 						p.axon[i][j][k].synapse["input"] = biasType(true)
 					}
@@ -206,7 +205,7 @@ func (p *perceptron) initSynapse(input []float64) {
 	for j, w := range p.axon[0] {
 		for k := range w {
 			if k < p.lenInput {
-				p.axon[0][j][k].synapse["input"] = FloatType(input[k])
+				p.axon[0][j][k].synapse["input"] = floatType(input[k])
 			}
 		}
 	}
@@ -223,7 +222,7 @@ func (p *perceptron) calcNeuron() {
 				for _, a := range n.axon {
 					n.value += getSynapseInput(a) * a.weight
 				}
-				n.value = FloatType(calcActivation(float64(n.value), p.modeActivation))
+				n.value = floatType(calcActivation(float64(n.value), p.modeActivation))
 				wait <- true
 			}(w)
 		}
@@ -235,7 +234,7 @@ func (p *perceptron) calcNeuron() {
 func (p *perceptron) calcLoss(target []float64) (loss float64) {
 	for i, v := range p.neuron[p.lastIndexLayer] {
 		if s, ok := v.specific.(*perceptronNeuron); ok {
-			s.Miss = FloatType(target[i]) - v.value
+			s.Miss = floatType(target[i]) - v.value
 			switch p.modeLoss {
 			default: fallthrough
 			case ModeMSE, ModeRMSE:
@@ -243,7 +242,7 @@ func (p *perceptron) calcLoss(target []float64) (loss float64) {
 			case ModeARCTAN:
 				loss += math.Pow(math.Atan(float64(s.Miss)), 2)
 			}
-			s.Miss *= FloatType(calcDerivative(float64(v.value), p.modeActivation))
+			s.Miss *= floatType(calcDerivative(float64(v.value), p.modeActivation))
 		}
 	}
 	loss /= float64(p.lenOutput)
@@ -259,18 +258,26 @@ func (p *perceptron) calcMiss() {
 	defer close(wait)
 	for i := p.lastIndexLayer - 1; i >= 0; i-- {
 		for j, v := range p.neuron[i] {
-			go func(n *Neuron) {
+			go func(j int, n *Neuron) {
 				if s, ok := n.specific.(*perceptronNeuron); ok {
 					s.Miss = 0
 					for _, w := range p.neuron[i + 1] {
 						if m, ok := w.specific.(*perceptronNeuron); ok {
 							s.Miss += m.Miss * w.axon[j].weight
+							w.axon[j].weight += n.value * m.Miss * p.rate
 						}
 					}
-					s.Miss *= FloatType(calcDerivative(float64(n.value), p.modeActivation))
+					s.Miss *= floatType(calcDerivative(float64(n.value), p.modeActivation))
 				}
 				wait <- true
-			}(v)
+			}(j, v)
+		}
+		if p.bias {
+			for _, w := range p.neuron[i + 1] {
+				if m, ok := w.specific.(*perceptronNeuron); ok {
+					w.axon[p.hiddenLayer[i]].weight += m.Miss * p.rate
+				}
+			}
 		}
 		for range p.neuron[i] { <- wait }
 	}
@@ -307,7 +314,7 @@ func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, 
 				break
 			}
 			p.calcMiss()
-			p.calcAxon()
+			//p.calcAxon()
 			count++
 		}
 	} else {
@@ -350,22 +357,14 @@ func (p *perceptron) Read(reader io.Reader) {
 func (p *perceptron) Write(writer ...io.Writer) {
 	for _, w := range writer {
 		switch v := w.(type) {
-		case *os.File:
-			continue
-		case *reportType:
-			//fmt.Printf("report: %T %v\n", v, v.input)
-			for _, u := range writer {
-				if _, ok := u.(*reportType); !ok {
-					if f, ok := u.(*os.File); ok {
-						p.writeReport(f, v)
-						//fmt.Printf("report: %T %v\n", f, f)
-					}
-				}
-			}
+		case *report:
+			p.writeReport(v)
 		case jsonType:
 			p.writeJSON(v)
 		/*case xml:
 			p.writeXML(v)
+		case xml:
+			p.writeCSV(v)
 		case db:
 			p.writeDB(v)*/
 		default:
@@ -384,7 +383,7 @@ func (p *perceptron) writeJSON(filename jsonType) {
 }
 
 // Report of neural network training results in io.Writer
-func (p *perceptron) writeReport(writer *os.File, report *reportType) {
+func (p *perceptron) writeReport(report *report) {
 	s := "----------------------------------------------\n"
 	n := "\n"
 	m := "\n\n"
@@ -418,7 +417,7 @@ func (p *perceptron) writeReport(writer *os.File, report *reportType) {
 	}
 
 	// Axons: weight
-	_, _ = b.WriteString(s + "Axons\n" + s)
+	_, _ = fmt.Fprintf(b, "%sAxons\n%s", s, s)
 	for _, u := range p.axon {
 		for i, v := range u {
 			_, _ = fmt.Fprint(b, i + 1)
@@ -431,8 +430,8 @@ func (p *perceptron) writeReport(writer *os.File, report *reportType) {
 	}
 
 	// Resume
-	_, _ = fmt.Fprintln(b, s + "Total error:\t\t\t", report.args[0])
-	_, _ = fmt.Fprintln(b, "Number of iteration:\t", report.args[1])
+	_, _ = fmt.Fprintf(b, "%sTotal error:\t\t%v\n", s,  report.args[0])
+	_, _ = fmt.Fprintf(b, "Number of iteration:\t%v\n", report.args[1])
 
-	_, _ = b.WriteTo(writer)
+	_, _ = b.WriteTo(report.writer)
 }

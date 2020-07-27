@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-type FloatType float32
+type floatType float32
 
 func init() {
 	rand.Seed(time.Now().UTC().UnixNano())
@@ -20,6 +20,7 @@ func New(reader ...io.Reader) NeuralNetwork {
 		switch reader[0].(type) {
 		case jsonType:
 		//case xml:
+		//case csv:
 		//case db:
 		default:
 		}
@@ -41,14 +42,14 @@ func (n *NN) init(input []float64, target ...[]float64) bool {
 	return n.IsInit
 }
 
-func (f FloatType) Set(...Setter)              {}
-func (f FloatType) Get(...Getter) GetterSetter { return nil }
+func (f floatType) Set(...Setter)              {}
+func (f floatType) Get(...Getter) GetterSetter { return nil }
 
 // Return random number from -0.5 to 0.5
-func getRand() (r FloatType) {
+func getRand() (r floatType) {
 	r = 0
 	for r == 0 {
-		r = FloatType(rand.Float64() - .5)
+		r = floatType(rand.Float64() - .5)
 	}
 	return
 }
