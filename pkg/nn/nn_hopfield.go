@@ -9,8 +9,8 @@ type Hopfield struct {
 	Architecture
 	Constructor
 
-	neuron []*Neuron
-	axon   [][]*Axon
+	neuron []*neuron
+	axon   [][]*axon
 }
 
 type hopfieldNeuron struct {
