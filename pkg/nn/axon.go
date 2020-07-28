@@ -2,10 +2,10 @@ package nn
 
 type axon struct {
 	weight  floatType         //
-	synapse map[string]Getter //
+	//synapse map[string]Getter //
 }
 
-func getSynapseInput(axon *axon) (input floatType) {
+/*func getSynapseInput(axon *axon) (input floatType) {
 	switch s := axon.synapse["input"].(type) {
 	case floatType:
 		input = s
@@ -17,7 +17,7 @@ func getSynapseInput(axon *axon) (input floatType) {
 		panic("error!!!") // !!!
 	}
 	return
-}
+}*/
 
 /*func Axon() GetterSetter {
 	return &axon{}

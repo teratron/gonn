@@ -179,9 +179,9 @@ func (p *perceptron) initAxon() {
 			for k := range w {
 				p.axon[i][j][k] = &axon{
 					weight:  .5,//getRand(),
-					synapse: map[string]Getter{},
+					//synapse: map[string]Getter{},
 				}
-				if i == 0 {
+				/*if i == 0 {
 					if k < p.lenInput {
 						p.axon[i][j][k].synapse["input"] = floatType(0)
 					} else {
@@ -194,14 +194,14 @@ func (p *perceptron) initAxon() {
 						p.axon[i][j][k].synapse["input"] = biasType(true)
 					}
 				}
-				p.axon[i][j][k].synapse["output"] = p.neuron[i][j]
+				p.axon[i][j][k].synapse["output"] = p.neuron[i][j]*/
 			}
 		}
 	}
 }
 
 //
-func (p *perceptron) initSynapse(input []float64) {
+/*func (p *perceptron) initSynapse(input []float64) {
 	for j, w := range p.axon[0] {
 		for k := range w {
 			if k < p.lenInput {
@@ -209,24 +209,40 @@ func (p *perceptron) initSynapse(input []float64) {
 			}
 		}
 	}
-}
+}*/
 
 // Calculating the values of neurons in a layers
-func (p *perceptron) calcNeuron() {
+func (p *perceptron) calcNeuron(input []float64) {
 	wait := make(chan bool)
 	defer close(wait)
-	for _, v := range p.neuron {
+	var l int
+	for i, v := range p.neuron {
+		if i == 0 {
+			l = p.lenInput
+		} else {
+			l = int(p.hiddenLayer[i - 1])
+		}
 		for _, w := range v {
 			go func(n *neuron) {
 				n.value = 0
-				for _, a := range n.axon {
-					n.value += getSynapseInput(a) * a.weight
+				for j, a := range n.axon {
+					if j < l {
+						if i == 0 {
+							n.value += floatType(input[j]) * a.weight
+						} else {
+							n.value += p.neuron[i - 1][j].value * a.weight
+						}
+					} else {
+						n.value += a.weight
+					}
 				}
 				n.value = floatType(calcActivation(float64(n.value), p.modeActivation))
 				wait <- true
 			}(w)
 		}
-		for range v { <- wait }
+		for range v {
+			<- wait
+		}
 	}
 }
 
@@ -252,8 +268,8 @@ func (p *perceptron) calcLoss(target []float64) (loss float64) {
 	return
 }
 
-// Calculating the error of neurons in hidden layers
-func (p *perceptron) calcMiss(input []float64) {
+// Calculating the error of neurons in hidden layers and update weights
+func (p *perceptron) calcAxon(input []float64) {
 	wait := make(chan bool)
 	defer close(wait)
 	for i := p.lastIndexLayer - 1; i >= 0; i-- {
@@ -279,23 +295,31 @@ func (p *perceptron) calcMiss(input []float64) {
 				}
 			}
 		}
-		for range p.neuron[i] { <- wait }
+		for range p.neuron[i] {
+			<- wait
+		}
 	}
 	for _, v := range p.neuron[0] {
-		if s, ok := v.specific.(*perceptronNeuron); ok {
-			for j, w := range v.axon {
-				if j < p.lenInput {
-					w.weight += floatType(input[j]) * s.miss * p.rate
-				} else {
-					w.weight += s.miss * p.rate
+		go func(n *neuron) {
+			if s, ok := n.specific.(*perceptronNeuron); ok {
+				for j, w := range n.axon {
+					if j < p.lenInput {
+						w.weight += floatType(input[j]) * s.miss * p.rate
+					} else {
+						w.weight += s.miss * p.rate
+					}
 				}
 			}
-		}
+			wait <- true
+		}(v)
+	}
+	for range p.neuron[0] {
+		<- wait
 	}
 }
 
 // Update weights
-func (p *perceptron) calcAxon() {
+/*func (p *perceptron) calcAxon() {
 	wait := make(chan bool)
 	defer close(wait)
 	for _, u := range p.axon {
@@ -313,19 +337,19 @@ func (p *perceptron) calcAxon() {
 			for range v { <- wait }
 		}
 	}
-}
+}*/
 
 // Training
 func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, count int) {
 	if len(target) > 0 {
-		p.initSynapse(input)
+		//p.initSynapse(input)
 		for count < 1 /*MaxIteration*/ {
-			p.calcNeuron()
+			p.calcNeuron(input)
 			if loss = p.calcLoss(target[0]); loss <= p.levelLoss || loss <= MinLevelLoss {
 				break
 			}
-			p.calcMiss(input)
-			//p.calcAxon(input)
+			//p.calcMiss(input)
+			p.calcAxon(input)
 			count++
 		}
 	} else {
@@ -337,8 +361,8 @@ func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, 
 
 // Querying
 func (p *perceptron) Query(input []float64) (output []float64) {
-	p.initSynapse(input)
-	p.calcNeuron()
+	//p.initSynapse(input)
+	p.calcNeuron(input)
 	output = make([]float64, p.lenOutput)
 	for i, n := range p.neuron[p.lastIndexLayer] {
 		output[i] = float64(n.value)
@@ -349,8 +373,8 @@ func (p *perceptron) Query(input []float64) (output []float64) {
 // Verifying
 func (p *perceptron) Verify(input []float64, target ...[]float64) (loss float64) {
 	if len(target) > 0 {
-		p.initSynapse(input)
-		p.calcNeuron()
+		//p.initSynapse(input)
+		p.calcNeuron(input)
 		loss = p.calcLoss(target[0])
 	} else {
 		Log("No target data", true) // !!!
