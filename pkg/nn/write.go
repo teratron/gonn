@@ -10,7 +10,9 @@ func (n *NN) Write(writer ...io.Writer) {
 	if lenWriter > 0 {
 		i := 0
 		for _, w := range writer {
-			if _, ok := w.(*os.File); ok { i++ }
+			if _, ok := w.(*os.File); ok {
+				i++
+			}
 		}
 		if i < lenWriter {
 			if a, ok := n.Get().(NeuralNetwork); ok {
@@ -20,5 +22,6 @@ func (n *NN) Write(writer ...io.Writer) {
 			Log("!!!", true)
 		}
 	} else {
+		panic("Empty Write()") // !!!
 	}
 }

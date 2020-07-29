@@ -179,9 +179,9 @@ func (p *perceptron) initAxon() {
 			for k := range w {
 				p.axon[i][j][k] = &axon{
 					weight:  .5,//getRand(),
-					//synapse: map[string]Getter{},
+					synapse: map[string]Getter{},
 				}
-				/*if i == 0 {
+				if i == 0 {
 					if k < p.lenInput {
 						p.axon[i][j][k].synapse["input"] = floatType(0)
 					} else {
@@ -194,14 +194,14 @@ func (p *perceptron) initAxon() {
 						p.axon[i][j][k].synapse["input"] = biasType(true)
 					}
 				}
-				p.axon[i][j][k].synapse["output"] = p.neuron[i][j]*/
+				p.axon[i][j][k].synapse["output"] = p.neuron[i][j]
 			}
 		}
 	}
 }
 
 //
-/*func (p *perceptron) initSynapse(input []float64) {
+func (p *perceptron) initSynapseInput(input []float64) {
 	for j, w := range p.axon[0] {
 		for k := range w {
 			if k < p.lenInput {
@@ -209,10 +209,10 @@ func (p *perceptron) initAxon() {
 			}
 		}
 	}
-}*/
+}
 
 // Calculating the values of neurons in a layers
-func (p *perceptron) calcNeuron(input []float64) {
+/*func (p *perceptron) calcNeuron(input []float64) {
 	wait := make(chan bool)
 	defer close(wait)
 	var l int
@@ -235,6 +235,27 @@ func (p *perceptron) calcNeuron(input []float64) {
 					} else {
 						n.value += a.weight
 					}
+				}
+				n.value = floatType(calcActivation(float64(n.value), p.modeActivation))
+				wait <- true
+			}(w)
+		}
+		for range v {
+			<- wait
+		}
+	}
+}*/
+
+func (p *perceptron) calcNeuron(input []float64) {
+	wait := make(chan bool)
+	defer close(wait)
+	p.initSynapseInput(input)
+	for _, v := range p.neuron {
+		for _, w := range v {
+			go func(n *neuron) {
+				n.value = 0
+				for _, a := range n.axon {
+					n.value += getSynapseInput(a) * a.weight
 				}
 				n.value = floatType(calcActivation(float64(n.value), p.modeActivation))
 				wait <- true
@@ -269,7 +290,7 @@ func (p *perceptron) calcLoss(target []float64) (loss float64) {
 }
 
 // Calculating the error of neurons in hidden layers and update weights
-func (p *perceptron) calcAxon(input []float64) {
+func (p *perceptron) calcMiss(input []float64) {
 	wait := make(chan bool)
 	defer close(wait)
 	for i := p.lastIndexLayer - 1; i >= 0; i-- {
@@ -280,7 +301,7 @@ func (p *perceptron) calcAxon(input []float64) {
 					for _, w := range p.neuron[i + 1] {
 						if m, ok := w.specific.(*perceptronNeuron); ok {
 							s.miss += m.miss * w.axon[j].weight
-							w.axon[j].weight += n.value * m.miss * p.rate
+							//w.axon[j].weight += n.value * m.miss * p.rate
 						}
 					}
 					s.miss *= floatType(calcDerivative(float64(n.value), p.modeActivation))
@@ -288,18 +309,18 @@ func (p *perceptron) calcAxon(input []float64) {
 				wait <- true
 			}(j, v)
 		}
-		if p.bias {
+		/*if p.bias {
 			for _, w := range p.neuron[i + 1] {
 				if m, ok := w.specific.(*perceptronNeuron); ok {
 					w.axon[p.hiddenLayer[i]].weight += m.miss * p.rate
 				}
 			}
-		}
+		}*/
 		for range p.neuron[i] {
 			<- wait
 		}
 	}
-	for _, v := range p.neuron[0] {
+	/*for _, v := range p.neuron[0] {
 		go func(n *neuron) {
 			if s, ok := n.specific.(*perceptronNeuron); ok {
 				for j, w := range n.axon {
@@ -315,13 +336,14 @@ func (p *perceptron) calcAxon(input []float64) {
 	}
 	for range p.neuron[0] {
 		<- wait
-	}
+	}*/
 }
 
 // Update weights
-/*func (p *perceptron) calcAxon() {
+func (p *perceptron) calcAxon(input []float64) {
 	wait := make(chan bool)
 	defer close(wait)
+	p.calcMiss(input)
 	for _, u := range p.axon {
 		for _, v := range u {
 			for _, w := range v {
@@ -334,15 +356,16 @@ func (p *perceptron) calcAxon(input []float64) {
 					wait <- true
 				}(w)
 			}
-			for range v { <- wait }
+			for range v {
+				<- wait
+			}
 		}
 	}
-}*/
+}
 
 // Training
 func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, count int) {
 	if len(target) > 0 {
-		//p.initSynapse(input)
 		for count < 1 /*MaxIteration*/ {
 			p.calcNeuron(input)
 			if loss = p.calcLoss(target[0]); loss <= p.levelLoss || loss <= MinLevelLoss {
@@ -361,7 +384,6 @@ func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, 
 
 // Querying
 func (p *perceptron) Query(input []float64) (output []float64) {
-	//p.initSynapse(input)
 	p.calcNeuron(input)
 	output = make([]float64, p.lenOutput)
 	for i, n := range p.neuron[p.lastIndexLayer] {
@@ -373,7 +395,6 @@ func (p *perceptron) Query(input []float64) (output []float64) {
 // Verifying
 func (p *perceptron) Verify(input []float64, target ...[]float64) (loss float64) {
 	if len(target) > 0 {
-		//p.initSynapse(input)
 		p.calcNeuron(input)
 		loss = p.calcLoss(target[0])
 	} else {
