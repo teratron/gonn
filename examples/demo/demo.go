@@ -16,10 +16,10 @@ func main() {
 	n.Set(
 		nn.HiddenLayer(3, 2),
 		nn.Bias(true),
-		nn.Rate(nn.DefaultRate),
-		nn.ModeActivation(nn.ModeSIGMOID),
-		nn.ModeLoss(nn.ModeMSE),
-		nn.LevelLoss(.0001))
+		nn.ActivationMode(nn.ModeSIGMOID),
+		nn.LossMode(nn.ModeMSE),
+		nn.LossLevel(.0001),
+		nn.Rate(nn.DefaultRate))
 
 	//
 	input  := []float64{2.3, 3.1}

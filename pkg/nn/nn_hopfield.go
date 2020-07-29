@@ -13,10 +13,6 @@ type Hopfield struct {
 	axon   [][]*axon
 }
 
-type hopfieldNeuron struct {
-	Energy floatType
-}
-
 // Returns a new Hopfield neural network instance with the default parameters
 func (n *NN) Hopfield() NeuralNetwork {
 	n.Architecture = &Hopfield{
@@ -55,13 +51,6 @@ func (h *Hopfield) Get(args ...Getter) GetterSetter {
 // Initialization
 func (h *Hopfield) init(args ...Setter) bool {
 	return true
-}
-
-//
-/*func (h *hopfieldNeuron) Set(args ...Setter) {}
-*/
-func (h *hopfieldNeuron) Get(args ...Getter) GetterSetter {
-	return nil
 }
 
 // Train

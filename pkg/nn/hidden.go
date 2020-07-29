@@ -11,7 +11,7 @@ func HiddenLayer(nums ...uint) HiddenType {
 func (h HiddenType) Set(args ...Setter) {
 	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
-			if n, ok := a.(*NN); ok && !n.IsInit {
+			if n, ok := a.(*NN); ok && !n.isInit {
 				a.Get().Set(h)
 			}
 		}

@@ -11,7 +11,6 @@ type floatType float32
 
 func init() {
 	rand.Seed(time.Now().UTC().UnixNano())
-	Log("Start", false) // !!!
 }
 
 // New returns a new neural network instance with the default parameters
@@ -28,8 +27,8 @@ func New(reader ...io.Reader) NeuralNetwork {
 	}
 	n := &NN{
 		Architecture: &perceptron{},
-		IsInit:       false,
-		IsTrain:      false,
+		isInit:       false,
+		isTrain:      false,
 	}
 	n.Perceptron() //???
 	return n
@@ -37,9 +36,9 @@ func New(reader ...io.Reader) NeuralNetwork {
 
 func (n *NN) init(input []float64, target ...[]float64) bool {
 	if a, ok := n.Get().(NeuralNetwork); ok {
-		n.IsInit = a.init(input, target...)
+		n.isInit = a.init(input, target...)
 	}
-	return n.IsInit
+	return n.isInit
 }
 
 func (f floatType) Set(...Setter) {}

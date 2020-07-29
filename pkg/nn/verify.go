@@ -2,10 +2,10 @@
 package nn
 
 func (n *NN) Verify(input []float64, target ...[]float64) (loss float64) {
-	if !n.IsTrain {
+	if !n.isTrain {
 		Log("Neural network is not trained", true) // !!!
-		if !n.IsInit {
-			if n.IsInit = n.init(input, target...); !n.IsInit {
+		if !n.isInit {
+			if n.isInit = n.init(input, target...); !n.isInit {
 				Log("Error initialization", true) // !!!
 				return
 			}

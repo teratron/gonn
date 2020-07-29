@@ -3,7 +3,7 @@ package nn
 
 import "math"
 
-type modeActivationType uint8
+type activationModeType uint8
 
 const (
 	ModeLINEAR uint8 = iota	// Linear/identity
@@ -13,16 +13,16 @@ const (
 	ModeTANH				// TanH - hyperbolic tangent
 )
 
-func ModeActivation(mode ...uint8) GetterSetter {
+func ActivationMode(mode ...uint8) GetterSetter {
 	if len(mode) > 0 {
-		return modeActivationType(mode[0])
+		return activationModeType(mode[0])
 	} else {
-		return modeActivationType(0)
+		return activationModeType(0)
 	}
 }
 
 // Setter
-func (m modeActivationType) Set(args ...Setter) {
+func (m activationModeType) Set(args ...Setter) {
 	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
 			a.Get().Set(m.check())
@@ -33,7 +33,7 @@ func (m modeActivationType) Set(args ...Setter) {
 }
 
 // Getter
-func (m modeActivationType) Get(args ...Getter) GetterSetter {
+func (m activationModeType) Get(args ...Getter) GetterSetter {
 	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
 			return a.Get().Get(m)
@@ -45,10 +45,10 @@ func (m modeActivationType) Get(args ...Getter) GetterSetter {
 }
 
 // Checking
-func (m modeActivationType) check() modeActivationType {
+func (m activationModeType) check() activationModeType {
 	switch {
-	case m < 0 || m > modeActivationType(ModeTANH):
-		return modeActivationType(ModeSIGMOID)
+	case m < 0 || m > activationModeType(ModeTANH):
+		return activationModeType(ModeSIGMOID)
 	default:
 		return m
 	}

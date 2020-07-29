@@ -17,7 +17,7 @@ type Constructor interface {
 	Train(input []float64, target ...[]float64) (loss float64, count int)
 
 	// Copying
-	//Copy([]float64) []float64
+	//Copy(dst []float64, src []float64) int
 
 	// Adding
 	//Add()

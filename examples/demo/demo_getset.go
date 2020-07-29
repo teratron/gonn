@@ -37,10 +37,10 @@ func main() {
 	n.Set(
 		nn.HiddenLayer(1, 5, 9),
 		nn.Bias(false),
-		nn.Rate(nn.DefaultRate),
-		nn.ModeActivation(nn.ModeTANH),
-		nn.ModeLoss(nn.ModeARCTAN),
-		nn.LevelLoss(.0005))
+		nn.ActivationMode(nn.ModeTANH),
+		nn.LossMode(nn.ModeARCTAN),
+		nn.LossLevel(.0005),
+		nn.Rate(nn.DefaultRate))
 	fmt.Printf("n.Get(): %T %v\n", n.Get(), n.Get())
 
 	// Hidden layers
@@ -51,21 +51,21 @@ func main() {
 	n.Set(nn.Bias(true))
 	fmt.Println("n.Get(nn.Bias()):", n.Get(nn.Bias()))
 
+	// Activation
+	n.Set(nn.ActivationMode(nn.ModeSIGMOID))
+	fmt.Println("n.Get(nn.ModeActivation()):", n.Get(nn.ActivationMode()))
+
+	// Loss
+	n.Set(nn.LossMode(nn.ModeMSE))
+	fmt.Println("n.Get(nn.ModeLoss()):", n.Get(nn.LossMode()))
+
+	// Level loss
+	n.Set(nn.LossLevel(.04))
+	fmt.Println("n.Get(nn.LevelLoss()):", n.Get(nn.LossLevel()))
+
 	// Rate
 	n.Set(nn.Rate(.1))
 	fmt.Println("n.Get(nn.Rate()):", n.Get(nn.Rate()))
-
-	// Activation
-	n.Set(nn.ModeActivation(nn.ModeSIGMOID))
-	fmt.Println("n.Get(nn.ModeActivation()):", n.Get(nn.ModeActivation()))
-
-	// Loss
-	n.Set(nn.ModeLoss(nn.ModeMSE))
-	fmt.Println("n.Get(nn.ModeLoss()):", n.Get(nn.ModeLoss()))
-
-	// Level loss
-	n.Set(nn.LevelLoss(.04))
-	fmt.Println("n.Get(nn.LevelLoss()):", n.Get(nn.LevelLoss()))
 
 	//
 	input  := []float64{2.3, 3.1}
@@ -94,6 +94,8 @@ func main() {
 	//fmt.Println(n.Get(nn.Neuron()))
 	//fmt.Printf("++++ Act: %.4f\n", 100*calcActivation(1, ModeSIGMOID))
 
-	n.Write(nn.Report(input, loss, count), file, os.Stdout)
+	n.Write(nn.JSON("perceptron.json"),
+		nn.Report(file, input, loss, count),
+		nn.Report(os.Stdout, input, loss, count))
 
 }
