@@ -42,7 +42,7 @@ func (n *NN) init(input []float64, target ...[]float64) bool {
 	return n.IsInit
 }
 
-func (f floatType) Set(...Setter)              {}
+func (f floatType) Set(...Setter) {}
 func (f floatType) Get(...Getter) GetterSetter { return nil }
 
 // Return random number from -0.5 to 0.5

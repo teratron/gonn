@@ -9,6 +9,10 @@ type neuron struct {
 	specific Getter
 }
 
+/*type miss struct {
+	miss floatType // Error value
+}*/
+
 /*func Neuron() GetterSetter {
 	return &neuron{}
 }*/
@@ -35,6 +39,10 @@ func (n *neuron) Get(args ...Getter) GetterSetter {
 	}
 	return nil
 }
+
+/*func (m *miss) Get(...Getter) GetterSetter {
+	return nil
+}*/
 
 /*func (n *neuronType) Set(args ...Setter) {
 }
