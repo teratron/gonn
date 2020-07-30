@@ -1,6 +1,8 @@
 package nn
 
-import "io"
+import (
+	"io"
+)
 
 func (n *NN) Read(reader io.Reader) {
 	if a, ok := n.Get().(NeuralNetwork); ok {

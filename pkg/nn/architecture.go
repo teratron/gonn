@@ -11,3 +11,10 @@ type Architecture interface {
 	//
 	Hopfield() NeuralNetwork
 }
+
+/*func (n *NN) Hopfield() NeuralNetwork {
+	n.Architecture = &hopfield.Hopfield{
+		Architecture: n,
+	}
+	return n
+}*/

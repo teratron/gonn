@@ -1,16 +1,19 @@
 //
-package nn
+package app
+
+import "github.com/zigenzoog/gonn/pkg"
 
 // Declare conformity with Application interface
 var _ Application = (*app)(nil)
 
 type Application interface {
 	//
-	GetterSetter
+	pkg.GetterSetter
 }
+
 type app struct {
-	language	langType
-	logging		modeLogType
+	language	pkg.LangType
+	logging		pkg.LogModeType
 }
 
 // New returns a new application instance with the default parameters

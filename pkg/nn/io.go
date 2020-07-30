@@ -1,19 +1,15 @@
 //
 package nn
 
-import "os"
+import (
+	"os"
+)
 
 type fileType *os.File
 
 func File(filename string) *os.File {
-	//f := new(os.File)
-	//f.name = filename
-	//f := os.File{name: filename}
-	//return &os.File{}
-	//f := new(os.File)
-
-	//f.name = filename
-
-	return nil
-
+	file, err := os.Create(filename)
+	if err != nil { os.Exit(1) }
+	//defer func() { err = file.Close() }()
+	return file
 }

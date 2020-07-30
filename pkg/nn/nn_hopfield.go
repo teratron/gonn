@@ -3,43 +3,56 @@ package nn
 
 import (
 	"log"
+
+	"github.com/zigenzoog/gonn/pkg"
 )
 
-type Hopfield struct {
+type hopfield struct {
 	Architecture
 	Constructor
 
-	neuron []*neuron
-	axon   [][]*axon
+	neuron []*Neuron
+	axon   [][]*Axon
+}
+
+func Hopfield() Architecture {
+	return nil
 }
 
 // Returns a new Hopfield neural network instance with the default parameters
 func (n *NN) Hopfield() NeuralNetwork {
-	n.Architecture = &Hopfield{
+	n.Architecture = &hopfield{
 		Architecture: n,
 	}
-	return n/*.Get().(*hopfield.Hopfield).Hopfield()*/
+	return n
 }
 
+/*func (h *hopfield) Hopfield() NeuralNetwork {
+	h.Architecture = &hopfield{
+		Architecture: h,
+	}
+	return nil
+}*/
+
 // Setter
-func (h *Hopfield) Set(args ...Setter) {
+func (h *hopfield) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
 		switch v := args[0].(type) {
 		default:
-			Log("This type of variable is missing for Hopfield Neural Network", true)
+			pkg.Log("This type of variable is missing for Hopfield Neural Network", true)
 			log.Printf("\tset: %T %v\n", v, v) // !!!
 		}
 	} else {
-		Log("Empty Set()", true) // !!!
+		pkg.Log("Empty Set()", true) // !!!
 	}
 }
 
 // Getter
-func (h *Hopfield) Get(args ...Getter) GetterSetter {
+func (h *hopfield) Get(args ...pkg.Getter) pkg.GetterSetter {
 	if len(args) > 0 {
 		switch args[0].(type) {
 		default:
-			Log("This type of variable is missing for Hopfield Neural Network", true)
+			pkg.Log("This type of variable is missing for Hopfield Neural Network", true)
 			log.Printf("\tget: %T %v\n", args[0], args[0]) // !!!
 			return nil
 		}
@@ -49,7 +62,7 @@ func (h *Hopfield) Get(args ...Getter) GetterSetter {
 }
 
 // Initialization
-func (h *Hopfield) init(args ...Setter) bool {
+func (h *hopfield) init(args ...pkg.Setter) bool {
 	return true
 }
 

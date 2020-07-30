@@ -1,12 +1,14 @@
 //
 package nn
 
+import "github.com/zigenzoog/gonn/pkg"
+
 //type neuronType [][]*neuron
 
-type neuron struct {
+type Neuron struct {
 	value    floatType // Neuron value
-	axon     []*axon
-	specific Getter
+	axon     []*Axon
+	specific pkg.Getter
 }
 
 /*type miss struct {
@@ -18,7 +20,7 @@ type neuron struct {
 }*/
 
 // Setter
-func (n *neuron) Set(args ...Setter) {
+func (n *Neuron) Set(args ...pkg.Setter) {
 	/*if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
 			a.Get().Set(n)
@@ -29,7 +31,7 @@ func (n *neuron) Set(args ...Setter) {
 }
 
 // Getter
-func (n *neuron) Get(args ...Getter) GetterSetter {
+func (n *Neuron) Get(args ...pkg.Getter) pkg.GetterSetter {
 	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
 			return a.Get().Get(n)

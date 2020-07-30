@@ -1,18 +1,20 @@
 //
 package nn
 
-type axon struct {
+import "github.com/zigenzoog/gonn/pkg"
+
+type Axon struct {
 	weight  floatType         //
-	synapse map[string]Getter //
+	synapse map[string]pkg.Getter //
 }
 
-func getSynapseInput(axon *axon) (input floatType) {
+func getSynapseInput(axon *Axon) (input floatType) {
 	switch s := axon.synapse["input"].(type) {
 	case floatType:
 		input = s
 	case biasType:
 		if s { input = 1 }
-	case *neuron:
+	case *Neuron:
 		input = s.value
 	default:
 		panic("error!!!") // !!!

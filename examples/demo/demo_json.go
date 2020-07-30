@@ -5,6 +5,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"github.com/zigenzoog/gonn/pkg/nn"
+	"reflect"
 )
 
 type Message struct {
@@ -39,7 +40,7 @@ func main() {
 		"json",
 	}
 
-/*	fmt.Printf("ValueOf-----%T -----%v\n", reflect.ValueOf(m), reflect.ValueOf(m))
+	fmt.Printf("ValueOf-----%T -----%v\n", reflect.ValueOf(m), reflect.ValueOf(m))
 	fmt.Printf("Kind-----%T -----%v\n", reflect.ValueOf(m).Kind(), reflect.ValueOf(m).Kind())
 	fmt.Printf("Type-----%T -----%v\n", reflect.ValueOf(m).Type(), reflect.ValueOf(m).Type())
 	fmt.Printf("NumField-----%T -----%v\n", reflect.ValueOf(m).NumField(), reflect.ValueOf(m).NumField())
@@ -50,7 +51,7 @@ func main() {
 	fmt.Printf("Method-----%T -----%v\n", reflect.ValueOf(m).Method(0), reflect.ValueOf(m).Method(0))
 	fmt.Printf("Method-----%T -----%v\n", reflect.ValueOf(m).Method(0), reflect.ValueOf(m).Type().Method(0))
 	fmt.Printf("Method-----%T -----%v\n", reflect.ValueOf(m).Method(0), reflect.ValueOf(m).Type().Method(0).Name)
-*/
+
 	//b, err := json.Marshal(m)
 	rawDataOutjson, err := json.MarshalIndent(m, "", "\t")
 	if err != nil { panic("!!!") }

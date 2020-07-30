@@ -1,6 +1,8 @@
 //
 package nn
 
+import "github.com/zigenzoog/gonn/pkg"
+
 // Declare conformity with NeuralNetwork interface
 var _ NeuralNetwork = (*NN)(nil)
 
@@ -13,7 +15,7 @@ type NeuralNetwork interface {
 	Constructor
 
 	//
-	GetterSetter
+	pkg.GetterSetter
 }
 
 //
@@ -23,7 +25,7 @@ type NN struct {
 	isInit  bool // Neural network initializing flag
 	isTrain bool // Neural network training flag
 
-	/*json	string
+	json	string
 	xml		string
-	csv		string*/
+	/*csv		string*/
 }

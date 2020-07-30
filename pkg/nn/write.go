@@ -3,6 +3,8 @@ package nn
 import (
 	"io"
 	"os"
+
+	"github.com/zigenzoog/gonn/pkg"
 )
 
 func (n *NN) Write(writer ...io.Writer) {
@@ -19,7 +21,7 @@ func (n *NN) Write(writer ...io.Writer) {
 				a.Write(writer...)
 			}
 		} else {
-			Log("!!!", true)
+			pkg.Log("!!!", true)
 		}
 	} else {
 		panic("Empty Write()") // !!!

@@ -1,12 +1,14 @@
 // Learning rate
 package nn
 
+import "github.com/zigenzoog/gonn/pkg"
+
 type rateType floatType
 
 // Default learning rate
 const DefaultRate float32 = .3
 
-func Rate(rate ...float32) GetterSetter {
+func Rate(rate ...float32) pkg.GetterSetter {
 	if len(rate) > 0 {
 		return rateType(rate[0])
 	} else {
@@ -15,18 +17,18 @@ func Rate(rate ...float32) GetterSetter {
 }
 
 // Setter
-func (r rateType) Set(args ...Setter) {
+func (r rateType) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
 			a.Get().Set(r.check())
 		}
 	} else {
-		Log("Empty Set()", true) // !!!
+		pkg.Log("Empty Set()", true) // !!!
 	}
 }
 
 // Getter
-func (r rateType) Get(args ...Getter) GetterSetter {
+func (r rateType) Get(args ...pkg.Getter) pkg.GetterSetter {
 	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
 			return a.Get().Get(r)

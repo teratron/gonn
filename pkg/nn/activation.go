@@ -1,7 +1,10 @@
 //
 package nn
 
-import "math"
+import (
+	"github.com/zigenzoog/gonn/pkg"
+	"math"
+)
 
 type activationModeType uint8
 
@@ -13,7 +16,8 @@ const (
 	ModeTANH				// TanH - hyperbolic tangent
 )
 
-func ActivationMode(mode ...uint8) GetterSetter {
+// ActivationMode
+func ActivationMode(mode ...uint8) pkg.GetterSetter {
 	if len(mode) > 0 {
 		return activationModeType(mode[0])
 	} else {
@@ -22,18 +26,18 @@ func ActivationMode(mode ...uint8) GetterSetter {
 }
 
 // Setter
-func (m activationModeType) Set(args ...Setter) {
+func (m activationModeType) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
 			a.Get().Set(m.check())
 		}
 	} else {
-		Log("Empty Set()", true) // !!!
+		pkg.Log("Empty Set()", true) // !!!
 	}
 }
 
 // Getter
-func (m activationModeType) Get(args ...Getter) GetterSetter {
+func (m activationModeType) Get(args ...pkg.Getter) pkg.GetterSetter {
 	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
 			return a.Get().Get(m)

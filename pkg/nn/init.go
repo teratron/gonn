@@ -5,6 +5,8 @@ import (
 	"io"
 	"math/rand"
 	"time"
+
+	"github.com/zigenzoog/gonn/pkg"
 )
 
 type floatType float32
@@ -18,9 +20,9 @@ func New(reader ...io.Reader) NeuralNetwork {
 	if len(reader) > 0 {
 		switch reader[0].(type) {
 		case jsonType:
-		//case xml:
-		//case csv:
-		//case db:
+		//case xmlType:
+		//case csvType:
+		//case dbType:
 		default:
 		}
 	} else {
@@ -41,8 +43,8 @@ func (n *NN) init(input []float64, target ...[]float64) bool {
 	return n.isInit
 }
 
-func (f floatType) Set(...Setter) {}
-func (f floatType) Get(...Getter) GetterSetter { return nil }
+func (f floatType) Set(...pkg.Setter) {}
+func (f floatType) Get(...pkg.Getter) pkg.GetterSetter { return nil }
 
 // Return random number from -0.5 to 0.5
 func getRand() (r floatType) {

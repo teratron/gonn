@@ -1,9 +1,11 @@
 // Neuron bias
 package nn
 
+import "github.com/zigenzoog/gonn/pkg"
+
 type biasType bool
 
-func Bias(bias ...bool) GetterSetter {
+func Bias(bias ...bool) pkg.GetterSetter {
 	if len(bias) > 0 {
 		return biasType(bias[0])
 	} else {
@@ -12,23 +14,21 @@ func Bias(bias ...bool) GetterSetter {
 }
 
 // Setter
-func (b biasType) Set(args ...Setter) {
+func (b biasType) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
-		if a, ok := args[0].(NeuralNetwork); ok {
-			if n, ok := a.(*NN); ok && !n.isInit {
-				a.Get().Set(b)
-			}
+		if n, ok := args[0].(*NN); ok && !n.isInit {
+			n.Get().Set(b)
 		}
 	} else {
-		Log("Empty Set()", true) // !!!
+		pkg.Log("Empty Set()", true) // !!!
 	}
 }
 
 // Getter
-func (b biasType) Get(args ...Getter) GetterSetter {
+func (b biasType) Get(args ...pkg.Getter) pkg.GetterSetter {
 	if len(args) > 0 {
-		if a, ok := args[0].(NeuralNetwork); ok {
-			return a.Get().Get(b)
+		if n, ok := args[0].(NeuralNetwork); ok {
+			return n.Get().Get(b)
 		}
 	} else {
 		return b

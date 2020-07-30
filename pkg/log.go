@@ -1,11 +1,11 @@
-package nn
+package pkg
 
 import (
 	"log"
 	"runtime"
 )
 
-type modeLogType uint8
+type LogModeType uint8
 
 type Logger interface {
 }

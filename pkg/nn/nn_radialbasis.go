@@ -3,6 +3,8 @@ package nn
 
 import (
 	"log"
+
+	"github.com/zigenzoog/gonn/pkg"
 )
 
 type radialBasis struct {
@@ -19,24 +21,24 @@ func (n *NN) RadialBasis() NeuralNetwork {
 }
 
 // Setter
-func (r *radialBasis) Set(args ...Setter) {
+func (r *radialBasis) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
 		switch v := args[0].(type) {
 		default:
-			Log("This type of variable is missing for Radial Basis Neural Network", true)
+			pkg.Log("This type of variable is missing for Radial Basis Neural Network", true)
 			log.Printf("\tset: %T %v\n", v, v) // !!!
 		}
 	} else {
-		Log("Empty Set()", true) // !!!
+		pkg.Log("Empty Set()", true) // !!!
 	}
 }
 
 // Getter
-func (r *radialBasis) Get(args ...Getter) GetterSetter {
+func (r *radialBasis) Get(args ...pkg.Getter) pkg.GetterSetter {
 	if len(args) > 0 {
 		switch args[0].(type) {
 		default:
-			Log("This type of variable is missing for Radial Basis Neural Network", true)
+			pkg.Log("This type of variable is missing for Radial Basis Neural Network", true)
 			log.Printf("\tget: %T %v\n", args[0], args[0]) // !!!
 			return nil
 		}
@@ -46,7 +48,7 @@ func (r *radialBasis) Get(args ...Getter) GetterSetter {
 }
 
 // Initialization
-func (r *radialBasis) init(args ...Setter) bool {
+func (r *radialBasis) init(args ...pkg.Setter) bool {
 	return true
 }
 

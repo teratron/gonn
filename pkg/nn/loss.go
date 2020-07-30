@@ -1,6 +1,8 @@
 // Loss
 package nn
 
+import "github.com/zigenzoog/gonn/pkg"
+
 type (
 	lossModeType  uint8   // Average error mode
 	lossLevelType float64 // Level loss
@@ -13,7 +15,7 @@ const (
 	MinLossLevel float64 = 10e-33 // The minimum value of the error limit at which training is forcibly terminated
 )
 
-func LossMode(mode ...uint8) GetterSetter {
+func LossMode(mode ...uint8) pkg.GetterSetter {
 	if len(mode) > 0 {
 		return lossModeType(mode[0])
 	} else {
@@ -21,7 +23,7 @@ func LossMode(mode ...uint8) GetterSetter {
 	}
 }
 
-func LossLevel(level ...float64) GetterSetter {
+func LossLevel(level ...float64) pkg.GetterSetter {
 	if len(level) > 0 {
 		return lossLevelType(level[0])
 	} else {
@@ -30,28 +32,28 @@ func LossLevel(level ...float64) GetterSetter {
 }
 
 // Setter
-func (m lossModeType) Set(args ...Setter) {
+func (m lossModeType) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
 			a.Get().Set(m.check())
 		}
 	} else {
-		Log("Empty Set()", true) // !!!
+		pkg.Log("Empty Set()", true) // !!!
 	}
 }
 
-func (l lossLevelType) Set(args ...Setter) {
+func (l lossLevelType) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
 			a.Get().Set(l.check())
 		}
 	} else {
-		Log("Empty Set()", true) // !!!
+		pkg.Log("Empty Set()", true) // !!!
 	}
 }
 
 // Getter
-func (m lossModeType) Get(args ...Getter) GetterSetter {
+func (m lossModeType) Get(args ...pkg.Getter) pkg.GetterSetter {
 	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
 			return a.Get().Get(m)
@@ -62,7 +64,7 @@ func (m lossModeType) Get(args ...Getter) GetterSetter {
 	return nil
 }
 
-func (l lossLevelType) Get(args ...Getter) GetterSetter {
+func (l lossLevelType) Get(args ...pkg.Getter) pkg.GetterSetter {
 	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
 			return a.Get().Get(l)

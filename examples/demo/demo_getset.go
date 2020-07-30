@@ -2,16 +2,17 @@ package main
 
 import (
 	"fmt"
+	"github.com/zigenzoog/gonn/pkg/nn"
 	"os"
 
-	"github.com/zigenzoog/gonn/pkg/nn"
+	"github.com/zigenzoog/gonn/pkg/app"
 )
 
 func main() {
 	//fmt.Printf("%T %v\n", c, c)
 
 	// Application
-	a := nn.App()
+	a := app.App()
 	fmt.Println("nn.App():", a)
 
 	// Common

@@ -1,12 +1,14 @@
 //
 package nn
 
+import "github.com/zigenzoog/gonn/pkg"
+
 func (n *NN) Verify(input []float64, target ...[]float64) (loss float64) {
 	if !n.isTrain {
-		Log("Neural network is not trained", true) // !!!
+		pkg.Log("Neural network is not trained", true) // !!!
 		if !n.isInit {
 			if n.isInit = n.init(input, target...); !n.isInit {
-				Log("Error initialization", true) // !!!
+				pkg.Log("Error initialization", true) // !!!
 				return
 			}
 		}

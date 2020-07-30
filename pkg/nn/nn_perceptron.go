@@ -5,9 +5,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/zigenzoog/gonn/pkg"
 	"io"
 	"log"
 	"math"
+	"os"
 )
 
 type perceptron struct {
@@ -20,8 +22,8 @@ type perceptron struct {
 	lossLevel      float64    // Minimum (sufficient) level of the average of the error during training
 	rate           floatType  // Learning coefficient, from 0 to 1
 
-	neuron			[][]*neuron
-	axon			[][][]*axon
+	neuron			[][]*Neuron
+	axon			[][][]*Axon
 
 	lastIndexLayer	int
 	lenInput		int
@@ -59,7 +61,7 @@ func (p *perceptron) Preset(name string) {
 }
 
 // Setter
-func (p *perceptron) Set(args ...Setter) {
+func (p *perceptron) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
 		switch v := args[0].(type) {
 		case HiddenType:
@@ -75,16 +77,16 @@ func (p *perceptron) Set(args ...Setter) {
 		case rateType:
 			p.rate = floatType(v)
 		default:
-			Log("This type is missing for Perceptron Neural Network", true) // !!!
+			pkg.Log("This type is missing for Perceptron Neural Network", true) // !!!
 			log.Printf("\tset: %T %v\n", v, v) // !!!
 		}
 	} else {
-		Log("Empty Set()", true) // !!!
+		pkg.Log("Empty Set()", true) // !!!
 	}
 }
 
 // Getter
-func (p *perceptron) Get(args ...Getter) GetterSetter {
+func (p *perceptron) Get(args ...pkg.Getter) pkg.GetterSetter {
 	if len(args) > 0 {
 		switch args[0].(type) {
 		case HiddenType:
@@ -100,7 +102,7 @@ func (p *perceptron) Get(args ...Getter) GetterSetter {
 		case rateType:
 			return p.rate
 		default:
-			Log("This type is missing for Perceptron Neural Network", true) // !!!
+			pkg.Log("This type is missing for Perceptron Neural Network", true) // !!!
 			log.Printf("\tget: %T %v\n", args[0], args[0]) // !!!
 			return nil
 		}
@@ -127,16 +129,16 @@ func (p *perceptron) init(input []float64, target ...[]float64) bool {
 		b := 0
 		if p.bias { b = 1 }
 
-		p.neuron = make([][]*neuron, lenLayer)
-		p.axon   = make([][][]*axon, lenLayer)
+		p.neuron = make([][]*Neuron, lenLayer)
+		p.axon   = make([][][]*Axon, lenLayer)
 		for i, l := range layer {
-			p.neuron[i] = make([]*neuron, l)
-			p.axon[i]   = make([][]*axon, l)
+			p.neuron[i] = make([]*Neuron, l)
+			p.axon[i]   = make([][]*Axon, l)
 			for j := 0; j < int(l); j++ {
 				if i == 0 {
-					p.axon[i][j] = make([]*axon, p.lenInput + b)
+					p.axon[i][j] = make([]*Axon, p.lenInput + b)
 				} else {
-					p.axon[i][j] = make([]*axon, int(layer[i - 1]) + b)
+					p.axon[i][j] = make([]*Axon, int(layer[i - 1]) + b)
 				}
 			}
 		}
@@ -144,7 +146,7 @@ func (p *perceptron) init(input []float64, target ...[]float64) bool {
 		p.initAxon()
 		return true
 	} else {
-		Log("No target data", true) // !!!
+		pkg.Log("No target data", true) // !!!
 		return false
 	}
 }
@@ -153,7 +155,7 @@ func (p *perceptron) init(input []float64, target ...[]float64) bool {
 func (p *perceptron) initNeuron() {
 	for i, v := range p.neuron {
 		for j := range v {
-			p.neuron[i][j] = &neuron{
+			p.neuron[i][j] = &Neuron{
 				axon:     p.axon[i][j],
 				specific: floatType(0),
 			}
@@ -166,9 +168,9 @@ func (p *perceptron) initAxon() {
 	for i, v := range p.axon {
 		for j, w := range v {
 			for k := range w {
-				p.axon[i][j][k] = &axon{
+				p.axon[i][j][k] = &Axon{
 					weight:  .5,//getRand(),
-					synapse: map[string]Getter{},
+					synapse: map[string]pkg.Getter{},
 				}
 				if i == 0 {
 					if k < p.lenInput {
@@ -206,7 +208,7 @@ func (p *perceptron) calcNeuron(input []float64) {
 	defer close(wait)
 	for _, v := range p.neuron {
 		for _, w := range v {
-			go func(n *neuron) {
+			go func(n *Neuron) {
 				n.value = 0
 				for _, a := range n.axon {
 					n.value += getSynapseInput(a) * a.weight
@@ -250,7 +252,7 @@ func (p *perceptron) calcMiss(input []float64) {
 	defer close(wait)
 	for i := p.lastIndexLayer - 1; i >= 0; i-- {
 		for j, v := range p.neuron[i] {
-			go func(j int, n *neuron) {
+			go func(j int, n *Neuron) {
 				if miss, ok := n.specific.(floatType); ok {
 					miss = 0
 					for _, w := range p.neuron[i + 1] {
@@ -278,8 +280,8 @@ func (p *perceptron) calcAxon(input []float64) {
 	for _, u := range p.axon {
 		for _, v := range u {
 			for _, w := range v {
-				go func(a *axon) {
-					if n, ok := a.synapse["output"].(*neuron); ok {
+				go func(a *Axon) {
+					if n, ok := a.synapse["output"].(*Neuron); ok {
 						if miss, ok := n.specific.(floatType); ok {
 							a.weight += getSynapseInput(a) * miss * p.rate
 						}
@@ -307,7 +309,7 @@ func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, 
 			count++
 		}
 	} else {
-		Log("No target data", true) // !!!
+		pkg.Log("No target data", true) // !!!
 		return -1, 0
 	}
 	return
@@ -329,7 +331,7 @@ func (p *perceptron) Verify(input []float64, target ...[]float64) (loss float64)
 		p.calcNeuron(input)
 		loss = p.calcLoss(target[0])
 	} else {
-		Log("No target data", true) // !!!
+		pkg.Log("No target data", true) // !!!
 		return -1
 	}
 	return
@@ -355,7 +357,7 @@ func (p *perceptron) Write(writer ...io.Writer) {
 		case db:
 			p.writeDB(v)*/
 		default:
-			Log("This type is missing for write", true) // !!!
+			pkg.Log("This type is missing for write", true) // !!!
 			log.Printf("\tWrite: %T %v\n", w, w) // !!!
 		}
 	}
@@ -379,41 +381,43 @@ func (p *perceptron) writeJSON(filename jsonType) {
 	test := struct{
 		Architecture	string			`json:"architecture" xml:"architecture"`
 		IsTrain			bool			`json:"isTrain" xml:"isTrain"`
-		HiddenLayer		[]uint			`json:"hiddenLayer" xml:"hiddenLayer"`
-		Bias			bool			`json:"bias" xml:"bias"`
-		ModeActivation	uint8			`json:"activationMode" xml:"activationMode"`
-		ModeLoss		uint8			`json:"lossMode" xml:"lossMode"`
-		LevelLoss		float64			`json:"lossLevel" xml:"lossLevel"`
-		Rate			float64			`json:"rate" xml:"rate"`
+		HiddenLayer		HiddenType		`json:"hiddenLayer" xml:"hiddenLayer"`
+		Bias			biasType		`json:"bias" xml:"bias"`
+		ActivationMode	uint8			`json:"activationMode" xml:"activationMode"`
+		LossMode		uint8			`json:"lossMode" xml:"lossMode"`
+		LossLevel		float64			`json:"lossLevel" xml:"lossLevel"`
+		Rate			floatType		`json:"rate" xml:"rate"`
 		Weights			[][][]floatType	`json:"weights" xml:"weights"`
 	}{
-		Architecture: "perceptron",
-		IsTrain: true,
-		HiddenLayer: []uint{3, 2},
-		Bias: true,
-		ModeActivation: 3,
-		ModeLoss: 0,
-		LevelLoss: 0.0001,
-		Rate: 0.3,
-		Weights: weight(),
-		/*Weights: [][][]floatType{
-			{
-				{1, 2},
-				{6, 9},
-				{5, 6, 9},
-			},
-			{
-				{1, 2},
-				{6, 9},
-				{5, 6, 9},
-			},
-		},*/
+		Architecture:	"perceptron",
+		IsTrain:		p.Architecture.(*NN).isTrain,
+		HiddenLayer:	p.hiddenLayer,
+		Bias:			p.bias,
+		ActivationMode:	p.activationMode,
+		LossMode:		p.lossMode,
+		LossLevel:		p.lossLevel,
+		Rate:			p.rate,
+		Weights:		weight(),
 	}
-	//fmt.Println(filename)
-	j, err := json.MarshalIndent(test/*p.Architecture.(*NN)*/, "", "\t")
+	//j, err := json.MarshalIndent(test, "", "\t")
+	j, err := json.Marshal(test)
 	if err != nil { panic("!!!") }
-	fmt.Println(string(j))
+	//fmt.Println(string(j))
 
+	var out bytes.Buffer
+	err = json.Indent(&out, j, "", "\t")
+	_,_ = out.WriteTo(os.Stdout)
+
+	//err = ioutil.WriteFile("perceptron.json", j, os.ModePerm)
+
+	/*file, _ := os.OpenFile("perceptron.json", os.O_CREATE, os.ModePerm)
+	defer func() { _ = file.Close() }()
+	encoder := json.NewEncoder(file)
+	err = encoder.Encode(j)*/
+
+
+	//fmt.Printf("%T %v\n", reflect.ValueOf(p.Architecture.(*NN).Architecture).Elem().Type(), reflect.ValueOf(p.Architecture.(*NN).Architecture).Elem().Type())
+	//fmt.Println(reflect.NewAt(perceptron{}, p.Architecture.(*NN).Architecture))
 
 	/*k, err := xml.MarshalIndent(test, "", "\t")
 	if err != nil { panic("!!!") }
@@ -454,7 +458,7 @@ func (p *perceptron) writeReport(report *report) {
 	s := "----------------------------------------------\n"
 	n := "\n"
 	m := "\n\n"
-	b := bytes.NewBufferString("Report of Perceptron Neural Network" + m)
+	b := bytes.NewBufferString("Report of Perceptron Neural Network\n\n")
 
 	// Input layer
 	_, _ = fmt.Fprintf(b, "%s0 Input layer size: %d\n%sNeurons:\t", s, p.lenInput, s)
@@ -501,4 +505,5 @@ func (p *perceptron) writeReport(report *report) {
 	_, _ = fmt.Fprintf(b, "Number of iteration:\t%v\n", report.args[1])
 
 	_, _ = b.WriteTo(report.writer)
+	report.writer.Close()
 }

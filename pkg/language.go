@@ -1,6 +1,6 @@
-package nn
+package pkg
 
-type langType string
+type LangType string
 
 /*func Language(lang ...langType) GetterSetter {
 	if len(lang) > 0 {
