@@ -16,7 +16,14 @@ type NeuralNetwork interface {
 
 	//
 	pkg.GetterSetter
+
+	//Settings
 }
+
+/*type Settings interface {
+	Bias() bool
+	HiddenLayer() []uint
+}*/
 
 //
 type NN struct {

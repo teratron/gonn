@@ -1,7 +1,9 @@
 // Neuron bias
 package nn
 
-import "github.com/zigenzoog/gonn/pkg"
+import (
+	"github.com/zigenzoog/gonn/pkg"
+)
 
 type biasType bool
 
@@ -10,6 +12,14 @@ func Bias(bias ...bool) pkg.GetterSetter {
 		return biasType(bias[0])
 	} else {
 		return biasType(false)
+	}
+}
+
+func (n *NN) Bias() bool {
+	if a, ok := n.Get().(NeuralNetwork); ok {
+		return a.Bias()
+	} else {
+		return ok
 	}
 }
 

@@ -9,8 +9,14 @@ import (
 	"io"
 	"log"
 	"math"
-	"os"
 )
+
+var _ NeuralNetwork = (*perceptron)(nil)
+
+type Perceptron interface {
+	HiddenLayer() []uint
+	Bias() bool
+}
 
 type perceptron struct {
 	Architecture
@@ -58,6 +64,16 @@ func (p *perceptron) Preset(name string) {
 			LossLevel(.0001),
 			Rate(DefaultRate))
 	}
+}
+
+// HiddenLayer
+func (p *perceptron) HiddenLayer() []uint {
+	return p.hiddenLayer
+}
+
+// Bias
+func (p *perceptron) Bias() bool {
+	return bool(p.bias)
 }
 
 // Setter
@@ -348,6 +364,11 @@ func (p *perceptron) Write(writer ...io.Writer) {
 		switch v := w.(type) {
 		case *report:
 			p.writeReport(v)
+			/*if u, ok := v.writer; ok {
+
+			}*/
+			//fmt.Printf("%T %v\n", v.writer, *v.writer)
+			//fmt.Println(v.writer)
 		case jsonType:
 			p.writeJSON(v)
 		/*case xml:
@@ -406,7 +427,7 @@ func (p *perceptron) writeJSON(filename jsonType) {
 
 	var out bytes.Buffer
 	err = json.Indent(&out, j, "", "\t")
-	_,_ = out.WriteTo(os.Stdout)
+	//_,_ = out.WriteTo(os.Stdout)
 
 	//err = ioutil.WriteFile("perceptron.json", j, os.ModePerm)
 
@@ -418,39 +439,6 @@ func (p *perceptron) writeJSON(filename jsonType) {
 
 	//fmt.Printf("%T %v\n", reflect.ValueOf(p.Architecture.(*NN).Architecture).Elem().Type(), reflect.ValueOf(p.Architecture.(*NN).Architecture).Elem().Type())
 	//fmt.Println(reflect.NewAt(perceptron{}, p.Architecture.(*NN).Architecture))
-
-	/*k, err := xml.MarshalIndent(test, "", "\t")
-	if err != nil { panic("!!!") }
-	fmt.Println(string(k))*/
-
-
-	/*j, err = json.MarshalIndent(p, "", "\t")
-	if err != nil { panic("!!!") }
-	fmt.Println(string(j))
-
-	j, err = json.MarshalIndent(p.hiddenLayer, "", "\t")
-	if err != nil { panic("!!!") }
-	fmt.Println(string(j))
-
-	j, err = json.MarshalIndent(p.bias, "", "\t")
-	if err != nil { panic("!!!") }
-	fmt.Println(string(j))
-
-	a := [][][]int{
-		{
-			{1, 2},
-			{6, 9},
-			{5, 6, 9},
-		},
-		{
-			{1, 2},
-			{6, 9},
-			{5, 6, 9},
-		},
-	}
-	j, err = json.MarshalIndent(a, "", "\t")
-	if err != nil { panic("!!!") }
-	fmt.Println(string(j))*/
 }
 
 // Report of neural network training results in io.Writer
@@ -462,7 +450,7 @@ func (p *perceptron) writeReport(report *report) {
 
 	// Input layer
 	_, _ = fmt.Fprintf(b, "%s0 Input layer size: %d\n%sNeurons:\t", s, p.lenInput, s)
-	for _, v := range report.input {
+	for _, v := range report.args[0].([]float64) {
 		_, _ = fmt.Fprintf(b, "  %v", v)
 	}
 	_, _ = fmt.Fprint(b, m)
@@ -501,9 +489,43 @@ func (p *perceptron) writeReport(report *report) {
 	}
 
 	// Resume
-	_, _ = fmt.Fprintf(b, "%sTotal error:\t\t%v\n", s,  report.args[0])
-	_, _ = fmt.Fprintf(b, "Number of iteration:\t%v\n", report.args[1])
+	_, _ = fmt.Fprintf(b, "%sTotal error:\t\t%v\n", s,  report.args[1])
+	_, _ = fmt.Fprintf(b, "Number of iteration:\t%v\n", report.args[2])
 
-	_, _ = b.WriteTo(report.writer)
-	report.writer.Close()
+	/*fs, _ := report.writer.Stat()
+	fss := fs.Sys()
+	fmt.Println("---", fs.Sys(), reflect.ValueOf(fs.Sys()).Elem().Field(5).Field(reflect.ValueOf(fs.Sys()).NumField() - 1))
+	if reflect.DeepEqual(reflect.ValueOf(fss).Elem().Field(5), reflect.ValueOf(fs.Sys()).Elem().Field(5)) {
+		fmt.Println( true)
+	} else {
+		fmt.Println( )
+	}
+	fmt.Println(reflect.ValueOf(fss).Elem().Field(5), reflect.ValueOf(fs.Sys()).Elem().Field(5).Convert(reflect.ValueOf(fs.Sys()).Type()))
+*/
+
+
+	/*fmt.Println("---", rws.Size())*/
+	_, _ = b.WriteTo(report.file)
+
+	//rwss := report.writer
+	//rwss, _ := report.file.Stat()
+	//fmt.Printf("`````````````` %v\n", rwss.Size())
+	rws, _ := report.file.Stat()
+	fmt.Printf("`````````````` %v\n", rws)
+
+	rws2, _ := report.file.Stat()
+	size:= rws2.Size()
+	sizePtr := &size
+	fmt.Println("---", sizePtr)
+
+	/*fi, _ := report.writer.Stat()
+
+	fmt.Println("---", fi.Sys(),reflect.ValueOf(fi.Sys()).Elem().Field(5), reflect.ValueOf(fi.Sys()).Elem().NumField() - 1)
+	fmt.Println(reflect.ValueOf(fss).Elem().Field(5).Type(), reflect.ValueOf(fi.Sys()).Elem().Field(5))
+	fmt.Printf("%T", reflect.ValueOf(fi.Sys()).Elem().Field(5))*/
+	//fmt.Println("yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy", report.writer.Fd())
+	report.file.Close()
+	//_, _ = fmt.Scanln()
+
+	//fmt.Println("yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy", report.writer.Fd())
 }

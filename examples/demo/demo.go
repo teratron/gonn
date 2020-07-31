@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/zigenzoog/gonn/pkg/nn"
 	"os"
+
+	"github.com/zigenzoog/gonn/pkg/nn"
 )
 
 func main() {
@@ -12,7 +13,7 @@ func main() {
 	// same n := nn.New().Perceptron()
 	n := nn.New()/*.Hopfield()*/
 
-	fmt.Println(n)
+	//fmt.Println(n)
 
 	// Set parameters
 	n.Set(
@@ -22,6 +23,9 @@ func main() {
 		nn.LossMode(nn.ModeMSE),
 		nn.LossLevel(.0001),
 		nn.Rate(nn.DefaultRate))
+
+	fmt.Println(n.HiddenLayer())
+	fmt.Println(n.Bias())
 
 	//
 	//numInputData  := 8	// 5
@@ -95,5 +99,5 @@ func main() {
 	//
 	n.Write(nn.JSON("perceptron.json"),
 			nn.Report(nn.File("report.txt"), input, loss, count),
-		    nn.Report(os.Stdout, input, loss, count))
+		    /*nn.Report(os.Stdout, input, loss, count)*/)
 }

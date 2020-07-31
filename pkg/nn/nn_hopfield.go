@@ -15,9 +15,9 @@ type hopfield struct {
 	axon   [][]*Axon
 }
 
-func Hopfield() Architecture {
+/*func Hopfield() io.ReadWriter {
 	return nil
-}
+}*/
 
 // Returns a new Hopfield neural network instance with the default parameters
 func (n *NN) Hopfield() NeuralNetwork {
@@ -26,13 +26,6 @@ func (n *NN) Hopfield() NeuralNetwork {
 	}
 	return n
 }
-
-/*func (h *hopfield) Hopfield() NeuralNetwork {
-	h.Architecture = &hopfield{
-		Architecture: h,
-	}
-	return nil
-}*/
 
 // Setter
 func (h *hopfield) Set(args ...pkg.Setter) {
