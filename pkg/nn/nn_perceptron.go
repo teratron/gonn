@@ -16,6 +16,10 @@ var _ NeuralNetwork = (*perceptron)(nil)
 type Perceptron interface {
 	HiddenLayer() []uint
 	Bias() bool
+	ActivationMode() uint8
+	LossMode() uint8
+	LossLevel() float64
+	Rate() float32
 }
 
 type perceptron struct {
@@ -74,6 +78,27 @@ func (p *perceptron) HiddenLayer() []uint {
 // Bias
 func (p *perceptron) Bias() bool {
 	return bool(p.bias)
+}
+
+// ActivationMode
+func (p *perceptron) ActivationMode() uint8 {
+	//fmt.Println("*")
+	return p.activationMode
+}
+
+// LossMode
+func (p *perceptron) LossMode() uint8 {
+	return p.lossMode
+}
+
+// LossLevel
+func (p *perceptron) LossLevel() float64 {
+	return p.lossLevel
+}
+
+// Rate
+func (p *perceptron) Rate() float32 {
+	return float32(p.rate)
 }
 
 // Setter
@@ -139,7 +164,7 @@ func (p *perceptron) init(input []float64, target ...[]float64) bool {
 		p.lenInput       = len(input)
 		p.lenOutput      = len(target[0])
 		tmp              = append(p.hiddenLayer, uint(p.lenOutput))
-		layer           := make(HiddenType, p.lastIndexLayer+1)
+		layer           := make(HiddenType, p.lastIndexLayer + 1)
 		lenLayer        := copy(layer, tmp)
 
 		b := 0
@@ -385,20 +410,22 @@ func (p *perceptron) Write(writer ...io.Writer) {
 }
 
 //
-func (p *perceptron) writeJSON(filename jsonType) {
-	weight := func() [][][]floatType {
-		array := make([][][]floatType, len(p.axon))
-		for i, u := range p.axon {
-			array[i] = make([][]floatType, len(p.axon[i]))
-			for j, v := range u {
-				array[i][j] = make([]floatType, len(p.axon[i][j]))
-				for k, w := range v {
-					array[i][j][k] = w.weight
-				}
+func (p *perceptron) getWeight() [][][]floatType {
+	weight := make([][][]floatType, len(p.axon))
+	for i, u := range p.axon {
+		weight[i] = make([][]floatType, len(p.axon[i]))
+		for j, v := range u {
+			weight[i][j] = make([]floatType, len(p.axon[i][j]))
+			for k, w := range v {
+				weight[i][j][k] = w.weight
 			}
 		}
-		return array
 	}
+	return weight
+}
+
+//
+func (p *perceptron) writeJSON(filename jsonType) {
 	test := struct{
 		Architecture	string			`json:"architecture" xml:"architecture"`
 		IsTrain			bool			`json:"isTrain" xml:"isTrain"`
@@ -418,7 +445,7 @@ func (p *perceptron) writeJSON(filename jsonType) {
 		LossMode:		p.lossMode,
 		LossLevel:		p.lossLevel,
 		Rate:			p.rate,
-		Weights:		weight(),
+		Weights:		p.getWeight(),
 	}
 	//j, err := json.MarshalIndent(test, "", "\t")
 	j, err := json.Marshal(test)
@@ -449,11 +476,13 @@ func (p *perceptron) writeReport(report *report) {
 	b := bytes.NewBufferString("Report of Perceptron Neural Network\n\n")
 
 	// Input layer
-	_, _ = fmt.Fprintf(b, "%s0 Input layer size: %d\n%sNeurons:\t", s, p.lenInput, s)
-	for _, v := range report.args[0].([]float64) {
-		_, _ = fmt.Fprintf(b, "  %v", v)
+	if in, ok := report.args[0].([]float64); ok {
+		_, _ = fmt.Fprintf(b, "%s0 Input layer size: %d\n%sNeurons:\t", s, p.lenInput, s)
+		for _, v := range in {
+			_, _ = fmt.Fprintf(b, "  %v", v)
+		}
+		_, _ = fmt.Fprint(b, m)
 	}
-	_, _ = fmt.Fprint(b, m)
 
 	// Layers: neuron, miss
 	var t string
@@ -489,43 +518,13 @@ func (p *perceptron) writeReport(report *report) {
 	}
 
 	// Resume
-	_, _ = fmt.Fprintf(b, "%sTotal error:\t\t%v\n", s,  report.args[1])
-	_, _ = fmt.Fprintf(b, "Number of iteration:\t%v\n", report.args[2])
-
-	/*fs, _ := report.writer.Stat()
-	fss := fs.Sys()
-	fmt.Println("---", fs.Sys(), reflect.ValueOf(fs.Sys()).Elem().Field(5).Field(reflect.ValueOf(fs.Sys()).NumField() - 1))
-	if reflect.DeepEqual(reflect.ValueOf(fss).Elem().Field(5), reflect.ValueOf(fs.Sys()).Elem().Field(5)) {
-		fmt.Println( true)
-	} else {
-		fmt.Println( )
+	if loss, ok := report.args[1].(float64); ok {
+		_, _ = fmt.Fprintf(b, "%sTotal error:\t\t%v\n", s, loss)
 	}
-	fmt.Println(reflect.ValueOf(fss).Elem().Field(5), reflect.ValueOf(fs.Sys()).Elem().Field(5).Convert(reflect.ValueOf(fs.Sys()).Type()))
-*/
+	if count, ok := report.args[2].(int); ok {
+		_, _ = fmt.Fprintf(b, "Number of iteration:\t%v\n", count)
+	}
 
-
-	/*fmt.Println("---", rws.Size())*/
 	_, _ = b.WriteTo(report.file)
-
-	//rwss := report.writer
-	//rwss, _ := report.file.Stat()
-	//fmt.Printf("`````````````` %v\n", rwss.Size())
-	rws, _ := report.file.Stat()
-	fmt.Printf("`````````````` %v\n", rws)
-
-	rws2, _ := report.file.Stat()
-	size:= rws2.Size()
-	sizePtr := &size
-	fmt.Println("---", sizePtr)
-
-	/*fi, _ := report.writer.Stat()
-
-	fmt.Println("---", fi.Sys(),reflect.ValueOf(fi.Sys()).Elem().Field(5), reflect.ValueOf(fi.Sys()).Elem().NumField() - 1)
-	fmt.Println(reflect.ValueOf(fss).Elem().Field(5).Type(), reflect.ValueOf(fi.Sys()).Elem().Field(5))
-	fmt.Printf("%T", reflect.ValueOf(fi.Sys()).Elem().Field(5))*/
-	//fmt.Println("yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy", report.writer.Fd())
-	report.file.Close()
-	//_, _ = fmt.Scanln()
-
-	//fmt.Println("yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy", report.writer.Fd())
+	_ = report.file.Close()
 }

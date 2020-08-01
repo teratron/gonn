@@ -5,7 +5,7 @@ package nn
 
 type Architecture interface {
 	//
-	//Perceptron() NeuralNetwork
+	Perceptron() NeuralNetwork
 	Perceptron
 
 	//

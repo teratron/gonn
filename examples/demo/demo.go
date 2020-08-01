@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/zigenzoog/gonn/pkg/nn"
@@ -11,7 +10,7 @@ func main() {
 	// New returns a new neural network
 	// instance with the default parameters
 	// same n := nn.New().Perceptron()
-	n := nn.New()/*.Hopfield()*/
+	n := nn.New().Perceptron()/*.Hopfield()*/
 
 	//fmt.Println(n)
 
@@ -23,9 +22,6 @@ func main() {
 		nn.LossMode(nn.ModeMSE),
 		nn.LossLevel(.0001),
 		nn.Rate(nn.DefaultRate))
-
-	fmt.Println(n.HiddenLayer())
-	fmt.Println(n.Bias())
 
 	//
 	//numInputData  := 8	// 5

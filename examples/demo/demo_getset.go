@@ -44,6 +44,13 @@ func main() {
 		nn.Rate(nn.DefaultRate))
 	fmt.Printf("n.Get(): %T %v\n", n.Get(), n.Get())
 
+	fmt.Println(n.HiddenLayer())
+	fmt.Println(n.Bias())
+	fmt.Println(n.ActivationMode())
+	fmt.Println(n.LossMode())
+	fmt.Println(n.LossLevel())
+	fmt.Println(n.Rate())
+
 	// Hidden layers
 	n.Set(nn.HiddenLayer(3, 2))
 	fmt.Println("n.Get(nn.HiddenLayer()):", n.Get(nn.HiddenLayer()))
