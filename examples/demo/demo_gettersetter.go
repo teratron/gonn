@@ -2,10 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/zigenzoog/gonn/pkg/nn"
-	"os"
-
 	"github.com/zigenzoog/gonn/pkg/app"
+	"github.com/zigenzoog/gonn/pkg/nn"
 )
 
 func main() {
@@ -74,36 +72,4 @@ func main() {
 	// Rate
 	n.Set(nn.Rate(.1))
 	fmt.Println("n.Get(nn.Rate()):", n.Get(nn.Rate()))
-
-	//
-	input  := []float64{2.3, 3.1}
-	target := []float64{3.6}
-
-	//
-	loss, count := n.Train(input, target)
-
-	file, err := os.Create("report.txt")
-	if err != nil {
-		os.Exit(1)
-	}
-	defer func() { _ = file.Close() }()
-	//n.Print(file, input, loss, count)
-	//n.Print(os.Stdout, input, loss, count)
-
-	//
-	//fmt.Println(n.Query(input))
-
-	//
-	//fmt.Println(n.Verify(input, target))
-
-
-	n.Write(nn.JSON("perceptron.json"))
-	n.Set(nn.Bias(true))
-	//fmt.Println(n.Get(nn.Neuron()))
-	//fmt.Printf("++++ Act: %.4f\n", 100*calcActivation(1, ModeSIGMOID))
-
-	n.Write(nn.JSON("perceptron.json"),
-		nn.Report(file, input, loss, count),
-		nn.Report(os.Stdout, input, loss, count))
-
 }

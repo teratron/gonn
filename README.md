@@ -14,6 +14,7 @@
 gonn - Neural Network for Golang
 
 # Install
+    
     $ go get -u github.com/zigenzoog/gonn
 
 # Getting Started
@@ -27,24 +28,24 @@ import (
 func main() {
     // Creat new Neural Network
     // Default Perceptron Neural Network, same f := nn.New().Perceptron()
+    // n = nn.New().RadialBasis()
+    // n = nn.New().Hopfield()
     n := nn.New()
-    // or
-    n = nn.New().Perceptron()
-    // or
-    n = nn.New().RadialBasis()
-    // or
-    n = nn.New().Hopfield()
 
-    // Set
-    n.Set(nn.Bias(false))
+	// Set parameters
+	n.Set(
+		nn.HiddenLayer(3, 2),
+		nn.Bias(true),
+		nn.ActivationMode(nn.ModeSIGMOID),
+		nn.LossMode(nn.ModeMSE),
+		nn.LossLevel(.0001),
+		nn.Rate(nn.DefaultRate))
 
-    // Get
-    //b := n.Get(nn.Bias())
-//Log("Parameter not specified for Bias", false)
 
 }
 ```
 And you can run that simply as:
+    
     $ go run main.go
 
 # Documentation
