@@ -15,13 +15,4 @@ func main() {
 	n.Write(
 		nn.JSON(),
 		nn.XML())
-
-	//b, err := json.Marshal(m)
-	/*rawDataOutjson, err := json.MarshalIndent(m, "", "\t")
-	if err != nil { panic("!!!") }
-	fmt.Println("++++ \n", string(rawDataOutjson))
-
-	rawDataOut, err := xml.MarshalIndent(m, "", "\t")
-	if err != nil { panic("!!!") }
-	fmt.Println("++++ \n", string(rawDataOut))*/
 }

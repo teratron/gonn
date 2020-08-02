@@ -29,5 +29,5 @@ func (a *app) Get(args ...pkg.Getter) pkg.GetterSetter {
 			return a
 		}*/
 	}
-	return nil
+	return a
 }

@@ -15,14 +15,6 @@ func Bias(bias ...bool) pkg.GetterSetter {
 	}
 }
 
-/*func (n *NN) Bias() bool {
-	if a, ok := n.Get().(NeuralNetwork); ok {
-		return a.Bias()
-	} else {
-		return ok
-	}
-}*/
-
 // Setter
 func (b biasType) Set(args ...pkg.Setter) {
 	if len(args) > 0 {

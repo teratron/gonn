@@ -5,7 +5,7 @@ import "io"
 
 type Constructor interface {
 	// Initializing
-	init(input []float64, target ...[]float64) bool
+	init(int, ...interface{}) bool
 
 	// Querying
 	Query(input []float64) (output []float64)

@@ -5,7 +5,13 @@ import "io"
 
 type jsonType string
 
+//
 func JSON(filename ...string) io.ReadWriter {
+	/*if len(filename) > 0 && filename[0] != "" {
+		return jsonType(filename[0])
+	} else {
+		return jsonType("")
+	}*/
 	return jsonType(filename[0])
 }
 

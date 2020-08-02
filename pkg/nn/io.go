@@ -4,25 +4,20 @@ package nn
 import (
 	"fmt"
 	"io"
+	"log"
 	"os"
 )
 
 type fileType io.ReadWriter
 
 func File(filename string) *os.File {
-	file, err := os.Open(filename)
-	if err == nil {
-		file, err = os.Create(filename)
+	file, err := os.Create(filename)
+	if err != nil {
+		fmt.Println("open")
+		file, err = os.Open(filename)
 	}
 	if err != nil {
-		os.Exit(1)
+		log.Fatal("Error !!!")
 	}
-	//rwss := file
-	rwss, _ := file.Stat()
-	//fmt.Printf("`````````````` %v\n", rwss.Size())
-	//info, _ := file.Stat()
-	//i := info.Size()
-	fmt.Printf("`````````````` %v\n", rwss)
-
 	return file
 }

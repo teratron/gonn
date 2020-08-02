@@ -31,5 +31,5 @@ func (n *NN) Get(args ...pkg.Getter) pkg.GetterSetter {
 			return a
 		}
 	}
-	return nil
+	return n
 }

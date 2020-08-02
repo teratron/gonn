@@ -7,8 +7,10 @@ import (
 	"fmt"
 	"github.com/zigenzoog/gonn/pkg"
 	"io"
+	"io/ioutil"
 	"log"
 	"math"
+	"os"
 )
 
 var _ NeuralNetwork = (*perceptron)(nil)
@@ -148,28 +150,32 @@ func (p *perceptron) Get(args ...pkg.Getter) pkg.GetterSetter {
 			return nil
 		}
 	} else {
-		return p
+		if a, ok := p.Architecture.(NeuralNetwork); ok {
+			return a
+		}
 	}
+	return p
 }
 
-// Initialization
-func (p *perceptron) init(input []float64, target ...[]float64) bool {
-	if len(target) > 0 {
+// init Initialization
+func (p *perceptron) init(lenInput int, lenTarget ...interface{}) bool {
+	if len(lenTarget) > 0 {
 		var tmp HiddenType
 		defer func() {
 			tmp = nil
 		}()
 
 		p.lastIndexLayer = len(p.hiddenLayer)
-		p.lenInput       = len(input)
-		p.lenOutput      = len(target[0])
+		p.lenInput       = lenInput
+		p.lenOutput      = lenTarget[0].(int)
 		tmp              = append(p.hiddenLayer, uint(p.lenOutput))
 		layer           := make(HiddenType, p.lastIndexLayer + 1)
 		lenLayer        := copy(layer, tmp)
 
 		b := 0
-		if p.bias { b = 1 }
-
+		if p.bias {
+			b = 1
+		}
 		p.neuron = make([][]*Neuron, lenLayer)
 		p.axon   = make([][][]*Axon, lenLayer)
 		for i, l := range layer {
@@ -183,8 +189,10 @@ func (p *perceptron) init(input []float64, target ...[]float64) bool {
 				}
 			}
 		}
-		p.initNeuron()
-		p.initAxon()
+		if n, ok := p.Get().(*NN); ok && !n.isTrain {
+			p.initNeuron()
+			p.initAxon()
+		}
 		return true
 	} else {
 		pkg.Log("No target data", true) // !!!
@@ -389,13 +397,8 @@ func (p *perceptron) Write(writer ...io.Writer) {
 		switch v := w.(type) {
 		case *report:
 			p.writeReport(v)
-			/*if u, ok := v.writer; ok {
-
-			}*/
-			//fmt.Printf("%T %v\n", v.writer, *v.writer)
-			//fmt.Println(v.writer)
 		case jsonType:
-			p.writeJSON(v)
+			p.writeJSON(string(v))
 		/*case xml:
 			p.writeXML(v)
 		case xml:
@@ -407,6 +410,11 @@ func (p *perceptron) Write(writer ...io.Writer) {
 			log.Printf("\tWrite: %T %v\n", w, w) // !!!
 		}
 	}
+}
+
+//
+func (p *perceptron) setWeight(weight [][][]floatType)  {
+
 }
 
 //
@@ -425,7 +433,41 @@ func (p *perceptron) getWeight() [][][]floatType {
 }
 
 //
-func (p *perceptron) writeJSON(filename jsonType) {
+func (p *perceptron) readJSON(filename string) {
+	var test struct{
+		Architecture	string			`json:"architecture" xml:"architecture"`
+		IsTrain			bool			`json:"isTrain" xml:"isTrain"`
+		HiddenLayer		HiddenType		`json:"hiddenLayer" xml:"hiddenLayer"`
+		Bias			biasType		`json:"bias" xml:"bias"`
+		ActivationMode	uint8			`json:"activationMode" xml:"activationMode"`
+		LossMode		uint8			`json:"lossMode" xml:"lossMode"`
+		LossLevel		float64			`json:"lossLevel" xml:"lossLevel"`
+		Rate			floatType		`json:"rate" xml:"rate"`
+		Weights			[][][]floatType	`json:"weights" xml:"weights"`
+	}
+	t := test
+	b, err := ioutil.ReadFile(filename)
+	if err != nil {
+		log.Fatal("Can't load settings: ", err)
+	}
+	err = json.Unmarshal(b, &t)
+	if err != nil {
+		log.Fatal("Invalid settings format: ", err)
+	}
+
+	err = ioutil.WriteFile(filename, b, os.ModePerm)
+
+	fmt.Println(t.Weights)
+
+	if t.Architecture == "perceptron" {
+
+	}
+
+	//fmt.Println("ValueOf ", reflect.ValueOf(t).Field(0)) // perceptron
+}
+
+//
+func (p *perceptron) writeJSON(filename string) {
 	test := struct{
 		Architecture	string			`json:"architecture" xml:"architecture"`
 		IsTrain			bool			`json:"isTrain" xml:"isTrain"`
@@ -447,25 +489,17 @@ func (p *perceptron) writeJSON(filename jsonType) {
 		Rate:			p.rate,
 		Weights:		p.getWeight(),
 	}
-	//j, err := json.MarshalIndent(test, "", "\t")
-	j, err := json.Marshal(test)
-	if err != nil { panic("!!!") }
-	//fmt.Println(string(j))
+	b, err := json.MarshalIndent(test, "", "\t")
+	if err != nil {
+		log.Fatal("JSON marshaling failed: ", err)
+	}
+	err = ioutil.WriteFile(filename, b, os.ModePerm)
+	if err != nil {
+		log.Fatal("Can't write updated settings file:", err)
+	}
 
-	var out bytes.Buffer
-	err = json.Indent(&out, j, "", "\t")
-	//_,_ = out.WriteTo(os.Stdout)
+	p.readJSON(filename)
 
-	//err = ioutil.WriteFile("perceptron.json", j, os.ModePerm)
-
-	/*file, _ := os.OpenFile("perceptron.json", os.O_CREATE, os.ModePerm)
-	defer func() { _ = file.Close() }()
-	encoder := json.NewEncoder(file)
-	err = encoder.Encode(j)*/
-
-
-	//fmt.Printf("%T %v\n", reflect.ValueOf(p.Architecture.(*NN).Architecture).Elem().Type(), reflect.ValueOf(p.Architecture.(*NN).Architecture).Elem().Type())
-	//fmt.Println(reflect.NewAt(perceptron{}, p.Architecture.(*NN).Architecture))
 }
 
 // Report of neural network training results in io.Writer

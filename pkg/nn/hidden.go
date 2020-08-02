@@ -11,14 +11,6 @@ func HiddenLayer(nums ...uint) HiddenType {
 	return nums
 }
 
-/*func (n *NN) HiddenLayer() []uint {
-	if a, ok := n.Get().(NeuralNetwork); ok {
-		return a.HiddenLayer()
-	} else {
-		return nil
-	}
-}*/
-
 // Setter
 func (h HiddenType) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
