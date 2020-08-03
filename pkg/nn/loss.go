@@ -31,7 +31,7 @@ func LossLevel(level ...float64) pkg.GetterSetter {
 	}
 }
 
-// Setter
+// Set
 func (m lossModeType) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
@@ -52,7 +52,7 @@ func (l lossLevelType) Set(args ...pkg.Setter) {
 	}
 }
 
-// Getter
+// Get
 func (m lossModeType) Get(args ...pkg.Getter) pkg.GetterSetter {
 	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
@@ -75,7 +75,7 @@ func (l lossLevelType) Get(args ...pkg.Getter) pkg.GetterSetter {
 	return nil
 }
 
-// Checking
+// Check
 func (m lossModeType) check() lossModeType {
 	switch {
 	case m < 0 || m > lossModeType(ModeARCTAN):

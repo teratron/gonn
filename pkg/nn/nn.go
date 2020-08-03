@@ -37,4 +37,5 @@ type NN struct {
 	json	jsonType
 	xml		xmlType
 	csv		csvType
+	db		dbType
 }

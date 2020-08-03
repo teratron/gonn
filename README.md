@@ -26,11 +26,11 @@ import (
 )
 
 func main() {
-    // Creat new Neural Network
-    // Default Perceptron Neural Network, same f := nn.New().Perceptron()
-    // n = nn.New().RadialBasis()
-    // n = nn.New().Hopfield()
-    n := nn.New()
+	// Creat new Neural Network
+	// Default Perceptron Neural Network, same f := nn.New().Perceptron()
+	// n = nn.New().RadialBasis()
+	// n = nn.New().Hopfield()
+	n := nn.New()
 
 	// Set parameters
 	n.Set(

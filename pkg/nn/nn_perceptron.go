@@ -24,22 +24,44 @@ type Perceptron interface {
 	Rate() float32
 }
 
+type test struct {
+	HiddenLayer		HiddenType		`json:"hiddenLayer" xml:"hiddenLayer"`
+	Bias			biasType		`json:"bias" xml:"bias"`
+	ActivationMode	uint8			`json:"activationMode" xml:"activationMode"`
+	LossMode		uint8			`json:"lossMode" xml:"lossMode"`
+	LossLevel		float64			`json:"lossLevel" xml:"lossLevel"`
+	Rate			floatType		`json:"rate" xml:"rate"`
+	Weights			[][][]floatType	`json:"weights" xml:"weights"`
+}
+
 type perceptron struct {
-	Architecture
+	Architecture				`json:"-"`
 
-	hiddenLayer    HiddenType // Array of the number of neurons in each hidden layer
-	bias           biasType   // The neuron bias, false or true
-	activationMode uint8      // Activation function mode
-	lossMode       uint8      //
-	lossLevel      float64    // Minimum (sufficient) level of the average of the error during training
-	rate           floatType  // Learning coefficient, from 0 to 1
+	// Array of the number of neurons in each hidden layer
+	hiddenLayer    HiddenType	//`json:"hiddenLayer" xml:"hiddenLayer"`
 
-	neuron			[][]*Neuron
-	axon			[][][]*Axon
+	// The neuron bias, false or true
+	bias           biasType		//`json:"bias" xml:"bias"`
 
-	lastIndexLayer	int
-	lenInput		int
-	lenOutput		int
+	// Activation function mode
+	activationMode uint8		//`json:"activationMode" xml:"activationMode"`
+
+	//
+	lossMode       uint8		//`json:"lossMode" xml:"lossMode"`
+
+	// Minimum (sufficient) level of the average of the error during training
+	lossLevel      float64		//`json:"lossLevel" xml:"lossLevel"`
+
+	// Learning coefficient, from 0 to 1
+	rate           floatType	//`json:"rate" xml:"rate"`
+
+	// Matrix
+	neuron			[][]*Neuron	`json:"-"`
+	axon			[][][]*Axon	`json:"-"`
+
+	lastIndexLayer	int			`json:"-"`
+	lenInput		int			`json:"-"`
+	lenOutput		int			`json:"-"`
 }
 
 // Returns a new Perceptron neural network instance with the default parameters
@@ -84,7 +106,6 @@ func (p *perceptron) Bias() bool {
 
 // ActivationMode
 func (p *perceptron) ActivationMode() uint8 {
-	//fmt.Println("*")
 	return p.activationMode
 }
 
@@ -450,14 +471,16 @@ func (p *perceptron) readJSON(filename string) {
 	if err != nil {
 		log.Fatal("Can't load settings: ", err)
 	}
+	fmt.Println(string(b))
+
 	err = json.Unmarshal(b, &t)
 	if err != nil {
 		log.Fatal("Invalid settings format: ", err)
 	}
 
-	err = ioutil.WriteFile(filename, b, os.ModePerm)
+	//err = ioutil.WriteFile(filename, b, os.ModePerm)
 
-	fmt.Println(t.Weights)
+	//fmt.Println(t.Weights)
 
 	if t.Architecture == "perceptron" {
 

@@ -3,6 +3,7 @@ package nn
 
 import (
 	"io"
+	"log"
 	"math/rand"
 	"time"
 
@@ -17,25 +18,31 @@ func init() {
 
 // New returns a new neural network instance with the default parameters
 func New(reader ...io.Reader) NeuralNetwork {
+	n := new(NN)
 	if len(reader) > 0 {
-		switch reader[0].(type) {
+		switch r := reader[0].(type) {
 		case jsonType:
+			if len(r) > 0 {
+				//n =
+			} else {
+				log.Fatal("Отсутствует название файла нейросети")
+			}
 		case xmlType:
 		case csvType:
-		//case dbType:
+		case dbType:
 		default:
 		}
 	} else {
+		n = &NN{
+			Architecture:	&perceptron{},
+			isInit:			false,
+			isTrain:		false,
+			json:			"",
+			xml:			"",
+			csv:			"",
+		}
+		n.Perceptron() //???
 	}
-	n := &NN{
-		Architecture: &perceptron{},
-		isInit:		false,
-		isTrain:	false,
-		json:		"",
-		xml:		"",
-		csv:		"",
-	}
-	n.Perceptron() //???
 	return n
 }
 
@@ -60,7 +67,7 @@ func getRand() (r floatType) {
 	return
 }
 
-// getLengthData
+// getLengthData возвращает длину срезов
 func getLengthData(data ...[]float64) []interface{} {
 	var tmp []interface{}
 	defer func() {

@@ -7,11 +7,12 @@ import (
 )
 
 func main() {
-	// Neural Network
+	// New returns a new neural network
 	n := nn.New(nn.JSON("perceptron.json"))
 
 	fmt.Println("nn.New(JSON(\"file\")):", n)
 
+	//
 	n.Write(
 		nn.JSON(),
 		nn.XML())
