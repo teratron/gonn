@@ -10,8 +10,8 @@ const MaxIteration uint = 10e+05
 
 // Train
 func (n *NN) Train(input []float64, target ...[]float64) (loss float64, count int) {
-	if !n.isInit {
-		if n.isInit = n.init(len(input), getLengthData(target...)...); !n.isInit {
+	if !n.IsInit {
+		if n.IsInit = n.init(len(input), getLengthData(target...)...); !n.IsInit {
 			pkg.Log("Error initialization", true) // !!!
 			return
 		}
@@ -19,7 +19,7 @@ func (n *NN) Train(input []float64, target ...[]float64) (loss float64, count in
 	if a, ok := n.Get().(NeuralNetwork); ok {
 		loss, count = a.Train(input, target...)
 		if count > 0 {
-			n.isTrain = true
+			n.IsTrain = true
 		}
 	}
 	return

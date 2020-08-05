@@ -14,7 +14,7 @@ func HiddenLayer(nums ...uint) HiddenType {
 // Setter
 func (h HiddenType) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
-		if n, ok := args[0].(*NN); ok && !n.isInit {
+		if n, ok := args[0].(*NN); ok && !n.IsInit {
 			n.Get().Set(h)
 		}
 	} else {

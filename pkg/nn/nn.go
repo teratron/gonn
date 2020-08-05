@@ -29,13 +29,18 @@ type NeuralNetwork interface {
 
 //
 type NN struct {
-	Architecture // Architecture of neural network
+	Architecture		`json:"-"`			// Architecture of neural network
 
-	isInit  bool // Neural network initializing flag
-	isTrain bool // Neural network training flag
+	IsInit  bool		`json:"-"`			// Neural network initializing flag
+	IsTrain bool		`json:"isTrain"`	// Neural network training flag
 
-	json	jsonType
-	xml		xmlType
-	csv		csvType
-	db		dbType
+	json	jsonType	`json:"-"`
+	xml		xmlType		`json:"-"`
+	csv		csvType		`json:"-"`
+	db		dbType		`json:"-"`
+}
+
+type settings struct {
+	Architecture	perceptron
+	IsTrain			bool
 }

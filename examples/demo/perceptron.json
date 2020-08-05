@@ -1,6 +1,5 @@
 {
-	"architecture": "perceptron",
-	"isTrain": true,
+	"architecture": {},
 	"hiddenLayer": [
 		3,
 		2

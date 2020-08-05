@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/zigenzoog/gonn/pkg/nn"
-	"os"
 )
 
 func main() {
@@ -95,7 +94,7 @@ func main() {
 	n.Write(
 		nn.JSON("perceptron.json"),
 		nn.Report(nn.File("report.txt"), input, loss, count),
-		nn.Report(os.Stdout, input, loss, count))
+		/*nn.Report(os.Stdout, input, loss, count)*/)
 
 	n.Read(nn.JSON("perceptron.json"))
 }

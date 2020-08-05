@@ -26,7 +26,7 @@ func main() {
 	//fmt.Println("n.Get(nn.Logging()):", n.Get(nn.Logging()))
 
 	// Neural Network
-	n := nn.New()	// same n := nn.New().Perceptron()
+	n := nn.New() // same n := nn.New().Perceptron()
 	//n := nn.New().Perceptron()
 	//n := nn.New().RadialBasis()
 	//n := nn.New(nn.Hopfield())

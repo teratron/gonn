@@ -4,9 +4,9 @@ package nn
 import "github.com/zigenzoog/gonn/pkg"
 
 func (n *NN) Query(input []float64) (output []float64) {
-	if !n.isTrain {
+	if !n.IsTrain {
 		pkg.Log("Neural network is not trained", true) // !!!
-		if !n.isInit {
+		if !n.IsInit {
 			pkg.Log("Error initialization", true) // !!!
 			return nil
 		}

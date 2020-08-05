@@ -25,6 +25,7 @@ type Perceptron interface {
 }
 
 type test struct {
+	Architecture	perceptron		`json:"architecture" xml:"architecture"`
 	HiddenLayer		HiddenType		`json:"hiddenLayer" xml:"hiddenLayer"`
 	Bias			biasType		`json:"bias" xml:"bias"`
 	ActivationMode	uint8			`json:"activationMode" xml:"activationMode"`
@@ -210,7 +211,7 @@ func (p *perceptron) init(lenInput int, lenTarget ...interface{}) bool {
 				}
 			}
 		}
-		if n, ok := p.Get().(*NN); ok && !n.isTrain {
+		if n, ok := p.Get().(*NN); ok && !n.IsTrain {
 			p.initNeuron()
 			p.initAxon()
 		}
@@ -433,12 +434,18 @@ func (p *perceptron) Write(writer ...io.Writer) {
 	}
 }
 
-//
+// setWeight
 func (p *perceptron) setWeight(weight [][][]floatType)  {
-
+	for i, u := range weight {
+		for j, v := range u {
+			for k, w := range v {
+				p.axon[i][j][k].weight = w
+			}
+		}
+	}
 }
 
-//
+// getWeight
 func (p *perceptron) getWeight() [][][]floatType {
 	weight := make([][][]floatType, len(p.axon))
 	for i, u := range p.axon {
@@ -471,39 +478,23 @@ func (p *perceptron) readJSON(filename string) {
 	if err != nil {
 		log.Fatal("Can't load settings: ", err)
 	}
-	fmt.Println(string(b))
-
+	//fmt.Println(string(b))
 	err = json.Unmarshal(b, &t)
 	if err != nil {
 		log.Fatal("Invalid settings format: ", err)
 	}
-
 	//err = ioutil.WriteFile(filename, b, os.ModePerm)
-
 	//fmt.Println(t.Weights)
-
 	if t.Architecture == "perceptron" {
-
 	}
-
 	//fmt.Println("ValueOf ", reflect.ValueOf(t).Field(0)) // perceptron
 }
 
 //
 func (p *perceptron) writeJSON(filename string) {
-	test := struct{
-		Architecture	string			`json:"architecture" xml:"architecture"`
-		IsTrain			bool			`json:"isTrain" xml:"isTrain"`
-		HiddenLayer		HiddenType		`json:"hiddenLayer" xml:"hiddenLayer"`
-		Bias			biasType		`json:"bias" xml:"bias"`
-		ActivationMode	uint8			`json:"activationMode" xml:"activationMode"`
-		LossMode		uint8			`json:"lossMode" xml:"lossMode"`
-		LossLevel		float64			`json:"lossLevel" xml:"lossLevel"`
-		Rate			floatType		`json:"rate" xml:"rate"`
-		Weights			[][][]floatType	`json:"weights" xml:"weights"`
-	}{
-		Architecture:	"perceptron",
-		IsTrain:		p.Architecture.(*NN).isTrain,
+	//fmt.Println("^^^")
+	t := test{
+		Architecture:	perceptron{},
 		HiddenLayer:	p.hiddenLayer,
 		Bias:			p.bias,
 		ActivationMode:	p.activationMode,
@@ -512,7 +503,7 @@ func (p *perceptron) writeJSON(filename string) {
 		Rate:			p.rate,
 		Weights:		p.getWeight(),
 	}
-	b, err := json.MarshalIndent(test, "", "\t")
+	b, err := json.MarshalIndent(t, "", "\t")
 	if err != nil {
 		log.Fatal("JSON marshaling failed: ", err)
 	}
@@ -521,7 +512,7 @@ func (p *perceptron) writeJSON(filename string) {
 		log.Fatal("Can't write updated settings file:", err)
 	}
 
-	p.readJSON(filename)
+	//p.readJSON(filename)
 
 }
 
@@ -532,13 +523,20 @@ func (p *perceptron) writeReport(report *report) {
 	m := "\n\n"
 	b := bytes.NewBufferString("Report of Perceptron Neural Network\n\n")
 
+	printFormat := func(format string, a ...interface{}) {
+		_, err := fmt.Fprintf(b, format, a...)
+		if err != nil {
+			log.Fatal("")
+		}
+	}
+
 	// Input layer
 	if in, ok := report.args[0].([]float64); ok {
-		_, _ = fmt.Fprintf(b, "%s0 Input layer size: %d\n%sNeurons:\t", s, p.lenInput, s)
+		printFormat("%s0 Input layer size: %d\n%sNeurons:\t", s, p.lenInput, s)
 		for _, v := range in {
-			_, _ = fmt.Fprintf(b, "  %v", v)
+			printFormat("  %v", v)
 		}
-		_, _ = fmt.Fprint(b, m)
+		printFormat("%s", m)
 	}
 
 	// Layers: neuron, miss
@@ -550,38 +548,41 @@ func (p *perceptron) writeReport(report *report) {
 		default:
 			t = "Hidden layer"
 		}
-		_, _ = fmt.Fprintf(b, "%s%d %s size: %d\n%sNeurons:\t", s, i + 1, t, len(p.neuron[i]), s)
+		printFormat("%s%d %s size: %d\n%sNeurons:\t", s, i + 1, t, len(p.neuron[i]), s)
 		for _, w := range v {
-			_, _ = fmt.Fprintf(b, "  %11.8f", w.value)
+			printFormat("  %11.8f", w.value)
 		}
-		_, _ = fmt.Fprint(b, "\nMiss:\t\t")
+		printFormat("\nMiss:\t\t")
 		for _, w := range v {
-			_, _ = fmt.Fprintf(b, "  %11.8f", w.specific)
+			printFormat("  %11.8f", w.specific)
 		}
-		_, _ = fmt.Fprint(b, m)
+		printFormat("%s", m)
 	}
 
 	// Axons: weight
-	_, _ = fmt.Fprintf(b, "%sAxons\n%s", s, s)
+	printFormat("%sAxons\n%s", s, s)
 	for _, u := range p.axon {
 		for i, v := range u {
-			_, _ = fmt.Fprint(b, i + 1)
+			printFormat("%d", i + 1)
 			for _, w := range v {
-				_, _ = fmt.Fprintf(b, "\t%11.8f", w.weight)
+				printFormat("\t%11.8f", w.weight)
 			}
-			_, _ = fmt.Fprint(b, n)
+			printFormat("%s", n)
 		}
-		_, _ = fmt.Fprint(b, n)
+		printFormat("%s", n)
 	}
 
 	// Resume
 	if loss, ok := report.args[1].(float64); ok {
-		_, _ = fmt.Fprintf(b, "%sTotal error:\t\t%v\n", s, loss)
+		printFormat("%sTotal loss (error):\t\t%v\n", s, loss)
 	}
 	if count, ok := report.args[2].(int); ok {
-		_, _ = fmt.Fprintf(b, "Number of iteration:\t%v\n", count)
+		printFormat("Number of iteration:\t%v\n", count)
 	}
 
-	_, _ = b.WriteTo(report.file)
-	_ = report.file.Close()
+	_, err := b.WriteTo(report.file)
+	err = report.file.Close()
+	if err != nil {
+		log.Fatal("")
+	}
 }

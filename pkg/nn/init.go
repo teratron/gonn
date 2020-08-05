@@ -34,12 +34,12 @@ func New(reader ...io.Reader) NeuralNetwork {
 		}
 	} else {
 		n = &NN{
-			Architecture:	&perceptron{},
-			isInit:			false,
-			isTrain:		false,
-			json:			"",
-			xml:			"",
-			csv:			"",
+			Architecture: &perceptron{},
+			IsInit:       false,
+			IsTrain:      false,
+			json:         "",
+			xml:          "",
+			csv:          "",
 		}
 		n.Perceptron() //???
 	}
@@ -48,9 +48,9 @@ func New(reader ...io.Reader) NeuralNetwork {
 
 func (n *NN) init(lenInput int, lenTarget ...interface{}) bool {
 	if a, ok := n.Get().(NeuralNetwork); ok {
-		n.isInit = a.init(lenInput, lenTarget...)
+		n.IsInit = a.init(lenInput, lenTarget...)
 	}
-	return n.isInit
+	return n.IsInit
 }
 
 func (f floatType) Set(...pkg.Setter) {}
