@@ -3,7 +3,6 @@ package nn
 
 import (
 	"fmt"
-	"github.com/zigenzoog/gonn/pkg"
 	"io"
 	"log"
 	"os"
@@ -15,7 +14,7 @@ import (
 func File(filename string) *os.File {
 	file, err := os.Open(filename)
 	if err != nil {
-		fmt.Println("-----------------------open----------------------------")
+		fmt.Println("-----------------------Create----------------------------")
 		file, err = os.Create(filename)
 		if err != nil {
 			log.Fatal("Error !!!", err)
@@ -30,7 +29,7 @@ func (n *NN) Read(reader io.Reader) {
 		a.Read(reader)
 	}
 
-	switch r := reader.(type) {
+	/*switch r := reader.(type) {
 	case jsonType:
 		n.readJSON(string(r))
 	case xmlType:
@@ -42,7 +41,7 @@ func (n *NN) Read(reader io.Reader) {
 	default:
 		pkg.Log("This type is missing for read", true) // !!!
 		log.Printf("\tWrite: %T %v\n", r, r) // !!!
-	}
+	}*/
 }
 
 //

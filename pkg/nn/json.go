@@ -25,8 +25,8 @@ func (j jsonType) Write(p []byte) (n int, err error) {
 	return
 }
 
-func (n *NN) readJSON(filename string) {
-	/*t := test
+/*func (n *NN) readJSON(filename string) {
+	t := test
 	b, err := ioutil.ReadFile(filename)
 	if err != nil {
 		log.Fatal("Can't load settings: ", err)
@@ -36,18 +36,18 @@ func (n *NN) readJSON(filename string) {
 		log.Fatal("Invalid settings format: ", err)
 	}
 
-	err = ioutil.WriteFile(filename, b, os.ModePerm)*/
-}
+	err = ioutil.WriteFile(filename, b, os.ModePerm)
+}*/
 
-func (n *NN) writeJSON(filename string) {
+/*func (n *NN) writeJSON(filename string) {
 	//fmt.Println("+-+--++++-")
 	//s := new(settings)
-	/*b, err := json.MarshalIndent(n, "", "\t")
+	b, err := json.MarshalIndent(n, "", "\t")
 	if err != nil {
 		log.Fatal("JSON marshaling failed: ", err)
 	}
 	err = ioutil.WriteFile(filename, b, os.ModePerm)
 	if err != nil {
 		log.Fatal("Can't write updated settings file:", err)
-	}*/
-}
+	}
+}*/

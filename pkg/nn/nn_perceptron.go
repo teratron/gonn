@@ -408,32 +408,6 @@ func (p *perceptron) Verify(input []float64, target ...[]float64) (loss float64)
 	return
 }
 
-//
-func (p *perceptron) Read(reader io.Reader) {
-
-}
-
-//
-func (p *perceptron) Write(writer ...io.Writer) {
-	for _, w := range writer {
-		switch v := w.(type) {
-		case *report:
-			p.writeReport(v)
-		case jsonType:
-			p.writeJSON(string(v))
-		/*case xml:
-			p.writeXML(v)
-		case xml:
-			p.writeCSV(v)
-		case db:
-			p.writeDB(v)*/
-		default:
-			pkg.Log("This type is missing for write", true) // !!!
-			log.Printf("\tWrite: %T %v\n", w, w) // !!!
-		}
-	}
-}
-
 // setWeight
 func (p *perceptron) setWeight(weight [][][]floatType)  {
 	for i, u := range weight {
@@ -460,7 +434,45 @@ func (p *perceptron) getWeight() [][][]floatType {
 	return weight
 }
 
-//
+// Read
+func (p *perceptron) Read(reader io.Reader) {
+	switch r := reader.(type) {
+	case jsonType:
+		p.readJSON(string(r))
+	/*case xml:
+		p.readXML(v)
+	case xml:
+		p.readCSV(v)
+	case db:
+		p.readDB(v)*/
+	default:
+		pkg.Log("This type is missing for write", true) // !!!
+		log.Printf("\tWrite: %T %v\n", r, r) // !!!
+	}
+}
+
+// Write
+func (p *perceptron) Write(writer ...io.Writer) {
+	for _, w := range writer {
+		switch v := w.(type) {
+		case *report:
+			p.writeReport(v)
+		case jsonType:
+			p.writeJSON(string(v))
+		/*case xml:
+			p.writeXML(v)
+		case xml:
+			p.writeCSV(v)
+		case db:
+			p.writeDB(v)*/
+		default:
+			pkg.Log("This type is missing for write", true) // !!!
+			log.Printf("\tWrite: %T %v\n", w, w) // !!!
+		}
+	}
+}
+
+// readJSON
 func (p *perceptron) readJSON(filename string) {
 	var test struct{
 		Architecture	string			`json:"architecture" xml:"architecture"`
@@ -490,7 +502,7 @@ func (p *perceptron) readJSON(filename string) {
 	//fmt.Println("ValueOf ", reflect.ValueOf(t).Field(0)) // perceptron
 }
 
-//
+// writeJSON
 func (p *perceptron) writeJSON(filename string) {
 	//fmt.Println("^^^")
 	t := test{
@@ -513,10 +525,9 @@ func (p *perceptron) writeJSON(filename string) {
 	}
 
 	//p.readJSON(filename)
-
 }
 
-// Report of neural network training results in io.Writer
+// writeReport report of neural network training results in io.Writer
 func (p *perceptron) writeReport(report *report) {
 	s := "----------------------------------------------\n"
 	n := "\n"
