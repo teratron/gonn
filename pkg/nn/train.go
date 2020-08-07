@@ -9,9 +9,9 @@ import (
 const MaxIteration uint = 10e+05
 
 // Train
-func (n *NN) Train(input []float64, target ...[]float64) (loss float64, count int) {
-	if !n.IsInit {
-		if n.IsInit = n.init(len(input), getLengthData(target...)...); !n.IsInit {
+func (n *net) Train(input []float64, target ...[]float64) (loss float64, count int) {
+	if !n.isInit {
+		if n.isInit = n.init(len(input), getLengthData(target...)...); !n.isInit {
 			pkg.Log("Error initialization", true) // !!!
 			return
 		}

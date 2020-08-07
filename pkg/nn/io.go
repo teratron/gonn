@@ -3,6 +3,7 @@ package nn
 
 import (
 	"fmt"
+	"github.com/zigenzoog/gonn/pkg"
 	"io"
 	"log"
 	"os"
@@ -24,12 +25,12 @@ func File(filename string) *os.File {
 }
 
 //
-func (n *NN) Read(reader io.Reader) {
-	if a, ok := n.Get().(NeuralNetwork); ok {
+func (n *net) Read(reader io.Reader) {
+	/*if a, ok := n.Get().(NeuralNetwork); ok {
 		a.Read(reader)
-	}
+	}*/
 
-	/*switch r := reader.(type) {
+	switch r := reader.(type) {
 	case jsonType:
 		n.readJSON(string(r))
 	case xmlType:
@@ -41,11 +42,11 @@ func (n *NN) Read(reader io.Reader) {
 	default:
 		pkg.Log("This type is missing for read", true) // !!!
 		log.Printf("\tWrite: %T %v\n", r, r) // !!!
-	}*/
+	}
 }
 
 //
-func (n *NN) Write(writer ...io.Writer) {
+func (n *net) Write(writer ...io.Writer) {
 	//fmt.Println("***")
 	if len(writer) > 0 {
 		if a, ok := n.Get().(NeuralNetwork); ok {
@@ -60,6 +61,7 @@ func (n *NN) Write(writer ...io.Writer) {
 			case jsonType:
 				n.writeJSON(string(v))
 			case xmlType:
+				n.writeXML(string(v))
 			case csvType:
 			case dbType:
 			default:

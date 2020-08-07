@@ -1,12 +1,8 @@
 //
 package nn
 
-import (
-	"github.com/zigenzoog/gonn/pkg"
-)
-
 // Declare conformity with NeuralNetwork interface
-var _ NeuralNetwork = (*NN)(nil)
+var _ NeuralNetwork = (*net)(nil)
 
 //
 type NeuralNetwork interface {
@@ -15,32 +11,17 @@ type NeuralNetwork interface {
 
 	//
 	Constructor
-
-	//
-	pkg.GetterSetter
-
-	//Settings
 }
-
-/*type Settings interface {
-	Bias() bool
-	HiddenLayer() []uint
-}*/
 
 //
-type NN struct {
-	Architecture		`json:"-"`			// Architecture of neural network
+type net struct {
+	Architecture		`json:"architecture"`	// Architecture of neural network
 
-	IsInit  bool		`json:"-"`			// Neural network initializing flag
-	IsTrain bool		`json:"isTrain"`	// Neural network training flag
+	isInit  bool								// Neural network initializing flag
+	IsTrain bool		`json:"isTrain"`		// Neural network training flag
 
-	json	jsonType	`json:"-"`
-	xml		xmlType		`json:"-"`
-	csv		csvType		`json:"-"`
-	db		dbType		`json:"-"`
-}
-
-type settings struct {
-	Architecture	perceptron
-	IsTrain			bool
+	json	jsonType
+	xml		xmlType
+	csv		csvType
+	db		dbType
 }

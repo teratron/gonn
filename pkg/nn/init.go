@@ -18,7 +18,7 @@ func init() {
 
 // New returns a new neural network instance with the default parameters
 func New(reader ...io.Reader) NeuralNetwork {
-	n := new(NN)
+	n := new(net)
 	if len(reader) > 0 {
 		switch r := reader[0].(type) {
 		case jsonType:
@@ -33,9 +33,9 @@ func New(reader ...io.Reader) NeuralNetwork {
 		default:
 		}
 	} else {
-		n = &NN{
+		n = &net{
 			Architecture: &perceptron{},
-			IsInit:       false,
+			isInit:       false,
 			IsTrain:      false,
 			json:         "",
 			xml:          "",
@@ -46,11 +46,11 @@ func New(reader ...io.Reader) NeuralNetwork {
 	return n
 }
 
-func (n *NN) init(lenInput int, lenTarget ...interface{}) bool {
+func (n *net) init(lenInput int, lenTarget ...interface{}) bool {
 	if a, ok := n.Get().(NeuralNetwork); ok {
-		n.IsInit = a.init(lenInput, lenTarget...)
+		n.isInit = a.init(lenInput, lenTarget...)
 	}
-	return n.IsInit
+	return n.isInit
 }
 
 func (f floatType) Set(...pkg.Setter) {}

@@ -13,7 +13,7 @@ type radialBasis struct {
 }
 
 // Returns a new Radial Basis neural network instance with the default parameters
-func (n *NN) RadialBasis() NeuralNetwork {
+func (n *net) RadialBasis() NeuralNetwork {
 	n.Architecture = &radialBasis{
 		Architecture: n,
 	}

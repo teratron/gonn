@@ -2,7 +2,11 @@
 package nn
 
 import (
+	"encoding/json"
+	"fmt"
 	"io"
+	"io/ioutil"
+	"log"
 )
 
 type jsonType string
@@ -25,23 +29,19 @@ func (j jsonType) Write(p []byte) (n int, err error) {
 	return
 }
 
-/*func (n *NN) readJSON(filename string) {
-	t := test
+func (n *net) readJSON(filename string) {
 	b, err := ioutil.ReadFile(filename)
 	if err != nil {
 		log.Fatal("Can't load settings: ", err)
 	}
-	err = json.Unmarshal(b, &t)
+	err = json.Unmarshal(b, n)
 	if err != nil {
 		log.Fatal("Invalid settings format: ", err)
 	}
+	fmt.Println(n.Architecture.(*perceptron).Settings)
+}
 
-	err = ioutil.WriteFile(filename, b, os.ModePerm)
-}*/
-
-/*func (n *NN) writeJSON(filename string) {
-	//fmt.Println("+-+--++++-")
-	//s := new(settings)
+/*func (n *net) writeJSON(filename string) {
 	b, err := json.MarshalIndent(n, "", "\t")
 	if err != nil {
 		log.Fatal("JSON marshaling failed: ", err)

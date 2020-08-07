@@ -5,12 +5,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/zigenzoog/gonn/pkg"
 	"io"
 	"io/ioutil"
 	"log"
 	"math"
 	"os"
+
+	"github.com/zigenzoog/gonn/pkg"
 )
 
 var _ NeuralNetwork = (*perceptron)(nil)
@@ -24,25 +25,24 @@ type Perceptron interface {
 	Rate() float32
 }
 
-type test struct {
-	Architecture	perceptron		`json:"architecture" xml:"architecture"`
-	HiddenLayer		HiddenType		`json:"hiddenLayer" xml:"hiddenLayer"`
-	Bias			biasType		`json:"bias" xml:"bias"`
-	ActivationMode	uint8			`json:"activationMode" xml:"activationMode"`
-	LossMode		uint8			`json:"lossMode" xml:"lossMode"`
-	LossLevel		float64			`json:"lossLevel" xml:"lossLevel"`
-	Rate			floatType		`json:"rate" xml:"rate"`
-	Weights			[][][]floatType	`json:"weights" xml:"weights"`
-}
-
 type perceptron struct {
-	Architecture				`json:"-"`
+	Architecture						`json:"-"`
+
+	Settings struct{
+		HiddenLayer		HiddenType		`json:"hiddenLayer" xml:"hiddenLayer"`
+		Bias			biasType		`json:"bias" xml:"bias"`
+		ActivationMode	uint8			`json:"activationMode" xml:"activationMode"`
+		LossMode		uint8			`json:"lossMode" xml:"lossMode"`
+		LossLevel		float64			`json:"lossLevel" xml:"lossLevel"`
+		Rate			floatType		`json:"rate" xml:"rate"`
+		Weights			[][][]floatType	`json:"weights" xml:"weights"`
+	}									`json:"perceptron" xml:"perceptron"`
 
 	// Array of the number of neurons in each hidden layer
 	hiddenLayer    HiddenType	//`json:"hiddenLayer" xml:"hiddenLayer"`
 
 	// The neuron bias, false or true
-	bias           biasType		//`json:"bias" xml:"bias"`
+	bias           biasType
 
 	// Activation function mode
 	activationMode uint8		//`json:"activationMode" xml:"activationMode"`
@@ -57,16 +57,17 @@ type perceptron struct {
 	rate           floatType	//`json:"rate" xml:"rate"`
 
 	// Matrix
-	neuron			[][]*Neuron	`json:"-"`
-	axon			[][][]*Axon	`json:"-"`
+	neuron			[][]*Neuron
+	axon			[][][]*Axon
 
-	lastIndexLayer	int			`json:"-"`
-	lenInput		int			`json:"-"`
-	lenOutput		int			`json:"-"`
+	lastIndexLayer	int
+	lenInput		int
+	lenOutput		int
 }
 
+
 // Returns a new Perceptron neural network instance with the default parameters
-func (n *NN) Perceptron() NeuralNetwork {
+func (n *net) Perceptron() NeuralNetwork {
 	n.Architecture = &perceptron{
 		Architecture:   n,
 		hiddenLayer:    HiddenType{},
@@ -75,6 +76,14 @@ func (n *NN) Perceptron() NeuralNetwork {
 		lossMode:       ModeMSE,
 		lossLevel:      .0001,
 		rate:           floatType(DefaultRate),
+	}
+	if p, ok := n.Architecture.(*perceptron); ok {
+		p.Settings.HiddenLayer		= HiddenType{9, 2}
+		p.Settings.Bias 			= true
+		p.Settings.ActivationMode	= ModeSIGMOID
+		p.Settings.LossMode			= ModeMSE
+		p.Settings.LossLevel		= .0001
+		p.Settings.Rate				= floatType(DefaultRate)
 	}
 	return n
 }
@@ -97,32 +106,32 @@ func (p *perceptron) Preset(name string) {
 
 // HiddenLayer
 func (p *perceptron) HiddenLayer() []uint {
-	return p.hiddenLayer
+	return p.Settings.HiddenLayer
 }
 
 // Bias
 func (p *perceptron) Bias() bool {
-	return bool(p.bias)
+	return bool(p.Settings.Bias)
 }
 
 // ActivationMode
 func (p *perceptron) ActivationMode() uint8 {
-	return p.activationMode
+	return p.Settings.ActivationMode
 }
 
 // LossMode
 func (p *perceptron) LossMode() uint8 {
-	return p.lossMode
+	return p.Settings.LossMode
 }
 
 // LossLevel
 func (p *perceptron) LossLevel() float64 {
-	return p.lossLevel
+	return p.Settings.LossLevel
 }
 
 // Rate
 func (p *perceptron) Rate() float32 {
-	return float32(p.rate)
+	return float32(p.Settings.Rate)
 }
 
 // Setter
@@ -211,7 +220,7 @@ func (p *perceptron) init(lenInput int, lenTarget ...interface{}) bool {
 				}
 			}
 		}
-		if n, ok := p.Get().(*NN); ok && !n.IsTrain {
+		if n, ok := p.Get().(*net); ok && !n.IsTrain {
 			p.initNeuron()
 			p.initAxon()
 		}
@@ -474,7 +483,7 @@ func (p *perceptron) Write(writer ...io.Writer) {
 
 // readJSON
 func (p *perceptron) readJSON(filename string) {
-	var test struct{
+	/*var test struct{
 		Architecture	string			`json:"architecture" xml:"architecture"`
 		IsTrain			bool			`json:"isTrain" xml:"isTrain"`
 		HiddenLayer		HiddenType		`json:"hiddenLayer" xml:"hiddenLayer"`
@@ -485,27 +494,28 @@ func (p *perceptron) readJSON(filename string) {
 		Rate			floatType		`json:"rate" xml:"rate"`
 		Weights			[][][]floatType	`json:"weights" xml:"weights"`
 	}
-	t := test
+	t := test*/
 	b, err := ioutil.ReadFile(filename)
 	if err != nil {
 		log.Fatal("Can't load settings: ", err)
 	}
 	//fmt.Println(string(b))
-	err = json.Unmarshal(b, &t)
+	err = json.Unmarshal(b, &p.Settings)
 	if err != nil {
 		log.Fatal("Invalid settings format: ", err)
 	}
+	fmt.Println(p.Settings)
 	//err = ioutil.WriteFile(filename, b, os.ModePerm)
 	//fmt.Println(t.Weights)
-	if t.Architecture == "perceptron" {
-	}
+	/*if t.Architecture == "perceptron" {
+	}*/
 	//fmt.Println("ValueOf ", reflect.ValueOf(t).Field(0)) // perceptron
 }
 
 // writeJSON
 func (p *perceptron) writeJSON(filename string) {
 	//fmt.Println("^^^")
-	t := test{
+	/*t := test{
 		Architecture:	perceptron{},
 		HiddenLayer:	p.hiddenLayer,
 		Bias:			p.bias,
@@ -514,8 +524,8 @@ func (p *perceptron) writeJSON(filename string) {
 		LossLevel:		p.lossLevel,
 		Rate:			p.rate,
 		Weights:		p.getWeight(),
-	}
-	b, err := json.MarshalIndent(t, "", "\t")
+	}*/
+	b, err := json.MarshalIndent(p, "", "\t")
 	if err != nil {
 		log.Fatal("JSON marshaling failed: ", err)
 	}

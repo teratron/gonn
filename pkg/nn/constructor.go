@@ -1,9 +1,16 @@
 //
 package nn
 
-import "io"
+import (
+	"io"
+
+	"github.com/zigenzoog/gonn/pkg"
+)
 
 type Constructor interface {
+	//
+	pkg.GetterSetter
+
 	// Initializing
 	init(int, ...interface{}) bool
 

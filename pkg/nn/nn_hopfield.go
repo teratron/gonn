@@ -20,7 +20,7 @@ type hopfield struct {
 }*/
 
 // Returns a new Hopfield neural network instance with the default parameters
-func (n *NN) Hopfield() NeuralNetwork {
+func (n *net) Hopfield() NeuralNetwork {
 	n.Architecture = &hopfield{
 		Architecture: n,
 	}
