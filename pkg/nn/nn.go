@@ -25,3 +25,7 @@ type net struct {
 	csv		csvType
 	db		dbType
 }
+
+type NN struct {
+	net *net
+}

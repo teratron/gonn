@@ -514,17 +514,6 @@ func (p *perceptron) readJSON(filename string) {
 
 // writeJSON
 func (p *perceptron) writeJSON(filename string) {
-	//fmt.Println("^^^")
-	/*t := test{
-		Architecture:	perceptron{},
-		HiddenLayer:	p.hiddenLayer,
-		Bias:			p.bias,
-		ActivationMode:	p.activationMode,
-		LossMode:		p.lossMode,
-		LossLevel:		p.lossLevel,
-		Rate:			p.rate,
-		Weights:		p.getWeight(),
-	}*/
 	b, err := json.MarshalIndent(p, "", "\t")
 	if err != nil {
 		log.Fatal("JSON marshaling failed: ", err)
@@ -533,8 +522,6 @@ func (p *perceptron) writeJSON(filename string) {
 	if err != nil {
 		log.Fatal("Can't write updated settings file:", err)
 	}
-
-	//p.readJSON(filename)
 }
 
 // writeReport report of neural network training results in io.Writer
