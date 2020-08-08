@@ -3,10 +3,10 @@ package nn
 
 import (
 	"fmt"
-	"github.com/zigenzoog/gonn/pkg"
-	"io"
 	"log"
 	"os"
+
+	"github.com/zigenzoog/gonn/pkg"
 )
 
 //type fileType io.ReadWriter
@@ -25,7 +25,7 @@ func File(filename string) *os.File {
 }
 
 //
-func (n *net) Read(reader io.Reader) {
+func (n *nn) Read(reader pkg.Reader) {
 	/*if a, ok := n.Get().(NeuralNetwork); ok {
 		a.Read(reader)
 	}*/
@@ -46,7 +46,7 @@ func (n *net) Read(reader io.Reader) {
 }
 
 //
-func (n *net) Write(writer ...io.Writer) {
+func (n *nn) Write(writer ...pkg.Writer) {
 	//fmt.Println("***")
 	if len(writer) > 0 {
 		if a, ok := n.Get().(NeuralNetwork); ok {

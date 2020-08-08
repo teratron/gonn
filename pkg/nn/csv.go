@@ -1,19 +1,24 @@
 //
 package nn
 
-import "io"
+import (
+	"github.com/zigenzoog/gonn/pkg"
+)
 
 type csvType string
 
 //
-func CSV(filename ...string) io.ReadWriter {
+func CSV(filename ...string) pkg.ReaderWriter {
 	return csvType(filename[0])
 }
 
-func (c csvType) Read(p []byte) (n int, err error) {
+/*func (c csvType) Read(p []byte) (n int, err error) {
 	return
 }
 
 func (c csvType) Write(p []byte) (n int, err error) {
 	return
-}
+}*/
+
+func (c csvType) Read(pkg.Reader) {}
+func (c csvType) Write(...pkg.Writer) {}

@@ -2,7 +2,7 @@
 package nn
 
 // Declare conformity with NeuralNetwork interface
-var _ NeuralNetwork = (*net)(nil)
+var _ NeuralNetwork = (*nn)(nil)
 
 //
 type NeuralNetwork interface {
@@ -11,10 +11,12 @@ type NeuralNetwork interface {
 
 	//
 	Constructor
+
+
 }
 
 //
-type net struct {
+type nn struct {
 	Architecture		`json:"architecture"`	// Architecture of neural network
 
 	isInit  bool								// Neural network initializing flag
@@ -27,5 +29,5 @@ type net struct {
 }
 
 type NN struct {
-	net *net
+	*nn
 }

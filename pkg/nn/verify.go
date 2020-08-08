@@ -3,7 +3,7 @@ package nn
 
 import "github.com/zigenzoog/gonn/pkg"
 
-func (n *net) Verify(input []float64, target ...[]float64) (loss float64) {
+func (n *nn) Verify(input []float64, target ...[]float64) (loss float64) {
 	if !n.IsTrain {
 		pkg.Log("Neural network is not trained", true) // !!!
 		if !n.isInit {

@@ -2,8 +2,6 @@
 package nn
 
 import (
-	"io"
-	"log"
 	"math/rand"
 	"time"
 
@@ -17,11 +15,21 @@ func init() {
 }
 
 // New returns a new neural network instance with the default parameters
-func New(reader ...io.Reader) NeuralNetwork {
-	n := new(net)
+func New(reader ...pkg.Reader) NeuralNetwork {
+	//n := new(nn)
+	n := &nn{
+		isInit:       false,
+		IsTrain:      false,
+		json:         "",
+		xml:          "",
+		csv:          "",
+	}
 	if len(reader) > 0 {
 		switch r := reader[0].(type) {
-		case jsonType:
+		case *perceptron:
+			n.Architecture = r
+			n.perceptron()
+		/*case jsonType:
 			if len(r) > 0 {
 				//n =
 			} else {
@@ -29,24 +37,17 @@ func New(reader ...io.Reader) NeuralNetwork {
 			}
 		case xmlType:
 		case csvType:
-		case dbType:
+		case dbType:*/
 		default:
 		}
 	} else {
-		n = &net{
-			Architecture: &perceptron{},
-			isInit:       false,
-			IsTrain:      false,
-			json:         "",
-			xml:          "",
-			csv:          "",
-		}
-		n.Perceptron() //???
+		n.Architecture = &perceptron{}
+		n.perceptron()
 	}
 	return n
 }
 
-func (n *net) init(lenInput int, lenTarget ...interface{}) bool {
+func (n *nn) init(lenInput int, lenTarget ...interface{}) bool {
 	if a, ok := n.Get().(NeuralNetwork); ok {
 		n.isInit = a.init(lenInput, lenTarget...)
 	}

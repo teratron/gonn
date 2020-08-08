@@ -3,28 +3,32 @@ package nn
 
 import (
 	"encoding/json"
-	"io"
 	"io/ioutil"
 	"log"
 	"os"
+
+	"github.com/zigenzoog/gonn/pkg"
 )
 
 type xmlType string
 
 //
-func XML(filename ...string) io.ReadWriter {
+func XML(filename ...string) pkg.ReaderWriter {
 	return xmlType(filename[0])
 }
 
-func (x xmlType) Read(p []byte) (n int, err error) {
+/*func (x xmlType) Read(p []byte) (n int, err error) {
 	return
 }
 
 func (x xmlType) Write(p []byte) (n int, err error) {
 	return
-}
+}*/
 
-func (n *net) readXML(filename string) {
+func (x xmlType) Read(pkg.Reader) {}
+func (x xmlType) Write(...pkg.Writer) {}
+
+func (n *nn) readXML(filename string) {
 	/*t := test
 	b, err := ioutil.ReadFile(filename)
 	if err != nil {
@@ -36,7 +40,7 @@ func (n *net) readXML(filename string) {
 	}*/
 }
 
-func (n *net) writeXML(filename string) {
+func (n *nn) writeXML(filename string) {
 	b, err := json.MarshalIndent(n, "", "\t")
 	if err != nil {
 		log.Fatal("XML marshaling failed: ", err)

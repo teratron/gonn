@@ -2,8 +2,9 @@
 package nn
 
 import (
-	"io"
 	"os"
+
+	"github.com/zigenzoog/gonn/pkg"
 )
 
 type report struct {
@@ -11,14 +12,16 @@ type report struct {
 	args	[]interface{}
 }
 
-func Report(file *os.File, args ...interface{}) io.Writer {
+func Report(file *os.File, args ...interface{}) pkg.Writer {
 	return &report{file, args}
 }
 
 /*func (r *report) Read(p []byte) (n int, err error) {
 	return
-}*/
+}
 
 func (r *report) Write(p []byte) (n int, err error) {
 	return
-}
+}*/
+
+func (r *report) Write(...pkg.Writer) {}

@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"math"
@@ -16,7 +15,7 @@ import (
 
 var _ NeuralNetwork = (*perceptron)(nil)
 
-type Perceptron interface {
+type Settings interface {
 	HiddenLayer() []uint
 	Bias() bool
 	ActivationMode() uint8
@@ -65,9 +64,12 @@ type perceptron struct {
 	lenOutput		int
 }
 
+func Perceptron() *perceptron {
+	return &perceptron{}
+}
 
 // Returns a new Perceptron neural network instance with the default parameters
-func (n *net) Perceptron() NeuralNetwork {
+func (n *nn) perceptron() NeuralNetwork {
 	n.Architecture = &perceptron{
 		Architecture:   n,
 		hiddenLayer:    HiddenType{},
@@ -220,7 +222,7 @@ func (p *perceptron) init(lenInput int, lenTarget ...interface{}) bool {
 				}
 			}
 		}
-		if n, ok := p.Get().(*net); ok && !n.IsTrain {
+		if n, ok := p.Get().(*nn); ok && !n.IsTrain {
 			p.initNeuron()
 			p.initAxon()
 		}
@@ -444,7 +446,7 @@ func (p *perceptron) getWeight() [][][]floatType {
 }
 
 // Read
-func (p *perceptron) Read(reader io.Reader) {
+func (p *perceptron) Read(reader pkg.Reader) {
 	switch r := reader.(type) {
 	case jsonType:
 		p.readJSON(string(r))
@@ -461,7 +463,7 @@ func (p *perceptron) Read(reader io.Reader) {
 }
 
 // Write
-func (p *perceptron) Write(writer ...io.Writer) {
+func (p *perceptron) Write(writer ...pkg.Writer) {
 	for _, w := range writer {
 		switch v := w.(type) {
 		case *report:

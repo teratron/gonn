@@ -5,8 +5,8 @@ package nn
 
 type Architecture interface {
 	//
-	Perceptron() NeuralNetwork
-	Perceptron
+	//perceptron() NeuralNetwork
+
 
 	//
 	RadialBasis() NeuralNetwork
@@ -15,6 +15,8 @@ type Architecture interface {
 	Hopfield() NeuralNetwork
 	//Hopfield
 
+	//
+	Settings
 }
 
 /*type Hopfield interface {

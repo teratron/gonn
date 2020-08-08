@@ -2,14 +2,13 @@
 package nn
 
 import (
-	"io"
-
 	"github.com/zigenzoog/gonn/pkg"
 )
 
 type Constructor interface {
 	//
 	pkg.GetterSetter
+	pkg.ReaderWriter
 
 	// Initializing
 	init(int, ...interface{}) bool
@@ -31,10 +30,4 @@ type Constructor interface {
 
 	// Deleting
 	//Delete()
-
-	//
-	Read(io.Reader)
-
-	//
-	Write(...io.Writer)
 }
