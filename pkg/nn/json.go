@@ -2,7 +2,6 @@
 package nn
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -40,15 +39,27 @@ func (n *nn) readJSON(filename string) {
 		log.Fatal("Can't load settings: ", err)
 	}
 	fmt.Println(string(b))
+	fmt.Println(b)
 
-	dec := json.NewDecoder(bytes.NewReader(b))
-	fmt.Println(dec)
+	//t1 := test1{Name: "1"}
+	//t2 := test2{Name2: "2"}
+	//t0 := new(test0)
+	t0 := &test0{}
 
-	err = dec.Decode(n)
+	//fmt.Println(*t0)
+
+	_ = json.Unmarshal(b, &t0)
+
+	fmt.Printf("%T %v",*t0, t0/*.Map["t1"]*/)
+
+	/*dec := json.NewDecoder(bytes.NewReader(b))
+	fmt.Println(dec)*/
+
+	/*err = dec.Decode(t0)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(dec)
+	fmt.Println(dec)*/
 
 	/*for {
 		t, err := dec.Token()
@@ -64,10 +75,10 @@ func (n *nn) readJSON(filename string) {
 		fmt.Printf("\n")
 	}*/
 
-	err = json.Unmarshal(b, n)
+	/*err = json.Unmarshal(b, n)
 	if err != nil {
 		log.Fatal("Invalid settings format: ", err)
-	}
+	}*/
 	//fmt.Println(n.Architecture.(*perceptron).Settings)
 }
 

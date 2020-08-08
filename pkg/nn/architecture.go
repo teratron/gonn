@@ -9,10 +9,10 @@ type Architecture interface {
 
 
 	//
-	RadialBasis() NeuralNetwork
+	//RadialBasis() NeuralNetwork
 
 	//
-	Hopfield() NeuralNetwork
+	//Hopfield() NeuralNetwork
 	//Hopfield
 
 	//

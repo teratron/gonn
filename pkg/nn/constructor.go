@@ -8,6 +8,8 @@ import (
 type Constructor interface {
 	//
 	pkg.GetterSetter
+
+	//
 	pkg.ReaderWriter
 
 	// Initializing

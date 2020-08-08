@@ -516,7 +516,17 @@ func (p *perceptron) readJSON(filename string) {
 
 // writeJSON
 func (p *perceptron) writeJSON(filename string) {
-	b, err := json.MarshalIndent(p, "", "\t")
+	t1 := test1{Name: "1"}
+	///t2 := test1{Name2: "2"}
+	t := test0{
+		Type: t1,
+		Map: map[string]Tester{
+			"t1": t1,
+		},
+	}
+
+
+	b, err := json.MarshalIndent(t, "", "\t")
 	if err != nil {
 		log.Fatal("JSON marshaling failed: ", err)
 	}

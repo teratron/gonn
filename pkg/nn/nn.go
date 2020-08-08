@@ -31,3 +31,23 @@ type nn struct {
 type NN struct {
 	*nn
 }
+
+type Tester interface {
+	com()
+}
+
+type test0 struct {
+	Type	Tester
+	Map		map[string]Tester
+}
+
+type test1 struct {
+	Name	string
+}
+
+type test2 struct {
+	Name2	string
+}
+
+func (t test1) com() {}
+func (t test2) com() {}

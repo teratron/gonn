@@ -29,10 +29,9 @@ import (
 )
 
 func main() {
-	// Creat new Neural Network
-	// Default Perceptron Neural Network, same n := nn.New(Perceptron())
-	// n = nn.New(RadialBasis())
-	// n = nn.New(Hopfield())
+	// Creat new Neural Network,
+	// default perceptron neural network,
+	// same n := nn.New(Perceptron())
 	n := nn.New()
 
 	// Set parameters
@@ -44,19 +43,21 @@ func main() {
 		nn.LossLevel(.0001),
 		nn.Rate(nn.DefaultRate))
 
-    // Data set
-    input  := []float64{1, 0}
+	// Data set
+	input  := []float64{1, 0}
 	target := []float64{0, 1}
 
 	//
 	loss, count := n.Train(input, target)
 	
-    //
+	//
 	n.Write(
+		nn.JSON("perceptron.json"),
 		nn.Report(nn.File("report.txt"), input, loss, count),
 		nn.Report(os.Stdout, input, loss, count))
 }
 ```
+
 And you can run that simply as:
     
     $ go run main.go
