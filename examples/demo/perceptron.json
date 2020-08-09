@@ -1,10 +1,14 @@
 {
-	"Type": {
-		"Name": "1"
-	},
-	"Map": {
-		"t2": {
-			"Name": "1"
+	"architecture": {
+		"perceptron": {
+			"hiddenLayer": null,
+			"bias": false,
+			"activationMode": 0,
+			"lossMode": 0,
+			"lossLevel": 0,
+			"rate": 0,
+			"weights": null
 		}
-	}
+	},
+	"isTrain": true
 }

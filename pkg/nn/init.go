@@ -18,16 +18,21 @@ func init() {
 func New(reader ...pkg.Reader) NeuralNetwork {
 	//n := new(nn)
 	n := &nn{
-		isInit:       false,
-		IsTrain:      false,
-		json:         "",
-		xml:          "",
-		csv:          "",
+		//Parameter: make(map[string]Architecture),
+		isInit:    false,
+		IsTrain:   false,
+		json:      "",
+		xml:       "",
+		csv:       "",
+		db:        "",
 	}
+	//n.Parameter = make(map[string]interface{})
 	if len(reader) > 0 {
 		switch r := reader[0].(type) {
 		case *perceptron:
 			n.Architecture = r
+			//n.Parameter["Architecture"] = r
+			n.Parameters = r
 			n.perceptron()
 		/*case jsonType:
 			if len(r) > 0 {
@@ -42,6 +47,7 @@ func New(reader ...pkg.Reader) NeuralNetwork {
 		}
 	} else {
 		n.Architecture = &perceptron{}
+		//n.Parameter["perceptron"] = &perceptron{}
 		n.perceptron()
 	}
 	return n

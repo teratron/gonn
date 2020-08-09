@@ -16,7 +16,7 @@ type Architecture interface {
 	//Hopfield
 
 	//
-	Settings
+	Parameter
 }
 
 /*type Hopfield interface {

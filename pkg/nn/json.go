@@ -1,4 +1,3 @@
-//
 package nn
 
 import (
@@ -6,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 
 	"github.com/zigenzoog/gonn/pkg"
 )
@@ -36,21 +36,18 @@ func (j jsonType) Write(...pkg.Writer) {}
 func (n *nn) readJSON(filename string) {
 	b, err := ioutil.ReadFile(filename)
 	if err != nil {
-		log.Fatal("Can't load settings: ", err)
+		log.Fatal("Can't load json: ", err)
 	}
 	fmt.Println(string(b))
-	fmt.Println(b)
+	//fmt.Println(b)
 
 	//t1 := test1{Name: "1"}
 	//t2 := test2{Name2: "2"}
 	//t0 := new(test0)
-	t0 := &test0{}
-
+	//t0 := &test0{}
 	//fmt.Println(*t0)
-
-	_ = json.Unmarshal(b, &t0)
-
-	fmt.Printf("%T %v",*t0, t0/*.Map["t1"]*/)
+	//_ = json.Unmarshal(b, &t0)
+	//fmt.Printf("%T %v",*t0, t0)
 
 	/*dec := json.NewDecoder(bytes.NewReader(b))
 	fmt.Println(dec)*/
@@ -75,14 +72,24 @@ func (n *nn) readJSON(filename string) {
 		fmt.Printf("\n")
 	}*/
 
-	/*err = json.Unmarshal(b, n)
+	err = json.Unmarshal(b, n)
 	if err != nil {
-		log.Fatal("Invalid settings format: ", err)
+		log.Fatal("Invalid format ", err)
+	}
+	fmt.Printf("%T - %v", n, n.Architecture)
+	/*fmt.Println(n.Architecture.(*perceptron).Settings["perceptron"])
+	if a, ok := n.Architecture.(*perceptron); ok {
+		for key, value := range a.Settings {
+			fmt.Printf("%s: %T - %v", key, value, value)
+		}
 	}*/
-	//fmt.Println(n.Architecture.(*perceptron).Settings)
+
 }
 
-/*func (n *net) writeJSON(filename string) {
+func (n *nn) writeJSON(filename string) {
+
+	//v := Parameters(n.Get().(*perceptron))
+
 	b, err := json.MarshalIndent(n, "", "\t")
 	if err != nil {
 		log.Fatal("JSON marshaling failed: ", err)
@@ -91,4 +98,4 @@ func (n *nn) readJSON(filename string) {
 	if err != nil {
 		log.Fatal("Can't write updated settings file:", err)
 	}
-}*/
+}

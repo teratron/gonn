@@ -49,10 +49,10 @@ func (n *nn) Read(reader pkg.Reader) {
 func (n *nn) Write(writer ...pkg.Writer) {
 	//fmt.Println("***")
 	if len(writer) > 0 {
-		if a, ok := n.Get().(NeuralNetwork); ok {
+		/*if a, ok := n.Get().(NeuralNetwork); ok {
 			a.Write(writer...)
-		}
-		/*for _, w := range writer {
+		}*/
+		for _, w := range writer {
 			switch v := w.(type) {
 			case *report:
 				if a, ok := n.Get().(NeuralNetwork); ok {
@@ -69,7 +69,7 @@ func (n *nn) Write(writer ...pkg.Writer) {
 					a.Write(writer...)
 				}
 			}
-		}*/
+		}
 	} else {
 		log.Println("Empty Write()") // !!!
 	}

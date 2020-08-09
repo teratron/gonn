@@ -17,28 +17,30 @@ type NeuralNetwork interface {
 
 //
 type nn struct {
-	Architecture		`json:"architecture"`	// Architecture of neural network
-
-	isInit  bool								// Neural network initializing flag
-	IsTrain bool		`json:"isTrain"`		// Neural network training flag
-
-	json	jsonType
-	xml		xmlType
-	csv		csvType
-	db		dbType
+	Architecture						`json:"-"`				// Architecture of neural network
+	//Parameter map[string]interface{}	`json:"architecture"`
+	Parameters interface{}	`json:"architecture"`
+	isInit    bool                    // Neural network initializing flag
+	IsTrain   bool                    `json:"isTrain"`		// Neural network training flag
+	json		jsonType
+	xml			xmlType
+	csv			csvType
+	db			dbType
 }
+
+//type Parameters interface{}
 
 type NN struct {
 	*nn
 }
 
-type Tester interface {
+/*type Tester interface {
 	com()
 }
 
 type test0 struct {
-	Type	Tester
-	Map		map[string]Tester
+	//Type	Tester
+	Architecture		map[string]Tester
 }
 
 type test1 struct {
@@ -50,4 +52,4 @@ type test2 struct {
 }
 
 func (t test1) com() {}
-func (t test2) com() {}
+func (t test2) com() {}*/

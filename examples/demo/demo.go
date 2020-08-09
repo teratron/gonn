@@ -29,8 +29,8 @@ func main() {
 	target := []float64{3.6}
 
 	//
-	//loss, count := n.Train(input, target)
-	_, _ = n.Train(input, target)
+	loss, count := n.Train(input, target)
+	//_, _ = n.Train(input, target)
 
 	//
 	//fmt.Println(n.Query(input))
@@ -92,10 +92,10 @@ func main() {
 	defer func() { _ = file.Close() }()*/
 
 	//
-	/*n.Write(
+	n.Write(
 		nn.JSON("perceptron.json"),
 		nn.Report(nn.File("report.txt"), input, loss, count),
-		nn.Report(os.Stdout, input, loss, count))*/
+		/*nn.Report(os.Stdout, input, loss, count)*/)
 
 	n.Read(nn.JSON("perceptron.json"))
 }
