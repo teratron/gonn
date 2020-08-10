@@ -8,7 +8,7 @@ func main() {
 	// New returns a new neural network
 	// instance with the default parameters
 	// same n := nn.New(Perceptron())
-	n := nn.New(nn.Perceptron())
+	n := nn.New(/*nn.Perceptron()*/)
 
 	//fmt.Println(n)
 
@@ -22,9 +22,10 @@ func main() {
 		nn.Rate(nn.DefaultRate))
 
 	//
-	//numInputData  := 8	// 5
-	//numOutputData := 1
-	//dataScale     := 1000.  // Коэфициент масштабирования данных, приводящих к промежутку от -1 до 1
+	//numInput  := 3
+	//numOutput := 2
+	//dataSet := []float64{.27, .31, .52, .66, .81, .13, .2, .49, .11, .73, .28, .43}
+
 	input  := []float64{2.3, 3.1}
 	target := []float64{3.6}
 
@@ -42,9 +43,9 @@ func main() {
 	/*maxEpoch := 100000
 	minError := 1.
 	for epoch := 1; epoch <= maxEpoch; epoch++ {
-		for i := numInputData; i <= len(dataSet) - numOutputData; i++ {
-			//input  = getInputArray(dataset[i - numInputData:i])
-			//target = getTargetArray(dataset[i:i + numOutputData])
+		for i := numInput; i <= len(dataSet) - numOutput; i++ {
+			input  = getInputData(dataSet[i - numInput:i])
+			target = getTargetData(dataSet[i:i + numOutput])
 			loss, count = n.Train(input, target)
 		}
 
@@ -82,13 +83,6 @@ func main() {
 			break
 		}
 	}*/
-
-	//
-	/*file, err := os.Create("report.txt")
-	if err != nil {
-		os.Exit(1)
-	}
-	defer func() { _ = file.Close() }()*/
 
 	//
 	n.Write(

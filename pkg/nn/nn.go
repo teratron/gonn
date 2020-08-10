@@ -1,5 +1,6 @@
-//
 package nn
+
+import "github.com/zigenzoog/gonn/pkg"
 
 // Declare conformity with NeuralNetwork interface
 var _ NeuralNetwork = (*nn)(nil)
@@ -7,49 +8,57 @@ var _ NeuralNetwork = (*nn)(nil)
 //
 type NeuralNetwork interface {
 	//
-	Architecture
+	pkg.GetterSetter
+
+	//
+	pkg.ReaderWriter
+
+	//
+	//Parameter
 
 	//
 	Constructor
 
+	//
+	/*pkg.GetterSetter
 
+	//
+	pkg.ReaderWriter
+
+	// Initializing
+	init(int, ...interface{}) bool
+
+	// Querying
+	Query(input []float64) (output []float64)
+
+	// Verifying
+	Verify(input []float64, target ...[]float64) (loss float64)
+
+	// Training
+	Train(input []float64, target ...[]float64) (loss float64, count int)
+
+	// Copying
+	//Copy(dst []float64, src []float64) int
+
+	// Adding
+	//Add()
+
+	// Deleting
+	//Delete()*/
 }
 
 //
 type nn struct {
-	Architecture						`json:"architecture,omitempty"`				// Architecture of neural network
-	//Parameter map[string]interface{}	`json:"architecture"`
-	//Parameters interface{}	`json:"architecture"`
-	isInit    bool                    // Neural network initializing flag
-	IsTrain   bool                    `json:"isTrain"`		// Neural network training flag
-	json		jsonType
-	xml			xmlType
-	csv			csvType
-	db			dbType
+	//Parameter						`json:"-"`
+	Architecture	NeuralNetwork	`json:"architecture,omitempty"`	// Architecture of neural network
+	isInit			bool                    						// Neural network initializing flag
+	IsTrain			bool			`json:"isTrain"`				// Neural network training flag
+	json			jsonType
+	xml				xmlType
+	csv				csvType
+	db				dbType
 }
-
-//type Parameters interface{}
 
 type NN struct {
 	*nn
 }
-
-/*type Tester interface {
-	com()
-}
-
-type test0 struct {
-	//Type	Tester
-	Architecture		map[string]Tester
-}
-
-type test1 struct {
-	Name	string
-}
-
-type test2 struct {
-	Name2	string
-}
-
-func (t test1) com() {}
-func (t test2) com() {}*/

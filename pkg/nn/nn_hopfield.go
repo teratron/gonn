@@ -7,15 +7,16 @@ import (
 	"github.com/zigenzoog/gonn/pkg"
 )
 
+var _ NeuralNetwork = (*hopfield)(nil)
+
 type hopfield struct {
-	Architecture
+	architecture		NeuralNetwork
+	//Parameter
 	Constructor
 
-	name			string
-
-	Parameter struct{
+	Parameters struct{
 		Weights			[][]floatType	`json:"weights" xml:"weights"`
-	}
+	}									`json:"hopfield" xml:"hopfield"`
 
 	// Matrix
 	neuron []*Neuron
@@ -29,8 +30,7 @@ func Hopfield() *hopfield {
 // Returns a new Hopfield neural network instance with the default parameters
 func (n *nn) hopfield() NeuralNetwork {
 	n.Architecture = &hopfield{
-		Architecture: n,
-		name:		"hopfield",
+		architecture: n,
 	}
 	return n
 }
@@ -63,7 +63,7 @@ func (h *hopfield) Get(args ...pkg.Getter) pkg.GetterSetter {
 }
 
 // Initialization
-func (h *hopfield) init(args ...pkg.Setter) bool {
+func (h *hopfield) init(length int, args ...interface{}) bool {
 	return true
 }
 
@@ -76,3 +76,41 @@ func (h *hopfield) init(args ...pkg.Setter) bool {
 func (h *hopfield) Query(input []float64) []float64 {
 	panic("implement me")
 }*/
+
+// Read
+func (h *hopfield) Read(reader pkg.Reader) {
+	/*switch r := reader.(type) {
+	case jsonType:
+		h.readJSON(string(r))
+	case xml:
+		h.readXML(v)
+	case xml:
+		h.readCSV(v)
+	case db:
+		h.readDB(v)
+	default:
+		pkg.Log("This type is missing for write", true) // !!!
+		log.Printf("\tWrite: %T %v\n", r, r) // !!!
+	}*/
+}
+
+// Write
+func (h *hopfield) Write(writer ...pkg.Writer) {
+	/*for _, w := range writer {
+		switch v := w.(type) {
+		case *report:
+			h.writeReport(v)
+		case jsonType:
+			h.writeJSON(string(v))
+		case xml:
+			h.writeXML(v)
+		case xml:
+			h.writeCSV(v)
+		case db:
+			h.writeDB(v)
+		default:
+			pkg.Log("This type is missing for write", true) // !!!
+			log.Printf("\tWrite: %T %v\n", w, w) // !!!
+		}
+	}*/
+}

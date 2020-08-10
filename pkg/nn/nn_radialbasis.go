@@ -1,21 +1,21 @@
 // Radial Basis Neural Network - under construction
 package nn
 
-import (
+/*import (
 	"log"
 
 	"github.com/zigenzoog/gonn/pkg"
 )
 
 type radialBasis struct {
-	Architecture
+	Parameter
 	Constructor
 }
 
 // Returns a new Radial Basis neural network instance with the default parameters
 func (n *nn) RadialBasis() NeuralNetwork {
 	n.Architecture = &radialBasis{
-		Architecture: n,
+		Parameter: n,
 	}
 	return n
 }
@@ -50,7 +50,7 @@ func (r *radialBasis) Get(args ...pkg.Getter) pkg.GetterSetter {
 // Initialization
 func (r *radialBasis) init(args ...pkg.Setter) bool {
 	return true
-}
+}*/
 
 // Train
 /*func (r *radialBasis) Train(input, target []float64) (loss float64, count int) {

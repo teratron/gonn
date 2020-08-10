@@ -14,61 +14,43 @@ import (
 )
 
 var _ NeuralNetwork = (*perceptron)(nil)
+//var _ PerceptronNN = (*perceptron)(nil)
 
-type Parameter interface {
+/*type PerceptronNN interface {
 	HiddenLayer() []uint
 	Bias() bool
 	ActivationMode() uint8
 	LossMode() uint8
 	LossLevel() float64
 	Rate() float32
-}
+}*/
 
-type perceptronParameter struct {
-	HiddenLayer		HiddenType		`json:"hiddenLayer" xml:"hiddenLayer"`
-	Bias			biasType		`json:"bias" xml:"bias"`
-	ActivationMode	uint8			`json:"activationMode" xml:"activationMode"`
-	LossMode		uint8			`json:"lossMode" xml:"lossMode"`
-	LossLevel		float64			`json:"lossLevel" xml:"lossLevel"`
-	Rate			floatType		`json:"rate" xml:"rate"`
-	Weights			[][][]floatType	`json:"weights" xml:"weights"`
-}
 
 type perceptron struct {
-	Architecture						`json:"-"`
-	name			string
+	architecture		NeuralNetwork
 
 	Parameter struct{
+		// Array of the number of neurons in each hidden layer
 		HiddenLayer		HiddenType		`json:"hiddenLayer" xml:"hiddenLayer"`
+
+		// The neuron bias, false or true
 		Bias			biasType		`json:"bias" xml:"bias"`
+
+		// Activation function mode
 		ActivationMode	uint8			`json:"activationMode" xml:"activationMode"`
+
+		// The mode of calculation of the total error
 		LossMode		uint8			`json:"lossMode" xml:"lossMode"`
+
+		// Minimum (sufficient) level of the average of the error during training
 		LossLevel		float64			`json:"lossLevel" xml:"lossLevel"`
+
+		// Learning coefficient, from 0 to 1
 		Rate			floatType		`json:"rate" xml:"rate"`
+
+		//
 		Weights			[][][]floatType	`json:"weights" xml:"weights"`
 	}									`json:"perceptron" xml:"perceptron"`
-
-	Parameters			perceptronParameter	//`json:"perceptron" xml:"perceptron"`
-
-	//Settings		map[string]interface{}								`json:"architecture" xml:"architecture"`
-
-	// Array of the number of neurons in each hidden layer
-	hiddenLayer    HiddenType	//`json:"hiddenLayer" xml:"hiddenLayer"`
-
-	// The neuron bias, false or true
-	bias           biasType
-
-	// Activation function mode
-	activationMode uint8		//`json:"activationMode" xml:"activationMode"`
-
-	//
-	lossMode       uint8		//`json:"lossMode" xml:"lossMode"`
-
-	// Minimum (sufficient) level of the average of the error during training
-	lossLevel      float64		//`json:"lossLevel" xml:"lossLevel"`
-
-	// Learning coefficient, from 0 to 1
-	rate           floatType	//`json:"rate" xml:"rate"`
 
 	// Matrix
 	neuron			[][]*Neuron
@@ -86,84 +68,22 @@ func Perceptron() *perceptron {
 // Returns a new Perceptron neural network instance with the default parameters
 func (n *nn) perceptron() NeuralNetwork {
 	n.Architecture = &perceptron{
-		Architecture:   n,
-
-		Parameters:		perceptronParameter{},
-
-		name:			"perceptron",
-		hiddenLayer:    HiddenType{},
-		bias:           false,
-		activationMode: ModeSIGMOID,
-		lossMode:       ModeMSE,
-		lossLevel:      .0001,
-		rate:           floatType(DefaultRate),
+		architecture: n,
 	}
 	if p, ok := n.Architecture.(*perceptron); ok {
-		/*p.Settings = make(map[string]interface{})
-		p.Settings["perceptron"] = struct{
-			HiddenLayer		HiddenType		`json:"hiddenLayer" xml:"hiddenLayer"`
-			Bias			biasType		`json:"bias" xml:"bias"`
-			ActivationMode	uint8			`json:"activationMode" xml:"activationMode"`
-			LossMode		uint8			`json:"lossMode" xml:"lossMode"`
-			LossLevel		float64			`json:"lossLevel" xml:"lossLevel"`
-			Rate			floatType		`json:"rate" xml:"rate"`
-			Weights			[][][]floatType	`json:"weights" xml:"weights"`
-		}{
-			HiddenLayer:    HiddenType{4, 9},
-			Bias:           false,
-			ActivationMode: ModeSIGMOID,
-			LossMode:       ModeMSE,
-			LossLevel:      .0001,
-			Rate:           floatType(DefaultRate),
-		}*/
-
-
-
-
-		/*p.Settings["perceptron"] = struct{
-			HiddenLayer		HiddenType		`json:"hiddenLayer" xml:"hiddenLayer"`
-			Bias			biasType		`json:"bias" xml:"bias"`
-			ActivationMode	uint8			`json:"activationMode" xml:"activationMode"`
-			LossMode		uint8			`json:"lossMode" xml:"lossMode"`
-			LossLevel		float64			`json:"lossLevel" xml:"lossLevel"`
-			Rate			floatType		`json:"rate" xml:"rate"`
-			Weights			[][][]floatType	`json:"weights" xml:"weights"`
-		}{
-			HiddenLayer:    HiddenType{},
-			Bias:           false,
-			ActivationMode: ModeSIGMOID,
-			LossMode:       ModeMSE,
-			LossLevel:      .0001,
-			Rate:           floatType(DefaultRate),
-		}*/
 		p.Parameter.HiddenLayer		= HiddenType{9, 2}
-		p.Parameter.Bias 			= true
+		p.Parameter.Bias 			= false
 		p.Parameter.ActivationMode	= ModeSIGMOID
 		p.Parameter.LossMode		= ModeMSE
 		p.Parameter.LossLevel		= .0001
 		p.Parameter.Rate			= floatType(DefaultRate)
+		p.Parameter.Weights			= nil
 	}
 	return n
 }
 
-// Preset
-func (p *perceptron) Preset(name string) {
-	switch name {
-	default:
-		fallthrough
-	case "default":
-		p.Set(
-			HiddenLayer(),
-			Bias(false),
-			ActivationMode(ModeSIGMOID),
-			LossMode(ModeMSE),
-			LossLevel(.0001),
-			Rate(DefaultRate))
-	}
-}
-
 // HiddenLayer
-func (p *perceptron) HiddenLayer() []uint {
+/*func (p *perceptron) HiddenLayer() []uint {
 	return p.Parameter.HiddenLayer
 }
 
@@ -190,24 +110,24 @@ func (p *perceptron) LossLevel() float64 {
 // Rate
 func (p *perceptron) Rate() float32 {
 	return float32(p.Parameter.Rate)
-}
+}*/
 
 // Setter
 func (p *perceptron) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
 		switch v := args[0].(type) {
 		case HiddenType:
-			p.hiddenLayer = v
+			p.Parameter.HiddenLayer = v
 		case biasType:
-			p.bias = v
+			p.Parameter.Bias = v
 		case activationModeType:
-			p.activationMode = uint8(v)
+			p.Parameter.ActivationMode = uint8(v)
 		case lossModeType:
-			p.lossMode = uint8(v)
+			p.Parameter.LossMode = uint8(v)
 		case lossLevelType:
-			p.lossLevel = float64(v)
+			p.Parameter.LossLevel = float64(v)
 		case rateType:
-			p.rate = floatType(v)
+			p.Parameter.Rate = floatType(v)
 		default:
 			pkg.Log("This type is missing for Perceptron Neural Network", true) // !!!
 			log.Printf("\tset: %T %v\n", v, v) // !!!
@@ -222,24 +142,24 @@ func (p *perceptron) Get(args ...pkg.Getter) pkg.GetterSetter {
 	if len(args) > 0 {
 		switch args[0].(type) {
 		case HiddenType:
-			return p.hiddenLayer
+			return p.Parameter.HiddenLayer
 		case biasType:
-			return p.bias
+			return p.Parameter.Bias
 		case activationModeType:
-			return activationModeType(p.activationMode)
+			return activationModeType(p.Parameter.ActivationMode)
 		case lossModeType:
-			return lossModeType(p.lossMode)
+			return lossModeType(p.Parameter.LossMode)
 		case lossLevelType:
-			return lossLevelType(p.lossLevel)
+			return lossLevelType(p.Parameter.LossLevel)
 		case rateType:
-			return p.rate
+			return p.Parameter.Rate
 		default:
 			pkg.Log("This type is missing for Perceptron Neural Network", true) // !!!
 			log.Printf("\tget: %T %v\n", args[0], args[0]) // !!!
 			return nil
 		}
 	} else {
-		if a, ok := p.Architecture.(NeuralNetwork); ok {
+		if a, ok := p.architecture.(NeuralNetwork); ok {
 			return a
 		}
 	}
@@ -254,15 +174,15 @@ func (p *perceptron) init(lenInput int, lenTarget ...interface{}) bool {
 			tmp = nil
 		}()
 
-		p.lastIndexLayer = len(p.hiddenLayer)
+		p.lastIndexLayer = len(p.Parameter.HiddenLayer)
 		p.lenInput       = lenInput
 		p.lenOutput      = lenTarget[0].(int)
-		tmp              = append(p.hiddenLayer, uint(p.lenOutput))
+		tmp              = append(p.Parameter.HiddenLayer, uint(p.lenOutput))
 		layer           := make(HiddenType, p.lastIndexLayer + 1)
 		lenLayer        := copy(layer, tmp)
 
 		b := 0
-		if p.bias {
+		if p.Parameter.Bias {
 			b = 1
 		}
 		p.neuron = make([][]*Neuron, lenLayer)
@@ -351,7 +271,7 @@ func (p *perceptron) calcNeuron(input []float64) {
 				for _, a := range n.axon {
 					n.value += getSynapseInput(a) * a.weight
 				}
-				n.value = floatType(calcActivation(float64(n.value), p.activationMode))
+				n.value = floatType(calcActivation(float64(n.value), p.Parameter.ActivationMode))
 				wait <- true
 			}(w)
 		}
@@ -366,19 +286,19 @@ func (p *perceptron) calcLoss(target []float64) (loss float64) {
 	for i, v := range p.neuron[p.lastIndexLayer] {
 		if miss, ok := v.specific.(floatType); ok {
 			miss = floatType(target[i]) - v.value
-			switch p.lossMode {
+			switch p.Parameter.LossMode {
 			default: fallthrough
 			case ModeMSE, ModeRMSE:
 				loss += math.Pow(float64(miss), 2)
 			case ModeARCTAN:
 				loss += math.Pow(math.Atan(float64(miss)), 2)
 			}
-			miss *= floatType(calcDerivative(float64(v.value), p.activationMode))
+			miss *= floatType(calcDerivative(float64(v.value), p.Parameter.ActivationMode))
 			v.specific = miss
 		}
 	}
 	loss /= float64(p.lenOutput)
-	if p.lossMode == ModeRMSE {
+	if p.Parameter.LossMode == ModeRMSE {
 		loss = math.Sqrt(loss)
 	}
 	return
@@ -398,7 +318,7 @@ func (p *perceptron) calcMiss(input []float64) {
 							miss += m * w.axon[j].weight
 						}
 					}
-					miss *= floatType(calcDerivative(float64(n.value), p.activationMode))
+					miss *= floatType(calcDerivative(float64(n.value), p.Parameter.ActivationMode))
 					n.specific = miss
 				}
 				wait <- true
@@ -421,7 +341,7 @@ func (p *perceptron) calcAxon(input []float64) {
 				go func(a *Axon) {
 					if n, ok := a.synapse["output"].(*Neuron); ok {
 						if miss, ok := n.specific.(floatType); ok {
-							a.weight += getSynapseInput(a) * miss * p.rate
+							a.weight += getSynapseInput(a) * miss * p.Parameter.Rate
 						}
 					}
 					wait <- true
@@ -439,7 +359,7 @@ func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, 
 	if len(target) > 0 {
 		for count < 1 /*MaxIteration*/ {
 			p.calcNeuron(input)
-			if loss = p.calcLoss(target[0]); loss <= p.lossLevel || loss <= MinLossLevel {
+			if loss = p.calcLoss(target[0]); loss <= p.Parameter.LossLevel || loss <= MinLossLevel {
 				break
 			}
 			//p.calcMiss(input)

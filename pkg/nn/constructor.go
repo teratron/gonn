@@ -1,16 +1,7 @@
-//
 package nn
 
-import (
-	"github.com/zigenzoog/gonn/pkg"
-)
-
+//
 type Constructor interface {
-	//
-	pkg.GetterSetter
-
-	//
-	pkg.ReaderWriter
 
 	// Initializing
 	init(int, ...interface{}) bool

@@ -72,7 +72,7 @@ func (n *nn) readJSON(filename string) {
 
 	aa := data["architecture"].(map[string]interface{})
 	//fmt.Println(aa)
-	dd := aa["Parameters"]
+	dd := aa["perceptron"]
 	//fmt.Println(dd)
 
 	st := os.Stdout
@@ -80,12 +80,13 @@ func (n *nn) readJSON(filename string) {
 	enc.SetIndent("", "\t")
 	err = enc.Encode(&dd)
 
-	pp := &perceptronParameter{}
+	pp := &perceptron{}
+	ppp := pp.Parameter
 	dec := json.NewDecoder(bufio.NewReader(st))
-	if err := dec.Decode(pp); err == io.EOF {
+	if err := dec.Decode(ppp); err == io.EOF {
 		return
 	}
-	fmt.Println(pp.Weights)
+	fmt.Printf("%T - %v\n", ppp.Bias, ppp.Bias)
 
 
 	//for key, value := range aa["perceptron"].(map[string]interface{}) {
