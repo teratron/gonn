@@ -32,7 +32,7 @@ func New(reader ...pkg.Reader) NeuralNetwork {
 		case *perceptron:
 			n.Architecture = r
 			//n.Parameter["Architecture"] = r
-			n.Parameters = r
+			//n.Parameters = r
 			n.perceptron()
 		/*case jsonType:
 			if len(r) > 0 {

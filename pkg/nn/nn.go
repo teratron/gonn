@@ -17,9 +17,9 @@ type NeuralNetwork interface {
 
 //
 type nn struct {
-	Architecture						`json:"-"`				// Architecture of neural network
+	Architecture						`json:"architecture,omitempty"`				// Architecture of neural network
 	//Parameter map[string]interface{}	`json:"architecture"`
-	Parameters interface{}	`json:"architecture"`
+	//Parameters interface{}	`json:"architecture"`
 	isInit    bool                    // Neural network initializing flag
 	IsTrain   bool                    `json:"isTrain"`		// Neural network training flag
 	json		jsonType

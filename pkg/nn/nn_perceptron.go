@@ -24,6 +24,16 @@ type Parameter interface {
 	Rate() float32
 }
 
+type perceptronParameter struct {
+	HiddenLayer		HiddenType		`json:"hiddenLayer" xml:"hiddenLayer"`
+	Bias			biasType		`json:"bias" xml:"bias"`
+	ActivationMode	uint8			`json:"activationMode" xml:"activationMode"`
+	LossMode		uint8			`json:"lossMode" xml:"lossMode"`
+	LossLevel		float64			`json:"lossLevel" xml:"lossLevel"`
+	Rate			floatType		`json:"rate" xml:"rate"`
+	Weights			[][][]floatType	`json:"weights" xml:"weights"`
+}
+
 type perceptron struct {
 	Architecture						`json:"-"`
 	name			string
@@ -37,6 +47,8 @@ type perceptron struct {
 		Rate			floatType		`json:"rate" xml:"rate"`
 		Weights			[][][]floatType	`json:"weights" xml:"weights"`
 	}									`json:"perceptron" xml:"perceptron"`
+
+	Parameters			perceptronParameter	//`json:"perceptron" xml:"perceptron"`
 
 	//Settings		map[string]interface{}								`json:"architecture" xml:"architecture"`
 
@@ -75,6 +87,9 @@ func Perceptron() *perceptron {
 func (n *nn) perceptron() NeuralNetwork {
 	n.Architecture = &perceptron{
 		Architecture:   n,
+
+		Parameters:		perceptronParameter{},
+
 		name:			"perceptron",
 		hiddenLayer:    HiddenType{},
 		bias:           false,
@@ -148,7 +163,7 @@ func (p *perceptron) Preset(name string) {
 }
 
 // HiddenLayer
-/*func (p *perceptron) HiddenLayer() []uint {
+func (p *perceptron) HiddenLayer() []uint {
 	return p.Parameter.HiddenLayer
 }
 
@@ -175,7 +190,7 @@ func (p *perceptron) LossLevel() float64 {
 // Rate
 func (p *perceptron) Rate() float32 {
 	return float32(p.Parameter.Rate)
-}*/
+}
 
 // Setter
 func (p *perceptron) Set(args ...pkg.Setter) {
@@ -577,12 +592,12 @@ func (p *perceptron) writeJSON(filename string) {
 		},
 	}*/
 
-	v := map[string]interface{}{
+	/*v := map[string]interface{}{
 		"architecture": p,
-	}
+	}*/
 
 
-	b, err := json.MarshalIndent(v, "", "\t")
+	b, err := json.MarshalIndent(p, "", "\t")
 	if err != nil {
 		log.Fatal("JSON marshaling failed: ", err)
 	}

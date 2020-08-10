@@ -11,18 +11,26 @@ type hopfield struct {
 	Architecture
 	Constructor
 
+	name			string
+
+	Parameter struct{
+		Weights			[][]floatType	`json:"weights" xml:"weights"`
+	}
+
+	// Matrix
 	neuron []*Neuron
 	axon   [][]*Axon
 }
 
-/*func Hopfield() io.ReadWriter {
-	return nil
-}*/
+func Hopfield() *hopfield {
+	return &hopfield{}
+}
 
 // Returns a new Hopfield neural network instance with the default parameters
-func (n *nn) Hopfield() NeuralNetwork {
+func (n *nn) hopfield() NeuralNetwork {
 	n.Architecture = &hopfield{
 		Architecture: n,
+		name:		"hopfield",
 	}
 	return n
 }

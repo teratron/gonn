@@ -38,7 +38,6 @@ func main() {
 	//
 	//fmt.Println(n.Verify(input, target))
 
-
 	// Обучение
 	/*maxEpoch := 100000
 	minError := 1.

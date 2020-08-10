@@ -1,13 +1,14 @@
 package nn
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
+	"github.com/zigenzoog/gonn/pkg"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
-
-	"github.com/zigenzoog/gonn/pkg"
 )
 
 type jsonType string
@@ -41,14 +42,6 @@ func (n *nn) readJSON(filename string) {
 	fmt.Println(string(b))
 	//fmt.Println(b)
 
-	//t1 := test1{Name: "1"}
-	//t2 := test2{Name2: "2"}
-	//t0 := new(test0)
-	//t0 := &test0{}
-	//fmt.Println(*t0)
-	//_ = json.Unmarshal(b, &t0)
-	//fmt.Printf("%T %v",*t0, t0)
-
 	/*dec := json.NewDecoder(bytes.NewReader(b))
 	fmt.Println(dec)*/
 
@@ -72,11 +65,44 @@ func (n *nn) readJSON(filename string) {
 		fmt.Printf("\n")
 	}*/
 
-	err = json.Unmarshal(b, n)
+	var v interface{}
+	err = json.Unmarshal(b, &v)
+	data := v.(map[string]interface{})
+	//fmt.Println(data)
+
+	aa := data["architecture"].(map[string]interface{})
+	//fmt.Println(aa)
+	dd := aa["Parameters"]
+	//fmt.Println(dd)
+
+	st := os.Stdout
+	enc := json.NewEncoder(st)
+	enc.SetIndent("", "\t")
+	err = enc.Encode(&dd)
+
+	pp := &perceptronParameter{}
+	dec := json.NewDecoder(bufio.NewReader(st))
+	if err := dec.Decode(pp); err == io.EOF {
+		return
+	}
+	fmt.Println(pp.Weights)
+
+
+	//for key, value := range aa["perceptron"].(map[string]interface{}) {
+	/*for key, value := range aa {
+		fmt.Printf("%s: %T - %v\n", key, value, value)
+		for k, v := range value.(map[string]interface{}) {
+			fmt.Printf("%s: %T - %v\n", k, v, v)
+		}
+	}*/
+
+	/*err = json.Unmarshal(b, n)
 	if err != nil {
 		log.Fatal("Invalid format ", err)
-	}
-	fmt.Printf("%T - %v", n, n.Architecture)
+	}*/
+	//fmt.Printf("%T - %v", n, n.Architecture.Bias())
+	//fmt.Println(n)
+	//fmt.Println(n.Architecture)
 	/*fmt.Println(n.Architecture.(*perceptron).Settings["perceptron"])
 	if a, ok := n.Architecture.(*perceptron); ok {
 		for key, value := range a.Settings {
@@ -87,9 +113,6 @@ func (n *nn) readJSON(filename string) {
 }
 
 func (n *nn) writeJSON(filename string) {
-
-	//v := Parameters(n.Get().(*perceptron))
-
 	b, err := json.MarshalIndent(n, "", "\t")
 	if err != nil {
 		log.Fatal("JSON marshaling failed: ", err)

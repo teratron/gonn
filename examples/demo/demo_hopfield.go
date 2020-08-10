@@ -10,7 +10,9 @@ func main() {
 	// New returns a new neural network
 	// instance with the default parameters
 	// for Hopfield neural network
-	n := nn.New().Hopfield()
+	n := nn.New(nn.Hopfield())
 
 	fmt.Println(n)
+
+	n.Read(nn.JSON("perceptron.json"))
 }
