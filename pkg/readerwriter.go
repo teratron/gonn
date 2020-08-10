@@ -8,6 +8,7 @@ type ReaderWriter interface {
 
 type Reader interface {
 	Read(Reader)
+
 }
 
 type Writer interface {

@@ -40,9 +40,8 @@ func main() {
 	//fmt.Println(n.Verify(input, target))
 
 	// Обучение
-	/*maxEpoch := 100000
-	minError := 1.
-	for epoch := 1; epoch <= maxEpoch; epoch++ {
+	/*minError := 1.
+	for epoch := 1; epoch <= 10000; epoch++ {
 		for i := numInput; i <= len(dataSet) - numOutput; i++ {
 			input  = getInputData(dataSet[i - numInput:i])
 			target = getTargetData(dataSet[i:i + numOutput])

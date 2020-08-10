@@ -2,6 +2,11 @@ package nn
 
 //
 type Constructor interface {
+	//
+	/*pkg.GetterSetter
+
+	//
+	pkg.ReaderWriter*/
 
 	// Initializing
 	init(int, ...interface{}) bool

@@ -2,25 +2,14 @@ package nn
 
 //
 type Parameter interface {
-	//
-	//perceptron() NeuralNetwork
-
-	//
-	//radialBasis() NeuralNetwork
-
-	//
-	//hopfield() NeuralNetwork
-
 	// Perceptron
-	/*HiddenLayer() []uint
+	HiddenLayer() []uint
 	Bias() bool
 	ActivationMode() uint8
 	LossMode() uint8
 	LossLevel() float64
-	Rate() float32*/
+	Rate() float32
 
 	// Hopfield
-	//Energy() float32
-
-	//PerceptronNN
+	Energy() float32
 }

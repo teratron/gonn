@@ -4,11 +4,12 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"github.com/zigenzoog/gonn/pkg"
 	"io"
 	"io/ioutil"
 	"log"
 	"os"
+
+	"github.com/zigenzoog/gonn/pkg"
 )
 
 type jsonType string
@@ -40,7 +41,6 @@ func (n *nn) readJSON(filename string) {
 		log.Fatal("Can't load json: ", err)
 	}
 	fmt.Println(string(b))
-	//fmt.Println(b)
 
 	/*dec := json.NewDecoder(bytes.NewReader(b))
 	fmt.Println(dec)*/
@@ -81,7 +81,7 @@ func (n *nn) readJSON(filename string) {
 	err = enc.Encode(&dd)
 
 	pp := &perceptron{}
-	ppp := pp.Parameter
+	ppp := pp.Configuration
 	dec := json.NewDecoder(bufio.NewReader(st))
 	if err := dec.Decode(ppp); err == io.EOF {
 		return

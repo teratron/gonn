@@ -13,10 +13,11 @@ import (
 
 //
 func File(filename string) *os.File {
-	file, err := os.Open(filename)
+	//os.IsExist()
+	file, err := os.Create(filename)
 	if err != nil {
-		fmt.Println("-----------------------Create----------------------------")
-		file, err = os.Create(filename)
+		fmt.Println("-----------------------Open----------------------------")
+		file, err = os.Open(filename)
 		if err != nil {
 			log.Fatal("Error !!!", err)
 		}

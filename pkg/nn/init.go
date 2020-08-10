@@ -74,7 +74,7 @@ func getRand() (r floatType) {
 	return
 }
 
-// getLengthData возвращает длину срезов
+// getLengthData returns the length of the slices
 func getLengthData(data ...[]float64) []interface{} {
 	var tmp []interface{}
 	defer func() {

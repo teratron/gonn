@@ -9,18 +9,24 @@ import (
 
 var _ NeuralNetwork = (*hopfield)(nil)
 
+/*type HopfieldNN interface {
+	Energy() float32
+}*/
+
 type hopfield struct {
 	architecture		NeuralNetwork
-	//Parameter
-	Constructor
 
-	Parameters struct{
+	Configuration struct{
+		Energy			floatType
 		Weights			[][]floatType	`json:"weights" xml:"weights"`
 	}									`json:"hopfield" xml:"hopfield"`
 
 	// Matrix
 	neuron []*Neuron
 	axon   [][]*Axon
+
+	Parameter							`json:"-"`
+	Constructor							`json:"-"`
 }
 
 func Hopfield() *hopfield {
@@ -33,6 +39,10 @@ func (n *nn) hopfield() NeuralNetwork {
 		architecture: n,
 	}
 	return n
+}
+
+func (h *hopfield) Energy() float32 {
+	return float32(h.Configuration.Energy)
 }
 
 // Setter

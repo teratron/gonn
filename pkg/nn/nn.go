@@ -8,25 +8,20 @@ var _ NeuralNetwork = (*nn)(nil)
 //
 type NeuralNetwork interface {
 	//
-	pkg.GetterSetter
-
-	//
-	pkg.ReaderWriter
-
-	//
-	//Parameter
+	Parameter
 
 	//
 	Constructor
 
 	//
-	/*pkg.GetterSetter
+	pkg.GetterSetter
 
 	//
 	pkg.ReaderWriter
 
+
 	// Initializing
-	init(int, ...interface{}) bool
+	/*init(int, ...interface{}) bool
 
 	// Querying
 	Query(input []float64) (output []float64)
@@ -49,14 +44,16 @@ type NeuralNetwork interface {
 
 //
 type nn struct {
-	//Parameter						`json:"-"`
 	Architecture	NeuralNetwork	`json:"architecture,omitempty"`	// Architecture of neural network
 	isInit			bool                    						// Neural network initializing flag
 	IsTrain			bool			`json:"isTrain"`				// Neural network training flag
+
 	json			jsonType
 	xml				xmlType
 	csv				csvType
 	db				dbType
+
+	Parameter						`json:"-"`
 }
 
 type NN struct {

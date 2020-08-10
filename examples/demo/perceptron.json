@@ -11,7 +11,8 @@
 			"lossLevel": 0.0001,
 			"rate": 0.3,
 			"weights": null
-		}
+		},
+		"Parameter": null
 	},
 	"isTrain": true
 }
