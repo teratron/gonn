@@ -53,6 +53,19 @@ func New(reader ...pkg.Reader) NeuralNetwork {
 	return n
 }
 
+func reset() *nn {
+	n := &nn{
+		Architecture: nil,
+		isInit:    false,
+		IsTrain:   false,
+		json:      "",
+		xml:       "",
+		csv:       "",
+		db:        "",
+	}
+	return n
+}
+
 func (n *nn) init(lenInput int, lenTarget ...interface{}) bool {
 	if a, ok := n.Get().(NeuralNetwork); ok {
 		n.isInit = a.init(lenInput, lenTarget...)

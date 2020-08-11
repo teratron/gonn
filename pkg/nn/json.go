@@ -1,10 +1,8 @@
 package nn
 
 import (
-	"bufio"
 	"encoding/json"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -40,37 +38,41 @@ func (n *nn) readJSON(filename string) {
 	if err != nil {
 		log.Fatal("Can't load json: ", err)
 	}
-	fmt.Println(string(b))
+	//fmt.Println(string(b))
 
-	/*dec := json.NewDecoder(bytes.NewReader(b))
-	fmt.Println(dec)*/
-
-	/*err = dec.Decode(t0)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(dec)*/
-
-	/*for {
-		t, err := dec.Token()
-		if err == io.EOF {
-			break
-		}else if err != nil {
-			log.Fatal(err)
-		}
-		fmt.Printf("%T: %v", t, t)
-		if dec.More() {
-			fmt.Printf(" (more)")
-		}
-		fmt.Printf("\n")
-	}*/
-
+	//rr := reset()
 	var v interface{}
 	err = json.Unmarshal(b, &v)
 	data := v.(map[string]interface{})
 	//fmt.Println(data)
 
-	aa := data["architecture"].(map[string]interface{})
+	for key, value := range data {
+		b, err = json.Marshal(&value)
+		fmt.Println("+", key, string(b))
+
+		if _, ok := value.(map[string]interface{}); ok {
+			err = json.Unmarshal(b, &n)
+			if err != nil { log.Println(err)}
+			fmt.Printf("---- %T - %v\n", n, n)
+		} else {
+			err = json.Unmarshal(b, &n.IsTrain)
+			if err != nil { log.Println(err)}
+			fmt.Printf("---- %T - %v\n", n.IsTrain, n.IsTrain)
+		}
+
+		/*dec := json.NewDecoder(bufio.NewReader(st1))
+		fmt.Println("+-+---",st1)
+		if _, ok := value.(map[string]interface{}); ok {
+			err = dec.Decode(rr)
+			err = json.Unmarshal(strings.(st1), &v)
+			fmt.Printf("---- %T - %v\n", rr, rr)
+		} else {
+			err = dec.Decode(rr.IsTrain)
+			fmt.Printf("---- %T - %v\n", rr.IsTrain, rr.IsTrain)
+		}*/
+	}
+
+	/*aa := data["architecture"].(map[string]interface{})
 	//fmt.Println(aa)
 	dd := aa["perceptron"]
 	//fmt.Println(dd)
@@ -85,31 +87,8 @@ func (n *nn) readJSON(filename string) {
 	dec := json.NewDecoder(bufio.NewReader(st))
 	if err := dec.Decode(ppp); err == io.EOF {
 		return
-	}
-	fmt.Printf("%T - %v\n", ppp.Bias, ppp.Bias)
-
-
-	//for key, value := range aa["perceptron"].(map[string]interface{}) {
-	/*for key, value := range aa {
-		fmt.Printf("%s: %T - %v\n", key, value, value)
-		for k, v := range value.(map[string]interface{}) {
-			fmt.Printf("%s: %T - %v\n", k, v, v)
-		}
 	}*/
-
-	/*err = json.Unmarshal(b, n)
-	if err != nil {
-		log.Fatal("Invalid format ", err)
-	}*/
-	//fmt.Printf("%T - %v", n, n.Architecture.Bias())
-	//fmt.Println(n)
-	//fmt.Println(n.Architecture)
-	/*fmt.Println(n.Architecture.(*perceptron).Settings["perceptron"])
-	if a, ok := n.Architecture.(*perceptron); ok {
-		for key, value := range a.Settings {
-			fmt.Printf("%s: %T - %v", key, value, value)
-		}
-	}*/
+	//fmt.Printf("%T - %v\n", ppp.Bias, ppp.Bias)
 
 }
 

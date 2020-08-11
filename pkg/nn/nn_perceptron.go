@@ -60,6 +60,7 @@ type perceptron struct {
 	lenOutput		int
 
 	Parameter							`json:"-"`
+	Constructor							`json:"-"`
 }
 
 func Perceptron() *perceptron {

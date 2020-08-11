@@ -85,7 +85,7 @@ func main() {
 
 	//
 	n.Write(
-		nn.JSON("perceptron.json"),
+		//nn.JSON("perceptron.json"),
 		nn.Report(nn.File("report.txt"), input, loss, count),
 		/*nn.Report(os.Stdout, input, loss, count)*/)
 
