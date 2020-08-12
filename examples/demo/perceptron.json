@@ -2,7 +2,7 @@
 	"architecture": {
 		"perceptron": {
 			"hiddenLayer": [
-				3,
+				4,
 				2
 			],
 			"bias": true,
@@ -13,5 +13,6 @@
 			"weights": null
 		}
 	},
-	"isTrain": true
+	"isInit": false,
+	"isTrain": false
 }

@@ -33,44 +33,67 @@ func (j jsonType) Write([]byte) (n int, err error) {
 func (j jsonType) Read(pkg.Reader) {}
 func (j jsonType) Write(...pkg.Writer) {}
 
-func (n *nn) readJSON(filename string) {
+func (n *NN) readJSON(filename string) {
 	b, err := ioutil.ReadFile(filename)
 	if err != nil {
 		log.Fatal("Can't load json: ", err)
 	}
 	//fmt.Println(string(b))
 
-	//rr := reset()
-	var v interface{}
-	err = json.Unmarshal(b, &v)
-	data := v.(map[string]interface{})
+	n.json = filename
+
+	// Декодируем json в NN
+	err = json.Unmarshal(b, &n)
+	if err != nil { log.Println(err) }
+	//fmt.Println(n)
+
+	// Декодируем json в map[string]interface{}
+	var data interface{}
+	err = json.Unmarshal(b, &data)
+	if err != nil { log.Println(err) }
 	//fmt.Println(data)
 
-	for key, value := range data {
-		b, err = json.Marshal(&value)
-		fmt.Println("+", key, string(b))
+	for key, value := range data.(map[string]interface{}) {
+		if v, ok := value.(map[string]interface{}); ok {
+			if key == "architecture" {
+				b, err = json.Marshal(&v)
+				if err != nil { log.Println(err) }
+				fmt.Println(string(b))
 
-		if _, ok := value.(map[string]interface{}); ok {
-			err = json.Unmarshal(b, &n)
-			if err != nil { log.Println(err)}
-			fmt.Printf("---- %T - %v\n", n, n)
-		} else {
-			err = json.Unmarshal(b, &n.IsTrain)
-			if err != nil { log.Println(err)}
-			fmt.Printf("---- %T - %v\n", n.IsTrain, n.IsTrain)
+				err = json.Unmarshal(b, &data)
+				if err != nil { log.Println(err) }
+				//fmt.Println(data)
+
+				for k, v := range data.(map[string]interface{}) {
+					switch k {
+					case "perceptron":
+						b, err = json.Marshal(&v)
+						if err != nil { log.Println(err) }
+						fmt.Println(string(b))
+
+						err = json.Unmarshal(b, &n.Architecture.(*perceptron).Configuration)
+						if err != nil { log.Println(err) }
+						fmt.Println(&n.Architecture.(*perceptron).Configuration)
+
+					case "hopfield":
+						fmt.Printf("%s - %T - %v\n", k, v, v)
+					default:
+					}
+				}
+			}
 		}
-
-		/*dec := json.NewDecoder(bufio.NewReader(st1))
-		fmt.Println("+-+---",st1)
-		if _, ok := value.(map[string]interface{}); ok {
-			err = dec.Decode(rr)
-			err = json.Unmarshal(strings.(st1), &v)
-			fmt.Printf("---- %T - %v\n", rr, rr)
-		} else {
-			err = dec.Decode(rr.IsTrain)
-			fmt.Printf("---- %T - %v\n", rr.IsTrain, rr.IsTrain)
-		}*/
 	}
+	/*dec := json.NewDecoder(bufio.NewReader(st1))
+	fmt.Println("+-+---",st1)
+	if _, ok := value.(map[string]interface{}); ok {
+		err = dec.Decode(rr)
+		err = json.Unmarshal(strings.(st1), &v)
+		fmt.Printf("---- %T - %v\n", rr, rr)
+	} else {
+		err = dec.Decode(rr.IsTrain)
+		fmt.Printf("---- %T - %v\n", rr.IsTrain, rr.IsTrain)
+	}*/
+	//fmt.Println(n.IsTrain)
 
 	/*aa := data["architecture"].(map[string]interface{})
 	//fmt.Println(aa)
@@ -92,7 +115,7 @@ func (n *nn) readJSON(filename string) {
 
 }
 
-func (n *nn) writeJSON(filename string) {
+func (n *NN) writeJSON(filename string) {
 	b, err := json.MarshalIndent(n, "", "\t")
 	if err != nil {
 		log.Fatal("JSON marshaling failed: ", err)

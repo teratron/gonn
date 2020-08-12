@@ -26,7 +26,7 @@ func File(filename string) *os.File {
 }
 
 //
-func (n *nn) Read(reader pkg.Reader) {
+func (n *NN) Read(reader pkg.Reader) {
 	/*if a, ok := n.Get().(NeuralNetwork); ok {
 		a.Read(reader)
 	}*/
@@ -47,7 +47,7 @@ func (n *nn) Read(reader pkg.Reader) {
 }
 
 //
-func (n *nn) Write(writer ...pkg.Writer) {
+func (n *NN) Write(writer ...pkg.Writer) {
 	//fmt.Println("***")
 	if len(writer) > 0 {
 		/*if a, ok := n.Get().(NeuralNetwork); ok {

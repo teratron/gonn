@@ -28,7 +28,7 @@ func (x xmlType) Write(p []byte) (n int, err error) {
 func (x xmlType) Read(pkg.Reader) {}
 func (x xmlType) Write(...pkg.Writer) {}
 
-func (n *nn) readXML(filename string) {
+func (n *NN) readXML(filename string) {
 	/*t := test
 	b, err := ioutil.ReadFile(filename)
 	if err != nil {
@@ -40,7 +40,7 @@ func (n *nn) readXML(filename string) {
 	}*/
 }
 
-func (n *nn) writeXML(filename string) {
+func (n *NN) writeXML(filename string) {
 	b, err := json.MarshalIndent(n, "", "\t")
 	if err != nil {
 		log.Fatal("XML marshaling failed: ", err)

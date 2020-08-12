@@ -17,14 +17,14 @@ func init() {
 // New returns a new neural network instance with the default parameters
 func New(reader ...pkg.Reader) NeuralNetwork {
 	//n := new(nn)
-	n := &nn{
+	n := &NN{
 		//Parameter: make(map[string]Architecture),
-		isInit:    false,
-		IsTrain:   false,
-		json:      "",
-		xml:       "",
-		csv:       "",
-		db:        "",
+		IsInit:  false,
+		IsTrain: false,
+		json:    "",
+		xml:     "",
+		csv:     "",
+		db:      "",
 	}
 	//n.Parameter = make(map[string]interface{})
 	if len(reader) > 0 {
@@ -53,24 +53,24 @@ func New(reader ...pkg.Reader) NeuralNetwork {
 	return n
 }
 
-func reset() *nn {
-	n := &nn{
+func reset() *NN {
+	n := &NN{
 		Architecture: nil,
-		isInit:    false,
-		IsTrain:   false,
-		json:      "",
-		xml:       "",
-		csv:       "",
-		db:        "",
+		IsInit:       false,
+		IsTrain:      false,
+		json:         "",
+		xml:          "",
+		csv:          "",
+		db:           "",
 	}
 	return n
 }
 
-func (n *nn) init(lenInput int, lenTarget ...interface{}) bool {
+func (n *NN) init(lenInput int, lenTarget ...interface{}) bool {
 	if a, ok := n.Get().(NeuralNetwork); ok {
-		n.isInit = a.init(lenInput, lenTarget...)
+		n.IsInit = a.init(lenInput, lenTarget...)
 	}
-	return n.isInit
+	return n.IsInit
 }
 
 func (f floatType) Set(...pkg.Setter) {}

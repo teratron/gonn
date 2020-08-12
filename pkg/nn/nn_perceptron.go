@@ -59,8 +59,8 @@ type perceptron struct {
 	lenInput		int
 	lenOutput		int
 
-	Parameter							`json:"-"`
-	Constructor							`json:"-"`
+	Parameter
+	Constructor
 }
 
 func Perceptron() *perceptron {
@@ -68,7 +68,7 @@ func Perceptron() *perceptron {
 }
 
 // Returns a new Perceptron neural network instance with the default parameters
-func (n *nn) perceptron() NeuralNetwork {
+func (n *NN) perceptron() NeuralNetwork {
 	n.Architecture = &perceptron{
 		architecture: n,
 	}
@@ -200,7 +200,7 @@ func (p *perceptron) init(lenInput int, lenTarget ...interface{}) bool {
 				}
 			}
 		}
-		if n, ok := p.Get().(*nn); ok && !n.IsTrain {
+		if n, ok := p.Get().(*NN); ok && !n.IsTrain {
 			p.initNeuron()
 			p.initAxon()
 		}
