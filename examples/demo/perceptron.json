@@ -2,7 +2,7 @@
 	"architecture": {
 		"perceptron": {
 			"hiddenLayer": [
-				4,
+				14,
 				2
 			],
 			"bias": true,
