@@ -5,12 +5,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"github.com/zigenzoog/gonn/pkg"
 	"log"
 	"math"
-	"os"
-
-	"github.com/zigenzoog/gonn/pkg"
 )
 
 var _ NeuralNetwork = (*perceptron)(nil)
@@ -59,8 +56,8 @@ type perceptron struct {
 	lenInput		int
 	lenOutput		int
 
-	Parameter
-	Constructor
+	Parameter							`json:"-"`
+	Constructor							`json:"-"`
 }
 
 func Perceptron() *perceptron {
@@ -155,6 +152,7 @@ func (p *perceptron) Get(args ...pkg.Getter) pkg.GetterSetter {
 			return lossLevelType(p.Configuration.LossLevel)
 		case rateType:
 			return p.Configuration.Rate
+		case *Axon:
 		default:
 			pkg.Log("This type is missing for Perceptron Neural Network", true) // !!!
 			log.Printf("\tget: %T %v\n", args[0], args[0]) // !!!
@@ -462,54 +460,22 @@ func (p *perceptron) Write(writer ...pkg.Writer) {
 }
 
 // readJSON
-func (p *perceptron) readJSON(filename string) {
-	/*var test struct{
-		Architecture	string			`json:"architecture" xml:"architecture"`
-		IsTrain			bool			`json:"isTrain" xml:"isTrain"`
-		HiddenLayer		HiddenType		`json:"hiddenLayer" xml:"hiddenLayer"`
-		Bias			biasType		`json:"bias" xml:"bias"`
-		ActivationMode	uint8			`json:"activationMode" xml:"activationMode"`
-		LossMode		uint8			`json:"lossMode" xml:"lossMode"`
-		LossLevel		float64			`json:"lossLevel" xml:"lossLevel"`
-		Rate			floatType		`json:"rate" xml:"rate"`
-		Weights			[][][]floatType	`json:"weights" xml:"weights"`
+func (p *perceptron) readJSON(value interface{}) {
+	if b, err := json.Marshal(&value); err != nil {
+		log.Fatal("JSON marshaling failed: ", err)
+	} else if err = json.Unmarshal(b, &p.Configuration); err != nil {
+		log.Fatal("JSON unmarshal failed: ", err)
 	}
-	t := test*/
-	b, err := ioutil.ReadFile(filename)
-	if err != nil {
-		log.Fatal("Can't load settings: ", err)
-	}
-
-	/*var v interface{}
-	err = json.Unmarshal(b, &v)
-	data := v.(map[string]interface{})
-	fmt.Printf("%T - %v", data, data)*/
-
-
-
-	//fmt.Println(string(b))
-	err = json.Unmarshal(b, &p.Configuration)
-	if err != nil {
-		log.Fatal("Invalid settings format: ", err)
-	}
-	fmt.Println(p.Configuration)
-
-
-
-	//err = ioutil.WriteFile(filename, b, os.ModePerm)
-	//fmt.Println(t.Weights)
-	/*if t.Architecture == "perceptron" {
-	}*/
-	//fmt.Println("ValueOf ", reflect.ValueOf(t).Field(0)) // perceptron
+	//fmt.Println(p.Configuration)
 }
 
 // writeJSON
 func (p *perceptron) writeJSON(filename string) {
-	if b, err := json.MarshalIndent(p, "", "\t"); err != nil {
+	/*if b, err := json.MarshalIndent(&p, "", "\t"); err != nil {
 		log.Fatal("JSON marshaling failed: ", err)
 	} else if err = ioutil.WriteFile(filename, b, os.ModePerm); err != nil {
-		log.Fatal("Can't write updated settings file:", err)
-	}
+		log.Fatal("Can't write file:", err)
+	}*/
 }
 
 // writeReport report of neural network training results in io.Writer

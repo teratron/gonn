@@ -45,8 +45,8 @@ type NeuralNetwork interface {
 //
 type NN struct {
 	Architecture NeuralNetwork `json:"architecture,omitempty"`	// Architecture of neural network
-	IsInit       bool          `json:"isInit"`				// Neural network initializing flag
-	IsTrain      bool          `json:"isTrain"`			// Neural network training flag
+	IsInit       bool          `json:"-"`						// Neural network initializing flag
+	IsTrain      bool          `json:"isTrain"`					// Neural network training flag
 
 	json		string
 	xml			xmlType

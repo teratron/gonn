@@ -8,6 +8,18 @@ type Axon struct {
 	synapse map[string]pkg.Getter //
 }
 
+func (a Axon) Get(...pkg.Getter) pkg.GetterSetter {
+	panic("implement me")
+}
+
+func (a Axon) Set(...pkg.Setter) {
+	panic("implement me")
+}
+
+func Weight() pkg.GetterSetter {
+	return &Axon{}
+}
+
 func getSynapseInput(axon *Axon) (input floatType) {
 	switch s := axon.synapse["input"].(type) {
 	case floatType:

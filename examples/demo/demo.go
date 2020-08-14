@@ -14,7 +14,7 @@ func main() {
 
 	// Set parameters
 	n.Set(
-		nn.HiddenLayer(3, 2),
+		nn.HiddenLayer(13, 2),
 		nn.Bias(true),
 		nn.ActivationMode(nn.ModeSIGMOID),
 		nn.LossMode(nn.ModeMSE),
@@ -85,7 +85,7 @@ func main() {
 
 	//
 	n.Write(
-		//nn.JSON("perceptron.json"),
+		nn.JSON("perceptron.json"),
 		nn.Report(nn.File("report.txt"), input, loss, count),
 		/*nn.Report(os.Stdout, input, loss, count)*/)
 

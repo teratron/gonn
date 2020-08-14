@@ -40,16 +40,16 @@ func (n *NN) readJSON(filename string) {
 	}
 	//fmt.Println(string(b))
 
-	n.json = filename
-
 	// Декодируем json в NN
 	err = json.Unmarshal(b, &n)
 	if err != nil {
 		log.Println(err)
 	}
 	//fmt.Println(n)
+	n.Architecture = nil
+	n.json = filename
 
-	// Декодируем json в map[string]interface{}
+	// Декодируем json в тип map[string]interface{}
 	var data interface{}
 	err = json.Unmarshal(b, &data)
 	if err != nil {
@@ -73,46 +73,36 @@ func (n *NN) readJSON(filename string) {
 				//fmt.Println(data)
 
 				for k, v := range data.(map[string]interface{}) {
+					//fmt.Printf("%s - %T - %v\n", k, v, v)
 					switch k {
 					case "perceptron":
-						//fmt.Printf("%T - %v\n", n.Architecture, n.Architecture)
-
-						if _, ok := n.Architecture.(*perceptron); !ok {
-							n.Architecture = nil
-						}
-
 						n.Architecture = &perceptron{}
-
-						fmt.Printf("%T - %v\n", v, v)
-						b, err = json.Marshal(&v)
-						if err != nil {
-							log.Println(err)
-						}
-						//fmt.Println(string(b))
 						if a, ok := n.Architecture.(*perceptron); ok {
-							err = json.Unmarshal(b, &a.Configuration)
-							if err != nil {
-								log.Println(err)
-							}
-							fmt.Println(a.Configuration)
+							a.readJSON(v)
 						}
 					case "hopfield":
-						fmt.Printf("%s - %T - %v\n", k, v, v)
+						n.Architecture = &hopfield{}
+						if a, ok := n.Architecture.(*hopfield); ok {
+							a.readJSON(v)
+						}
 					default:
 					}
 				}
 			}
 		}
 	}
+	fmt.Println(n)
 }
 
 func (n *NN) writeJSON(filename string) {
-	b, err := json.MarshalIndent(n, "", "\t")
-	if err != nil {
-		log.Fatal("JSON marshaling failed: ", err)
+	if n.IsTrain {
+		n.Get().Get(Weight())
+		//fmt.Printf(" - %T - %v\n", n.Get(), n.Get())
 	}
-	err = ioutil.WriteFile(filename, b, os.ModePerm)
-	if err != nil {
-		log.Fatal("Can't write updated settings file:", err)
+
+	if b, err := json.MarshalIndent(&n, "", "\t"); err != nil {
+		log.Fatal("JSON marshaling failed: ", err)
+	} else if err = ioutil.WriteFile(filename, b, os.ModePerm); err != nil {
+		log.Fatal("Can't write file:", err)
 	}
 }

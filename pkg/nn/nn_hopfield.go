@@ -2,6 +2,7 @@
 package nn
 
 import (
+	"encoding/json"
 	"log"
 
 	"github.com/zigenzoog/gonn/pkg"
@@ -123,4 +124,18 @@ func (h *hopfield) Write(writer ...pkg.Writer) {
 			log.Printf("\tWrite: %T %v\n", w, w) // !!!
 		}
 	}*/
+}
+
+// readJSON
+func (h *hopfield) readJSON(value interface{}) {
+	b, err := json.Marshal(&value)
+	if err != nil {
+		log.Fatal("JSON marshaling failed: ", err)
+	}
+	//fmt.Println(string(b))
+	err = json.Unmarshal(b, &h.Configuration)
+	if err != nil {
+		log.Fatal("JSON unmarshal failed: ", err)
+	}
+	//fmt.Println(p.Configuration)
 }
