@@ -10,11 +10,9 @@ func main() {
 	// same n := nn.New(Perceptron())
 	n := nn.New(/*nn.Perceptron()*/)
 
-	//fmt.Println(n)
-
 	// Set parameters
 	n.Set(
-		nn.HiddenLayer(13, 2),
+		nn.HiddenLayer(3, 2),
 		nn.Bias(true),
 		nn.ActivationMode(nn.ModeSIGMOID),
 		nn.LossMode(nn.ModeMSE),

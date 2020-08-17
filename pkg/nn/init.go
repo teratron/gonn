@@ -53,7 +53,7 @@ func New(reader ...pkg.Reader) NeuralNetwork {
 	return n
 }
 
-func reset() *NN {
+func Reset() *NN {
 	n := &NN{
 		Architecture: nil,
 		IsInit:       false,
@@ -64,6 +64,16 @@ func reset() *NN {
 		db:           "",
 	}
 	return n
+}
+
+func (n *NN) erase() {
+	n.Architecture = nil
+	n.IsInit = false
+	n.IsTrain = false
+	n.json = ""
+	n.xml = ""
+	n.csv = ""
+	n.db = ""
 }
 
 func (n *NN) init(lenInput int, lenTarget ...interface{}) bool {

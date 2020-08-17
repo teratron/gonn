@@ -26,16 +26,13 @@ func main() {
 	//fmt.Println("n.Get(nn.Logging()):", n.Get(nn.Logging()))
 
 	// Neural Network
-	n := nn.New() // same n := nn.New().Perceptron()
-	//n := nn.New().Perceptron()
-	//n := nn.New().RadialBasis()
-	//n := nn.New(nn.Hopfield())
-	//fmt.Println("nn.New():", n)
+	n := nn.New(nn.Perceptron())
+	fmt.Println("nn.New():", n)
 
 	// Common
 	n.Set(
 		nn.HiddenLayer(1, 5, 9),
-		nn.Bias(false),
+		nn.Bias(true),
 		nn.ActivationMode(nn.ModeTANH),
 		nn.LossMode(nn.ModeARCTAN),
 		nn.LossLevel(.0005),
@@ -61,7 +58,7 @@ func main() {
 	n.Set(nn.ActivationMode(nn.ModeSIGMOID))
 	fmt.Println("n.Get(nn.ModeActivation()):", n.Get(nn.ActivationMode()))
 
-	// Loss
+	// Loss mode
 	n.Set(nn.LossMode(nn.ModeMSE))
 	fmt.Println("n.Get(nn.ModeLoss()):", n.Get(nn.LossMode()))
 
@@ -72,4 +69,8 @@ func main() {
 	// Rate
 	n.Set(nn.Rate(.1))
 	fmt.Println("n.Get(nn.Rate()):", n.Get(nn.Rate()))
+
+	// Weight
+	//n.Set(nn.Weight(0))
+	//fmt.Println("n.Get(nn.Rate()):", n.Get(nn.Rate()))
 }

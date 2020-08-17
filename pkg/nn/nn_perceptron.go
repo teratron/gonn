@@ -23,7 +23,7 @@ var _ NeuralNetwork = (*perceptron)(nil)
 }*/
 
 type perceptron struct {
-	architecture		NeuralNetwork
+	Architecture		NeuralNetwork	`json:"-" xml:"-"`
 
 	Configuration struct{
 		// Array of the number of neurons in each hidden layer
@@ -45,7 +45,7 @@ type perceptron struct {
 		Rate			floatType		`json:"rate" xml:"rate"`
 
 		// Matrix of weight values
-		Weights			[][][]floatType	`json:"weights" xml:"weights"`
+		Weight			[][][]floatType `json:"weight" xml:"weight"`
 	}									`json:"perceptron" xml:"perceptron"`
 
 	// Matrix
@@ -56,8 +56,8 @@ type perceptron struct {
 	lenInput		int
 	lenOutput		int
 
-	Parameter							`json:"-"`
-	Constructor							`json:"-"`
+	Parameter							`json:"-" xml:"-"`
+	Constructor							`json:"-" xml:"-"`
 }
 
 func Perceptron() *perceptron {
@@ -67,7 +67,7 @@ func Perceptron() *perceptron {
 // Returns a new Perceptron neural network instance with the default parameters
 func (n *NN) perceptron() NeuralNetwork {
 	n.Architecture = &perceptron{
-		architecture: n,
+		Architecture: n,
 	}
 	if p, ok := n.Architecture.(*perceptron); ok {
 		p.Configuration.HiddenLayer		= HiddenType{9, 2}
@@ -76,7 +76,7 @@ func (n *NN) perceptron() NeuralNetwork {
 		p.Configuration.LossMode		= ModeMSE
 		p.Configuration.LossLevel		= .0001
 		p.Configuration.Rate			= floatType(DefaultRate)
-		p.Configuration.Weights			= nil
+		p.Configuration.Weight			= nil
 	}
 	return n
 }
@@ -152,14 +152,15 @@ func (p *perceptron) Get(args ...pkg.Getter) pkg.GetterSetter {
 			return lossLevelType(p.Configuration.LossLevel)
 		case rateType:
 			return p.Configuration.Rate
-		case *Axon:
+		//case weightType:
+			//return p.getWeight()
 		default:
 			pkg.Log("This type is missing for Perceptron Neural Network", true) // !!!
 			log.Printf("\tget: %T %v\n", args[0], args[0]) // !!!
 			return nil
 		}
 	} else {
-		if a, ok := p.architecture.(NeuralNetwork); ok {
+		if a, ok := p.Architecture.(NeuralNetwork); ok {
 			return a
 		}
 	}
@@ -362,7 +363,7 @@ func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, 
 			if loss = p.calcLoss(target[0]); loss <= p.Configuration.LossLevel || loss <= MinLossLevel {
 				break
 			}
-			//p.calcMiss(input)
+			p.calcMiss(input)
 			p.calcAxon(input)
 			count++
 		}
@@ -395,30 +396,30 @@ func (p *perceptron) Verify(input []float64, target ...[]float64) (loss float64)
 	return
 }
 
+// getWeight
+func (p *perceptron) getWeight() {
+	p.Configuration.Weight = make([][][]floatType, len(p.axon))
+	for i, u := range p.axon {
+		p.Configuration.Weight[i] = make([][]floatType, len(p.axon[i]))
+		for j, v := range u {
+			p.Configuration.Weight[i][j] = make([]floatType, len(p.axon[i][j]))
+			for k, w := range v {
+				p.Configuration.Weight[i][j][k] = w.weight
+			}
+		}
+	}
+}
+
 // setWeight
-func (p *perceptron) setWeight(weight [][][]floatType)  {
-	for i, u := range weight {
+func (p *perceptron) setWeight()  {
+	for i, u := range p.Configuration.Weight {
 		for j, v := range u {
 			for k, w := range v {
 				p.axon[i][j][k].weight = w
 			}
 		}
 	}
-}
-
-// getWeight
-func (p *perceptron) getWeight() [][][]floatType {
-	weight := make([][][]floatType, len(p.axon))
-	for i, u := range p.axon {
-		weight[i] = make([][]floatType, len(p.axon[i]))
-		for j, v := range u {
-			weight[i][j] = make([]floatType, len(p.axon[i][j]))
-			for k, w := range v {
-				weight[i][j][k] = w.weight
-			}
-		}
-	}
-	return weight
+	p.Configuration.Weight = nil
 }
 
 // Read
@@ -466,7 +467,6 @@ func (p *perceptron) readJSON(value interface{}) {
 	} else if err = json.Unmarshal(b, &p.Configuration); err != nil {
 		log.Fatal("JSON unmarshal failed: ", err)
 	}
-	//fmt.Println(p.Configuration)
 }
 
 // writeJSON

@@ -91,14 +91,18 @@ func (n *NN) readJSON(filename string) {
 			}
 		}
 	}
-	fmt.Println(n)
+	fmt.Println("+++++++++", n)
 }
 
 func (n *NN) writeJSON(filename string) {
 	if n.IsTrain {
-		n.Get().Get(Weight())
-		//fmt.Printf(" - %T - %v\n", n.Get(), n.Get())
+		//n.Get().Get(Weight())
+		//n.Get().(*perceptron).getWeight()
+		//fmt.Printf(" -+ %T - %v\n", n.Get(), n.Get())
+	} else {
+
 	}
+	n.Get().(*perceptron).getWeight()
 
 	if b, err := json.MarshalIndent(&n, "", "\t"); err != nil {
 		log.Fatal("JSON marshaling failed: ", err)

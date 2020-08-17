@@ -15,7 +15,11 @@ func Bias(bias ...bool) pkg.GetterSetter {
 	}
 }
 
-// Setter
+func (n *NN) Bias() bool {
+	return n.Get().(Parameter).Bias()
+}
+
+// Set
 func (b biasType) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
 		if n, ok := args[0].(*NN); ok && !n.IsInit {
@@ -26,7 +30,7 @@ func (b biasType) Set(args ...pkg.Setter) {
 	}
 }
 
-// Getter
+// Get
 func (b biasType) Get(args ...pkg.Getter) pkg.GetterSetter {
 	if len(args) > 0 {
 		if n, ok := args[0].(NeuralNetwork); ok {

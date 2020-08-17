@@ -3,21 +3,33 @@ package nn
 
 import "github.com/zigenzoog/gonn/pkg"
 
+type weightType floatType
+
 type Axon struct {
-	weight  floatType         //
-	synapse map[string]pkg.Getter //
+	weight  floatType				//
+	synapse map[string]pkg.Getter	//
 }
 
-func (a Axon) Get(...pkg.Getter) pkg.GetterSetter {
-	panic("implement me")
+func Weight() pkg.GetterSetter {
+	return weightType(0)
 }
 
+// Set
 func (a Axon) Set(...pkg.Setter) {
 	panic("implement me")
 }
 
-func Weight() pkg.GetterSetter {
-	return &Axon{}
+func (w weightType) Set(...pkg.Setter) {
+	panic("implement me")
+}
+
+// Get
+func (a Axon) Get(...pkg.Getter) pkg.GetterSetter {
+	panic("implement me")
+}
+
+func (w weightType) Get(...pkg.Getter) pkg.GetterSetter {
+	panic("implement me")
 }
 
 func getSynapseInput(axon *Axon) (input floatType) {

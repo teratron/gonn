@@ -16,6 +16,10 @@ func Rate(rate ...float32) pkg.GetterSetter {
 	}
 }
 
+func (n *NN) Rate() float32 {
+	return n.Get().(Parameter).Rate()
+}
+
 // Setter
 func (r rateType) Set(args ...pkg.Setter) {
 	if len(args) > 0 {

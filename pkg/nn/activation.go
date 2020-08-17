@@ -25,6 +25,10 @@ func ActivationMode(mode ...uint8) pkg.GetterSetter {
 	}
 }
 
+func (n *NN) ActivationMode() uint8 {
+	return n.Get().(Parameter).ActivationMode()
+}
+
 // Setter
 func (m activationModeType) Set(args ...pkg.Setter) {
 	if len(args) > 0 {

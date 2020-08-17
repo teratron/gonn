@@ -11,6 +11,10 @@ func HiddenLayer(nums ...uint) HiddenType {
 	return nums
 }
 
+func (n *NN) HiddenLayer() []uint {
+	return n.Get().(Parameter).HiddenLayer()
+}
+
 // Setter
 func (h HiddenType) Set(args ...pkg.Setter) {
 	if len(args) > 0 {

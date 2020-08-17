@@ -31,6 +31,14 @@ func LossLevel(level ...float64) pkg.GetterSetter {
 	}
 }
 
+func (n *NN) LossMode() uint8 {
+	return n.Get().(Parameter).LossMode()
+}
+
+func (n *NN) LossLevel() float64 {
+	return n.Get().(Parameter).LossLevel()
+}
+
 // Set
 func (m lossModeType) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
