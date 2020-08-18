@@ -2,7 +2,6 @@ package nn
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -46,6 +45,7 @@ func (n *NN) readJSON(filename string) {
 		log.Println(err)
 	}
 	//fmt.Println(n)
+	//fmt.Println(n.Architecture)
 	//n.Architecture = nil
 	n.json = filename
 
@@ -78,6 +78,9 @@ func (n *NN) readJSON(filename string) {
 					case "perceptron":
 						n.Architecture = &perceptron{}
 						if a, ok := n.Architecture.(*perceptron); ok {
+							//a.Configuration.Bias = true
+							//a.Configuration.Rate = 0.89
+							//fmt.Println(a.Configuration)
 							a.readJSON(v)
 						}
 					case "hopfield":
@@ -108,6 +111,6 @@ func (n *NN) writeJSON(filename string) {
 	}
 }
 
-func (p *perceptron) getWeight() {
+/*func (p *perceptron) getWeight() {
 	fmt.Println("func (p *perceptron) getWeight() ")
-}
+}*/

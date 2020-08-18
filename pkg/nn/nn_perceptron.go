@@ -400,7 +400,7 @@ func (p *perceptron) Verify(input []float64, target ...[]float64) (loss float64)
 
 // getWeight
 func getWeight(p *perceptron) /**[][][]floatType*/ {
-	fmt.Println(len(p.axon))
+	fmt.Println("g", len(p.axon), p.axon)
 	p.Configuration.Weight = make([][][]floatType, len(p.axon))
 	for i, u := range p.axon {
 		p.Configuration.Weight[i] = make([][]floatType, len(p.axon[i]))
@@ -416,12 +416,12 @@ func getWeight(p *perceptron) /**[][][]floatType*/ {
 
 // setWeight
 func setWeight(p *perceptron)  {
-	fmt.Println(len(p.axon))
+	fmt.Println("s", len(p.axon), p.axon)
 	for i, u := range p.Configuration.Weight {
 		for j, v := range u {
 			for k, w := range v {
 				p.axon[i][j][k].weight = w
-				fmt.Println(p.axon[i][j][k].weight)
+				//fmt.Println(p.axon[i][j][k].weight)
 			}
 		}
 	}
@@ -468,12 +468,15 @@ func (p *perceptron) Write(writer ...pkg.Writer) {
 
 // readJSON
 func (p *perceptron) readJSON(value interface{}) {
+	fmt.Println(p.Configuration.Weight)
 	if b, err := json.Marshal(&value); err != nil {
 		log.Fatal("JSON marshaling failed: ", err)
 	} else if err = json.Unmarshal(b, &p.Configuration); err != nil {
 		log.Fatal("JSON unmarshal failed: ", err)
 	}
-	fmt.Println(len(p.axon))
+	fmt.Println(p.Architecture)
+	fmt.Println(p.Configuration.Weight)
+	//fmt.Println(len(p.axon), p.axon)
 	//fmt.Println(p.Configuration.Weight)
 	//p.Set(Weight())
 	//setWeight(p)
