@@ -46,7 +46,7 @@ func (n *NN) readJSON(filename string) {
 		log.Println(err)
 	}
 	//fmt.Println(n)
-	n.Architecture = nil
+	//n.Architecture = nil
 	n.json = filename
 
 	// Декодируем json в тип map[string]interface{}
@@ -91,22 +91,23 @@ func (n *NN) readJSON(filename string) {
 			}
 		}
 	}
-	fmt.Println("+++++++++", n)
+	//fmt.Println("+++++++++", n)
 }
 
 func (n *NN) writeJSON(filename string) {
+	//n.Architecture.(Architecture).getWeight()
 	if n.IsTrain {
-		//n.Get().Get(Weight())
-		//n.Get().(*perceptron).getWeight()
-		//fmt.Printf(" -+ %T - %v\n", n.Get(), n.Get())
+		n.Get().Get(Weight())
 	} else {
-
+		log.Println("Not trained network")
 	}
-	n.Get().(*perceptron).getWeight()
-
 	if b, err := json.MarshalIndent(&n, "", "\t"); err != nil {
 		log.Fatal("JSON marshaling failed: ", err)
 	} else if err = ioutil.WriteFile(filename, b, os.ModePerm); err != nil {
 		log.Fatal("Can't write file:", err)
 	}
+}
+
+func (p *perceptron) getWeight() {
+	fmt.Println("func (p *perceptron) getWeight() ")
 }

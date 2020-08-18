@@ -15,7 +15,9 @@ var _ NeuralNetwork = (*hopfield)(nil)
 }*/
 
 type hopfield struct {
-	architecture		NeuralNetwork
+	Architecture						`json:"-" xml:"-"`
+	Parameter							`json:"-" xml:"-"`
+	Constructor							`json:"-" xml:"-"`
 
 	Configuration struct{
 		Energy			floatType
@@ -25,9 +27,6 @@ type hopfield struct {
 	// Matrix
 	neuron []*Neuron
 	axon   [][]*Axon
-
-	Parameter							`json:"-"`
-	Constructor							`json:"-"`
 }
 
 func Hopfield() *hopfield {
@@ -37,7 +36,7 @@ func Hopfield() *hopfield {
 // Returns a new Hopfield neural network instance with the default parameters
 func (n *NN) hopfield() NeuralNetwork {
 	n.Architecture = &hopfield{
-		architecture: n,
+		Architecture: n,
 	}
 	return n
 }

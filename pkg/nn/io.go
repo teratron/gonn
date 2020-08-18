@@ -30,7 +30,6 @@ func (n *NN) Read(reader pkg.Reader) {
 	/*if a, ok := n.Get().(NeuralNetwork); ok {
 		a.Read(reader)
 	}*/
-
 	switch r := reader.(type) {
 	case jsonType:
 		n.readJSON(string(r))
@@ -48,7 +47,6 @@ func (n *NN) Read(reader pkg.Reader) {
 
 //
 func (n *NN) Write(writer ...pkg.Writer) {
-	//fmt.Println("***")
 	if len(writer) > 0 {
 		/*if a, ok := n.Get().(NeuralNetwork); ok {
 			a.Write(writer...)

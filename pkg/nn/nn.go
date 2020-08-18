@@ -8,6 +8,9 @@ var _ NeuralNetwork = (*NN)(nil)
 //
 type NeuralNetwork interface {
 	//
+	Architecture
+
+	//
 	Parameter
 
 	//
@@ -42,18 +45,25 @@ type NeuralNetwork interface {
 	//Delete()*/
 }
 
+type Architecture interface {
+	//Perceptron() *perceptron
+	perceptron() NeuralNetwork
+	hopfield() NeuralNetwork
+}
+
 //
 type NN struct {
-	Architecture NeuralNetwork `json:"architecture,omitempty" xml:"architecture,omitempty"`	// Architecture of neural network
-	IsInit       bool          `json:"-" xml:"-"`						// Neural network initializing flag
-	IsTrain      bool          `json:"isTrain" xml:"isTrain"`					// Neural network training flag
+	Architecture			`json:"architecture,omitempty" xml:"architecture,omitempty"`	// Architecture of neural network
+
+	IsInit       bool		`json:"-" xml:"-"`				// Neural network initializing flag
+	IsTrain      bool		`json:"isTrain" xml:"isTrain"`	// Neural network training flag
 
 	json		string
 	xml			xmlType
 	csv			csvType
 	db			dbType
 
-	Parameter					`json:"-" xml:"-"`
+	Parameter				`json:"-" xml:"-"`
 }
 
 /*type NN struct {

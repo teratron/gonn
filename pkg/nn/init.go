@@ -31,8 +31,6 @@ func New(reader ...pkg.Reader) NeuralNetwork {
 		switch r := reader[0].(type) {
 		case *perceptron:
 			n.Architecture = r
-			//n.Parameter["Architecture"] = r
-			//n.Parameters = r
 			n.perceptron()
 		/*case jsonType:
 			if len(r) > 0 {
@@ -47,7 +45,6 @@ func New(reader ...pkg.Reader) NeuralNetwork {
 		}
 	} else {
 		n.Architecture = &perceptron{}
-		//n.Parameter["perceptron"] = &perceptron{}
 		n.perceptron()
 	}
 	return n
