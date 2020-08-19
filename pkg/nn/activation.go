@@ -26,7 +26,7 @@ func ActivationMode(mode ...uint8) pkg.GetterSetter {
 }
 
 func (n *NN) ActivationMode() uint8 {
-	return n.Get().(Parameter).ActivationMode()
+	return n.Architecture.(Parameter).ActivationMode()
 }
 
 // Setter

@@ -16,7 +16,7 @@ func (n *NN) Train(input []float64, target ...[]float64) (loss float64, count in
 			return
 		}
 	}
-	if a, ok := n.Get().(NeuralNetwork); ok {
+	if a, ok := n.Architecture.(NeuralNetwork); ok {
 		loss, count = a.Train(input, target...)
 		if count > 0 {
 			n.IsTrain = true

@@ -5,9 +5,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/zigenzoog/gonn/pkg"
 	"log"
 	"math"
+
+	"github.com/zigenzoog/gonn/pkg"
 )
 
 var _ NeuralNetwork = (*perceptron)(nil)
@@ -26,7 +27,7 @@ HiddenLayer() []uint
 type perceptron struct {
 	Architecture						`json:"-" xml:"-"`
 	Parameter							`json:"-" xml:"-"`
-	Constructor							`json:"-" xml:"-"`
+	//Constructor							`json:"-" xml:"-"`
 
 	Configuration struct{
 		// Array of the number of neurons in each hidden layer
@@ -162,7 +163,7 @@ func (p *perceptron) Get(args ...pkg.Getter) pkg.GetterSetter {
 			return nil
 		}
 	} else {
-		if a, ok := p.Architecture.(NeuralNetwork); ok {
+		if a, ok := p.Architecture.(*NN); ok {
 			return a
 		}
 	}
@@ -184,9 +185,9 @@ func (p *perceptron) init(lenInput int, lenTarget ...interface{}) bool {
 		layer           := make(HiddenType, p.lastIndexLayer + 1)
 		lenLayer        := copy(layer, tmp)
 
-		b := 0
+		bias := 0
 		if p.Configuration.Bias {
-			b = 1
+			bias = 1
 		}
 		p.neuron = make([][]*Neuron, lenLayer)
 		p.axon   = make([][][]*Axon, lenLayer)
@@ -195,16 +196,16 @@ func (p *perceptron) init(lenInput int, lenTarget ...interface{}) bool {
 			p.axon[i]   = make([][]*Axon, l)
 			for j := 0; j < int(l); j++ {
 				if i == 0 {
-					p.axon[i][j] = make([]*Axon, p.lenInput + b)
+					p.axon[i][j] = make([]*Axon, p.lenInput + bias)
 				} else {
-					p.axon[i][j] = make([]*Axon, int(layer[i - 1]) + b)
+					p.axon[i][j] = make([]*Axon, int(layer[i - 1]) + bias)
 				}
 			}
 		}
-		if n, ok := p.Get().(*NN); ok && !n.IsTrain {
+		//if n, ok := p.Architecture.(*NN); ok && !n.IsTrain {
 			p.initNeuron()
 			p.initAxon()
-		}
+		//}
 		return true
 	} else {
 		pkg.Log("No target data", true) // !!!
@@ -400,7 +401,7 @@ func (p *perceptron) Verify(input []float64, target ...[]float64) (loss float64)
 
 // getWeight
 func getWeight(p *perceptron) /**[][][]floatType*/ {
-	fmt.Println("g", len(p.axon), p.axon)
+	//fmt.Println("g", len(p.axon), p.axon)
 	p.Configuration.Weight = make([][][]floatType, len(p.axon))
 	for i, u := range p.axon {
 		p.Configuration.Weight[i] = make([][]floatType, len(p.axon[i]))
@@ -416,7 +417,7 @@ func getWeight(p *perceptron) /**[][][]floatType*/ {
 
 // setWeight
 func setWeight(p *perceptron)  {
-	fmt.Println("s", len(p.axon), p.axon)
+	//fmt.Println("s", len(p.axon), p.axon)
 	for i, u := range p.Configuration.Weight {
 		for j, v := range u {
 			for k, w := range v {
@@ -468,17 +469,23 @@ func (p *perceptron) Write(writer ...pkg.Writer) {
 
 // readJSON
 func (p *perceptron) readJSON(value interface{}) {
-	fmt.Println(p.Configuration.Weight)
+	//fmt.Println(p.Configuration.Weight)
 	if b, err := json.Marshal(&value); err != nil {
 		log.Fatal("JSON marshaling failed: ", err)
 	} else if err = json.Unmarshal(b, &p.Configuration); err != nil {
 		log.Fatal("JSON unmarshal failed: ", err)
 	}
-	fmt.Println(p.Architecture)
-	fmt.Println(p.Configuration.Weight)
+	//fmt.Println(p.Architecture)
+	//fmt.Println(len(p.Configuration.Weight[len(p.Configuration.Weight) - 1]))
+	bias := 0
+	if p.Configuration.Bias {
+		bias = 1
+	}
+	//fmt.Println(len(p.Configuration.Weight[0][0]) - bias)
+	p.Architecture.(*NN).IsInit = p.init(len(p.Configuration.Weight[0][0]) - bias, len(p.Configuration.Weight[len(p.Configuration.Weight) - 1]))
 	//fmt.Println(len(p.axon), p.axon)
 	//fmt.Println(p.Configuration.Weight)
-	//p.Set(Weight())
+	p.Set(Weight())
 	//setWeight(p)
 }
 

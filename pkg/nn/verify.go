@@ -13,7 +13,7 @@ func (n *NN) Verify(input []float64, target ...[]float64) (loss float64) {
 			}
 		}
 	}
-	if a, ok := n.Get().(NeuralNetwork); ok {
+	if a, ok := n.Architecture.(NeuralNetwork); ok {
 		loss = a.Verify(input, target...)
 	}
 	return

@@ -16,7 +16,7 @@ func Bias(bias ...bool) pkg.GetterSetter {
 }
 
 func (n *NN) Bias() bool {
-	return n.Get().(Parameter).Bias()
+	return n.Architecture.(Parameter).Bias()
 }
 
 // Set

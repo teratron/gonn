@@ -54,7 +54,7 @@ func (n *NN) Write(writer ...pkg.Writer) {
 		for _, w := range writer {
 			switch v := w.(type) {
 			case *report:
-				if a, ok := n.Get().(NeuralNetwork); ok {
+				if a, ok := n.Architecture.(NeuralNetwork); ok {
 					a.Write(v)
 				}
 			case jsonType:
@@ -64,7 +64,7 @@ func (n *NN) Write(writer ...pkg.Writer) {
 			case csvType:
 			case dbType:
 			default:
-				if a, ok := n.Get().(NeuralNetwork); ok {
+				if a, ok := n.Architecture.(NeuralNetwork); ok {
 					a.Write(writer...)
 				}
 			}

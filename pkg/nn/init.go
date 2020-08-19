@@ -105,5 +105,10 @@ func getLengthData(data ...[]float64) []interface{} {
 			tmp = append(tmp, len(v))
 		}
 	}
+	//fmt.Println(tmp)
 	return tmp
+}
+
+func Debug(args ...interface{}) {
+	//fmt.Println(getLengthData([]float64{.2,.3,.8}))
 }

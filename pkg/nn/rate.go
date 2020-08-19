@@ -17,7 +17,7 @@ func Rate(rate ...float32) pkg.GetterSetter {
 }
 
 func (n *NN) Rate() float32 {
-	return n.Get().(Parameter).Rate()
+	return n.Architecture.(Parameter).Rate()
 }
 
 // Setter

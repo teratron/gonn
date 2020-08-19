@@ -2,7 +2,7 @@
 package nn
 
 import (
-	"encoding/json"
+	"encoding/xml"
 	"io/ioutil"
 	"log"
 	"os"
@@ -41,12 +41,9 @@ func (n *NN) readXML(filename string) {
 }
 
 func (n *NN) writeXML(filename string) {
-	b, err := json.MarshalIndent(n, "", "\t")
-	if err != nil {
+	if b, err := xml.MarshalIndent(n, "", "\t"); err != nil {
 		log.Fatal("XML marshaling failed: ", err)
-	}
-	err = ioutil.WriteFile(filename, b, os.ModePerm)
-	if err != nil {
-		log.Fatal("Can't write updated settings file:", err)
+	} else if err = ioutil.WriteFile(filename, b, os.ModePerm); err != nil {
+		log.Fatal("Can't write file:", err)
 	}
 }

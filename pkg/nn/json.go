@@ -45,9 +45,9 @@ func (n *NN) readJSON(filename string) {
 		log.Println(err)
 	}
 	//fmt.Println(n)
-	//fmt.Println(n.Architecture)
-	//n.Architecture = nil
-	n.json = filename
+	n.Architecture = nil
+	n.IsInit       = false
+	n.json         = filename
 
 	// Декодируем json в тип map[string]interface{}
 	var data interface{}
@@ -81,6 +81,7 @@ func (n *NN) readJSON(filename string) {
 							//a.Configuration.Bias = true
 							//a.Configuration.Rate = 0.89
 							//fmt.Println(a.Configuration)
+							a.Architecture = n
 							a.readJSON(v)
 						}
 					case "hopfield":

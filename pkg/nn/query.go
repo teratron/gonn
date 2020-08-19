@@ -11,7 +11,7 @@ func (n *NN) Query(input []float64) (output []float64) {
 			return nil
 		}
 	}
-	if a, ok := n.Get().(NeuralNetwork); ok {
+	if a, ok := n.Architecture.(NeuralNetwork); ok {
 		output = a.Query(input)
 	}
 	return

@@ -12,7 +12,7 @@ func HiddenLayer(nums ...uint) HiddenType {
 }
 
 func (n *NN) HiddenLayer() []uint {
-	return n.Get().(Parameter).HiddenLayer()
+	return n.Architecture.(Parameter).HiddenLayer()
 }
 
 // Setter

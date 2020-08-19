@@ -12,7 +12,7 @@ func main() {
 
 	// Set parameters
 	n.Set(
-		nn.HiddenLayer(3, 2),
+		nn.HiddenLayer(3, 5),
 		nn.Bias(true),
 		nn.ActivationMode(nn.ModeSIGMOID),
 		nn.LossMode(nn.ModeMSE),
@@ -89,4 +89,6 @@ func main() {
 
 	n.Read(nn.JSON("perceptron.json"))
 	n.Write(nn.JSON("perceptron2.json"))
+
+	nn.Debug(n)
 }
