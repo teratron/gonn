@@ -13,93 +13,95 @@ type jsonType string
 
 //
 func JSON(filename ...string) pkg.ReaderWriter {
-	/*if len(filename) > 0 && filename[0] != "" {
-		return jsonType(filename[0])
-	} else {
-		return jsonType("")
-	}*/
 	return jsonType(filename[0])
 }
 
-/*func (j jsonType) Read([]byte) (n int, err error) {
-	return
+func (j jsonType) Read(reader pkg.Reader) {
+	if n, ok := reader.(NeuralNetwork); ok {
+		n.readJSON(string(j))
+	}
 }
 
-func (j jsonType) Write([]byte) (n int, err error) {
-	return
-}*/
-
-func (j jsonType) Read(pkg.Reader) {}
-func (j jsonType) Write(...pkg.Writer) {}
-
-func (n *NN) readJSON(filename string) {
-	b, err := ioutil.ReadFile(filename)
-	if err != nil {
-		log.Fatal("Can't load json: ", err)
+func (j jsonType) Write(writer ...pkg.Writer) {
+	if len(writer) > 0 {
+		if n, ok := writer[0].(NeuralNetwork); ok {
+			n.writeJSON(string(j))
+		}
+	} else {
+		pkg.Log("Empty write", true) // !!!
 	}
-	//fmt.Println(string(b))
+}
 
-	// Декодируем json в NN
-	err = json.Unmarshal(b, &n)
-	if err != nil {
-		log.Println(err)
-	}
-	//fmt.Println(n)
-	n.Architecture = nil
-	n.IsInit       = false
-	n.json         = filename
+func (n *NN) readJSON(value interface{}) {
+	filename, ok := value.(string)
+	if ok {
+		b, err := ioutil.ReadFile(filename)
+		if err != nil {
+			log.Fatal("Can't load json: ", err)
+		}
+		//fmt.Println(string(b))
 
-	// Декодируем json в тип map[string]interface{}
-	var data interface{}
-	err = json.Unmarshal(b, &data)
-	if err != nil {
-		log.Println(err)
-	}
-	//fmt.Println(data)
+		// Декодируем json в NN
+		err = json.Unmarshal(b, &n)
+		if err != nil {
+			log.Println(err)
+		}
+		//fmt.Println(n)
+		n.Architecture = nil
+		n.IsInit       = false
+		n.json         = filename
 
-	for key, value := range data.(map[string]interface{}) {
-		if v, ok := value.(map[string]interface{}); ok {
-			if key == "architecture" {
-				b, err = json.Marshal(&v)
-				if err != nil {
-					log.Println(err)
-				}
-				//fmt.Println(string(b))
+		// Декодируем json в тип map[string]interface{}
+		var data interface{}
+		err = json.Unmarshal(b, &data)
+		if err != nil {
+			log.Println(err)
+		}
+		//fmt.Println(data)
 
-				err = json.Unmarshal(b, &data)
-				if err != nil {
-					log.Println(err)
-				}
-				//fmt.Println(data)
+		for key, value := range data.(map[string]interface{}) {
+			if v, ok := value.(map[string]interface{}); ok {
+				if key == "architecture" {
+					b, err = json.Marshal(&v)
+					if err != nil {
+						log.Println(err)
+					}
+					//fmt.Println(string(b))
 
-				for k, v := range data.(map[string]interface{}) {
-					//fmt.Printf("%s - %T - %v\n", k, v, v)
-					switch k {
-					case "perceptron":
-						n.Architecture = &perceptron{}
-						if a, ok := n.Architecture.(*perceptron); ok {
-							//a.Configuration.Bias = true
-							//a.Configuration.Rate = 0.89
-							//fmt.Println(a.Configuration)
-							a.Architecture = n
-							a.readJSON(v)
+					err = json.Unmarshal(b, &data)
+					if err != nil {
+						log.Println(err)
+					}
+					//fmt.Println(data)
+
+					for k, v := range data.(map[string]interface{}) {
+						//fmt.Printf("%s - %T - %v\n", k, v, v)
+						switch k {
+						case "perceptron":
+							n.Architecture = &perceptron{
+								Architecture: n,
+							}
+							if a, ok := n.Architecture.(*perceptron); ok {
+								a.readJSON(v)
+							}
+						case "hopfield":
+							n.Architecture = &hopfield{
+								Architecture: n,
+							}
+							if a, ok := n.Architecture.(*hopfield); ok {
+								a.readJSON(v)
+							}
+						default:
 						}
-					case "hopfield":
-						n.Architecture = &hopfield{}
-						if a, ok := n.Architecture.(*hopfield); ok {
-							a.readJSON(v)
-						}
-					default:
 					}
 				}
 			}
 		}
+		//fmt.Println("+++++++++", n)
 	}
-	//fmt.Println("+++++++++", n)
 }
 
 func (n *NN) writeJSON(filename string) {
-	//n.Architecture.(Architecture).getWeight()
 	if n.IsTrain {
 		n.Get().Get(Weight())
 	} else {
@@ -111,7 +113,3 @@ func (n *NN) writeJSON(filename string) {
 		log.Fatal("Can't write file:", err)
 	}
 }
-
-/*func (p *perceptron) getWeight() {
-	fmt.Println("func (p *perceptron) getWeight() ")
-}*/

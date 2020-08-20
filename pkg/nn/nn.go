@@ -20,7 +20,8 @@ type NeuralNetwork interface {
 	pkg.GetterSetter
 
 	//
-	pkg.ReaderWriter
+	readerWriter
+	//pkg.ReaderWriter
 }
 
 type Architecture interface {

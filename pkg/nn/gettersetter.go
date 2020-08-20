@@ -5,7 +5,7 @@ import (
 	"github.com/zigenzoog/gonn/pkg"
 )
 
-// Setter
+// Set
 func (n *NN) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
 		for _, v := range args {
@@ -18,7 +18,7 @@ func (n *NN) Set(args ...pkg.Setter) {
 	}
 }
 
-// Getter
+// Get
 func (n *NN) Get(args ...pkg.Getter) pkg.GetterSetter {
 	if len(args) > 0 {
 		for _, v := range args {

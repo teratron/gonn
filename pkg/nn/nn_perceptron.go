@@ -112,7 +112,7 @@ func (p *perceptron) Rate() float32 {
 	return float32(p.Configuration.Rate)
 }
 
-// Setter
+// Set
 func (p *perceptron) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
 		switch v := args[0].(type) {
@@ -139,7 +139,7 @@ func (p *perceptron) Set(args ...pkg.Setter) {
 	}
 }
 
-// Getter
+// Get
 func (p *perceptron) Get(args ...pkg.Getter) pkg.GetterSetter {
 	if len(args) > 0 {
 		switch args[0].(type) {
@@ -202,10 +202,8 @@ func (p *perceptron) init(lenInput int, lenTarget ...interface{}) bool {
 				}
 			}
 		}
-		//if n, ok := p.Architecture.(*NN); ok && !n.IsTrain {
-			p.initNeuron()
-			p.initAxon()
-		//}
+		p.initNeuron()
+		p.initAxon()
 		return true
 	} else {
 		pkg.Log("No target data", true) // !!!
@@ -213,7 +211,7 @@ func (p *perceptron) init(lenInput int, lenTarget ...interface{}) bool {
 	}
 }
 
-//
+// initNeuron
 func (p *perceptron) initNeuron() {
 	for i, v := range p.neuron {
 		for j := range v {
@@ -225,14 +223,20 @@ func (p *perceptron) initNeuron() {
 	}
 }
 
-//
+// initAxon
 func (p *perceptron) initAxon() {
+	isTrain := true
+	if n, ok := p.Architecture.(*NN); ok && !n.IsTrain {
+		isTrain = false
+	}
 	for i, v := range p.axon {
 		for j, w := range v {
 			for k := range w {
 				p.axon[i][j][k] = &Axon{
-					weight:  .5,//getRand(),
 					synapse: map[string]pkg.Getter{},
+				}
+				if !isTrain {
+					p.axon[i][j][k].weight = .5//getRand()
 				}
 				if i == 0 {
 					if k < p.lenInput {
@@ -253,7 +257,7 @@ func (p *perceptron) initAxon() {
 	}
 }
 
-//
+// initSynapseInput
 func (p *perceptron) initSynapseInput(input []float64) {
 	for j, w := range p.axon[0] {
 		for k := range w {
@@ -264,6 +268,7 @@ func (p *perceptron) initSynapseInput(input []float64) {
 	}
 }
 
+// calcNeuron
 func (p *perceptron) calcNeuron(input []float64) {
 	p.initSynapseInput(input)
 	wait := make(chan bool)
@@ -285,7 +290,7 @@ func (p *perceptron) calcNeuron(input []float64) {
 	}
 }
 
-// Calculating the error of the output neuron
+// calcLoss calculating the error of the output neuron
 func (p *perceptron) calcLoss(target []float64) (loss float64) {
 	for i, v := range p.neuron[p.lastIndexLayer] {
 		if miss, ok := v.specific.(floatType); ok {
@@ -308,7 +313,7 @@ func (p *perceptron) calcLoss(target []float64) (loss float64) {
 	return
 }
 
-// Calculating the error of neurons in hidden layers and update weights
+// calcMiss calculating the error of neurons in hidden layers and update weights
 func (p *perceptron) calcMiss(input []float64) {
 	wait := make(chan bool)
 	defer close(wait)
@@ -334,7 +339,7 @@ func (p *perceptron) calcMiss(input []float64) {
 	}
 }
 
-// Update weights
+// calcAxon update weights
 func (p *perceptron) calcAxon(input []float64) {
 	p.calcMiss(input)
 	wait := make(chan bool)
@@ -358,7 +363,7 @@ func (p *perceptron) calcAxon(input []float64) {
 	}
 }
 
-// Training
+// Train training neural network
 func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, count int) {
 	if len(target) > 0 {
 		for count < 1 /*MaxIteration*/ {
@@ -377,7 +382,7 @@ func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, 
 	return
 }
 
-// Querying
+// Query querying neural network
 func (p *perceptron) Query(input []float64) (output []float64) {
 	p.calcNeuron(input)
 	output = make([]float64, p.lenOutput)
@@ -387,7 +392,7 @@ func (p *perceptron) Query(input []float64) (output []float64) {
 	return
 }
 
-// Verifying
+// Verify verifying neural network
 func (p *perceptron) Verify(input []float64, target ...[]float64) (loss float64) {
 	if len(target) > 0 {
 		p.calcNeuron(input)
@@ -433,7 +438,7 @@ func setWeight(p *perceptron)  {
 func (p *perceptron) Read(reader pkg.Reader) {
 	switch r := reader.(type) {
 	case jsonType:
-		p.readJSON(string(r))
+		//p.readJSON(string(r))
 	/*case xml:
 		p.readXML(v)
 	case xml:
@@ -490,13 +495,13 @@ func (p *perceptron) readJSON(value interface{}) {
 }
 
 // writeJSON
-/*func (p *perceptron) writeJSON(filename string) {
-	if b, err := json.MarshalIndent(&p, "", "\t"); err != nil {
+func (p *perceptron) writeJSON(filename string) {
+/*if b, err := json.MarshalIndent(&p, "", "\t"); err != nil {
 		log.Fatal("JSON marshaling failed: ", err)
 	} else if err = ioutil.WriteFile(filename, b, os.ModePerm); err != nil {
 		log.Fatal("Can't write file:", err)
-	}
-}*/
+	}*/
+}
 
 // writeReport report of neural network training results in io.Writer
 func (p *perceptron) writeReport(report *report) {
