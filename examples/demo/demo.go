@@ -90,5 +90,5 @@ func main() {
 	n.Read(nn.JSON("perceptron.json"))
 	n.Write(nn.JSON("perceptron2.json"))
 
-	nn.Debug(n)
+	//nn.Debug(n)
 }

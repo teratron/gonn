@@ -5,6 +5,19 @@ import (
 	"github.com/zigenzoog/gonn/pkg"
 )
 
+/*type GetterSetter interface {
+	Getter
+	Setter
+}
+
+type Getter interface {
+	pkg.Getter
+}
+
+type Setter interface {
+	pkg.Setter
+}*/
+
 // Set
 func (n *NN) Set(args ...pkg.Setter) {
 	if len(args) > 0 {

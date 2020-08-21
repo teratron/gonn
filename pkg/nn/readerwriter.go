@@ -7,34 +7,28 @@ import (
 	"github.com/zigenzoog/gonn/pkg"
 )
 
-type readerWriter interface {
-	reader
-	writer
+/*type ReaderWriter interface {
+	Reader
+	Writer
 }
 
-type reader interface {
+type Reader interface {
 	pkg.Reader
-	readJSON(interface{})
+	//readJSON(interface{})
 	//readXML(string)
 	//readCSV(string)
 }
 
-type writer interface {
+type Writer interface {
 	pkg.Writer
-	writeJSON(string)
+	//writeJSON(string)
 	//writeXML(string)
 	//writeCSV(string)
-}
+}*/
 
 // Read
 func (n *NN) Read(reader pkg.Reader) {
-	/*if a, ok := n.Get().(NeuralNetwork); ok {
-		a.Read(reader)
-	}*/
-	if r, ok := reader.(pkg.Reader); ok {
-		r.Read(n)
-	}
-	/*switch r := reader.(type) {
+	switch r := reader.(type) {
 	case jsonType:
 		n.readJSON(string(r))
 	case xmlType:
@@ -44,40 +38,33 @@ func (n *NN) Read(reader pkg.Reader) {
 	case dbType:
 		//n.readDB(r)
 	default:
-		pkg.Log("This type is missing for read", true) // !!!
-		log.Printf("\tWrite: %T %v\n", r, r) // !!!
-	}*/
+		if v, ok := r.(pkg.Reader); ok {
+			v.Read(n)
+		}
+		//pkg.Log("This type is missing for read", true) // !!!
+		//log.Printf("\tWrite: %T %v\n", r, r) // !!!
+	}
 }
 
 // Write
 func (n *NN) Write(writer ...pkg.Writer) {
 	if len(writer) > 0 {
-		/*if a, ok := n.Get().(NeuralNetwork); ok {
-			a.Write(writer...)
-		}*/
 		for _, w := range writer {
-			if v, ok := w.(pkg.Writer); ok {
-				v.Write(n)
-			}
-		}
-		/*for _, w := range writer {
 			switch v := w.(type) {
-			case *report:
-				if a, ok := n.Architecture.(NeuralNetwork); ok {
-					a.Write(v)
-				}
 			case jsonType:
 				n.writeJSON(string(v))
 			case xmlType:
-				n.writeXML(string(v))
+				//n.writeXML(string(v))
 			case csvType:
+				//n.writeCSV(string(v))
 			case dbType:
+				//n.writeDB(string(v))
 			default:
-				if a, ok := n.Architecture.(NeuralNetwork); ok {
-					a.Write(writer...)
+				if u, ok := v.(pkg.Writer); ok {
+					u.Write(n)
 				}
 			}
-		}*/
+		}
 	} else {
 		log.Println("Empty write") // !!!
 	}

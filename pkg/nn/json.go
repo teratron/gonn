@@ -17,15 +17,15 @@ func JSON(filename ...string) pkg.ReaderWriter {
 }
 
 func (j jsonType) Read(reader pkg.Reader) {
-	if n, ok := reader.(NeuralNetwork); ok {
-		n.readJSON(string(j))
+	if r, ok := reader.(pkg.Reader); ok {
+		r.Read(j)
 	}
 }
 
 func (j jsonType) Write(writer ...pkg.Writer) {
 	if len(writer) > 0 {
-		if n, ok := writer[0].(NeuralNetwork); ok {
-			n.writeJSON(string(j))
+		if w, ok := writer[0].(pkg.Writer); ok {
+			w.Write(j)
 		}
 	} else {
 		pkg.Log("Empty write", true) // !!!

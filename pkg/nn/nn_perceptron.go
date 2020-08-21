@@ -457,9 +457,9 @@ func (p *perceptron) Write(writer ...pkg.Writer) {
 		switch v := w.(type) {
 		case *report:
 			p.writeReport(v)
-		/*case jsonType:
+		case jsonType:
 			p.writeJSON(string(v))
-		case xml:
+		/*case xml:
 			p.writeXML(v)
 		case xml:
 			p.writeCSV(v)
