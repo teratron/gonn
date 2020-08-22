@@ -19,13 +19,13 @@ type hopfield struct {
 	Constructor							`json:"-" xml:"-"`
 
 	Configuration struct{
-		Energy			floatType
-		Weights			[][]floatType	`json:"weights" xml:"weights"`
+		Energy  floatType
+		Weights [][]floatType `json:"weights" xml:"weights"`
 	}									`json:"hopfield" xml:"hopfield"`
 
 	// Matrix
-	neuron []*Neuron
-	axon   [][]*Axon
+	neuron []*neuron
+	Axon   [][]*axon
 }
 
 func Hopfield() *hopfield {

@@ -16,9 +16,7 @@ func init() {
 
 // New returns a new neural network instance with the default parameters
 func New(reader ...pkg.Reader) NeuralNetwork {
-	//n := new(nn)
 	n := &NN{
-		//Parameter: make(map[string]Architecture),
 		IsInit:  false,
 		IsTrain: false,
 		json:    "",
@@ -26,7 +24,6 @@ func New(reader ...pkg.Reader) NeuralNetwork {
 		csv:     "",
 		db:      "",
 	}
-	//n.Parameter = make(map[string]interface{})
 	if len(reader) > 0 {
 		switch r := reader[0].(type) {
 		case *perceptron:

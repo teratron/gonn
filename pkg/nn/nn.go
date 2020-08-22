@@ -1,6 +1,8 @@
 package nn
 
-import "github.com/zigenzoog/gonn/pkg"
+import (
+	"github.com/zigenzoog/gonn/pkg"
+)
 
 // Declare conformity with NeuralNetwork interface
 var _ NeuralNetwork = (*NN)(nil)
@@ -26,13 +28,14 @@ type NeuralNetwork interface {
 }
 
 type Architecture interface {
-	//perceptron() NeuralNetwork
-	//hopfield() NeuralNetwork
+	perceptron() NeuralNetwork
+	hopfield() NeuralNetwork
 }
 
 //
 type NN struct {
-	Architecture			`json:"architecture,omitempty" xml:"architecture,omitempty"`	// Architecture of neural network
+	// Architecture of neural network
+	Architecture			`json:"architecture,omitempty" xml:"architecture,omitempty"`
 	Parameter				`json:"-" xml:"-"`
 
 	IsInit       bool		`json:"-" xml:"-"`				// Neural network initializing flag

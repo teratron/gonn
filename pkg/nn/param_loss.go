@@ -83,7 +83,7 @@ func (l lossLevelType) Get(args ...pkg.Getter) pkg.GetterSetter {
 	return nil
 }
 
-// Check
+// check
 func (m lossModeType) check() lossModeType {
 	switch {
 	case m < 0 || m > lossModeType(ModeARCTAN):

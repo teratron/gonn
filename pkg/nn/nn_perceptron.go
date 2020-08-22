@@ -12,17 +12,6 @@ import (
 )
 
 var _ NeuralNetwork = (*perceptron)(nil)
-//var _ PerceptronNN = (*perceptron)(nil)
-
-/*type PerceptronNN interface {
-	getWeight()
-HiddenLayer() []uint
-	Bias() bool
-	ActivationMode() uint8
-	LossMode() uint8
-	LossLevel() float64
-	Rate() float32
-}*/
 
 type perceptron struct {
 	Architecture						`json:"-" xml:"-"`
@@ -46,15 +35,15 @@ type perceptron struct {
 		LossLevel		float64			`json:"lossLevel" xml:"lossLevel"`
 
 		// Learning coefficient, from 0 to 1
-		Rate			floatType		`json:"rate" xml:"rate"`
+		Rate floatType `json:"rate" xml:"rate"`
 
 		// Matrix of weight values
 		Weight			[][][]floatType `json:"weight" xml:"weight"`
 	}									`json:"perceptron" xml:"perceptron"`
 
 	// Matrix
-	neuron			[][]*Neuron
-	axon			[][][]*Axon
+	neuron [][]*neuron
+	axon   [][][]*axon
 
 	lastIndexLayer	int
 	lenInput		int
@@ -80,6 +69,10 @@ func (n *NN) perceptron() NeuralNetwork {
 		p.Configuration.Weight			= nil
 	}
 	return n
+}
+
+func (p *perceptron) perceptron() NeuralNetwork {
+	return p
 }
 
 // HiddenLayer
@@ -129,7 +122,7 @@ func (p *perceptron) Set(args ...pkg.Setter) {
 		case rateType:
 			p.Configuration.Rate = floatType(v)
 		case weightType:
-			setWeight(p)
+			p.setWeight()
 		default:
 			pkg.Log("This type is missing for Perceptron Neural Network", true) // !!!
 			log.Printf("\tset: %T %v\n", v, v) // !!!
@@ -156,7 +149,7 @@ func (p *perceptron) Get(args ...pkg.Getter) pkg.GetterSetter {
 		case rateType:
 			return p.Configuration.Rate
 		case weightType:
-			getWeight(p)
+			p.getWeight()
 		default:
 			pkg.Log("This type is missing for Perceptron Neural Network", true) // !!!
 			log.Printf("\tget: %T %v\n", args[0], args[0]) // !!!
@@ -189,16 +182,16 @@ func (p *perceptron) init(lenInput int, lenTarget ...interface{}) bool {
 		if p.Configuration.Bias {
 			bias = 1
 		}
-		p.neuron = make([][]*Neuron, lenLayer)
-		p.axon   = make([][][]*Axon, lenLayer)
+		p.neuron = make([][]*neuron, lenLayer)
+		p.axon = make([][][]*axon, lenLayer)
 		for i, l := range layer {
-			p.neuron[i] = make([]*Neuron, l)
-			p.axon[i]   = make([][]*Axon, l)
+			p.neuron[i] = make([]*neuron, l)
+			p.axon[i]   = make([][]*axon, l)
 			for j := 0; j < int(l); j++ {
 				if i == 0 {
-					p.axon[i][j] = make([]*Axon, p.lenInput + bias)
+					p.axon[i][j] = make([]*axon, p.lenInput + bias)
 				} else {
-					p.axon[i][j] = make([]*Axon, int(layer[i - 1]) + bias)
+					p.axon[i][j] = make([]*axon, int(layer[i - 1]) + bias)
 				}
 			}
 		}
@@ -215,7 +208,7 @@ func (p *perceptron) init(lenInput int, lenTarget ...interface{}) bool {
 func (p *perceptron) initNeuron() {
 	for i, v := range p.neuron {
 		for j := range v {
-			p.neuron[i][j] = &Neuron{
+			p.neuron[i][j] = &neuron{
 				axon:     p.axon[i][j],
 				specific: floatType(0),
 			}
@@ -232,11 +225,11 @@ func (p *perceptron) initAxon() {
 	for i, v := range p.axon {
 		for j, w := range v {
 			for k := range w {
-				p.axon[i][j][k] = &Axon{
+				p.axon[i][j][k] = &axon{
 					synapse: map[string]pkg.Getter{},
 				}
 				if !isTrain {
-					p.axon[i][j][k].weight = .5//getRand()
+					p.axon[i][j][k].weight = .5 //getRand()
 				}
 				if i == 0 {
 					if k < p.lenInput {
@@ -275,7 +268,7 @@ func (p *perceptron) calcNeuron(input []float64) {
 	defer close(wait)
 	for _, v := range p.neuron {
 		for _, w := range v {
-			go func(n *Neuron) {
+			go func(n *neuron) {
 				n.value = 0
 				for _, a := range n.axon {
 					n.value += getSynapseInput(a) * a.weight
@@ -319,7 +312,7 @@ func (p *perceptron) calcMiss(input []float64) {
 	defer close(wait)
 	for i := p.lastIndexLayer - 1; i >= 0; i-- {
 		for j, v := range p.neuron[i] {
-			go func(j int, n *Neuron) {
+			go func(j int, n *neuron) {
 				if miss, ok := n.specific.(floatType); ok {
 					miss = 0
 					for _, w := range p.neuron[i + 1] {
@@ -347,8 +340,8 @@ func (p *perceptron) calcAxon(input []float64) {
 	for _, u := range p.axon {
 		for _, v := range u {
 			for _, w := range v {
-				go func(a *Axon) {
-					if n, ok := a.synapse["output"].(*Neuron); ok {
+				go func(a *axon) {
+					if n, ok := a.synapse["output"].(*neuron); ok {
 						if miss, ok := n.specific.(floatType); ok {
 							a.weight += getSynapseInput(a) * miss * p.Configuration.Rate
 						}
@@ -405,7 +398,7 @@ func (p *perceptron) Verify(input []float64, target ...[]float64) (loss float64)
 }
 
 // getWeight
-func getWeight(p *perceptron) /**[][][]floatType*/ {
+func (p *perceptron) getWeight() /**[][][]floatType*/ {
 	//fmt.Println("g", len(p.axon), p.axon)
 	p.Configuration.Weight = make([][][]floatType, len(p.axon))
 	for i, u := range p.axon {
@@ -421,25 +414,23 @@ func getWeight(p *perceptron) /**[][][]floatType*/ {
 }
 
 // setWeight
-func setWeight(p *perceptron)  {
-	//fmt.Println("s", len(p.axon), p.axon)
+func (p *perceptron) setWeight() {
 	for i, u := range p.Configuration.Weight {
 		for j, v := range u {
 			for k, w := range v {
 				p.axon[i][j][k].weight = w
-				//fmt.Println(p.axon[i][j][k].weight)
 			}
 		}
 	}
-	//p.Configuration.Weight = nil
+	p.Configuration.Weight = nil
 }
 
 // Read
 func (p *perceptron) Read(reader pkg.Reader) {
 	switch r := reader.(type) {
-	case jsonType:
-		//p.readJSON(string(r))
-	/*case xml:
+	/*case jsonType:
+		p.readJSON(string(r))
+	case xml:
 		p.readXML(v)
 	case xml:
 		p.readCSV(v)
@@ -474,29 +465,22 @@ func (p *perceptron) Write(writer ...pkg.Writer) {
 
 // readJSON
 func (p *perceptron) readJSON(value interface{}) {
-	//fmt.Println(p.Configuration.Weight)
 	if b, err := json.Marshal(&value); err != nil {
 		log.Fatal("JSON marshaling failed: ", err)
 	} else if err = json.Unmarshal(b, &p.Configuration); err != nil {
 		log.Fatal("JSON unmarshal failed: ", err)
 	}
-	//fmt.Println(p.Architecture)
-	//fmt.Println(len(p.Configuration.Weight[len(p.Configuration.Weight) - 1]))
 	bias := 0
 	if p.Configuration.Bias {
 		bias = 1
 	}
-	//fmt.Println(len(p.Configuration.Weight[0][0]) - bias)
 	p.Architecture.(*NN).IsInit = p.init(len(p.Configuration.Weight[0][0]) - bias, len(p.Configuration.Weight[len(p.Configuration.Weight) - 1]))
-	//fmt.Println(len(p.axon), p.axon)
-	//fmt.Println(p.Configuration.Weight)
 	p.Set(Weight())
-	//setWeight(p)
 }
 
 // writeJSON
 func (p *perceptron) writeJSON(filename string) {
-/*if b, err := json.MarshalIndent(&p, "", "\t"); err != nil {
+	/*if b, err := json.MarshalIndent(&p, "", "\t"); err != nil {
 		log.Fatal("JSON marshaling failed: ", err)
 	} else if err = ioutil.WriteFile(filename, b, os.ModePerm); err != nil {
 		log.Fatal("Can't write file:", err)

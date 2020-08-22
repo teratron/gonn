@@ -1,4 +1,3 @@
-//
 package nn
 
 import (
@@ -29,7 +28,7 @@ func (n *NN) ActivationMode() uint8 {
 	return n.Architecture.(Parameter).ActivationMode()
 }
 
-// Setter
+// Set
 func (m activationModeType) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
@@ -40,7 +39,7 @@ func (m activationModeType) Set(args ...pkg.Setter) {
 	}
 }
 
-// Getter
+// Get
 func (m activationModeType) Get(args ...pkg.Getter) pkg.GetterSetter {
 	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
@@ -52,7 +51,7 @@ func (m activationModeType) Get(args ...pkg.Getter) pkg.GetterSetter {
 	return nil
 }
 
-// Checking
+// check
 func (m activationModeType) check() activationModeType {
 	switch {
 	case m < 0 || m > activationModeType(ModeTANH):
@@ -62,7 +61,7 @@ func (m activationModeType) check() activationModeType {
 	}
 }
 
-// Activation function
+// calcActivation activation function
 func calcActivation(value float64, mode uint8) float64 {
 	switch mode {
 	default:
@@ -94,7 +93,7 @@ func calcActivation(value float64, mode uint8) float64 {
 	}
 }
 
-// Derivative activation function
+// calcDerivative derivative activation function
 func calcDerivative(value float64, mode uint8) float64 {
 	switch mode {
 	default:

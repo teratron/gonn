@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/zigenzoog/gonn/pkg/app"
 	"github.com/zigenzoog/gonn/pkg/nn"
 )
@@ -37,8 +38,8 @@ func main() {
 		nn.LossMode(nn.ModeARCTAN),
 		nn.LossLevel(.0005),
 		nn.Rate(nn.DefaultRate))
-	fmt.Printf("n.Get(): %T %v\n", n.Get(), n.Get())
 
+	fmt.Printf("n.Get(): %T %v\n", n.Get(), n.Get())
 	fmt.Println(n.HiddenLayer())
 	fmt.Println(n.Bias())
 	fmt.Println(n.ActivationMode())

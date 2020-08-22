@@ -3,7 +3,7 @@ package app
 
 import "github.com/zigenzoog/gonn/pkg"
 
-// Setter
+// Set
 func (a *app) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
 		/*for _, v := range args {
@@ -16,7 +16,7 @@ func (a *app) Set(args ...pkg.Setter) {
 	}
 }
 
-// Getter
+// Get
 func (a *app) Get(args ...pkg.Getter) pkg.GetterSetter {
 	if len(args) > 0 {
 		/*for _, v := range args {

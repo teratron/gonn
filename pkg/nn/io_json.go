@@ -11,7 +11,7 @@ import (
 
 type jsonType string
 
-//
+// JSON
 func JSON(filename ...string) pkg.ReaderWriter {
 	return jsonType(filename[0])
 }
@@ -97,7 +97,6 @@ func (n *NN) readJSON(value interface{}) {
 				}
 			}
 		}
-		//fmt.Println("+++++++++", n)
 	}
 }
 

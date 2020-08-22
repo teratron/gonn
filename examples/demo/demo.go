@@ -1,14 +1,15 @@
 package main
 
 import (
+	"os"
+
 	"github.com/zigenzoog/gonn/pkg/nn"
 )
 
 func main() {
-	// New returns a new neural network
-	// instance with the default parameters
+	// New returns a new neural network instance with the default parameters
 	// same n := nn.New(Perceptron())
-	n := nn.New(/*nn.Perceptron()*/)
+	n := nn.New(nn.Perceptron())
 
 	// Set parameters
 	n.Set(
@@ -85,10 +86,9 @@ func main() {
 	n.Write(
 		nn.JSON("perceptron.json"),
 		nn.Report(nn.File("report.txt"), input, loss, count),
-		/*nn.Report(os.Stdout, input, loss, count)*/)
+		nn.Report(os.Stdout, input, loss, count))
 
 	n.Read(nn.JSON("perceptron.json"))
 	n.Write(nn.JSON("perceptron2.json"))
-
 	//nn.Debug(n)
 }
