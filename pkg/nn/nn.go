@@ -42,7 +42,7 @@ type NN struct {
 	IsTrain      bool		`json:"isTrain" xml:"isTrain"`	// Neural network training flag
 
 	json		string
-	xml			xmlType
+	xml			string
 	csv			csvType
 	db			dbType
 }

@@ -32,11 +32,11 @@ func (n *NN) Read(reader pkg.Reader) {
 	case jsonType:
 		n.readJSON(string(r))
 	case xmlType:
-		//n.readXML(string(r))
-	case csvType:
-		//n.readCSV(string(r))
+		n.readXML(string(r))
+	/*case csvType:
+		n.readCSV(string(r))
 	case dbType:
-		//n.readDB(r)
+		n.readDB(r)*/
 	default:
 		if v, ok := r.(pkg.Reader); ok {
 			v.Read(n)
@@ -54,11 +54,11 @@ func (n *NN) Write(writer ...pkg.Writer) {
 			case jsonType:
 				n.writeJSON(string(v))
 			case xmlType:
-				//n.writeXML(string(v))
-			case csvType:
-				//n.writeCSV(string(v))
+				n.writeXML(string(v))
+			/*case csvType:
+				n.writeCSV(string(v))
 			case dbType:
-				//n.writeDB(string(v))
+				n.writeDB(string(v))*/
 			default:
 				if u, ok := v.(pkg.Writer); ok {
 					u.Write(n)

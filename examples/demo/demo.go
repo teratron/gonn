@@ -1,94 +1,68 @@
 package main
 
 import (
-	"os"
-
+	"fmt"
 	"github.com/zigenzoog/gonn/pkg/nn"
 )
 
 func main() {
 	// New returns a new neural network instance with the default parameters
 	// same n := nn.New(Perceptron())
-	n := nn.New(nn.Perceptron())
+	n := nn.New()
 
 	// Set parameters
 	n.Set(
-		nn.HiddenLayer(3, 5),
+		nn.HiddenLayer(5, 3),
 		nn.Bias(true),
 		nn.ActivationMode(nn.ModeSIGMOID),
 		nn.LossMode(nn.ModeMSE),
-		nn.LossLevel(.0001),
+		nn.LossLevel(.01),
 		nn.Rate(nn.DefaultRate))
 
-	//
-	//numInput  := 3
-	//numOutput := 2
-	//dataSet := []float64{.27, .31, .52, .66, .81, .13, .2, .49, .11, .73, .28, .43}
+	// Training dataset
+	dataSet   := []float64{.27, .31, .52, .66, .81, .13, .2, .49, .11, .73, .28, .43}
+	numInput  := 3	// Number of input data
+	numOutput := 2	// Number of output data
 
-	input  := []float64{2.3, 3.1}
-	target := []float64{3.6}
-
-	//
-	loss, count := n.Train(input, target)
-	//_, _ = n.Train(input, target)
-
-	//
-	//fmt.Println(n.Query(input))
-
-	//
-	//fmt.Println(n.Verify(input, target))
-
-	// Обучение
-	/*minError := 1.
-	for epoch := 1; epoch <= 10000; epoch++ {
+	// Training
+	minLoss := 1.
+	for epoch := 1; epoch <= 100000; epoch++ {
 		for i := numInput; i <= len(dataSet) - numOutput; i++ {
-			input  = getInputData(dataSet[i - numInput:i])
-			target = getTargetData(dataSet[i:i + numOutput])
-			loss, count = n.Train(input, target)
+			_, _ = n.Train(dataSet[i - numInput:i], dataSet[i:i + numOutput])
 		}
 
 		// Verifying
 		sum := 0.
 		num := 0
-		for i := numInputData; i <= len(dataSet) - numOutputData; i++ {
-			loss = n.Verify(input, target)
+		for i := numInput; i <= len(dataSet) - numOutput; i++ {
+			loss := n.Verify(dataSet[i - numInput:i], dataSet[i:i + numOutput])
 			sum += loss
 			num++
 		}
 
-		// Средняя ошибка за всю эпоху
+		// Average error for the entire epoch
 		sum /= float64(num)
 
-		//
-		//if loss > mx.Limit {
-			//if epoch == 1 || epoch == 10 || epoch % 1000 == 0 || epoch == maxEpoch {
-				//fmt.Printf("+++++++++ Epoch: %v\tError: %.8f\n", epoch, sum)
-			//}
-			//continue
-		//}
-
-		// Минимальная средняя ошибка
-		if sum < minError && epoch >= 1000 {
-			minError = sum
-			fmt.Println("--------- Epoch:", epoch, "\tmin avg error:", minError)
-			//if epoch >= 10000 {
-				//mx.CopyWeight(weight)
-			//}
+		if epoch == 1 || epoch == 10 || epoch % 100 == 0 || epoch == 100000 {
+			fmt.Printf("Epoch: %v\tError: %.8f\n", epoch, sum)
 		}
 
-		//
-		if sum <= float64(n.Get(nn.LossLevel()).(nn.GetterSetter)) {
+		// Weights are copied at the minimum average error
+		if sum < minLoss && epoch >= 1000 {
+			fmt.Println("----- Epoch:", epoch, "\tmin avg error:", sum)
+			n.Copy(nn.Weight())
+			minLoss = sum
+		}
+
+		// Exiting the cycle of learning epochs, when the minimum error level is reached
+		if sum <= n.LossLevel() {
+			fmt.Printf("Epoch: %v\tError: %.8f\n", epoch, sum)
 			break
 		}
-	}*/
+	}
 
-	//
+	// Saving the neural network configuration to a file
 	n.Write(
-		nn.JSON("perceptron.json"),
-		nn.Report(nn.File("report.txt"), input, loss, count),
-		nn.Report(os.Stdout, input, loss, count))
-
-	n.Read(nn.JSON("perceptron.json"))
-	n.Write(nn.JSON("perceptron2.json"))
-	//nn.Debug(n)
+		nn.JSON("config/perceptron.json"),
+		nn.XML("config/perceptron.xml"))
 }

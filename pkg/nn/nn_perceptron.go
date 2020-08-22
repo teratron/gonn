@@ -4,6 +4,7 @@ package nn
 import (
 	"bytes"
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"log"
 	"math"
@@ -229,7 +230,7 @@ func (p *perceptron) initAxon() {
 					synapse: map[string]pkg.Getter{},
 				}
 				if !isTrain {
-					p.axon[i][j][k].weight = .5 //getRand()
+					p.axon[i][j][k].weight = getRand()
 				}
 				if i == 0 {
 					if k < p.lenInput {
@@ -306,7 +307,7 @@ func (p *perceptron) calcLoss(target []float64) (loss float64) {
 	return
 }
 
-// calcMiss calculating the error of neurons in hidden layers and update weights
+// calcMiss calculating the error of neurons in hidden layers
 func (p *perceptron) calcMiss(input []float64) {
 	wait := make(chan bool)
 	defer close(wait)
@@ -397,9 +398,17 @@ func (p *perceptron) Verify(input []float64, target ...[]float64) (loss float64)
 	return
 }
 
+//
+func (p *perceptron) Copy(obj pkg.Getter) {
+}
+
+//
+func (p *perceptron) Paste(obj pkg.Getter) (err error) {
+	return
+}
+
 // getWeight
 func (p *perceptron) getWeight() /**[][][]floatType*/ {
-	//fmt.Println("g", len(p.axon), p.axon)
 	p.Configuration.Weight = make([][][]floatType, len(p.axon))
 	for i, u := range p.axon {
 		p.Configuration.Weight[i] = make([][]floatType, len(p.axon[i]))
@@ -448,13 +457,13 @@ func (p *perceptron) Write(writer ...pkg.Writer) {
 		switch v := w.(type) {
 		case *report:
 			p.writeReport(v)
-		case jsonType:
+		/*case jsonType:
 			p.writeJSON(string(v))
-		/*case xml:
-			p.writeXML(v)
-		case xml:
+		case xmlType:
+			p.writeXML(string(v))
+		case csvType:
 			p.writeCSV(v)
-		case db:
+		case dbType:
 			p.writeDB(v)*/
 		default:
 			pkg.Log("This type is missing for write", true) // !!!
@@ -470,21 +479,40 @@ func (p *perceptron) readJSON(value interface{}) {
 	} else if err = json.Unmarshal(b, &p.Configuration); err != nil {
 		log.Fatal("JSON unmarshal failed: ", err)
 	}
+
 	bias := 0
 	if p.Configuration.Bias {
 		bias = 1
 	}
+
 	p.Architecture.(*NN).IsInit = p.init(len(p.Configuration.Weight[0][0]) - bias, len(p.Configuration.Weight[len(p.Configuration.Weight) - 1]))
 	p.Set(Weight())
 }
 
 // writeJSON
-func (p *perceptron) writeJSON(filename string) {
-	/*if b, err := json.MarshalIndent(&p, "", "\t"); err != nil {
+/*func (p *perceptron) writeJSON(filename string) {
+	if b, err := json.MarshalIndent(&p, "", "\t"); err != nil {
 		log.Fatal("JSON marshaling failed: ", err)
 	} else if err = ioutil.WriteFile(filename, b, os.ModePerm); err != nil {
 		log.Fatal("Can't write file:", err)
-	}*/
+	}
+}*/
+
+// readXML
+func (p *perceptron) readXML(value interface{}) {
+	if b, err := xml.Marshal(&value); err != nil {
+		log.Fatal("JSON marshaling failed: ", err)
+	} else if err = xml.Unmarshal(b, &p.Configuration); err != nil {
+		log.Fatal("JSON unmarshal failed: ", err)
+	}
+
+	bias := 0
+	if p.Configuration.Bias {
+		bias = 1
+	}
+
+	p.Architecture.(*NN).IsInit = p.init(len(p.Configuration.Weight[0][0]) - bias, len(p.Configuration.Weight[len(p.Configuration.Weight) - 1]))
+	p.Set(Weight())
 }
 
 // writeReport report of neural network training results in io.Writer

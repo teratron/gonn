@@ -130,6 +130,10 @@ func (h *hopfield) readJSON(value interface{}) {
 }
 
 // writeJSON
-func (h *hopfield) writeJSON(filename string) {
+/*func (h *hopfield) writeJSON(filename string) {
+	panic("implement me")
+}*/
+
+func (h *hopfield) readXML(value interface{}) {
 	panic("implement me")
 }
