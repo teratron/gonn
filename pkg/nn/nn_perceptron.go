@@ -398,11 +398,11 @@ func (p *perceptron) Verify(input []float64, target ...[]float64) (loss float64)
 	return
 }
 
-//
+// Copy
 func (p *perceptron) Copy(obj pkg.Getter) {
 }
 
-//
+// Paste
 func (p *perceptron) Paste(obj pkg.Getter) (err error) {
 	return
 }

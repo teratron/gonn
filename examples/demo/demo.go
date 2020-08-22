@@ -10,7 +10,13 @@ func main() {
 	// same n := nn.New(Perceptron())
 	n := nn.New()
 
-	// Set parameters
+	// Set parameters:
+	//		HiddenLayer - Array of the number of neurons in each hidden layer
+	//		Bias - The neuron bias, false or true
+	//		ActivationMode - Activation function mode
+	//		LossMode - The mode of calculation of the total error
+	//		LossLevel - Minimum (sufficient) level of the average of the error during training
+	//		Rate - Learning coefficient, from 0 to 1
 	n.Set(
 		nn.HiddenLayer(5, 3),
 		nn.Bias(true),
@@ -43,6 +49,12 @@ func main() {
 		// Average error for the entire epoch
 		sum /= float64(num)
 
+		// Exiting the cycle of learning epochs, when the minimum error level is reached
+		if sum <= n.LossLevel() {
+			fmt.Printf("Epoch: %v\tError: %.8f\n", epoch, sum)
+			break
+		}
+
 		if epoch == 1 || epoch == 10 || epoch % 100 == 0 || epoch == 100000 {
 			fmt.Printf("Epoch: %v\tError: %.8f\n", epoch, sum)
 		}
@@ -52,12 +64,6 @@ func main() {
 			fmt.Println("----- Epoch:", epoch, "\tmin avg error:", sum)
 			n.Copy(nn.Weight())
 			minLoss = sum
-		}
-
-		// Exiting the cycle of learning epochs, when the minimum error level is reached
-		if sum <= n.LossLevel() {
-			fmt.Printf("Epoch: %v\tError: %.8f\n", epoch, sum)
-			break
 		}
 	}
 
