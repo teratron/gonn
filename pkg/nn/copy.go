@@ -4,6 +4,7 @@ import "github.com/zigenzoog/gonn/pkg"
 
 // Copy
 func (n *NN) Copy(obj pkg.Getter) {
+
 }
 
 // Paste

@@ -3,20 +3,21 @@ package main
 import (
 	"fmt"
 	"github.com/zigenzoog/gonn/pkg/nn"
+	"log"
 )
 
 func main() {
-	// New returns a new neural network instance with the default parameters
+	// New returns a new neural network instance with the default parameters,
 	// same n := nn.New(Perceptron())
 	n := nn.New()
 
 	// Set parameters:
-	//		HiddenLayer - Array of the number of neurons in each hidden layer
-	//		Bias - The neuron bias, false or true
-	//		ActivationMode - Activation function mode
-	//		LossMode - The mode of calculation of the total error
-	//		LossLevel - Minimum (sufficient) level of the average of the error during training
-	//		Rate - Learning coefficient, from 0 to 1
+	// HiddenLayer    - Array of the number of neurons in each hidden layer
+	// Bias           - The neuron bias, false or true
+	// ActivationMode - Activation function mode
+	// LossMode       - The mode of calculation of the total error
+	// LossLevel      - Minimum (sufficient) level of the average of the error during training
+	// Rate           - Learning coefficient, from 0 to 1
 	n.Set(
 		nn.HiddenLayer(5, 3),
 		nn.Bias(true),
@@ -48,15 +49,18 @@ func main() {
 
 		// Average error for the entire epoch
 		sum /= float64(num)
+		if epoch == 1 || epoch == 10 || epoch % 100 == 0 || epoch == 100000 {
+			fmt.Printf("Epoch: %v\tError: %.8f\n", epoch, sum)
+		}
 
 		// Exiting the cycle of learning epochs, when the minimum error level is reached
 		if sum <= n.LossLevel() {
 			fmt.Printf("Epoch: %v\tError: %.8f\n", epoch, sum)
+			err := n.Paste(nn.Weight())
+			if err != nil {
+				log.Println("", err)
+			}
 			break
-		}
-
-		if epoch == 1 || epoch == 10 || epoch % 100 == 0 || epoch == 100000 {
-			fmt.Printf("Epoch: %v\tError: %.8f\n", epoch, sum)
 		}
 
 		// Weights are copied at the minimum average error
