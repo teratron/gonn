@@ -1,6 +1,8 @@
 package nn
 
-import "github.com/zigenzoog/gonn/pkg"
+import (
+	"github.com/zigenzoog/gonn/pkg"
+)
 
 type weightType floatType
 
@@ -10,26 +12,31 @@ type axon struct {
 	synapse map[string]pkg.Getter //
 }
 
+func (a axon) Set(...pkg.Setter) {}
+func (a axon) Get(...pkg.Getter) pkg.GetterSetter {
+	return a
+}
+
+// Weight
 func Weight() pkg.GetterSetter {
 	return weightType(0)
 }
 
-// Set
-func (a axon) Set(...pkg.Setter) {
-	panic("implement me")
-}
-
-func (w weightType) Set(...pkg.Setter) {
-	panic("implement me")
-}
-
-// Get
-func (a axon) Get(...pkg.Getter) pkg.GetterSetter {
-	panic("implement me")
-}
-
+func (w weightType) Set(...pkg.Setter) {}
 func (w weightType) Get(...pkg.Getter) pkg.GetterSetter {
-	panic("implement me")
+	return w
+}
+
+func (w weightType) Copy(obj pkg.Getter) {
+	if n, ok := obj.(*NN); ok {
+		if a, ok := n.Architecture.(NeuralNetwork); ok {
+			a.Copy(w)
+		}
+	}
+}
+
+func (w weightType) Paste(obj pkg.Getter) (err error) {
+	return
 }
 
 func getSynapseInput(axon *axon) (input floatType) {
@@ -37,7 +44,9 @@ func getSynapseInput(axon *axon) (input floatType) {
 	case floatType:
 		input = s
 	case biasType:
-		if s { input = 1 }
+		if s {
+			input = 1
+		}
 	case *neuron:
 		input = s.value
 	default:

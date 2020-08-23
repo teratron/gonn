@@ -1,8 +1,6 @@
 package main
 
 import (
-	"os"
-
 	"github.com/zigenzoog/gonn/pkg/nn"
 )
 
@@ -24,23 +22,27 @@ func main() {
 	target := []float64{3.6}
 
 	//
-	loss, count := n.Train(input, target)
-	//_, _ = n.Train(input, target)
+	//loss, count := n.Train(input, target)
+	_, _ = n.Train(input, target)
 
 	//
 	//fmt.Println(n.Query(input))
 
 	//
 	//fmt.Println(n.Verify(input, target))
+	n.Copy(nn.Weight())
 
 	//
 	n.Write(
 		nn.JSON("config/perceptron.json"),
 		nn.XML("config/perceptron.xml"),
-		nn.Report(nn.File("report.txt"), input, loss, count),
-		nn.Report(os.Stdout, input, loss, count))
+		/*nn.Report(nn.File("report.txt"), input, loss, count),
+		nn.Report(os.Stdout, input, loss, count)*/)
 
 	n.Read(nn.JSON("config/perceptron.json"))
 	n.Write(nn.JSON("config/perceptron2.json"))
 	//nn.Debug(n)
+
+	//n.Read(nn.XML("config/perceptron.xml"))
+	//n.Write(nn.XML("config/perceptron2.xml"))
 }

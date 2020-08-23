@@ -11,6 +11,9 @@ import (
 
 type Getter interface {
 	pkg.Getter
+
+	Copy(Getter)
+	Paste(Getter) error
 }
 
 type Setter interface {

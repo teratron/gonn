@@ -20,7 +20,7 @@ type hopfield struct {
 
 	Configuration struct{
 		Energy  floatType
-		Weights [][]floatType `json:"weights" xml:"weights"`
+		Weight  [][]floatType			`json:"weights" xml:"weight"`
 	}									`json:"hopfield" xml:"hopfield"`
 
 	// Matrix
@@ -85,6 +85,11 @@ func (h *hopfield) init(length int, args ...interface{}) bool {
 func (h *hopfield) Query(input []float64) []float64 {
 	panic("implement me")
 }*/
+
+func (h *hopfield) Copy(pkg.Getter) {}
+func (h *hopfield) Paste(pkg.Getter) (err error) {
+	return
+}
 
 // Read
 func (h *hopfield) Read(reader pkg.Reader) {

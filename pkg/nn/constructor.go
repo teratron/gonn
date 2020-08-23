@@ -1,7 +1,5 @@
 package nn
 
-import "github.com/zigenzoog/gonn/pkg"
-
 //
 type Constructor interface {
 	// Initializing
@@ -17,10 +15,10 @@ type Constructor interface {
 	Train(input []float64, target ...[]float64) (loss float64, count int)
 
 	// Copying
-	Copy(pkg.Getter)
+	//Copy(pkg.Getter)
 
 	// Pasting
-	Paste(pkg.Getter) error
+	//Paste(pkg.Getter) error
 
 	// Adding
 	//Add()

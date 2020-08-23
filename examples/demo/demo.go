@@ -33,7 +33,7 @@ func main() {
 
 	// Training
 	minLoss := 1.
-	for epoch := 1; epoch <= 100000; epoch++ {
+	for epoch := 1; epoch <= 1000; epoch++ {
 		for i := numInput; i <= len(dataSet) - numOutput; i++ {
 			_, _ = n.Train(dataSet[i - numInput:i], dataSet[i:i + numOutput])
 		}
@@ -49,7 +49,7 @@ func main() {
 
 		// Average error for the entire epoch
 		sum /= float64(num)
-		if epoch == 1 || epoch == 10 || epoch % 100 == 0 || epoch == 100000 {
+		if epoch == 1 || epoch == 10 || epoch % 100 == 0 || epoch == 1000 {
 			fmt.Printf("Epoch: %v\tError: %.8f\n", epoch, sum)
 		}
 

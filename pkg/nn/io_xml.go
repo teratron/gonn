@@ -39,11 +39,13 @@ func (n *NN) readXML(value interface{}) {
 		if err != nil {
 			log.Fatal("Can't load xml: ", err)
 		}
+		//fmt.Println(string(b))
 
 		err = xml.Unmarshal(b, &n)
 		if err != nil {
 			log.Println(err)
 		}
+		//fmt.Println(n)
 		n.Architecture = nil
 		n.IsInit       = false
 		n.xml          = filename
@@ -53,8 +55,9 @@ func (n *NN) readXML(value interface{}) {
 		if err != nil {
 			log.Println(err)
 		}
+		//fmt.Println(data)
 
-		for key, value := range data.(map[string]interface{}) {
+		/*for key, value := range data.(map[string]interface{}) {
 			if v, ok := value.(map[string]interface{}); ok {
 				if key == "architecture" {
 					b, err = xml.Marshal(&v)
@@ -88,7 +91,7 @@ func (n *NN) readXML(value interface{}) {
 					}
 				}
 			}
-		}
+		}*/
 	}
 }
 

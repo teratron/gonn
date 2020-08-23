@@ -25,6 +25,9 @@ type NeuralNetwork interface {
 	//
 	//ReaderWriter
 	pkg.ReaderWriter
+
+	//
+	pkg.CopyPaster
 }
 
 type Architecture interface {
@@ -36,14 +39,14 @@ type Architecture interface {
 type NN struct {
 	// Architecture of neural network
 	Architecture			`json:"architecture,omitempty" xml:"architecture,omitempty"`
-	Parameter				`json:"-" xml:"-"`
 
+	// State of the neural network
 	IsInit       bool		`json:"-" xml:"-"`				// Neural network initializing flag
 	IsTrain      bool		`json:"isTrain" xml:"isTrain"`	// Neural network training flag
 
 	json		string
 	xml			string
-	csv			csvType
+	csv			string
 	db			dbType
 }
 

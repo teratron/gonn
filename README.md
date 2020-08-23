@@ -1,5 +1,3 @@
-# under construction
-
 <div style="text-align: center">
   <a href="https://pkg.go.dev/zigenzoog/gonn?tab=doc" title="Go API Reference" rel="nofollow"><img src="https://img.shields.io/badge/go-documentation-blue.svg?style=flat" alt="Go API Reference"></a>
   <a href="https://github.com/zigenzoog/gonn/releases/tag/v0.0.1" title="0.0.1 Release" rel="nofollow"><img src="https://img.shields.io/badge/version-0.0.1-blue.svg?style=flat" alt="0.0.1 release"></a>

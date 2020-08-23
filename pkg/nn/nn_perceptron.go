@@ -17,11 +17,11 @@ var _ NeuralNetwork = (*perceptron)(nil)
 type perceptron struct {
 	Architecture						`json:"-" xml:"-"`
 	Parameter							`json:"-" xml:"-"`
-	//Constructor							`json:"-" xml:"-"`
+	Constructor							`json:"-" xml:"-"`
 
 	Configuration struct{
 		// Array of the number of neurons in each hidden layer
-		HiddenLayer		HiddenType		`json:"hiddenLayer" xml:"hiddenLayer"`
+		HiddenLayer		HiddenType		`json:"hiddenLayer" xml:"hiddenLayer>layer"`
 
 		// The neuron bias, false or true
 		Bias			biasType		`json:"bias" xml:"bias"`
@@ -36,10 +36,10 @@ type perceptron struct {
 		LossLevel		float64			`json:"lossLevel" xml:"lossLevel"`
 
 		// Learning coefficient, from 0 to 1
-		Rate floatType `json:"rate" xml:"rate"`
+		Rate			floatType		`json:"rate" xml:"rate"`
 
 		// Matrix of weight values
-		Weight			[][][]floatType `json:"weight" xml:"weight"`
+		Weight			[][][]floatType `json:"weight" xml:"weight>weight"`
 	}									`json:"perceptron" xml:"perceptron"`
 
 	// Matrix
@@ -70,10 +70,6 @@ func (n *NN) perceptron() NeuralNetwork {
 		p.Configuration.Weight			= nil
 	}
 	return n
-}
-
-func (p *perceptron) perceptron() NeuralNetwork {
-	return p
 }
 
 // HiddenLayer
@@ -400,6 +396,19 @@ func (p *perceptron) Verify(input []float64, target ...[]float64) (loss float64)
 
 // Copy
 func (p *perceptron) Copy(obj pkg.Getter) {
+	switch r := obj.(type) {
+	case weightType:
+		fmt.Println("***")
+	/*case xml:
+		p.readXML(v)
+	case xml:
+		p.readCSV(v)
+	case db:
+		p.readDB(v)*/
+	default:
+		pkg.Log("This type is missing for write", true) // !!!
+		log.Printf("\tWrite: %T %v\n", r, r) // !!!
+	}
 }
 
 // Paste
@@ -501,9 +510,9 @@ func (p *perceptron) readJSON(value interface{}) {
 // readXML
 func (p *perceptron) readXML(value interface{}) {
 	if b, err := xml.Marshal(&value); err != nil {
-		log.Fatal("JSON marshaling failed: ", err)
+		log.Fatal("XML marshaling failed: ", err)
 	} else if err = xml.Unmarshal(b, &p.Configuration); err != nil {
-		log.Fatal("JSON unmarshal failed: ", err)
+		log.Fatal("XML unmarshal failed: ", err)
 	}
 
 	bias := 0

@@ -16,12 +16,14 @@ func JSON(filename ...string) pkg.ReaderWriter {
 	return jsonType(filename[0])
 }
 
+// Read
 func (j jsonType) Read(reader pkg.Reader) {
 	if r, ok := reader.(pkg.Reader); ok {
 		r.Read(j)
 	}
 }
 
+// Write
 func (j jsonType) Write(writer ...pkg.Writer) {
 	if len(writer) > 0 {
 		if w, ok := writer[0].(pkg.Writer); ok {
@@ -32,6 +34,7 @@ func (j jsonType) Write(writer ...pkg.Writer) {
 	}
 }
 
+// readJSON
 func (n *NN) readJSON(value interface{}) {
 	filename, ok := value.(string)
 	if ok {
@@ -100,6 +103,7 @@ func (n *NN) readJSON(value interface{}) {
 	}
 }
 
+// writeJSON
 func (n *NN) writeJSON(filename string) {
 	if n.IsTrain {
 		n.Get().Get(Weight())
