@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/zigenzoog/gonn/pkg/nn"
+	"log"
 )
 
 func main() {
@@ -31,6 +32,10 @@ func main() {
 	//
 	//fmt.Println(n.Verify(input, target))
 	n.Copy(nn.Weight())
+	err := n.Paste(nn.Weight())
+	if err != nil {
+		log.Println(err)
+	}
 
 	//
 	n.Write(

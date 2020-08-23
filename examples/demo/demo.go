@@ -33,7 +33,7 @@ func main() {
 
 	// Training
 	minLoss := 1.
-	for epoch := 1; epoch <= 1000; epoch++ {
+	for epoch := 1; epoch <= 10000; epoch++ {
 		for i := numInput; i <= len(dataSet) - numOutput; i++ {
 			_, _ = n.Train(dataSet[i - numInput:i], dataSet[i:i + numOutput])
 		}
@@ -49,26 +49,30 @@ func main() {
 
 		// Average error for the entire epoch
 		sum /= float64(num)
-		if epoch == 1 || epoch == 10 || epoch % 100 == 0 || epoch == 1000 {
+		if epoch == 1 || epoch == 10 || epoch % 100 == 0 || epoch == 10000 {
 			fmt.Printf("Epoch: %v\tError: %.8f\n", epoch, sum)
-		}
-
-		// Exiting the cycle of learning epochs, when the minimum error level is reached
-		if sum <= n.LossLevel() {
-			fmt.Printf("Epoch: %v\tError: %.8f\n", epoch, sum)
-			err := n.Paste(nn.Weight())
-			if err != nil {
-				log.Println("", err)
-			}
-			break
 		}
 
 		// Weights are copied at the minimum average error
 		if sum < minLoss && epoch >= 1000 {
 			fmt.Println("----- Epoch:", epoch, "\tmin avg error:", sum)
-			n.Copy(nn.Weight())
 			minLoss = sum
+
+			// Copying weights
+			n.Copy(nn.Weight())
 		}
+
+		// Exiting the cycle of learning epochs, when the minimum error level is reached
+		if sum <= n.LossLevel() {
+			fmt.Printf("Epoch: %v\tError: %.8f\n", epoch, sum)
+			break
+		}
+	}
+
+	// Returning weights for further recording
+	err := n.Paste(nn.Weight())
+	if err != nil {
+		log.Println("error: ", err)
 	}
 
 	// Saving the neural network configuration to a file

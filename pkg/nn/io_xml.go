@@ -97,7 +97,7 @@ func (n *NN) readXML(value interface{}) {
 
 func (n *NN) writeXML(filename string) {
 	if n.IsTrain {
-		n.Get().Get(Weight())
+		n.Copy(Weight())
 	} else {
 		log.Println("Not trained network")
 	}

@@ -23,11 +23,11 @@ type NeuralNetwork interface {
 	//GetterSetter
 
 	//
-	//ReaderWriter
-	pkg.ReaderWriter
+	pkg.CopyPaster
 
 	//
-	pkg.CopyPaster
+	//ReaderWriter
+	pkg.ReaderWriter
 }
 
 type Architecture interface {

@@ -22,20 +22,41 @@ func Weight() pkg.GetterSetter {
 	return weightType(0)
 }
 
-func (w weightType) Set(...pkg.Setter) {}
-func (w weightType) Get(...pkg.Getter) pkg.GetterSetter {
-	return w
+func (w weightType) Set(args ...pkg.Setter) {
+	if len(args) > 0 {
+		if n, ok := args[0].(NeuralNetwork); ok {
+			n.Get().Set(w)
+		}
+	} else {
+		pkg.Log("Empty set", true) // !!!
+	}
 }
 
-func (w weightType) Copy(obj pkg.Getter) {
-	if n, ok := obj.(*NN); ok {
+func (w weightType) Get(args ...pkg.Getter) pkg.GetterSetter {
+	if len(args) > 0 {
+		if a, ok := args[0].(NeuralNetwork); ok {
+			return a.Get().Get(w)
+		}
+	} else {
+		return w
+	}
+	return nil
+}
+
+func (w weightType) Copy(copier pkg.Getter) {
+	if n, ok := copier.(*NN); ok {
 		if a, ok := n.Architecture.(NeuralNetwork); ok {
 			a.Copy(w)
 		}
 	}
 }
 
-func (w weightType) Paste(obj pkg.Getter) (err error) {
+func (w weightType) Paste(paster pkg.Getter) (err error) {
+	if n, ok := paster.(*NN); ok {
+		if a, ok := n.Architecture.(NeuralNetwork); ok {
+			err = a.Paste(w)
+		}
+	}
 	return
 }
 

@@ -106,7 +106,7 @@ func (n *NN) readJSON(value interface{}) {
 // writeJSON
 func (n *NN) writeJSON(filename string) {
 	if n.IsTrain {
-		n.Get().Get(Weight())
+		n.Copy(Weight())
 	} else {
 		log.Println("Not trained network")
 	}

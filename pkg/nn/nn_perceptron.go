@@ -118,8 +118,8 @@ func (p *perceptron) Set(args ...pkg.Setter) {
 			p.Configuration.LossLevel = float64(v)
 		case rateType:
 			p.Configuration.Rate = floatType(v)
-		case weightType:
-			p.setWeight()
+		/*case weightType:
+		p.setWeight()*/
 		default:
 			pkg.Log("This type is missing for Perceptron Neural Network", true) // !!!
 			log.Printf("\tset: %T %v\n", v, v) // !!!
@@ -145,8 +145,8 @@ func (p *perceptron) Get(args ...pkg.Getter) pkg.GetterSetter {
 			return lossLevelType(p.Configuration.LossLevel)
 		case rateType:
 			return p.Configuration.Rate
-		case weightType:
-			p.getWeight()
+		/*case weightType:
+		p.getWeight()*/
 		default:
 			pkg.Log("This type is missing for Perceptron Neural Network", true) // !!!
 			log.Printf("\tget: %T %v\n", args[0], args[0]) // !!!
@@ -158,6 +158,67 @@ func (p *perceptron) Get(args ...pkg.Getter) pkg.GetterSetter {
 		}
 	}
 	return p
+}
+
+// Copy
+func (p *perceptron) Copy(copier pkg.Getter) {
+	switch c := copier.(type) {
+	case weightType:
+		p.copyWeight()
+	default:
+		pkg.Log("This type is missing for copy", true) // !!!
+		log.Printf("\tWrite: %T %v\n", c, c) // !!!
+	}
+}
+
+// Paste
+func (p *perceptron) Paste(paster pkg.Getter) (err error) {
+	switch c := paster.(type) {
+	case weightType:
+		p.pasteWeight()
+	default:
+		pkg.Log("This type is missing for paste", true) // !!!
+		log.Printf("\tWrite: %T %v\n", c, c) // !!!
+	}
+	return
+}
+
+// Read
+func (p *perceptron) Read(reader pkg.Reader) {
+	switch r := reader.(type) {
+	/*case jsonType:
+		p.readJSON(string(r))
+	case xml:
+		p.readXML(v)
+	case xml:
+		p.readCSV(v)
+	case db:
+		p.readDB(v)*/
+	default:
+		pkg.Log("This type is missing for write", true) // !!!
+		log.Printf("\tWrite: %T %v\n", r, r) // !!!
+	}
+}
+
+// Write
+func (p *perceptron) Write(writer ...pkg.Writer) {
+	for _, w := range writer {
+		switch v := w.(type) {
+		case *report:
+			p.writeReport(v)
+		/*case jsonType:
+			p.writeJSON(string(v))
+		case xmlType:
+			p.writeXML(string(v))
+		case csvType:
+			p.writeCSV(v)
+		case dbType:
+			p.writeDB(v)*/
+		default:
+			pkg.Log("This type is missing for write", true) // !!!
+			log.Printf("\tWrite: %T %v\n", w, w) // !!!
+		}
+	}
 }
 
 // init Initialization
@@ -394,30 +455,8 @@ func (p *perceptron) Verify(input []float64, target ...[]float64) (loss float64)
 	return
 }
 
-// Copy
-func (p *perceptron) Copy(obj pkg.Getter) {
-	switch r := obj.(type) {
-	case weightType:
-		fmt.Println("***")
-	/*case xml:
-		p.readXML(v)
-	case xml:
-		p.readCSV(v)
-	case db:
-		p.readDB(v)*/
-	default:
-		pkg.Log("This type is missing for write", true) // !!!
-		log.Printf("\tWrite: %T %v\n", r, r) // !!!
-	}
-}
-
-// Paste
-func (p *perceptron) Paste(obj pkg.Getter) (err error) {
-	return
-}
-
 // getWeight
-func (p *perceptron) getWeight() /**[][][]floatType*/ {
+func (p *perceptron) copyWeight() /**[][][]floatType*/ {
 	p.Configuration.Weight = make([][][]floatType, len(p.axon))
 	for i, u := range p.axon {
 		p.Configuration.Weight[i] = make([][]floatType, len(p.axon[i]))
@@ -432,7 +471,7 @@ func (p *perceptron) getWeight() /**[][][]floatType*/ {
 }
 
 // setWeight
-func (p *perceptron) setWeight() {
+func (p *perceptron) pasteWeight() {
 	for i, u := range p.Configuration.Weight {
 		for j, v := range u {
 			for k, w := range v {
@@ -443,44 +482,6 @@ func (p *perceptron) setWeight() {
 	p.Configuration.Weight = nil
 }
 
-// Read
-func (p *perceptron) Read(reader pkg.Reader) {
-	switch r := reader.(type) {
-	/*case jsonType:
-		p.readJSON(string(r))
-	case xml:
-		p.readXML(v)
-	case xml:
-		p.readCSV(v)
-	case db:
-		p.readDB(v)*/
-	default:
-		pkg.Log("This type is missing for write", true) // !!!
-		log.Printf("\tWrite: %T %v\n", r, r) // !!!
-	}
-}
-
-// Write
-func (p *perceptron) Write(writer ...pkg.Writer) {
-	for _, w := range writer {
-		switch v := w.(type) {
-		case *report:
-			p.writeReport(v)
-		/*case jsonType:
-			p.writeJSON(string(v))
-		case xmlType:
-			p.writeXML(string(v))
-		case csvType:
-			p.writeCSV(v)
-		case dbType:
-			p.writeDB(v)*/
-		default:
-			pkg.Log("This type is missing for write", true) // !!!
-			log.Printf("\tWrite: %T %v\n", w, w) // !!!
-		}
-	}
-}
-
 // readJSON
 func (p *perceptron) readJSON(value interface{}) {
 	if b, err := json.Marshal(&value); err != nil {
@@ -488,14 +489,12 @@ func (p *perceptron) readJSON(value interface{}) {
 	} else if err = json.Unmarshal(b, &p.Configuration); err != nil {
 		log.Fatal("JSON unmarshal failed: ", err)
 	}
-
 	bias := 0
 	if p.Configuration.Bias {
 		bias = 1
 	}
-
 	p.Architecture.(*NN).IsInit = p.init(len(p.Configuration.Weight[0][0]) - bias, len(p.Configuration.Weight[len(p.Configuration.Weight) - 1]))
-	p.Set(Weight())
+	_ = p.Paste(Weight())
 }
 
 // writeJSON
@@ -514,14 +513,12 @@ func (p *perceptron) readXML(value interface{}) {
 	} else if err = xml.Unmarshal(b, &p.Configuration); err != nil {
 		log.Fatal("XML unmarshal failed: ", err)
 	}
-
 	bias := 0
 	if p.Configuration.Bias {
 		bias = 1
 	}
-
 	p.Architecture.(*NN).IsInit = p.init(len(p.Configuration.Weight[0][0]) - bias, len(p.Configuration.Weight[len(p.Configuration.Weight) - 1]))
-	p.Set(Weight())
+	_ = p.Paste(Weight())
 }
 
 // writeReport report of neural network training results in io.Writer
