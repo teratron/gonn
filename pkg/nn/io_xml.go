@@ -2,11 +2,10 @@ package nn
 
 import (
 	"encoding/xml"
+	"github.com/zigenzoog/gonn/pkg"
 	"io/ioutil"
 	"log"
 	"os"
-
-	"github.com/zigenzoog/gonn/pkg"
 )
 
 type xmlType string
@@ -16,25 +15,10 @@ func XML(filename ...string) pkg.ReadWriter {
 	return xmlType(filename[0])
 }
 
+// Read
 func (j xmlType) Read(reader pkg.Reader) {
-	if r, ok := reader.(pkg.Reader); ok {
-		r.Read(j)
-	}
-}
-
-func (j xmlType) Write(writer ...pkg.Writer) {
-	if len(writer) > 0 {
-		if w, ok := writer[0].(pkg.Writer); ok {
-			w.Write(j)
-		}
-	} else {
-		pkg.Log("Empty write", true) // !!!
-	}
-}
-
-func (n *NN) readXML(value interface{}) {
-	filename, ok := value.(string)
-	if ok {
+	if n, ok := reader.(*NN); ok {
+		filename := string(j)
 		b, err := ioutil.ReadFile(filename)
 		if err != nil {
 			log.Fatal("Can't load xml: ", err)
@@ -95,15 +79,23 @@ func (n *NN) readXML(value interface{}) {
 	}
 }
 
-func (n *NN) writeXML(filename string) {
-	if n.IsTrain {
-		n.Copy(Weight())
+// Write
+func (j xmlType) Write(writer ...pkg.Writer) {
+	if len(writer) > 0 {
+		if n, ok := writer[0].(*NN); ok {
+			filename := string(j)
+			if n.IsTrain {
+				n.Copy(Weight())
+			} else {
+				log.Println("Not trained network")
+			}
+			if b, err := xml.MarshalIndent(&n, "", "\t"); err != nil {
+				log.Fatal("XML marshaling failed: ", err)
+			} else if err = ioutil.WriteFile(filename, b, os.ModePerm); err != nil {
+				log.Fatal("Can't write file:", err)
+			}
+		}
 	} else {
-		log.Println("Not trained network")
-	}
-	if b, err := xml.MarshalIndent(&n, "", "\t"); err != nil {
-		log.Fatal("XML marshaling failed: ", err)
-	} else if err = ioutil.WriteFile(filename, b, os.ModePerm); err != nil {
-		log.Fatal("Can't write file:", err)
+		pkg.Log("Empty write", true) // !!!
 	}
 }

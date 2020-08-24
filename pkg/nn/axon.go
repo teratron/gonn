@@ -6,13 +6,8 @@ import (
 
 //
 type axon struct {
-	weight  floatType             //
-	synapse map[string]pkg.Getter //
-}
-
-func (a axon) Set(...pkg.Setter) {}
-func (a axon) Get(...pkg.Getter) pkg.GetSetter {
-	return a
+	weight  floatType
+	synapse map[string]pkg.Getter
 }
 
 type weight struct{

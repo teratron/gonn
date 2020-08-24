@@ -17,7 +17,7 @@ var _ NeuralNetwork = (*perceptron)(nil)
 type perceptron struct {
 	Architecture						`json:"-" xml:"-"`
 	Parameter							`json:"-" xml:"-"`
-	Constructor							`json:"-" xml:"-"`
+	//Constructor							`json:"-" xml:"-"`
 
 	Configuration struct{
 		// Array of the number of neurons in each hidden layer
@@ -58,12 +58,7 @@ func Perceptron() *perceptron {
 
 // Returns a new Perceptron neural network instance with the default parameters
 func (n *NN) perceptron() NeuralNetwork {
-	n.Architecture = &perceptron{
-		Architecture: n,
-		weight: &weight{
-			isInitWeight: false,
-		},
-	}
+	n.Architecture = &perceptron{Architecture: n}
 	if p, ok := n.Architecture.(*perceptron); ok {
 		p.Configuration.HiddenLayer		= HiddenType{9, 2}
 		p.Configuration.Bias 			= false
@@ -244,8 +239,9 @@ func (p *perceptron) init(lenInput int, lenTarget ...interface{}) bool {
 		if p.Configuration.Bias {
 			bias = 1
 		}
+		p.weight = &weight{isInitWeight: false}
 		p.neuron = make([][]*neuron, lenLayer)
-		p.axon = make([][][]*axon, lenLayer)
+		p.axon   = make([][][]*axon, lenLayer)
 		for i, l := range layer {
 			p.neuron[i] = make([]*neuron, l)
 			p.axon[i]   = make([][]*axon, l)
@@ -498,8 +494,23 @@ func (p *perceptron) pasteWeight() {
 			}
 		}
 	}
-	p.Configuration.Weight = nil
+}
+
+// deleteWeight
+func (p *perceptron) deleteWeight() {
 	p.isInitWeight = false
+	p.Configuration.Weight = nil
+}
+
+// reInit
+func (p *perceptron) reInit() {
+	bias := 0
+	if p.Configuration.Bias {
+		bias = 1
+	}
+	if n, ok := p.Architecture.(*NN); ok {
+		n.IsInit = p.init(len(p.Configuration.Weight[0][0]) - bias, len(p.Configuration.Weight[len(p.Configuration.Weight) - 1]))
+	}
 }
 
 // readJSON
@@ -509,25 +520,9 @@ func (p *perceptron) readJSON(value interface{}) {
 	} else if err = json.Unmarshal(b, &p.Configuration); err != nil {
 		log.Fatal("JSON unmarshal failed: ", err)
 	}
-	bias := 0
-	if p.Configuration.Bias {
-		bias = 1
-	}
-	p.Architecture.(*NN).IsInit = p.init(len(p.Configuration.Weight[0][0]) - bias, len(p.Configuration.Weight[len(p.Configuration.Weight) - 1]))
-
-	if err := p.Paste(Weight()); err != nil {
-		log.Println("error: ", err)
-	}
+	p.reInit()
+	p.pasteWeight()
 }
-
-// writeJSON
-/*func (p *perceptron) writeJSON(filename string) {
-	if b, err := json.MarshalIndent(&p, "", "\t"); err != nil {
-		log.Fatal("JSON marshaling failed: ", err)
-	} else if err = ioutil.WriteFile(filename, b, os.ModePerm); err != nil {
-		log.Fatal("Can't write file:", err)
-	}
-}*/
 
 // readXML
 func (p *perceptron) readXML(value interface{}) {
@@ -536,15 +531,8 @@ func (p *perceptron) readXML(value interface{}) {
 	} else if err = xml.Unmarshal(b, &p.Configuration); err != nil {
 		log.Fatal("XML unmarshal failed: ", err)
 	}
-	bias := 0
-	if p.Configuration.Bias {
-		bias = 1
-	}
-	p.Architecture.(*NN).IsInit = p.init(len(p.Configuration.Weight[0][0]) - bias, len(p.Configuration.Weight[len(p.Configuration.Weight) - 1]))
-
-	if err := p.Paste(Weight()); err != nil {
-		log.Println("error: ", err)
-	}
+	p.reInit()
+	p.pasteWeight()
 }
 
 // writeReport report of neural network training results in io.Writer
