@@ -7,7 +7,7 @@ import (
 
 type biasType bool
 
-func Bias(bias ...bool) pkg.GetterSetter {
+func Bias(bias ...bool) pkg.GetSetter {
 	if len(bias) > 0 {
 		return biasType(bias[0])
 	} else {
@@ -31,7 +31,7 @@ func (b biasType) Set(args ...pkg.Setter) {
 }
 
 // Get
-func (b biasType) Get(args ...pkg.Getter) pkg.GetterSetter {
+func (b biasType) Get(args ...pkg.Getter) pkg.GetSetter {
 	if len(args) > 0 {
 		if n, ok := args[0].(NeuralNetwork); ok {
 			return n.Get().Get(b)

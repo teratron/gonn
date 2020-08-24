@@ -1,13 +1,13 @@
-//
+// GetterSetter
 package pkg
 
-type GetterSetter interface {
+type GetSetter interface {
 	Getter
 	Setter
 }
 
 type Getter interface {
-	Get(...Getter) GetterSetter
+	Get(...Getter) GetSetter
 }
 
 type Setter interface {

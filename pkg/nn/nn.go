@@ -19,15 +19,13 @@ type NeuralNetwork interface {
 	Constructor
 
 	//
-	pkg.GetterSetter
-	//GetterSetter
+	pkg.GetSetter
 
 	//
 	pkg.CopyPaster
 
 	//
-	//ReaderWriter
-	pkg.ReaderWriter
+	pkg.ReadWriter
 }
 
 type Architecture interface {

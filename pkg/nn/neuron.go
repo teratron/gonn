@@ -24,7 +24,7 @@ func (n *neuron) Set(args ...pkg.Setter) {
 }
 
 // Get
-func (n *neuron) Get(args ...pkg.Getter) pkg.GetterSetter {
+func (n *neuron) Get(args ...pkg.Getter) pkg.GetSetter {
 	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
 			return a.Get().Get(n)

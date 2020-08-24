@@ -6,7 +6,7 @@ import (
 )
 
 // The maximum number of iterations after which training is forcibly terminated
-const MaxIteration uint = 10e+05
+const MaxIteration int = 10e+05
 
 // Train
 func (n *NN) Train(input []float64, target ...[]float64) (loss float64, count int) {

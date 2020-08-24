@@ -58,7 +58,7 @@ func (h *hopfield) Set(args ...pkg.Setter) {
 }
 
 // Getter
-func (h *hopfield) Get(args ...pkg.Getter) pkg.GetterSetter {
+func (h *hopfield) Get(args ...pkg.Getter) pkg.GetSetter {
 	if len(args) > 0 {
 		switch args[0].(type) {
 		default:
@@ -86,8 +86,8 @@ func (h *hopfield) Query(input []float64) []float64 {
 	panic("implement me")
 }*/
 
-func (h *hopfield) Copy(pkg.Getter) {}
-func (h *hopfield) Paste(pkg.Getter) (err error) {
+func (h *hopfield) Copy(pkg.Copier) {}
+func (h *hopfield) Paste(pkg.Paster) (err error) {
 	return
 }
 

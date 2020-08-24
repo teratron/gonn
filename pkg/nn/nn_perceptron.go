@@ -45,6 +45,7 @@ type perceptron struct {
 	// Matrix
 	neuron [][]*neuron
 	axon   [][][]*axon
+	*weight
 
 	lastIndexLayer	int
 	lenInput		int
@@ -59,6 +60,9 @@ func Perceptron() *perceptron {
 func (n *NN) perceptron() NeuralNetwork {
 	n.Architecture = &perceptron{
 		Architecture: n,
+		weight: &weight{
+			isInitWeight: false,
+		},
 	}
 	if p, ok := n.Architecture.(*perceptron); ok {
 		p.Configuration.HiddenLayer		= HiddenType{9, 2}
@@ -119,7 +123,7 @@ func (p *perceptron) Set(args ...pkg.Setter) {
 		case rateType:
 			p.Configuration.Rate = floatType(v)
 		/*case weightType:
-		p.setWeight()*/
+			p.setWeight()*/
 		default:
 			pkg.Log("This type is missing for Perceptron Neural Network", true) // !!!
 			log.Printf("\tset: %T %v\n", v, v) // !!!
@@ -130,7 +134,7 @@ func (p *perceptron) Set(args ...pkg.Setter) {
 }
 
 // Get
-func (p *perceptron) Get(args ...pkg.Getter) pkg.GetterSetter {
+func (p *perceptron) Get(args ...pkg.Getter) pkg.GetSetter {
 	if len(args) > 0 {
 		switch args[0].(type) {
 		case HiddenType:
@@ -146,7 +150,7 @@ func (p *perceptron) Get(args ...pkg.Getter) pkg.GetterSetter {
 		case rateType:
 			return p.Configuration.Rate
 		/*case weightType:
-		p.getWeight()*/
+			p.getWeight()*/
 		default:
 			pkg.Log("This type is missing for Perceptron Neural Network", true) // !!!
 			log.Printf("\tget: %T %v\n", args[0], args[0]) // !!!
@@ -161,9 +165,9 @@ func (p *perceptron) Get(args ...pkg.Getter) pkg.GetterSetter {
 }
 
 // Copy
-func (p *perceptron) Copy(copier pkg.Getter) {
+func (p *perceptron) Copy(copier pkg.Copier) {
 	switch c := copier.(type) {
-	case weightType:
+	case *weight:
 		p.copyWeight()
 	default:
 		pkg.Log("This type is missing for copy", true) // !!!
@@ -172,9 +176,9 @@ func (p *perceptron) Copy(copier pkg.Getter) {
 }
 
 // Paste
-func (p *perceptron) Paste(paster pkg.Getter) (err error) {
+func (p *perceptron) Paste(paster pkg.Paster) (err error) {
 	switch c := paster.(type) {
-	case weightType:
+	case *weight:
 		p.pasteWeight()
 	default:
 		pkg.Log("This type is missing for paste", true) // !!!
@@ -287,7 +291,7 @@ func (p *perceptron) initAxon() {
 					synapse: map[string]pkg.Getter{},
 				}
 				if !isTrain {
-					p.axon[i][j][k].weight = getRand()
+					p.axon[i][j][k].weight = .5 //getRand()
 				}
 				if i == 0 {
 					if k < p.lenInput {
@@ -455,13 +459,28 @@ func (p *perceptron) Verify(input []float64, target ...[]float64) (loss float64)
 	return
 }
 
-// getWeight
-func (p *perceptron) copyWeight() /**[][][]floatType*/ {
+// initWeight
+func (p *perceptron) initWeight() {
 	p.Configuration.Weight = make([][][]floatType, len(p.axon))
-	for i, u := range p.axon {
+	for i, v := range p.axon {
 		p.Configuration.Weight[i] = make([][]floatType, len(p.axon[i]))
-		for j, v := range u {
+		for j := range v {
 			p.Configuration.Weight[i][j] = make([]floatType, len(p.axon[i][j]))
+		}
+	}
+	p.isInitWeight = true
+}
+
+// getWeight
+// setWeight
+
+// copyWeight
+func (p *perceptron) copyWeight() /**[][][]floatType*/ {
+	if !p.isInitWeight {
+		p.initWeight()
+	}
+	for i, u := range p.axon {
+		for j, v := range u {
 			for k, w := range v {
 				p.Configuration.Weight[i][j][k] = w.weight
 			}
@@ -470,7 +489,7 @@ func (p *perceptron) copyWeight() /**[][][]floatType*/ {
 	//return &p.Configuration.Weight
 }
 
-// setWeight
+// pasteWeight
 func (p *perceptron) pasteWeight() {
 	for i, u := range p.Configuration.Weight {
 		for j, v := range u {
@@ -480,6 +499,7 @@ func (p *perceptron) pasteWeight() {
 		}
 	}
 	p.Configuration.Weight = nil
+	p.isInitWeight = false
 }
 
 // readJSON
@@ -494,7 +514,10 @@ func (p *perceptron) readJSON(value interface{}) {
 		bias = 1
 	}
 	p.Architecture.(*NN).IsInit = p.init(len(p.Configuration.Weight[0][0]) - bias, len(p.Configuration.Weight[len(p.Configuration.Weight) - 1]))
-	_ = p.Paste(Weight())
+
+	if err := p.Paste(Weight()); err != nil {
+		log.Println("error: ", err)
+	}
 }
 
 // writeJSON
@@ -518,7 +541,10 @@ func (p *perceptron) readXML(value interface{}) {
 		bias = 1
 	}
 	p.Architecture.(*NN).IsInit = p.init(len(p.Configuration.Weight[0][0]) - bias, len(p.Configuration.Weight[len(p.Configuration.Weight) - 1]))
-	_ = p.Paste(Weight())
+
+	if err := p.Paste(Weight()); err != nil {
+		log.Println("error: ", err)
+	}
 }
 
 // writeReport report of neural network training results in io.Writer

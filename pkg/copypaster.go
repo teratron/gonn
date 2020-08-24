@@ -1,6 +1,15 @@
+//
 package pkg
 
 type CopyPaster interface {
-	Copy(Getter)
-	Paste(Getter) error
+	Copier
+	Paster
+}
+
+type Copier interface {
+	Copy(Copier)
+}
+
+type Paster interface {
+	Paste(Paster) error
 }

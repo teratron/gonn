@@ -8,10 +8,10 @@ var _ Application = (*app)(nil)
 
 type Application interface {
 	//
-	pkg.GetterSetter
+	pkg.GetSetter
 
 	//
-	pkg.ReaderWriter
+	pkg.ReadWriter
 }
 
 type app struct {

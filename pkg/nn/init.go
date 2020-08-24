@@ -78,7 +78,7 @@ func (n *NN) init(lenInput int, lenTarget ...interface{}) bool {
 }
 
 func (f floatType) Set(...pkg.Setter) {}
-func (f floatType) Get(...pkg.Getter) pkg.GetterSetter {
+func (f floatType) Get(...pkg.Getter) pkg.GetSetter {
 	return f
 }
 

@@ -1,7 +1,7 @@
 //
 package pkg
 
-type ReaderWriter interface {
+type ReadWriter interface {
 	Reader
 	Writer
 }

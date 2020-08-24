@@ -34,7 +34,7 @@ func (n *NN) Set(args ...pkg.Setter) {
 }
 
 // Get
-func (n *NN) Get(args ...pkg.Getter) pkg.GetterSetter {
+func (n *NN) Get(args ...pkg.Getter) pkg.GetSetter {
 	if len(args) > 0 {
 		for _, v := range args {
 			if g, ok := v.(pkg.Getter); ok {

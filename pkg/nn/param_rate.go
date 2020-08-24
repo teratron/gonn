@@ -8,7 +8,7 @@ type rateType floatType
 // Default learning rate
 const DefaultRate float32 = .3
 
-func Rate(rate ...float32) pkg.GetterSetter {
+func Rate(rate ...float32) pkg.GetSetter {
 	if len(rate) > 0 {
 		return rateType(rate[0])
 	} else {
@@ -32,7 +32,7 @@ func (r rateType) Set(args ...pkg.Setter) {
 }
 
 // Getter
-func (r rateType) Get(args ...pkg.Getter) pkg.GetterSetter {
+func (r rateType) Get(args ...pkg.Getter) pkg.GetSetter {
 	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
 			return a.Get().Get(r)

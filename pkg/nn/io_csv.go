@@ -8,7 +8,7 @@ import (
 type csvType string
 
 //
-func CSV(filename ...string) pkg.ReaderWriter {
+func CSV(filename ...string) pkg.ReadWriter {
 	return csvType(filename[0])
 }
 

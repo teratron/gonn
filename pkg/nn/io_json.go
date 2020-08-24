@@ -12,7 +12,7 @@ import (
 type jsonType string
 
 // JSON
-func JSON(filename ...string) pkg.ReaderWriter {
+func JSON(filename ...string) pkg.ReadWriter {
 	return jsonType(filename[0])
 }
 

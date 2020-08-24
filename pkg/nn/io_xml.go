@@ -12,7 +12,7 @@ import (
 type xmlType string
 
 // XML
-func XML(filename ...string) pkg.ReaderWriter {
+func XML(filename ...string) pkg.ReadWriter {
 	return xmlType(filename[0])
 }
 

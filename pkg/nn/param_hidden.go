@@ -27,7 +27,7 @@ func (h HiddenType) Set(args ...pkg.Setter) {
 }
 
 // Getter
-func (h HiddenType) Get(args ...pkg.Getter) pkg.GetterSetter {
+func (h HiddenType) Get(args ...pkg.Getter) pkg.GetSetter {
 	if len(args) > 0 {
 		if n, ok := args[0].(NeuralNetwork); ok {
 			return n.Get().Get(h)

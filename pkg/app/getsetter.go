@@ -17,7 +17,7 @@ func (a *app) Set(args ...pkg.Setter) {
 }
 
 // Get
-func (a *app) Get(args ...pkg.Getter) pkg.GetterSetter {
+func (a *app) Get(args ...pkg.Getter) pkg.GetSetter {
 	if len(args) > 0 {
 		/*for _, v := range args {
 			if g, ok := v.(Getter); ok {

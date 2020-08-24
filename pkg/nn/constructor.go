@@ -1,6 +1,6 @@
+//
 package nn
 
-//
 type Constructor interface {
 	// Initializing
 	init(int, ...interface{}) bool
@@ -13,16 +13,4 @@ type Constructor interface {
 
 	// Training
 	Train(input []float64, target ...[]float64) (loss float64, count int)
-
-	// Copying
-	//Copy(pkg.Getter)
-
-	// Pasting
-	//Paste(pkg.Getter) error
-
-	// Adding
-	//Add()
-
-	// Deleting
-	//Delete()
 }

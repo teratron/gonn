@@ -16,7 +16,7 @@ const (
 )
 
 // ActivationMode
-func ActivationMode(mode ...uint8) pkg.GetterSetter {
+func ActivationMode(mode ...uint8) pkg.GetSetter {
 	if len(mode) > 0 {
 		return activationModeType(mode[0])
 	} else {
@@ -40,7 +40,7 @@ func (m activationModeType) Set(args ...pkg.Setter) {
 }
 
 // Get
-func (m activationModeType) Get(args ...pkg.Getter) pkg.GetterSetter {
+func (m activationModeType) Get(args ...pkg.Getter) pkg.GetSetter {
 	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
 			return a.Get().Get(m)

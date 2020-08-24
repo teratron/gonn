@@ -4,8 +4,6 @@ import (
 	"github.com/zigenzoog/gonn/pkg"
 )
 
-type weightType floatType
-
 //
 type axon struct {
 	weight  floatType             //
@@ -13,16 +11,20 @@ type axon struct {
 }
 
 func (a axon) Set(...pkg.Setter) {}
-func (a axon) Get(...pkg.Getter) pkg.GetterSetter {
+func (a axon) Get(...pkg.Getter) pkg.GetSetter {
 	return a
 }
 
-// Weight
-func Weight() pkg.GetterSetter {
-	return weightType(0)
+type weight struct{
+	isInitWeight bool
 }
 
-func (w weightType) Set(args ...pkg.Setter) {
+// Weight
+func Weight() pkg.Controller {
+	return &weight{}
+}
+
+func (w *weight) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
 		if n, ok := args[0].(NeuralNetwork); ok {
 			n.Get().Set(w)
@@ -32,7 +34,7 @@ func (w weightType) Set(args ...pkg.Setter) {
 	}
 }
 
-func (w weightType) Get(args ...pkg.Getter) pkg.GetterSetter {
+func (w *weight) Get(args ...pkg.Getter) pkg.GetSetter {
 	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
 			return a.Get().Get(w)
@@ -43,7 +45,7 @@ func (w weightType) Get(args ...pkg.Getter) pkg.GetterSetter {
 	return nil
 }
 
-func (w weightType) Copy(copier pkg.Getter) {
+func (w *weight) Copy(copier pkg.Copier) {
 	if n, ok := copier.(*NN); ok {
 		if a, ok := n.Architecture.(NeuralNetwork); ok {
 			a.Copy(w)
@@ -51,7 +53,7 @@ func (w weightType) Copy(copier pkg.Getter) {
 	}
 }
 
-func (w weightType) Paste(paster pkg.Getter) (err error) {
+func (w *weight) Paste(paster pkg.Paster) (err error) {
 	if n, ok := paster.(*NN); ok {
 		if a, ok := n.Architecture.(NeuralNetwork); ok {
 			err = a.Paste(w)
