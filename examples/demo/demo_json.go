@@ -14,6 +14,6 @@ func main() {
 
 	//
 	n.Write(
-		nn.JSON(),
-		nn.XML())
+		nn.JSON("config/perceptron2.json"),
+	/*nn.XML()*/)
 }

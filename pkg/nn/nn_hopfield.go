@@ -33,11 +33,21 @@ func Hopfield() *hopfield {
 }
 
 // Returns a new Hopfield neural network instance with the default parameters
-func (n *NN) hopfield() NeuralNetwork {
+func (n *NN) hopfield() {
 	n.Architecture = &hopfield{
 		Architecture: n,
 	}
-	return n
+}
+
+func (h *hopfield) architecture() Architecture {
+	return h.Architecture
+}
+
+func (h *hopfield) setArchitecture(network Architecture) {
+	if n, ok := network.(*NN); ok {
+		h.Architecture = n
+	}
+	h.Configuration.Weight = nil
 }
 
 func (h *hopfield) Energy() float32 {

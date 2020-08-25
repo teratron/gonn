@@ -2,6 +2,7 @@
 package nn
 
 import (
+	"log"
 	"math/rand"
 	"time"
 
@@ -17,61 +18,56 @@ func init() {
 // New returns a new neural network instance with the default parameters
 func New(reader ...pkg.Reader) NeuralNetwork {
 	n := &NN{
-		IsInit:  false,
-		IsTrain: false,
-		json:    "",
-		xml:     "",
-		csv:     "",
-		db:      "",
+		//Architecture:	&perceptron{},
+		IsInit:			false,
+		IsTrain:		false,
+		json:			"",
+		xml:			"",
+		csv:			"",
+		db:				"",
 	}
+
 	if len(reader) > 0 {
 		switch r := reader[0].(type) {
-		case *perceptron:
+		case Architecture:
 			n.Architecture = r
-			n.perceptron()
-		/*case jsonType:
+			r.setArchitecture(n)
+			//fmt.Println("Architecture", n.Architecture)
+			//fmt.Printf("***%T %v\n",r,r)
+			//fmt.Printf("***%T %v\n",n,n)
+		/*case *perceptron:
+			//n.Architecture = r
+			n.perceptron()*/
+		case jsonType:
 			if len(r) > 0 {
-				//n =
+				//fmt.Printf("***%T %v\n",r,r)
+				//fmt.Printf("***%T %v\n",n,n)
+				r.Read(n)
 			} else {
-				log.Fatal("Отсутствует название файла нейросети")
+				log.Println("Отсутствует название файла нейросети для JSON")
 			}
 		case xmlType:
-		case csvType:
+			if len(r) > 0 {
+				r.Read(n)
+			} else {
+				log.Println("Отсутствует название файла нейросети для XML")
+			}
+		/*case csvType:
 		case dbType:*/
 		default:
+			log.Println("This type is missing for Neural Network")
 		}
 	} else {
-		n.Architecture = &perceptron{}
+		//n.Architecture = &perceptron{}
 		n.perceptron()
 	}
+
 	return n
 }
 
-func Reset() *NN {
-	n := &NN{
-		Architecture: nil,
-		IsInit:       false,
-		IsTrain:      false,
-		json:         "",
-		xml:          "",
-		csv:          "",
-		db:           "",
-	}
-	return n
-}
-
-func (n *NN) erase() {
-	n.Architecture = nil
-	n.IsInit = false
-	n.IsTrain = false
-	n.json = ""
-	n.xml = ""
-	n.csv = ""
-	n.db = ""
-}
-
+// init
 func (n *NN) init(lenInput int, lenTarget ...interface{}) bool {
-	if a, ok := n.Get().(NeuralNetwork); ok {
+	if a, ok := n.Architecture.(NeuralNetwork); ok {
 		n.IsInit = a.init(lenInput, lenTarget...)
 	}
 	return n.IsInit

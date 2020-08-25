@@ -10,7 +10,7 @@ var _ NeuralNetwork = (*NN)(nil)
 //
 type NeuralNetwork interface {
 	//
-	Architecture
+	//Architecture
 
 	//
 	Parameter
@@ -26,11 +26,6 @@ type NeuralNetwork interface {
 
 	//
 	pkg.ReadWriter
-}
-
-type Architecture interface {
-	perceptron() NeuralNetwork
-	hopfield() NeuralNetwork
 }
 
 //

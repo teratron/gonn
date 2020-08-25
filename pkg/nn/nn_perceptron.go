@@ -57,7 +57,7 @@ func Perceptron() *perceptron {
 }
 
 // Returns a new Perceptron neural network instance with the default parameters
-func (n *NN) perceptron() NeuralNetwork {
+func (n *NN) perceptron() {
 	n.Architecture = &perceptron{Architecture: n}
 	if p, ok := n.Architecture.(*perceptron); ok {
 		p.Configuration.HiddenLayer		= HiddenType{9, 2}
@@ -68,7 +68,25 @@ func (n *NN) perceptron() NeuralNetwork {
 		p.Configuration.Rate			= floatType(DefaultRate)
 		p.Configuration.Weight			= nil
 	}
-	return n
+}
+
+func (p *perceptron) architecture() Architecture {
+	return p.Architecture
+}
+
+func (p *perceptron) setArchitecture(network Architecture) {
+	fmt.Println("architecture()")
+	if n, ok := network.(*NN); ok {
+		//n.Architecture = &perceptron{Architecture: n}
+		p.Architecture = n
+	}
+	p.Configuration.HiddenLayer		= HiddenType{9, 2}
+	p.Configuration.Bias 			= false
+	p.Configuration.ActivationMode	= ModeSIGMOID
+	p.Configuration.LossMode		= ModeMSE
+	p.Configuration.LossLevel		= .0001
+	p.Configuration.Rate			= floatType(DefaultRate)
+	p.Configuration.Weight			= nil
 }
 
 // HiddenLayer
@@ -117,7 +135,7 @@ func (p *perceptron) Set(args ...pkg.Setter) {
 			p.Configuration.LossLevel = float64(v)
 		case rateType:
 			p.Configuration.Rate = floatType(v)
-		/*case weightType:
+		/*case *weight:
 			p.setWeight()*/
 		default:
 			pkg.Log("This type is missing for Perceptron Neural Network", true) // !!!
@@ -144,7 +162,7 @@ func (p *perceptron) Get(args ...pkg.Getter) pkg.GetSetter {
 			return lossLevelType(p.Configuration.LossLevel)
 		case rateType:
 			return p.Configuration.Rate
-		/*case weightType:
+		/*case *weight:
 			p.getWeight()*/
 		default:
 			pkg.Log("This type is missing for Perceptron Neural Network", true) // !!!

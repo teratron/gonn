@@ -12,7 +12,11 @@ type jsonType string
 
 // JSON
 func JSON(filename ...string) pkg.ReadWriter {
-	return jsonType(filename[0])
+	if len(filename) > 0 {
+		return jsonType(filename[0])
+	} else {
+		return jsonType("")
+	}
 }
 
 // Read
