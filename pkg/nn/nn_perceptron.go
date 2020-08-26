@@ -57,7 +57,7 @@ func Perceptron() *perceptron {
 }
 
 // Returns a new Perceptron neural network instance with the default parameters
-func (n *NN) perceptron() {
+/*func (n *NN) perceptron() {
 	n.Architecture = &perceptron{Architecture: n}
 	if p, ok := n.Architecture.(*perceptron); ok {
 		p.Configuration.HiddenLayer		= HiddenType{9, 2}
@@ -68,7 +68,7 @@ func (n *NN) perceptron() {
 		p.Configuration.Rate			= floatType(DefaultRate)
 		p.Configuration.Weight			= nil
 	}
-}
+}*/
 
 func (p *perceptron) architecture() Architecture {
 	return p.Architecture

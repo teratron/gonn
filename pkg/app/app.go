@@ -11,6 +11,9 @@ type Application interface {
 	pkg.GetSetter
 
 	//
+	pkg.CopyPaster
+
+	//
 	pkg.ReadWriter
 }
 

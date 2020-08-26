@@ -6,6 +6,10 @@ type Architecture interface {
 	setArchitecture(Architecture)
 }
 
+type blank struct {
+	Architecture
+}
+
 func (n *NN) architecture() Architecture {
 	return n.Architecture
 }

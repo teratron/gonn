@@ -2,6 +2,7 @@
 package nn
 
 import (
+	"fmt"
 	"log"
 	"math/rand"
 	"time"
@@ -18,7 +19,7 @@ func init() {
 // New returns a new neural network instance with the default parameters
 func New(reader ...pkg.Reader) NeuralNetwork {
 	n := &NN{
-		//Architecture:	&perceptron{},
+		Architecture:	&blank{},
 		IsInit:			false,
 		IsTrain:		false,
 		json:			"",
@@ -32,13 +33,14 @@ func New(reader ...pkg.Reader) NeuralNetwork {
 		case Architecture:
 			n.Architecture = r
 			r.setArchitecture(n)
-			//fmt.Println("Architecture", n.Architecture)
+			fmt.Println("Architecture", n.Architecture)
 			//fmt.Printf("***%T %v\n",r,r)
 			//fmt.Printf("***%T %v\n",n,n)
 		/*case *perceptron:
 			//n.Architecture = r
 			n.perceptron()*/
 		case jsonType:
+			fmt.Println("jsonType")
 			if len(r) > 0 {
 				//fmt.Printf("***%T %v\n",r,r)
 				//fmt.Printf("***%T %v\n",n,n)
@@ -59,7 +61,8 @@ func New(reader ...pkg.Reader) NeuralNetwork {
 		}
 	} else {
 		//n.Architecture = &perceptron{}
-		n.perceptron()
+		//n.Architecture.setArchitecture(n)
+		//n.perceptron()
 	}
 
 	return n

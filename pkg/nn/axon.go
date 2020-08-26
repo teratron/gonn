@@ -15,7 +15,7 @@ type weight struct{
 }
 
 // Weight
-func Weight() pkg.Controller {
+func Weight() pkg.GetCopyPaster {
 	return &weight{}
 }
 
