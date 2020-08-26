@@ -196,12 +196,12 @@ func (p *perceptron) Copy(copier pkg.Copier) {
 
 // Paste
 func (p *perceptron) Paste(paster pkg.Paster) (err error) {
-	switch c := paster.(type) {
+	switch v := paster.(type) {
 	case *weight:
-		p.pasteWeight()
+		return p.pasteWeight()
 	default:
 		pkg.Log("This type is missing for paste", true) // !!!
-		log.Printf("\tWrite: %T %v\n", c, c) // !!!
+		log.Printf("\tWrite: %T %v\n", v, v) // !!!
 	}
 	return
 }
@@ -308,7 +308,7 @@ func (p *perceptron) initAxon() {
 		for j, w := range v {
 			for k := range w {
 				p.axon[i][j][k] = &axon{
-					synapse: map[string]pkg.Getter{},
+					synapse: map[string]Synapser{},
 				}
 				if !isTrain {
 					p.axon[i][j][k].weight = .5 //getRand()
@@ -353,7 +353,7 @@ func (p *perceptron) calcNeuron(input []float64) {
 			go func(n *neuron) {
 				n.value = 0
 				for _, a := range n.axon {
-					n.value += getSynapseInput(a) * a.weight
+					n.value += a.getSynapseInput() * a.weight
 				}
 				n.value = floatType(calcActivation(float64(n.value), p.Configuration.ActivationMode))
 				wait <- true
@@ -425,7 +425,7 @@ func (p *perceptron) calcAxon(input []float64) {
 				go func(a *axon) {
 					if n, ok := a.synapse["output"].(*neuron); ok {
 						if miss, ok := n.specific.(floatType); ok {
-							a.weight += getSynapseInput(a) * miss * p.Configuration.Rate
+							a.weight += a.getSynapseInput() * miss * p.Configuration.Rate
 						}
 					}
 					wait <- true
@@ -501,7 +501,6 @@ func (p *perceptron) setWeight(weight float3Type) (err error) {
 
 		}
 	}*/
-
 	// TODO: make error
 
 	for i, u := range p.axon {
@@ -541,7 +540,7 @@ func (p *perceptron) copyWeight() {
 }
 
 // pasteWeight inserts weights from the buffer
-func (p *perceptron) pasteWeight() {
+func (p *perceptron) pasteWeight() (err error) {
 	for i, u := range p.Configuration.Weight {
 		for j, v := range u {
 			for k, w := range v {
@@ -549,6 +548,8 @@ func (p *perceptron) pasteWeight() {
 			}
 		}
 	}
+	// TODO: where error?
+	return
 }
 
 // deleteWeight
@@ -577,7 +578,10 @@ func (p *perceptron) readJSON(value interface{}) {
 		log.Fatal("JSON unmarshal failed: ", err)
 	}
 	p.reInit()
-	p.pasteWeight()
+	err := p.pasteWeight()
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 // readXML
@@ -588,7 +592,10 @@ func (p *perceptron) readXML(value interface{}) {
 		log.Fatal("XML unmarshal failed: ", err)
 	}
 	p.reInit()
-	p.pasteWeight()
+	err := p.pasteWeight()
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 // writeReport report of neural network training results in io.Writer

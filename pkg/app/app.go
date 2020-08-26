@@ -8,13 +8,7 @@ var _ Application = (*app)(nil)
 
 type Application interface {
 	//
-	pkg.GetSetter
-
-	//
-	pkg.CopyPaster
-
-	//
-	pkg.ReadWriter
+	//pkg.Controller
 }
 
 type app struct {

@@ -1,16 +1,40 @@
 package nn
 
 import (
-	"github.com/zigenzoog/gonn/pkg"
 	"log"
+
+	"github.com/zigenzoog/gonn/pkg"
 )
 
-//
-type axon struct {
-	weight  floatType
-	synapse map[string]pkg.Getter
+// Synapser
+type Synapser interface {
+	pkg.GetSetter
 }
 
+// axon
+type axon struct {
+	weight  floatType
+	synapse map[string]Synapser
+}
+
+// getSynapseInput
+func (a *axon) getSynapseInput() (input floatType) {
+	switch s := a.synapse["input"].(type) {
+	case floatType:
+		input = s
+	case biasType:
+		if s {
+			input = 1
+		}
+	case *neuron:
+		input = s.value
+	default:
+		panic("error!!!") // !!!
+	}
+	return
+}
+
+// weight
 type weight struct{
 	isInitWeight bool
 }
@@ -88,47 +112,3 @@ func (w *weight) Write(writer ...pkg.Writer) {
 		log.Println("Empty write") // !!!
 	}
 }
-
-// getSynapseInput
-func getSynapseInput(axon *axon) (input floatType) {
-	switch s := axon.synapse["input"].(type) {
-	case floatType:
-		input = s
-	case biasType:
-		if s {
-			input = 1
-		}
-	case *neuron:
-		input = s.value
-	default:
-		panic("error!!!") // !!!
-	}
-	return
-}
-
-/*func Axon() GetterSetter {
-	return &axon{}
-}
-
-// Set
-func (a *axon) Set(args ...Setter) {
-	if len(args) > 0 {
-		if n, ok := args[0].(NeuralNetwork); ok {
-			n.Get().Set(a)
-		}
-	} else {
-		Log("Empty Set()", true) // !!!
-	}
-}
-
-// Get
-func (a *axon) Get(args ...Getter) GetterSetter {
-	if len(args) > 0 {
-		if n, ok := args[0].(NeuralNetwork); ok {
-			return n.Get().Get(a)
-		}
-	} else {
-		return a
-	}
-	return nil
-}*/

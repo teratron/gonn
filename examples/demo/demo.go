@@ -58,7 +58,7 @@ func main() {
 			fmt.Println("----- Epoch:", epoch, "\tmin avg error:", sum)
 			minLoss = sum
 
-			// Copying weights
+			// Copying weights to the buffer
 			n.Copy(nn.Weight())
 		}
 
@@ -69,7 +69,7 @@ func main() {
 		}
 	}
 
-	// Returning weights for further recording
+	// Returning weights for further recording from the buffer
 	err := n.Paste(nn.Weight())
 	if err != nil {
 		log.Println("error: ", err)

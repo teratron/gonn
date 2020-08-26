@@ -93,7 +93,11 @@ func (j jsonType) Write(writer ...pkg.Writer) {
 		if n, ok := writer[0].(*NN); ok {
 			filename := string(j)
 			if len(filename) == 0 {
-				filename = n.json
+				if len(n.json) > 0 {
+					filename = n.json
+				} else {
+					// TODO: error
+				}
 			}
 			if n.IsTrain {
 				n.Copy(Weight())

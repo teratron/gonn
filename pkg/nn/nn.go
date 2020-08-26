@@ -10,9 +10,6 @@ var _ NeuralNetwork = (*NN)(nil)
 //
 type NeuralNetwork interface {
 	//
-	//Architecture
-
-	//
 	Parameter
 
 	//
