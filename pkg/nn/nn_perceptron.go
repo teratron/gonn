@@ -75,9 +75,7 @@ func (p *perceptron) architecture() Architecture {
 }
 
 func (p *perceptron) setArchitecture(network Architecture) {
-	fmt.Println("architecture()")
 	if n, ok := network.(*NN); ok {
-		//n.Architecture = &perceptron{Architecture: n}
 		p.Architecture = n
 	}
 	p.Configuration.HiddenLayer		= HiddenType{9, 2}
@@ -119,6 +117,17 @@ func (p *perceptron) Rate() float32 {
 	return float32(p.Configuration.Rate)
 }
 
+// Weight
+func (p *perceptron) Weight() Floater {
+	/*f := float2Type{
+		{floatType(10), floatType(20)},
+		{floatType(10), floatType(20)},
+	}
+	f.getFloat(1,0)*/
+	//fmt.Printf("%T %v\n",f,f)
+	return p.getWeight()
+}
+
 // Set
 func (p *perceptron) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
@@ -135,8 +144,11 @@ func (p *perceptron) Set(args ...pkg.Setter) {
 			p.Configuration.LossLevel = float64(v)
 		case rateType:
 			p.Configuration.Rate = floatType(v)
-		/*case *weight:
-			p.setWeight()*/
+		case *weight:
+			/*err := p.setWeight(v)
+			if err != nil {
+				log.Println(err)
+			}*/
 		default:
 			pkg.Log("This type is missing for Perceptron Neural Network", true) // !!!
 			log.Printf("\tset: %T %v\n", v, v) // !!!
@@ -163,7 +175,7 @@ func (p *perceptron) Get(args ...pkg.Getter) pkg.GetSetter {
 		case rateType:
 			return p.Configuration.Rate
 		/*case *weight:
-			p.getWeight()*/
+			return p.getWeight()*/
 		default:
 			pkg.Log("This type is missing for Perceptron Neural Network", true) // !!!
 			log.Printf("\tget: %T %v\n", args[0], args[0]) // !!!
@@ -473,6 +485,41 @@ func (p *perceptron) Verify(input []float64, target ...[]float64) (loss float64)
 	return
 }
 
+// getWeight
+func (p *perceptron) getWeight() (weight float3Type) {
+	weight = make(float3Type, len(p.axon))
+	for i, u := range p.axon {
+		weight[i] = make(float2Type, len(p.axon[i]))
+		for j, v := range u {
+			weight[i][j] = make(float1Type, len(p.axon[i][j]))
+			for k, w := range v {
+				weight[i][j][k] = w.weight
+			}
+		}
+	}
+	return
+}
+
+// setWeight
+func (p *perceptron) setWeight(weight float3Type) (err error) {
+	/*if len(weight) == len(p.axon) {
+		if len(weight[]) == len(p.axon[]) {
+
+		}
+	}*/
+
+	// TODO: make error
+
+	for i, u := range p.axon {
+		for j, v := range u {
+			for k, w := range v {
+				w.weight = weight[i][j][k]
+			}
+		}
+	}
+	return
+}
+
 // initWeight
 func (p *perceptron) initWeight() {
 	p.Configuration.Weight = make([][][]floatType, len(p.axon))
@@ -485,11 +532,8 @@ func (p *perceptron) initWeight() {
 	p.isInitWeight = true
 }
 
-// getWeight
-// setWeight
-
-// copyWeight
-func (p *perceptron) copyWeight() /**[][][]floatType*/ {
+// copyWeight copies weights to the buffer
+func (p *perceptron) copyWeight() {
 	if !p.isInitWeight {
 		p.initWeight()
 	}
@@ -500,10 +544,9 @@ func (p *perceptron) copyWeight() /**[][][]floatType*/ {
 			}
 		}
 	}
-	//return &p.Configuration.Weight
 }
 
-// pasteWeight
+// pasteWeight inserts weights from the buffer
 func (p *perceptron) pasteWeight() {
 	for i, u := range p.Configuration.Weight {
 		for j, v := range u {

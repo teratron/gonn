@@ -47,6 +47,9 @@ func main() {
 	fmt.Println(n.LossLevel())
 	fmt.Println(n.Rate())
 
+
+
+
 	// Hidden layers
 	n.Set(nn.HiddenLayer(3, 2))
 	fmt.Println("n.Get(nn.HiddenLayer()):", n.Get(nn.HiddenLayer()))

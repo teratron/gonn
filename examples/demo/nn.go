@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/zigenzoog/gonn/pkg/nn"
 )
 
@@ -35,6 +36,9 @@ func main() {
 	if err != nil {
 		log.Println(err)
 	}*/
+	fmt.Println("Weight:", n.Weight())
+
+	nn.Debug(n.Weight())
 
 	//
 	n.Write(

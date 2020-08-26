@@ -1,19 +1,18 @@
 package main
 
-import (
-	"fmt"
-
-	"github.com/zigenzoog/gonn/pkg/nn"
-)
+import "github.com/zigenzoog/gonn/pkg/nn"
 
 func main() {
 	// New returns a new neural network
 	n := nn.New(nn.JSON("config/perceptron.json"))
 
-	fmt.Println("nn.New(JSON(\"file\")):", n)
+	// Training dataset
+	input  := []float64{2.3, 3.1}
+	target := []float64{3.6}
 
-	//
-	n.Write(
-		nn.JSON("config/perceptron2.json"),
-	/*nn.XML()*/)
+	// Training
+	_, _ = n.Train(input, target)
+
+	// Writing the neural network configuration to a file
+	n.Write(nn.JSON(/*"config/perceptron2.json"*/))
 }

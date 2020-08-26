@@ -10,8 +10,6 @@ import (
 	"github.com/zigenzoog/gonn/pkg"
 )
 
-type floatType float32
-
 func init() {
 	rand.Seed(time.Now().UTC().UnixNano())
 }
@@ -19,7 +17,7 @@ func init() {
 // New returns a new neural network instance with the default parameters
 func New(reader ...pkg.Reader) NeuralNetwork {
 	n := &NN{
-		Architecture:	&blank{},
+		Architecture:	&architecture{},
 		IsInit:			false,
 		IsTrain:		false,
 		json:			"",
@@ -33,14 +31,11 @@ func New(reader ...pkg.Reader) NeuralNetwork {
 		case Architecture:
 			n.Architecture = r
 			r.setArchitecture(n)
-			fmt.Println("Architecture", n.Architecture)
-			//fmt.Printf("***%T %v\n",r,r)
-			//fmt.Printf("***%T %v\n",n,n)
 		/*case *perceptron:
 			//n.Architecture = r
 			n.perceptron()*/
 		case jsonType:
-			fmt.Println("jsonType")
+			//fmt.Println("jsonType")
 			if len(r) > 0 {
 				//fmt.Printf("***%T %v\n",r,r)
 				//fmt.Printf("***%T %v\n",n,n)
@@ -60,9 +55,8 @@ func New(reader ...pkg.Reader) NeuralNetwork {
 			log.Println("This type is missing for Neural Network")
 		}
 	} else {
-		//n.Architecture = &perceptron{}
-		//n.Architecture.setArchitecture(n)
-		//n.perceptron()
+		n.Architecture = &perceptron{}
+		n.Architecture.setArchitecture(n)
 	}
 
 	return n
@@ -74,11 +68,6 @@ func (n *NN) init(lenInput int, lenTarget ...interface{}) bool {
 		n.IsInit = a.init(lenInput, lenTarget...)
 	}
 	return n.IsInit
-}
-
-func (f floatType) Set(...pkg.Setter) {}
-func (f floatType) Get(...pkg.Getter) pkg.GetSetter {
-	return f
 }
 
 // getRand return random number from -0.5 to 0.5
@@ -101,10 +90,9 @@ func getLengthData(data ...[]float64) []interface{} {
 			tmp = append(tmp, len(v))
 		}
 	}
-	//fmt.Println(tmp)
 	return tmp
 }
 
 func Debug(args ...interface{}) {
-	//fmt.Println(getLengthData([]float64{.2,.3,.8}))
+	fmt.Println(args[0])
 }

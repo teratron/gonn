@@ -6,7 +6,7 @@ type Architecture interface {
 	setArchitecture(Architecture)
 }
 
-type blank struct {
+type architecture struct {
 	Architecture
 }
 

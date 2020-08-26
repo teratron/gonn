@@ -1,7 +1,8 @@
-//
 package pkg
 
-type GetCopyPaster interface {
-	Getter
+// Controller
+type Controller interface {
+	GetSetter
 	CopyPaster
+	ReadWriter
 }

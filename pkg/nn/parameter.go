@@ -2,6 +2,8 @@ package nn
 
 //
 type Parameter interface {
+	Weight() Floater
+
 	// Perceptron
 	HiddenLayer() []uint
 	Bias() bool

@@ -75,7 +75,7 @@ func main() {
 		log.Println("error: ", err)
 	}
 
-	// Saving the neural network configuration to a file
+	// Writing the neural network configuration to a file
 	n.Write(
 		nn.JSON("config/perceptron.json"),
 		nn.XML("config/perceptron.xml"))
