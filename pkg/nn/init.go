@@ -31,14 +31,8 @@ func New(reader ...pkg.Reader) NeuralNetwork {
 		case Architecture:
 			n.Architecture = r
 			r.setArchitecture(n)
-		/*case *perceptron:
-			//n.Architecture = r
-			n.perceptron()*/
 		case jsonType:
-			//fmt.Println("jsonType")
 			if len(r) > 0 {
-				//fmt.Printf("***%T %v\n",r,r)
-				//fmt.Printf("***%T %v\n",n,n)
 				r.Read(n)
 			} else {
 				log.Println("Отсутствует название файла нейросети для JSON")

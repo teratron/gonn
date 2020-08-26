@@ -84,6 +84,9 @@ func (j xmlType) Write(writer ...pkg.Writer) {
 	if len(writer) > 0 {
 		if n, ok := writer[0].(*NN); ok {
 			filename := string(j)
+			if len(filename) == 0 {
+				filename = n.xml
+			}
 			if n.IsTrain {
 				n.Copy(Weight())
 			} else {

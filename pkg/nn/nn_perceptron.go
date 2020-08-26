@@ -119,12 +119,6 @@ func (p *perceptron) Rate() float32 {
 
 // Weight
 func (p *perceptron) Weight() Floater {
-	/*f := float2Type{
-		{floatType(10), floatType(20)},
-		{floatType(10), floatType(20)},
-	}
-	f.getFloat(1,0)*/
-	//fmt.Printf("%T %v\n",f,f)
 	return p.getWeight()
 }
 
@@ -561,6 +555,7 @@ func (p *perceptron) pasteWeight() {
 func (p *perceptron) deleteWeight() {
 	p.isInitWeight = false
 	p.Configuration.Weight = nil
+	// TODO: why?
 }
 
 // reInit
