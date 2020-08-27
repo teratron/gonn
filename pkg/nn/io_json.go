@@ -71,9 +71,7 @@ func (j jsonType) Read(reader pkg.Reader) {
 						case "perceptron":
 							n.Architecture = &perceptron{Architecture: n}
 							if a, ok := n.Architecture.(*perceptron); ok {
-								//fmt.Printf("%T %v", v, v)
 								a.readJSON(v)
-								//a.Read(pkg.Reader(v))
 							}
 						case "hopfield":
 							n.Architecture = &hopfield{Architecture: n}

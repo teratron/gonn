@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/zigenzoog/gonn/pkg/nn"
 	"log"
+
+	"github.com/zigenzoog/gonn/pkg/nn"
 )
 
 func main() {
@@ -53,13 +54,11 @@ func main() {
 			fmt.Printf("Epoch: %v\tError: %.8f\n", epoch, sum)
 		}
 
-		// Weights are copied at the minimum average error
+		// Weights are copied to the buffer at the minimum average error
 		if sum < minLoss && epoch >= 100 {
 			fmt.Println("----- Epoch:", epoch, "\tmin avg error:", sum)
-			minLoss = sum
-
-			// Copying weights to the buffer
 			n.Copy(nn.Weight())
+			minLoss = sum
 		}
 
 		// Exiting the cycle of learning epochs, when the minimum error level is reached
