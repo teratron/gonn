@@ -3,28 +3,11 @@ package main
 import (
 	"fmt"
 
-	"github.com/zigenzoog/gonn/pkg/app"
 	"github.com/zigenzoog/gonn/pkg/nn"
 )
 
 func main() {
 	//fmt.Printf("%T %v\n", c, c)
-
-	// Application
-	a := app.App()
-	fmt.Println("nn.App():", a)
-
-	// Common
-	/*a.Set(nn.Language("ru"),
-		  nn.Logging(1))*/
-
-	// Language
-	//n.Set(nn.Language("ru"))
-	//fmt.Println("n.Get(nn.Language()):", n.Get(nn.Language()))
-
-	// Logging
-	//n.Set(nn.Logging(0)) //set
-	//fmt.Println("n.Get(nn.Logging()):", n.Get(nn.Logging()))
 
 	// Neural Network
 	n := nn.New(nn.Perceptron())
@@ -46,9 +29,6 @@ func main() {
 	fmt.Println(n.LossMode())
 	fmt.Println(n.LossLevel())
 	fmt.Println(n.Rate())
-
-
-
 
 	// Hidden layers
 	n.Set(nn.HiddenLayer(3, 2))
@@ -75,6 +55,6 @@ func main() {
 	fmt.Println("n.Get(nn.Rate()):", n.Get(nn.Rate()))
 
 	// Weight
-	//n.Set(nn.Weight(0))
-	//fmt.Println("n.Get(nn.Rate()):", n.Get(nn.Rate()))
+	//n.Set(nn.Weight())
+	//fmt.Println("n.Get(nn.Weight()):", n.Get(nn.Weight()))
 }

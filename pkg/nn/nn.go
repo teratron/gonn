@@ -34,6 +34,6 @@ type NN struct {
 	db			dbType
 }
 
-/*type NN struct {
-	*nn
-}*/
+type NNN struct {
+	*NN
+}

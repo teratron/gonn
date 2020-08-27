@@ -2,7 +2,6 @@
 package nn
 
 import (
-	"fmt"
 	"log"
 	"math/rand"
 	"time"
@@ -25,26 +24,13 @@ func New(reader ...pkg.Reader) NeuralNetwork {
 		csv:			"",
 		db:				"",
 	}
-
 	if len(reader) > 0 {
 		switch r := reader[0].(type) {
 		case Architecture:
 			n.Architecture = r
 			r.setArchitecture(n)
-		case jsonType:
-			if len(r) > 0 {
-				r.Read(n)
-			} else {
-				log.Println("Отсутствует название файла нейросети для JSON")
-			}
-		case xmlType:
-			if len(r) > 0 {
-				r.Read(n)
-			} else {
-				log.Println("Отсутствует название файла нейросети для XML")
-			}
-		/*case csvType:
-		case dbType:*/
+		case Filer:
+			r.Read(n)
 		default:
 			log.Println("This type is missing for Neural Network")
 		}
@@ -52,7 +38,6 @@ func New(reader ...pkg.Reader) NeuralNetwork {
 		n.Architecture = &perceptron{}
 		n.Architecture.setArchitecture(n)
 	}
-
 	return n
 }
 
@@ -88,5 +73,5 @@ func getLengthData(data ...[]float64) []interface{} {
 }
 
 func Debug(args ...interface{}) {
-	fmt.Println(args[0])
+	log.Println(args[0])
 }

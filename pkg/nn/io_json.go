@@ -2,10 +2,11 @@ package nn
 
 import (
 	"encoding/json"
-	"github.com/zigenzoog/gonn/pkg"
 	"io/ioutil"
 	"log"
 	"os"
+
+	"github.com/zigenzoog/gonn/pkg"
 )
 
 type jsonType string
@@ -23,6 +24,9 @@ func JSON(filename ...string) pkg.ReadWriter {
 func (j jsonType) Read(reader pkg.Reader) {
 	if n, ok := reader.(*NN); ok {
 		filename := string(j)
+		if len(filename) == 0 {
+			log.Fatal("Отсутствует название файла нейросети для JSON")
+		}
 		b, err := ioutil.ReadFile(filename)
 		if err != nil {
 			log.Fatal("Can't load json: ", err)
@@ -96,7 +100,8 @@ func (j jsonType) Write(writer ...pkg.Writer) {
 				if len(n.json) > 0 {
 					filename = n.json
 				} else {
-					// TODO: error
+					// TODO: generate filename
+					filename = "config/neural_network.json"
 				}
 			}
 			if n.IsTrain {

@@ -2,8 +2,8 @@ package nn
 
 import "github.com/zigenzoog/gonn/pkg"
 
-// Specifier
-type Specifier interface {
+// Neuroner
+type Neuroner interface {
 	pkg.GetSetter
 }
 
@@ -13,5 +13,5 @@ type neuron struct {
 
 	value    floatType	// Neuron value
 	axon     []*axon	// All incoming axons
-	specific Specifier
+	specific Neuroner	// Specific option of neuron: miss (error)
 }

@@ -19,6 +19,9 @@ func XML(filename ...string) pkg.ReadWriter {
 func (j xmlType) Read(reader pkg.Reader) {
 	if n, ok := reader.(*NN); ok {
 		filename := string(j)
+		if len(filename) == 0 {
+			log.Fatal("Отсутствует название файла нейросети для XML")
+		}
 		b, err := ioutil.ReadFile(filename)
 		if err != nil {
 			log.Fatal("Can't load xml: ", err)
@@ -85,7 +88,12 @@ func (j xmlType) Write(writer ...pkg.Writer) {
 		if n, ok := writer[0].(*NN); ok {
 			filename := string(j)
 			if len(filename) == 0 {
-				filename = n.xml
+				if len(n.xml) > 0 {
+					filename = n.xml
+				} else {
+					// TODO: generate filename
+					filename = "config/neural_network.json"
+				}
 			}
 			if n.IsTrain {
 				n.Copy(Weight())
