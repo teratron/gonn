@@ -24,7 +24,7 @@ func (j xmlType) Read(reader pkg.Reader) {
 		}
 		b, err := ioutil.ReadFile(filename)
 		if err != nil {
-			log.Fatal("Can't load xml: ", err)
+			log.Println("Can't load xml:", err)
 		}
 		//fmt.Println(string(b))
 
@@ -101,9 +101,9 @@ func (j xmlType) Write(writer ...pkg.Writer) {
 				log.Println("Not trained network")
 			}
 			if b, err := xml.MarshalIndent(&n, "", "\t"); err != nil {
-				log.Fatal("XML marshaling failed: ", err)
+				log.Println("XML marshaling failed:", err)
 			} else if err = ioutil.WriteFile(filename, b, os.ModePerm); err != nil {
-				log.Fatal("Can't write file:", err)
+				log.Println("Can't write file:", err)
 			}
 		}
 	} else {

@@ -26,12 +26,17 @@ import (
 )
 
 func main() {
-	// Creat new Neural Network,
-	// default perceptron neural network,
-	// same n := nn.New(Perceptron())
+	// New returns a new neural network instance with the default parameters,
+    // same n := nn.New(Perceptron())
 	n := nn.New()
 
-	// Set parameters
+	// Set parameters:
+	// HiddenLayer    - Array of the number of neurons in each hidden layer
+	// Bias           - The neuron bias, false or true
+	// ActivationMode - Activation function mode
+	// LossMode       - The mode of calculation of the total error
+	// LossLevel      - Minimum (sufficient) level of the average of the error during training
+	// Rate           - Learning coefficient, from 0 to 1
 	n.Set(
 		nn.HiddenLayer(3, 2),
 		nn.Bias(true),
@@ -40,16 +45,16 @@ func main() {
 		nn.LossLevel(.0001),
 		nn.Rate(nn.DefaultRate))
 
-	// Data set
+	// Training dataset
 	input  := []float64{1, 0}
 	target := []float64{0, 1}
 
-	//
+	// Training
 	loss, count := n.Train(input, target)
 
-	//
+	// Writing the neural network configuration to a file
 	n.Write(
-		nn.JSON("perceptron.json"),
+		nn.JSON("config/perceptron.json"),
 		nn.Report(os.Stdout, input, loss, count))
 }
 ```
