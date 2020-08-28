@@ -11,7 +11,7 @@ type Neuroner interface {
 type neuron struct {
 	Synapser
 
-	value    floatType	// Neuron value
-	axon     []*axon	// All incoming axons
-	specific Neuroner	// Specific option of neuron: miss (error)
+	value    floatType // Neuron value
+	axon     []*axon   // All incoming axons
+	specific Neuroner  // Specific option of neuron: miss (error)
 }

@@ -41,8 +41,8 @@ func (j jsonType) Read(reader pkg.Reader) {
 		}
 		//fmt.Println(n)
 		n.Architecture = nil
-		n.IsInit       = false
-		n.json         = filename
+		n.IsInit = false
+		n.json = filename
 
 		// Декодируем json в тип map[string]interface{}
 		var data interface{}

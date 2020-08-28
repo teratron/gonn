@@ -34,8 +34,8 @@ func (j xmlType) Read(reader pkg.Reader) {
 		}
 		//fmt.Println(n)
 		n.Architecture = nil
-		n.IsInit       = false
-		n.xml          = filename
+		n.IsInit = false
+		n.xml = filename
 
 		var data interface{}
 		err = xml.Unmarshal(b, &data)

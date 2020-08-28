@@ -15,42 +15,42 @@ import (
 var _ NeuralNetwork = (*perceptron)(nil)
 
 type perceptron struct {
-	Architecture						`json:"-" xml:"-"`
-	Parameter							`json:"-" xml:"-"`
+	Architecture `json:"-" xml:"-"`
+	Parameter    `json:"-" xml:"-"`
 	//Constructor							`json:"-" xml:"-"`
 
 	// Configuration
-	Conf struct{
+	Conf struct {
 		// Array of the number of neurons in each hidden layer
-		HiddenLayer		HiddenType		`json:"hiddenLayer" xml:"hiddenLayer>layer"`
+		HiddenLayer HiddenType `json:"hiddenLayer" xml:"hiddenLayer>layer"`
 
 		// The neuron bias, false or true
-		Bias			biasType		`json:"bias" xml:"bias"`
+		Bias biasType `json:"bias" xml:"bias"`
 
 		// Activation function mode
-		ActivationMode	uint8			`json:"activationMode" xml:"activationMode"`
+		ActivationMode uint8 `json:"activationMode" xml:"activationMode"`
 
 		// The mode of calculation of the total error
-		LossMode		uint8			`json:"lossMode" xml:"lossMode"`
+		LossMode uint8 `json:"lossMode" xml:"lossMode"`
 
 		// Minimum (sufficient) level of the average of the error during training
-		LossLevel		float64			`json:"lossLevel" xml:"lossLevel"`
+		LossLevel float64 `json:"lossLevel" xml:"lossLevel"`
 
 		// Learning coefficient, from 0 to 1
-		Rate			floatType		`json:"rate" xml:"rate"`
+		Rate floatType `json:"rate" xml:"rate"`
 
 		// Matrix of weight values
-		Weight			[][][]floatType `json:"weight" xml:"weight>weight"`
-	}									`json:"perceptron,omitempty" xml:"perceptron,omitempty"`
+		Weight [][][]floatType `json:"weight" xml:"weight>weight"`
+	} `json:"perceptron,omitempty" xml:"perceptron,omitempty"`
 
 	// Matrix
 	neuron [][]*neuron
 	axon   [][][]*axon
 	*weight
 
-	lastIndexLayer	int
-	lenInput		int
-	lenOutput		int
+	lastIndexLayer int
+	lenInput       int
+	lenOutput      int
 }
 
 func Perceptron() *perceptron {
@@ -66,13 +66,13 @@ func (p *perceptron) setArchitecture(network Architecture) {
 	if n, ok := network.(*NN); ok {
 		p.Architecture = n
 	}
-	p.Conf.HiddenLayer		= HiddenType{9, 2}
-	p.Conf.Bias 			= false
-	p.Conf.ActivationMode	= ModeSIGMOID
-	p.Conf.LossMode			= ModeMSE
-	p.Conf.LossLevel		= .0001
-	p.Conf.Rate				= floatType(DefaultRate)
-	p.Conf.Weight			= nil
+	p.Conf.HiddenLayer = HiddenType{9, 2}
+	p.Conf.Bias = false
+	p.Conf.ActivationMode = ModeSIGMOID
+	p.Conf.LossMode = ModeMSE
+	p.Conf.LossLevel = .0001
+	p.Conf.Rate = floatType(DefaultRate)
+	p.Conf.Weight = nil
 }
 
 // HiddenLayer
@@ -133,7 +133,7 @@ func (p *perceptron) Set(args ...pkg.Setter) {
 			}*/
 		default:
 			pkg.Log("This type is missing for Perceptron Neural Network", true) // !!!
-			log.Printf("\tset: %T %v\n", v, v) // !!!
+			log.Printf("\tset: %T %v\n", v, v)                                  // !!!
 		}
 	} else {
 		pkg.Log("Empty Set()", true) // !!!
@@ -157,10 +157,10 @@ func (p *perceptron) Get(args ...pkg.Getter) pkg.GetSetter {
 		case rateType:
 			return p.Conf.Rate
 		/*case *weight:
-			return p.getWeight()*/
+		return p.getWeight()*/
 		default:
 			pkg.Log("This type is missing for Perceptron Neural Network", true) // !!!
-			log.Printf("\tget: %T %v\n", args[0], args[0]) // !!!
+			log.Printf("\tget: %T %v\n", args[0], args[0])                      // !!!
 			return nil
 		}
 	} else {
@@ -178,7 +178,7 @@ func (p *perceptron) Copy(copier pkg.Copier) {
 		p.copyWeight()
 	default:
 		pkg.Log("This type is missing for copy", true) // !!!
-		log.Printf("\tWrite: %T %v\n", c, c) // !!!
+		log.Printf("\tWrite: %T %v\n", c, c)           // !!!
 	}
 }
 
@@ -189,7 +189,7 @@ func (p *perceptron) Paste(paster pkg.Paster) (err error) {
 		return p.pasteWeight()
 	default:
 		pkg.Log("This type is missing for paste", true) // !!!
-		log.Printf("\tWrite: %T %v\n", v, v) // !!!
+		log.Printf("\tWrite: %T %v\n", v, v)            // !!!
 	}
 	return
 }
@@ -207,7 +207,7 @@ func (p *perceptron) Read(reader pkg.Reader) {
 		p.readDB(v)*/
 	default:
 		pkg.Log("This type is missing for write", true) // !!!
-		log.Printf("\tWrite: %T %v\n", r, r) // !!!
+		log.Printf("\tWrite: %T %v\n", r, r)            // !!!
 	}
 }
 
@@ -227,7 +227,7 @@ func (p *perceptron) Write(writer ...pkg.Writer) {
 			p.writeDB(v)*/
 		default:
 			pkg.Log("This type is missing for write", true) // !!!
-			log.Printf("\tWrite: %T %v\n", w, w) // !!!
+			log.Printf("\tWrite: %T %v\n", w, w)            // !!!
 		}
 	}
 }
@@ -241,11 +241,11 @@ func (p *perceptron) init(lenInput int, lenTarget ...interface{}) bool {
 		}()
 
 		p.lastIndexLayer = len(p.Conf.HiddenLayer)
-		p.lenInput       = lenInput
-		p.lenOutput      = lenTarget[0].(int)
-		tmp              = append(p.Conf.HiddenLayer, uint(p.lenOutput))
-		layer           := make(HiddenType, p.lastIndexLayer + 1)
-		lenLayer        := copy(layer, tmp)
+		p.lenInput = lenInput
+		p.lenOutput = lenTarget[0].(int)
+		tmp = append(p.Conf.HiddenLayer, uint(p.lenOutput))
+		layer := make(HiddenType, p.lastIndexLayer+1)
+		lenLayer := copy(layer, tmp)
 
 		bias := 0
 		if p.Conf.Bias {
@@ -253,15 +253,15 @@ func (p *perceptron) init(lenInput int, lenTarget ...interface{}) bool {
 		}
 		p.weight = &weight{isInitWeight: false}
 		p.neuron = make([][]*neuron, lenLayer)
-		p.axon   = make([][][]*axon, lenLayer)
+		p.axon = make([][][]*axon, lenLayer)
 		for i, l := range layer {
 			p.neuron[i] = make([]*neuron, l)
-			p.axon[i]   = make([][]*axon, l)
+			p.axon[i] = make([][]*axon, l)
 			for j := 0; j < int(l); j++ {
 				if i == 0 {
-					p.axon[i][j] = make([]*axon, p.lenInput + bias)
+					p.axon[i][j] = make([]*axon, p.lenInput+bias)
 				} else {
-					p.axon[i][j] = make([]*axon, int(layer[i - 1]) + bias)
+					p.axon[i][j] = make([]*axon, int(layer[i-1])+bias)
 				}
 			}
 		}
@@ -308,8 +308,8 @@ func (p *perceptron) initAxon() {
 						p.axon[i][j][k].synapse["input"] = biasType(true)
 					}
 				} else {
-					if k < len(p.axon[i - 1]) {
-						p.axon[i][j][k].synapse["input"] = p.neuron[i - 1][k]
+					if k < len(p.axon[i-1]) {
+						p.axon[i][j][k].synapse["input"] = p.neuron[i-1][k]
 					} else {
 						p.axon[i][j][k].synapse["input"] = biasType(true)
 					}
@@ -348,7 +348,7 @@ func (p *perceptron) calcNeuron(input []float64) {
 			}(w)
 		}
 		for range v {
-			<- wait
+			<-wait
 		}
 	}
 }
@@ -359,7 +359,8 @@ func (p *perceptron) calcLoss(target []float64) (loss float64) {
 		if miss, ok := v.specific.(floatType); ok {
 			miss = floatType(target[i]) - v.value
 			switch p.Conf.LossMode {
-			default: fallthrough
+			default:
+				fallthrough
 			case ModeMSE, ModeRMSE:
 				loss += math.Pow(float64(miss), 2)
 			case ModeARCTAN:
@@ -385,7 +386,7 @@ func (p *perceptron) calcMiss(input []float64) {
 			go func(j int, n *neuron) {
 				if miss, ok := n.specific.(floatType); ok {
 					miss = 0
-					for _, w := range p.neuron[i + 1] {
+					for _, w := range p.neuron[i+1] {
 						if m, ok := w.specific.(floatType); ok {
 							miss += m * w.axon[j].weight
 						}
@@ -397,7 +398,7 @@ func (p *perceptron) calcMiss(input []float64) {
 			}(j, v)
 		}
 		for range p.neuron[i] {
-			<- wait
+			<-wait
 		}
 	}
 }
@@ -420,7 +421,7 @@ func (p *perceptron) calcAxon(input []float64) {
 				}(w)
 			}
 			for range v {
-				<- wait
+				<-wait
 			}
 		}
 	}
@@ -553,8 +554,13 @@ func (p *perceptron) reInit() {
 	if p.Conf.Bias {
 		bias = 1
 	}
+	length := len(p.Conf.Weight) - 1
+	p.Conf.HiddenLayer = make(HiddenType, length)
+	for i := range p.Conf.HiddenLayer {
+		p.Conf.HiddenLayer[i] = uint(len(p.Conf.Weight[i]))
+	}
 	if n, ok := p.Architecture.(*NN); ok {
-		n.IsInit = p.init(len(p.Conf.Weight[0][0]) - bias, len(p.Conf.Weight[len(p.Conf.Weight) - 1]))
+		n.IsInit = p.init(len(p.Conf.Weight[0][0]) - bias, len(p.Conf.Weight[length]))
 	}
 }
 
@@ -617,7 +623,7 @@ func (p *perceptron) writeReport(report *report) {
 		default:
 			t = "Hidden layer"
 		}
-		printFormat("%s%d %s size: %d\n%sNeurons:\t", s, i + 1, t, len(p.neuron[i]), s)
+		printFormat("%s%d %s size: %d\n%sNeurons:\t", s, i+1, t, len(p.neuron[i]), s)
 		for _, w := range v {
 			printFormat("  %11.8f", w.value)
 		}
@@ -632,7 +638,7 @@ func (p *perceptron) writeReport(report *report) {
 	printFormat("%sAxons (weights)\n%s", s, s)
 	for _, u := range p.axon {
 		for i, v := range u {
-			printFormat("%d", i + 1)
+			printFormat("%d", i+1)
 			for _, w := range v {
 				printFormat("\t%11.8f", w.weight)
 			}

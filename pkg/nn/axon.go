@@ -35,7 +35,7 @@ func (a *axon) getSynapseInput() (input floatType) {
 }
 
 // weight
-type weight struct{
+type weight struct {
 	isInitWeight bool
 }
 

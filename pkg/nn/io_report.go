@@ -8,8 +8,8 @@ import (
 )
 
 type report struct {
-	file	*os.File
-	args	[]interface{}
+	file *os.File
+	args []interface{}
 }
 
 func Report(file *os.File, args ...interface{}) pkg.Writer {

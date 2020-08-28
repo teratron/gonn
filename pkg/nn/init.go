@@ -16,13 +16,13 @@ func init() {
 // New returns a new neural network instance with the default parameters
 func New(reader ...pkg.Reader) NeuralNetwork {
 	n := &NN{
-		Architecture:	&architecture{},
-		IsInit:			false,
-		IsTrain:		false,
-		json:			"",
-		xml:			"",
-		csv:			"",
-		db:				"",
+		Architecture: &architecture{},
+		IsInit:       false,
+		IsTrain:      false,
+		json:         "",
+		xml:          "",
+		csv:          "",
+		db:           "",
 	}
 	if len(reader) > 0 {
 		switch r := reader[0].(type) {

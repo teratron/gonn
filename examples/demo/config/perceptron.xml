@@ -2,50 +2,61 @@
 	<architecture>
 		<perceptron>
 			<hiddenLayer>
-				<layer>3</layer>
 				<layer>5</layer>
+				<layer>3</layer>
 			</hiddenLayer>
 			<bias>true</bias>
 			<activationMode>3</activationMode>
 			<lossMode>0</lossMode>
-			<lossLevel>0.0001</lossLevel>
+			<lossLevel>0.01</lossLevel>
 			<rate>0.3</rate>
 			<weight>
-				<weight>0.5005667</weight>
-				<weight>0.50076383</weight>
-				<weight>0.5002464</weight>
-				<weight>0.5005667</weight>
-				<weight>0.50076383</weight>
-				<weight>0.5002464</weight>
-				<weight>0.5005667</weight>
-				<weight>0.50076383</weight>
-				<weight>0.5002464</weight>
-				<weight>0.50251657</weight>
-				<weight>0.50251657</weight>
-				<weight>0.50251657</weight>
-				<weight>0.50261915</weight>
-				<weight>0.50251657</weight>
-				<weight>0.50251657</weight>
-				<weight>0.50251657</weight>
-				<weight>0.50261915</weight>
-				<weight>0.50251657</weight>
-				<weight>0.50251657</weight>
-				<weight>0.50251657</weight>
-				<weight>0.50261915</weight>
-				<weight>0.50251657</weight>
-				<weight>0.50251657</weight>
-				<weight>0.50251657</weight>
-				<weight>0.50261915</weight>
-				<weight>0.50251657</weight>
-				<weight>0.50251657</weight>
-				<weight>0.50251657</weight>
-				<weight>0.50261915</weight>
-				<weight>0.5417358</weight>
-				<weight>0.5417358</weight>
-				<weight>0.5417358</weight>
-				<weight>0.5417358</weight>
-				<weight>0.5417358</weight>
-				<weight>0.547726</weight>
+				<weight>0.5600778</weight>
+				<weight>0.47511196</weight>
+				<weight>0.4597545</weight>
+				<weight>0.3615165</weight>
+				<weight>0.5600778</weight>
+				<weight>0.47511196</weight>
+				<weight>0.4597545</weight>
+				<weight>0.3615165</weight>
+				<weight>0.5600778</weight>
+				<weight>0.47511196</weight>
+				<weight>0.4597545</weight>
+				<weight>0.3615165</weight>
+				<weight>0.5600778</weight>
+				<weight>0.47511196</weight>
+				<weight>0.4597545</weight>
+				<weight>0.3615165</weight>
+				<weight>0.5600778</weight>
+				<weight>0.47511196</weight>
+				<weight>0.4597545</weight>
+				<weight>0.3615165</weight>
+				<weight>0.25630364</weight>
+				<weight>0.25630364</weight>
+				<weight>0.25630364</weight>
+				<weight>0.25630364</weight>
+				<weight>0.25630364</weight>
+				<weight>0.050994154</weight>
+				<weight>0.25630364</weight>
+				<weight>0.25630364</weight>
+				<weight>0.25630364</weight>
+				<weight>0.25630364</weight>
+				<weight>0.25630364</weight>
+				<weight>0.050994154</weight>
+				<weight>0.25630364</weight>
+				<weight>0.25630364</weight>
+				<weight>0.25630364</weight>
+				<weight>0.25630364</weight>
+				<weight>0.25630364</weight>
+				<weight>0.050994154</weight>
+				<weight>-0.24277425</weight>
+				<weight>-0.24277425</weight>
+				<weight>-0.24277425</weight>
+				<weight>0.194031</weight>
+				<weight>-0.28121683</weight>
+				<weight>-0.28121683</weight>
+				<weight>-0.28121683</weight>
+				<weight>0.18430372</weight>
 			</weight>
 		</perceptron>
 	</architecture>

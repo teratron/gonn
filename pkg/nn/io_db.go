@@ -19,5 +19,5 @@ func (d dbType) Write(p []byte) (n int, err error) {
 	return
 }*/
 
-func (d dbType) Read(pkg.Reader) {}
+func (d dbType) Read(pkg.Reader)     {}
 func (d dbType) Write(...pkg.Writer) {}

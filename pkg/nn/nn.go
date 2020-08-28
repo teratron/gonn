@@ -22,16 +22,16 @@ type NeuralNetwork interface {
 //
 type NN struct {
 	// Architecture of neural network
-	Architecture			`json:"architecture,omitempty" xml:"architecture,omitempty"`
+	Architecture `json:"architecture,omitempty" xml:"architecture,omitempty"`
 
 	// State of the neural network
-	IsInit       bool		`json:"-" xml:"-"`				// Neural network initializing flag
-	IsTrain      bool		`json:"isTrain" xml:"isTrain"`	// Neural network training flag
+	IsInit  bool `json:"-" xml:"-"`             // Neural network initializing flag
+	IsTrain bool `json:"isTrain" xml:"isTrain"` // Neural network training flag
 
-	json		string
-	xml			string
-	csv			string
-	db			dbType
+	json string
+	xml  string
+	csv  string
+	db   dbType
 }
 
 type NNN struct {

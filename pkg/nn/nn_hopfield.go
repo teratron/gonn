@@ -14,14 +14,14 @@ var _ NeuralNetwork = (*hopfield)(nil)
 }*/
 
 type hopfield struct {
-	Architecture						`json:"-" xml:"-"`
-	Parameter							`json:"-" xml:"-"`
-	Constructor							`json:"-" xml:"-"`
+	Architecture `json:"-" xml:"-"`
+	Parameter    `json:"-" xml:"-"`
+	Constructor  `json:"-" xml:"-"`
 
-	Configuration struct{
-		Energy  floatType
-		Weight  [][]floatType			`json:"weights" xml:"weight"`
-	}									`json:"hopfield" xml:"hopfield"`
+	Configuration struct {
+		Energy floatType
+		Weight [][]floatType `json:"weights" xml:"weight"`
+	} `json:"hopfield" xml:"hopfield"`
 
 	// Matrix
 	neuron []*neuron

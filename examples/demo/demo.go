@@ -28,29 +28,29 @@ func main() {
 		nn.Rate(nn.DefaultRate))
 
 	// Training dataset
-	dataSet   := []float64{.27, .31, .52, .66, .81, .13, .2, .49, .11, .73, .28, .43}
-	numInput  := 3	// Number of input data
-	numOutput := 2	// Number of output data
+	dataSet := []float64{.27, .31, .52, .66, .81, .13, .2, .49, .11, .73, .28, .43}
+	numInput := 3  // Number of input data
+	numOutput := 2 // Number of output data
 
 	// Training
 	minLoss := 1.
 	for epoch := 1; epoch <= 1000; epoch++ {
-		for i := numInput; i <= len(dataSet) - numOutput; i++ {
-			_, _ = n.Train(dataSet[i - numInput:i], dataSet[i:i + numOutput])
+		for i := numInput; i <= len(dataSet)-numOutput; i++ {
+			_, _ = n.Train(dataSet[i-numInput:i], dataSet[i:i+numOutput])
 		}
 
 		// Verifying
 		sum := 0.
 		num := 0
-		for i := numInput; i <= len(dataSet) - numOutput; i++ {
-			loss := n.Verify(dataSet[i - numInput:i], dataSet[i:i + numOutput])
+		for i := numInput; i <= len(dataSet)-numOutput; i++ {
+			loss := n.Verify(dataSet[i-numInput:i], dataSet[i:i+numOutput])
 			sum += loss
 			num++
 		}
 
 		// Average error for the entire epoch
 		sum /= float64(num)
-		if epoch == 1 || epoch == 10 || epoch % 100 == 0 || epoch == 1000 {
+		if epoch == 1 || epoch == 10 || epoch%100 == 0 || epoch == 1000 {
 			fmt.Printf("Epoch: %v\tError: %.8f\n", epoch, sum)
 		}
 

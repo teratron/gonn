@@ -12,15 +12,15 @@ type Application interface {
 }
 
 type app struct {
-	language	pkg.LangType
-	logging		pkg.LogModeType
+	language pkg.LangType
+	logging  pkg.LogModeType
 }
 
 // New returns a new application instance with the default parameters
 func App() *app {
 	a := &app{
-		language:	"en",
-		logging:	1,
+		language: "en",
+		logging:  1,
 	}
 	return a
 }

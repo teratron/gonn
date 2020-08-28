@@ -20,5 +20,5 @@ func (c csvType) Write(p []byte) (n int, err error) {
 	return
 }*/
 
-func (c csvType) Read(pkg.Reader) {}
+func (c csvType) Read(pkg.Reader)     {}
 func (c csvType) Write(...pkg.Writer) {}
