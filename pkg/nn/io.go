@@ -21,17 +21,36 @@ type Filer interface {
 func File(filename string) *os.File {
 	/*file, err := os.Open(filename)
 	if err != nil {
-		if os.IsNotExist(err) {
-			log.Println("file not found:", filename)
-			os.Exit(1)
-		}
-		log.Println("file open error:", err)
-		os.Exit(1)
+		errorOS(err, filename)
 	}*/
 	file, err := os.Create(filename)
 	if err != nil {
-		log.Println("file create error:", err)
-		os.Exit(1)
+		errorOS(err)
 	}
 	return file
+}
+
+// errorOS
+func errorOS(err error, args ...interface{}) {
+	if len(args) > 0 {
+		for _, a := range args {
+			switch v := a.(type) {
+			case string:
+				if os.IsNotExist(err) {
+					log.Println("file not found:", v)
+				}
+			}
+		}
+	}
+	switch e := err.(type) {
+	case *os.LinkError:
+		log.Println("link error:", e)
+	case *os.PathError:
+		log.Println("path error:", e)
+	case *os.SyscallError:
+		log.Println("syscall error:", e)
+	default:
+		log.Println("file error:", err)
+	}
+	os.Exit(1)
 }

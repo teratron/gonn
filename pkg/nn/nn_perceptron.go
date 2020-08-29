@@ -567,9 +567,9 @@ func (p *perceptron) reInit() {
 // readJSON
 func (p *perceptron) readJSON(value interface{}) {
 	if b, err := json.Marshal(&value); err != nil {
-		log.Fatal("JSON marshaling failed: ", err)
+		errorJSON(err)
 	} else if err = json.Unmarshal(b, &p.Conf); err != nil {
-		log.Fatal("JSON unmarshal failed: ", err)
+		errorJSON(err)
 	}
 	p.reInit()
 	err := p.pasteWeight()

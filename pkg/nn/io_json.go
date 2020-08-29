@@ -29,15 +29,14 @@ func (j jsonType) Read(reader pkg.Reader) {
 		}
 		b, err := ioutil.ReadFile(filename)
 		if err != nil {
-			log.Println("Can't load json: ", err)
+			log.Println("Can't load json:", err)
 		}
 		//fmt.Println(string(b))
 
 		// Декодируем json в NN
 		err = json.Unmarshal(b, &n)
 		if err != nil {
-			log.Println(err)
-			os.Exit(1)
+			errorJSON(err)
 		}
 		//fmt.Println(n)
 		n.Architecture = nil
@@ -48,17 +47,7 @@ func (j jsonType) Read(reader pkg.Reader) {
 		var data interface{}
 		err = json.Unmarshal(b, &data)
 		if err != nil {
-			switch e := err.(type) {
-			case *json.SyntaxError:
-				log.Println("syntax json error:", e, "offset:", e.Offset)
-				os.Exit(1)
-			case *json.UnmarshalTypeError:
-				log.Println("unmarshal json error:", e, "offset:", e.Offset)
-				os.Exit(1)
-			default:
-				log.Println("json error:", err)
-				os.Exit(1)
-			}
+			errorJSON(err)
 		}
 		//fmt.Println(data)
 
@@ -67,14 +56,13 @@ func (j jsonType) Read(reader pkg.Reader) {
 				if key == "architecture" {
 					b, err = json.Marshal(&v)
 					if err != nil {
-						log.Println(err)
+						errorJSON(err)
 					}
 					//fmt.Println(string(b))
 
 					err = json.Unmarshal(b, &data)
 					if err != nil {
-						log.Println(err)
-						os.Exit(1)
+						errorJSON(err)
 					}
 					//fmt.Println(data)
 
@@ -120,7 +108,7 @@ func (j jsonType) Write(writer ...pkg.Writer) {
 				log.Println("Not trained network")
 			}
 			if b, err := json.MarshalIndent(&n, "", "\t"); err != nil {
-				log.Println("JSON marshaling failed: ", err)
+				errorJSON(err)
 			} else if err = ioutil.WriteFile(filename, b, os.ModePerm); err != nil {
 				log.Println("Can't write file:", err)
 			}
@@ -128,4 +116,19 @@ func (j jsonType) Write(writer ...pkg.Writer) {
 	} else {
 		pkg.Log("Empty write", true) // !!!
 	}
+}
+
+// errorJSON
+func errorJSON(err error) {
+	switch e := err.(type) {
+	case *json.SyntaxError:
+		log.Println("syntax json error:", e, "offset:", e.Offset)
+	case *json.UnmarshalTypeError:
+		log.Println("unmarshal json error:", e, "offset:", e.Offset)
+	case *json.MarshalerError:
+		log.Println("marshaling json error:", e)
+	default:
+		log.Println("json error:", err)
+	}
+	os.Exit(1)
 }
