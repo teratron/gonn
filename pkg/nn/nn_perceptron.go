@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"encoding/xml"
+	"errors"
 	"fmt"
 	"log"
 	"math"
@@ -127,10 +128,10 @@ func (p *perceptron) Set(args ...pkg.Setter) {
 		case rateType:
 			p.Conf.Rate = floatType(v)
 		case *weight:
-			/*err := p.setWeight(v)
+			err := p.setWeight(v.array.(float3Type))
 			if err != nil {
 				log.Println(err)
-			}*/
+			}
 		default:
 			pkg.Log("This type is missing for Perceptron Neural Network", true) // !!!
 			log.Printf("\tset: %T %v\n", v, v)                                  // !!!
@@ -156,8 +157,8 @@ func (p *perceptron) Get(args ...pkg.Getter) pkg.GetSetter {
 			return lossLevelType(p.Conf.LossLevel)
 		case rateType:
 			return p.Conf.Rate
-		/*case *weight:
-		return p.getWeight()*/
+		case *weight:
+			return p.getWeight()
 		default:
 			pkg.Log("This type is missing for Perceptron Neural Network", true) // !!!
 			log.Printf("\tget: %T %v\n", args[0], args[0])                      // !!!
@@ -485,13 +486,13 @@ func (p *perceptron) getWeight() (weight float3Type) {
 
 // setWeight
 func (p *perceptron) setWeight(weight float3Type) (err error) {
+	err = errors.New("")
 	/*if len(weight) == len(p.axon) {
 		if len(weight[]) == len(p.axon[]) {
 
 		}
 	}*/
 	// TODO: make error
-
 	for i, u := range p.axon {
 		for j, v := range u {
 			for k, w := range v {
@@ -499,6 +500,7 @@ func (p *perceptron) setWeight(weight float3Type) (err error) {
 			}
 		}
 	}
+	err = fmt.Errorf("setWeight error")
 	return
 }
 
@@ -601,7 +603,7 @@ func (p *perceptron) writeReport(report *report) {
 
 	printFormat := func(format string, a ...interface{}) {
 		if _, err := fmt.Fprintf(b, format, a...); err != nil {
-			log.Println(err)
+			log.Println("error:", err)
 		}
 	}
 

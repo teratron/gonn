@@ -37,13 +37,19 @@ func (a *axon) getSynapseInput() (input floatType) {
 // weight
 type weight struct {
 	isInitWeight bool
+	array        Floater
 }
 
 // Weight
 func Weight(weights ...Floater) pkg.Controller {
 	if len(weights) > 0 {
-		if w, ok := weights[0].(pkg.Controller); ok {
-			return w
+		switch weights[0].(type) {
+		case Floater:
+			return &weight{array: weights[0]}
+		default:
+			if w, ok := weights[0].(pkg.Controller); ok {
+				return w
+			}
 		}
 	} else {
 		return &weight{}

@@ -39,6 +39,8 @@ func errorOS(err error, args ...interface{}) {
 				if os.IsNotExist(err) {
 					log.Println("file not found:", v)
 				}
+			default:
+				log.Println("file error:", err, a)
 			}
 		}
 	}
@@ -50,7 +52,9 @@ func errorOS(err error, args ...interface{}) {
 	case *os.SyscallError:
 		log.Println("syscall error:", e)
 	default:
-		log.Println("file error:", err)
+		if len(args) == 0 {
+			log.Println("file error:", err)
+		}
 	}
 	os.Exit(1)
 }
