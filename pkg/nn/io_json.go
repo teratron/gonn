@@ -2,6 +2,7 @@ package nn
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -25,18 +26,18 @@ func (j jsonType) Read(reader pkg.Reader) {
 	if n, ok := reader.(*NN); ok {
 		filename := string(j)
 		if len(filename) == 0 {
-			log.Println("Отсутствует название файла нейросети для JSON")
+			errJSON(fmt.Errorf("file json is missing\n"))
 		}
 		b, err := ioutil.ReadFile(filename)
 		if err != nil {
-			log.Println("Can't load json:", err)
+			errOS(err)
 		}
 		//fmt.Println(string(b))
 
 		// Декодируем json в NN
 		err = json.Unmarshal(b, &n)
 		if err != nil {
-			errorJSON(err)
+			errJSON(err)
 		}
 		//fmt.Println(n)
 		n.Architecture = nil
@@ -47,7 +48,7 @@ func (j jsonType) Read(reader pkg.Reader) {
 		var data interface{}
 		err = json.Unmarshal(b, &data)
 		if err != nil {
-			errorJSON(err)
+			errJSON(err)
 		}
 		//fmt.Println(data)
 
@@ -56,13 +57,13 @@ func (j jsonType) Read(reader pkg.Reader) {
 				if key == "architecture" {
 					b, err = json.Marshal(&v)
 					if err != nil {
-						errorJSON(err)
+						errJSON(err)
 					}
 					//fmt.Println(string(b))
 
 					err = json.Unmarshal(b, &data)
 					if err != nil {
-						errorJSON(err)
+						errJSON(err)
 					}
 					//fmt.Println(data)
 
@@ -105,12 +106,13 @@ func (j jsonType) Write(writer ...pkg.Writer) {
 			if n.IsTrain {
 				n.Copy(Weight())
 			} else {
-				log.Println("Not trained network")
+				log.Println("network isn't trained")
+				errNN(ErrNotTrained)
 			}
 			if b, err := json.MarshalIndent(&n, "", "\t"); err != nil {
-				errorJSON(err)
+				errJSON(err)
 			} else if err = ioutil.WriteFile(filename, b, os.ModePerm); err != nil {
-				log.Println("Can't write file:", err)
+				errOS(err)
 			}
 		}
 	} else {
@@ -118,8 +120,8 @@ func (j jsonType) Write(writer ...pkg.Writer) {
 	}
 }
 
-// errorJSON
-func errorJSON(err error) {
+// errJSON
+func errJSON(err error) {
 	switch e := err.(type) {
 	case *json.SyntaxError:
 		log.Println("syntax json error:", e, "offset:", e.Offset)

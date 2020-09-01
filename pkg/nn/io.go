@@ -25,25 +25,13 @@ func File(filename string) *os.File {
 	}*/
 	file, err := os.Create(filename)
 	if err != nil {
-		errorOS(err)
+		errOS(err)
 	}
 	return file
 }
 
-// errorOS
-func errorOS(err error, args ...interface{}) {
-	if len(args) > 0 {
-		for _, a := range args {
-			switch v := a.(type) {
-			case string:
-				if os.IsNotExist(err) {
-					log.Println("file not found:", v)
-				}
-			default:
-				log.Println("file error:", err, a)
-			}
-		}
-	}
+// errOS
+func errOS(err error) {
 	switch e := err.(type) {
 	case *os.LinkError:
 		log.Println("link error:", e)
@@ -52,9 +40,7 @@ func errorOS(err error, args ...interface{}) {
 	case *os.SyscallError:
 		log.Println("syscall error:", e)
 	default:
-		if len(args) == 0 {
-			log.Println("file error:", err)
-		}
+		log.Println("file error:", err)
 	}
 	os.Exit(1)
 }

@@ -218,14 +218,6 @@ func (p *perceptron) Write(writer ...pkg.Writer) {
 		switch v := w.(type) {
 		case *report:
 			p.writeReport(v)
-		/*case jsonType:
-			p.writeJSON(string(v))
-		case xmlType:
-			p.writeXML(string(v))
-		case csvType:
-			p.writeCSV(v)
-		case dbType:
-			p.writeDB(v)*/
 		default:
 			pkg.Log("This type is missing for write", true) // !!!
 			log.Printf("\tWrite: %T %v\n", w, w)            // !!!
@@ -562,16 +554,16 @@ func (p *perceptron) reInit() {
 		p.Conf.HiddenLayer[i] = uint(len(p.Conf.Weight[i]))
 	}
 	if n, ok := p.Architecture.(*NN); ok {
-		n.IsInit = p.init(len(p.Conf.Weight[0][0]) - bias, len(p.Conf.Weight[length]))
+		n.IsInit = p.init(len(p.Conf.Weight[0][0])-bias, len(p.Conf.Weight[length]))
 	}
 }
 
 // readJSON
 func (p *perceptron) readJSON(value interface{}) {
 	if b, err := json.Marshal(&value); err != nil {
-		errorJSON(err)
+		errJSON(err)
 	} else if err = json.Unmarshal(b, &p.Conf); err != nil {
-		errorJSON(err)
+		errJSON(err)
 	}
 	p.reInit()
 	err := p.pasteWeight()
