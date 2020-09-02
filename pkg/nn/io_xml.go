@@ -2,6 +2,7 @@ package nn
 
 import (
 	"encoding/xml"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -21,17 +22,17 @@ func (j xmlType) Read(reader pkg.Reader) {
 	if n, ok := reader.(*nn); ok {
 		filename := string(j)
 		if len(filename) == 0 {
-			log.Fatal("Отсутствует название файла нейросети для XML")
+			errXML(fmt.Errorf("file xml is missing\n"))
 		}
 		b, err := ioutil.ReadFile(filename)
 		if err != nil {
-			log.Println("Can't load xml:", err)
+			errOS(err)
 		}
 		//fmt.Println(string(b))
 
 		err = xml.Unmarshal(b, &n)
 		if err != nil {
-			log.Println(err)
+			errXML(err)
 		}
 		//fmt.Println(n)
 		n.Architecture = nil
@@ -41,7 +42,7 @@ func (j xmlType) Read(reader pkg.Reader) {
 		var data interface{}
 		err = xml.Unmarshal(b, &data)
 		if err != nil {
-			log.Println(err)
+			errXML(err)
 		}
 		//fmt.Println(data)
 
@@ -50,12 +51,12 @@ func (j xmlType) Read(reader pkg.Reader) {
 				if key == "architecture" {
 					b, err = xml.Marshal(&v)
 					if err != nil {
-						log.Println(err)
+						errXML(err)
 					}
 
 					err = xml.Unmarshal(b, &data)
 					if err != nil {
-						log.Println(err)
+						errXML(err)
 					}
 
 					for k, v := range data.(map[string]interface{}) {
@@ -75,6 +76,7 @@ func (j xmlType) Read(reader pkg.Reader) {
 								a.readXML(v)
 							}
 						default:
+							errNN(ErrNotRecognized)
 						}
 					}
 				}
@@ -99,15 +101,34 @@ func (j xmlType) Write(writer ...pkg.Writer) {
 			if n.IsTrain {
 				n.Copy(Weight())
 			} else {
-				log.Println("Not trained network")
+				//log.Println("Not trained network")
+				errNN(ErrNotTrained)
 			}
 			if b, err := xml.MarshalIndent(&n, "", "\t"); err != nil {
-				log.Println("XML marshaling failed:", err)
+				errXML(err)
 			} else if err = ioutil.WriteFile(filename, b, os.ModePerm); err != nil {
-				log.Println("Can't write file:", err)
+				errOS(err)
 			}
 		}
 	} else {
-		pkg.Log("Empty write", true) // !!!
+		//pkg.Log("Empty write", true) // !!!
+		errNN(ErrEmptyWrite)
 	}
+}
+
+// errXML
+func errXML(err error) {
+	switch e := err.(type) {
+	case *xml.SyntaxError:
+		log.Println("syntax xml error:", e, "line:", e.Line)
+	case *xml.UnsupportedTypeError:
+		log.Println("unsupported type xml error:", e)
+	case *xml.TagPathError:
+		log.Println("tag path xml error:", e)
+	case *xml.UnmarshalError:
+		log.Println("unmarshal xml error:", e)
+	default:
+		log.Println("xml error:", err)
+	}
+	os.Exit(1)
 }

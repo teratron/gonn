@@ -4,11 +4,13 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"os"
 )
 
 var (
-	ErrNotTrained = errors.New("network isn't trained")
+	ErrNotTrained    = errors.New("network is not trained")
+	ErrNotRecognized = errors.New("network is not recognized")
+	ErrMissingType   = errors.New("type is missing")
+	ErrNoTarget      = errors.New("no target data")
 )
 
 type Response struct {
@@ -16,6 +18,12 @@ type Response struct {
 		Id   int    `json:"id" xml:"id"`
 		Text string `json:"text" xml:"text"`
 	} `json:"error,omitempty"`
+}
+
+type nnError struct {
+	Err     error
+	Message string
+	Code    int
 }
 
 /*func myErrorB() error {
@@ -29,6 +37,10 @@ func (r *Response) Error() string {
 	return fmt.Sprintf("%d: %s\n", r.Err.Id, r.Err.Text)
 }
 
+func (e *nnError) Error() string {
+	return fmt.Sprintf("%d: %s %v\n", e.Code, e.Message, e.Err)
+}
+
 // errNN
 func errNN(err error) {
 	switch e := err.(type) {
@@ -39,7 +51,6 @@ func errNN(err error) {
 	case :
 		log.Println("marshaling json error:", e)*/
 	default:
-		log.Println("nn error:", err)
+		log.Println("error:", err)
 	}
-	os.Exit(1)
 }

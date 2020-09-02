@@ -31,9 +31,9 @@ type nn struct {
 	json string
 	xml  string
 	csv  string
-	db   dbType
+	db   string
 }
 
-type NNN struct {
+type NN struct {
 	*nn
 }

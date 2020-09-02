@@ -160,8 +160,7 @@ func (p *perceptron) Get(args ...pkg.Getter) pkg.GetSetter {
 		case *weight:
 			return p.getWeight()
 		default:
-			pkg.Log("This type is missing for Perceptron Neural Network", true) // !!!
-			log.Printf("\tget: %T %v\n", args[0], args[0])                      // !!!
+			errNN(fmt.Errorf("%v for perceptron neural network\n", ErrMissingType))
 			return nil
 		}
 	} else {
@@ -178,37 +177,29 @@ func (p *perceptron) Copy(copier pkg.Copier) {
 	case *weight:
 		p.copyWeight()
 	default:
-		pkg.Log("This type is missing for copy", true) // !!!
-		log.Printf("\tWrite: %T %v\n", c, c)           // !!!
+		errNN(fmt.Errorf("%v for copy: %v\n", ErrMissingType, c))
 	}
 }
 
 // Paste
-func (p *perceptron) Paste(paster pkg.Paster) (err error) {
+func (p *perceptron) Paste(paster pkg.Paster) {
+	var err error
 	switch v := paster.(type) {
 	case *weight:
-		return p.pasteWeight()
+		err = p.pasteWeight()
 	default:
-		pkg.Log("This type is missing for paste", true) // !!!
-		log.Printf("\tWrite: %T %v\n", v, v)            // !!!
+		errNN(fmt.Errorf("%v for paste: %v\n", ErrMissingType, v))
 	}
-	return
+	if err != nil {
+		// TODO: error
+	}
 }
 
 // Read
 func (p *perceptron) Read(reader pkg.Reader) {
 	switch r := reader.(type) {
-	/*case jsonType:
-		p.readJSON(string(r))
-	case xml:
-		p.readXML(v)
-	case xml:
-		p.readCSV(v)
-	case db:
-		p.readDB(v)*/
 	default:
-		pkg.Log("This type is missing for write", true) // !!!
-		log.Printf("\tWrite: %T %v\n", r, r)            // !!!
+		errNN(fmt.Errorf("%v for read: %v\n", ErrMissingType, r))
 	}
 }
 
@@ -219,13 +210,12 @@ func (p *perceptron) Write(writer ...pkg.Writer) {
 		case *report:
 			p.writeReport(v)
 		default:
-			pkg.Log("This type is missing for write", true) // !!!
-			log.Printf("\tWrite: %T %v\n", w, w)            // !!!
+			errNN(fmt.Errorf("%v for write: %v\n", ErrMissingType, w))
 		}
 	}
 }
 
-// init Initialization
+// init initialize
 func (p *perceptron) init(lenInput int, lenTarget ...interface{}) bool {
 	if len(lenTarget) > 0 {
 		var tmp HiddenType
@@ -262,7 +252,7 @@ func (p *perceptron) init(lenInput int, lenTarget ...interface{}) bool {
 		p.initAxon()
 		return true
 	} else {
-		pkg.Log("No target data", true) // !!!
+		errNN(ErrNoTarget)
 		return false
 	}
 }
@@ -566,8 +556,7 @@ func (p *perceptron) readJSON(value interface{}) {
 		errJSON(err)
 	}
 	p.reInit()
-	err := p.pasteWeight()
-	if err != nil {
+	if err := p.pasteWeight(); err != nil {
 		log.Println(err)
 	}
 }
@@ -575,13 +564,12 @@ func (p *perceptron) readJSON(value interface{}) {
 // readXML
 func (p *perceptron) readXML(value interface{}) {
 	if b, err := xml.Marshal(&value); err != nil {
-		log.Fatal("XML marshaling failed: ", err)
+		errXML(err)
 	} else if err = xml.Unmarshal(b, &p.Conf); err != nil {
-		log.Fatal("XML unmarshal failed: ", err)
+		errXML(err)
 	}
 	p.reInit()
-	err := p.pasteWeight()
-	if err != nil {
+	if err := p.pasteWeight(); err != nil {
 		log.Println(err)
 	}
 }

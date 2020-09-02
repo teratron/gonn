@@ -80,8 +80,7 @@ func (j jsonType) Read(reader pkg.Reader) {
 								a.readJSON(v)
 							}
 						default:
-							log.Println("Нейронная сеть не распознана")
-
+							errNN(ErrNotRecognized)
 						}
 					}
 				}
@@ -106,7 +105,6 @@ func (j jsonType) Write(writer ...pkg.Writer) {
 			if n.IsTrain {
 				n.Copy(Weight())
 			} else {
-				log.Println("network isn't trained")
 				errNN(ErrNotTrained)
 			}
 			if b, err := json.MarshalIndent(&n, "", "\t"); err != nil {
@@ -116,7 +114,7 @@ func (j jsonType) Write(writer ...pkg.Writer) {
 			}
 		}
 	} else {
-		pkg.Log("Empty write", true) // !!!
+		errNN(ErrEmptyWrite)
 	}
 }
 

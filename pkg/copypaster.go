@@ -11,5 +11,5 @@ type Copier interface {
 }
 
 type Paster interface {
-	Paste(Paster) error
+	Paste(Paster)
 }

@@ -29,7 +29,7 @@ func (a *axon) getSynapseInput() (input floatType) {
 	case *neuron:
 		input = s.value
 	default:
-		panic("error!!!") // !!!
+		// TODO: error
 	}
 	return
 }
@@ -94,13 +94,12 @@ func (w *weight) Copy(copier pkg.Copier) {
 }
 
 // Paste
-func (w *weight) Paste(paster pkg.Paster) (err error) {
+func (w *weight) Paste(paster pkg.Paster) {
 	if n, ok := paster.(*nn); ok {
 		if a, ok := n.Architecture.(NeuralNetwork); ok {
-			err = a.Paste(w)
+			a.Paste(w)
 		}
 	}
-	return
 }
 
 // Read

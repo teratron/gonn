@@ -8,6 +8,6 @@ func (a *app) Copy(copier pkg.Copier) {
 }
 
 // Paste
-func (a *app) Paste(paster pkg.Paster) error {
-	return paster.Paste(a)
+func (a *app) Paste(paster pkg.Paster) {
+	paster.Paste(a)
 }

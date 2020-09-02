@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/zigenzoog/gonn/pkg/nn"
 )
@@ -28,8 +27,8 @@ func main() {
 		nn.Rate(nn.DefaultRate))
 
 	// Training dataset
-	dataSet   := []float64{.27, .31, .52, .66, .81, .13, .2, .49, .11, .73, .28, .43}
-	numInput  := 3  // Number of input data
+	dataSet := []float64{.27, .31, .52, .66, .81, .13, .2, .49, .11, .73, .28, .43}
+	numInput := 3  // Number of input data
 	numOutput := 2 // Number of output data
 
 	// Training
@@ -69,10 +68,7 @@ func main() {
 	}
 
 	// Returning weights for further recording from the buffer
-	err := n.Paste(nn.Weight())
-	if err != nil {
-		log.Println("error: ", err)
-	}
+	n.Paste(nn.Weight())
 
 	// Writing the neural network configuration to a file
 	n.Write(
