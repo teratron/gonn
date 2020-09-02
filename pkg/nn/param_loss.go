@@ -31,11 +31,11 @@ func LossLevel(level ...float64) pkg.GetSetter {
 	}
 }
 
-func (n *NN) LossMode() uint8 {
+func (n *nn) LossMode() uint8 {
 	return n.Architecture.(Parameter).LossMode()
 }
 
-func (n *NN) LossLevel() float64 {
+func (n *nn) LossLevel() float64 {
 	return n.Architecture.(Parameter).LossLevel()
 }
 

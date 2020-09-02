@@ -15,14 +15,14 @@ func Bias(bias ...bool) pkg.GetSetter {
 	}
 }
 
-func (n *NN) Bias() bool {
+func (n *nn) Bias() bool {
 	return n.Architecture.(Parameter).Bias()
 }
 
 // Set
 func (b biasType) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
-		if n, ok := args[0].(*NN); ok && !n.IsInit {
+		if n, ok := args[0].(*nn); ok && !n.IsInit {
 			n.Get().Set(b)
 		}
 	} else {

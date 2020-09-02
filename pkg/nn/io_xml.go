@@ -2,10 +2,11 @@ package nn
 
 import (
 	"encoding/xml"
-	"github.com/zigenzoog/gonn/pkg"
 	"io/ioutil"
 	"log"
 	"os"
+
+	"github.com/zigenzoog/gonn/pkg"
 )
 
 type xmlType string
@@ -17,7 +18,7 @@ func XML(filename ...string) pkg.ReadWriter {
 
 // Read
 func (j xmlType) Read(reader pkg.Reader) {
-	if n, ok := reader.(*NN); ok {
+	if n, ok := reader.(*nn); ok {
 		filename := string(j)
 		if len(filename) == 0 {
 			log.Fatal("Отсутствует название файла нейросети для XML")
@@ -85,7 +86,7 @@ func (j xmlType) Read(reader pkg.Reader) {
 // Write
 func (j xmlType) Write(writer ...pkg.Writer) {
 	if len(writer) > 0 {
-		if n, ok := writer[0].(*NN); ok {
+		if n, ok := writer[0].(*nn); ok {
 			filename := string(j)
 			if len(filename) == 0 {
 				if len(n.xml) > 0 {

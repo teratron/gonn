@@ -5,7 +5,7 @@ import (
 )
 
 // Declare conformity with NeuralNetwork interface
-var _ NeuralNetwork = (*NN)(nil)
+var _ NeuralNetwork = (*nn)(nil)
 
 //
 type NeuralNetwork interface {
@@ -20,7 +20,7 @@ type NeuralNetwork interface {
 }
 
 //
-type NN struct {
+type nn struct {
 	// Architecture of neural network
 	Architecture `json:"architecture,omitempty" xml:"architecture,omitempty"`
 
@@ -35,5 +35,5 @@ type NN struct {
 }
 
 type NNN struct {
-	*NN
+	*nn
 }

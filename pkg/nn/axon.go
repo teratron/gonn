@@ -57,7 +57,7 @@ func Weight(weights ...Floater) pkg.Controller {
 	return nil
 }
 
-func (n *NN) Weight() Floater {
+func (n *nn) Weight() Floater {
 	return n.Architecture.(Parameter).Weight()
 }
 
@@ -86,7 +86,7 @@ func (w *weight) Get(args ...pkg.Getter) pkg.GetSetter {
 
 // Copy
 func (w *weight) Copy(copier pkg.Copier) {
-	if n, ok := copier.(*NN); ok {
+	if n, ok := copier.(*nn); ok {
 		if a, ok := n.Architecture.(NeuralNetwork); ok {
 			a.Copy(w)
 		}
@@ -95,7 +95,7 @@ func (w *weight) Copy(copier pkg.Copier) {
 
 // Paste
 func (w *weight) Paste(paster pkg.Paster) (err error) {
-	if n, ok := paster.(*NN); ok {
+	if n, ok := paster.(*nn); ok {
 		if a, ok := n.Architecture.(NeuralNetwork); ok {
 			err = a.Paste(w)
 		}

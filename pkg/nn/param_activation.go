@@ -1,8 +1,9 @@
 package nn
 
 import (
-	"github.com/zigenzoog/gonn/pkg"
 	"math"
+
+	"github.com/zigenzoog/gonn/pkg"
 )
 
 type activationModeType uint8
@@ -24,7 +25,7 @@ func ActivationMode(mode ...uint8) pkg.GetSetter {
 	}
 }
 
-func (n *NN) ActivationMode() uint8 {
+func (n *nn) ActivationMode() uint8 {
 	return n.Architecture.(Parameter).ActivationMode()
 }
 

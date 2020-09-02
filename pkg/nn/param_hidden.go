@@ -11,14 +11,14 @@ func HiddenLayer(nums ...uint) HiddenType {
 	return nums
 }
 
-func (n *NN) HiddenLayer() []uint {
+func (n *nn) HiddenLayer() []uint {
 	return n.Architecture.(Parameter).HiddenLayer()
 }
 
 // Setter
 func (h HiddenType) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
-		if n, ok := args[0].(*NN); ok && !n.IsInit {
+		if n, ok := args[0].(*nn); ok && !n.IsInit {
 			n.Get().Set(h)
 		}
 	} else {

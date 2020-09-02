@@ -39,7 +39,7 @@ func errNN(err error) {
 	case :
 		log.Println("marshaling json error:", e)*/
 	default:
-		log.Println("error:", err)
+		log.Println("nn error:", err)
 	}
 	os.Exit(1)
 }

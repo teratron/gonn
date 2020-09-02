@@ -23,7 +23,7 @@ func JSON(filename ...string) pkg.ReadWriter {
 
 // Read
 func (j jsonType) Read(reader pkg.Reader) {
-	if n, ok := reader.(*NN); ok {
+	if n, ok := reader.(*nn); ok {
 		filename := string(j)
 		if len(filename) == 0 {
 			errJSON(fmt.Errorf("file json is missing\n"))
@@ -93,7 +93,7 @@ func (j jsonType) Read(reader pkg.Reader) {
 // Write
 func (j jsonType) Write(writer ...pkg.Writer) {
 	if len(writer) > 0 {
-		if n, ok := writer[0].(*NN); ok {
+		if n, ok := writer[0].(*nn); ok {
 			filename := string(j)
 			if len(filename) == 0 {
 				if len(n.json) > 0 {

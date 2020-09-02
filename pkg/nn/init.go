@@ -15,7 +15,7 @@ func init() {
 
 // New returns a new neural network instance with the default parameters
 func New(reader ...pkg.Reader) NeuralNetwork {
-	n := &NN{
+	n := &nn{
 		Architecture: &architecture{},
 		IsInit:       false,
 		IsTrain:      false,
@@ -42,7 +42,7 @@ func New(reader ...pkg.Reader) NeuralNetwork {
 }
 
 // init
-func (n *NN) init(lenInput int, lenTarget ...interface{}) bool {
+func (n *nn) init(lenInput int, lenTarget ...interface{}) bool {
 	if a, ok := n.Architecture.(NeuralNetwork); ok {
 		n.IsInit = a.init(lenInput, lenTarget...)
 	}

@@ -7,12 +7,12 @@ import (
 )
 
 // Read
-func (n *NN) Read(reader pkg.Reader) {
+func (n *nn) Read(reader pkg.Reader) {
 	reader.Read(n)
 }
 
 // Write
-func (n *NN) Write(writer ...pkg.Writer) {
+func (n *nn) Write(writer ...pkg.Writer) {
 	if len(writer) > 0 {
 		for _, w := range writer {
 			w.Write(n)

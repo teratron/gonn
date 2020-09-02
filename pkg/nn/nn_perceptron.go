@@ -64,7 +64,7 @@ func (p *perceptron) architecture() Architecture {
 }
 
 func (p *perceptron) setArchitecture(network Architecture) {
-	if n, ok := network.(*NN); ok {
+	if n, ok := network.(*nn); ok {
 		p.Architecture = n
 	}
 	p.Conf.HiddenLayer = HiddenType{9, 2}
@@ -165,7 +165,7 @@ func (p *perceptron) Get(args ...pkg.Getter) pkg.GetSetter {
 			return nil
 		}
 	} else {
-		if a, ok := p.Architecture.(*NN); ok {
+		if a, ok := p.Architecture.(*nn); ok {
 			return a
 		}
 	}
@@ -282,7 +282,7 @@ func (p *perceptron) initNeuron() {
 // initAxon
 func (p *perceptron) initAxon() {
 	isTrain := true
-	if n, ok := p.Architecture.(*NN); ok && !n.IsTrain {
+	if n, ok := p.Architecture.(*nn); ok && !n.IsTrain {
 		isTrain = false
 	}
 	for i, v := range p.axon {
@@ -553,7 +553,7 @@ func (p *perceptron) reInit() {
 	for i := range p.Conf.HiddenLayer {
 		p.Conf.HiddenLayer[i] = uint(len(p.Conf.Weight[i]))
 	}
-	if n, ok := p.Architecture.(*NN); ok {
+	if n, ok := p.Architecture.(*nn); ok {
 		n.IsInit = p.init(len(p.Conf.Weight[0][0])-bias, len(p.Conf.Weight[length]))
 	}
 }

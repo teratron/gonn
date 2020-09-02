@@ -16,7 +16,7 @@ func Rate(rate ...float32) pkg.GetSetter {
 	}
 }
 
-func (n *NN) Rate() float32 {
+func (n *nn) Rate() float32 {
 	return n.Architecture.(Parameter).Rate()
 }
 

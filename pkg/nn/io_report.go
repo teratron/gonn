@@ -18,7 +18,7 @@ func Report(file *os.File, args ...interface{}) pkg.Writer {
 
 func (r *report) Write(writer ...pkg.Writer) {
 	if len(writer) > 0 {
-		if n, ok := writer[0].(*NN); ok {
+		if n, ok := writer[0].(*nn); ok {
 			if a, ok := n.Architecture.(NeuralNetwork); ok {
 				a.Write(r)
 			}

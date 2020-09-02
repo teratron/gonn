@@ -1,5 +1,5 @@
 package nn
 
-func (n *NN) Energy() float32 {
+func (n *nn) Energy() float32 {
 	panic("implement me")
 }

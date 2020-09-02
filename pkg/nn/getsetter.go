@@ -5,7 +5,7 @@ import (
 )
 
 // Set
-func (n *NN) Set(args ...pkg.Setter) {
+func (n *nn) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
 		for _, v := range args {
 			v.Set(n)
@@ -16,7 +16,7 @@ func (n *NN) Set(args ...pkg.Setter) {
 }
 
 // Get
-func (n *NN) Get(args ...pkg.Getter) pkg.GetSetter {
+func (n *nn) Get(args ...pkg.Getter) pkg.GetSetter {
 	if len(args) > 0 {
 		for _, v := range args {
 			return v.Get(n)

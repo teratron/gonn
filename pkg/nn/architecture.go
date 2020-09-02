@@ -12,11 +12,11 @@ type architecture struct {
 }
 
 // architecture
-func (n *NN) architecture() Architecture {
+func (n *nn) architecture() Architecture {
 	return n.Architecture
 }
 
 // setArchitecture
-func (n *NN) setArchitecture(network Architecture) {
+func (n *nn) setArchitecture(network Architecture) {
 	n.Architecture = network
 }
