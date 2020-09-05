@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"encoding/xml"
-	"errors"
 	"fmt"
 	"log"
 	"math"
@@ -13,6 +12,7 @@ import (
 	"github.com/zigenzoog/gonn/pkg"
 )
 
+// Declare conformity with NeuralNetwork interface
 var _ NeuralNetwork = (*perceptron)(nil)
 
 type perceptron struct {
@@ -40,8 +40,8 @@ type perceptron struct {
 		// Learning coefficient, from 0 to 1
 		Rate floatType `json:"rate" xml:"rate"`
 
-		// Matrix of weight values
-		Weight [][][]floatType `json:"weight" xml:"weight>weight"`
+		// Buffer of weight values
+		Weight float3Type `json:"weight" xml:"weight>weight"`
 	} `json:"perceptron,omitempty" xml:"perceptron,omitempty"`
 
 	// Matrix
@@ -74,6 +74,12 @@ func (p *perceptron) setArchitecture(network Architecture) {
 	p.Conf.LossLevel = .0001
 	p.Conf.Rate = floatType(DefaultRate)
 	p.Conf.Weight = nil
+	//p.buffer              = &p.Conf.Weight
+
+	/*p.Conf.weight = &weight{
+		isInitWeight: false,
+		buffer:       float3Type{},
+	}*/
 }
 
 // HiddenLayer
@@ -128,13 +134,13 @@ func (p *perceptron) Set(args ...pkg.Setter) {
 		case rateType:
 			p.Conf.Rate = floatType(v)
 		case *weight:
-			err := p.setWeight(v.array.(float3Type))
+			//fmt.Printf("%T %v",v,v)
+			err := p.setWeight(v.buffer.(*float3Type))
 			if err != nil {
 				log.Println(err)
 			}
 		default:
-			pkg.Log("This type is missing for Perceptron Neural Network", true) // !!!
-			log.Printf("\tset: %T %v\n", v, v)                                  // !!!
+			errNN(fmt.Errorf("%T %v for perceptron neural network\n", v, ErrMissingType))
 		}
 	} else {
 		pkg.Log("Empty Set()", true) // !!!
@@ -234,7 +240,12 @@ func (p *perceptron) init(lenInput int, lenTarget ...interface{}) bool {
 		if p.Conf.Bias {
 			bias = 1
 		}
-		p.weight = &weight{isInitWeight: false}
+
+		p.weight = &weight{
+			isInitWeight: false,
+			buffer:       nil,
+		}
+
 		p.neuron = make([][]*neuron, lenLayer)
 		p.axon = make([][][]*axon, lenLayer)
 		for i, l := range layer {
@@ -248,8 +259,10 @@ func (p *perceptron) init(lenInput int, lenTarget ...interface{}) bool {
 				}
 			}
 		}
+
 		p.initNeuron()
 		p.initAxon()
+
 		return true
 	} else {
 		errNN(ErrNoTarget)
@@ -423,7 +436,7 @@ func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, 
 			count++
 		}
 	} else {
-		pkg.Log("No target data", true) // !!!
+		errNN(ErrNoTarget)
 		return -1, 0
 	}
 	return
@@ -445,30 +458,36 @@ func (p *perceptron) Verify(input []float64, target ...[]float64) (loss float64)
 		p.calcNeuron(input)
 		loss = p.calcLoss(target[0])
 	} else {
-		pkg.Log("No target data", true) // !!!
+		errNN(ErrNoTarget)
 		return -1
 	}
 	return
 }
 
-// getWeight
-func (p *perceptron) getWeight() (weight float3Type) {
-	weight = make(float3Type, len(p.axon))
-	for i, u := range p.axon {
-		weight[i] = make(float2Type, len(p.axon[i]))
-		for j, v := range u {
-			weight[i][j] = make(float1Type, len(p.axon[i][j]))
-			for k, w := range v {
-				weight[i][j][k] = w.weight
-			}
+// initWeight
+func (p *perceptron) initWeight() {
+	p.Conf.Weight = make(float3Type, len(p.axon))
+	for i, v := range p.axon {
+		p.Conf.Weight[i] = make(float2Type, len(p.axon[i]))
+		for j := range v {
+			p.Conf.Weight[i][j] = make(float1Type, len(p.axon[i][j]))
 		}
 	}
-	return
+	p.weight = &weight{
+		isInitWeight: true,
+		buffer:       &p.Conf.Weight,
+	}
+}
+
+// getWeight
+func (p *perceptron) getWeight() *float3Type {
+	p.copyWeight()
+	return &p.Conf.Weight
 }
 
 // setWeight
-func (p *perceptron) setWeight(weight float3Type) (err error) {
-	err = errors.New("")
+func (p *perceptron) setWeight(weight *float3Type) (err error) {
+	//err = errors.New("")
 	/*if len(weight) == len(p.axon) {
 		if len(weight[]) == len(p.axon[]) {
 
@@ -478,24 +497,11 @@ func (p *perceptron) setWeight(weight float3Type) (err error) {
 	for i, u := range p.axon {
 		for j, v := range u {
 			for k, w := range v {
-				w.weight = weight[i][j][k]
+				w.weight = (*weight)[i][j][k]
 			}
 		}
 	}
-	err = fmt.Errorf("setWeight error")
-	return
-}
-
-// initWeight
-func (p *perceptron) initWeight() {
-	p.Conf.Weight = make([][][]floatType, len(p.axon))
-	for i, v := range p.axon {
-		p.Conf.Weight[i] = make([][]floatType, len(p.axon[i]))
-		for j := range v {
-			p.Conf.Weight[i][j] = make([]floatType, len(p.axon[i][j]))
-		}
-	}
-	p.isInitWeight = true
+	return nil //fmt.Errorf("setWeight error")
 }
 
 // copyWeight copies weights to the buffer
@@ -527,8 +533,9 @@ func (p *perceptron) pasteWeight() (err error) {
 
 // deleteWeight
 func (p *perceptron) deleteWeight() {
-	p.isInitWeight = false
 	p.Conf.Weight = nil
+	p.isInitWeight = false
+	p.buffer = nil
 	// TODO: why?
 }
 
@@ -551,9 +558,10 @@ func (p *perceptron) reInit() {
 // readJSON
 func (p *perceptron) readJSON(value interface{}) {
 	if b, err := json.Marshal(&value); err != nil {
-		errJSON(err)
+		//fmt.Println(b)
+		errJSON(fmt.Errorf("read marshal %w", err))
 	} else if err = json.Unmarshal(b, &p.Conf); err != nil {
-		errJSON(err)
+		errJSON(fmt.Errorf("read unmarshal %w", err))
 	}
 	p.reInit()
 	if err := p.pasteWeight(); err != nil {

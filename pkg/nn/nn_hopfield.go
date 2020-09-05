@@ -2,30 +2,26 @@
 package nn
 
 import (
-	"log"
-
 	"github.com/zigenzoog/gonn/pkg"
 )
 
+// Declare conformity with NeuralNetwork interface
 var _ NeuralNetwork = (*hopfield)(nil)
-
-/*type HopfieldNN interface {
-	Energy() float32
-}*/
 
 type hopfield struct {
 	Architecture `json:"-" xml:"-"`
 	Parameter    `json:"-" xml:"-"`
 	Constructor  `json:"-" xml:"-"`
 
-	Configuration struct {
-		Energy floatType
+	Conf struct {
+		Energy floatType     `json:"energy" xml:"energy"`
 		Weight [][]floatType `json:"weights" xml:"weight"`
-	} `json:"hopfield" xml:"hopfield"`
+	} `json:"hopfield,omitempty" xml:"hopfield,omitempty"`
 
 	// Matrix
 	neuron []*neuron
-	Axon   [][]*axon
+	axon   [][]*axon
+	*weight
 }
 
 func Hopfield() *hopfield {
@@ -47,108 +43,35 @@ func (h *hopfield) setArchitecture(network Architecture) {
 	if n, ok := network.(*nn); ok {
 		h.Architecture = n
 	}
-	h.Configuration.Weight = nil
+	h.Conf.Weight = nil
 }
 
 func (h *hopfield) Energy() float32 {
-	return float32(h.Configuration.Energy)
+	return float32(h.Conf.Energy)
 }
 
-// Setter
-func (h *hopfield) Set(args ...pkg.Setter) {
-	if len(args) > 0 {
-		switch v := args[0].(type) {
-		default:
-			pkg.Log("This type of variable is missing for Hopfield Neural Network", true)
-			log.Printf("\tset: %T %v\n", v, v) // !!!
-		}
-	} else {
-		pkg.Log("Empty Set()", true) // !!!
-	}
-}
+// Set
+func (h *hopfield) Set(args ...pkg.Setter) {}
 
-// Getter
+// Get
 func (h *hopfield) Get(args ...pkg.Getter) pkg.GetSetter {
-	if len(args) > 0 {
-		switch args[0].(type) {
-		default:
-			pkg.Log("This type of variable is missing for Hopfield Neural Network", true)
-			log.Printf("\tget: %T %v\n", args[0], args[0]) // !!!
-			return nil
-		}
-	} else {
-		return h
-	}
+	return h
 }
 
-// Initialization
-func (h *hopfield) init(length int, args ...interface{}) bool {
-	return true
-}
+// Copy
+func (h *hopfield) Copy(copier pkg.Copier) {}
 
-// Train
-/*func (h *hopfield) Train(input, target []float64) (loss float64, count int) {
-	return
-}
-
-// Query
-func (h *hopfield) Query(input []float64) []float64 {
-	panic("implement me")
-}*/
-
-func (h *hopfield) Copy(pkg.Copier) {}
-func (h *hopfield) Paste(pkg.Paster) (err error) {
-	return
-}
+// Paste
+func (h *hopfield) Paste(paster pkg.Paster) {}
 
 // Read
-func (h *hopfield) Read(reader pkg.Reader) {
-	/*switch r := reader.(type) {
-	case jsonType:
-		h.readJSON(string(r))
-	case xml:
-		h.readXML(v)
-	case xml:
-		h.readCSV(v)
-	case db:
-		h.readDB(v)
-	default:
-		pkg.Log("This type is missing for write", true) // !!!
-		log.Printf("\tWrite: %T %v\n", r, r) // !!!
-	}*/
-}
+func (h *hopfield) Read(reader pkg.Reader) {}
 
 // Write
-func (h *hopfield) Write(writer ...pkg.Writer) {
-	/*for _, w := range writer {
-		switch v := w.(type) {
-		case *report:
-			h.writeReport(v)
-		case jsonType:
-			h.writeJSON(string(v))
-		case xml:
-			h.writeXML(v)
-		case xml:
-			h.writeCSV(v)
-		case db:
-			h.writeDB(v)
-		default:
-			pkg.Log("This type is missing for write", true) // !!!
-			log.Printf("\tWrite: %T %v\n", w, w) // !!!
-		}
-	}*/
-}
+func (h *hopfield) Write(writer ...pkg.Writer) {}
 
 // readJSON
-func (h *hopfield) readJSON(value interface{}) {
-	panic("implement me")
-}
+func (h *hopfield) readJSON(value interface{}) {}
 
-// writeJSON
-/*func (h *hopfield) writeJSON(filename string) {
-	panic("implement me")
-}*/
-
-func (h *hopfield) readXML(value interface{}) {
-	panic("implement me")
-}
+// readXML
+func (h *hopfield) readXML(value interface{}) {}

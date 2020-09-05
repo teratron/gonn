@@ -4,9 +4,11 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"time"
 )
 
 var (
+	ErrNotFound      = errors.New("not found")
 	ErrNotTrained    = errors.New("network is not trained")
 	ErrNotRecognized = errors.New("network is not recognized")
 	ErrMissingType   = errors.New("type is missing")
@@ -23,6 +25,7 @@ type Response struct {
 type nnError struct {
 	Err     error
 	Message string
+	When    time.Time
 	Code    int
 }
 
@@ -45,7 +48,7 @@ func (e *nnError) Error() string {
 func errNN(err error) {
 	switch e := err.(type) {
 	case error:
-		log.Println("syntax json error:", e)
+		log.Println("error:", e)
 	/*case :
 		log.Println("unmarshal json error:", e)
 	case :

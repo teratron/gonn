@@ -10,23 +10,23 @@ import (
 	"github.com/zigenzoog/gonn/pkg"
 )
 
-type jsonType string
+type jsonString string
 
 // JSON
 func JSON(filename ...string) pkg.ReadWriter {
 	if len(filename) > 0 {
-		return jsonType(filename[0])
+		return jsonString(filename[0])
 	} else {
-		return jsonType("")
+		return jsonString("")
 	}
 }
 
 // Read
-func (j jsonType) Read(reader pkg.Reader) {
+func (j jsonString) Read(reader pkg.Reader) {
 	if n, ok := reader.(*nn); ok {
 		filename := string(j)
 		if len(filename) == 0 {
-			errJSON(fmt.Errorf("file json is missing\n"))
+			errJSON(fmt.Errorf("json: file json is missing\n"))
 		}
 		b, err := ioutil.ReadFile(filename)
 		if err != nil {
@@ -37,7 +37,7 @@ func (j jsonType) Read(reader pkg.Reader) {
 		// Декодируем json в NN
 		err = json.Unmarshal(b, &n)
 		if err != nil {
-			errJSON(err)
+			errJSON(fmt.Errorf("--read unmarshal %w", err))
 		}
 		//fmt.Println(n)
 		n.Architecture = nil
@@ -48,7 +48,7 @@ func (j jsonType) Read(reader pkg.Reader) {
 		var data interface{}
 		err = json.Unmarshal(b, &data)
 		if err != nil {
-			errJSON(err)
+			errJSON(fmt.Errorf("read unmarshal %w", err))
 		}
 		//fmt.Println(data)
 
@@ -57,13 +57,13 @@ func (j jsonType) Read(reader pkg.Reader) {
 				if key == "architecture" {
 					b, err = json.Marshal(&v)
 					if err != nil {
-						errJSON(err)
+						errJSON(fmt.Errorf("read marshal %w", err))
 					}
 					//fmt.Println(string(b))
 
 					err = json.Unmarshal(b, &data)
 					if err != nil {
-						errJSON(err)
+						errJSON(fmt.Errorf("read unmarshal %w", err))
 					}
 					//fmt.Println(data)
 
@@ -90,7 +90,7 @@ func (j jsonType) Read(reader pkg.Reader) {
 }
 
 // Write
-func (j jsonType) Write(writer ...pkg.Writer) {
+func (j jsonString) Write(writer ...pkg.Writer) {
 	if len(writer) > 0 {
 		if n, ok := writer[0].(*nn); ok {
 			filename := string(j)
@@ -108,7 +108,7 @@ func (j jsonType) Write(writer ...pkg.Writer) {
 				errNN(ErrNotTrained)
 			}
 			if b, err := json.MarshalIndent(&n, "", "\t"); err != nil {
-				errJSON(err)
+				errJSON(fmt.Errorf("write %w", err))
 			} else if err = ioutil.WriteFile(filename, b, os.ModePerm); err != nil {
 				errOS(err)
 			}
@@ -128,7 +128,7 @@ func errJSON(err error) {
 	case *json.MarshalerError:
 		log.Println("marshaling json error:", e)
 	default:
-		log.Println("json error:", err)
+		log.Println(err)
 	}
-	os.Exit(1)
+	//os.Exit(1)
 }

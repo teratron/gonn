@@ -1,10 +1,6 @@
 package main
 
-import (
-	"fmt"
-
-	"github.com/zigenzoog/gonn/pkg/nn"
-)
+import "github.com/zigenzoog/gonn/pkg/nn"
 
 func main() {
 	// New returns a new neural network instance with the default parameters,
@@ -49,20 +45,15 @@ func main() {
 
 		// Average error for the entire epoch
 		sum /= float64(num)
-		if epoch == 1 || epoch == 10 || epoch%100 == 0 || epoch == 1000 {
-			fmt.Printf("Epoch: %v\tError: %.8f\n", epoch, sum)
-		}
 
 		// Weights are copied to the buffer at the minimum average error
-		if sum < minLoss && epoch >= 100 {
-			fmt.Println("----- Epoch:", epoch, "\tmin avg error:", sum)
+		if sum < minLoss {
 			n.Copy(nn.Weight())
 			minLoss = sum
 		}
 
 		// Exiting the cycle of learning epochs, when the minimum error level is reached
 		if sum <= n.LossLevel() {
-			fmt.Printf("Epoch: %v\tError: %.8f\n", epoch, sum)
 			break
 		}
 	}

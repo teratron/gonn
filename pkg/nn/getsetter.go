@@ -1,8 +1,6 @@
 package nn
 
-import (
-	"github.com/zigenzoog/gonn/pkg"
-)
+import "github.com/zigenzoog/gonn/pkg"
 
 // Set
 func (n *nn) Set(args ...pkg.Setter) {

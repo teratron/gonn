@@ -40,7 +40,7 @@ func errOS(err error) {
 	case *os.SyscallError:
 		log.Println("syscall error:", e)
 	default:
-		log.Println("file error:", err)
+		log.Println("os error:", err)
 	}
 	os.Exit(1)
 }

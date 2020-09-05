@@ -10,15 +10,15 @@ import (
 	"github.com/zigenzoog/gonn/pkg"
 )
 
-type xmlType string
+type xmlString string
 
 // XML
 func XML(filename ...string) pkg.ReadWriter {
-	return xmlType(filename[0])
+	return xmlString(filename[0])
 }
 
 // Read
-func (j xmlType) Read(reader pkg.Reader) {
+func (j xmlString) Read(reader pkg.Reader) {
 	if n, ok := reader.(*nn); ok {
 		filename := string(j)
 		if len(filename) == 0 {
@@ -86,7 +86,7 @@ func (j xmlType) Read(reader pkg.Reader) {
 }
 
 // Write
-func (j xmlType) Write(writer ...pkg.Writer) {
+func (j xmlString) Write(writer ...pkg.Writer) {
 	if len(writer) > 0 {
 		if n, ok := writer[0].(*nn); ok {
 			filename := string(j)
