@@ -18,6 +18,21 @@ type (
 	float3Type [][][]floatType
 )
 
+/*type Float1Type struct {
+	*float1Type
+	pkg.GetSetter
+}
+
+type Float2Type struct {
+	*float2Type
+	pkg.GetSetter
+}
+
+type Float3Type struct {
+	*float3Type
+	pkg.GetSetter
+}*/
+
 func (f floatType) Set(...pkg.Setter) {}
 
 func (f floatType) Get(...pkg.Getter) pkg.GetSetter {
@@ -66,7 +81,11 @@ func (f float3Type) Read(pkg.Reader) {}
 
 func (f float3Type) Write(...pkg.Writer) {}*/
 
-/*func (f floatType) float()  {}
-func (f float1Type) float() {}
-func (f float2Type) float() {}
-func (f float3Type) float() {}*/
+/*func (f *floatType)  float() {}
+func (f *float1Type) float() {}
+func (f *float2Type) float() {}
+func (f *float3Type) float() {}*/
+
+/*func (f *Float1Type) float() {}
+func (f *Float2Type) float() {}
+func (f *Float3Type) float() {}*/

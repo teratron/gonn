@@ -44,10 +44,9 @@ type weight struct {
 func Weight(args ...Floater) pkg.Controller {
 	if len(args) > 0 {
 		switch v := args[0].(type) {
-		/*case float3Type, float2Type, float1Type:
-		return v*/
-		case Floater:
-			//fmt.Printf("%T %v",v,v)
+		case *float3Type, *float2Type, *float1Type/*, *Float1Type, *Float2Type, *Float3Type*/:
+			//return v
+			//fmt.Printf("+-+-+-+-%T %v",v,v)
 			return &weight{
 				isInitWeight: true,
 				buffer:       v,
@@ -63,6 +62,7 @@ func Weight(args ...Floater) pkg.Controller {
 	return nil
 }
 
+// Weight
 func (n *nn) Weight() Floater {
 	return n.Architecture.(Parameter).Weight()
 }

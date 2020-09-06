@@ -13,5 +13,5 @@ type neuron struct {
 
 	value    floatType // Neuron value
 	axon     []*axon   // All incoming axons
-	specific Neuroner  // Specific option of neuron: miss (error)
+	specific Neuroner  // Specific option of neuron: miss (error) or other
 }

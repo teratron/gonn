@@ -54,6 +54,7 @@ type perceptron struct {
 	lenOutput      int
 }
 
+// Perceptron
 func Perceptron() *perceptron {
 	return &perceptron{}
 }
@@ -267,6 +268,22 @@ func (p *perceptron) init(lenInput int, lenTarget ...interface{}) bool {
 	} else {
 		errNN(ErrNoTarget)
 		return false
+	}
+}
+
+// reInit
+func (p *perceptron) reInit() {
+	bias := 0
+	if p.Conf.Bias {
+		bias = 1
+	}
+	length := len(p.Conf.Weight) - 1
+	p.Conf.HiddenLayer = make(HiddenType, length)
+	for i := range p.Conf.HiddenLayer {
+		p.Conf.HiddenLayer[i] = uint(len(p.Conf.Weight[i]))
+	}
+	if n, ok := p.Architecture.(*nn); ok {
+		n.IsInit = p.init(len(p.Conf.Weight[0][0]) - bias, len(p.Conf.Weight[length]))
 	}
 }
 
@@ -539,22 +556,6 @@ func (p *perceptron) deleteWeight() {
 	// TODO: why?
 }
 
-// reInit
-func (p *perceptron) reInit() {
-	bias := 0
-	if p.Conf.Bias {
-		bias = 1
-	}
-	length := len(p.Conf.Weight) - 1
-	p.Conf.HiddenLayer = make(HiddenType, length)
-	for i := range p.Conf.HiddenLayer {
-		p.Conf.HiddenLayer[i] = uint(len(p.Conf.Weight[i]))
-	}
-	if n, ok := p.Architecture.(*nn); ok {
-		n.IsInit = p.init(len(p.Conf.Weight[0][0])-bias, len(p.Conf.Weight[length]))
-	}
-}
-
 // readJSON
 func (p *perceptron) readJSON(value interface{}) {
 	if b, err := json.Marshal(&value); err != nil {
@@ -565,7 +566,7 @@ func (p *perceptron) readJSON(value interface{}) {
 	}
 	p.reInit()
 	if err := p.pasteWeight(); err != nil {
-		log.Println(err)
+		errNN(err)
 	}
 }
 
@@ -578,7 +579,7 @@ func (p *perceptron) readXML(value interface{}) {
 	}
 	p.reInit()
 	if err := p.pasteWeight(); err != nil {
-		log.Println(err)
+		errNN(err)
 	}
 }
 
@@ -591,7 +592,7 @@ func (p *perceptron) writeReport(report *report) {
 
 	printFormat := func(format string, a ...interface{}) {
 		if _, err := fmt.Fprintf(b, format, a...); err != nil {
-			log.Println("error:", err)
+			errNN(err)
 		}
 	}
 
