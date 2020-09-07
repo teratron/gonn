@@ -1,7 +1,7 @@
-// Initialization
 package nn
 
 import (
+	"fmt"
 	"log"
 	"math/rand"
 	"time"
@@ -20,9 +20,7 @@ func New(reader ...pkg.Reader) NeuralNetwork {
 		IsInit:       false,
 		IsTrain:      false,
 		json:         "",
-		xml:          "",
 		csv:          "",
-		db:           "",
 	}
 	if len(reader) > 0 {
 		switch r := reader[0].(type) {
@@ -32,7 +30,7 @@ func New(reader ...pkg.Reader) NeuralNetwork {
 		case Filer:
 			r.Read(n)
 		default:
-			log.Println("This type is missing for Neural Network")
+			errNN(fmt.Errorf("%T %w for neural network\n", r, ErrMissingType))
 		}
 	} else {
 		n.Architecture = &perceptron{}
@@ -72,6 +70,7 @@ func getLengthData(data ...[]float64) []interface{} {
 	return tmp
 }
 
+// Debug
 func Debug(args ...interface{}) {
 	log.Println(args[0])
 }

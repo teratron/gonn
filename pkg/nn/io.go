@@ -7,11 +7,6 @@ import (
 	"github.com/zigenzoog/gonn/pkg"
 )
 
-/*var (
-	fileIn  = flag.String("in",  "","Specify input file path.")
-	fileOut = flag.String("out", "","Specify output file path.")
-)*/
-
 // Filer
 type Filer interface {
 	pkg.ReadWriter

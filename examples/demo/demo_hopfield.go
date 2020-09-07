@@ -14,5 +14,5 @@ func main() {
 
 	fmt.Println(n)
 
-	n.Read(nn.JSON("perceptron.json"))
+	n.Read(nn.JSON("hopfield.json"))
 }

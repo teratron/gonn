@@ -1,7 +1,7 @@
-//
 package nn
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/zigenzoog/gonn/pkg"
@@ -12,10 +12,12 @@ type report struct {
 	args []interface{}
 }
 
+// Report
 func Report(file *os.File, args ...interface{}) pkg.Writer {
 	return &report{file, args}
 }
 
+// Write
 func (r *report) Write(writer ...pkg.Writer) {
 	if len(writer) > 0 {
 		if n, ok := writer[0].(*nn); ok {
@@ -24,6 +26,6 @@ func (r *report) Write(writer ...pkg.Writer) {
 			}
 		}
 	} else {
-		pkg.Log("Empty write", true) // !!!
+		errNN(fmt.Errorf("%w write for report\n", ErrEmpty))
 	}
 }

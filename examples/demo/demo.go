@@ -64,5 +64,5 @@ func main() {
 	// Writing the neural network configuration to a file
 	n.Write(
 		nn.JSON("config/perceptron.json"),
-		nn.XML("config/perceptron.xml"))
+		nn.CSV("config/perceptron.csv"))
 }

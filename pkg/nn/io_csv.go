@@ -5,20 +5,16 @@ import (
 	"github.com/zigenzoog/gonn/pkg"
 )
 
-type csvType string
+type csvString string
 
-//
+// CSV
 func CSV(filename ...string) pkg.ReadWriter {
-	return csvType(filename[0])
+	if len(filename) > 0 {
+		return csvString(filename[0])
+	} else {
+		return csvString("")
+	}
 }
 
-/*func (c csvType) Read(p []byte) (n int, err error) {
-	return
-}
-
-func (c csvType) Write(p []byte) (n int, err error) {
-	return
-}*/
-
-func (c csvType) Read(pkg.Reader)     {}
-func (c csvType) Write(...pkg.Writer) {}
+func (c csvString) Read(pkg.Reader)     {}
+func (c csvString) Write(...pkg.Writer) {}

@@ -1,7 +1,7 @@
 package nn
 
 import (
-	"log"
+	"fmt"
 
 	"github.com/zigenzoog/gonn/pkg"
 )
@@ -29,7 +29,7 @@ func (a *axon) getSynapseInput() (input floatType) {
 	case *neuron:
 		input = s.value
 	default:
-		// TODO: error
+		errNN(fmt.Errorf("%w for method getSynapseInput: %v\n", ErrMissingType, s))
 	}
 	return
 }
@@ -44,9 +44,7 @@ type weight struct {
 func Weight(args ...Floater) pkg.Controller {
 	if len(args) > 0 {
 		switch v := args[0].(type) {
-		case *float3Type, *float2Type, *float1Type/*, *Float1Type, *Float2Type, *Float3Type*/:
-			//return v
-			//fmt.Printf("+-+-+-+-%T %v",v,v)
+		case *float3Type, *float2Type, *float1Type:
 			return &weight{
 				isInitWeight: true,
 				buffer:       v,
@@ -74,7 +72,7 @@ func (w *weight) Set(args ...pkg.Setter) {
 			n.Get().Set(w)
 		}
 	} else {
-		pkg.Log("Empty set", true) // !!!
+		errNN(fmt.Errorf("%w set for weight\n", ErrEmpty))
 	}
 }
 
@@ -120,6 +118,6 @@ func (w *weight) Write(writer ...pkg.Writer) {
 			v.Write(w)
 		}
 	} else {
-		log.Println("Empty write") // !!!
+		errNN(fmt.Errorf("%w write for weight\n", ErrEmpty))
 	}
 }

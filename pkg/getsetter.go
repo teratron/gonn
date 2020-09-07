@@ -1,5 +1,6 @@
 package pkg
 
+// GetSetter
 type GetSetter interface {
 	Getter
 	Setter

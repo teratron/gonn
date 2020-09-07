@@ -26,31 +26,28 @@ func (j jsonString) Read(reader pkg.Reader) {
 	if n, ok := reader.(*nn); ok {
 		filename := string(j)
 		if len(filename) == 0 {
-			errJSON(fmt.Errorf("json: file json is missing\n"))
+			errJSON(fmt.Errorf("json: file json is missing"))
 		}
 		b, err := ioutil.ReadFile(filename)
 		if err != nil {
 			errOS(err)
 		}
-		//fmt.Println(string(b))
 
-		// Декодируем json в NN
+		// Decoding json to NN
 		err = json.Unmarshal(b, &n)
 		if err != nil {
-			errJSON(fmt.Errorf("--read unmarshal %w", err))
+			errJSON(fmt.Errorf("read unmarshal %w", err))
 		}
-		//fmt.Println(n)
 		n.Architecture = nil
 		n.IsInit = false
 		n.json = filename
 
-		// Декодируем json в тип map[string]interface{}
+		// Decoding json to map[string]interface{}
 		var data interface{}
 		err = json.Unmarshal(b, &data)
 		if err != nil {
 			errJSON(fmt.Errorf("read unmarshal %w", err))
 		}
-		//fmt.Println(data)
 
 		for key, value := range data.(map[string]interface{}) {
 			if v, ok := value.(map[string]interface{}); ok {
@@ -59,14 +56,10 @@ func (j jsonString) Read(reader pkg.Reader) {
 					if err != nil {
 						errJSON(fmt.Errorf("read marshal %w", err))
 					}
-					//fmt.Println(string(b))
-
 					err = json.Unmarshal(b, &data)
 					if err != nil {
 						errJSON(fmt.Errorf("read unmarshal %w", err))
 					}
-					//fmt.Println(data)
-
 					for k, v := range data.(map[string]interface{}) {
 						switch k {
 						case "perceptron":
@@ -114,7 +107,7 @@ func (j jsonString) Write(writer ...pkg.Writer) {
 			}
 		}
 	} else {
-		errNN(ErrEmptyWrite)
+		errNN(fmt.Errorf("%w json write", ErrEmpty))
 	}
 }
 

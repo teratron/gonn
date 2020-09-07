@@ -1,14 +1,9 @@
 package nn
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/zigenzoog/gonn/pkg"
-)
-
-var (
-	ErrEmptyWrite = errors.New("empty write")
 )
 
 // Read
@@ -23,6 +18,6 @@ func (n *nn) Write(writer ...pkg.Writer) {
 			w.Write(n)
 		}
 	} else {
-		errNN(fmt.Errorf("%w", ErrEmptyWrite))
+		errNN(fmt.Errorf("%w for write\n", ErrEmpty))
 	}
 }

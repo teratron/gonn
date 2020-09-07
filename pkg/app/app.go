@@ -1,4 +1,3 @@
-//
 package app
 
 import "github.com/zigenzoog/gonn/pkg"
@@ -8,19 +7,13 @@ var _ Application = (*app)(nil)
 
 type Application interface {
 	//
-	//pkg.Controller
+	pkg.Controller
 }
 
 type app struct {
-	language pkg.LangType
-	logging  pkg.LogModeType
 }
 
-// New returns a new application instance with the default parameters
+// App returns a new application instance with the default parameters
 func App() *app {
-	a := &app{
-		language: "en",
-		logging:  1,
-	}
-	return a
+	return &app{}
 }

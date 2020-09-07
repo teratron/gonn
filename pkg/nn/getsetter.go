@@ -1,6 +1,10 @@
 package nn
 
-import "github.com/zigenzoog/gonn/pkg"
+import (
+	"fmt"
+
+	"github.com/zigenzoog/gonn/pkg"
+)
 
 // Set
 func (n *nn) Set(args ...pkg.Setter) {
@@ -9,7 +13,7 @@ func (n *nn) Set(args ...pkg.Setter) {
 			v.Set(n)
 		}
 	} else {
-		pkg.Log("Empty Set()", true) // !!!
+		errNN(fmt.Errorf("%w set for nn\n", ErrEmpty))
 	}
 }
 

@@ -1,6 +1,7 @@
 package nn
 
 import (
+	"fmt"
 	"math"
 
 	"github.com/zigenzoog/gonn/pkg"
@@ -25,6 +26,7 @@ func ActivationMode(mode ...uint8) pkg.GetSetter {
 	}
 }
 
+// ActivationMode
 func (n *nn) ActivationMode() uint8 {
 	return n.Architecture.(Parameter).ActivationMode()
 }
@@ -32,18 +34,18 @@ func (n *nn) ActivationMode() uint8 {
 // Set
 func (m activationModeType) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
-		if a, ok := args[0].(NeuralNetwork); ok {
+		if a, ok := args[0].(Architecture); ok {
 			a.Get().Set(m.check())
 		}
 	} else {
-		pkg.Log("Empty Set()", true) // !!!
+		errNN(fmt.Errorf("%w set for activation", ErrEmpty))
 	}
 }
 
 // Get
 func (m activationModeType) Get(args ...pkg.Getter) pkg.GetSetter {
 	if len(args) > 0 {
-		if a, ok := args[0].(NeuralNetwork); ok {
+		if a, ok := args[0].(Architecture); ok {
 			return a.Get().Get(m)
 		}
 	} else {

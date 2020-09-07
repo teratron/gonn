@@ -1,21 +1,24 @@
-// Hidden layers
 package nn
 
 import (
+	"fmt"
+
 	"github.com/zigenzoog/gonn/pkg"
 )
 
 type HiddenType []uint
 
+// HiddenLayer
 func HiddenLayer(nums ...uint) HiddenType {
 	return nums
 }
 
+// HiddenLayer
 func (n *nn) HiddenLayer() []uint {
 	return n.Architecture.(Parameter).HiddenLayer()
 }
 
-// Setter
+// Set
 func (h HiddenType) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
 		if n, ok := args[0].(*nn); ok && !n.IsInit {
@@ -23,13 +26,14 @@ func (h HiddenType) Set(args ...pkg.Setter) {
 		}
 	} else {
 		pkg.Log("Empty Set()", true) // !!!
+		errNN(fmt.Errorf("%w set for bias", ErrEmpty))
 	}
 }
 
-// Getter
+// Get
 func (h HiddenType) Get(args ...pkg.Getter) pkg.GetSetter {
 	if len(args) > 0 {
-		if n, ok := args[0].(NeuralNetwork); ok {
+		if n, ok := args[0].(Architecture); ok {
 			return n.Get().Get(h)
 		}
 	} else {

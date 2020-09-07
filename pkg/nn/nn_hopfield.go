@@ -13,10 +13,11 @@ type hopfield struct {
 	Parameter    `json:"-" xml:"-"`
 	Constructor  `json:"-" xml:"-"`
 
+	// Configurations
 	Conf struct {
-		Energy floatType     `json:"energy" xml:"energy"`
-		Weight [][]floatType `json:"weights" xml:"weight"`
-	} `json:"hopfield,omitempty" xml:"hopfield,omitempty"`
+		Energy floatType	`json:"energy" xml:"energy"`
+		Weight float2Type	`json:"weights" xml:"weight"`
+	}						`json:"hopfield,omitempty" xml:"hopfield,omitempty"`
 
 	// Matrix
 	neuron []*neuron
@@ -24,28 +25,24 @@ type hopfield struct {
 	*weight
 }
 
+// Hopfield
 func Hopfield() *hopfield {
 	return &hopfield{}
 }
 
-// Returns a new Hopfield neural network instance with the default parameters
-func (n *nn) hopfield() {
-	n.Architecture = &hopfield{
-		Architecture: n,
-	}
-}
-
+// architecture
 func (h *hopfield) architecture() Architecture {
 	return h.Architecture
 }
 
+// setArchitecture
 func (h *hopfield) setArchitecture(network Architecture) {
 	if n, ok := network.(*nn); ok {
 		h.Architecture = n
 	}
-	h.Conf.Weight = nil
 }
 
+// Energy
 func (h *hopfield) Energy() float32 {
 	return float32(h.Conf.Energy)
 }
@@ -72,6 +69,3 @@ func (h *hopfield) Write(writer ...pkg.Writer) {}
 
 // readJSON
 func (h *hopfield) readJSON(value interface{}) {}
-
-// readXML
-func (h *hopfield) readXML(value interface{}) {}

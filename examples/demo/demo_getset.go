@@ -7,8 +7,6 @@ import (
 )
 
 func main() {
-	//fmt.Printf("%T %v\n", c, c)
-
 	// Neural Network
 	n := nn.New(nn.Perceptron())
 	fmt.Println("nn.New():", n)

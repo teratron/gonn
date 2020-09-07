@@ -1,6 +1,6 @@
 package nn
 
-//
+// Parameter
 type Parameter interface {
 	Weight() Floater
 
