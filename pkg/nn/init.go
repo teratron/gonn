@@ -30,7 +30,7 @@ func New(reader ...pkg.Reader) NeuralNetwork {
 		case Filer:
 			r.Read(n)
 		default:
-			errNN(fmt.Errorf("%T %w for neural network\n", r, ErrMissingType))
+			errNN(fmt.Errorf("%T %w for neural network", r, ErrMissingType))
 		}
 	} else {
 		n.Architecture = &perceptron{}

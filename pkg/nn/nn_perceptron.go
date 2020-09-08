@@ -232,7 +232,7 @@ func (p *perceptron) init(lenInput int, lenTarget ...interface{}) bool {
 		}
 
 		p.neuron = make([][]*neuron, lenLayer)
-		p.axon   = make([][][]*axon, lenLayer)
+		p.axon = make([][][]*axon, lenLayer)
 		for i, l := range layer {
 			p.neuron[i] = make([]*neuron, l)
 			p.axon[i]   = make([][]*axon, l)

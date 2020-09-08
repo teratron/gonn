@@ -23,13 +23,11 @@ func (a *axon) getSynapseInput() (input floatType) {
 	case floatType:
 		input = s
 	case biasType:
-		if s {
-			input = 1
-		}
+		if s { input = 1 }
 	case *neuron:
 		input = s.value
 	default:
-		errNN(fmt.Errorf("%w for method getSynapseInput: %v\n", ErrMissingType, s))
+		errNN(fmt.Errorf("%w for method getSynapseInput: %v", ErrMissingType, s))
 	}
 	return
 }
@@ -72,7 +70,7 @@ func (w *weight) Set(args ...pkg.Setter) {
 			n.Get().Set(w)
 		}
 	} else {
-		errNN(fmt.Errorf("%w set for weight\n", ErrEmpty))
+		errNN(fmt.Errorf("%w set for weight", ErrEmpty))
 	}
 }
 
@@ -118,6 +116,6 @@ func (w *weight) Write(writer ...pkg.Writer) {
 			v.Write(w)
 		}
 	} else {
-		errNN(fmt.Errorf("%w write for weight\n", ErrEmpty))
+		errNN(fmt.Errorf("%w write for weight", ErrEmpty))
 	}
 }

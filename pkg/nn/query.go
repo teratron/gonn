@@ -1,13 +1,13 @@
-//
 package nn
 
-import "github.com/zigenzoog/gonn/pkg"
+import "fmt"
 
+// Query
 func (n *nn) Query(input []float64) (output []float64) {
 	if !n.IsTrain {
-		pkg.Log("Neural network is not trained", true) // !!!
+		errNN(fmt.Errorf("query: %w", ErrNotTrained))
 		if !n.IsInit {
-			pkg.Log("Error initialization", true) // !!!
+			errNN(fmt.Errorf("%w for query", ErrInit))
 			return nil
 		}
 	}

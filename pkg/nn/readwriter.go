@@ -18,6 +18,6 @@ func (n *nn) Write(writer ...pkg.Writer) {
 			w.Write(n)
 		}
 	} else {
-		errNN(fmt.Errorf("%w for write\n", ErrEmpty))
+		errNN(fmt.Errorf("%w for write", ErrEmpty))
 	}
 }

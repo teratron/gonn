@@ -25,7 +25,6 @@ func (h HiddenType) Set(args ...pkg.Setter) {
 			n.Get().Set(h)
 		}
 	} else {
-		pkg.Log("Empty Set()", true) // !!!
 		errNN(fmt.Errorf("%w set for bias", ErrEmpty))
 	}
 }

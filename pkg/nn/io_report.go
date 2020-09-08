@@ -26,6 +26,6 @@ func (r *report) Write(writer ...pkg.Writer) {
 			}
 		}
 	} else {
-		errNN(fmt.Errorf("%w write for report\n", ErrEmpty))
+		errNN(fmt.Errorf("%w write for report", ErrEmpty))
 	}
 }

@@ -13,7 +13,7 @@ func (n *nn) Set(args ...pkg.Setter) {
 			v.Set(n)
 		}
 	} else {
-		errNN(fmt.Errorf("%w set for nn\n", ErrEmpty))
+		errNN(fmt.Errorf("%w set for nn", ErrEmpty))
 	}
 }
 

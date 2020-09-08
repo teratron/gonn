@@ -98,7 +98,7 @@ func (j jsonString) Write(writer ...pkg.Writer) {
 			if n.IsTrain {
 				n.Copy(Weight())
 			} else {
-				errNN(ErrNotTrained)
+				errNN(fmt.Errorf("json write: %w", ErrNotTrained))
 			}
 			if b, err := json.MarshalIndent(&n, "", "\t"); err != nil {
 				errJSON(fmt.Errorf("write %w", err))
