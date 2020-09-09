@@ -6,7 +6,7 @@ import (
 	"github.com/zigenzoog/gonn/pkg"
 )
 
-type rateType floatType
+type rateFloat floatType
 
 // Default learning rate
 const DefaultRate float32 = .3
@@ -14,9 +14,9 @@ const DefaultRate float32 = .3
 // Rate
 func Rate(rate ...float32) pkg.GetSetter {
 	if len(rate) > 0 {
-		return rateType(rate[0])
+		return rateFloat(rate[0])
 	} else {
-		return rateType(0)
+		return rateFloat(0)
 	}
 }
 
@@ -26,7 +26,7 @@ func (n *nn) Rate() float32 {
 }
 
 // Set
-func (r rateType) Set(args ...pkg.Setter) {
+func (r rateFloat) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
 		if a, ok := args[0].(Architecture); ok {
 			a.Get().Set(r.check())
@@ -37,7 +37,7 @@ func (r rateType) Set(args ...pkg.Setter) {
 }
 
 // Get
-func (r rateType) Get(args ...pkg.Getter) pkg.GetSetter {
+func (r rateFloat) Get(args ...pkg.Getter) pkg.GetSetter {
 	if len(args) > 0 {
 		if a, ok := args[0].(Architecture); ok {
 			return a.Get().Get(r)
@@ -49,10 +49,10 @@ func (r rateType) Get(args ...pkg.Getter) pkg.GetSetter {
 }
 
 // check
-func (r rateType) check() rateType {
+func (r rateFloat) check() rateFloat {
 	switch {
 	case r < 0 || r > 1:
-		return rateType(DefaultRate)
+		return rateFloat(DefaultRate)
 	default:
 		return r
 	}

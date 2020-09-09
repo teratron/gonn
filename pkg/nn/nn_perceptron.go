@@ -22,10 +22,10 @@ type perceptron struct {
 	// Configuration
 	Conf struct {
 		// Array of the number of neurons in each hidden layer
-		HiddenLayer HiddenType `json:"hiddenLayer" xml:"hiddenLayer>layer"`
+		HiddenLayer HiddenArrUint `json:"hiddenLayer" xml:"hiddenLayer>layer"`
 
 		// The neuron bias, false or true
-		Bias biasType `json:"bias" xml:"bias"`
+		Bias biasBool `json:"bias" xml:"bias"`
 
 		// Activation function mode
 		ActivationMode uint8 `json:"activationMode" xml:"activationMode"`
@@ -68,7 +68,7 @@ func (p *perceptron) setArchitecture(network Architecture) {
 	if n, ok := network.(*nn); ok {
 		p.Architecture = n
 	}
-	p.Conf.HiddenLayer    = HiddenType{9, 2}
+	p.Conf.HiddenLayer    = HiddenArrUint{9, 2}
 	p.Conf.Bias           = false
 	p.Conf.ActivationMode = ModeSIGMOID
 	p.Conf.LossMode       = ModeMSE
@@ -115,17 +115,17 @@ func (p *perceptron) Weight() Floater {
 func (p *perceptron) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
 		switch v := args[0].(type) {
-		case HiddenType:
+		case HiddenArrUint:
 			p.Conf.HiddenLayer = v
-		case biasType:
+		case biasBool:
 			p.Conf.Bias = v
-		case activationModeType:
+		case activationModeUint:
 			p.Conf.ActivationMode = uint8(v)
-		case lossModeType:
+		case lossModeUint:
 			p.Conf.LossMode = uint8(v)
-		case lossLevelType:
+		case lossLevelFloat:
 			p.Conf.LossLevel = float64(v)
-		case rateType:
+		case rateFloat:
 			p.Conf.Rate = floatType(v)
 		case *weight:
 			p.setWeight(v.buffer.(*float3Type))
@@ -141,17 +141,17 @@ func (p *perceptron) Set(args ...pkg.Setter) {
 func (p *perceptron) Get(args ...pkg.Getter) pkg.GetSetter {
 	if len(args) > 0 {
 		switch args[0].(type) {
-		case HiddenType:
+		case HiddenArrUint:
 			return p.Conf.HiddenLayer
-		case biasType:
+		case biasBool:
 			return p.Conf.Bias
-		case activationModeType:
-			return activationModeType(p.Conf.ActivationMode)
-		case lossModeType:
-			return lossModeType(p.Conf.LossMode)
-		case lossLevelType:
-			return lossLevelType(p.Conf.LossLevel)
-		case rateType:
+		case activationModeUint:
+			return activationModeUint(p.Conf.ActivationMode)
+		case lossModeUint:
+			return lossModeUint(p.Conf.LossMode)
+		case lossLevelFloat:
+			return lossLevelFloat(p.Conf.LossLevel)
+		case rateFloat:
 			return p.Conf.Rate
 		case *weight:
 			return p.getWeight()
@@ -214,22 +214,18 @@ func (p *perceptron) Write(writer ...pkg.Writer) {
 // init initialize
 func (p *perceptron) init(lenInput int, lenTarget ...interface{}) bool {
 	if len(lenTarget) > 0 {
-		var tmp HiddenType
-		defer func() {
-			tmp = nil
-		}()
+		var tmp HiddenArrUint
+		defer func() { tmp = nil }()
 
 		p.lastIndexLayer = len(p.Conf.HiddenLayer)
 		p.lenInput = lenInput
 		p.lenOutput = lenTarget[0].(int)
 		tmp = append(p.Conf.HiddenLayer, uint(p.lenOutput))
-		layer := make(HiddenType, p.lastIndexLayer+1)
+		layer := make(HiddenArrUint, p.lastIndexLayer+1)
 		lenLayer := copy(layer, tmp)
 
 		bias := 0
-		if p.Conf.Bias {
-			bias = 1
-		}
+		if p.Conf.Bias { bias = 1 }
 
 		p.neuron = make([][]*neuron, lenLayer)
 		p.axon = make([][][]*axon, lenLayer)
@@ -261,7 +257,7 @@ func (p *perceptron) reInit() {
 		bias = 1
 	}
 	length := len(p.Conf.Weight) - 1
-	p.Conf.HiddenLayer = make(HiddenType, length)
+	p.Conf.HiddenLayer = make(HiddenArrUint, length)
 	for i := range p.Conf.HiddenLayer {
 		p.Conf.HiddenLayer[i] = uint(len(p.Conf.Weight[i]))
 	}
@@ -301,13 +297,13 @@ func (p *perceptron) initAxon() {
 					if k < p.lenInput {
 						p.axon[i][j][k].synapse["input"] = floatType(0)
 					} else {
-						p.axon[i][j][k].synapse["input"] = biasType(true)
+						p.axon[i][j][k].synapse["input"] = biasBool(true)
 					}
 				} else {
 					if k < len(p.axon[i-1]) {
 						p.axon[i][j][k].synapse["input"] = p.neuron[i - 1][k]
 					} else {
-						p.axon[i][j][k].synapse["input"] = biasType(true)
+						p.axon[i][j][k].synapse["input"] = biasBool(true)
 					}
 				}
 				p.axon[i][j][k].synapse["output"] = p.neuron[i][j]

@@ -22,7 +22,7 @@ func (a *axon) getSynapseInput() (input floatType) {
 	switch s := a.synapse["input"].(type) {
 	case floatType:
 		input = s
-	case biasType:
+	case biasBool:
 		if s { input = 1 }
 	case *neuron:
 		input = s.value

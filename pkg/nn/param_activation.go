@@ -7,7 +7,7 @@ import (
 	"github.com/zigenzoog/gonn/pkg"
 )
 
-type activationModeType uint8
+type activationModeUint uint8
 
 const (
 	ModeLINEAR    uint8 = iota // Linear/identity
@@ -20,9 +20,9 @@ const (
 // ActivationMode
 func ActivationMode(mode ...uint8) pkg.GetSetter {
 	if len(mode) > 0 {
-		return activationModeType(mode[0])
+		return activationModeUint(mode[0])
 	} else {
-		return activationModeType(0)
+		return activationModeUint(0)
 	}
 }
 
@@ -32,7 +32,7 @@ func (n *nn) ActivationMode() uint8 {
 }
 
 // Set
-func (m activationModeType) Set(args ...pkg.Setter) {
+func (m activationModeUint) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
 		if a, ok := args[0].(Architecture); ok {
 			a.Get().Set(m.check())
@@ -43,7 +43,7 @@ func (m activationModeType) Set(args ...pkg.Setter) {
 }
 
 // Get
-func (m activationModeType) Get(args ...pkg.Getter) pkg.GetSetter {
+func (m activationModeUint) Get(args ...pkg.Getter) pkg.GetSetter {
 	if len(args) > 0 {
 		if a, ok := args[0].(Architecture); ok {
 			return a.Get().Get(m)
@@ -55,10 +55,10 @@ func (m activationModeType) Get(args ...pkg.Getter) pkg.GetSetter {
 }
 
 // check
-func (m activationModeType) check() activationModeType {
+func (m activationModeUint) check() activationModeUint {
 	switch {
-	case m < 0 || m > activationModeType(ModeTANH):
-		return activationModeType(ModeSIGMOID)
+	case m < 0 || m > activationModeUint(ModeTANH):
+		return activationModeUint(ModeSIGMOID)
 	default:
 		return m
 	}

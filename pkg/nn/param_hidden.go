@@ -6,10 +6,10 @@ import (
 	"github.com/zigenzoog/gonn/pkg"
 )
 
-type HiddenType []uint
+type HiddenArrUint []uint
 
 // HiddenLayer
-func HiddenLayer(nums ...uint) HiddenType {
+func HiddenLayer(nums ...uint) HiddenArrUint {
 	return nums
 }
 
@@ -19,7 +19,7 @@ func (n *nn) HiddenLayer() []uint {
 }
 
 // Set
-func (h HiddenType) Set(args ...pkg.Setter) {
+func (h HiddenArrUint) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
 		if n, ok := args[0].(*nn); ok && !n.IsInit {
 			n.Get().Set(h)
@@ -30,7 +30,7 @@ func (h HiddenType) Set(args ...pkg.Setter) {
 }
 
 // Get
-func (h HiddenType) Get(args ...pkg.Getter) pkg.GetSetter {
+func (h HiddenArrUint) Get(args ...pkg.Getter) pkg.GetSetter {
 	if len(args) > 0 {
 		if n, ok := args[0].(Architecture); ok {
 			return n.Get().Get(h)

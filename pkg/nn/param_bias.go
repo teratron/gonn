@@ -6,14 +6,14 @@ import (
 	"github.com/zigenzoog/gonn/pkg"
 )
 
-type biasType bool
+type biasBool bool
 
 // Bias
 func Bias(bias ...bool) pkg.GetSetter {
 	if len(bias) > 0 {
-		return biasType(bias[0])
+		return biasBool(bias[0])
 	} else {
-		return biasType(false)
+		return biasBool(false)
 	}
 }
 
@@ -23,7 +23,7 @@ func (n *nn) Bias() bool {
 }
 
 // Set
-func (b biasType) Set(args ...pkg.Setter) {
+func (b biasBool) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
 		if n, ok := args[0].(*nn); ok && !n.IsInit {
 			n.Get().Set(b)
@@ -34,7 +34,7 @@ func (b biasType) Set(args ...pkg.Setter) {
 }
 
 // Get
-func (b biasType) Get(args ...pkg.Getter) pkg.GetSetter {
+func (b biasBool) Get(args ...pkg.Getter) pkg.GetSetter {
 	if len(args) > 0 {
 		if n, ok := args[0].(Architecture); ok {
 			return n.Get().Get(b)

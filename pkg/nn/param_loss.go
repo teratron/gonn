@@ -7,8 +7,8 @@ import (
 )
 
 type (
-	lossModeType  uint8   // Average error mode
-	lossLevelType float64 // Level loss
+	lossModeUint   uint8   // Average error mode
+	lossLevelFloat float64 // Level loss
 )
 
 const (
@@ -21,18 +21,18 @@ const (
 // LossMode
 func LossMode(mode ...uint8) pkg.GetSetter {
 	if len(mode) > 0 {
-		return lossModeType(mode[0])
+		return lossModeUint(mode[0])
 	} else {
-		return lossModeType(0)
+		return lossModeUint(0)
 	}
 }
 
 // LossLevel
 func LossLevel(level ...float64) pkg.GetSetter {
 	if len(level) > 0 {
-		return lossLevelType(level[0])
+		return lossLevelFloat(level[0])
 	} else {
-		return lossLevelType(0)
+		return lossLevelFloat(0)
 	}
 }
 
@@ -47,7 +47,7 @@ func (n *nn) LossLevel() float64 {
 }
 
 // Set
-func (m lossModeType) Set(args ...pkg.Setter) {
+func (m lossModeUint) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
 		if a, ok := args[0].(Architecture); ok {
 			a.Get().Set(m.check())
@@ -58,7 +58,7 @@ func (m lossModeType) Set(args ...pkg.Setter) {
 }
 
 // Set
-func (l lossLevelType) Set(args ...pkg.Setter) {
+func (l lossLevelFloat) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
 		if a, ok := args[0].(Architecture); ok {
 			a.Get().Set(l.check())
@@ -69,7 +69,7 @@ func (l lossLevelType) Set(args ...pkg.Setter) {
 }
 
 // Get
-func (m lossModeType) Get(args ...pkg.Getter) pkg.GetSetter {
+func (m lossModeUint) Get(args ...pkg.Getter) pkg.GetSetter {
 	if len(args) > 0 {
 		if a, ok := args[0].(Architecture); ok {
 			return a.Get().Get(m)
@@ -81,7 +81,7 @@ func (m lossModeType) Get(args ...pkg.Getter) pkg.GetSetter {
 }
 
 // Get
-func (l lossLevelType) Get(args ...pkg.Getter) pkg.GetSetter {
+func (l lossLevelFloat) Get(args ...pkg.Getter) pkg.GetSetter {
 	if len(args) > 0 {
 		if a, ok := args[0].(Architecture); ok {
 			return a.Get().Get(l)
@@ -93,20 +93,20 @@ func (l lossLevelType) Get(args ...pkg.Getter) pkg.GetSetter {
 }
 
 // check
-func (m lossModeType) check() lossModeType {
+func (m lossModeUint) check() lossModeUint {
 	switch {
-	case m < 0 || m > lossModeType(ModeARCTAN):
-		return lossModeType(ModeMSE)
+	case m < 0 || m > lossModeUint(ModeARCTAN):
+		return lossModeUint(ModeMSE)
 	default:
 		return m
 	}
 }
 
 // check
-func (l lossLevelType) check() lossLevelType {
+func (l lossLevelFloat) check() lossLevelFloat {
 	switch {
-	case l < 0 || l < lossLevelType(MinLossLevel):
-		return lossLevelType(MinLossLevel)
+	case l < 0 || l < lossLevelFloat(MinLossLevel):
+		return lossLevelFloat(MinLossLevel)
 	default:
 		return l
 	}
