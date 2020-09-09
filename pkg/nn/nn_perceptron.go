@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"log"
 	"math"
 
 	"github.com/zigenzoog/gonn/pkg"
@@ -179,15 +178,14 @@ func (p *perceptron) Copy(copier pkg.Copier) {
 
 // Paste
 func (p *perceptron) Paste(paster pkg.Paster) {
-	var err error
 	switch v := paster.(type) {
 	case *weight:
-		err = p.pasteWeight()
+		err := p.pasteWeight()
+		if err != nil {
+			errNN(err)
+		}
 	default:
 		errNN(fmt.Errorf("%v for paste: %v", ErrMissingType, v))
-	}
-	if err != nil {
-		// TODO: error
 	}
 }
 
@@ -339,9 +337,7 @@ func (p *perceptron) calcNeuron(input []float64) {
 				wait <- true
 			}(w)
 		}
-		for range v {
-			<-wait
-		}
+		for range v { <-wait }
 	}
 }
 
@@ -389,9 +385,7 @@ func (p *perceptron) calcMiss(input []float64) {
 				wait <- true
 			}(j, v)
 		}
-		for range p.neuron[i] {
-			<-wait
-		}
+		for range p.neuron[i] { <-wait }
 	}
 }
 
@@ -412,9 +406,7 @@ func (p *perceptron) calcAxon(input []float64) {
 					wait <- true
 				}(w)
 			}
-			for range v {
-				<-wait
-			}
+			for range v { <-wait }
 		}
 	}
 }
@@ -517,8 +509,9 @@ func (p *perceptron) pasteWeight() (err error) {
 			}
 		}
 		p.deleteWeight()
+	} else {
+		err = fmt.Errorf("paste weight error: missing weights\n")
 	}
-	// TODO: where error?
 	return
 }
 
@@ -537,7 +530,7 @@ func (p *perceptron) readJSON(value interface{}) {
 	}
 	p.reInit()
 	if err := p.pasteWeight(); err != nil {
-		errNN(err)
+		errNN(fmt.Errorf("read json: %w", err))
 	}
 }
 
@@ -550,7 +543,7 @@ func (p *perceptron) writeReport(report *report) {
 
 	printFormat := func(format string, a ...interface{}) {
 		if _, err := fmt.Fprintf(b, format, a...); err != nil {
-			errNN(err)
+			errNN(fmt.Errorf("write report error: %w", err))
 		}
 	}
 
@@ -605,8 +598,8 @@ func (p *perceptron) writeReport(report *report) {
 	}
 
 	if _, err := b.WriteTo(report.file); err != nil {
-		log.Println(err)
+		errNN(fmt.Errorf("write report error: %w", err))
 	} else if err = report.file.Close(); err != nil {
-		log.Println(err)
+		errNN(fmt.Errorf("write report close error: %w", err))
 	}
 }

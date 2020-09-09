@@ -4,9 +4,7 @@ package nn
 import (
 	"encoding/csv"
 	"fmt"
-	"io/ioutil"
 	"log"
-	"os"
 
 	"github.com/zigenzoog/gonn/pkg"
 )
@@ -54,11 +52,11 @@ func (c csvString) Write(writer ...pkg.Writer) {
 			} else {
 				errNN(fmt.Errorf("csv write: %w", ErrNotTrained))
 			}
-			if b, err := csv.MarshalIndent(&n, "", "\t"); err != nil {
+			/*if b, err := csv.MarshalIndent(&n, "", "\t"); err != nil {
 				errCSV(fmt.Errorf("write %w", err))
 			} else if err = ioutil.WriteFile(filename, b, os.ModePerm); err != nil {
 				errOS(err)
-			}
+			}*/
 		}
 	} else {
 		errNN(fmt.Errorf("%w csv write", ErrEmpty))

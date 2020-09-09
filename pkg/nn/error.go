@@ -25,6 +25,6 @@ func errNN(err error) {
 	case :
 		log.Println("marshaling json error:", e)*/
 	default:
-		log.Println("error:", err)
+		log.Println(err)
 	}
 }
