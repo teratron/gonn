@@ -155,7 +155,7 @@ func (p *perceptron) Get(args ...pkg.Getter) pkg.GetSetter {
 		case *weight:
 			return p.getWeight()
 		default:
-			errNN(fmt.Errorf("%w for perceptron", ErrMissingType))
+			errNN(fmt.Errorf("%T %w for perceptron", args[0], ErrMissingType))
 			return nil
 		}
 	} else {
@@ -172,7 +172,7 @@ func (p *perceptron) Copy(copier pkg.Copier) {
 	case *weight:
 		p.copyWeight()
 	default:
-		errNN(fmt.Errorf("%v for copy: %v", ErrMissingType, c))
+		errNN(fmt.Errorf("%T %w for copy: %v", c, ErrMissingType, c))
 	}
 }
 
@@ -185,15 +185,17 @@ func (p *perceptron) Paste(paster pkg.Paster) {
 			errNN(err)
 		}
 	default:
-		errNN(fmt.Errorf("%v for paste: %v", ErrMissingType, v))
+		errNN(fmt.Errorf("%T %w for paste: %v", v, ErrMissingType, v))
 	}
 }
 
 // Read
 func (p *perceptron) Read(reader pkg.Reader) {
 	switch r := reader.(type) {
+	case csvString:
+		p.readCSV()
 	default:
-		errNN(fmt.Errorf("%v for read: %v", ErrMissingType, r))
+		errNN(fmt.Errorf("%T %w for read: %v", r, ErrMissingType, r))
 	}
 }
 
@@ -201,10 +203,12 @@ func (p *perceptron) Read(reader pkg.Reader) {
 func (p *perceptron) Write(writer ...pkg.Writer) {
 	for _, w := range writer {
 		switch v := w.(type) {
+		case csvString:
+			p.writeCSV(v)
 		case *report:
 			p.writeReport(v)
 		default:
-			errNN(fmt.Errorf("%v for write: %v", ErrMissingType, w))
+			errNN(fmt.Errorf("%T %w for write: %v", v, ErrMissingType, w))
 		}
 	}
 }
@@ -532,6 +536,14 @@ func (p *perceptron) readJSON(value interface{}) {
 	if err := p.pasteWeight(); err != nil {
 		errNN(fmt.Errorf("read json: %w", err))
 	}
+}
+
+// readCSV
+func (p *perceptron) readCSV() {
+}
+
+// writeCSV
+func (p *perceptron) writeCSV(weight float3Type) {
 }
 
 // writeReport report of neural network training results in io.Writer

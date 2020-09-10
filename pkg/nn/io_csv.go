@@ -12,7 +12,7 @@ import (
 type csvString string
 
 // CSV
-func CSV(filename ...string/*, comma rune*/) pkg.ReadWriter {
+func CSV(filename ...string) pkg.ReadWriter {
 	if len(filename) > 0 {
 		return csvString(filename[0])
 	} else {
@@ -43,8 +43,8 @@ func (c csvString) Write(writer ...pkg.Writer) {
 				if len(n.csv) > 0 {
 					filename = n.csv
 				} else {
-					// TODO: generate filename
-					filename = "config/neural_network.csv"
+					// TODO: generate path and filename
+					filename = "config/neural_network_weights.csv"
 				}
 			}
 			if n.IsTrain {
@@ -52,11 +52,6 @@ func (c csvString) Write(writer ...pkg.Writer) {
 			} else {
 				errNN(fmt.Errorf("csv write: %w", ErrNotTrained))
 			}
-			/*if b, err := csv.MarshalIndent(&n, "", "\t"); err != nil {
-				errCSV(fmt.Errorf("write %w", err))
-			} else if err = ioutil.WriteFile(filename, b, os.ModePerm); err != nil {
-				errOS(err)
-			}*/
 		}
 	} else {
 		errNN(fmt.Errorf("%w csv write", ErrEmpty))
@@ -71,5 +66,4 @@ func errCSV(err error) {
 	default:
 		log.Println(err)
 	}
-	//os.Exit(1)
 }

@@ -91,7 +91,7 @@ func (j jsonString) Write(writer ...pkg.Writer) {
 				if len(n.json) > 0 {
 					filename = n.json
 				} else {
-					// TODO: generate filename
+					// TODO: generate path and filename
 					filename = "config/neural_network.json"
 				}
 			}
@@ -123,5 +123,4 @@ func errJSON(err error) {
 	default:
 		log.Println(err)
 	}
-	//os.Exit(1)
 }

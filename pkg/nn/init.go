@@ -20,6 +20,7 @@ func New(reader ...pkg.Reader) NeuralNetwork {
 		IsInit:       false,
 		IsTrain:      false,
 		json:         "",
+		xml:          "",
 		csv:          "",
 	}
 	if len(reader) > 0 {

@@ -17,13 +17,7 @@ var (
 
 // errNN
 func errNN(err error) {
-	switch e := err.(type) {
-	case error:
-		log.Println("error:", e)
-	/*case :
-		log.Println("unmarshal json error:", e)
-	case :
-		log.Println("marshaling json error:", e)*/
+	switch err.(type) {
 	default:
 		log.Println(err)
 	}
