@@ -38,7 +38,7 @@ func (c csvString) Read(reader pkg.Reader) {
 func (c csvString) Write(writer ...pkg.Writer) {
 	if len(writer) > 0 {
 		if n, ok := writer[0].(*nn); ok {
-			filename := string(c)
+			filename := c
 			if len(filename) == 0 {
 				if len(n.csv) > 0 {
 					filename = n.csv
@@ -48,7 +48,9 @@ func (c csvString) Write(writer ...pkg.Writer) {
 				}
 			}
 			if n.IsTrain {
-				n.Copy(Weight())
+				if a, ok := n.Architecture.(NeuralNetwork); ok {
+					a.Write(filename)
+				}
 			} else {
 				errNN(fmt.Errorf("csv write: %w", ErrNotTrained))
 			}

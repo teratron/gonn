@@ -540,10 +540,16 @@ func (p *perceptron) readJSON(value interface{}) {
 
 // readCSV
 func (p *perceptron) readCSV() {
+
 }
 
 // writeCSV
-func (p *perceptron) writeCSV(weight float3Type) {
+func (p *perceptron) writeCSV(filename csvString) {
+	var record [][]string
+	fmt.Println(filename, p.Conf.Weight)
+	p.copyWeight()
+	for range p.Conf.Weight {
+	}
 }
 
 // writeReport report of neural network training results in io.Writer
