@@ -26,9 +26,7 @@ func File(filename string) *os.File {
 		}
 	}*/
 	file, err := os.Create(filename)
-	if err != nil {
-		errOS(err)
-	}
+	if err != nil { errOS(err) }
 	return file
 }
 

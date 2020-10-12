@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
+	"strconv"
 
 	"github.com/zigenzoog/gonn/pkg"
 )
@@ -490,9 +491,7 @@ func (p *perceptron) setWeight(weight *float3Type) {
 
 // copyWeight copies weights to the buffer
 func (p *perceptron) copyWeight() {
-	if p.weight == nil {
-		p.initWeight()
-	}
+	if p.weight == nil { p.initWeight() }
 	for i, u := range p.axon {
 		for j, v := range u {
 			for k, w := range v {
@@ -514,7 +513,7 @@ func (p *perceptron) pasteWeight() (err error) {
 		}
 		p.deleteWeight()
 	} else {
-		err = fmt.Errorf("paste weight error: missing weights\n")
+		err = fmt.Errorf("paste weight error: missing weights")
 	}
 	return
 }
@@ -545,15 +544,27 @@ func (p *perceptron) readCSV() {
 
 // writeCSV
 func (p *perceptron) writeCSV(filename csvString) {
-	var record [][]string
-	fmt.Println(filename, p.Conf.Weight)
+	//var record [][]string
+	//fmt.Println(filename, p.Conf.Weight)
+	record := make([][]string, 10000/*len(p.Conf.Weight)*/)
+	n := 0
 	p.copyWeight()
-	for range p.Conf.Weight {
+	for i, u := range p.Conf.Weight {
+		for j, v := range u {
+			record[n][j] = ""
+			for k, w := range v {
+				//p.axon[i][j][k].weight = w
+				//record[j][k] = strconv.FormatFloat(float64(w), 'f', -1, 64)
+				fmt.Println(i, j, k, strconv.FormatFloat(float64(w), 'f', -1, 64))
+				record[i][j] += strconv.FormatFloat(float64(w), 'f', -1, 64) + " "
+			}
+			n += i
+		}
 	}
 }
 
 // writeReport report of neural network training results in io.Writer
-func (p *perceptron) writeReport(report *report) {
+func (p *perceptron) writeReport(rep *report) {
 	s := "----------------------------------------------\n"
 	n := "\n"
 	m := "\n\n"
@@ -566,7 +577,7 @@ func (p *perceptron) writeReport(report *report) {
 	}
 
 	// Input layer
-	if in, ok := report.args[0].([]float64); ok {
+	if in, ok := rep.args[0].([]float64); ok {
 		printFormat("%s0 Input layer size: %d\n%sNeurons:\t", s, p.lenInput, s)
 		for _, v := range in {
 			printFormat("  %v", v)
@@ -608,16 +619,16 @@ func (p *perceptron) writeReport(report *report) {
 	}
 
 	// Resume
-	if loss, ok := report.args[1].(float64); ok {
+	if loss, ok := rep.args[1].(float64); ok {
 		printFormat("%sTotal loss (error):\t\t%v\n", s, loss)
 	}
-	if count, ok := report.args[2].(int); ok {
+	if count, ok := rep.args[2].(int); ok {
 		printFormat("Number of iteration:\t%v\n", count)
 	}
 
-	if _, err := b.WriteTo(report.file); err != nil {
+	if _, err := b.WriteTo(rep.file); err != nil {
 		errNN(fmt.Errorf("write report error: %w", err))
-	} else if err = report.file.Close(); err != nil {
+	} else if err = rep.file.Close(); err != nil {
 		errNN(fmt.Errorf("write report close error: %w", err))
 	}
 }
