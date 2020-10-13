@@ -555,7 +555,7 @@ func (p *perceptron) writeCSV(filename csvString) {
 			for k, w := range v {
 				//p.axon[i][j][k].weight = w
 				//record[j][k] = strconv.FormatFloat(float64(w), 'f', -1, 64)
-				//fmt.Println(i, j, k, strconv.FormatFloat(float64(w), 'f', -1, 64))
+				fmt.Println(i, j, k, strconv.FormatFloat(float64(w), 'f', -1, 64))
 				record[i][j] += strconv.FormatFloat(float64(w), 'f', -1, 64) + " "
 			}
 			n += i
