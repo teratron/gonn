@@ -543,7 +543,7 @@ func (p *perceptron) readCSV() {
 }
 
 // writeCSV
-func (p *perceptron) writeCSV(filename csvString) {
+/*func (p *perceptron) writeCSV(filename csvString) {
 	//var record [][]string
 	//fmt.Println(filename, p.Conf.Weight)
 	record := make([][]string, 10000/*len(p.Conf.Weight)*/)
@@ -561,7 +561,7 @@ func (p *perceptron) writeCSV(filename csvString) {
 			n += i
 		}
 	}
-}
+}*/
 
 // writeReport report of neural network training results in io.Writer
 func (p *perceptron) writeReport(rep *report) {
