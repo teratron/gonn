@@ -293,7 +293,7 @@ func (p *perceptron) initAxon() {
 					synapse: map[string]Synapser{},
 				}
 				if !isTrain {
-					p.axon[i][j][k].weight = .5 //getRand()
+					p.axon[i][j][k].weight = getRand()
 				}
 				if i == 0 {
 					if k < p.lenInput {
@@ -418,7 +418,7 @@ func (p *perceptron) calcAxon(input []float64) {
 // Train training neural network
 func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, count int) {
 	if len(target) > 0 {
-		for count < 1 /*MaxIteration*/ {
+		for count < MaxIteration {
 			p.calcNeuron(input)
 			if loss = p.calcLoss(target[0]); loss <= p.Conf.LossLevel || loss <= MinLossLevel {
 				break

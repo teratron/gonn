@@ -5,19 +5,12 @@ import "github.com/zigenzoog/gonn/pkg"
 // Declare conformity with NeuralNetwork interface
 var _ NeuralNetwork = (*nn)(nil)
 
-//
 type NeuralNetwork interface {
-	//
 	Parameter
-
-	//
 	Constructor
-
-	//
 	pkg.Controller
 }
 
-//
 type nn struct {
 	// Architecture of neural network
 	Architecture `json:"architecture,omitempty" xml:"architecture,omitempty"`

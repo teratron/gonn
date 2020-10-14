@@ -22,16 +22,6 @@ func CSV(filename ...string) pkg.ReadWriter {
 
 // Read
 func (c csvString) Read(reader pkg.Reader) {
-	/*if n, ok := reader.(*nn); ok {
-		filename := string(c)
-		if len(filename) == 0 {
-			errCSV(fmt.Errorf("error: file csv is missing"))
-		}
-		b, err := ioutil.ReadFile(filename)
-		if err != nil {
-			errOS(err)
-		}
-	}*/
 }
 
 // Write

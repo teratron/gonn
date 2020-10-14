@@ -6,7 +6,6 @@ import "github.com/zigenzoog/gonn/pkg"
 var _ Application = (*app)(nil)
 
 type Application interface {
-	//
 	pkg.Controller
 }
 
