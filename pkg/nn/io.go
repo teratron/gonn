@@ -14,17 +14,6 @@ type Filer interface {
 
 // File
 func File(filename string) *os.File {
-	/*file, err := os.Open(filename)
-	if err != nil {
-		errOS(err)
-		if os.IsNotExist(err) {
-			file, err = os.Create(filename)
-			if err != nil {
-				errOS(err)
-				return nil
-			}
-		}
-	}*/
 	file, err := os.Create(filename)
 	if err != nil { errOS(err) }
 	return file

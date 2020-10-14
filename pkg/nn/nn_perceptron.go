@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
-	"strconv"
 
 	"github.com/zigenzoog/gonn/pkg"
 )
@@ -539,29 +538,11 @@ func (p *perceptron) readJSON(value interface{}) {
 
 // readCSV
 func (p *perceptron) readCSV() {
-
 }
 
 // writeCSV
-/*func (p *perceptron) writeCSV(filename csvString) {
-	//var record [][]string
-	//fmt.Println(filename, p.Conf.Weight)
-	record := make([][]string, 10000/*len(p.Conf.Weight)*/)
-	n := 0
-	p.copyWeight()
-	for i, u := range p.Conf.Weight {
-		for j, v := range u {
-			record[n][j] = ""
-			for k, w := range v {
-				//p.axon[i][j][k].weight = w
-				//record[j][k] = strconv.FormatFloat(float64(w), 'f', -1, 64)
-				fmt.Println(i, j, k, strconv.FormatFloat(float64(w), 'f', -1, 64))
-				record[i][j] += strconv.FormatFloat(float64(w), 'f', -1, 64) + " "
-			}
-			n += i
-		}
-	}
-}*/
+func (p *perceptron) writeCSV(filename csvString) {
+}
 
 // writeReport report of neural network training results in io.Writer
 func (p *perceptron) writeReport(rep *report) {

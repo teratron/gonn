@@ -30,7 +30,3 @@ type nn struct {
 	xml  string
 	csv  csvString
 }
-
-type NN struct {
-	*nn
-}
