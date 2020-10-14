@@ -7,6 +7,7 @@ import (
 	"github.com/zigenzoog/gonn/pkg"
 )
 
+// report
 type report struct {
 	file *os.File
 	args []interface{}

@@ -1,6 +1,6 @@
-//
 package nn
 
+//
 type Constructor interface {
 	// Initializing
 	init(int, ...interface{}) bool
