@@ -54,5 +54,5 @@ func main() {
 
 	// Weight
 	fmt.Println("n.Get(nn.Weight()):", n.Get(nn.Weight()))
-	n.Set(nn.Weight())
+	//n.Set(nn.Weight())
 }

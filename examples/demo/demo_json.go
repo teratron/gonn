@@ -7,8 +7,8 @@ func main() {
 	n := nn.New(nn.JSON("config/perceptron.json"))
 
 	// Training dataset
-	input  := []float64{2.3, 3.1}
-	target := []float64{3.6}
+	input  := []float64{.27, .31, .52}
+	target := []float64{.66, .81}
 
 	// Training
 	_, _ = n.Train(input, target)
