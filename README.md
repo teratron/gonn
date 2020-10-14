@@ -59,10 +59,6 @@ func main() {
 }
 ```
 
-And you can run that simply as:
-    
-    $ go run main.go
-
 # Documentation
 More documentation is available at the [gonn website](https://zigenzoog.github.io/gonn/) or on [pkg.go.dev](https://pkg.go.dev/zigenzoog/gonn?tab=doc).
 
