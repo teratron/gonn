@@ -24,7 +24,7 @@ func main() {
 
 	// Training dataset
 	dataSet   := []float64{.27, .31, .52, .66, .81, .13, .2, .49, .11, .73, .28, .43}
-	numInput  := 3  // Number of input data
+	numInput  := 3 // Number of input data
 	numOutput := 2 // Number of output data
 
 	// Training
