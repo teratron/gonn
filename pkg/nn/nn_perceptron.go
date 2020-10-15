@@ -4,6 +4,7 @@ package nn
 import (
 	"bytes"
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"math"
 	"strconv"
@@ -534,6 +535,19 @@ func (p *perceptron) readJSON(value interface{}) {
 	p.reInit()
 	if err := p.pasteWeight(); err != nil {
 		errNN(fmt.Errorf("read json: %w", err))
+	}
+}
+
+// readXML
+func (p *perceptron) readXML(value interface{}) {
+	if b, err := xml.Marshal(&value); err != nil {
+		errXML(fmt.Errorf("read marshal %w", err))
+	} else if err = xml.Unmarshal(b, &p.Conf); err != nil {
+		errXML(fmt.Errorf("read unmarshal %w", err))
+	}
+	p.reInit()
+	if err := p.pasteWeight(); err != nil {
+		errNN(err)
 	}
 }
 
