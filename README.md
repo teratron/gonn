@@ -29,7 +29,7 @@ import (
 
 func main() {
 	// New returns a new neural network instance with the default parameters,
-    // same n := nn.New(Perceptron())
+	// same n := nn.New(Perceptron())
 	n := nn.New()
 
 	// Set parameters:
