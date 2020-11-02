@@ -11,7 +11,7 @@ func (a *app) Set(args ...pkg.Setter) {
 			}
 		}*/
 	} else {
-		pkg.Log("Empty Set()", true) // !!!
+		//pkg.Log("Empty Set()", true) // !!!
 	}
 }
 
