@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-// The maximum number of iterations after which training is forcibly terminated
+// MaxIteration the maximum number of iterations after which training is forcibly terminated
 const MaxIteration int = 10e+05
 
 // Train
