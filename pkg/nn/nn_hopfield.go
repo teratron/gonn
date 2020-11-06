@@ -1,9 +1,7 @@
 // Hopfield Neural Network - under construction
 package nn
 
-import (
-	"github.com/zigenzoog/gonn/pkg"
-)
+import "github.com/zigenzoog/gonn/pkg"
 
 // Declare conformity with NeuralNetwork interface
 var _ NeuralNetwork = (*hopfield)(nil)
@@ -15,9 +13,9 @@ type hopfield struct {
 
 	// Configurations
 	Conf struct {
-		Energy floatType	`json:"energy" xml:"energy"`
-		Weight float2Type	`json:"weights" xml:"weight"`
-	}						`json:"hopfield,omitempty" xml:"hopfield,omitempty"`
+		Energy floatType  `json:"energy" xml:"energy"`
+		Weight float2Type `json:"weights" xml:"weight"`
+	} `json:"hopfield,omitempty" xml:"hopfield,omitempty"`
 
 	// Matrix
 	neuron []*neuron

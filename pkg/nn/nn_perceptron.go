@@ -67,12 +67,12 @@ func (p *perceptron) setArchitecture(network Architecture) {
 	if n, ok := network.(*nn); ok {
 		p.Architecture = n
 	}
-	p.Conf.HiddenLayer    = HiddenArrUint{9, 2}
-	p.Conf.Bias           = false
+	p.Conf.HiddenLayer = HiddenArrUint{9, 2}
+	p.Conf.Bias = false
 	p.Conf.ActivationMode = ModeSIGMOID
-	p.Conf.LossMode       = ModeMSE
-	p.Conf.LossLevel      = .0001
-	p.Conf.Rate           = floatType(DefaultRate)
+	p.Conf.LossMode = ModeMSE
+	p.Conf.LossLevel = .0001
+	p.Conf.Rate = floatType(DefaultRate)
 }
 
 // HiddenLayer
@@ -192,8 +192,6 @@ func (p *perceptron) Paste(paster pkg.Paster) {
 // Read
 func (p *perceptron) Read(reader pkg.Reader) {
 	switch r := reader.(type) {
-	case csvString:
-		p.readCSV()
 	default:
 		errNN(fmt.Errorf("%T %w for read: %v", r, ErrMissingType, r))
 	}
@@ -203,8 +201,6 @@ func (p *perceptron) Read(reader pkg.Reader) {
 func (p *perceptron) Write(writer ...pkg.Writer) {
 	for _, w := range writer {
 		switch v := w.(type) {
-		case csvString:
-			p.writeCSV(v)
 		case *report:
 			p.writeReport(v)
 		default:
@@ -227,18 +223,20 @@ func (p *perceptron) init(lenInput int, lenTarget ...interface{}) bool {
 		lenLayer := copy(layer, tmp)
 
 		bias := 0
-		if p.Conf.Bias { bias = 1 }
+		if p.Conf.Bias {
+			bias = 1
+		}
 
 		p.neuron = make([][]*neuron, lenLayer)
 		p.axon = make([][][]*axon, lenLayer)
 		for i, l := range layer {
 			p.neuron[i] = make([]*neuron, l)
-			p.axon[i]   = make([][]*axon, l)
+			p.axon[i] = make([][]*axon, l)
 			for j := 0; j < int(l); j++ {
 				if i == 0 {
-					p.axon[i][j] = make([]*axon, p.lenInput + bias)
+					p.axon[i][j] = make([]*axon, p.lenInput+bias)
 				} else {
-					p.axon[i][j] = make([]*axon, int(layer[i - 1]) + bias)
+					p.axon[i][j] = make([]*axon, int(layer[i-1])+bias)
 				}
 			}
 		}
@@ -264,7 +262,7 @@ func (p *perceptron) reInit() {
 		p.Conf.HiddenLayer[i] = uint(len(p.Conf.Weight[i]))
 	}
 	if n, ok := p.Architecture.(*nn); ok {
-		n.IsInit = p.init(len(p.Conf.Weight[0][0]) - bias, len(p.Conf.Weight[length]))
+		n.IsInit = p.init(len(p.Conf.Weight[0][0])-bias, len(p.Conf.Weight[length]))
 	}
 }
 
@@ -303,7 +301,7 @@ func (p *perceptron) initAxon() {
 					}
 				} else {
 					if k < len(p.axon[i-1]) {
-						p.axon[i][j][k].synapse["input"] = p.neuron[i - 1][k]
+						p.axon[i][j][k].synapse["input"] = p.neuron[i-1][k]
 					} else {
 						p.axon[i][j][k].synapse["input"] = biasBool(true)
 					}
@@ -341,7 +339,9 @@ func (p *perceptron) calcNeuron(input []float64) {
 				wait <- true
 			}(w)
 		}
-		for range v { <-wait }
+		for range v {
+			<-wait
+		}
 	}
 }
 
@@ -378,7 +378,7 @@ func (p *perceptron) calcMiss(input []float64) {
 			go func(j int, n *neuron) {
 				if miss, ok := n.specific.(floatType); ok {
 					miss = 0
-					for _, w := range p.neuron[i + 1] {
+					for _, w := range p.neuron[i+1] {
 						if m, ok := w.specific.(floatType); ok {
 							miss += m * w.axon[j].weight
 						}
@@ -389,7 +389,9 @@ func (p *perceptron) calcMiss(input []float64) {
 				wait <- true
 			}(j, v)
 		}
-		for range p.neuron[i] { <-wait }
+		for range p.neuron[i] {
+			<-wait
+		}
 	}
 }
 
@@ -410,7 +412,9 @@ func (p *perceptron) calcAxon(input []float64) {
 					wait <- true
 				}(w)
 			}
-			for range v { <-wait }
+			for range v {
+				<-wait
+			}
 		}
 	}
 }
@@ -490,7 +494,9 @@ func (p *perceptron) setWeight(weight *float3Type) {
 
 // copyWeight copies weights to the buffer
 func (p *perceptron) copyWeight() {
-	if p.weight == nil { p.initWeight() }
+	if p.weight == nil {
+		p.initWeight()
+	}
 	for i, u := range p.axon {
 		for j, v := range u {
 			for k, w := range v {
@@ -520,7 +526,7 @@ func (p *perceptron) pasteWeight() (err error) {
 // deleteWeight
 func (p *perceptron) deleteWeight() {
 	p.Conf.Weight = nil
-	p.weight      = nil
+	p.weight = nil
 }
 
 // readJSON
@@ -534,14 +540,6 @@ func (p *perceptron) readJSON(value interface{}) {
 	if err := p.pasteWeight(); err != nil {
 		errNN(fmt.Errorf("read json: %w", err))
 	}
-}
-
-// readCSV
-func (p *perceptron) readCSV() {
-}
-
-// writeCSV
-func (p *perceptron) writeCSV(filename csvString) {
 }
 
 // writeReport report of neural network training results in io.Writer
