@@ -23,7 +23,9 @@ func (a *axon) getSynapseInput() (input floatType) {
 	case floatType:
 		input = s
 	case biasBool:
-		if s { input = 1 }
+		if s {
+			input = 1
+		}
 	case *neuron:
 		input = s.value
 	default:
