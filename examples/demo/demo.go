@@ -4,7 +4,7 @@ import "github.com/zigenzoog/gonn/pkg/nn"
 
 func main() {
 	// New returns a new neural network instance with the default parameters,
-	// same n := nn.New(Perceptron())
+	// same n := nn.New(nn.Perceptron())
 	n := nn.New()
 
 	// Set parameters:
