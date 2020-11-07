@@ -4,7 +4,7 @@ import "github.com/zigenzoog/gonn/pkg/nn"
 
 func main() {
 	// New returns a new neural network
-	n := nn.New(nn.JSON("config/perceptron.json"))
+	n := nn.New(nn.JSON("perceptron.json"))
 
 	// Training dataset
 	input := []float64{.27, .31, .52}
