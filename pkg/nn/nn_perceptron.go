@@ -54,7 +54,14 @@ type perceptron struct {
 
 // Perceptron
 func Perceptron() *perceptron {
-	return &perceptron{}
+	p := &perceptron{}
+	p.Conf.HiddenLayer = HiddenArrUint{5, 3}
+	p.Conf.Bias = true
+	p.Conf.ActivationMode = ModeSIGMOID
+	p.Conf.LossMode = ModeMSE
+	p.Conf.LossLevel = .001
+	p.Conf.Rate = floatType(DefaultRate)
+	return p
 }
 
 // architecture
@@ -67,11 +74,11 @@ func (p *perceptron) setArchitecture(network Architecture) {
 	if n, ok := network.(*nn); ok {
 		p.Architecture = n
 	}
-	p.Conf.HiddenLayer = HiddenArrUint{9, 2}
-	p.Conf.Bias = false
+	p.Conf.HiddenLayer = HiddenArrUint{5, 3}
+	p.Conf.Bias = true
 	p.Conf.ActivationMode = ModeSIGMOID
 	p.Conf.LossMode = ModeMSE
-	p.Conf.LossLevel = .0001
+	p.Conf.LossLevel = .001
 	p.Conf.Rate = floatType(DefaultRate)
 }
 
