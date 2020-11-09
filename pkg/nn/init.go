@@ -48,7 +48,6 @@ func (n *nn) init(lenInput int, lenTarget ...interface{}) bool {
 
 // getRand return random number from -0.5 to 0.5
 func getRand() (r floatType) {
-	r = 0
 	for r == 0 {
 		r = floatType(rand.Float64() - .5)
 	}
@@ -58,9 +57,7 @@ func getRand() (r floatType) {
 // getLengthData returns the length of the slices
 func getLengthData(data ...[]float64) []interface{} {
 	var tmp []interface{}
-	defer func() {
-		tmp = nil
-	}()
+	defer func() { tmp = nil }()
 	if len(data) > 0 {
 		for _, v := range data {
 			tmp = append(tmp, len(v))

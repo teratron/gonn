@@ -54,7 +54,14 @@ type perceptron struct {
 
 // Perceptron
 func Perceptron() *perceptron {
-	return &perceptron{}
+	p := &perceptron{}
+	p.Conf.HiddenLayer = HiddenArrUint{5, 3}
+	p.Conf.Bias = true
+	p.Conf.ActivationMode = ModeSIGMOID
+	p.Conf.LossMode = ModeMSE
+	p.Conf.LossLevel = .001
+	p.Conf.Rate = floatType(DefaultRate)
+	return p
 }
 
 // architecture
@@ -67,11 +74,11 @@ func (p *perceptron) setArchitecture(network Architecture) {
 	if n, ok := network.(*nn); ok {
 		p.Architecture = n
 	}
-	p.Conf.HiddenLayer = HiddenArrUint{9, 2}
-	p.Conf.Bias = false
+	p.Conf.HiddenLayer = HiddenArrUint{5, 3}
+	p.Conf.Bias = true
 	p.Conf.ActivationMode = ModeSIGMOID
 	p.Conf.LossMode = ModeMSE
-	p.Conf.LossLevel = .0001
+	p.Conf.LossLevel = .001
 	p.Conf.Rate = floatType(DefaultRate)
 }
 
@@ -370,7 +377,7 @@ func (p *perceptron) calcLoss(target []float64) (loss float64) {
 }
 
 // calcMiss calculating the error of neurons in hidden layers
-func (p *perceptron) calcMiss(input []float64) {
+func (p *perceptron) calcMiss() {
 	wait := make(chan bool)
 	defer close(wait)
 	for i := p.lastIndexLayer - 1; i >= 0; i-- {
@@ -396,8 +403,8 @@ func (p *perceptron) calcMiss(input []float64) {
 }
 
 // calcAxon update weights
-func (p *perceptron) calcAxon(input []float64) {
-	p.calcMiss(input)
+func (p *perceptron) calcAxon() {
+	p.calcMiss()
 	wait := make(chan bool)
 	defer close(wait)
 	for _, u := range p.axon {
@@ -427,8 +434,8 @@ func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, 
 			if loss = p.calcLoss(target[0]); loss <= p.Conf.LossLevel || loss <= MinLossLevel {
 				break
 			}
-			p.calcMiss(input)
-			p.calcAxon(input)
+			p.calcMiss()
+			p.calcAxon()
 			count++
 		}
 	} else {
