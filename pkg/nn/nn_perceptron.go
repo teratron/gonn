@@ -54,14 +54,7 @@ type perceptron struct {
 
 // Perceptron
 func Perceptron() *perceptron {
-	p := &perceptron{}
-	p.Conf.HiddenLayer = HiddenArrUint{5, 3}
-	p.Conf.Bias = true
-	p.Conf.ActivationMode = ModeSIGMOID
-	p.Conf.LossMode = ModeMSE
-	p.Conf.LossLevel = .001
-	p.Conf.Rate = floatType(DefaultRate)
-	return p
+	return &perceptron{}
 }
 
 // architecture

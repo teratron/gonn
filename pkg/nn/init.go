@@ -2,7 +2,6 @@ package nn
 
 import (
 	"fmt"
-	"log"
 	"math/rand"
 	"time"
 
@@ -32,7 +31,7 @@ func New(reader ...pkg.Reader) NeuralNetwork {
 			errNN(fmt.Errorf("%T %w for neural network", r, ErrMissingType))
 		}
 	} else {
-		n.Architecture = &perceptron{}
+		n.Architecture = Perceptron()
 		n.Architecture.setArchitecture(n)
 	}
 	return n
@@ -64,9 +63,4 @@ func getLengthData(data ...[]float64) []interface{} {
 		}
 	}
 	return tmp
-}
-
-// Debug
-func Debug(args ...interface{}) {
-	log.Println(args[0])
 }

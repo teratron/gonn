@@ -38,6 +38,7 @@ func (h *hopfield) setArchitecture(network Architecture) {
 	if n, ok := network.(*nn); ok {
 		h.Architecture = n
 	}
+	h.Conf.Energy = .001
 }
 
 // Energy
