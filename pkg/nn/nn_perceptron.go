@@ -377,7 +377,7 @@ func (p *perceptron) calcLoss(target []float64) (loss float64) {
 }
 
 // calcMiss calculating the error of neurons in hidden layers
-func (p *perceptron) calcMiss(input []float64) {
+func (p *perceptron) calcMiss() {
 	wait := make(chan bool)
 	defer close(wait)
 	for i := p.lastIndexLayer - 1; i >= 0; i-- {
@@ -403,8 +403,8 @@ func (p *perceptron) calcMiss(input []float64) {
 }
 
 // calcAxon update weights
-func (p *perceptron) calcAxon(input []float64) {
-	p.calcMiss(input)
+func (p *perceptron) calcAxon() {
+	p.calcMiss()
 	wait := make(chan bool)
 	defer close(wait)
 	for _, u := range p.axon {
@@ -434,8 +434,8 @@ func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, 
 			if loss = p.calcLoss(target[0]); loss <= p.Conf.LossLevel || loss <= MinLossLevel {
 				break
 			}
-			p.calcMiss(input)
-			p.calcAxon(input)
+			p.calcMiss()
+			p.calcAxon()
 			count++
 		}
 	} else {
