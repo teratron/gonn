@@ -6,6 +6,7 @@ import (
 	"github.com/zigenzoog/gonn/pkg"
 )
 
+// HiddenArrUint
 type HiddenArrUint []uint
 
 // HiddenLayer

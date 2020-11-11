@@ -10,7 +10,6 @@ type Application interface {
 	pkg.Controller
 }
 
-// app
 type app struct {
 }
 

@@ -6,7 +6,6 @@ import (
 )
 
 var (
-	//ErrNotFound      = errors.New("not found")
 	ErrInit          = errors.New("initialization error")
 	ErrNotTrained    = errors.New("network is not trained")
 	ErrNotRecognized = errors.New("network is not recognized")

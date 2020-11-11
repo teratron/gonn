@@ -12,9 +12,8 @@ type biasBool bool
 func Bias(bias ...bool) pkg.GetSetter {
 	if len(bias) > 0 {
 		return biasBool(bias[0])
-	} else {
-		return biasBool(false)
 	}
+	return biasBool(false)
 }
 
 // Bias

@@ -1,7 +1,11 @@
-// Hopfield Neural Network - under construction
+// Package nn - under construction
 package nn
 
-import "github.com/zigenzoog/gonn/pkg"
+import (
+	"fmt"
+
+	"github.com/zigenzoog/gonn/pkg"
+)
 
 // Declare conformity with NeuralNetwork interface
 var _ NeuralNetwork = (*hopfield)(nil)
@@ -23,7 +27,7 @@ type hopfield struct {
 	*weight
 }
 
-// Hopfield
+// Hopfield return
 func Hopfield() *hopfield {
 	return &hopfield{}
 }
@@ -47,24 +51,37 @@ func (h *hopfield) Energy() float32 {
 }
 
 // Set
-func (h *hopfield) Set(args ...pkg.Setter) {}
+func (h *hopfield) Set(args ...pkg.Setter) {
+	fmt.Print(args)
+}
 
 // Get
 func (h *hopfield) Get(args ...pkg.Getter) pkg.GetSetter {
+	fmt.Print(args)
 	return h
 }
 
 // Copy
-func (h *hopfield) Copy(copier pkg.Copier) {}
+func (h *hopfield) Copy(copier pkg.Copier) {
+	fmt.Print(copier)
+}
 
 // Paste
-func (h *hopfield) Paste(paster pkg.Paster) {}
+func (h *hopfield) Paste(paster pkg.Paster) {
+	fmt.Print(paster)
+}
 
 // Read
-func (h *hopfield) Read(reader pkg.Reader) {}
+func (h *hopfield) Read(reader pkg.Reader) {
+	fmt.Print(reader)
+}
 
 // Write
-func (h *hopfield) Write(writer ...pkg.Writer) {}
+func (h *hopfield) Write(writer ...pkg.Writer) {
+	fmt.Print(writer)
+}
 
 // readJSON
-func (h *hopfield) readJSON(value interface{}) {}
+func (h *hopfield) readJSON(value interface{}) {
+	fmt.Print(value)
+}
