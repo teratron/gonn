@@ -1,4 +1,3 @@
-// Perceptron Neural Network
 package nn
 
 import (
@@ -52,17 +51,15 @@ type perceptron struct {
 	lenOutput      int
 }
 
-// Perceptron
+// Perceptron return
 func Perceptron() *perceptron {
 	return &perceptron{}
 }
 
-// architecture
 func (p *perceptron) architecture() Architecture {
 	return p.Architecture
 }
 
-// setArchitecture
 func (p *perceptron) setArchitecture(network Architecture) {
 	if n, ok := network.(*nn); ok {
 		p.Architecture = n
@@ -213,7 +210,9 @@ func (p *perceptron) Write(writer ...pkg.Writer) {
 func (p *perceptron) init(lenInput int, lenTarget ...interface{}) bool {
 	if len(lenTarget) > 0 {
 		var tmp HiddenArrUint
-		defer func() { tmp = nil }()
+		defer func() {
+			tmp = nil
+		}()
 
 		p.lastIndexLayer = len(p.Conf.HiddenLayer)
 		p.lenInput = lenInput
@@ -244,10 +243,9 @@ func (p *perceptron) init(lenInput int, lenTarget ...interface{}) bool {
 		p.initAxon()
 
 		return true
-	} else {
-		errNN(ErrNoTarget)
-		return false
 	}
+	errNN(ErrNoTarget)
+	return false
 }
 
 // reInit

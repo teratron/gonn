@@ -56,7 +56,9 @@ func getRand() (r floatType) {
 // getLengthData returns the length of the slices
 func getLengthData(data ...[]float64) []interface{} {
 	var tmp []interface{}
-	defer func() { tmp = nil }()
+	defer func() {
+		tmp = nil
+	}()
 	if len(data) > 0 {
 		for _, v := range data {
 			tmp = append(tmp, len(v))

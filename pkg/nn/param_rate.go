@@ -15,9 +15,8 @@ const DefaultRate float32 = .3
 func Rate(rate ...float32) pkg.GetSetter {
 	if len(rate) > 0 {
 		return rateFloat(rate[0])
-	} else {
-		return rateFloat(0)
 	}
+	return rateFloat(0)
 }
 
 // Rate

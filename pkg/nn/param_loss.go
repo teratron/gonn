@@ -22,18 +22,16 @@ const (
 func LossMode(mode ...uint8) pkg.GetSetter {
 	if len(mode) > 0 {
 		return lossModeUint(mode[0])
-	} else {
-		return lossModeUint(0)
 	}
+	return lossModeUint(0)
 }
 
 // LossLevel
 func LossLevel(level ...float64) pkg.GetSetter {
 	if len(level) > 0 {
 		return lossLevelFloat(level[0])
-	} else {
-		return lossLevelFloat(0)
 	}
+	return lossLevelFloat(0)
 }
 
 // LossMode

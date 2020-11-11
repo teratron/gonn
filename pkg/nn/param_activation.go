@@ -21,9 +21,8 @@ const (
 func ActivationMode(mode ...uint8) pkg.GetSetter {
 	if len(mode) > 0 {
 		return activationModeUint(mode[0])
-	} else {
-		return activationModeUint(0)
 	}
+	return activationModeUint(0)
 }
 
 // ActivationMode

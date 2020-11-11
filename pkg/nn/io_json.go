@@ -16,9 +16,8 @@ type jsonString string
 func JSON(filename ...string) pkg.ReadWriter {
 	if len(filename) > 0 {
 		return jsonString(filename[0])
-	} else {
-		return jsonString("")
 	}
+	return jsonString("")
 }
 
 // Read
