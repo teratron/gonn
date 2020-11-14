@@ -1,10 +1,6 @@
 package main
 
-import (
-	"fmt"
-
-	"github.com/zigenzoog/gonn/pkg/nn"
-)
+import "github.com/zigenzoog/gonn/pkg/nn"
 
 func main() {
 	// New returns a new neural network
@@ -15,5 +11,5 @@ func main() {
 
 	// Neural network query
 	output := n.Query(input)
-	fmt.Println(output)
+	println(output)
 }

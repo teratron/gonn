@@ -10,11 +10,20 @@ import (
 type activationModeUint uint8
 
 const (
-	ModeLINEAR    uint8 = iota // Linear/identity
-	ModeRELU                   // ReLu - rectified linear unit
-	ModeLEAKYRELU              // Leaky ReLu - leaky rectified linear unit
-	ModeSIGMOID                // Logistic, a.k.a. sigmoid or soft step
-	ModeTANH                   // TanH - hyperbolic tangent
+	// ModeLINEAR - Linear/identity
+	ModeLINEAR uint8 = iota
+
+	// ModeRELU - ReLu (rectified linear unit)
+	ModeRELU
+
+	// ModeLEAKYRELU - Leaky ReLu (leaky rectified linear unit)
+	ModeLEAKYRELU
+
+	// ModeSIGMOID - Logistic, a.k.a. sigmoid or soft step
+	ModeSIGMOID
+
+	// ModeTANH - TanH (hyperbolic tangent)
+	ModeTANH
 )
 
 // ActivationMode

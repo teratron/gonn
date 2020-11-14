@@ -177,8 +177,7 @@ func (p *perceptron) Copy(copier pkg.Copier) {
 func (p *perceptron) Paste(paster pkg.Paster) {
 	switch v := paster.(type) {
 	case *weight:
-		err := p.pasteWeight()
-		if err != nil {
+		if err := p.pasteWeight(); err != nil {
 			errNN(err)
 		}
 	default:
