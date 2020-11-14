@@ -12,10 +12,17 @@ type (
 )
 
 const (
-	ModeMSE      uint8   = iota   // Mean Squared Error
-	ModeRMSE                      // Root Mean Squared Error
-	ModeARCTAN                    // Arctan
-	MinLossLevel float64 = 10e-33 // The minimum value of the error limit at which training is forcibly terminated
+	// ModeMSE - Mean Squared Error
+	ModeMSE uint8 = iota
+
+	// ModeRMSE - Root Mean Squared Error
+	ModeRMSE
+
+	// ModeARCTAN - Arctan
+	ModeARCTAN
+
+	// MinLossLevel the minimum value of the error limit at which training is forcibly terminated
+	MinLossLevel float64 = 10e-33
 )
 
 // LossMode
