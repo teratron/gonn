@@ -1,9 +1,13 @@
 package main
 
-import "github.com/zigenzoog/gonn/pkg/app"
+import (
+	"fmt"
+
+	"github.com/zigenzoog/gonn/pkg/app"
+)
 
 func main() {
 	// Application
 	a := app.App()
-	println("nn.App():", a)
+	fmt.Println("nn.App():", a)
 }

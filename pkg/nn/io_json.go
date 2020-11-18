@@ -91,7 +91,7 @@ func (j jsonString) Write(writer ...pkg.Writer) {
 					filename = n.json
 				} else {
 					// TODO: generate path and filename
-					filename = "config/neural_network.json"
+					filename = "neural_network.json"
 				}
 			}
 			if n.IsTrain {
