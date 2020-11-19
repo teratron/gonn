@@ -4,10 +4,10 @@ import "fmt"
 
 // Verify
 func (n *nn) Verify(input []float64, target ...[]float64) (loss float64) {
-	if !n.IsTrain {
+	if !n.isTrain {
 		errNN(fmt.Errorf("verify: %w", ErrNotTrained))
-		if !n.IsInit {
-			if n.IsInit = n.init(len(input), getLengthData(target...)...); !n.IsInit {
+		if !n.isInit {
+			if n.isInit = n.init(len(input), getLengthData(target...)...); !n.isInit {
 				errNN(fmt.Errorf("%w for verify", ErrInit))
 				return
 			}

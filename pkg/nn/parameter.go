@@ -6,12 +6,12 @@ type Parameter interface {
 
 	// Perceptron
 	HiddenLayer() []uint
-	Bias() bool
+	NeuronBias() bool
 	ActivationMode() uint8
 	LossMode() uint8
-	LossLevel() float64
-	Rate() float32
+	LossLimit() float64
+	LearningRate() float32
 
 	// Hopfield
-	Energy() float32
+	NeuronEnergy() float32
 }

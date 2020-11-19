@@ -14,19 +14,19 @@ func main() {
 	// Common
 	n.Set(
 		nn.HiddenLayer(1, 5, 9),
-		nn.Bias(true),
+		nn.NeuronBias(true),
 		nn.ActivationMode(nn.ModeTANH),
 		nn.LossMode(nn.ModeARCTAN),
-		nn.LossLevel(.0005),
-		nn.Rate(nn.DefaultRate))
+		nn.LossLimit(.0005),
+		nn.LearningRate(nn.DefaultRate))
 
 	fmt.Printf("n.Get(): %T %v\n", n.Get(), n.Get())
 	fmt.Println(n.HiddenLayer())
-	fmt.Println(n.Bias())
+	fmt.Println(n.NeuronBias())
 	fmt.Println(n.ActivationMode())
 	fmt.Println(n.LossMode())
-	fmt.Println(n.LossLevel())
-	fmt.Println(n.Rate())
+	fmt.Println(n.LossLimit())
+	fmt.Println(n.LearningRate())
 
 	// Hidden layers
 	n.Set(nn.HiddenLayer(3, 2))

@@ -12,12 +12,12 @@ func init() {
 	rand.Seed(time.Now().UTC().UnixNano())
 }
 
-// New returns a new neural network instance with the default parameters
+// New returns a new neural network instance
 func New(reader ...pkg.Reader) NeuralNetwork {
 	n := &nn{
 		Architecture: &architecture{},
-		IsInit:       false,
-		IsTrain:      false,
+		isInit:       false,
+		isTrain:      false,
 		json:         "",
 	}
 	if len(reader) > 0 {
@@ -40,9 +40,9 @@ func New(reader ...pkg.Reader) NeuralNetwork {
 // init
 func (n *nn) init(lenInput int, lenTarget ...interface{}) bool {
 	if a, ok := n.Architecture.(NeuralNetwork); ok {
-		n.IsInit = a.init(lenInput, lenTarget...)
+		n.isInit = a.init(lenInput, lenTarget...)
 	}
-	return n.IsInit
+	return n.isInit
 }
 
 // getRand return random number from -0.5 to 0.5

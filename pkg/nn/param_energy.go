@@ -1,5 +1,5 @@
 package nn
 
-func (n *nn) Energy() float32 {
+func (n *nn) NeuronEnergy() float32 {
 	return 0
 }

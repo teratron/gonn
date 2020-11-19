@@ -12,7 +12,7 @@ type rateFloat floatType
 const DefaultRate float32 = .3
 
 // Rate
-func Rate(rate ...float32) pkg.GetSetter {
+func LearningRate(rate ...float32) pkg.GetSetter {
 	if len(rate) > 0 {
 		return rateFloat(rate[0])
 	}
@@ -20,8 +20,8 @@ func Rate(rate ...float32) pkg.GetSetter {
 }
 
 // Rate
-func (n *nn) Rate() float32 {
-	return n.Architecture.(Parameter).Rate()
+func (n *nn) LearningRate() float32 {
+	return n.Architecture.(Parameter).LearningRate()
 }
 
 // Set

@@ -15,11 +15,14 @@ type hopfield struct {
 	Parameter    `json:"-" xml:"-"`
 	Constructor  `json:"-" xml:"-"`
 
+	Energy  floatType  `json:"energy" xml:"energy"`
+	Weights float2Type `json:"weights" xml:"weights"`
+
 	// Configurations
-	Conf struct {
+	/*Conf struct {
 		Energy floatType  `json:"energy" xml:"energy"`
 		Weight float2Type `json:"weights" xml:"weight"`
-	} `json:"hopfield,omitempty" xml:"hopfield,omitempty"`
+	} `json:"hopfield,omitempty" xml:"hopfield,omitempty"`*/
 
 	// Matrix
 	neuron []*neuron
@@ -42,12 +45,12 @@ func (h *hopfield) setArchitecture(network Architecture) {
 	if n, ok := network.(*nn); ok {
 		h.Architecture = n
 	}
-	h.Conf.Energy = .001
+	h.Energy = .001
 }
 
-// Energy
-func (h *hopfield) Energy() float32 {
-	return float32(h.Conf.Energy)
+// NeuronEnergy
+func (h *hopfield) NeuronEnergy() float32 {
+	return float32(h.Energy)
 }
 
 // Set

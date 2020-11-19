@@ -8,23 +8,23 @@ import (
 
 type biasBool bool
 
-// Bias
-func Bias(bias ...bool) pkg.GetSetter {
+// NeuronBias
+func NeuronBias(bias ...bool) pkg.GetSetter {
 	if len(bias) > 0 {
 		return biasBool(bias[0])
 	}
 	return biasBool(false)
 }
 
-// Bias
-func (n *nn) Bias() bool {
-	return n.Architecture.(Parameter).Bias()
+// NeuronBias
+func (n *nn) NeuronBias() bool {
+	return n.Architecture.(Parameter).NeuronBias()
 }
 
 // Set
 func (b biasBool) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
-		if n, ok := args[0].(*nn); ok && !n.IsInit {
+		if n, ok := args[0].(*nn); ok && !n.isInit {
 			n.Get().Set(b)
 		}
 	} else {

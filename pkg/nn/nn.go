@@ -18,8 +18,8 @@ type nn struct {
 	Architecture `json:"architecture,omitempty" xml:"architecture,omitempty"`
 
 	// State of the neural network
-	IsInit  bool `json:"-" xml:"-"`             // Neural network initializing flag
-	IsTrain bool `json:"isTrain" xml:"isTrain"` // Neural network training flag
+	isInit  bool // Neural network initializing flag
+	isTrain bool // Neural network training flag
 
 	json string
 }

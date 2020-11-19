@@ -38,7 +38,7 @@ func (j jsonString) Read(reader pkg.Reader) {
 			errJSON(fmt.Errorf("read unmarshal %w", err))
 		}
 		n.Architecture = nil
-		n.IsInit = false
+		n.isInit = false
 		n.json = filename
 
 		// Decoding json to map[string]interface{}
@@ -94,12 +94,12 @@ func (j jsonString) Write(writer ...pkg.Writer) {
 					filename = "neural_network.json"
 				}
 			}
-			if n.IsTrain {
+			if n.isTrain {
 				n.Copy(Weight())
 			} else {
 				errNN(fmt.Errorf("json write: %w", ErrNotTrained))
 			}
-			if b, err := json.MarshalIndent(&n, "", "\t"); err != nil {
+			if b, err := json.MarshalIndent(&n.Architecture, "", "\t"); err != nil {
 				errJSON(fmt.Errorf("write %w", err))
 			} else if err = ioutil.WriteFile(filename, b, os.ModePerm); err != nil {
 				errOS(err)

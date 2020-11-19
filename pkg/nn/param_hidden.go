@@ -25,7 +25,7 @@ func (n *nn) HiddenLayer() []uint {
 // Set
 func (h HiddenArrUint) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
-		if n, ok := args[0].(*nn); ok && !n.IsInit {
+		if n, ok := args[0].(*nn); ok && !n.isInit {
 			n.Get().Set(h)
 		}
 	} else {
