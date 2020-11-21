@@ -22,22 +22,23 @@ func JSON(filename ...string) pkg.ReadWriter {
 
 // Read
 func (j jsonString) Read(reader pkg.Reader) {
+	filename := string(j)
+	if len(filename) == 0 {
+		errJSON(fmt.Errorf("json: file json is missing"))
+	}
+	b, err := ioutil.ReadFile(filename)
+	if err != nil {
+		errOS(err)
+	}
 	if n, ok := reader.(*nn); ok {
-		filename := string(j)
-		if len(filename) == 0 {
-			errJSON(fmt.Errorf("json: file json is missing"))
-		}
-		b, err := ioutil.ReadFile(filename)
-		if err != nil {
-			errOS(err)
-		}
-
 		// Decoding json to NN
-		err = json.Unmarshal(b, &n)
+		/*err = json.Unmarshal(b, &n.Architecture)
 		if err != nil {
 			errJSON(fmt.Errorf("read unmarshal %w", err))
 		}
-		n.Architecture = nil
+		fmt.Println(n.Architecture)
+		fmt.Println(n.Architecture.(*perceptron).Weights)*/
+		//n.Architecture = nil
 		n.isInit = false
 		n.json = filename
 
@@ -47,8 +48,34 @@ func (j jsonString) Read(reader pkg.Reader) {
 		if err != nil {
 			errJSON(fmt.Errorf("read unmarshal %w", err))
 		}
+		//fmt.Println(data.(map[string]interface{})["weights"])
 
-		for key, value := range data.(map[string]interface{}) {
+		if value, ok := data.(map[string]interface{})["name"]; ok {
+			switch value.(string) {
+			case perceptronName:
+				n.Architecture = &perceptron{
+					Architecture: n,
+					Name:         perceptronName,
+				}
+				//fmt.Println(n.Architecture.(*perceptron).Weights)
+			case hopfieldName:
+				n.Architecture = &hopfield{
+					Architecture: n,
+					Name:         hopfieldName,
+				}
+			default:
+				errNN(fmt.Errorf("read json: %w", ErrNotRecognized))
+				return
+			}
+
+			err = json.Unmarshal(b, &n.Architecture)
+			if err != nil {
+				errJSON(fmt.Errorf("read unmarshal %w", err))
+			}
+		}
+
+		/*for key, value := range data.(map[string]interface{}) {
+			//fmt.Println(key, value)
 			if v, ok := value.(map[string]interface{}); ok {
 				if key == "architecture" {
 					b, err = json.Marshal(&v)
@@ -77,7 +104,7 @@ func (j jsonString) Read(reader pkg.Reader) {
 					}
 				}
 			}
-		}
+		}*/
 	}
 }
 

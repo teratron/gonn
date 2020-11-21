@@ -3,24 +3,25 @@ package main
 import "github.com/zigenzoog/gonn/pkg/nn"
 
 func main() {
-	// New returns a new neural network instance with the default parameters,
+	// New returns a new neural network
+	// instance with the default parameters,
 	// same n := nn.New(nn.Perceptron())
 	n := nn.New()
 
 	// Set parameters:
 	// HiddenLayer    - Array of the number of neurons in each hidden layer
-	// Bias           - The neuron bias, false or true
+	// NeuronBias     - The neuron bias, false or true
 	// ActivationMode - Activation function mode
 	// LossMode       - The mode of calculation of the total error
-	// LossLevel      - Minimum (sufficient) level of the average of the error during training
-	// Rate           - Learning coefficient, from 0 to 1
+	// LossLimit      - Minimum (sufficient) limit of the average of the error during training
+	// LearningRate   - Learning coefficient, from 0 to 1
 	n.Set(
 		nn.HiddenLayer(5, 3),
-		nn.Bias(true),
+		nn.NeuronBias(true),
 		nn.ActivationMode(nn.ModeSIGMOID),
 		nn.LossMode(nn.ModeMSE),
-		nn.LossLevel(.01),
-		nn.Rate(nn.DefaultRate))
+		nn.LossLimit(.01),
+		nn.LearningRate(nn.DefaultRate))
 
 	// Training dataset
 	dataSet := []float64{.27, .31, .52, .66, .81, .13, .2, .49, .11, .73, .28}

@@ -9,9 +9,12 @@ import (
 	"github.com/zigenzoog/gonn/pkg"
 )
 
+const perceptronName = "perceptron"
+
 // Declare conformity with NeuralNetwork interface
 var _ NeuralNetwork = (*perceptron)(nil)
 
+// perceptron
 type perceptron struct {
 	Architecture `json:"-" xml:"-"`
 	Parameter    `json:"-" xml:"-"`
@@ -70,14 +73,26 @@ type perceptron struct {
 	axon   [][][]*axon
 	*weight
 
+	// State of the neural network
+	isInit  bool // Neural network initializing flag
+	isTrain bool // Neural network training flag
+
 	lastIndexLayer int
 	lenInput       int
 	lenOutput      int
 }
 
-// Perceptron return
+// Perceptron return perceptron neural network
 func Perceptron() *perceptron {
-	return &perceptron{}
+	return &perceptron{
+		Name:       perceptronName,
+		Hidden:     HiddenArrUint{},
+		Bias:       false,
+		Activation: ModeSIGMOID,
+		Loss:       ModeMSE,
+		Limit:      .01,
+		Rate:       floatType(DefaultRate),
+	}
 }
 
 func (p *perceptron) architecture() Architecture {
@@ -88,13 +103,13 @@ func (p *perceptron) setArchitecture(network Architecture) {
 	if n, ok := network.(*nn); ok {
 		p.Architecture = n
 	}
-	p.Name = "perceptron"
-	p.Hidden = HiddenArrUint{5, 3}
-	p.Bias = true
+	/*p.Name = "perceptron"
+	p.Hidden = HiddenArrUint{}
+	p.Bias = false
 	p.Activation = ModeSIGMOID
 	p.Loss = ModeMSE
-	p.Limit = .001
-	p.Rate = floatType(DefaultRate)
+	p.Limit = .01
+	p.Rate = floatType(DefaultRate)*/
 }
 
 // HiddenLayer

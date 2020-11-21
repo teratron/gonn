@@ -9,17 +9,15 @@ type Architecture interface {
 	pkg.GetSetter
 }
 
-// architecture
-type architecture struct {
+/*type architecture struct {
 	Architecture
-}
+}*/
 
-// architecture
 func (n *nn) architecture() Architecture {
 	return n.Architecture
 }
 
-// setArchitecture
 func (n *nn) setArchitecture(network Architecture) {
 	n.Architecture = network
+	n.Architecture.setArchitecture(n)
 }

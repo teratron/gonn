@@ -14,25 +14,28 @@ func init() {
 
 // New returns a new neural network instance
 func New(reader ...pkg.Reader) NeuralNetwork {
-	n := &nn{
-		Architecture: &architecture{},
-		isInit:       false,
-		isTrain:      false,
-		json:         "",
-	}
+	/*n := &nn{
+		//Architecture: &architecture{},
+		//isInit:  false,
+		//isTrain: false,
+		//json:    "",
+	}*/
+	n := new(nn)
 	if len(reader) > 0 {
 		switch r := reader[0].(type) {
 		case Architecture:
-			n.Architecture = r
-			r.setArchitecture(n)
+			//n.Architecture = r
+			//r.setArchitecture(n)
+			n.setArchitecture(r)
 		case Filer:
 			r.Read(n)
 		default:
 			errNN(fmt.Errorf("%T %w for neural network", r, ErrMissingType))
 		}
 	} else {
-		n.Architecture = Perceptron()
-		n.Architecture.setArchitecture(n)
+		n.setArchitecture(Perceptron())
+		//n.Architecture = Perceptron()
+		//n.Architecture.setArchitecture(n)
 	}
 	return n
 }

@@ -15,11 +15,12 @@ type NeuralNetwork interface {
 // nn
 type nn struct {
 	// Architecture of neural network
-	Architecture `json:"architecture,omitempty" xml:"architecture,omitempty"`
+	Architecture //`json:"architecture,omitempty" xml:"architecture,omitempty"`
 
 	// State of the neural network
 	isInit  bool // Neural network initializing flag
 	isTrain bool // Neural network training flag
 
+	// Encoding and decoding for a config resource
 	json string
 }

@@ -33,8 +33,8 @@ func main() {
 	fmt.Println("n.Get(nn.HiddenLayer()):", n.Get(nn.HiddenLayer()))
 
 	// Bias
-	n.Set(nn.Bias(true))
-	fmt.Println("n.Get(nn.Bias()):", n.Get(nn.Bias()))
+	n.Set(nn.NeuronBias(true))
+	fmt.Println("n.Get(nn.NeuronBias()):", n.Get(nn.NeuronBias()))
 
 	// Activation
 	n.Set(nn.ActivationMode(nn.ModeSIGMOID))
@@ -44,13 +44,13 @@ func main() {
 	n.Set(nn.LossMode(nn.ModeMSE))
 	fmt.Println("n.Get(nn.ModeLoss()):", n.Get(nn.LossMode()))
 
-	// Level loss
-	n.Set(nn.LossLevel(.04))
-	fmt.Println("n.Get(nn.LevelLoss()):", n.Get(nn.LossLevel()))
+	// Limit loss
+	n.Set(nn.LossLimit(.04))
+	fmt.Println("n.Get(nn.LossLimit()):", n.Get(nn.LossLimit()))
 
 	// Rate
-	n.Set(nn.Rate(.1))
-	fmt.Println("n.Get(nn.Rate()):", n.Get(nn.Rate()))
+	n.Set(nn.LearningRate(.1))
+	fmt.Println("n.Get(nn.LearningRate()):", n.Get(nn.LearningRate()))
 
 	// Weight
 	fmt.Println("n.Get(nn.Weight()):", n.Get(nn.Weight()))

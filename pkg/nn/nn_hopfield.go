@@ -7,6 +7,8 @@ import (
 	"github.com/zigenzoog/gonn/pkg"
 )
 
+const hopfieldName = "hopfield"
+
 // Declare conformity with NeuralNetwork interface
 var _ NeuralNetwork = (*hopfield)(nil)
 
@@ -14,6 +16,9 @@ type hopfield struct {
 	Architecture `json:"-" xml:"-"`
 	Parameter    `json:"-" xml:"-"`
 	Constructor  `json:"-" xml:"-"`
+
+	// Neural network architecture name
+	Name string `json:"name" xml:"name"`
 
 	Energy  floatType  `json:"energy" xml:"energy"`
 	Weights float2Type `json:"weights" xml:"weights"`
@@ -32,7 +37,9 @@ type hopfield struct {
 
 // Hopfield return
 func Hopfield() *hopfield {
-	return &hopfield{}
+	return &hopfield{
+		Name: hopfieldName,
+	}
 }
 
 // architecture
