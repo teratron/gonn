@@ -3,11 +3,12 @@ package nn
 import (
 	"encoding/json"
 	"fmt"
+	_ "io"
 	"io/ioutil"
 	"log"
 	"os"
 
-	"github.com/zigenzoog/gonn/pkg"
+	"github.com/teratron/gonn/pkg"
 )
 
 type jsonString string
@@ -20,6 +21,10 @@ func JSON(filename ...string) pkg.ReadWriter {
 	return jsonString("")
 }
 
+func read() NeuralNetwork {
+	return nil
+}
+
 // Read
 func (j jsonString) Read(reader pkg.Reader) {
 	filename := string(j)
@@ -30,7 +35,13 @@ func (j jsonString) Read(reader pkg.Reader) {
 	if err != nil {
 		errOS(err)
 	}
-	if n, ok := reader.(*nn); ok {
+
+	/*switch n := reader.(type) {
+	case :
+
+	}*/
+
+	if n, ok := reader.(NeuralNetwork); ok {
 		// Decoding json to NN
 		/*err = json.Unmarshal(b, &n.Architecture)
 		if err != nil {
@@ -39,8 +50,8 @@ func (j jsonString) Read(reader pkg.Reader) {
 		fmt.Println(n.Architecture)
 		fmt.Println(n.Architecture.(*perceptron).Weights)*/
 		//n.Architecture = nil
-		n.isInit = false
-		n.json = filename
+		//n.isInit = false
+		//n.json = filename
 
 		// Decoding json to map[string]interface{}
 		var data interface{}
@@ -53,22 +64,20 @@ func (j jsonString) Read(reader pkg.Reader) {
 		if value, ok := data.(map[string]interface{})["name"]; ok {
 			switch value.(string) {
 			case perceptronName:
-				n.Architecture = &perceptron{
-					Architecture: n,
-					Name:         perceptronName,
+				n = &perceptron{
+					Name: perceptronName,
 				}
 				//fmt.Println(n.Architecture.(*perceptron).Weights)
 			case hopfieldName:
-				n.Architecture = &hopfield{
-					Architecture: n,
-					Name:         hopfieldName,
+				n = &hopfield{
+					Name: hopfieldName,
 				}
 			default:
 				errNN(fmt.Errorf("read json: %w", ErrNotRecognized))
 				return
 			}
 
-			err = json.Unmarshal(b, &n.Architecture)
+			err = json.Unmarshal(b, &n)
 			if err != nil {
 				errJSON(fmt.Errorf("read unmarshal %w", err))
 			}
@@ -111,7 +120,7 @@ func (j jsonString) Read(reader pkg.Reader) {
 // Write
 func (j jsonString) Write(writer ...pkg.Writer) {
 	if len(writer) > 0 {
-		if n, ok := writer[0].(*nn); ok {
+		if n, ok := writer[0].(*perceptron); ok {
 			filename := string(j)
 			if len(filename) == 0 {
 				if len(n.json) > 0 {
@@ -126,7 +135,7 @@ func (j jsonString) Write(writer ...pkg.Writer) {
 			} else {
 				errNN(fmt.Errorf("json write: %w", ErrNotTrained))
 			}
-			if b, err := json.MarshalIndent(&n.Architecture, "", "\t"); err != nil {
+			if b, err := json.MarshalIndent(&n, "", "\t"); err != nil {
 				errJSON(fmt.Errorf("write %w", err))
 			} else if err = ioutil.WriteFile(filename, b, os.ModePerm); err != nil {
 				errOS(err)

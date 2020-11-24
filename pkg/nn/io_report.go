@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/zigenzoog/gonn/pkg"
+	"github.com/teratron/gonn/pkg"
 )
 
 // report
@@ -21,11 +21,11 @@ func Report(file *os.File, args ...interface{}) pkg.Writer {
 // Write
 func (r *report) Write(writer ...pkg.Writer) {
 	if len(writer) > 0 {
-		if n, ok := writer[0].(*nn); ok {
+		/*if n, ok := writer[0].(*nn); ok {
 			if a, ok := n.Architecture.(NeuralNetwork); ok {
 				a.Write(r)
 			}
-		}
+		}*/
 	} else {
 		errNN(fmt.Errorf("%w write for report", ErrEmpty))
 	}

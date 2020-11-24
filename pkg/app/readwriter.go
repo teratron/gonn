@@ -1,6 +1,6 @@
 package app
 
-import "github.com/zigenzoog/gonn/pkg"
+import "github.com/teratron/gonn/pkg"
 
 // Read
 func (a *app) Read(reader pkg.Reader) {}

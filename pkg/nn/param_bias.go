@@ -3,7 +3,7 @@ package nn
 import (
 	"fmt"
 
-	"github.com/zigenzoog/gonn/pkg"
+	"github.com/teratron/gonn/pkg"
 )
 
 type biasBool bool
@@ -17,16 +17,16 @@ func NeuronBias(bias ...bool) pkg.GetSetter {
 }
 
 // NeuronBias
-func (n *nn) NeuronBias() bool {
+/*func (n *nn) NeuronBias() bool {
 	return n.Architecture.(Parameter).NeuronBias()
-}
+}*/
 
 // Set
 func (b biasBool) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
-		if n, ok := args[0].(*nn); ok && !n.isInit {
+		/*if n, ok := args[0].(*nn); ok && !n.isInit {
 			n.Get().Set(b)
-		}
+		}*/
 	} else {
 		errNN(fmt.Errorf("%w set for bias", ErrEmpty))
 	}
@@ -35,7 +35,7 @@ func (b biasBool) Set(args ...pkg.Setter) {
 // Get
 func (b biasBool) Get(args ...pkg.Getter) pkg.GetSetter {
 	if len(args) > 0 {
-		if n, ok := args[0].(Architecture); ok {
+		if n, ok := args[0].(NeuralNetwork); ok {
 			return n.Get().Get(b)
 		}
 	} else {

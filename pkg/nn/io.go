@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/zigenzoog/gonn/pkg"
+	"github.com/teratron/gonn/pkg"
 )
 
 // Filer

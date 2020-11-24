@@ -1,6 +1,6 @@
 package nn
 
-import "github.com/zigenzoog/gonn/pkg"
+import "github.com/teratron/gonn/pkg"
 
 // Neuroner
 type Neuroner interface {
@@ -9,7 +9,7 @@ type Neuroner interface {
 
 // neuron
 type neuron struct {
-	value    floatType // Neuron value
+	value    FloatType // Neuron value
 	axon     []*axon   // All incoming axons
 	specific Neuroner  // Specific option of neuron: miss (error) or other
 

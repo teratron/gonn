@@ -1,6 +1,6 @@
 package app
 
-import "github.com/zigenzoog/gonn/pkg"
+import "github.com/teratron/gonn/pkg"
 
 // Copy
 func (a *app) Copy(copier pkg.Copier) {

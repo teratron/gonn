@@ -4,7 +4,9 @@ package nn
 import (
 	"fmt"
 
-	"github.com/zigenzoog/gonn/pkg"
+	//"github.com/teratron/gonn/pkg"
+	//"github.com/teratron/gonn/pkg/nn"
+	"github.com/teratron/gonn/pkg"
 )
 
 const hopfieldName = "hopfield"
@@ -13,15 +15,15 @@ const hopfieldName = "hopfield"
 var _ NeuralNetwork = (*hopfield)(nil)
 
 type hopfield struct {
-	Architecture `json:"-" xml:"-"`
-	Parameter    `json:"-" xml:"-"`
-	Constructor  `json:"-" xml:"-"`
+	//Architecture `json:"-" xml:"-"`
+	//Parameter   `json:"-" xml:"-"`
+	Constructor `json:"-" xml:"-"`
 
 	// Neural network architecture name
 	Name string `json:"name" xml:"name"`
 
-	Energy  floatType  `json:"energy" xml:"energy"`
-	Weights float2Type `json:"weights" xml:"weights"`
+	Energy  FloatType  `json:"energy" xml:"energy"`
+	Weights Float2Type `json:"weights" xml:"weights"`
 
 	// Configurations
 	/*Conf struct {
@@ -30,9 +32,9 @@ type hopfield struct {
 	} `json:"hopfield,omitempty" xml:"hopfield,omitempty"`*/
 
 	// Matrix
-	neuron []*neuron
-	axon   [][]*axon
-	*weight
+	//neuron []*neuron
+	//axon   [][]*axon
+	//*weight
 }
 
 // Hopfield return
@@ -43,7 +45,7 @@ func Hopfield() *hopfield {
 }
 
 // architecture
-func (h *hopfield) architecture() Architecture {
+/*func (h *hopfield) architecture() Architecture {
 	return h.Architecture
 }
 
@@ -53,7 +55,7 @@ func (h *hopfield) setArchitecture(network Architecture) {
 		h.Architecture = n
 	}
 	h.Energy = .001
-}
+}*/
 
 // NeuronEnergy
 func (h *hopfield) NeuronEnergy() float32 {

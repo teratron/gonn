@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/zigenzoog/gonn/pkg"
+	"github.com/teratron/gonn/pkg"
 )
 
 type activationModeUint uint8
@@ -35,14 +35,14 @@ func ActivationMode(mode ...uint8) pkg.GetSetter {
 }
 
 // ActivationMode
-func (n *nn) ActivationMode() uint8 {
+/*func (n *nn) ActivationMode() uint8 {
 	return n.Architecture.(Parameter).ActivationMode()
-}
+}*/
 
 // Set
 func (m activationModeUint) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
-		if a, ok := args[0].(Architecture); ok {
+		if a, ok := args[0].(NeuralNetwork); ok {
 			a.Get().Set(m.check())
 		}
 	} else {
@@ -53,7 +53,7 @@ func (m activationModeUint) Set(args ...pkg.Setter) {
 // Get
 func (m activationModeUint) Get(args ...pkg.Getter) pkg.GetSetter {
 	if len(args) > 0 {
-		if a, ok := args[0].(Architecture); ok {
+		if a, ok := args[0].(NeuralNetwork); ok {
 			return a.Get().Get(m)
 		}
 	} else {

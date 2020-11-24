@@ -3,7 +3,7 @@ package nn
 import (
 	"fmt"
 
-	"github.com/zigenzoog/gonn/pkg"
+	"github.com/teratron/gonn/pkg"
 )
 
 // Synapser
@@ -13,14 +13,14 @@ type Synapser interface {
 
 // axon
 type axon struct {
-	weight  floatType
+	weight  FloatType
 	synapse map[string]Synapser
 }
 
 // getSynapseInput
-func (a *axon) getSynapseInput() (input floatType) {
+func (a *axon) getSynapseInput() (input FloatType) {
 	switch s := a.synapse["input"].(type) {
-	case floatType:
+	case FloatType:
 		input = s
 	case biasBool:
 		if s {
@@ -44,7 +44,7 @@ type weight struct {
 func Weight(args ...Floater) pkg.Controller {
 	if len(args) > 0 {
 		switch v := args[0].(type) {
-		case *float3Type, *float2Type, *float1Type:
+		case *float3Type, *Float2Type, *float1Type:
 			return &weight{
 				isInitWeight: true,
 				buffer:       v,
@@ -61,9 +61,9 @@ func Weight(args ...Floater) pkg.Controller {
 }
 
 // Weight
-func (n *nn) Weight() Floater {
+/*func (n *nn) Weight() Floater {
 	return n.Architecture.(Parameter).Weight()
-}
+}*/
 
 // Set
 func (w *weight) Set(args ...pkg.Setter) {
@@ -90,20 +90,20 @@ func (w *weight) Get(args ...pkg.Getter) pkg.GetSetter {
 
 // Copy
 func (w *weight) Copy(copier pkg.Copier) {
-	if n, ok := copier.(*nn); ok {
+	/*if n, ok := copier.(*nn); ok {
 		if a, ok := n.Architecture.(NeuralNetwork); ok {
 			a.Copy(w)
 		}
-	}
+	}*/
 }
 
 // Paste
 func (w *weight) Paste(paster pkg.Paster) {
-	if n, ok := paster.(*nn); ok {
+	/*if n, ok := paster.(*nn); ok {
 		if a, ok := n.Architecture.(NeuralNetwork); ok {
 			a.Paste(w)
 		}
-	}
+	}*/
 }
 
 // Read

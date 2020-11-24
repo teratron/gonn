@@ -1,6 +1,6 @@
 package nn
 
-import "github.com/zigenzoog/gonn/pkg"
+import "github.com/teratron/gonn/pkg"
 
 // Floater
 type Floater interface {
@@ -8,15 +8,15 @@ type Floater interface {
 }
 
 type (
-	floatType  float32
-	float1Type []floatType
-	float2Type [][]floatType
-	float3Type [][][]floatType
+	FloatType  float32
+	float1Type []FloatType
+	Float2Type [][]FloatType
+	float3Type [][][]FloatType
 )
 
-func (f floatType) Set(...pkg.Setter) {}
+func (f FloatType) Set(...pkg.Setter) {}
 
-func (f floatType) Get(...pkg.Getter) pkg.GetSetter {
+func (f FloatType) Get(...pkg.Getter) pkg.GetSetter {
 	return f
 }
 
@@ -26,9 +26,9 @@ func (f *float1Type) Get(...pkg.Getter) pkg.GetSetter {
 	return f
 }
 
-func (f *float2Type) Set(...pkg.Setter) {}
+func (f *Float2Type) Set(...pkg.Setter) {}
 
-func (f *float2Type) Get(...pkg.Getter) pkg.GetSetter {
+func (f *Float2Type) Get(...pkg.Getter) pkg.GetSetter {
 	return f
 }
 

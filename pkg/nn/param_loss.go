@@ -3,7 +3,7 @@ package nn
 import (
 	"fmt"
 
-	"github.com/zigenzoog/gonn/pkg"
+	"github.com/teratron/gonn/pkg"
 )
 
 type (
@@ -42,19 +42,19 @@ func LossLimit(level ...float64) pkg.GetSetter {
 }
 
 // LossMode
-func (n *nn) LossMode() uint8 {
+/*func (n *nn) LossMode() uint8 {
 	return n.Architecture.(Parameter).LossMode()
 }
 
 // LossLimit
 func (n *nn) LossLimit() float64 {
 	return n.Architecture.(Parameter).LossLimit()
-}
+}*/
 
 // Set
 func (l lossModeUint) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
-		if a, ok := args[0].(Architecture); ok {
+		if a, ok := args[0].(NeuralNetwork); ok {
 			a.Get().Set(l.check())
 		}
 	} else {
@@ -65,18 +65,18 @@ func (l lossModeUint) Set(args ...pkg.Setter) {
 // Set
 func (l lossLimitFloat) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
-		if a, ok := args[0].(Architecture); ok {
+		if a, ok := args[0].(NeuralNetwork); ok {
 			a.Get().Set(l.check())
 		}
 	} else {
-		errNN(fmt.Errorf("%w set for loss level", ErrEmpty))
+		errNN(fmt.Errorf("%w set for loss limit", ErrEmpty))
 	}
 }
 
 // Get
 func (l lossModeUint) Get(args ...pkg.Getter) pkg.GetSetter {
 	if len(args) > 0 {
-		if a, ok := args[0].(Architecture); ok {
+		if a, ok := args[0].(NeuralNetwork); ok {
 			return a.Get().Get(l)
 		}
 	} else {
@@ -88,7 +88,7 @@ func (l lossModeUint) Get(args ...pkg.Getter) pkg.GetSetter {
 // Get
 func (l lossLimitFloat) Get(args ...pkg.Getter) pkg.GetSetter {
 	if len(args) > 0 {
-		if a, ok := args[0].(Architecture); ok {
+		if a, ok := args[0].(NeuralNetwork); ok {
 			return a.Get().Get(l)
 		}
 	} else {

@@ -1,7 +1,7 @@
 package nn
 
 // Parameter
-type Parameter interface {
+/*type Parameter interface {
 	Weight() Floater
 
 	// Perceptron
@@ -14,4 +14,4 @@ type Parameter interface {
 
 	// Hopfield
 	NeuronEnergy() float32
-}
+}*/

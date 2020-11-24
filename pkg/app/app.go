@@ -1,6 +1,6 @@
 package app
 
-import "github.com/zigenzoog/gonn/pkg"
+import "github.com/teratron/gonn/pkg"
 
 // Declare conformity with Application interface
 var _ Application = (*app)(nil)

@@ -3,10 +3,10 @@ package nn
 import (
 	"fmt"
 
-	"github.com/zigenzoog/gonn/pkg"
+	"github.com/teratron/gonn/pkg"
 )
 
-type rateFloat floatType
+type rateFloat FloatType
 
 // Default learning rate
 const DefaultRate float32 = .3
@@ -20,14 +20,14 @@ func LearningRate(rate ...float32) pkg.GetSetter {
 }
 
 // Rate
-func (n *nn) LearningRate() float32 {
+/*func (n *nn) LearningRate() float32 {
 	return n.Architecture.(Parameter).LearningRate()
-}
+}*/
 
 // Set
 func (r rateFloat) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
-		if a, ok := args[0].(Architecture); ok {
+		if a, ok := args[0].(NeuralNetwork); ok {
 			a.Get().Set(r.check())
 		}
 	} else {
@@ -38,7 +38,7 @@ func (r rateFloat) Set(args ...pkg.Setter) {
 // Get
 func (r rateFloat) Get(args ...pkg.Getter) pkg.GetSetter {
 	if len(args) > 0 {
-		if a, ok := args[0].(Architecture); ok {
+		if a, ok := args[0].(NeuralNetwork); ok {
 			return a.Get().Get(r)
 		}
 	} else {
