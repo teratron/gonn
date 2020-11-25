@@ -6,7 +6,7 @@ import (
 	"github.com/teratron/gonn/pkg"
 )
 
-type rateFloat FloatType
+type rateFloat pkg.FloatType
 
 // Default learning rate
 const DefaultRate float32 = .3
@@ -19,11 +19,6 @@ func LearningRate(rate ...float32) pkg.GetSetter {
 	return rateFloat(0)
 }
 
-// Rate
-/*func (n *nn) LearningRate() float32 {
-	return n.Architecture.(Parameter).LearningRate()
-}*/
-
 // Set
 func (r rateFloat) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
@@ -31,7 +26,7 @@ func (r rateFloat) Set(args ...pkg.Setter) {
 			a.Get().Set(r.check())
 		}
 	} else {
-		errNN(fmt.Errorf("%w set for rate", ErrEmpty))
+		pkg.LogError(fmt.Errorf("%w set for rate", pkg.ErrEmpty))
 	}
 }
 

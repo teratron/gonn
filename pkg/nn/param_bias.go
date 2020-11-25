@@ -16,11 +16,6 @@ func NeuronBias(bias ...bool) pkg.GetSetter {
 	return biasBool(false)
 }
 
-// NeuronBias
-/*func (n *nn) NeuronBias() bool {
-	return n.Architecture.(Parameter).NeuronBias()
-}*/
-
 // Set
 func (b biasBool) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
@@ -28,7 +23,7 @@ func (b biasBool) Set(args ...pkg.Setter) {
 			n.Get().Set(b)
 		}*/
 	} else {
-		errNN(fmt.Errorf("%w set for bias", ErrEmpty))
+		pkg.LogError(fmt.Errorf("%w set for bias", pkg.ErrEmpty))
 	}
 }
 

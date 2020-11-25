@@ -1,8 +1,17 @@
 package nn
 
+import "github.com/teratron/gonn/pkg"
+
 // Parameter
-/*type Parameter interface {
-	Weight() Floater
+type Parameter interface {
+	name() string
+	setName(string)
+
+	stateInit() bool
+	setStateInit(bool)
+
+	json() string
+	setNameJSON(string)
 
 	// Perceptron
 	HiddenLayer() []uint
@@ -14,4 +23,6 @@ package nn
 
 	// Hopfield
 	NeuronEnergy() float32
-}*/
+
+	Weight() pkg.Floater
+}

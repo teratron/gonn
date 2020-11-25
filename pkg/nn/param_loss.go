@@ -41,16 +41,6 @@ func LossLimit(level ...float64) pkg.GetSetter {
 	return lossLimitFloat(0)
 }
 
-// LossMode
-/*func (n *nn) LossMode() uint8 {
-	return n.Architecture.(Parameter).LossMode()
-}
-
-// LossLimit
-func (n *nn) LossLimit() float64 {
-	return n.Architecture.(Parameter).LossLimit()
-}*/
-
 // Set
 func (l lossModeUint) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
@@ -58,7 +48,7 @@ func (l lossModeUint) Set(args ...pkg.Setter) {
 			a.Get().Set(l.check())
 		}
 	} else {
-		errNN(fmt.Errorf("%w set for loss mode", ErrEmpty))
+		pkg.LogError(fmt.Errorf("%w set for loss mode", pkg.ErrEmpty))
 	}
 }
 
@@ -69,7 +59,7 @@ func (l lossLimitFloat) Set(args ...pkg.Setter) {
 			a.Get().Set(l.check())
 		}
 	} else {
-		errNN(fmt.Errorf("%w set for loss limit", ErrEmpty))
+		pkg.LogError(fmt.Errorf("%w set for loss limit", pkg.ErrEmpty))
 	}
 }
 

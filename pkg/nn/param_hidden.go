@@ -17,11 +17,6 @@ func HiddenLayer(nums ...uint) HiddenArrUint {
 	return nums
 }
 
-// HiddenLayer
-/*func (n *nn) HiddenLayer() []uint {
-	return n.Architecture.(Parameter).HiddenLayer()
-}*/
-
 // Set
 func (h HiddenArrUint) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
@@ -29,7 +24,7 @@ func (h HiddenArrUint) Set(args ...pkg.Setter) {
 			n.Get().Set(h)
 		}*/
 	} else {
-		errNN(fmt.Errorf("%w set for bias", ErrEmpty))
+		pkg.LogError(fmt.Errorf("%w set for bias", pkg.ErrEmpty))
 	}
 }
 

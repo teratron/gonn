@@ -13,14 +13,14 @@ type Synapser interface {
 
 // axon
 type axon struct {
-	weight  FloatType
+	weight  pkg.FloatType
 	synapse map[string]Synapser
 }
 
 // getSynapseInput
-func (a *axon) getSynapseInput() (input FloatType) {
+func (a *axon) getSynapseInput() (input pkg.FloatType) {
 	switch s := a.synapse["input"].(type) {
-	case FloatType:
+	case pkg.FloatType:
 		input = s
 	case biasBool:
 		if s {
@@ -29,7 +29,7 @@ func (a *axon) getSynapseInput() (input FloatType) {
 	case *neuron:
 		input = s.value
 	default:
-		errNN(fmt.Errorf("%w for method getSynapseInput: %v", ErrMissingType, s))
+		pkg.LogError(fmt.Errorf("%w for method getSynapseInput: %v", pkg.ErrMissingType, s))
 	}
 	return
 }
@@ -37,14 +37,14 @@ func (a *axon) getSynapseInput() (input FloatType) {
 // weight
 type weight struct {
 	isInitWeight bool
-	buffer       Floater
+	buffer       pkg.Floater
 }
 
 // Weight
-func Weight(args ...Floater) pkg.Controller {
+func Weight(args ...pkg.Floater) pkg.Controller {
 	if len(args) > 0 {
 		switch v := args[0].(type) {
-		case *float3Type, *Float2Type, *float1Type:
+		case *pkg.Float3Type, *pkg.Float2Type, *pkg.Float1Type:
 			return &weight{
 				isInitWeight: true,
 				buffer:       v,
@@ -72,7 +72,7 @@ func (w *weight) Set(args ...pkg.Setter) {
 			n.Get().Set(w)
 		}
 	} else {
-		errNN(fmt.Errorf("%w set for weight", ErrEmpty))
+		pkg.LogError(fmt.Errorf("%w set for weight", pkg.ErrEmpty))
 	}
 }
 
@@ -118,6 +118,6 @@ func (w *weight) Write(writer ...pkg.Writer) {
 			v.Write(w)
 		}
 	} else {
-		errNN(fmt.Errorf("%w write for weight", ErrEmpty))
+		pkg.LogError(fmt.Errorf("%w write for weight", pkg.ErrEmpty))
 	}
 }

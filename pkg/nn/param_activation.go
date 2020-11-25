@@ -34,11 +34,6 @@ func ActivationMode(mode ...uint8) pkg.GetSetter {
 	return activationModeUint(0)
 }
 
-// ActivationMode
-/*func (n *nn) ActivationMode() uint8 {
-	return n.Architecture.(Parameter).ActivationMode()
-}*/
-
 // Set
 func (m activationModeUint) Set(args ...pkg.Setter) {
 	if len(args) > 0 {
@@ -46,7 +41,7 @@ func (m activationModeUint) Set(args ...pkg.Setter) {
 			a.Get().Set(m.check())
 		}
 	} else {
-		errNN(fmt.Errorf("%w set for activation", ErrEmpty))
+		pkg.LogError(fmt.Errorf("%w set for activation", pkg.ErrEmpty))
 	}
 }
 

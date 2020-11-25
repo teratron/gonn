@@ -4,8 +4,6 @@ package nn
 import (
 	"fmt"
 
-	//"github.com/teratron/gonn/pkg"
-	//"github.com/teratron/gonn/pkg/nn"
 	"github.com/teratron/gonn/pkg"
 )
 
@@ -15,26 +13,23 @@ const hopfieldName = "hopfield"
 var _ NeuralNetwork = (*hopfield)(nil)
 
 type hopfield struct {
-	//Architecture `json:"-" xml:"-"`
-	//Parameter   `json:"-" xml:"-"`
-	Constructor `json:"-" xml:"-"`
+	NeuralNetwork `json:"-" xml:"-"`
 
 	// Neural network architecture name
 	Name string `json:"name" xml:"name"`
 
-	Energy  FloatType  `json:"energy" xml:"energy"`
-	Weights Float2Type `json:"weights" xml:"weights"`
-
-	// Configurations
-	/*Conf struct {
-		Energy floatType  `json:"energy" xml:"energy"`
-		Weight float2Type `json:"weights" xml:"weight"`
-	} `json:"hopfield,omitempty" xml:"hopfield,omitempty"`*/
+	Energy  pkg.FloatType  `json:"energy" xml:"energy"`
+	Weights pkg.Float2Type `json:"weights" xml:"weights"`
 
 	// Matrix
 	//neuron []*neuron
 	//axon   [][]*axon
 	//*weight
+
+	// State of the neural network
+	isInit   bool
+	isTrain  bool
+	nameJSON string
 }
 
 // Hopfield return
@@ -43,19 +38,6 @@ func Hopfield() *hopfield {
 		Name: hopfieldName,
 	}
 }
-
-// architecture
-/*func (h *hopfield) architecture() Architecture {
-	return h.Architecture
-}
-
-// setArchitecture
-func (h *hopfield) setArchitecture(network Architecture) {
-	if n, ok := network.(*nn); ok {
-		h.Architecture = n
-	}
-	h.Energy = .001
-}*/
 
 // NeuronEnergy
 func (h *hopfield) NeuronEnergy() float32 {
