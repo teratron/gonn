@@ -9,9 +9,9 @@ type Neuroner interface {
 
 // neuron
 type neuron struct {
-	value    pkg.FloatType // Neuron value
-	axon     []*axon       // All incoming axons
-	specific Neuroner      // Specific option of neuron: miss (error) or other
+	value    FloatType // Neuron value
+	axon     []*axon   // All incoming axons
+	specific Neuroner  // Specific option of neuron: miss (error) or other
 
 	Synapser
 }

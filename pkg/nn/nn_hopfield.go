@@ -14,12 +14,13 @@ var _ NeuralNetwork = (*hopfield)(nil)
 
 type hopfield struct {
 	NeuralNetwork `json:"-" xml:"-"`
+	//Parameter     `json:"-" xml:"-"`
 
 	// Neural network architecture name
 	Name string `json:"name" xml:"name"`
 
-	Energy  pkg.FloatType  `json:"energy" xml:"energy"`
-	Weights pkg.Float2Type `json:"weights" xml:"weights"`
+	Energy  FloatType  `json:"energy" xml:"energy"`
+	Weights Float2Type `json:"weights" xml:"weights"`
 
 	// Matrix
 	//neuron []*neuron
@@ -29,7 +30,7 @@ type hopfield struct {
 	// State of the neural network
 	isInit   bool
 	isTrain  bool
-	nameJSON string
+	jsonName string
 }
 
 // Hopfield return
@@ -73,9 +74,4 @@ func (h *hopfield) Read(reader pkg.Reader) {
 // Write
 func (h *hopfield) Write(writer ...pkg.Writer) {
 	fmt.Print(writer)
-}
-
-// readJSON
-func (h *hopfield) readJSON(value interface{}) {
-	fmt.Print(value)
 }

@@ -7,6 +7,9 @@ const MaxIteration int = 10e+05
 
 // NeuralNetwork
 type NeuralNetwork interface {
+	pkg.Controller
+	Parameter
+
 	// Initializing
 	init(int, ...interface{}) bool
 
@@ -18,7 +21,4 @@ type NeuralNetwork interface {
 
 	// Training
 	Train(input []float64, target ...[]float64) (loss float64, count int)
-
-	pkg.Controller
-	Parameter
 }

@@ -37,10 +37,10 @@ type perceptron struct {
 	Limit float64 `json:"limit" xml:"limit"`
 
 	// Learning coefficient, from 0 to 1
-	Rate pkg.FloatType `json:"rate" xml:"rate"`
+	Rate FloatType `json:"rate" xml:"rate"`
 
 	// Buffer of weight values
-	Weights pkg.Float3Type `json:"weights" xml:"weights>weights"`
+	Weights Float3Type `json:"weights" xml:"weights>weights"`
 
 	// Matrix
 	neuron [][]*neuron
@@ -60,7 +60,7 @@ type perceptron struct {
 	// State of the neural network
 	isInit   bool
 	isTrain  bool
-	nameJSON string
+	jsonName string
 
 	lastIndexLayer int
 	lenInput       int
@@ -76,7 +76,7 @@ func Perceptron() *perceptron {
 		Activation: ModeSIGMOID,
 		Loss:       ModeMSE,
 		Limit:      .01,
-		Rate:       pkg.FloatType(DefaultRate),
+		Rate:       FloatType(DefaultRate),
 	}
 }
 
@@ -88,20 +88,28 @@ func (p *perceptron) setName(name string) {
 	p.Name = name
 }
 
-func (p *perceptron) json() string {
-	return p.nameJSON
-}
-
-func (p *perceptron) setNameJSON(name string) {
-	p.nameJSON = name
-}
-
 func (p *perceptron) stateInit() bool {
 	return p.isInit
 }
 
 func (p *perceptron) setStateInit(state bool) {
 	p.isInit = state
+}
+
+func (p *perceptron) stateTrain() bool {
+	return p.isTrain
+}
+
+func (p *perceptron) setStateTrain(state bool) {
+	p.isTrain = state
+}
+
+func (p *perceptron) nameJSON() string {
+	return p.jsonName
+}
+
+func (p *perceptron) setNameJSON(name string) {
+	p.jsonName = name
 }
 
 // HiddenLayer
@@ -135,7 +143,7 @@ func (p *perceptron) LearningRate() float32 {
 }
 
 // Weight
-func (p *perceptron) Weight() pkg.Floater {
+func (p *perceptron) Weight() Floater {
 	return p.getWeight()
 }
 
@@ -155,9 +163,9 @@ func (p *perceptron) Set(args ...pkg.Setter) {
 			case lossLimitFloat:
 				p.Limit = float64(v)
 			case rateFloat:
-				p.Rate = pkg.FloatType(v)
+				p.Rate = FloatType(v)
 			case *weight:
-				p.setWeight(v.buffer.(*pkg.Float3Type))
+				p.setWeight(v.buffer.(*Float3Type))
 			default:
 				pkg.LogError(fmt.Errorf("%T %w for perceptron", v, pkg.ErrMissingType))
 			}
@@ -297,9 +305,6 @@ func (p *perceptron) reInit() {
 	for i := range p.Hidden {
 		p.Hidden[i] = uint(len(p.Weights[i]))
 	}
-	/*if n, ok := p.Architecture.(*nn); ok {
-		n.isInit = p.init(len(p.Weights[0][0])-bias, len(p.Weights[length]))
-	}*/
 	p.isInit = p.init(len(p.Weights[0][0])-bias, len(p.Weights[length]))
 }
 
@@ -309,9 +314,8 @@ func (p *perceptron) initNeuron() {
 		for j := range v {
 			p.neuron[i][j] = &neuron{
 				axon:     p.axon[i][j],
-				specific: pkg.FloatType(0),
+				specific: FloatType(0),
 			}
-			//p.neuron[i][j].axon = p.axon[i][j]
 		}
 	}
 }
@@ -319,9 +323,6 @@ func (p *perceptron) initNeuron() {
 // initAxon
 func (p *perceptron) initAxon() {
 	isTrain := true
-	/*if n, ok := p.Architecture.(*nn); ok && !n.isTrain {
-		isTrain = false
-	}*/
 	if !p.isTrain {
 		isTrain = false
 	}
@@ -336,7 +337,7 @@ func (p *perceptron) initAxon() {
 				}
 				if i == 0 {
 					if k < p.lenInput {
-						p.axon[i][j][k].synapse["input"] = pkg.FloatType(0)
+						p.axon[i][j][k].synapse["input"] = FloatType(0)
 					} else {
 						p.axon[i][j][k].synapse["input"] = biasBool(true)
 					}
@@ -358,7 +359,7 @@ func (p *perceptron) initSynapseInput(input []float64) {
 	for j, w := range p.axon[0] {
 		for k := range w {
 			if k < p.lenInput {
-				p.axon[0][j][k].synapse["input"] = pkg.FloatType(input[k])
+				p.axon[0][j][k].synapse["input"] = FloatType(input[k])
 			}
 		}
 	}
@@ -376,7 +377,7 @@ func (p *perceptron) calcNeuron(input []float64) {
 				for _, a := range n.axon {
 					n.value += a.getSynapseInput() * a.weight
 				}
-				n.value = pkg.FloatType(calcActivation(float64(n.value), p.Activation))
+				n.value = FloatType(calcActivation(float64(n.value), p.Activation))
 				wait <- true
 			}(w)
 		}
@@ -389,8 +390,8 @@ func (p *perceptron) calcNeuron(input []float64) {
 // calcLoss calculating the error of the output neuron
 func (p *perceptron) calcLoss(target []float64) (loss float64) {
 	for i, v := range p.neuron[p.lastIndexLayer] {
-		if miss, ok := v.specific.(pkg.FloatType); ok {
-			miss = pkg.FloatType(target[i]) - v.value
+		if miss, ok := v.specific.(FloatType); ok {
+			miss = FloatType(target[i]) - v.value
 			switch p.Loss {
 			default:
 				fallthrough
@@ -399,7 +400,7 @@ func (p *perceptron) calcLoss(target []float64) (loss float64) {
 			case ModeARCTAN:
 				loss += math.Pow(math.Atan(float64(miss)), 2)
 			}
-			miss *= pkg.FloatType(calcDerivative(float64(v.value), p.Activation))
+			miss *= FloatType(calcDerivative(float64(v.value), p.Activation))
 			v.specific = miss
 		}
 	}
@@ -417,14 +418,14 @@ func (p *perceptron) calcMiss() {
 	for i := p.lastIndexLayer - 1; i >= 0; i-- {
 		for j, v := range p.neuron[i] {
 			go func(j int, n *neuron) {
-				if miss, ok := n.specific.(pkg.FloatType); ok {
+				if miss, ok := n.specific.(FloatType); ok {
 					miss = 0
 					for _, w := range p.neuron[i+1] {
-						if m, ok := w.specific.(pkg.FloatType); ok {
+						if m, ok := w.specific.(FloatType); ok {
 							miss += m * w.axon[j].weight
 						}
 					}
-					miss *= pkg.FloatType(calcDerivative(float64(n.value), p.Activation))
+					miss *= FloatType(calcDerivative(float64(n.value), p.Activation))
 					n.specific = miss
 				}
 				wait <- true
@@ -446,7 +447,7 @@ func (p *perceptron) calcAxon() {
 			for _, w := range v {
 				go func(a *axon) {
 					if n, ok := a.synapse["output"].(*neuron); ok {
-						if miss, ok := n.specific.(pkg.FloatType); ok {
+						if miss, ok := n.specific.(FloatType); ok {
 							a.weight += a.getSynapseInput() * miss * p.Rate
 						}
 					}
@@ -528,11 +529,11 @@ func (p *perceptron) Verify(input []float64, target ...[]float64) (loss float64)
 
 // initWeight
 func (p *perceptron) initWeight() {
-	p.Weights = make(pkg.Float3Type, len(p.axon))
+	p.Weights = make(Float3Type, len(p.axon))
 	for i, v := range p.axon {
-		p.Weights[i] = make(pkg.Float2Type, len(p.axon[i]))
+		p.Weights[i] = make(Float2Type, len(p.axon[i]))
 		for j := range v {
-			p.Weights[i][j] = make(pkg.Float1Type, len(p.axon[i][j]))
+			p.Weights[i][j] = make(Float1Type, len(p.axon[i][j]))
 		}
 	}
 	p.weight = &weight{
@@ -542,13 +543,13 @@ func (p *perceptron) initWeight() {
 }
 
 // getWeight
-func (p *perceptron) getWeight() *pkg.Float3Type {
+func (p *perceptron) getWeight() *Float3Type {
 	p.copyWeight()
 	return &p.Weights
 }
 
 // setWeight
-func (p *perceptron) setWeight(weight *pkg.Float3Type) {
+func (p *perceptron) setWeight(weight *Float3Type) {
 	for i, u := range *weight {
 		for j, v := range u {
 			for k, w := range v {

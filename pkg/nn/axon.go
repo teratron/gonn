@@ -13,14 +13,14 @@ type Synapser interface {
 
 // axon
 type axon struct {
-	weight  pkg.FloatType
+	weight  FloatType
 	synapse map[string]Synapser
 }
 
 // getSynapseInput
-func (a *axon) getSynapseInput() (input pkg.FloatType) {
+func (a *axon) getSynapseInput() (input FloatType) {
 	switch s := a.synapse["input"].(type) {
-	case pkg.FloatType:
+	case FloatType:
 		input = s
 	case biasBool:
 		if s {
@@ -37,14 +37,14 @@ func (a *axon) getSynapseInput() (input pkg.FloatType) {
 // weight
 type weight struct {
 	isInitWeight bool
-	buffer       pkg.Floater
+	buffer       Floater
 }
 
 // Weight
-func Weight(args ...pkg.Floater) pkg.Controller {
+func Weight(args ...Floater) pkg.Controller {
 	if len(args) > 0 {
 		switch v := args[0].(type) {
-		case *pkg.Float3Type, *pkg.Float2Type, *pkg.Float1Type:
+		case *Float3Type, *Float2Type, *Float1Type:
 			return &weight{
 				isInitWeight: true,
 				buffer:       v,

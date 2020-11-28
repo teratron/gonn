@@ -6,7 +6,7 @@ import (
 	"github.com/teratron/gonn/pkg"
 )
 
-type rateFloat pkg.FloatType
+type rateFloat FloatType
 
 // Default learning rate
 const DefaultRate float32 = .3

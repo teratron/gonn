@@ -1,7 +1,5 @@
 package nn
 
-import "github.com/teratron/gonn/pkg"
-
 // Parameter
 type Parameter interface {
 	name() string
@@ -10,7 +8,10 @@ type Parameter interface {
 	stateInit() bool
 	setStateInit(bool)
 
-	json() string
+	stateTrain() bool
+	setStateTrain(bool)
+
+	nameJSON() string
 	setNameJSON(string)
 
 	// Perceptron
@@ -24,5 +25,5 @@ type Parameter interface {
 	// Hopfield
 	NeuronEnergy() float32
 
-	Weight() pkg.Floater
+	Weight() Floater
 }

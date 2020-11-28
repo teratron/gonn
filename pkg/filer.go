@@ -5,6 +5,7 @@ import "os"
 // Filer
 type Filer interface {
 	ReadWriter
+	ToString() string
 }
 
 func File(filename string) *os.File {

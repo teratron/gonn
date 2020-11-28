@@ -20,6 +20,11 @@ func JSON(filename ...string) pkg.ReadWriter {
 	return jsonString("")
 }
 
+// ToString
+func (j jsonString) ToString() string {
+	return string(j)
+}
+
 // Read
 func (j jsonString) Read(reader pkg.Reader) {
 	filename := string(j)
@@ -72,8 +77,8 @@ func (j jsonString) Write(writer ...pkg.Writer) {
 		if n, ok := writer[0].(*perceptron); ok {
 			filename := string(j)
 			if len(filename) == 0 {
-				if len(n.nameJSON) > 0 {
-					filename = n.nameJSON
+				if len(n.jsonName) > 0 {
+					filename = n.jsonName
 				} else {
 					// TODO: generate path and filename
 					filename = "neural_network.json"
