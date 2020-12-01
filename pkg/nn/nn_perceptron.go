@@ -45,6 +45,11 @@ type perceptron struct {
 	//input   []float64
 	//target  []float64
 
+	neurons [][]struct {
+		value FloatType
+		miss  FloatType
+	}
+
 	lastIndexLayer int
 	lenInput       int
 	lenOutput      int
@@ -379,7 +384,6 @@ func (p *perceptron) calcNeuron(input []float64) {
 	//defer close(wait)
 
 	var length int
-	//var neuron FloatType
 	for i, v := range p.neuron {
 		if i == 0 {
 			length = p.lenInput
@@ -390,21 +394,6 @@ func (p *perceptron) calcNeuron(input []float64) {
 			//var sum FloatType = 0
 			n = 0
 			for k, weight := range p.Weights[i][j] {
-				/*if i == 0 {
-					if k < length {
-						n += FloatType(input[k]) * weight
-						neuron = FloatType(input[k])
-					} else {
-						n += weight
-					}
-				} else {
-					if k < length {
-						n += p.neuron[i-1][k] * weight
-						neuron = p.neuron[i-1][k]
-					} else {
-						n += weight
-					}
-				}*/
 				if k < length {
 					if i == 0 {
 						n += FloatType(input[k]) * weight
@@ -436,7 +425,6 @@ func (p *perceptron) calcNeuron(input []float64) {
 // calcLoss calculating the error of the output neuron
 func (p *perceptron) calcLoss(target []float64) (loss float64) {
 	for i, n := range p.neuron[p.lastIndexLayer] {
-		//n.miss = FloatType(target[i]) - n.value
 		p.miss[p.lastIndexLayer][i] = FloatType(target[i]) - n
 		switch p.Loss {
 		default:
