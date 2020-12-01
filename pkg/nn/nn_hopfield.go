@@ -19,8 +19,10 @@ type hopfield struct {
 	// Neural network architecture name
 	Name string `json:"name" xml:"name"`
 
-	Energy  FloatType  `json:"energy" xml:"energy"`
-	Weights Float2Type `json:"weights" xml:"weights"`
+	Energy FloatType `json:"energy" xml:"energy"`
+
+	// Weights values
+	Weights [][]FloatType `json:"weights" xml:"weights"`
 
 	// Matrix
 	//neuron []*neuron
@@ -28,8 +30,10 @@ type hopfield struct {
 	//*weight
 
 	// State of the neural network
-	isInit   bool
-	isTrain  bool
+	isInit  bool
+	isTrain bool
+
+	// Config
 	jsonName string
 }
 

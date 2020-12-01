@@ -21,31 +21,44 @@ func New(reader ...pkg.Reader) NeuralNetwork {
 		case NeuralNetwork:
 			return r
 		case pkg.Filer:
-			//fmt.Printf("Filer %T %s\n", r, r)
 			var n NeuralNetwork
 			filename := r.ToString()
 			if len(filename) == 0 {
-				pkg.LogError(fmt.Errorf("json: file json is missing"))
+				pkg.LogError(fmt.Errorf("init: file config is missing"))
 			}
 			b, err := ioutil.ReadFile(filename)
 			if err != nil {
 				pkg.LogError(err)
 			}
+
+			switch r.(type) {
+			case jsonString:
+			}
+			//fmt.Printf("Filer %T %s\n", r, r)
+
 			var data interface{}
 			if err = json.Unmarshal(b, &data); err != nil {
 				pkg.LogError(fmt.Errorf("read unmarshal %w", err))
 			}
 			if value, ok := data.(map[string]interface{})["name"]; ok {
-				fmt.Println(data.(map[string]interface{})["hidden"])
-				fmt.Println(data.(map[string]interface{})["weights"])
-				//fmt.Println(getArchitecture(value.(string)))
 				n = getArchitecture(value.(string))
-				//fmt.Println(n)
 				if err = json.Unmarshal(b, &n); err != nil {
 					pkg.LogError(fmt.Errorf("read unmarshal %w", err))
 				}
+				fmt.Println(n.(*perceptron).Weights)
+				fmt.Printf("%T %v\n", n.(*perceptron).Weights, n.(*perceptron).Weights)
+				//n.setName("asd")
+				//n.Set(NeuronBias(false))
+
 				n.setStateInit(false)
 				n.setNameJSON(filename)
+				if weight, ok := data.(map[string]interface{})["weights"]; ok && weight != nil /*&& len(w) > 0*/ {
+					if w, ok := weight.(Float3Type); ok {
+						fmt.Println(w)
+					}
+					//fmt.Println(weight)
+					//fmt.Printf("%T %v\n", weight, weight)
+				}
 			}
 			return n
 		default:
@@ -60,9 +73,9 @@ func New(reader ...pkg.Reader) NeuralNetwork {
 func getArchitecture(name string) NeuralNetwork {
 	switch name {
 	case perceptronName:
-		return &perceptron{}
+		return Perceptron() //&perceptron{}
 	case hopfieldName:
-		return &hopfield{}
+		return Hopfield() //&hopfield{}
 	default:
 		pkg.LogError(fmt.Errorf("neural network %w", pkg.ErrNotFound))
 		return nil

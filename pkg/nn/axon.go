@@ -12,10 +12,12 @@ type Synapser interface {
 }
 
 // axon
-type axon struct {
-	weight  FloatType
+/*type axon struct {
+	//weight  FloatType
 	synapse map[string]Synapser
-}
+}*/
+
+//type axon map[string]Synapser
 
 // getSynapseInput
 func (a *axon) getSynapseInput() (input FloatType) {
