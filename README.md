@@ -44,7 +44,7 @@ func main() {
 		nn.Bias(true),
 		nn.ActivationMode(nn.ModeSIGMOID),
 		nn.LossMode(nn.ModeMSE),
-		nn.LossLevel(.0001),
+		nn.LossLevel(.1),
 		nn.Rate(nn.DefaultRate))
 
 	// Training dataset
