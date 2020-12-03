@@ -7,9 +7,9 @@ import (
 )
 
 // Synapser
-type Synapser interface {
+/*type Synapser interface {
 	pkg.GetSetter
-}
+}*/
 
 // axon
 /*type axon struct {
@@ -20,7 +20,7 @@ type Synapser interface {
 //type axon map[string]Synapser
 
 // getSynapseInput
-func (a *axon) getSynapseInput() (input FloatType) {
+/*func (a *axon) getSynapseInput() (input FloatType) {
 	switch s := a.synapse["input"].(type) {
 	case FloatType:
 		input = s
@@ -34,7 +34,7 @@ func (a *axon) getSynapseInput() (input FloatType) {
 		pkg.LogError(fmt.Errorf("%w for method getSynapseInput: %v", pkg.ErrMissingType, s))
 	}
 	return
-}
+}*/
 
 // weight
 type weight struct {

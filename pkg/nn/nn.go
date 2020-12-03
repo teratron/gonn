@@ -10,9 +10,6 @@ type NeuralNetwork interface {
 	pkg.Controller
 	Parameter
 
-	// Initializing
-	//init(int, ...interface{}) bool
-
 	// Querying
 	Query(input []float64) (output []float64)
 
