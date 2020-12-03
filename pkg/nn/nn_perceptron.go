@@ -156,8 +156,8 @@ func (p *perceptron) Set(args ...pkg.Setter) {
 				p.Limit = float64(v)
 			case rateFloat:
 				p.Rate = FloatType(v)
-			case *weight:
-				//p.setWeight(v.buffer.(*Float3Type))
+			//case *weight:
+			//p.setWeight(v.buffer.(*Float3Type))
 			default:
 				pkg.LogError(fmt.Errorf("%T %w for perceptron", v, pkg.ErrMissingType))
 			}
@@ -184,8 +184,8 @@ func (p *perceptron) Get(args ...pkg.Getter) pkg.GetSetter {
 				return lossLimitFloat(p.Limit)
 			case rateFloat:
 				return p.Rate
-			case *weight:
-				//return p.getWeight()
+			//case *weight:
+			//return p.getWeight()
 			default:
 				pkg.LogError(fmt.Errorf("%T %w for perceptron", a, pkg.ErrMissingType))
 			}
@@ -197,8 +197,8 @@ func (p *perceptron) Get(args ...pkg.Getter) pkg.GetSetter {
 // Copy
 func (p *perceptron) Copy(copier pkg.Copier) {
 	switch c := copier.(type) {
-	case *weight:
-		//p.copyWeight()
+	//case *weight:
+	//p.copyWeight()
 	default:
 		pkg.LogError(fmt.Errorf("%T %w for copy: %v", c, pkg.ErrMissingType, c))
 	}
@@ -207,10 +207,10 @@ func (p *perceptron) Copy(copier pkg.Copier) {
 // Paste
 func (p *perceptron) Paste(paster pkg.Paster) {
 	switch v := paster.(type) {
-	case *weight:
-		/*if err := p.pasteWeight(); err != nil {
-			pkg.LogError(err)
-		}*/
+	//case *weight:
+	/*if err := p.pasteWeight(); err != nil {
+		pkg.LogError(err)
+	}*/
 	default:
 		pkg.LogError(fmt.Errorf("%T %w for paste: %v", v, pkg.ErrMissingType, v))
 	}
@@ -390,8 +390,8 @@ func (p *perceptron) calcMiss() {
 func (p *perceptron) updWeight(input []float64) {
 	p.calcMiss()
 
-	//wait := make(chan bool)
-	//defer close(wait)
+	wait := make(chan bool)
+	defer close(wait)
 
 	var length int
 	for i, u := range p.Weights {
@@ -414,6 +414,9 @@ func (p *perceptron) updWeight(input []float64) {
 					w += b
 				}
 			}
+		}
+		for range u {
+			<-wait
 		}
 	}
 

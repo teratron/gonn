@@ -3,7 +3,6 @@ package nn
 import (
 	"encoding/json"
 	"fmt"
-	_ "io"
 	"io/ioutil"
 	"os"
 
