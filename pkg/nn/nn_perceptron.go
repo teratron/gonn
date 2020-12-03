@@ -486,7 +486,7 @@ func (p *perceptron) Verify(input []float64, target ...[]float64) (loss float64)
 	if !p.isTrain {
 		pkg.LogError(fmt.Errorf("verify: %w", pkg.ErrNotTrained))
 		if !p.isInit {
-			if p.isInit = p.init(len(input), getLengthData(target...)...); !p.isInit {
+			if p.isInit = p.init(len(input), len(target[0])); !p.isInit {
 				pkg.LogError(fmt.Errorf("%w for verify", pkg.ErrInit))
 				return -1
 			}
