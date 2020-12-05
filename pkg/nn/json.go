@@ -5,14 +5,12 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-
-	"github.com/teratron/gonn/pkg"
 )
 
 type jsonString string
 
 // JSON
-func JSON(filename ...string) pkg.ReadWriter {
+func JSON(filename ...string) ReadWriter {
 	if len(filename) > 0 {
 		return jsonString(filename[0])
 	}
@@ -25,28 +23,28 @@ func (j jsonString) ToString() string {
 }
 
 // Read
-func (j jsonString) Read(reader pkg.Reader) {
+func (j jsonString) Read(reader Reader) {
 	filename := string(j)
 	if len(filename) == 0 {
-		pkg.LogError(fmt.Errorf("json: file json is missing"))
+		LogError(fmt.Errorf("json: file json is missing"))
 	}
 
 	b, err := ioutil.ReadFile(filename)
 	if err != nil {
-		pkg.LogError(err)
+		LogError(err)
 	}
 
 	if n, ok := reader.(NeuralNetwork); ok {
 		var data interface{}
 		if err = json.Unmarshal(b, &data); err != nil {
-			pkg.LogError(fmt.Errorf("read unmarshal %w", err))
+			LogError(fmt.Errorf("read unmarshal %w", err))
 		}
 		//fmt.Println(data.(map[string]interface{})["weights"])
 
 		if value, ok := data.(map[string]interface{})["name"]; ok {
 			if value == n.name() {
 				if err = json.Unmarshal(b, &n); err != nil {
-					pkg.LogError(fmt.Errorf("read unmarshal %w", err))
+					LogError(fmt.Errorf("read unmarshal %w", err))
 				}
 				n.setStateInit(false)
 				n.setNameJSON(filename)
@@ -62,7 +60,7 @@ func (j jsonString) Read(reader pkg.Reader) {
 						Name: hopfieldName,
 					}
 				default:
-					pkg.LogError(fmt.Errorf("read json: %w", pkg.ErrNotRecognized))
+					LogError(fmt.Errorf("read json: %w", ErrNotRecognized))
 					return
 				}
 			}
@@ -71,7 +69,7 @@ func (j jsonString) Read(reader pkg.Reader) {
 }
 
 // Write
-func (j jsonString) Write(writer ...pkg.Writer) {
+func (j jsonString) Write(writer ...Writer) {
 	if len(writer) > 0 {
 		if n, ok := writer[0].(*perceptron); ok {
 			filename := string(j)
@@ -86,15 +84,15 @@ func (j jsonString) Write(writer ...pkg.Writer) {
 			if n.isTrain {
 				n.Copy(Weight())
 			} else {
-				pkg.LogError(fmt.Errorf("json write: %w", pkg.ErrNotTrained))
+				LogError(fmt.Errorf("json write: %w", ErrNotTrained))
 			}
 			if b, err := json.MarshalIndent(&n, "", "\t"); err != nil {
-				pkg.LogError(fmt.Errorf("write %w", err))
+				LogError(fmt.Errorf("write %w", err))
 			} else if err = ioutil.WriteFile(filename, b, os.ModePerm); err != nil {
-				pkg.LogError(err)
+				LogError(err)
 			}
 		}
 	} else {
-		pkg.LogError(fmt.Errorf("%w json write", pkg.ErrEmpty))
+		LogError(fmt.Errorf("%w json write", ErrEmpty))
 	}
 }

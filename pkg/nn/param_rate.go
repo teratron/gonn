@@ -1,10 +1,6 @@
 package nn
 
-import (
-	"fmt"
-
-	"github.com/teratron/gonn/pkg"
-)
+import "fmt"
 
 type rateFloat FloatType
 
@@ -12,7 +8,7 @@ type rateFloat FloatType
 const DefaultRate float32 = .3
 
 // Rate
-func LearningRate(rate ...float32) pkg.GetSetter {
+func LearningRate(rate ...float32) GetSetter {
 	if len(rate) > 0 {
 		return rateFloat(rate[0])
 	}
@@ -20,18 +16,18 @@ func LearningRate(rate ...float32) pkg.GetSetter {
 }
 
 // Set
-func (r rateFloat) Set(args ...pkg.Setter) {
+func (r rateFloat) Set(args ...Setter) {
 	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
 			a.Get().Set(r.check())
 		}
 	} else {
-		pkg.LogError(fmt.Errorf("%w set for rate", pkg.ErrEmpty))
+		LogError(fmt.Errorf("%w set for rate", ErrEmpty))
 	}
 }
 
 // Get
-func (r rateFloat) Get(args ...pkg.Getter) pkg.GetSetter {
+func (r rateFloat) Get(args ...Getter) GetSetter {
 	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
 			return a.Get().Get(r)

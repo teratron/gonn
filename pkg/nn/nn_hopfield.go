@@ -1,11 +1,7 @@
 // Package nn - under construction
 package nn
 
-import (
-	"fmt"
-
-	"github.com/teratron/gonn/pkg"
-)
+import "fmt"
 
 const hopfieldName = "hopfield"
 
@@ -25,9 +21,7 @@ type hopfield struct {
 	Weights [][]FloatType `json:"weights" xml:"weights"`
 
 	// Matrix
-	//neuron []*neuron
-	//axon   [][]*axon
-	//*weight
+	neuron []FloatType
 
 	// State of the neural network
 	isInit  bool
@@ -50,32 +44,32 @@ func (h *hopfield) NeuronEnergy() float32 {
 }
 
 // Set
-func (h *hopfield) Set(args ...pkg.Setter) {
+func (h *hopfield) Set(args ...Setter) {
 	fmt.Print(args)
 }
 
 // Get
-func (h *hopfield) Get(args ...pkg.Getter) pkg.GetSetter {
+func (h *hopfield) Get(args ...Getter) GetSetter {
 	fmt.Print(args)
 	return h
 }
 
 // Copy
-func (h *hopfield) Copy(copier pkg.Copier) {
+func (h *hopfield) Copy(copier Copier) {
 	fmt.Print(copier)
 }
 
 // Paste
-func (h *hopfield) Paste(paster pkg.Paster) {
+func (h *hopfield) Paste(paster Paster) {
 	fmt.Print(paster)
 }
 
 // Read
-func (h *hopfield) Read(reader pkg.Reader) {
+func (h *hopfield) Read(reader Reader) {
 	fmt.Print(reader)
 }
 
 // Write
-func (h *hopfield) Write(writer ...pkg.Writer) {
+func (h *hopfield) Write(writer ...Writer) {
 	fmt.Print(writer)
 }

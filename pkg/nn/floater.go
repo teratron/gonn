@@ -1,10 +1,8 @@
 package nn
 
-import "github.com/teratron/gonn/pkg"
-
 // Floater
 type Floater interface {
-	pkg.GetSetter
+	GetSetter
 }
 
 type (
@@ -14,26 +12,26 @@ type (
 	Float3Type [][][]FloatType
 )
 
-func (f FloatType) Set(...pkg.Setter) {}
+func (f FloatType) Set(...Setter) {}
 
-func (f FloatType) Get(...pkg.Getter) pkg.GetSetter {
+func (f FloatType) Get(...Getter) GetSetter {
 	return f
 }
 
-func (f *Float1Type) Set(...pkg.Setter) {}
+func (f *Float1Type) Set(...Setter) {}
 
-func (f *Float1Type) Get(...pkg.Getter) pkg.GetSetter {
+func (f *Float1Type) Get(...Getter) GetSetter {
 	return f
 }
 
-func (f *Float2Type) Set(...pkg.Setter) {}
+func (f *Float2Type) Set(...Setter) {}
 
-func (f *Float2Type) Get(...pkg.Getter) pkg.GetSetter {
+func (f *Float2Type) Get(...Getter) GetSetter {
 	return f
 }
 
-func (f *Float3Type) Set(...pkg.Setter) {}
+func (f *Float3Type) Set(...Setter) {}
 
-func (f *Float3Type) Get(...pkg.Getter) pkg.GetSetter {
+func (f *Float3Type) Get(...Getter) GetSetter {
 	return f
 }

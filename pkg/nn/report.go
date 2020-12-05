@@ -1,21 +1,17 @@
 package nn
 
-import (
-	"os"
-
-	"github.com/teratron/gonn/pkg"
-)
+import "os"
 
 // report
 type report struct {
 	file *os.File
 	args []interface{}
 
-	pkg.Writer
+	Writer
 }
 
 // Report
-func Report(file *os.File, args ...interface{}) pkg.Writer {
+func Report(file *os.File, args ...interface{}) Writer {
 	return &report{
 		file: file,
 		args: args,

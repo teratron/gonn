@@ -3,8 +3,6 @@ package nn
 import (
 	"fmt"
 	"math"
-
-	"github.com/teratron/gonn/pkg"
 )
 
 type activationModeUint uint8
@@ -27,7 +25,7 @@ const (
 )
 
 // ActivationMode
-func ActivationMode(mode ...uint8) pkg.GetSetter {
+func ActivationMode(mode ...uint8) GetSetter {
 	if len(mode) > 0 {
 		return activationModeUint(mode[0])
 	}
@@ -35,18 +33,18 @@ func ActivationMode(mode ...uint8) pkg.GetSetter {
 }
 
 // Set
-func (m activationModeUint) Set(args ...pkg.Setter) {
+func (m activationModeUint) Set(args ...Setter) {
 	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
 			a.Get().Set(m.check())
 		}
 	} else {
-		pkg.LogError(fmt.Errorf("%w set for activation", pkg.ErrEmpty))
+		LogError(fmt.Errorf("%w set for activation", ErrEmpty))
 	}
 }
 
 // Get
-func (m activationModeUint) Get(args ...pkg.Getter) pkg.GetSetter {
+func (m activationModeUint) Get(args ...Getter) GetSetter {
 	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
 			return a.Get().Get(m)

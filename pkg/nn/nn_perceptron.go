@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"math"
-
-	"github.com/teratron/gonn/pkg"
 )
 
 const perceptronName = "perceptron"
@@ -109,9 +107,19 @@ func (p *perceptron) HiddenLayer() []uint {
 	return p.Hidden
 }
 
+// SetHiddenLayer
+func (p *perceptron) SetHiddenLayer(layer []uint) {
+	p.Hidden = layer
+}
+
 // NeuronBias
 func (p *perceptron) NeuronBias() bool {
 	return bool(p.Bias)
+}
+
+// SetNeuronBias
+func (p *perceptron) SetNeuronBias(bias bool) {
+	p.Bias = biasBool(bias)
 }
 
 // ActivationMode
@@ -119,9 +127,19 @@ func (p *perceptron) ActivationMode() uint8 {
 	return p.Activation
 }
 
+// SetActivationMode
+func (p *perceptron) SetActivationMode(mode uint8) {
+	p.Activation = mode
+}
+
 // LossMode
 func (p *perceptron) LossMode() uint8 {
 	return p.Loss
+}
+
+// SetLossMode
+func (p *perceptron) SetLossMode(mode uint8) {
+	p.Loss = mode
 }
 
 // LossLimit
@@ -129,18 +147,33 @@ func (p *perceptron) LossLimit() float64 {
 	return p.Limit
 }
 
+// SetLossLimit
+func (p *perceptron) SetLossLimit(limit float64) {
+	p.Limit = limit
+}
+
 // LearningRate
 func (p *perceptron) LearningRate() float32 {
 	return float32(p.Rate)
 }
 
+// SetLearningRate
+func (p *perceptron) SetLearningRate(rate float32) {
+	p.Rate = FloatType(rate)
+}
+
 // Weight
 func (p *perceptron) Weight() Floater {
-	return nil //p.getWeight()
+	return nil //Float3Type(p.Weights)
+}
+
+// SetWeight
+func (p *perceptron) SetWeight(weight Floater) {
+	//p.Weights = weight.(Float3Type)
 }
 
 // Set
-func (p *perceptron) Set(args ...pkg.Setter) {
+func (p *perceptron) Set(args ...Setter) {
 	if len(args) > 0 {
 		for _, a := range args {
 			switch v := a.(type) {
@@ -159,16 +192,16 @@ func (p *perceptron) Set(args ...pkg.Setter) {
 			//case *weight:
 			//p.setWeight(v.buffer.(*Float3Type))
 			default:
-				pkg.LogError(fmt.Errorf("%T %w for perceptron", v, pkg.ErrMissingType))
+				LogError(fmt.Errorf("%T %w for perceptron", v, ErrMissingType))
 			}
 		}
 	} else {
-		pkg.LogError(fmt.Errorf("%w set for perceptron", pkg.ErrEmpty))
+		LogError(fmt.Errorf("%w set for perceptron", ErrEmpty))
 	}
 }
 
 // Get
-func (p *perceptron) Get(args ...pkg.Getter) pkg.GetSetter {
+func (p *perceptron) Get(args ...Getter) GetSetter {
 	if len(args) > 0 {
 		for _, a := range args {
 			switch a.(type) {
@@ -187,7 +220,7 @@ func (p *perceptron) Get(args ...pkg.Getter) pkg.GetSetter {
 			//case *weight:
 			//return p.getWeight()
 			default:
-				pkg.LogError(fmt.Errorf("%T %w for perceptron", a, pkg.ErrMissingType))
+				LogError(fmt.Errorf("%T %w for perceptron", a, ErrMissingType))
 			}
 		}
 	}
@@ -195,52 +228,52 @@ func (p *perceptron) Get(args ...pkg.Getter) pkg.GetSetter {
 }
 
 // Copy
-func (p *perceptron) Copy(copier pkg.Copier) {
+func (p *perceptron) Copy(copier Copier) {
 	switch c := copier.(type) {
 	//case *weight:
 	//p.copyWeight()
 	default:
-		pkg.LogError(fmt.Errorf("%T %w for copy: %v", c, pkg.ErrMissingType, c))
+		LogError(fmt.Errorf("%T %w for copy: %v", c, ErrMissingType, c))
 	}
 }
 
 // Paste
-func (p *perceptron) Paste(paster pkg.Paster) {
+func (p *perceptron) Paste(paster Paster) {
 	switch v := paster.(type) {
 	//case *weight:
 	/*if err := p.pasteWeight(); err != nil {
-		pkg.LogError(err)
+		LogError(err)
 	}*/
 	default:
-		pkg.LogError(fmt.Errorf("%T %w for paste: %v", v, pkg.ErrMissingType, v))
+		LogError(fmt.Errorf("%T %w for paste: %v", v, ErrMissingType, v))
 	}
 }
 
 // Read
-func (p *perceptron) Read(reader pkg.Reader) {
+func (p *perceptron) Read(reader Reader) {
 	switch r := reader.(type) {
-	case pkg.Filer:
+	case Filer:
 		r.Read(p)
 	default:
-		pkg.LogError(fmt.Errorf("%T %w for read: %v", r, pkg.ErrMissingType, r))
+		LogError(fmt.Errorf("%T %w for read: %v", r, ErrMissingType, r))
 	}
 }
 
 // Write
-func (p *perceptron) Write(writer ...pkg.Writer) {
+func (p *perceptron) Write(writer ...Writer) {
 	if len(writer) > 0 {
 		for _, w := range writer {
 			switch v := w.(type) {
-			case pkg.Filer:
+			case Filer:
 				v.Write(p)
 			case *report:
 				p.writeReport(v)
 			default:
-				pkg.LogError(fmt.Errorf("%T %w for write: %v", v, pkg.ErrMissingType, w))
+				LogError(fmt.Errorf("%T %w for write: %v", v, ErrMissingType, w))
 			}
 		}
 	} else {
-		pkg.LogError(fmt.Errorf("%w for write", pkg.ErrEmpty))
+		LogError(fmt.Errorf("%w for write", ErrEmpty))
 	}
 }
 
@@ -403,6 +436,7 @@ func (p *perceptron) updWeight(input []float64) {
 		}
 		for j, v := range u {
 			b := p.miss[i][j] * p.Rate
+
 			for k, w := range v {
 				if k < length {
 					if i > 0 {
@@ -414,6 +448,7 @@ func (p *perceptron) updWeight(input []float64) {
 					w += b
 				}
 			}
+
 		}
 		for range u {
 			<-wait
@@ -441,7 +476,7 @@ func (p *perceptron) updWeight(input []float64) {
 func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, count int) {
 	if !p.isInit {
 		if p.isInit = p.init(len(input), len(target[0])); !p.isInit {
-			pkg.LogError(fmt.Errorf("%w for train", pkg.ErrInit))
+			LogError(fmt.Errorf("%w for train", ErrInit))
 			return -1, 0
 		}
 	}
@@ -461,7 +496,7 @@ func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, 
 			p.isTrain = true
 		}
 	} else {
-		pkg.LogError(pkg.ErrNoTarget)
+		LogError(ErrNoTarget)
 		return -1, 0
 	}
 	return
@@ -470,9 +505,9 @@ func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, 
 // Query querying neural network
 func (p *perceptron) Query(input []float64) (output []float64) {
 	if !p.isTrain {
-		pkg.LogError(fmt.Errorf("query: %w", pkg.ErrNotTrained))
+		LogError(fmt.Errorf("query: %w", ErrNotTrained))
 		if !p.isInit {
-			pkg.LogError(fmt.Errorf("%w for query", pkg.ErrInit))
+			LogError(fmt.Errorf("%w for query", ErrInit))
 			return nil
 		}
 	}
@@ -487,10 +522,10 @@ func (p *perceptron) Query(input []float64) (output []float64) {
 // Verify verifying neural network
 func (p *perceptron) Verify(input []float64, target ...[]float64) (loss float64) {
 	if !p.isTrain {
-		pkg.LogError(fmt.Errorf("verify: %w", pkg.ErrNotTrained))
+		LogError(fmt.Errorf("verify: %w", ErrNotTrained))
 		if !p.isInit {
 			if p.isInit = p.init(len(input), len(target[0])); !p.isInit {
-				pkg.LogError(fmt.Errorf("%w for verify", pkg.ErrInit))
+				LogError(fmt.Errorf("%w for verify", ErrInit))
 				return -1
 			}
 		}
@@ -499,7 +534,7 @@ func (p *perceptron) Verify(input []float64, target ...[]float64) (loss float64)
 		p.calcNeuron(input)
 		loss = p.calcLoss(target[0])
 	} else {
-		pkg.LogError(pkg.ErrNoTarget)
+		LogError(ErrNoTarget)
 		return -1
 	}
 	return
@@ -577,13 +612,13 @@ func (p *perceptron) Verify(input []float64, target ...[]float64) (loss float64)
 // readJSON
 /*func (p *perceptron) readJSON(value interface{}) {
 	if b, err := json.Marshal(&value); err != nil {
-		pkg.LogError(fmt.Errorf("read marshal %w", err))
+		LogError(fmt.Errorf("read marshal %w", err))
 	} else if err = json.Unmarshal(b, &p); err != nil {
-		pkg.LogError(fmt.Errorf("read unmarshal %w", err))
+		LogError(fmt.Errorf("read unmarshal %w", err))
 	}
 	p.reInit()
 	if err := p.pasteWeight(); err != nil {
-		pkg.LogError(fmt.Errorf("read json: %w", err))
+		LogError(fmt.Errorf("read json: %w", err))
 	}
 }*/
 
@@ -596,7 +631,7 @@ func (p *perceptron) writeReport(rep *report) {
 
 	printFormat := func(format string, a ...interface{}) {
 		if _, err := fmt.Fprintf(b, format, a...); err != nil {
-			pkg.LogError(fmt.Errorf("write report error: %w", err))
+			LogError(fmt.Errorf("write report error: %w", err))
 		}
 	}
 
@@ -651,8 +686,8 @@ func (p *perceptron) writeReport(rep *report) {
 	}
 
 	if _, err := b.WriteTo(rep.file); err != nil {
-		pkg.LogError(fmt.Errorf("write report error: %w", err))
+		LogError(fmt.Errorf("write report error: %w", err))
 	} else if err = rep.file.Close(); err != nil {
-		pkg.LogError(fmt.Errorf("write report close error: %w", err))
+		LogError(fmt.Errorf("write report close error: %w", err))
 	}
 }

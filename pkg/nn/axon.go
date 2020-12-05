@@ -1,14 +1,10 @@
 package nn
 
-import (
-	"fmt"
-
-	"github.com/teratron/gonn/pkg"
-)
+import "fmt"
 
 // Synapser
 /*type Synapser interface {
-	pkg.GetSetter
+	GetSetter
 }*/
 
 // axon
@@ -31,7 +27,7 @@ import (
 	case *neuron:
 		input = s.value
 	default:
-		pkg.LogError(fmt.Errorf("%w for method getSynapseInput: %v", pkg.ErrMissingType, s))
+		LogError(fmt.Errorf("%w for method getSynapseInput: %v", ErrMissingType, s))
 	}
 	return
 }*/
@@ -43,7 +39,7 @@ import (
 }*/
 
 // Weight
-func Weight(args ...Floater) pkg.Controller {
+func Weight(args ...Floater) Controller {
 	if len(args) > 0 {
 		switch v := args[0].(type) {
 		case *Float3Type, *Float2Type, *Float1Type:
@@ -53,7 +49,7 @@ func Weight(args ...Floater) pkg.Controller {
 			buffer:       v,
 		}*/
 		default:
-			if w, ok := args[0].(pkg.Controller); ok {
+			if w, ok := args[0].(Controller); ok {
 				return w
 			}
 		}
@@ -69,18 +65,18 @@ func Weight(args ...Floater) pkg.Controller {
 }*/
 
 // Set
-/*func (w *weight) Set(args ...pkg.Setter) {
+/*func (w *weight) Set(args ...Setter) {
 	if len(args) > 0 {
 		if n, ok := args[0].(NeuralNetwork); ok {
 			n.Get().Set(w)
 		}
 	} else {
-		pkg.LogError(fmt.Errorf("%w set for weight", pkg.ErrEmpty))
+		LogError(fmt.Errorf("%w set for weight", ErrEmpty))
 	}
 }*/
 
 // Get
-/*func (w *weight) Get(args ...pkg.Getter) pkg.GetSetter {
+/*func (w *weight) Get(args ...Getter) GetSetter {
 	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
 			return a.Get().Get(w)
@@ -92,7 +88,7 @@ func Weight(args ...Floater) pkg.Controller {
 }*/
 
 // Copy
-/*func (w *weight) Copy(copier pkg.Copier) {
+/*func (w *weight) Copy(copier Copier) {
 	if n, ok := copier.(*nn); ok {
 		if a, ok := n.Architecture.(NeuralNetwork); ok {
 			a.Copy(w)
@@ -101,7 +97,7 @@ func Weight(args ...Floater) pkg.Controller {
 }*/
 
 // Paste
-/*func (w *weight) Paste(paster pkg.Paster) {
+/*func (w *weight) Paste(paster Paster) {
 	if n, ok := paster.(*nn); ok {
 		if a, ok := n.Architecture.(NeuralNetwork); ok {
 			a.Paste(w)
@@ -110,17 +106,17 @@ func Weight(args ...Floater) pkg.Controller {
 }*/
 
 // Read
-/*func (w *weight) Read(reader pkg.Reader) {
+/*func (w *weight) Read(reader Reader) {
 	reader.Read(w)
 }*/
 
 // Write
-/*func (w *weight) Write(writer ...pkg.Writer) {
+/*func (w *weight) Write(writer ...Writer) {
 	if len(writer) > 0 {
 		for _, v := range writer {
 			v.Write(w)
 		}
 	} else {
-		pkg.LogError(fmt.Errorf("%w write for weight", pkg.ErrEmpty))
+		LogError(fmt.Errorf("%w write for weight", ErrEmpty))
 	}
 }*/

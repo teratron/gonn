@@ -1,10 +1,6 @@
 package nn
 
-import (
-	"fmt"
-
-	"github.com/teratron/gonn/pkg"
-)
+import "fmt"
 
 type (
 	lossModeUint   uint8   // Average error mode
@@ -26,7 +22,7 @@ const (
 )
 
 // LossMode
-func LossMode(mode ...uint8) pkg.GetSetter {
+func LossMode(mode ...uint8) GetSetter {
 	if len(mode) > 0 {
 		return lossModeUint(mode[0])
 	}
@@ -34,7 +30,7 @@ func LossMode(mode ...uint8) pkg.GetSetter {
 }
 
 // LossLimit
-func LossLimit(level ...float64) pkg.GetSetter {
+func LossLimit(level ...float64) GetSetter {
 	if len(level) > 0 {
 		return lossLimitFloat(level[0])
 	}
@@ -42,29 +38,29 @@ func LossLimit(level ...float64) pkg.GetSetter {
 }
 
 // Set
-func (l lossModeUint) Set(args ...pkg.Setter) {
+func (l lossModeUint) Set(args ...Setter) {
 	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
 			a.Get().Set(l.check())
 		}
 	} else {
-		pkg.LogError(fmt.Errorf("%w set for loss mode", pkg.ErrEmpty))
+		LogError(fmt.Errorf("%w set for loss mode", ErrEmpty))
 	}
 }
 
 // Set
-func (l lossLimitFloat) Set(args ...pkg.Setter) {
+func (l lossLimitFloat) Set(args ...Setter) {
 	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
 			a.Get().Set(l.check())
 		}
 	} else {
-		pkg.LogError(fmt.Errorf("%w set for loss limit", pkg.ErrEmpty))
+		LogError(fmt.Errorf("%w set for loss limit", ErrEmpty))
 	}
 }
 
 // Get
-func (l lossModeUint) Get(args ...pkg.Getter) pkg.GetSetter {
+func (l lossModeUint) Get(args ...Getter) GetSetter {
 	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
 			return a.Get().Get(l)
@@ -76,7 +72,7 @@ func (l lossModeUint) Get(args ...pkg.Getter) pkg.GetSetter {
 }
 
 // Get
-func (l lossLimitFloat) Get(args ...pkg.Getter) pkg.GetSetter {
+func (l lossLimitFloat) Get(args ...Getter) GetSetter {
 	if len(args) > 0 {
 		if a, ok := args[0].(NeuralNetwork); ok {
 			return a.Get().Get(l)

@@ -6,8 +6,6 @@ import (
 	"io/ioutil"
 	"math/rand"
 	"time"
-
-	"github.com/teratron/gonn/pkg"
 )
 
 func init() {
@@ -15,20 +13,20 @@ func init() {
 }
 
 // New returns a new neural network instance
-func New(reader ...pkg.Reader) NeuralNetwork {
+func New(reader ...Reader) NeuralNetwork {
 	if len(reader) > 0 {
 		switch r := reader[0].(type) {
 		case NeuralNetwork:
 			return r
-		case pkg.Filer:
+		case Filer:
 			var n NeuralNetwork
 			filename := r.ToString()
 			if len(filename) == 0 {
-				pkg.LogError(fmt.Errorf("init: file config is missing"))
+				LogError(fmt.Errorf("init: file config is missing"))
 			}
 			b, err := ioutil.ReadFile(filename)
 			if err != nil {
-				pkg.LogError(err)
+				LogError(err)
 			}
 
 			switch r.(type) {
@@ -38,12 +36,12 @@ func New(reader ...pkg.Reader) NeuralNetwork {
 
 			var data interface{}
 			if err = json.Unmarshal(b, &data); err != nil {
-				pkg.LogError(fmt.Errorf("read unmarshal %w", err))
+				LogError(fmt.Errorf("read unmarshal %w", err))
 			}
 			if value, ok := data.(map[string]interface{})["name"]; ok {
 				n = getArchitecture(value.(string))
 				if err = json.Unmarshal(b, &n); err != nil {
-					pkg.LogError(fmt.Errorf("read unmarshal %w", err))
+					LogError(fmt.Errorf("read unmarshal %w", err))
 				}
 				fmt.Println(n.(*perceptron).Weights)
 				fmt.Printf("%T %v\n", n.(*perceptron).Weights, n.(*perceptron).Weights)
@@ -62,7 +60,7 @@ func New(reader ...pkg.Reader) NeuralNetwork {
 			}
 			return n
 		default:
-			pkg.LogError(fmt.Errorf("%T %w for neural network", r, pkg.ErrMissingType))
+			LogError(fmt.Errorf("%T %w for neural network", r, ErrMissingType))
 			return nil
 		}
 	}
@@ -77,7 +75,7 @@ func getArchitecture(name string) NeuralNetwork {
 	case hopfieldName:
 		return Hopfield() //&hopfield{}
 	default:
-		pkg.LogError(fmt.Errorf("neural network %w", pkg.ErrNotFound))
+		LogError(fmt.Errorf("neural network %w", ErrNotFound))
 		return nil
 	}
 }

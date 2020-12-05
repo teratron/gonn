@@ -1,4 +1,4 @@
-package pkg
+package nn
 
 // Controller
 type Controller interface {
