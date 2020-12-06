@@ -424,7 +424,6 @@ func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, 
 			if loss = p.calcLoss(target[0]); loss <= p.Conf.LossLevel || loss <= MinLossLevel {
 				break
 			}
-			p.calcMiss()
 			p.calcAxon()
 			count++
 		}
