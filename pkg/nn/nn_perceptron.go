@@ -394,9 +394,11 @@ func (p *perceptron) calcMiss() {
 
 // calcAxon update weights
 func (p *perceptron) calcAxon() {
-	p.calcMiss()
 	wait := make(chan bool)
 	defer close(wait)
+
+	p.calcMiss()
+
 	for _, u := range p.axon {
 		for _, v := range u {
 			for _, w := range v {
