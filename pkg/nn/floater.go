@@ -18,20 +18,20 @@ func (f FloatType) Get(...Getter) GetSetter {
 	return f
 }
 
-func (f *Float1Type) Set(...Setter) {}
+func (f Float1Type) Set(...Setter) {}
 
-func (f *Float1Type) Get(...Getter) GetSetter {
+func (f Float1Type) Get(...Getter) GetSetter {
 	return f
 }
 
-func (f *Float2Type) Set(...Setter) {}
+func (f Float2Type) Set(...Setter) {}
 
-func (f *Float2Type) Get(...Getter) GetSetter {
+func (f Float2Type) Get(...Getter) GetSetter {
 	return f
 }
 
-func (f *Float3Type) Set(...Setter) {}
+func (f Float3Type) Set(...Setter) {}
 
-func (f *Float3Type) Get(...Getter) GetSetter {
+func (f Float3Type) Get(...Getter) GetSetter {
 	return f
 }

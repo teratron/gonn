@@ -89,7 +89,7 @@ func getRand() (r FloatType) {
 }
 
 // getLengthData returns the length of the slices
-func getLengthData(data ...[]float64) []interface{} {
+/*func getLengthData(data ...[]float64) []interface{} {
 	var tmp []interface{}
 	defer func() {
 		tmp = nil
@@ -100,4 +100,4 @@ func getLengthData(data ...[]float64) []interface{} {
 		}
 	}
 	return tmp
-}
+}*/

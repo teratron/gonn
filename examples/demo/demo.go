@@ -1,6 +1,6 @@
 package main
 
-import "github.com/zigenzoog/gonn/pkg/nn"
+import "github.com/teratron/gonn/pkg/nn"
 
 func main() {
 	// New returns a new neural network
@@ -49,18 +49,18 @@ func main() {
 
 		// Weights are copied to the buffer at the minimum average error
 		if sum < minLoss {
-			n.Copy(nn.Weight())
+			//n.Copy(nn.Weight())
 			minLoss = sum
 		}
 
 		// Exiting the cycle of learning epochs, when the minimum error level is reached
-		if sum <= n.LossLevel() {
+		if sum <= n.LossLimit() {
 			break
 		}
 	}
 
 	// Returning weights for further recording from the buffer
-	n.Paste(nn.Weight())
+	//n.Paste(nn.Weight())
 
 	// Writing the neural network configuration to a file
 	n.Write(nn.JSON("perceptron.json"))

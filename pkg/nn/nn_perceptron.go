@@ -37,7 +37,7 @@ type perceptron struct {
 	Rate FloatType `json:"rate" xml:"rate"`
 
 	// Weight value
-	Weights [][][]FloatType `json:"weights" xml:"weights>weights"`
+	Weights Float3Type `json:"weights" xml:"weights>weights"`
 
 	// Neuron
 	neuron [][]FloatType // Neuron value
@@ -164,12 +164,12 @@ func (p *perceptron) SetLearningRate(rate float32) {
 
 // Weight
 func (p *perceptron) Weight() Floater {
-	return nil //Float3Type(p.Weights)
+	return &p.Weights
 }
 
 // SetWeight
 func (p *perceptron) SetWeight(weight Floater) {
-	//p.Weights = weight.(Float3Type)
+	p.Weights = weight.(Float3Type)
 }
 
 // Set
@@ -225,28 +225,6 @@ func (p *perceptron) Get(args ...Getter) GetSetter {
 		}
 	}
 	return p
-}
-
-// Copy
-func (p *perceptron) Copy(copier Copier) {
-	switch c := copier.(type) {
-	//case *weight:
-	//p.copyWeight()
-	default:
-		LogError(fmt.Errorf("%T %w for copy: %v", c, ErrMissingType, c))
-	}
-}
-
-// Paste
-func (p *perceptron) Paste(paster Paster) {
-	switch v := paster.(type) {
-	//case *weight:
-	/*if err := p.pasteWeight(); err != nil {
-		LogError(err)
-	}*/
-	default:
-		LogError(fmt.Errorf("%T %w for paste: %v", v, ErrMissingType, v))
-	}
 }
 
 // Read
@@ -343,20 +321,20 @@ func (p *perceptron) calcNeuron(input []float64) {
 
 	var length int
 	for i, v := range p.neuron {
-		d := i - 1
+		dec := i - 1
 		if i > 0 {
-			length = len(p.neuron[d])
+			length = len(p.neuron[dec])
 		} else {
 			length = p.lenInput
 		}
 		for j, w := range v {
 			go func(m int, n FloatType) {
-				fmt.Println(n)
+				//fmt.Println(n)
 				n = 0
 				for k, weight := range p.Weights[i][m] {
 					if k < length {
 						if i > 0 {
-							n += p.neuron[d][k] * weight
+							n += p.neuron[dec][k] * weight
 						} else {
 							n += FloatType(input[k]) * weight
 						}
@@ -364,7 +342,7 @@ func (p *perceptron) calcNeuron(input []float64) {
 						n += weight
 					}
 				}
-				//fmt.Println(n, p.neuron[i][j])
+				fmt.Println(n, p.neuron[i][m])
 				n = FloatType(calcActivation(float64(n), p.Activation))
 				wait <- true
 			}(j, w)
@@ -402,12 +380,12 @@ func (p *perceptron) calcMiss() {
 	defer close(wait)
 
 	for i := p.lastLayerIndex - 1; i >= 0; i-- {
-		c := i + 1
+		inc := i + 1
 		for j, v := range p.miss[i] {
 			go func(n int, m FloatType) {
 				m = 0
-				for k, miss := range p.miss[c] {
-					m += miss * p.Weights[c][k][n]
+				for k, miss := range p.miss[inc] {
+					m += miss * p.Weights[inc][k][n]
 				}
 				m *= FloatType(calcDerivative(float64(p.neuron[i][n]), p.Activation))
 				wait <- true
@@ -421,55 +399,41 @@ func (p *perceptron) calcMiss() {
 
 // updWeight update weights
 func (p *perceptron) updWeight(input []float64) {
-	p.calcMiss()
-
 	wait := make(chan bool)
 	defer close(wait)
 
+	p.calcMiss()
+
 	var length int
 	for i, u := range p.Weights {
-		d := i - 1
+		dec := i - 1
 		if i > 0 {
-			length = len(p.neuron[d])
+			length = len(p.neuron[dec])
 		} else {
 			length = p.lenInput
 		}
 		for j, v := range u {
-			b := p.miss[i][j] * p.Rate
-
-			for k, w := range v {
-				if k < length {
-					if i > 0 {
-						w += p.neuron[d][k] * b
+			go func(m, l int, r FloatType, n []FloatType) {
+				for k, w := range n {
+					if k < l {
+						if i > 0 {
+							w += p.neuron[m][k] * r
+						} else {
+							w += FloatType(input[k]) * r
+						}
 					} else {
-						w += FloatType(input[k]) * b
+						w += r
 					}
-				} else {
-					w += b
 				}
-			}
-
+				wait <- true
+			}(dec, length, p.miss[i][j]*p.Rate, v)
 		}
+	}
+	for _, u := range p.Weights {
 		for range u {
 			<-wait
 		}
 	}
-
-	/*for _, u := range p.axon {
-		for _, v := range u {
-			for _, w := range v {
-				go func(a *axon) {
-					if n, ok := a.synapse["output"].(*neuron); ok {
-						a.weight += a.getSynapseInput() * n.miss * p.Rate
-					}
-					wait <- true
-				}(w)
-			}
-			for range v {
-				<-wait
-			}
-		}
-	}*/
 }
 
 // Train training neural network
@@ -488,7 +452,6 @@ func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, 
 			if loss = p.calcLoss(target[0]); loss <= p.Limit || loss <= MinLossLimit {
 				break
 			}
-			p.calcMiss()
 			p.updWeight(input)
 			count++
 		}

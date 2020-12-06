@@ -82,7 +82,7 @@ func (j jsonString) Write(writer ...Writer) {
 				}
 			}
 			if n.isTrain {
-				n.Copy(Weight())
+				//n.Copy(Weight())
 			} else {
 				LogError(fmt.Errorf("json write: %w", ErrNotTrained))
 			}

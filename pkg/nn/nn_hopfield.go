@@ -54,16 +54,6 @@ func (h *hopfield) Get(args ...Getter) GetSetter {
 	return h
 }
 
-// Copy
-func (h *hopfield) Copy(copier Copier) {
-	fmt.Print(copier)
-}
-
-// Paste
-func (h *hopfield) Paste(paster Paster) {
-	fmt.Print(paster)
-}
-
 // Read
 func (h *hopfield) Read(reader Reader) {
 	fmt.Print(reader)

@@ -4,7 +4,6 @@ package nn
 type Controller interface {
 	GetSetter
 	ReadWriter
-	CopyPaster
 }
 
 // GetSetter
@@ -37,20 +36,4 @@ type Reader interface {
 // Writer
 type Writer interface {
 	Write(...Writer)
-}
-
-// CopyPaster
-type CopyPaster interface {
-	Copier
-	Paster
-}
-
-// Copier
-type Copier interface {
-	Copy(Copier)
-}
-
-// Paster
-type Paster interface {
-	Paste(Paster)
 }

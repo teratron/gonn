@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/zigenzoog/gonn/pkg/nn"
+	"github.com/teratron/gonn/pkg/nn"
 )
 
 func main() {
@@ -17,7 +17,7 @@ func main() {
 		nn.NeuronBias(true),
 		nn.ActivationMode(nn.ModeTANH),
 		nn.LossMode(nn.ModeARCTAN),
-		nn.LossLimit(.0005),
+		nn.LossLimit(.005),
 		nn.LearningRate(nn.DefaultRate))
 
 	fmt.Printf("n.Get(): %T %v\n", n.Get(), n.Get())
