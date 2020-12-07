@@ -45,6 +45,11 @@ type perceptron struct {
 	//input   []float64
 	//target  []float64
 
+	neurons [][]struct {
+		value FloatType
+		miss  FloatType
+	}
+
 	lastLayerIndex int
 	lenInput       int
 	lenOutput      int
@@ -55,6 +60,11 @@ type perceptron struct {
 
 	// Config
 	jsonName string
+}
+
+type perceptronNeuron struct {
+	value FloatType
+	miss  FloatType
 }
 
 // Perceptron return perceptron neural network
@@ -280,6 +290,8 @@ func (p *perceptron) init(lenInput, lenTarget int) bool {
 	//p.input = make([]float64, p.lenInput)
 	//p.target = make([]float64, p.lenOutput)
 
+	p.neurons = make([][]struct{ value, miss FloatType }, lenLayer)
+
 	for i, l := range layer {
 		p.Weights[i] = make([][]FloatType, lenLayer)
 		p.neuron[i] = make([]FloatType, lenLayer)
@@ -402,7 +414,6 @@ func (p *perceptron) updWeight(input []float64) {
 	wait := make(chan bool)
 	defer close(wait)
 
-	p.calcMiss()
 	var length int
 	for i, u := range p.Weights {
 		dec := i - 1
@@ -448,18 +459,19 @@ func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, 
 	if len(target) > 0 {
 		for count < MaxIteration {
 			p.calcNeuron(input)
-			if loss = p.calcLoss(target[0]); loss <= p.Limit || loss <= MinLossLimit {
+			if loss = p.calcLoss(target[0]); loss <= p.Limit {
 				break
 			}
+			p.calcMiss()
 			p.updWeight(input)
 			count++
-		}
-		if count > 0 {
-			p.isTrain = true
 		}
 	} else {
 		LogError(ErrNoTarget)
 		return -1, 0
+	}
+	if !p.isTrain && count > 0 {
+		p.isTrain = true
 	}
 	return
 }
@@ -470,8 +482,8 @@ func (p *perceptron) Query(input []float64) (output []float64) {
 		LogError(fmt.Errorf("query: %w", ErrNotTrained))
 		if !p.isInit {
 			LogError(fmt.Errorf("%w for query", ErrInit))
-			return nil
 		}
+		return nil
 	}
 	p.calcNeuron(input)
 	output = make([]float64, p.lenOutput)

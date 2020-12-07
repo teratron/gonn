@@ -16,9 +16,6 @@ const (
 
 	// ModeARCTAN - Arctan
 	ModeARCTAN
-
-	// MinLossLimit the minimum value of the error limit at which training is forcibly terminated
-	MinLossLimit float64 = 10e-33
 )
 
 // LossMode
@@ -40,8 +37,8 @@ func LossLimit(level ...float64) GetSetter {
 // Set
 func (l lossModeUint) Set(args ...Setter) {
 	if len(args) > 0 {
-		if a, ok := args[0].(NeuralNetwork); ok {
-			a.Get().Set(l.check())
+		if n, ok := args[0].(NeuralNetwork); ok {
+			n.Set(l.check())
 		}
 	} else {
 		LogError(fmt.Errorf("%w set for loss mode", ErrEmpty))
@@ -51,8 +48,8 @@ func (l lossModeUint) Set(args ...Setter) {
 // Set
 func (l lossLimitFloat) Set(args ...Setter) {
 	if len(args) > 0 {
-		if a, ok := args[0].(NeuralNetwork); ok {
-			a.Get().Set(l.check())
+		if n, ok := args[0].(NeuralNetwork); ok {
+			n.Set(l)
 		}
 	} else {
 		LogError(fmt.Errorf("%w set for loss limit", ErrEmpty))
@@ -62,8 +59,8 @@ func (l lossLimitFloat) Set(args ...Setter) {
 // Get
 func (l lossModeUint) Get(args ...Getter) GetSetter {
 	if len(args) > 0 {
-		if a, ok := args[0].(NeuralNetwork); ok {
-			return a.Get().Get(l)
+		if n, ok := args[0].(NeuralNetwork); ok {
+			return n.Get(l)
 		}
 	} else {
 		return l
@@ -74,8 +71,8 @@ func (l lossModeUint) Get(args ...Getter) GetSetter {
 // Get
 func (l lossLimitFloat) Get(args ...Getter) GetSetter {
 	if len(args) > 0 {
-		if a, ok := args[0].(NeuralNetwork); ok {
-			return a.Get().Get(l)
+		if n, ok := args[0].(NeuralNetwork); ok {
+			return n.Get(l)
 		}
 	} else {
 		return l
@@ -88,16 +85,6 @@ func (l lossModeUint) check() lossModeUint {
 	switch {
 	case l < 0 || l > lossModeUint(ModeARCTAN):
 		return lossModeUint(ModeMSE)
-	default:
-		return l
-	}
-}
-
-// check
-func (l lossLimitFloat) check() lossLimitFloat {
-	switch {
-	case l < 0 || l < lossLimitFloat(MinLossLimit):
-		return lossLimitFloat(MinLossLimit)
 	default:
 		return l
 	}
