@@ -18,8 +18,8 @@ func LearningRate(rate ...float32) GetSetter {
 // Set
 func (r rateFloat) Set(args ...Setter) {
 	if len(args) > 0 {
-		if a, ok := args[0].(NeuralNetwork); ok {
-			a.Get().Set(r.check())
+		if n, ok := args[0].(NeuralNetwork); ok {
+			n.Set(r.check())
 		}
 	} else {
 		LogError(fmt.Errorf("%w set for rate", ErrEmpty))
@@ -29,8 +29,8 @@ func (r rateFloat) Set(args ...Setter) {
 // Get
 func (r rateFloat) Get(args ...Getter) GetSetter {
 	if len(args) > 0 {
-		if a, ok := args[0].(NeuralNetwork); ok {
-			return a.Get().Get(r)
+		if n, ok := args[0].(NeuralNetwork); ok {
+			return n.Get(r)
 		}
 	} else {
 		return r

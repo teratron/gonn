@@ -8,9 +8,6 @@ type Parameter interface {
 	stateInit() bool
 	setStateInit(bool)
 
-	stateTrain() bool
-	setStateTrain(bool)
-
 	nameJSON() string
 	setNameJSON(string)
 

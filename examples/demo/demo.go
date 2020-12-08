@@ -39,8 +39,7 @@ func main() {
 		sum := 0.
 		num := 0
 		for i := numInput; i <= len(dataSet)-numOutput; i++ {
-			loss := n.Verify(dataSet[i-numInput:i], dataSet[i:i+numOutput])
-			sum += loss
+			sum += n.Verify(dataSet[i-numInput:i], dataSet[i:i+numOutput])
 			num++
 		}
 

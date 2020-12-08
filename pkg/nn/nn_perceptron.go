@@ -42,13 +42,16 @@ type perceptron struct {
 	// Neuron
 	neuron [][]*perceptronNeuron
 
+	// Buffers
+	//input  []float64
+	//target []float64
+
 	lastLayerIndex int
 	lenInput       int
 	lenOutput      int
 
 	// State of the neural network
-	isInit  bool // Neural network initializing flag
-	isTrain bool // Neural network training flag
+	isInit bool // Initializing flag
 
 	// Config
 	jsonName string
@@ -67,7 +70,7 @@ func Perceptron() *perceptron {
 		Bias:       false,
 		Activation: ModeSIGMOID,
 		Loss:       ModeMSE,
-		Limit:      .01,
+		Limit:      .1,
 		Rate:       FloatType(DefaultRate),
 	}
 }
@@ -86,14 +89,6 @@ func (p *perceptron) stateInit() bool {
 
 func (p *perceptron) setStateInit(state bool) {
 	p.isInit = state
-}
-
-func (p *perceptron) stateTrain() bool {
-	return p.isTrain
-}
-
-func (p *perceptron) setStateTrain(state bool) {
-	p.isTrain = state
 }
 
 func (p *perceptron) nameJSON() string {
@@ -274,6 +269,8 @@ func (p *perceptron) init(lenInput, lenTarget int) bool {
 
 	p.Weights = make(Float3Type, lenLayer)
 	p.neuron = make([][]*perceptronNeuron, lenLayer)
+	//p.input = make([]float64, lenInput)
+	//p.target = make([]float64, lenTarget)
 
 	for i, l := range layers {
 		p.Weights[i] = make([][]FloatType, l)
@@ -317,7 +314,6 @@ func (p *perceptron) calcNeuron(input []float64) {
 
 	var length int
 	for i, v := range p.neuron {
-		fmt.Println(i, v)
 		dec := i - 1
 		if i > 0 {
 			length = len(p.neuron[dec])
@@ -398,16 +394,16 @@ func (p *perceptron) updWeight(input []float64) {
 	defer close(wait)
 
 	var length int
-	for i, u := range p.Weights {
+	for i, v := range p.Weights {
 		dec := i - 1
 		if i > 0 {
 			length = len(p.neuron[dec])
 		} else {
 			length = p.lenInput
 		}
-		for j, v := range u {
-			go func(i, j, dec, length int, grad FloatType, v []FloatType) {
-				for k := range v {
+		for j, w := range v {
+			go func(i, j, dec, length int, grad FloatType, w []FloatType) {
+				for k := range w {
 					if k < length {
 						if i > 0 {
 							p.Weights[i][j][k] += p.neuron[dec][k].value * grad
@@ -419,11 +415,11 @@ func (p *perceptron) updWeight(input []float64) {
 					}
 				}
 				wait <- true
-			}(i, j, dec, length, p.neuron[i][j].miss*p.Rate, v)
+			}(i, j, dec, length, p.neuron[i][j].miss*p.Rate, w)
 		}
 	}
-	for _, u := range p.Weights {
-		for range u {
+	for _, v := range p.Weights {
+		for range v {
 			<-wait
 		}
 	}
@@ -437,9 +433,11 @@ func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, 
 			return -1, 0
 		}
 	}
-	fmt.Println(p)
+	//fmt.Println(p)
 	//_ = copy(p.input, input)
 	//_ = copy(p.target, target[0])
+	//fmt.Println(input, p.input)
+	//fmt.Println(target, p.target)
 	if len(target) > 0 {
 		for count < MaxIteration {
 			p.calcNeuron(input)
@@ -453,9 +451,6 @@ func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, 
 	} else {
 		LogError(ErrNoTarget)
 		return -1, 0
-	}
-	if !p.isTrain && count > 0 {
-		p.isTrain = true
 	}
 	return
 }
@@ -480,11 +475,8 @@ func (p *perceptron) Verify(input []float64, target ...[]float64) (loss float64)
 
 // Query querying neural network
 func (p *perceptron) Query(input []float64) (output []float64) {
-	if !p.isTrain {
-		LogError(fmt.Errorf("query: %w", ErrNotTrained))
-		if !p.isInit {
-			LogError(fmt.Errorf("%w for query", ErrInit))
-		}
+	if !p.isInit {
+		LogError(fmt.Errorf("%w for query", ErrInit))
 		return nil
 	}
 	p.calcNeuron(input)

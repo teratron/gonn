@@ -17,6 +17,7 @@ func New(reader ...Reader) NeuralNetwork {
 	if len(reader) > 0 {
 		switch r := reader[0].(type) {
 		case NeuralNetwork:
+			fmt.Println("+++")
 			return r
 		case Filer:
 			var n NeuralNetwork

@@ -81,11 +81,11 @@ func (j jsonString) Write(writer ...Writer) {
 					filename = "neural_network.json"
 				}
 			}
-			if n.isTrain {
+			/*if n.isTrain {
 				//n.Copy(Weight())
 			} else {
 				LogError(fmt.Errorf("json write: %w", ErrNotTrained))
-			}
+			}*/
 			if b, err := json.MarshalIndent(&n, "", "\t"); err != nil {
 				LogError(fmt.Errorf("write %w", err))
 			} else if err = ioutil.WriteFile(filename, b, os.ModePerm); err != nil {

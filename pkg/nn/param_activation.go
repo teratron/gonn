@@ -33,10 +33,10 @@ func ActivationMode(mode ...uint8) GetSetter {
 }
 
 // Set
-func (m activationModeUint) Set(args ...Setter) {
+func (a activationModeUint) Set(args ...Setter) {
 	if len(args) > 0 {
-		if a, ok := args[0].(NeuralNetwork); ok {
-			a.Get().Set(m.check())
+		if n, ok := args[0].(NeuralNetwork); ok {
+			n.Set(a.check())
 		}
 	} else {
 		LogError(fmt.Errorf("%w set for activation", ErrEmpty))
@@ -44,24 +44,24 @@ func (m activationModeUint) Set(args ...Setter) {
 }
 
 // Get
-func (m activationModeUint) Get(args ...Getter) GetSetter {
+func (a activationModeUint) Get(args ...Getter) GetSetter {
 	if len(args) > 0 {
-		if a, ok := args[0].(NeuralNetwork); ok {
-			return a.Get().Get(m)
+		if n, ok := args[0].(NeuralNetwork); ok {
+			return n.Get(a)
 		}
 	} else {
-		return m
+		return a
 	}
 	return nil
 }
 
 // check
-func (m activationModeUint) check() activationModeUint {
+func (a activationModeUint) check() activationModeUint {
 	switch {
-	case m < 0 || m > activationModeUint(ModeTANH):
+	case a < 0 || a > activationModeUint(ModeTANH):
 		return activationModeUint(ModeSIGMOID)
 	default:
-		return m
+		return a
 	}
 }
 

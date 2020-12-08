@@ -1,5 +1,7 @@
 package nn
 
+import "fmt"
+
 type biasBool bool
 
 // NeuronBias
@@ -12,23 +14,23 @@ func NeuronBias(bias ...bool) GetSetter {
 
 // Set
 func (b biasBool) Set(args ...Setter) {
-	/*if len(args) > 0 {
-		if n, ok := args[0].(*nn); ok && !n.isInit {
-			n.Get().Set(b)
+	if len(args) > 0 {
+		if n, ok := args[0].(NeuralNetwork); ok {
+			n.Set(b)
 		}
 	} else {
 		LogError(fmt.Errorf("%w set for bias", ErrEmpty))
-	}*/
+	}
 }
 
 // Get
 func (b biasBool) Get(args ...Getter) GetSetter {
-	/*if len(args) > 0 {
+	if len(args) > 0 {
 		if n, ok := args[0].(NeuralNetwork); ok {
-			return n.Get().Get(b)
+			return n.Get(b)
 		}
 	} else {
 		return b
-	}*/
+	}
 	return nil
 }
