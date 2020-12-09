@@ -3,6 +3,7 @@ package nn
 // Floater
 type Floater interface {
 	GetSetter
+	//ToFloat32()
 }
 
 type (

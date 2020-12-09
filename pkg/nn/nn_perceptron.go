@@ -105,8 +105,8 @@ func (p *perceptron) HiddenLayer() []uint {
 }
 
 // SetHiddenLayer
-func (p *perceptron) SetHiddenLayer(layer []uint) {
-	p.Hidden = layer
+func (p *perceptron) SetHiddenLayer(layer ...uint) {
+	p.Hidden = HiddenLayer(layer...)
 }
 
 // NeuronBias
@@ -285,7 +285,7 @@ func (p *perceptron) init(lenInput, lenTarget int) bool {
 				p.Weights[i][j] = make([]FloatType, biasInput)
 			}
 			for k := range p.Weights[i][j] {
-				p.Weights[i][j][k] = getRand()
+				p.Weights[i][j][k] = .5 //getRand()
 			}
 			p.neuron[i][j] = &perceptronNeuron{}
 		}
@@ -335,6 +335,7 @@ func (p *perceptron) calcNeuron(input []float64) {
 					}
 				}
 				n.value = FloatType(calcActivation(float64(n.value), p.Activation))
+				//fmt.Println(n.value)
 				wait <- true
 			}(j, n)
 		}
@@ -347,7 +348,9 @@ func (p *perceptron) calcNeuron(input []float64) {
 // calcLoss calculating the error of the output neuron
 func (p *perceptron) calcLoss(target []float64) (loss float64) {
 	for i, n := range p.neuron[p.lastLayerIndex] {
+		//fmt.Printf("%4.6f\n",n.miss)
 		n.miss = FloatType(target[i]) - n.value
+		fmt.Println(n.miss)
 		switch p.Loss {
 		default:
 			fallthrough
@@ -433,25 +436,31 @@ func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, 
 			return -1, 0
 		}
 	}
-	//fmt.Println(p)
+	fmt.Println("p.isInit")
 	//_ = copy(p.input, input)
 	//_ = copy(p.target, target[0])
 	//fmt.Println(input, p.input)
 	//fmt.Println(target, p.target)
 	if len(target) > 0 {
-		for count < MaxIteration {
+		for count < 1 /*MaxIteration*/ {
+			//fmt.Println(count, loss, "0")
 			p.calcNeuron(input)
+			//fmt.Println(count, loss, "1", p.Limit)
 			if loss = p.calcLoss(target[0]); loss <= p.Limit {
 				break
 			}
+			//fmt.Println(count, loss, "2")
 			p.calcMiss()
+			//fmt.Println(count, loss, "3")
 			p.updWeight(input)
+			//fmt.Println(count, loss, "4")
 			count++
 		}
 	} else {
 		LogError(ErrNoTarget)
 		return -1, 0
 	}
+	fmt.Println("Train")
 	return
 }
 

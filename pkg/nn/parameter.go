@@ -13,7 +13,7 @@ type Parameter interface {
 
 	// Perceptron
 	HiddenLayer() []uint
-	SetHiddenLayer([]uint)
+	SetHiddenLayer(...uint)
 
 	NeuronBias() bool
 	SetNeuronBias(bool)
