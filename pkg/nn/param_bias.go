@@ -2,18 +2,18 @@ package nn
 
 import "fmt"
 
-type biasBool bool
+type BiasBool bool
 
 // NeuronBias
-func NeuronBias(bias ...bool) GetSetter {
+func NeuronBias(bias ...bool) BiasBool {
 	if len(bias) > 0 {
-		return biasBool(bias[0])
+		return BiasBool(bias[0])
 	}
-	return biasBool(false)
+	return false
 }
 
 // Set
-func (b biasBool) Set(args ...Setter) {
+func (b BiasBool) Set(args ...Setter) {
 	if len(args) > 0 {
 		if n, ok := args[0].(NeuralNetwork); ok {
 			n.Set(b)
@@ -24,7 +24,7 @@ func (b biasBool) Set(args ...Setter) {
 }
 
 // Get
-func (b biasBool) Get(args ...Getter) GetSetter {
+func (b BiasBool) Get(args ...Getter) GetSetter {
 	if len(args) > 0 {
 		if n, ok := args[0].(NeuralNetwork); ok {
 			return n.Get(b)

@@ -5,7 +5,7 @@ import (
 	"math"
 )
 
-type activationModeUint uint8
+type ActivationModeUint uint8
 
 const (
 	// ModeLINEAR - Linear/identity
@@ -25,15 +25,15 @@ const (
 )
 
 // ActivationMode
-func ActivationMode(mode ...uint8) GetSetter {
+func ActivationMode(mode ...uint8) ActivationModeUint {
 	if len(mode) > 0 {
-		return activationModeUint(mode[0])
+		return ActivationModeUint(mode[0])
 	}
-	return activationModeUint(0)
+	return 0
 }
 
 // Set
-func (a activationModeUint) Set(args ...Setter) {
+func (a ActivationModeUint) Set(args ...Setter) {
 	if len(args) > 0 {
 		if n, ok := args[0].(NeuralNetwork); ok {
 			n.Set(a.check())
@@ -44,7 +44,7 @@ func (a activationModeUint) Set(args ...Setter) {
 }
 
 // Get
-func (a activationModeUint) Get(args ...Getter) GetSetter {
+func (a ActivationModeUint) Get(args ...Getter) GetSetter {
 	if len(args) > 0 {
 		if n, ok := args[0].(NeuralNetwork); ok {
 			return n.Get(a)
@@ -56,10 +56,10 @@ func (a activationModeUint) Get(args ...Getter) GetSetter {
 }
 
 // check
-func (a activationModeUint) check() activationModeUint {
+func (a ActivationModeUint) check() ActivationModeUint {
 	switch {
-	case a < 0 || a > activationModeUint(ModeTANH):
-		return activationModeUint(ModeSIGMOID)
+	case a < 0 || a > ActivationModeUint(ModeTANH):
+		return ActivationModeUint(ModeSIGMOID)
 	default:
 		return a
 	}

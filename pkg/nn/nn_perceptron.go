@@ -22,7 +22,7 @@ type perceptron struct {
 	Hidden HiddenArrUint `json:"hidden" xml:"hidden>layer"`
 
 	// The neuron bias, false or true
-	Bias biasBool `json:"bias" xml:"bias"`
+	Bias BiasBool `json:"bias" xml:"bias"`
 
 	// Activation function mode
 	Activation uint8 `json:"activation" xml:"activation"`
@@ -116,7 +116,7 @@ func (p *perceptron) NeuronBias() bool {
 
 // SetNeuronBias
 func (p *perceptron) SetNeuronBias(bias bool) {
-	p.Bias = biasBool(bias)
+	p.Bias = NeuronBias(bias)
 }
 
 // ActivationMode
@@ -126,7 +126,7 @@ func (p *perceptron) ActivationMode() uint8 {
 
 // SetActivationMode
 func (p *perceptron) SetActivationMode(mode uint8) {
-	p.Activation = mode
+	p.Activation = uint8(ActivationMode(mode))
 }
 
 // LossMode
@@ -136,7 +136,7 @@ func (p *perceptron) LossMode() uint8 {
 
 // SetLossMode
 func (p *perceptron) SetLossMode(mode uint8) {
-	p.Loss = mode
+	p.Loss = uint8(LossMode(mode))
 }
 
 // LossLimit
@@ -146,7 +146,7 @@ func (p *perceptron) LossLimit() float64 {
 
 // SetLossLimit
 func (p *perceptron) SetLossLimit(limit float64) {
-	p.Limit = limit
+	p.Limit = float64(LossLimit(limit))
 }
 
 // LearningRate
@@ -156,7 +156,7 @@ func (p *perceptron) LearningRate() float32 {
 
 // SetLearningRate
 func (p *perceptron) SetLearningRate(rate float32) {
-	p.Rate = FloatType(rate)
+	p.Rate = FloatType(LearningRate(rate)) //FloatType(rate)
 }
 
 // Weight
@@ -176,15 +176,15 @@ func (p *perceptron) Set(args ...Setter) {
 			switch v := a.(type) {
 			case HiddenArrUint:
 				p.Hidden = v
-			case biasBool:
+			case BiasBool:
 				p.Bias = v
-			case activationModeUint:
+			case ActivationModeUint:
 				p.Activation = uint8(v)
-			case lossModeUint:
+			case LossModeUint:
 				p.Loss = uint8(v)
-			case lossLimitFloat:
+			case LossLimitFloat:
 				p.Limit = float64(v)
-			case rateFloat:
+			case RateFloat:
 				p.Rate = FloatType(v)
 			//case *weight:
 			//p.setWeight(v.buffer.(*Float3Type))
@@ -204,15 +204,15 @@ func (p *perceptron) Get(args ...Getter) GetSetter {
 			switch a.(type) {
 			case HiddenArrUint:
 				return p.Hidden
-			case biasBool:
+			case BiasBool:
 				return p.Bias
-			case activationModeUint:
-				return activationModeUint(p.Activation)
-			case lossModeUint:
-				return lossModeUint(p.Loss)
-			case lossLimitFloat:
-				return lossLimitFloat(p.Limit)
-			case rateFloat:
+			case ActivationModeUint:
+				return ActivationModeUint(p.Activation)
+			case LossModeUint:
+				return LossModeUint(p.Loss)
+			case LossLimitFloat:
+				return LossLimitFloat(p.Limit)
+			case RateFloat:
 				return p.Rate
 			//case *weight:
 			//return p.getWeight()

@@ -3,8 +3,8 @@ package nn
 import "fmt"
 
 type (
-	lossModeUint   uint8   // Average error mode
-	lossLimitFloat float64 // Level loss
+	LossModeUint   uint8   // Average error mode
+	LossLimitFloat float64 // Level loss
 )
 
 const (
@@ -19,23 +19,23 @@ const (
 )
 
 // LossMode
-func LossMode(mode ...uint8) GetSetter {
+func LossMode(mode ...uint8) LossModeUint {
 	if len(mode) > 0 {
-		return lossModeUint(mode[0])
+		return LossModeUint(mode[0])
 	}
-	return lossModeUint(0)
+	return 0
 }
 
 // LossLimit
-func LossLimit(level ...float64) GetSetter {
+func LossLimit(level ...float64) LossLimitFloat {
 	if len(level) > 0 {
-		return lossLimitFloat(level[0])
+		return LossLimitFloat(level[0])
 	}
-	return lossLimitFloat(0)
+	return 0
 }
 
 // Set
-func (l lossModeUint) Set(args ...Setter) {
+func (l LossModeUint) Set(args ...Setter) {
 	if len(args) > 0 {
 		if n, ok := args[0].(NeuralNetwork); ok {
 			n.Set(l.check())
@@ -46,7 +46,7 @@ func (l lossModeUint) Set(args ...Setter) {
 }
 
 // Set
-func (l lossLimitFloat) Set(args ...Setter) {
+func (l LossLimitFloat) Set(args ...Setter) {
 	if len(args) > 0 {
 		if n, ok := args[0].(NeuralNetwork); ok {
 			n.Set(l)
@@ -57,7 +57,7 @@ func (l lossLimitFloat) Set(args ...Setter) {
 }
 
 // Get
-func (l lossModeUint) Get(args ...Getter) GetSetter {
+func (l LossModeUint) Get(args ...Getter) GetSetter {
 	if len(args) > 0 {
 		if n, ok := args[0].(NeuralNetwork); ok {
 			return n.Get(l)
@@ -69,7 +69,7 @@ func (l lossModeUint) Get(args ...Getter) GetSetter {
 }
 
 // Get
-func (l lossLimitFloat) Get(args ...Getter) GetSetter {
+func (l LossLimitFloat) Get(args ...Getter) GetSetter {
 	if len(args) > 0 {
 		if n, ok := args[0].(NeuralNetwork); ok {
 			return n.Get(l)
@@ -81,10 +81,10 @@ func (l lossLimitFloat) Get(args ...Getter) GetSetter {
 }
 
 // check
-func (l lossModeUint) check() lossModeUint {
+func (l LossModeUint) check() LossModeUint {
 	switch {
-	case l < 0 || l > lossModeUint(ModeARCTAN):
-		return lossModeUint(ModeMSE)
+	case l < 0 || l > LossModeUint(ModeARCTAN):
+		return LossModeUint(ModeMSE)
 	default:
 		return l
 	}
