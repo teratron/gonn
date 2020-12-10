@@ -1,11 +1,6 @@
 package nn
 
-import (
-	"fmt"
-	"math"
-)
-
-type ActivationModeUint uint8
+import "math"
 
 const (
 	// ModeLINEAR - Linear/identity
@@ -24,44 +19,13 @@ const (
 	ModeTANH
 )
 
-// ActivationMode
-func ActivationMode(mode ...uint8) ActivationModeUint {
-	if len(mode) > 0 {
-		return ActivationModeUint(mode[0])
-	}
-	return 0
-}
-
-// Set
-func (a ActivationModeUint) Set(args ...Setter) {
-	if len(args) > 0 {
-		if n, ok := args[0].(NeuralNetwork); ok {
-			n.Set(a.check())
-		}
-	} else {
-		LogError(fmt.Errorf("%w set for activation", ErrEmpty))
-	}
-}
-
-// Get
-func (a ActivationModeUint) Get(args ...Getter) GetSetter {
-	if len(args) > 0 {
-		if n, ok := args[0].(NeuralNetwork); ok {
-			return n.Get(a)
-		}
-	} else {
-		return a
-	}
-	return nil
-}
-
-// check
-func (a ActivationModeUint) check() ActivationModeUint {
+// checkActivationMode
+func checkActivationMode(mode uint8) uint8 {
 	switch {
-	case a < 0 || a > ActivationModeUint(ModeTANH):
-		return ActivationModeUint(ModeSIGMOID)
+	case mode < 0 || mode > ModeTANH:
+		return ModeSIGMOID
 	default:
-		return a
+		return mode
 	}
 }
 

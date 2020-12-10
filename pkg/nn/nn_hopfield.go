@@ -18,14 +18,13 @@ type hopfield struct {
 	Energy FloatType `json:"energy" xml:"energy"`
 
 	// Weights values
-	Weights [][]FloatType `json:"weights" xml:"weights"`
+	Weights Float2Type `json:"weights" xml:"weights"`
 
 	// Matrix
 	neuron []FloatType
 
 	// State of the neural network
-	isInit  bool
-	isTrain bool
+	isInit bool // Initializing flag
 
 	// Config
 	jsonName string
@@ -39,19 +38,13 @@ func Hopfield() *hopfield {
 }
 
 // NeuronEnergy
-func (h *hopfield) NeuronEnergy() float32 {
-	return float32(h.Energy)
+func (h *hopfield) NeuronEnergy() float64 {
+	return float64(h.Energy)
 }
 
-// Set
-func (h *hopfield) Set(args ...Setter) {
-	fmt.Print(args)
-}
-
-// Get
-func (h *hopfield) Get(args ...Getter) GetSetter {
-	fmt.Print(args)
-	return h
+// SetNeuronEnergy
+func (h *hopfield) SetNeuronEnergy(energy float64) {
+	h.Energy = FloatType(energy)
 }
 
 // Read

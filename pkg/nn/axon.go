@@ -1,7 +1,5 @@
 package nn
 
-import "fmt"
-
 // Synapser
 /*type Synapser interface {
 	GetSetter
@@ -39,15 +37,15 @@ import "fmt"
 }*/
 
 // Weight
-func Weight(args ...Floater) Controller {
+/*func Weight(args ...Floater) Controller {
 	if len(args) > 0 {
 		switch v := args[0].(type) {
 		case *Float3Type, *Float2Type, *Float1Type:
 			fmt.Println(v)
-		/*return &weight{
+		return &weight{
 			isInitWeight: true,
 			buffer:       v,
-		}*/
+		}
 		default:
 			if w, ok := args[0].(Controller); ok {
 				return w
@@ -57,7 +55,7 @@ func Weight(args ...Floater) Controller {
 		return nil //&weight{}
 	}
 	return nil
-}
+}*/
 
 // Weight
 /*func (n *nn) Weight() Floater {

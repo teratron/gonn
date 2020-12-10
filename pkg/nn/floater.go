@@ -2,7 +2,7 @@ package nn
 
 // Floater
 type Floater interface {
-	GetSetter
+	//GetSetter
 	//ToFloat32()
 }
 
@@ -13,7 +13,7 @@ type (
 	Float3Type [][][]FloatType
 )
 
-func (f FloatType) Set(...Setter) {}
+/*func (f FloatType) Set(...Setter) {}
 
 func (f FloatType) Get(...Getter) GetSetter {
 	return f
@@ -35,4 +35,4 @@ func (f Float3Type) Set(...Setter) {}
 
 func (f Float3Type) Get(...Getter) GetSetter {
 	return f
-}
+}*/

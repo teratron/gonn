@@ -5,8 +5,8 @@ const MaxIteration int = 10e+05
 
 // NeuralNetwork
 type NeuralNetwork interface {
-	Controller
 	Parameter
+	ReadWriter
 
 	// Querying
 	Query(input []float64) (output []float64)

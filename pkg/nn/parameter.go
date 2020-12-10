@@ -31,8 +31,8 @@ type Parameter interface {
 	SetLearningRate(float32)
 
 	// Hopfield
-	NeuronEnergy() float32
-	SetNeuronEnergy(float32)
+	NeuronEnergy() float64
+	SetNeuronEnergy(float64)
 
 	Weight() Floater
 	SetWeight(Floater)

@@ -9,19 +9,18 @@ func main() {
 	n := nn.New()
 
 	// Set parameters:
-	// HiddenLayer    - Array of the number of neurons in each hidden layer
-	// NeuronBias     - The neuron bias, false or true
-	// ActivationMode - Activation function mode
-	// LossMode       - The mode of calculation of the total error
-	// LossLimit      - Minimum (sufficient) limit of the average of the error during training
-	// LearningRate   - Learning coefficient, from 0 to 1
-	n.Set(
-		nn.HiddenLayer(5, 3),
-		nn.NeuronBias(true),
-		nn.ActivationMode(nn.ModeSIGMOID),
-		nn.LossMode(nn.ModeMSE),
-		nn.LossLimit(.01),
-		nn.LearningRate(nn.DefaultRate))
+	// SetHiddenLayer    - Array of the number of neurons in each hidden layer
+	// SetNeuronBias     - The neuron bias, false or true
+	// SetActivationMode - Activation function mode
+	// SetLossMode       - The mode of calculation of the total error
+	// SetLossLimit      - Minimum (sufficient) limit of the average of the error during training
+	// SetLearningRate   - Learning coefficient, from 0 to 1
+	n.SetHiddenLayer(5, 3)
+	n.SetNeuronBias(true)
+	n.SetActivationMode(nn.ModeSIGMOID)
+	n.SetLossMode(nn.ModeMSE)
+	n.SetLossLimit(.01)
+	n.SetLearningRate(nn.DefaultRate)
 
 	// Training dataset
 	dataSet := []float64{.27, .31, .52, .66, .81, .13, .2, .49, .11, .73, .28}
