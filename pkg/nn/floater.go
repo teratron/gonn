@@ -2,8 +2,7 @@ package nn
 
 // Floater
 type Floater interface {
-	//GetSetter
-	//ToFloat32()
+	Dimension() int
 }
 
 type (
@@ -13,26 +12,18 @@ type (
 	Float3Type [][][]FloatType
 )
 
-/*func (f FloatType) Set(...Setter) {}
-
-func (f FloatType) Get(...Getter) GetSetter {
-	return f
+func (f FloatType) Dimension() int {
+	return 0
 }
 
-func (f Float1Type) Set(...Setter) {}
-
-func (f Float1Type) Get(...Getter) GetSetter {
-	return f
+func (f Float1Type) Dimension() int {
+	return 1
 }
 
-func (f Float2Type) Set(...Setter) {}
-
-func (f Float2Type) Get(...Getter) GetSetter {
-	return f
+func (f Float2Type) Dimension() int {
+	return 2
 }
 
-func (f Float3Type) Set(...Setter) {}
-
-func (f Float3Type) Get(...Getter) GetSetter {
-	return f
-}*/
+func (f Float3Type) Dimension() int {
+	return 3
+}

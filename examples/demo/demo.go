@@ -8,18 +8,23 @@ func main() {
 	// same n := nn.New(nn.Perceptron())
 	n := nn.New()
 
-	// Set parameters:
-	// SetHiddenLayer    - Array of the number of neurons in each hidden layer
-	// SetNeuronBias     - The neuron bias, false or true
-	// SetActivationMode - Activation function mode
-	// SetLossMode       - The mode of calculation of the total error
-	// SetLossLimit      - Minimum (sufficient) limit of the average of the error during training
-	// SetLearningRate   - Learning coefficient, from 0 to 1
+	// Parameters:
+	// Array of the number of neurons in each hidden layer
 	n.SetHiddenLayer(5, 3)
+
+	// The neuron bias, false or true
 	n.SetNeuronBias(true)
+
+	// Activation function mode
 	n.SetActivationMode(nn.ModeSIGMOID)
+
+	// The mode of calculation of the total error
 	n.SetLossMode(nn.ModeMSE)
+
+	// Minimum (sufficient) limit of the average of the error during training
 	n.SetLossLimit(.01)
+
+	// Learning coefficient, from 0 to 1
 	n.SetLearningRate(nn.DefaultRate)
 
 	// Training dataset

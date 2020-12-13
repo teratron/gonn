@@ -40,7 +40,7 @@ type perceptron struct {
 	Weights Float3Type `json:"weights" xml:"weights>weights"`
 
 	// Neuron
-	neuron [][]*perceptronNeuron
+	neuron [][]*neuronPerceptron
 
 	// Buffers
 	//input  []float64
@@ -57,7 +57,8 @@ type perceptron struct {
 	jsonName string
 }
 
-type perceptronNeuron struct {
+// perceptronNeuron
+type neuronPerceptron struct {
 	value FloatType
 	miss  FloatType
 }
@@ -283,13 +284,13 @@ func (p *perceptron) init(lenInput, lenTarget int) bool {
 	var biasLayer int
 
 	p.Weights = make(Float3Type, lenLayer)
-	p.neuron = make([][]*perceptronNeuron, lenLayer)
+	p.neuron = make([][]*neuronPerceptron, lenLayer)
 	//p.input = make([]float64, lenInput)
 	//p.target = make([]float64, lenTarget)
 
 	for i, l := range layers {
 		p.Weights[i] = make([][]FloatType, l)
-		p.neuron[i] = make([]*perceptronNeuron, l)
+		p.neuron[i] = make([]*neuronPerceptron, l)
 		if i > 0 {
 			biasLayer = int(layers[i-1]) + bias
 		}
@@ -302,7 +303,7 @@ func (p *perceptron) init(lenInput, lenTarget int) bool {
 			for k := range p.Weights[i][j] {
 				p.Weights[i][j][k] = .5 //getRand()
 			}
-			p.neuron[i][j] = &perceptronNeuron{}
+			p.neuron[i][j] = &neuronPerceptron{}
 		}
 	}
 	return true
@@ -336,7 +337,7 @@ func (p *perceptron) calcNeuron(input []float64) {
 			length = p.lenInput
 		}
 		for j, n := range v {
-			go func(j int, n *perceptronNeuron) {
+			go func(j int, n *neuronPerceptron) {
 				n.value = 0
 				for k, w := range p.Weights[i][j] {
 					if k < length {
@@ -391,7 +392,7 @@ func (p *perceptron) calcMiss() {
 	for i := p.lastLayerIndex - 1; i >= 0; i-- {
 		inc := i + 1
 		for j, n := range p.neuron[i] {
-			go func(j int, n *perceptronNeuron) {
+			go func(j int, n *neuronPerceptron) {
 				n.miss = 0
 				for k, m := range p.neuron[inc] {
 					n.miss += m.miss * p.Weights[inc][k][j]

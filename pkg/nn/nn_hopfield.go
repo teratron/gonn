@@ -8,6 +8,7 @@ const hopfieldName = "hopfield"
 // Declare conformity with NeuralNetwork interface
 var _ NeuralNetwork = (*hopfield)(nil)
 
+// hopfield
 type hopfield struct {
 	NeuralNetwork `json:"-" xml:"-"`
 	//Parameter     `json:"-" xml:"-"`
@@ -21,13 +22,18 @@ type hopfield struct {
 	Weights Float2Type `json:"weights" xml:"weights"`
 
 	// Matrix
-	neuron []FloatType
+	neuron []*hopfieldNeuron
 
 	// State of the neural network
 	isInit bool // Initializing flag
 
 	// Config
 	jsonName string
+}
+
+// hopfieldNeuron
+type hopfieldNeuron struct {
+	value FloatType
 }
 
 // Hopfield return

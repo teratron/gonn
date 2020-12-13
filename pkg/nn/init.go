@@ -71,9 +71,9 @@ func New(reader ...Reader) NeuralNetwork {
 func getArchitecture(name string) NeuralNetwork {
 	switch name {
 	case perceptronName:
-		return Perceptron() //&perceptron{}
+		return Perceptron()
 	case hopfieldName:
-		return Hopfield() //&hopfield{}
+		return Hopfield()
 	default:
 		LogError(fmt.Errorf("neural network %w", ErrNotFound))
 		return nil
