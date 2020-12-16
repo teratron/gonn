@@ -18,11 +18,11 @@ type perceptron struct {
 	// Neural network architecture name
 	Name string `json:"name" xml:"name"`
 
-	// Array of the number of neurons in each hidden layer
-	Hidden HiddenArrUint `json:"hidden" xml:"hidden>layer"`
-
 	// The neuron bias, false or true
 	Bias bool `json:"bias" xml:"bias"`
+
+	// Array of the number of neurons in each hidden layer
+	Hidden []int `json:"hidden" xml:"hidden>layer"`
 
 	// Activation function mode
 	Activation uint8 `json:"activation" xml:"activation"`
@@ -46,6 +46,7 @@ type perceptron struct {
 	//input  []float64
 	//target []float64
 
+	layers         []int
 	lastLayerIndex int
 	lenInput       int
 	lenOutput      int
@@ -67,7 +68,7 @@ type neuronPerceptron struct {
 func Perceptron() *perceptron {
 	return &perceptron{
 		Name:       perceptronName,
-		Hidden:     HiddenArrUint{},
+		Hidden:     []int{},
 		Bias:       false,
 		Activation: ModeSIGMOID,
 		Loss:       ModeMSE,
@@ -100,16 +101,6 @@ func (p *perceptron) setNameJSON(name string) {
 	p.jsonName = name
 }
 
-// HiddenLayer
-func (p *perceptron) HiddenLayer() []uint {
-	return p.Hidden
-}
-
-// SetHiddenLayer
-func (p *perceptron) SetHiddenLayer(layer ...uint) {
-	p.Hidden = HiddenLayer(layer...)
-}
-
 // NeuronBias
 func (p *perceptron) NeuronBias() bool {
 	return p.Bias
@@ -118,6 +109,16 @@ func (p *perceptron) NeuronBias() bool {
 // SetNeuronBias
 func (p *perceptron) SetNeuronBias(bias bool) {
 	p.Bias = bias
+}
+
+// HiddenLayer
+func (p *perceptron) HiddenLayer() []int {
+	return p.Hidden
+}
+
+// SetHiddenLayer
+func (p *perceptron) SetHiddenLayer(layer ...int) {
+	p.Hidden = layer //HiddenLayer(layer...)
 }
 
 // ActivationMode
@@ -204,7 +205,7 @@ func (p *perceptron) Write(writer ...Writer) {
 func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, count int) {
 	if !p.isInit {
 		if p.isInit = p.init(len(input), len(target[0])); !p.isInit {
-			LogError(fmt.Errorf("%w for train", ErrInit))
+			LogError(fmt.Errorf("train: %w", ErrInit))
 			return -1, 0
 		}
 	}
@@ -240,7 +241,7 @@ func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, 
 func (p *perceptron) Verify(input []float64, target ...[]float64) (loss float64) {
 	if !p.isInit {
 		if p.isInit = p.init(len(input), len(target[0])); !p.isInit {
-			LogError(fmt.Errorf("%w for verify", ErrInit))
+			LogError(fmt.Errorf("verify: %w", ErrInit))
 			return -1
 		}
 	}
@@ -257,7 +258,7 @@ func (p *perceptron) Verify(input []float64, target ...[]float64) (loss float64)
 // Query querying neural network
 func (p *perceptron) Query(input []float64) (output []float64) {
 	if !p.isInit {
-		LogError(fmt.Errorf("%w for query", ErrInit))
+		LogError(fmt.Errorf("query: %w", ErrInit))
 		return nil
 	}
 	p.calcNeuron(input)
@@ -268,13 +269,17 @@ func (p *perceptron) Query(input []float64) (output []float64) {
 	return
 }
 
+func (p *perceptron) Init() {
+
+}
+
 // init initialize
 func (p *perceptron) init(lenInput, lenTarget int) bool {
-	p.lastLayerIndex = len(p.Hidden)
 	p.lenInput = lenInput
 	p.lenOutput = lenTarget
-	layers := append(p.Hidden, uint(p.lenOutput))
-	lenLayer := len(layers)
+	p.lastLayerIndex = len(p.Hidden)
+	layer := append(p.Hidden, p.lenOutput)
+	lenLayer := len(layer)
 
 	bias := 0
 	if p.Bias {
@@ -288,13 +293,13 @@ func (p *perceptron) init(lenInput, lenTarget int) bool {
 	//p.input = make([]float64, lenInput)
 	//p.target = make([]float64, lenTarget)
 
-	for i, l := range layers {
-		p.Weights[i] = make([][]FloatType, l)
-		p.neuron[i] = make([]*neuronPerceptron, l)
+	for i, v := range layer {
+		p.Weights[i] = make([][]FloatType, v)
+		p.neuron[i] = make([]*neuronPerceptron, v)
 		if i > 0 {
-			biasLayer = int(layers[i-1]) + bias
+			biasLayer = layer[i-1] + bias
 		}
-		for j := 0; j < int(l); j++ {
+		for j := 0; j < v; j++ {
 			if i > 0 {
 				p.Weights[i][j] = make([]FloatType, biasLayer)
 			} else {
@@ -309,8 +314,43 @@ func (p *perceptron) init(lenInput, lenTarget int) bool {
 	return true
 }
 
-// reInit
-func (p *perceptron) reInit() {
+// initNeuronFromWeight
+func (p *perceptron) initNeuronFromWeight() {
+	p.neuron = make([][]*neuronPerceptron, len(p.Weights))
+	for i, v := range p.Weights {
+		p.neuron[i] = make([]*neuronPerceptron, len(v))
+		for j := range v {
+			p.neuron[i][j] = &neuronPerceptron{}
+		}
+	}
+}
+
+// initHiddenFromWeight
+func (p *perceptron) initHiddenFromWeight() {
+	//fmt.Println(len(p.Hidden), len(p.Weights)-1)
+	if len(p.Hidden) != len(p.Weights)-1 {
+		p.Hidden = make([]int, len(p.Weights)-1)
+		for i := range p.Hidden {
+			p.Hidden[i] = len(p.Weights[i])
+		}
+	}
+}
+
+// lenInputFromWeight
+func (p *perceptron) lenInputFromWeight() {
+	p.lenInput = len(p.Weights[0][0])
+	if p.Bias {
+		p.lenInput -= 1
+	}
+}
+
+// lenOutputFromWeight
+func (p *perceptron) lenOutputFromWeight() {
+	p.lastLayerIndex = len(p.Weights) - 1
+	p.lenOutput = len(p.Weights[p.lastLayerIndex])
+}
+
+/*func (p *perceptron) reInit() {
 	bias := 0
 	if p.Bias {
 		bias = 1
@@ -321,7 +361,7 @@ func (p *perceptron) reInit() {
 		p.Hidden[i] = uint(len(p.Weights[i]))
 	}
 	p.isInit = p.init(len(p.Weights[0][0])-bias, len(p.Weights[length]))
-}
+}*/
 
 // calcNeuron
 func (p *perceptron) calcNeuron(input []float64) {

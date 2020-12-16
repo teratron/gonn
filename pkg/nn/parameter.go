@@ -11,9 +11,8 @@ type Parameter interface {
 	nameJSON() string
 	setNameJSON(string)
 
-	// Perceptron
-	HiddenLayer() []uint
-	SetHiddenLayer(...uint)
+	HiddenLayer() []int
+	SetHiddenLayer(...int)
 
 	NeuronBias() bool
 	SetNeuronBias(bool)
@@ -30,7 +29,6 @@ type Parameter interface {
 	LearningRate() float32
 	SetLearningRate(float32)
 
-	// Hopfield
 	NeuronEnergy() float64
 	SetNeuronEnergy(float64)
 

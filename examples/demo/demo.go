@@ -8,12 +8,11 @@ func main() {
 	// same n := nn.New(nn.Perceptron())
 	n := nn.New()
 
-	// Parameters:
-	// Array of the number of neurons in each hidden layer
-	n.SetHiddenLayer(5, 3)
-
 	// The neuron bias, false or true
 	n.SetNeuronBias(true)
+
+	// Array of the number of neurons in each hidden layer
+	n.SetHiddenLayer(5, 3)
 
 	// Activation function mode
 	n.SetActivationMode(nn.ModeSIGMOID)

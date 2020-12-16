@@ -2,7 +2,7 @@ package nn
 
 // Floater
 type Floater interface {
-	Dimension() int
+	Length() int
 }
 
 type (
@@ -12,18 +12,28 @@ type (
 	Float3Type [][][]FloatType
 )
 
-func (f FloatType) Dimension() int {
-	return 0
+func (f Float1Type) Length() int {
+	return len(f)
 }
 
-func (f Float1Type) Dimension() int {
-	return 1
+func (f Float2Type) Length() int {
+	return len(f)
 }
 
-func (f Float2Type) Dimension() int {
-	return 2
-}
+func (f Float3Type) Length() int {
+	/*if len(row) > 0 {
+		switch row[0] {
+		case 0:
+		default:
+			return -1
+		}
+		for i, u := range row {
+			for j, v := range u {
+				for k := range v {
 
-func (f Float3Type) Dimension() int {
-	return 3
+				}
+			}
+		}
+	}*/
+	return len(f)
 }

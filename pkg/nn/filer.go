@@ -8,6 +8,7 @@ type Filer interface {
 	ToString() string
 }
 
+// File
 func File(filename string) *os.File {
 	file, err := os.Create(filename)
 	if err != nil {

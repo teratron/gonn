@@ -1,6 +1,6 @@
 package nn
 
-type Neuroner interface {
+/*type Neuroner interface {
 	setSpecific()
 }
 
@@ -10,5 +10,5 @@ type neuron struct {
 }
 
 func (f FloatType) setSpecific() {
-
 }
+*/
