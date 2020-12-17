@@ -41,45 +41,22 @@ func New(reader ...Reader) NeuralNetwork {
 					if err = json.Unmarshal(b, &n); err != nil {
 						LogError(fmt.Errorf("read unmarshal %w", err))
 					}
-					n.(*perceptron).initHiddenFromWeight()
-					n.(*perceptron).lenInputFromWeight()
-					n.(*perceptron).lenOutputFromWeight()
-					n.(*perceptron).initNeuronFromWeight()
-
-					//fmt.Printf("%T %v\n", n.(*perceptron), n.(*perceptron))
-					//fmt.Printf("%T %v\n", n.(*perceptron).Weights, n.(*perceptron).Weights)
 					//fmt.Println(len(n.(*perceptron).Weights),cap(n.(*perceptron).Weights))
-					//fmt.Println(len(n.(*perceptron).Weights[0]),cap(n.(*perceptron).Weights[0]))
-					//fmt.Println(len(n.(*perceptron).Weights[1]),cap(n.(*perceptron).Weights[1]))
-					//fmt.Println(len(n.(*perceptron).Weights[1][0]),cap(n.(*perceptron).Weights[1][0]))
-
-					//fmt.Printf("%T %v\n", n.(*perceptron).Hidden, n.(*perceptron).Hidden)
-					//fmt.Println(n.Weight().Length())
-					/*bias := 0
-					if n.NeuronBias() {
-						bias = 1
-					}*/
-					//length := n.Weight().Length() - 1
-					//fmt.Println(length, len(n.(*perceptron).Hidden))
-					/*n.SetHiddenLayer() = make(HiddenArrUint, length)
-					for i := range p.Hidden {
-						p.Hidden[i] = uint(len(p.Weights[i]))
-					}*/
-
+					//fmt.Printf("%T %v\n", n.(*perceptron).Weights, n.(*perceptron).Weights)
+					if n.(*perceptron).Weights != nil && len(n.(*perceptron).Weights) > 0 {
+						n.(*perceptron).initHiddenFromWeight()
+						n.(*perceptron).lenInputFromWeight()
+						n.(*perceptron).lenOutputFromWeight()
+						n.(*perceptron).initNeuronFromWeight()
+						n.setStateInit(true)
+					}
 					n.setNameJSON(filename)
-					n.setStateInit(true)
-					/*if weight, ok := data.(map[string]interface{})["weights"]; ok && weight != nil {
-						//fmt.Printf("%T %v\n", weight, weight)
-						if w, ok := weight.(Float3Type); ok {
-							fmt.Printf("%T %v\n", w, w)
-						}
-						//fmt.Println(weight)
-						//fmt.Printf("%T %v\n", weight, weight)
-					}*/
 				}
 				return n
+			default:
+				//LogError(fmt.Errorf("%T %w for neural network", r, ErrMissingType))
+				//return nil
 			}
-			//fmt.Printf("Filer %T %s\n", r, r)
 		default:
 			LogError(fmt.Errorf("%T %w for neural network", r, ErrMissingType))
 			return nil

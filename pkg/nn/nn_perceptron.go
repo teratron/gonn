@@ -37,7 +37,7 @@ type perceptron struct {
 	Rate FloatType `json:"rate" xml:"rate"`
 
 	// Weight value
-	Weights Float3Type `json:"weights" xml:"weights>weights"`
+	Weights Float3Type `json:"weights" xml:"weights>weights,omitempty"`
 
 	// Neuron
 	neuron [][]*neuronPerceptron
@@ -46,7 +46,6 @@ type perceptron struct {
 	//input  []float64
 	//target []float64
 
-	layers         []int
 	lastLayerIndex int
 	lenInput       int
 	lenOutput      int
@@ -58,7 +57,7 @@ type perceptron struct {
 	jsonName string
 }
 
-// perceptronNeuron
+// neuronPerceptron
 type neuronPerceptron struct {
 	value FloatType
 	miss  FloatType
@@ -68,8 +67,8 @@ type neuronPerceptron struct {
 func Perceptron() *perceptron {
 	return &perceptron{
 		Name:       perceptronName,
-		Hidden:     []int{},
 		Bias:       false,
+		Hidden:     []int{},
 		Activation: ModeSIGMOID,
 		Loss:       ModeMSE,
 		Limit:      .1,
@@ -118,7 +117,7 @@ func (p *perceptron) HiddenLayer() []int {
 
 // SetHiddenLayer
 func (p *perceptron) SetHiddenLayer(layer ...int) {
-	p.Hidden = layer //HiddenLayer(layer...)
+	p.Hidden = layer
 }
 
 // ActivationMode
@@ -152,12 +151,12 @@ func (p *perceptron) SetLossLimit(limit float64) {
 }
 
 // LearningRate
-func (p *perceptron) LearningRate() float32 {
-	return float32(p.Rate)
+func (p *perceptron) LearningRate() float64 {
+	return float64(p.Rate)
 }
 
 // SetLearningRate
-func (p *perceptron) SetLearningRate(rate float32) {
+func (p *perceptron) SetLearningRate(rate float64) {
 	p.Rate = checkLearningRate(rate)
 }
 
@@ -209,7 +208,7 @@ func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, 
 			return -1, 0
 		}
 	}
-	fmt.Println("p.isInit")
+	//fmt.Println("p.isInit")
 	//_ = copy(p.input, input)
 	//_ = copy(p.target, target[0])
 	//fmt.Println(input, p.input)
@@ -350,19 +349,6 @@ func (p *perceptron) lenOutputFromWeight() {
 	p.lenOutput = len(p.Weights[p.lastLayerIndex])
 }
 
-/*func (p *perceptron) reInit() {
-	bias := 0
-	if p.Bias {
-		bias = 1
-	}
-	length := len(p.Weights) - 1
-	p.Hidden = make(HiddenArrUint, length)
-	for i := range p.Hidden {
-		p.Hidden[i] = uint(len(p.Weights[i]))
-	}
-	p.isInit = p.init(len(p.Weights[0][0])-bias, len(p.Weights[length]))
-}*/
-
 // calcNeuron
 func (p *perceptron) calcNeuron(input []float64) {
 	wait := make(chan bool)
@@ -406,7 +392,7 @@ func (p *perceptron) calcLoss(target []float64) (loss float64) {
 	for i, n := range p.neuron[p.lastLayerIndex] {
 		//fmt.Printf("%4.6f\n",n.miss)
 		n.miss = FloatType(target[i]) - n.value
-		fmt.Println(n.miss)
+		//fmt.Println(n.miss)
 		switch p.Loss {
 		default:
 			fallthrough
@@ -483,75 +469,6 @@ func (p *perceptron) updWeight(input []float64) {
 		}
 	}
 }
-
-// initWeight
-/*func (p *perceptron) initWeight() {
-	p.Weights = make(Float3Type, len(p.axon))
-	for i, v := range p.axon {
-		p.Weights[i] = make(Float2Type, len(p.axon[i]))
-		for j := range v {
-			p.Weights[i][j] = make(Float1Type, len(p.axon[i][j]))
-		}
-	}
-	p.weight = &weight{
-		isInitWeight: true,
-		buffer:       &p.Weights,
-	}
-}*/
-
-// getWeight
-/*func (p *perceptron) getWeight() *Float3Type {
-	p.copyWeight()
-	return &p.Weights
-}*/
-
-// setWeight
-/*func (p *perceptron) setWeight(weight *Float3Type) {
-	for i, u := range *weight {
-		for j, v := range u {
-			for k, w := range v {
-				p.axon[i][j][k].weight = w
-			}
-		}
-	}
-}*/
-
-// copyWeight copies weights to the buffer
-/*func (p *perceptron) copyWeight() {
-	if p.weight == nil {
-		p.initWeight()
-	}
-	for i, u := range p.axon {
-		for j, v := range u {
-			for k, w := range v {
-				p.Weights[i][j][k] = w.weight
-			}
-		}
-	}
-}*/
-
-// pasteWeight inserts weights from the buffer
-/*func (p *perceptron) pasteWeight() (err error) {
-	if p.Weights != nil {
-		for i, u := range p.Weights {
-			for j, v := range u {
-				for k, w := range v {
-					p.axon[i][j][k].weight = w
-				}
-			}
-		}
-		p.deleteWeight()
-	} else {
-		err = fmt.Errorf("paste weight error: missing weights")
-	}
-	return
-}*/
-
-// deleteWeight
-/*func (p *perceptron) deleteWeight() {
-	p.Weights = nil
-	p.weight = nil
-}*/
 
 // readJSON
 /*func (p *perceptron) readJSON(value interface{}) {
