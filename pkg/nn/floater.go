@@ -21,19 +21,5 @@ func (f Float2Type) Length() int {
 }
 
 func (f Float3Type) Length() int {
-	/*if len(row) > 0 {
-		switch row[0] {
-		case 0:
-		default:
-			return -1
-		}
-		for i, u := range row {
-			for j, v := range u {
-				for k := range v {
-
-				}
-			}
-		}
-	}*/
 	return len(f)
 }

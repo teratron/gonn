@@ -44,9 +44,9 @@ func New(reader ...Reader) NeuralNetwork {
 					//fmt.Println(len(n.(*perceptron).Weights),cap(n.(*perceptron).Weights))
 					//fmt.Printf("%T %v\n", n.(*perceptron).Weights, n.(*perceptron).Weights)
 					if n.(*perceptron).Weights != nil && len(n.(*perceptron).Weights) > 0 {
-						n.(*perceptron).initHiddenFromWeight()
 						n.(*perceptron).lenInputFromWeight()
 						n.(*perceptron).lenOutputFromWeight()
+						n.(*perceptron).initHiddenFromWeight()
 						n.(*perceptron).initNeuronFromWeight()
 						n.setStateInit(true)
 					}

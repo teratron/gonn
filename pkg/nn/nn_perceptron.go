@@ -42,13 +42,9 @@ type perceptron struct {
 	// Neuron
 	neuron [][]*neuronPerceptron
 
-	// Buffers
-	//input  []float64
-	//target []float64
-
-	lastLayerIndex int
 	lenInput       int
 	lenOutput      int
+	lastLayerIndex int
 
 	// State of the neural network
 	isInit bool // Initializing flag
@@ -209,10 +205,6 @@ func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, 
 		}
 	}
 	//fmt.Println("p.isInit")
-	//_ = copy(p.input, input)
-	//_ = copy(p.target, target[0])
-	//fmt.Println(input, p.input)
-	//fmt.Println(target, p.target)
 	if len(target) > 0 {
 		for count < 1 /*MaxIteration*/ {
 			//fmt.Println(count, loss, "0")
@@ -313,6 +305,11 @@ func (p *perceptron) init(lenInput, lenTarget int) bool {
 	return true
 }
 
+// initFromWeight
+func (p *perceptron) initFromWeight() {
+
+}
+
 // initNeuronFromWeight
 func (p *perceptron) initNeuronFromWeight() {
 	p.neuron = make([][]*neuronPerceptron, len(p.Weights))
@@ -326,11 +323,26 @@ func (p *perceptron) initNeuronFromWeight() {
 
 // initHiddenFromWeight
 func (p *perceptron) initHiddenFromWeight() {
-	//fmt.Println(len(p.Hidden), len(p.Weights)-1)
-	if len(p.Hidden) != len(p.Weights)-1 {
-		p.Hidden = make([]int, len(p.Weights)-1)
+	length := len(p.Weights) - 1
+	if len(p.Hidden) != length {
+		p.Hidden = make([]int, length)
 		for i := range p.Hidden {
 			p.Hidden[i] = len(p.Weights[i])
+		}
+	}
+}
+
+// setBiasFromWeight
+func (p *perceptron) setBiasFromWeight() {
+	if !p.Bias {
+		if len(p.Weights) > 1 {
+			if len(p.Weights[0])+1 == len(p.Weights[1][0]) {
+				p.Bias = true
+			} else {
+
+			}
+		} else {
+			LogError(fmt.Errorf("there are no hidden layers to determine the bias"))
 		}
 	}
 }
@@ -377,7 +389,6 @@ func (p *perceptron) calcNeuron(input []float64) {
 					}
 				}
 				n.value = FloatType(calcActivation(float64(n.value), p.Activation))
-				//fmt.Println(n.value)
 				wait <- true
 			}(j, n)
 		}
