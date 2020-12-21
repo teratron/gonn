@@ -307,7 +307,38 @@ func (p *perceptron) init(lenInput, lenTarget int) bool {
 
 // initFromWeight
 func (p *perceptron) initFromWeight() {
+	length := len(p.Weights)
 
+	if !p.Bias {
+		if length > 1 {
+			if len(p.Weights[0])+1 == len(p.Weights[1][0]) {
+				p.Bias = true
+			}
+		}
+	}
+
+	p.lenInput = len(p.Weights[0][0])
+	if p.Bias {
+		p.lenInput -= 1
+	}
+
+	p.lastLayerIndex = length - 1
+	p.lenOutput = len(p.Weights[p.lastLayerIndex])
+
+	if len(p.Hidden) != p.lastLayerIndex {
+		p.Hidden = make([]int, p.lastLayerIndex)
+		for i := range p.Hidden {
+			p.Hidden[i] = len(p.Weights[i])
+		}
+	}
+
+	p.neuron = make([][]*neuronPerceptron, length)
+	for i, v := range p.Weights {
+		p.neuron[i] = make([]*neuronPerceptron, len(v))
+		for j := range v {
+			p.neuron[i][j] = &neuronPerceptron{}
+		}
+	}
 }
 
 // initNeuronFromWeight
@@ -338,25 +369,21 @@ func (p *perceptron) setBiasFromWeight() {
 		if len(p.Weights) > 1 {
 			if len(p.Weights[0])+1 == len(p.Weights[1][0]) {
 				p.Bias = true
-			} else {
-
 			}
-		} else {
-			LogError(fmt.Errorf("there are no hidden layers to determine the bias"))
 		}
 	}
 }
 
-// lenInputFromWeight
-func (p *perceptron) lenInputFromWeight() {
+// setLenInputFromWeight
+func (p *perceptron) setLenInputFromWeight() {
 	p.lenInput = len(p.Weights[0][0])
 	if p.Bias {
 		p.lenInput -= 1
 	}
 }
 
-// lenOutputFromWeight
-func (p *perceptron) lenOutputFromWeight() {
+// setLenOutputFromWeight
+func (p *perceptron) setLenOutputFromWeight() {
 	p.lastLayerIndex = len(p.Weights) - 1
 	p.lenOutput = len(p.Weights[p.lastLayerIndex])
 }

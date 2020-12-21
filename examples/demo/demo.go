@@ -28,21 +28,21 @@ func main() {
 
 	// Training dataset
 	dataSet := []float64{.27, .31, .52, .66, .81, .13, .2, .49, .11, .73, .28}
-	numInput := 3  // Number of input data
-	numOutput := 2 // Number of output data
+	lenInput := 3  // Number of input data
+	lenOutput := 2 // Number of output data
 
 	// Training
 	minLoss := 1.
 	for epoch := 1; epoch <= 1000; epoch++ {
-		for i := numInput; i <= len(dataSet)-numOutput; i++ {
-			_, _ = n.Train(dataSet[i-numInput:i], dataSet[i:i+numOutput])
+		for i := lenInput; i <= len(dataSet)-lenOutput; i++ {
+			_, _ = n.Train(dataSet[i-lenInput:i], dataSet[i:i+lenOutput])
 		}
 
 		// Verifying
 		sum := 0.
 		num := 0
-		for i := numInput; i <= len(dataSet)-numOutput; i++ {
-			sum += n.Verify(dataSet[i-numInput:i], dataSet[i:i+numOutput])
+		for i := lenInput; i <= len(dataSet)-lenOutput; i++ {
+			sum += n.Verify(dataSet[i-lenInput:i], dataSet[i:i+lenOutput])
 			num++
 		}
 
