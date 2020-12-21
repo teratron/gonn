@@ -13,31 +13,31 @@ var _ NeuralNetwork = (*perceptron)(nil)
 
 // perceptron
 type perceptron struct {
-	Parameter `json:"-" xml:"-"`
+	Parameter `json:"-"`
 
 	// Neural network architecture name
-	Name string `json:"name" xml:"name"`
+	Name string `json:"name"`
 
 	// The neuron bias, false or true
-	Bias bool `json:"bias" xml:"bias"`
+	Bias bool `json:"bias"`
 
 	// Array of the number of neurons in each hidden layer
-	Hidden []int `json:"hidden" xml:"hidden>layer"`
+	Hidden []int `json:"hidden,omitempty"`
 
 	// Activation function mode
-	Activation uint8 `json:"activation" xml:"activation"`
+	Activation uint8 `json:"activation"`
 
 	// The mode of calculation of the total error
-	Loss uint8 `json:"loss" xml:"loss"`
+	Loss uint8 `json:"loss"`
 
 	// Minimum (sufficient) limit of the average of the error during training
-	Limit float64 `json:"limit" xml:"limit"`
+	Limit float64 `json:"limit"`
 
 	// Learning coefficient, from 0 to 1
-	Rate FloatType `json:"rate" xml:"rate"`
+	Rate FloatType `json:"rate"`
 
 	// Weight value
-	Weights Float3Type `json:"weights" xml:"weights>weights,omitempty"`
+	Weights Float3Type `json:"weights,omitempty"`
 
 	// Neuron
 	neuron [][]*neuronPerceptron
@@ -339,6 +339,8 @@ func (p *perceptron) initFromWeight() {
 			p.neuron[i][j] = &neuronPerceptron{}
 		}
 	}
+
+	p.isInit = true
 }
 
 // initNeuronFromWeight
