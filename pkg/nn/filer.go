@@ -5,7 +5,7 @@ import "os"
 // Filer
 type Filer interface {
 	ReadWriter
-	ToString() string
+	getValue(key string) interface{}
 }
 
 // File

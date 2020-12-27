@@ -2,24 +2,24 @@ package nn
 
 // Floater
 type Floater interface {
-	Length() int
+	length() int
 }
 
 type (
-	FloatType  float32
-	Float1Type []FloatType
-	Float2Type [][]FloatType
-	Float3Type [][][]FloatType
+	floatType  float32
+	Float1Type []floatType
+	Float2Type [][]floatType
+	Float3Type [][][]floatType
 )
 
-func (f Float1Type) Length() int {
+func (f Float1Type) length() int {
 	return len(f)
 }
 
-func (f Float2Type) Length() int {
+func (f Float2Type) length() int {
 	return len(f)
 }
 
-func (f Float3Type) Length() int {
+func (f Float3Type) length() int {
 	return len(f)
 }

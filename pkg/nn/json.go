@@ -9,6 +9,11 @@ import (
 
 type jsonString string
 
+type jsonFile struct {
+	filename string
+	buffer   []byte
+}
+
 // JSON
 func JSON(filename ...string) ReadWriter {
 	if len(filename) > 0 {
@@ -17,16 +22,10 @@ func JSON(filename ...string) ReadWriter {
 	return jsonString("")
 }
 
-// ToString
-func (j jsonString) ToString() string {
-	return string(j)
-}
-
-// Read
-func (j jsonString) Read(reader Reader) {
+func (j jsonString) getValue(key string) interface{} {
 	filename := string(j)
 	if len(filename) == 0 {
-		LogError(fmt.Errorf("json: file json is missing"))
+		LogError(fmt.Errorf("json: file config is missing"))
 	}
 
 	b, err := ioutil.ReadFile(filename)
@@ -34,7 +33,34 @@ func (j jsonString) Read(reader Reader) {
 		LogError(err)
 	}
 
-	if n, ok := reader.(NeuralNetwork); ok {
+	var data interface{}
+	if err = json.Unmarshal(b, &data); err != nil {
+		LogError(fmt.Errorf("read unmarshal %w", err))
+	}
+
+	if value, ok := data.(map[string]interface{})[key]; ok {
+		return value
+	}
+	return nil
+}
+
+// Read
+func (j jsonString) Read(reader Reader) {
+	filename := string(j)
+	if len(filename) == 0 {
+		LogError(fmt.Errorf("json: file config is missing"))
+	}
+
+	b, err := ioutil.ReadFile(filename)
+	if err != nil {
+		LogError(err)
+	}
+
+	if err = json.Unmarshal(b, &reader); err != nil {
+		LogError(fmt.Errorf("read unmarshal %w", err))
+	}
+
+	/*if n, ok := reader.(NeuralNetwork); ok {
 		var data interface{}
 		if err = json.Unmarshal(b, &data); err != nil {
 			LogError(fmt.Errorf("read unmarshal %w", err))
@@ -65,7 +91,7 @@ func (j jsonString) Read(reader Reader) {
 				}
 			}
 		}
-	}
+	}*/
 }
 
 // Write

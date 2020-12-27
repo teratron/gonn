@@ -1,9 +1,7 @@
 package nn
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"math/rand"
 	"time"
 )
@@ -19,44 +17,18 @@ func New(reader ...Reader) NeuralNetwork {
 		case NeuralNetwork:
 			return r
 		case Filer:
-			filename := r.ToString()
-			if len(filename) == 0 {
-				LogError(fmt.Errorf("init: file config is missing"))
-			}
+			//fmt.Printf("%T, %v", v, v)
+			if value, ok := r.getValue("name").(string); ok {
+				n := getArchitecture(value)
+				r.Read(n)
 
-			b, err := ioutil.ReadFile(filename)
-			if err != nil {
-				LogError(err)
-			}
-
-			switch r.(type) {
-			case jsonString:
-				var data interface{}
-				if err = json.Unmarshal(b, &data); err != nil {
-					LogError(fmt.Errorf("read unmarshal %w", err))
+				if n.(*perceptron).Weights != nil && len(n.(*perceptron).Weights) > 0 {
+					n.(*perceptron).initFromWeight()
 				}
-				var n NeuralNetwork
-				if value, ok := data.(map[string]interface{})["name"]; ok {
-					n = getArchitecture(value.(string))
-					if err = json.Unmarshal(b, &n); err != nil {
-						LogError(fmt.Errorf("read unmarshal %w", err))
-					}
-					//fmt.Println(len(n.(*perceptron).Weights),cap(n.(*perceptron).Weights))
-					//fmt.Printf("%T %v\n", n.(*perceptron).Weights, n.(*perceptron).Weights)
-					if n.(*perceptron).Weights != nil && len(n.(*perceptron).Weights) > 0 {
-						n.(*perceptron).setLenInputFromWeight()
-						n.(*perceptron).setLenOutputFromWeight()
-						n.(*perceptron).initHiddenFromWeight()
-						n.(*perceptron).initNeuronFromWeight()
-						n.setStateInit(true)
-					}
-					n.setNameJSON(filename)
-				}
+				//n.setNameJSON(filename)
 				return n
-			default:
-				//LogError(fmt.Errorf("%T %w for neural network", r, ErrMissingType))
-				//return nil
 			}
+			return nil
 		default:
 			LogError(fmt.Errorf("%T %w for neural network", r, ErrMissingType))
 			return nil
@@ -79,9 +51,9 @@ func getArchitecture(name string) NeuralNetwork {
 }
 
 // getRand return random number from -0.5 to 0.5
-func getRand() (r FloatType) {
+func getRand() (r floatType) {
 	for r == 0 {
-		r = FloatType(rand.Float64() - .5)
+		r = floatType(rand.Float64() - .5)
 	}
 	return
 }
