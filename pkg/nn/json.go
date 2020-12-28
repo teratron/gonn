@@ -9,11 +9,6 @@ import (
 
 type jsonString string
 
-type jsonFile struct {
-	filename string
-	buffer   []byte
-}
-
 // JSON
 func JSON(filename ...string) ReadWriter {
 	if len(filename) > 0 {

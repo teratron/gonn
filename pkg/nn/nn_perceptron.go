@@ -1,7 +1,6 @@
 package nn
 
 import (
-	"bytes"
 	"fmt"
 	"math"
 )
@@ -39,22 +38,15 @@ type perceptron struct {
 	// Weight value
 	Weights Float3Type `json:"weights,omitempty"`
 
-	// Number of input data
-	LenInput int `json:"input"`
-
-	// Number of output data
-	LenOutput int `json:"output"`
-
 	// Neuron
 	neuron [][]*neuronPerceptron
 
-	// State of the neural network
-	isInit bool // Initializing flag
-
-	// Config
+	// Settings
+	lenInput       int
+	lenOutput      int
 	lastLayerIndex int
+	isInit         bool
 	jsonName       string
-	json           *jsonFile
 }
 
 // neuronPerceptron
@@ -67,8 +59,6 @@ type neuronPerceptron struct {
 func Perceptron() *perceptron {
 	return &perceptron{
 		Name:       perceptronName,
-		Bias:       false,
-		Hidden:     []int{},
 		Activation: ModeSIGMOID,
 		Loss:       ModeMSE,
 		Limit:      .1,
@@ -172,26 +162,6 @@ func (p *perceptron) SetWeight(weight Floater) {
 	}
 }
 
-// LengthInput
-func (p *perceptron) LengthInput() int {
-	return p.LenInput
-}
-
-// SetLengthInput
-func (p *perceptron) SetLengthInput(length int) {
-	p.LenInput = length
-}
-
-// LengthOutput
-func (p *perceptron) LengthOutput() int {
-	return p.LenOutput
-}
-
-// SetLengthOutput
-func (p *perceptron) SetLengthOutput(length int) {
-	p.LenOutput = length
-}
-
 // Read
 func (p *perceptron) Read(reader Reader) {
 	switch r := reader.(type) {
@@ -211,8 +181,8 @@ func (p *perceptron) Write(writer ...Writer) {
 			switch v := w.(type) {
 			case Filer:
 				v.Write(p)
-			case *report:
-				p.writeReport(v)
+			/*case *report:
+			p.writeReport(v)*/
 			default:
 				LogError(fmt.Errorf("%T %w for write: %v", v, ErrMissingType, w))
 			}
@@ -224,52 +194,94 @@ func (p *perceptron) Write(writer ...Writer) {
 
 // Train training neural network
 func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, count int) {
-	if len(target) > 0 {
-		if !p.isInit {
-			p.init(len(input), len(target[0]))
-			if !p.isInit {
-				LogError(fmt.Errorf("train: %w", ErrInit))
+	lenInput := len(input)
+	if lenInput > 0 {
+		if len(target) > 0 {
+			lenOutput := len(target[0])
+			if lenOutput > 0 {
+				if !p.isInit {
+					p.init(lenInput, lenOutput)
+					if !p.isInit {
+						LogError(fmt.Errorf("train: %w", ErrInit))
+						return -1, 0
+					}
+				} else {
+					if p.lenInput != lenInput {
+						LogError(fmt.Errorf("train: invalid number of elements in the input data"))
+						return -1, 0
+					}
+					if p.lenOutput != lenOutput {
+						LogError(fmt.Errorf("train: invalid number of elements in the output data"))
+						return -1, 0
+					}
+				}
+
+				for count < 1 /*MaxIteration*/ {
+					//fmt.Println(count, loss, "0")
+					p.calcNeuron(input)
+					//fmt.Println(count, loss, "1", p.Limit)
+					if loss = p.calcLoss(target[0]); loss <= p.Limit {
+						break
+					}
+					//fmt.Println(count, loss, "2")
+					p.calcMiss()
+					//fmt.Println(count, loss, "3")
+					p.updWeight(input)
+					//fmt.Println(count, loss, "4")
+					count++
+				}
+			} else {
+				LogError(fmt.Errorf("train: %w", ErrNoTarget))
 				return -1, 0
 			}
-		}
-
-		for count < 1 /*MaxIteration*/ {
-			//fmt.Println(count, loss, "0")
-			p.calcNeuron(input)
-			//fmt.Println(count, loss, "1", p.Limit)
-			if loss = p.calcLoss(target[0]); loss <= p.Limit {
-				break
-			}
-			//fmt.Println(count, loss, "2")
-			p.calcMiss()
-			//fmt.Println(count, loss, "3")
-			p.updWeight(input)
-			//fmt.Println(count, loss, "4")
-			count++
+		} else {
+			LogError(fmt.Errorf("train: %w", ErrNoTarget))
+			return -1, 0
 		}
 	} else {
-		LogError(ErrNoTarget)
+		LogError(fmt.Errorf("train: %w", ErrNoInput))
 		return -1, 0
 	}
+
 	fmt.Println("Train")
 	return
 }
 
 // Verify verifying neural network
 func (p *perceptron) Verify(input []float64, target ...[]float64) (loss float64) {
-	if len(target) > 0 {
-		if !p.isInit {
-			p.init(len(input), len(target[0]))
-			if !p.isInit {
-				LogError(fmt.Errorf("verify: %w", ErrInit))
+	lenInput := len(input)
+	if lenInput > 0 {
+		if len(target) > 0 {
+			lenOutput := len(target[0])
+			if lenOutput > 0 {
+				if !p.isInit {
+					p.init(lenInput, lenOutput)
+					if !p.isInit {
+						LogError(fmt.Errorf("verify: %w", ErrInit))
+						return -1
+					}
+				} else {
+					if p.lenInput != lenInput {
+						LogError(fmt.Errorf("verify: invalid number of elements in the input data"))
+						return -1
+					}
+					if p.lenOutput != lenOutput {
+						LogError(fmt.Errorf("verify: invalid number of elements in the output data"))
+						return -1
+					}
+				}
+				p.calcNeuron(input)
+				loss = p.calcLoss(target[0])
+			} else {
+				LogError(fmt.Errorf("verify: %w", ErrNoTarget))
 				return -1
 			}
+		} else {
+			LogError(fmt.Errorf("verify: %w", ErrNoTarget))
+			return -1
 		}
-
-		p.calcNeuron(input)
-		loss = p.calcLoss(target[0])
 	} else {
-		LogError(ErrNoTarget)
+		LogError(fmt.Errorf("verify: %w", ErrNoInput))
 		return -1
 	}
 	return
@@ -282,7 +294,7 @@ func (p *perceptron) Query(input []float64) (output []float64) {
 		return nil
 	}
 	p.calcNeuron(input)
-	output = make([]float64, p.LenOutput)
+	output = make([]float64, p.lenOutput)
 	for i, n := range p.neuron[p.lastLayerIndex] {
 		output[i] = float64(n.value)
 	}
@@ -295,17 +307,25 @@ func (p *perceptron) Init() {
 
 // init initialize
 func (p *perceptron) init(lenInput, lenTarget int) {
-	p.LenInput = lenInput
-	p.LenOutput = lenTarget
+	if lenInput > 0 {
+		p.lenInput = lenInput
+	} else {
+
+	}
+
+	if lenTarget > 0 {
+		p.lenOutput = lenTarget
+	}
+
 	p.lastLayerIndex = len(p.Hidden)
-	layer := append(p.Hidden, p.LenOutput)
+	layer := append(p.Hidden, p.lenOutput)
 	lenLayer := len(layer)
 
 	bias := 0
 	if p.Bias {
 		bias = 1
 	}
-	biasInput := p.LenInput + bias
+	biasInput := p.lenInput + bias
 	var biasLayer int
 
 	p.Weights = make(Float3Type, lenLayer)
@@ -347,13 +367,13 @@ func (p *perceptron) initFromWeight() {
 		}
 	}
 
-	p.LenInput = len(p.Weights[0][0])
+	p.lenInput = len(p.Weights[0][0])
 	if p.Bias {
-		p.LenInput -= 1
+		p.lenInput -= 1
 	}
 
 	p.lastLayerIndex = length - 1
-	p.LenOutput = len(p.Weights[p.lastLayerIndex])
+	p.lenOutput = len(p.Weights[p.lastLayerIndex])
 
 	p.Hidden = make([]int, p.lastLayerIndex)
 	for i := range p.Hidden {
@@ -382,7 +402,7 @@ func (p *perceptron) calcNeuron(input []float64) {
 		if i > 0 {
 			length = len(p.neuron[dec])
 		} else {
-			length = p.LenInput
+			length = p.lenInput
 		}
 		for j, n := range v {
 			go func(j int, n *neuronPerceptron) {
@@ -424,7 +444,7 @@ func (p *perceptron) calcLoss(target []float64) (loss float64) {
 		}
 		n.miss *= floatType(calcDerivative(float64(n.miss), p.Activation))
 	}
-	loss /= float64(p.LenOutput)
+	loss /= float64(p.lenOutput)
 	if p.Loss == ModeRMSE {
 		loss = math.Sqrt(loss)
 	}
@@ -465,7 +485,7 @@ func (p *perceptron) updWeight(input []float64) {
 		if i > 0 {
 			length = len(p.neuron[dec])
 		} else {
-			length = p.LenInput
+			length = p.lenInput
 		}
 		for j, w := range v {
 			go func(i, j, dec, length int, grad floatType, w []floatType) {
@@ -488,88 +508,5 @@ func (p *perceptron) updWeight(input []float64) {
 		for range v {
 			<-wait
 		}
-	}
-}
-
-// readJSON
-/*func (p *perceptron) readJSON(value interface{}) {
-	if b, err := json.Marshal(&value); err != nil {
-		LogError(fmt.Errorf("read marshal %w", err))
-	} else if err = json.Unmarshal(b, &p); err != nil {
-		LogError(fmt.Errorf("read unmarshal %w", err))
-	}
-	p.reInit()
-	if err := p.pasteWeight(); err != nil {
-		LogError(fmt.Errorf("read json: %w", err))
-	}
-}*/
-
-// writeReport report of neural network training results in io.Writer
-func (p *perceptron) writeReport(rep *report) {
-	s := "----------------------------------------------\n"
-	n := "\n"
-	m := "\n\n"
-	b := bytes.NewBufferString("Report of Perceptron Neural Network\n\n")
-
-	printFormat := func(format string, a ...interface{}) {
-		if _, err := fmt.Fprintf(b, format, a...); err != nil {
-			LogError(fmt.Errorf("write report error: %w", err))
-		}
-	}
-
-	// Input layer
-	if in, ok := rep.args[0].([]float64); ok {
-		printFormat("%s0 Input layer size: %d\n%sNeurons:\t", s, p.LenInput, s)
-		for _, v := range in {
-			printFormat("  %v", v)
-		}
-		printFormat("%s", m)
-	}
-
-	// Layers: neuron, miss
-	var t string
-	for i, v := range p.neuron {
-		switch i {
-		case p.lastLayerIndex:
-			t = "Output layer"
-		default:
-			t = "Hidden layer"
-		}
-		printFormat("%s%d %s size: %d\n%sNeurons:\t", s, i+1, t, len(p.neuron[i]), s)
-		for _, w := range v {
-			printFormat("  %11.8f", w.value)
-		}
-		printFormat("\nMiss:\t\t")
-		for _, w := range v {
-			printFormat("  %11.8f", w.miss)
-		}
-		printFormat("%s", m)
-	}
-
-	// Axons: weight
-	printFormat("%sAxons (weights)\n%s", s, s)
-	for _, u := range p.Weights {
-		for i, v := range u {
-			printFormat("%d", i+1)
-			for _, w := range v {
-				printFormat("\t%11.8f", w)
-			}
-			printFormat("%s", n)
-		}
-		printFormat("%s", n)
-	}
-
-	// Resume
-	if loss, ok := rep.args[1].(float64); ok {
-		printFormat("%sTotal loss (error):\t\t%v\n", s, loss)
-	}
-	if count, ok := rep.args[2].(int); ok {
-		printFormat("Number of iteration:\t%v\n", count)
-	}
-
-	if _, err := b.WriteTo(rep.file); err != nil {
-		LogError(fmt.Errorf("write report error: %w", err))
-	} else if err = rep.file.Close(); err != nil {
-		LogError(fmt.Errorf("write report close error: %w", err))
 	}
 }
