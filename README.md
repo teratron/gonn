@@ -21,43 +21,41 @@ gonn - Neural Network for Golang
 ```go
 package main
 
-import (
-    "os"
-
-    "github.com/zigenzoog/gonn/pkg/nn"
-)
+import "github.com/zigenzoog/gonn/pkg/nn"
 
 func main() {
-	// New returns a new neural network instance with the default parameters,
+	// New returns a new neural network
+	// instance with the default parameters,
 	// same n := nn.New(nn.Perceptron())
 	n := nn.New()
 
-	// Set parameters:
-	// HiddenLayer    - Array of the number of neurons in each hidden layer
-	// NeuronBias     - The neuron bias, false or true
-	// ActivationMode - Activation function mode
-	// LossMode       - The mode of calculation of the total error
-	// LossLimit      - Minimum (sufficient) limit of the average of the error during training
-	// LearningRate   - Learning coefficient, from 0 to 1
-	n.Set(
-		nn.HiddenLayer(3, 2),
-		nn.NeuronBias(true),
-		nn.ActivationMode(nn.ModeSIGMOID),
-		nn.LossMode(nn.ModeMSE),
-		nn.LossLimit(.1),
-		nn.LearningRate(nn.DefaultRate))
+	// The neuron bias, false or true
+	n.SetNeuronBias(true)
+
+	// Array of the number of neurons in each hidden layer
+	n.SetHiddenLayer(3, 2)
+
+	// Activation function mode
+	n.SetActivationMode(nn.ModeSIGMOID)
+
+	// The mode of calculation of the total error
+	n.SetLossMode(nn.ModeMSE)
+
+	// Minimum (sufficient) limit of the average of the error during training
+	n.SetLossLimit(.1)
+
+	// Learning coefficient, from 0 to 1
+	n.SetLearningRate(nn.DefaultRate)
 
 	// Training dataset
 	input  := []float64{1, 0}
 	target := []float64{0, 1}
 
 	// Training
-	loss, count := n.Train(input, target)
+	_, _ = n.Train(input, target)
 
 	// Writing the neural network configuration to a file
-	n.Write(
-		nn.JSON("perceptron.json"),
-		nn.Report(os.Stdout, input, loss, count))
+	n.Write(nn.JSON("perceptron.json"))
 }
 ```
 

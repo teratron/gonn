@@ -41,6 +41,9 @@ type perceptron struct {
 	// Neuron
 	neuron [][]*neuronPerceptron
 
+	// Errors
+	Err error `json:"-"`
+
 	// Settings
 	lenInput       int
 	lenOutput      int
@@ -63,6 +66,7 @@ func Perceptron() *perceptron {
 		Loss:       ModeMSE,
 		Limit:      .1,
 		Rate:       floatType(DefaultRate),
+		Err:        nil,
 	}
 }
 
@@ -162,6 +166,14 @@ func (p *perceptron) SetWeight(weight Floater) {
 	}
 }
 
+// Error
+func (p *perceptron) Error() string {
+	if p.Err != nil {
+		return p.Err.Error()
+	}
+	return ErrNoError.Error()
+}
+
 // Read
 func (p *perceptron) Read(reader Reader) {
 	switch r := reader.(type) {
@@ -181,8 +193,8 @@ func (p *perceptron) Write(writer ...Writer) {
 			switch v := w.(type) {
 			case Filer:
 				v.Write(p)
-			/*case *report:
-			p.writeReport(v)*/
+			case *report:
+				p.writeReport(v)
 			default:
 				LogError(fmt.Errorf("%T %w for write: %v", v, ErrMissingType, w))
 			}
@@ -194,45 +206,37 @@ func (p *perceptron) Write(writer ...Writer) {
 
 // Train training neural network
 func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, count int) {
-	lenInput := len(input)
-	if lenInput > 0 {
-		if len(target) > 0 {
-			lenOutput := len(target[0])
-			if lenOutput > 0 {
+	if len(input) > 0 {
+		if len(target) > 0 && len(target[0]) > 0 {
+			if !p.isInit {
+				p.init(len(input), len(target[0]))
 				if !p.isInit {
-					p.init(lenInput, lenOutput)
-					if !p.isInit {
-						LogError(fmt.Errorf("train: %w", ErrInit))
-						return -1, 0
-					}
-				} else {
-					if p.lenInput != lenInput {
-						LogError(fmt.Errorf("train: invalid number of elements in the input data"))
-						return -1, 0
-					}
-					if p.lenOutput != lenOutput {
-						LogError(fmt.Errorf("train: invalid number of elements in the output data"))
-						return -1, 0
-					}
-				}
-
-				for count < 1 /*MaxIteration*/ {
-					//fmt.Println(count, loss, "0")
-					p.calcNeuron(input)
-					//fmt.Println(count, loss, "1", p.Limit)
-					if loss = p.calcLoss(target[0]); loss <= p.Limit {
-						break
-					}
-					//fmt.Println(count, loss, "2")
-					p.calcMiss()
-					//fmt.Println(count, loss, "3")
-					p.updWeight(input)
-					//fmt.Println(count, loss, "4")
-					count++
+					LogError(fmt.Errorf("train: %w", ErrInit))
+					return -1, 0
 				}
 			} else {
-				LogError(fmt.Errorf("train: %w", ErrNoTarget))
-				return -1, 0
+				if p.lenInput != len(input) {
+					LogError(fmt.Errorf("train: invalid number of elements in the input data"))
+					return -1, 0
+				}
+				if p.lenOutput != len(target[0]) {
+					LogError(fmt.Errorf("train: invalid number of elements in the target data"))
+					return -1, 0
+				}
+			}
+			for count < 1 /*MaxIteration*/ {
+				//fmt.Println(count, loss, "0")
+				p.calcNeuron(input)
+				//fmt.Println(count, loss, "1", p.Limit)
+				if loss = p.calcLoss(target[0]); loss <= p.Limit {
+					break
+				}
+				//fmt.Println(count, loss, "2")
+				p.calcMiss()
+				//fmt.Println(count, loss, "3")
+				p.updWeight(input)
+				//fmt.Println(count, loss, "4")
+				count++
 			}
 		} else {
 			LogError(fmt.Errorf("train: %w", ErrNoTarget))
@@ -242,40 +246,32 @@ func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, 
 		LogError(fmt.Errorf("train: %w", ErrNoInput))
 		return -1, 0
 	}
-
-	fmt.Println("Train")
+	//fmt.Println("Train")
 	return
 }
 
 // Verify verifying neural network
 func (p *perceptron) Verify(input []float64, target ...[]float64) (loss float64) {
-	lenInput := len(input)
-	if lenInput > 0 {
-		if len(target) > 0 {
-			lenOutput := len(target[0])
-			if lenOutput > 0 {
+	if len(input) > 0 {
+		if len(target) > 0 && len(target[0]) > 0 {
+			if !p.isInit {
+				p.init(len(input), len(target[0]))
 				if !p.isInit {
-					p.init(lenInput, lenOutput)
-					if !p.isInit {
-						LogError(fmt.Errorf("verify: %w", ErrInit))
-						return -1
-					}
-				} else {
-					if p.lenInput != lenInput {
-						LogError(fmt.Errorf("verify: invalid number of elements in the input data"))
-						return -1
-					}
-					if p.lenOutput != lenOutput {
-						LogError(fmt.Errorf("verify: invalid number of elements in the output data"))
-						return -1
-					}
+					LogError(fmt.Errorf("verify: %w", ErrInit))
+					return -1
 				}
-				p.calcNeuron(input)
-				loss = p.calcLoss(target[0])
 			} else {
-				LogError(fmt.Errorf("verify: %w", ErrNoTarget))
-				return -1
+				if p.lenInput != len(input) {
+					LogError(fmt.Errorf("verify: invalid number of elements in the input data"))
+					return -1
+				}
+				if p.lenOutput != len(target[0]) {
+					LogError(fmt.Errorf("verify: invalid number of elements in the target data"))
+					return -1
+				}
 			}
+			p.calcNeuron(input)
+			loss = p.calcLoss(target[0])
 		} else {
 			LogError(fmt.Errorf("verify: %w", ErrNoTarget))
 			return -1
@@ -289,14 +285,22 @@ func (p *perceptron) Verify(input []float64, target ...[]float64) (loss float64)
 
 // Query querying neural network
 func (p *perceptron) Query(input []float64) (output []float64) {
-	if !p.isInit {
-		LogError(fmt.Errorf("query: %w", ErrInit))
+	if len(input) > 0 {
+		if !p.isInit {
+			LogError(fmt.Errorf("query: %w", ErrInit))
+			return nil
+		} else if p.lenInput != len(input) {
+			LogError(fmt.Errorf("query: invalid number of elements in the input data"))
+			return nil
+		}
+		p.calcNeuron(input)
+		output = make([]float64, p.lenOutput)
+		for i, n := range p.neuron[p.lastLayerIndex] {
+			output[i] = float64(n.value)
+		}
+	} else {
+		LogError(fmt.Errorf("query: %w", ErrNoInput))
 		return nil
-	}
-	p.calcNeuron(input)
-	output = make([]float64, p.lenOutput)
-	for i, n := range p.neuron[p.lastLayerIndex] {
-		output[i] = float64(n.value)
 	}
 	return
 }
@@ -307,16 +311,8 @@ func (p *perceptron) Init() {
 
 // init initialize
 func (p *perceptron) init(lenInput, lenTarget int) {
-	if lenInput > 0 {
-		p.lenInput = lenInput
-	} else {
-
-	}
-
-	if lenTarget > 0 {
-		p.lenOutput = lenTarget
-	}
-
+	p.lenInput = lenInput
+	p.lenOutput = lenTarget
 	p.lastLayerIndex = len(p.Hidden)
 	layer := append(p.Hidden, p.lenOutput)
 	lenLayer := len(layer)
@@ -351,7 +347,6 @@ func (p *perceptron) init(lenInput, lenTarget int) {
 			p.neuron[i][j] = &neuronPerceptron{}
 		}
 	}
-
 	p.isInit = true
 }
 
@@ -367,13 +362,12 @@ func (p *perceptron) initFromWeight() {
 		}
 	}
 
+	p.lastLayerIndex = length - 1
+	p.lenOutput = len(p.Weights[p.lastLayerIndex])
 	p.lenInput = len(p.Weights[0][0])
 	if p.Bias {
 		p.lenInput -= 1
 	}
-
-	p.lastLayerIndex = length - 1
-	p.lenOutput = len(p.Weights[p.lastLayerIndex])
 
 	p.Hidden = make([]int, p.lastLayerIndex)
 	for i := range p.Hidden {
@@ -387,7 +381,6 @@ func (p *perceptron) initFromWeight() {
 			p.neuron[i][j] = &neuronPerceptron{}
 		}
 	}
-
 	p.isInit = true
 }
 

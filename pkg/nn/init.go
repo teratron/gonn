@@ -22,9 +22,9 @@ func New(reader ...Reader) NeuralNetwork {
 				n := getArchitecture(value)
 				r.Read(n)
 
-				if n.(*perceptron).Weights != nil && len(n.(*perceptron).Weights) > 0 {
+				/*if n.(*perceptron).Weights != nil && len(n.(*perceptron).Weights) > 0 {
 					n.(*perceptron).initFromWeight()
-				}
+				}*/
 				//n.setNameJSON(filename)
 				return n
 			}
@@ -45,7 +45,7 @@ func getArchitecture(name string) NeuralNetwork {
 	case hopfieldName:
 		return Hopfield()
 	default:
-		LogError(fmt.Errorf("neural network %w", ErrNotFound))
+		LogError(fmt.Errorf("neural network is %w", ErrNotRecognized))
 		return nil
 	}
 }
