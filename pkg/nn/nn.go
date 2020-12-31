@@ -8,9 +8,6 @@ type NeuralNetwork interface {
 	Parameter
 	ReadWriter
 
-	// Error
-	Error() string
-
 	// Query
 	Query(input []float64) (output []float64)
 

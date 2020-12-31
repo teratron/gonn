@@ -66,7 +66,7 @@ func Perceptron() *perceptron {
 		Loss:       ModeMSE,
 		Limit:      .1,
 		Rate:       floatType(DefaultRate),
-		Err:        nil,
+		//Err:        nil,
 	}
 }
 
@@ -167,20 +167,27 @@ func (p *perceptron) SetWeight(weight Floater) {
 }
 
 // Error
-func (p *perceptron) Error() string {
+/*func (p *perceptron) Error() string {
 	if p.Err != nil {
 		return p.Err.Error()
 	}
 	return ErrNoError.Error()
-}
+}*/
 
 // Read
 func (p *perceptron) Read(reader Reader) {
 	switch r := reader.(type) {
 	case Filer:
 		r.Read(p)
-		//p.isInit = true
-		//p.setNameJSON(string(reader))
+		if len(p.Weights) > 0 {
+			p.initFromWeight()
+		}
+		switch s := r.(type) {
+		case jsonString:
+			p.jsonName = string(s)
+		default:
+			LogError(fmt.Errorf("%T %w for file: %v", s, ErrMissingType, s))
+		}
 	default:
 		LogError(fmt.Errorf("%T %w for read: %v", r, ErrMissingType, r))
 	}
@@ -303,10 +310,6 @@ func (p *perceptron) Query(input []float64) (output []float64) {
 		return nil
 	}
 	return
-}
-
-func (p *perceptron) Init() {
-
 }
 
 // init initialize

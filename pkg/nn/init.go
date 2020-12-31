@@ -17,15 +17,9 @@ func New(reader ...Reader) NeuralNetwork {
 		case NeuralNetwork:
 			return r
 		case Filer:
-			//fmt.Printf("%T, %v", v, v)
 			if value, ok := r.getValue("name").(string); ok {
 				n := getArchitecture(value)
-				r.Read(n)
-
-				/*if n.(*perceptron).Weights != nil && len(n.(*perceptron).Weights) > 0 {
-					n.(*perceptron).initFromWeight()
-				}*/
-				//n.setNameJSON(filename)
+				n.Read(r)
 				return n
 			}
 			return nil
