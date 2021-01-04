@@ -41,9 +41,6 @@ type perceptron struct {
 	// Neuron
 	neuron [][]*neuronPerceptron
 
-	// Errors
-	Err error `json:"-"`
-
 	// Settings
 	lenInput       int
 	lenOutput      int
@@ -66,7 +63,6 @@ func Perceptron() *perceptron {
 		Loss:       ModeMSE,
 		Limit:      .1,
 		Rate:       floatType(DefaultRate),
-		//Err:        nil,
 	}
 }
 
@@ -166,14 +162,6 @@ func (p *perceptron) SetWeight(weight Floater) {
 	}
 }
 
-// Error
-/*func (p *perceptron) Error() string {
-	if p.Err != nil {
-		return p.Err.Error()
-	}
-	return ErrNoError.Error()
-}*/
-
 // Read
 func (p *perceptron) Read(reader Reader) {
 	switch r := reader.(type) {
@@ -211,7 +199,7 @@ func (p *perceptron) Write(writer ...Writer) {
 	}
 }
 
-// Train training neural network
+// Train training dataset
 func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, count int) {
 	if len(input) > 0 {
 		if len(target) > 0 && len(target[0]) > 0 {
@@ -257,7 +245,7 @@ func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, 
 	return
 }
 
-// Verify verifying neural network
+// Verify verifying dataset
 func (p *perceptron) Verify(input []float64, target ...[]float64) (loss float64) {
 	if len(input) > 0 {
 		if len(target) > 0 && len(target[0]) > 0 {
@@ -290,7 +278,7 @@ func (p *perceptron) Verify(input []float64, target ...[]float64) (loss float64)
 	return
 }
 
-// Query querying neural network
+// Query querying dataset
 func (p *perceptron) Query(input []float64) (output []float64) {
 	if len(input) > 0 {
 		if !p.isInit {
