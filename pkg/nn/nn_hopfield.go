@@ -1,4 +1,3 @@
-// Package nn - under construction
 package nn
 
 import "fmt"
