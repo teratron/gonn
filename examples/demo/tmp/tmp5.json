@@ -1,0 +1,8 @@
+{
+  "name": "perceptron",
+  "bias": false,
+  "activation": 3,
+  "loss": 0,
+  "limit": 0.1,
+  "rate": 0.3
+}
