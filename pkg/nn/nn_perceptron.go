@@ -107,7 +107,7 @@ func (p *perceptron) HiddenLayer() []int {
 
 // SetHiddenLayer
 func (p *perceptron) SetHiddenLayer(layer ...int) {
-	p.Hidden = layer
+	p.Hidden = checkHiddenLayer(layer)
 }
 
 // ActivationMode
@@ -141,12 +141,12 @@ func (p *perceptron) SetLossLimit(limit float64) {
 }
 
 // LearningRate
-func (p *perceptron) LearningRate() float64 {
-	return float64(p.Rate)
+func (p *perceptron) LearningRate() float32 {
+	return float32(p.Rate)
 }
 
 // SetLearningRate
-func (p *perceptron) SetLearningRate(rate float64) {
+func (p *perceptron) SetLearningRate(rate float32) {
 	p.Rate = checkLearningRate(rate)
 }
 

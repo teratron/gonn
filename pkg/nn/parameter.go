@@ -26,8 +26,8 @@ type Parameter interface {
 	LossLimit() float64
 	SetLossLimit(float64)
 
-	LearningRate() float64
-	SetLearningRate(float64)
+	LearningRate() float32
+	SetLearningRate(float32)
 
 	NeuronEnergy() float64
 	SetNeuronEnergy(float64)

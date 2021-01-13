@@ -6,7 +6,7 @@ type Floater interface {
 }
 
 type (
-	floatType  float32
+	floatType  float64
 	Float1Type []floatType
 	Float2Type [][]floatType
 	Float3Type [][][]floatType

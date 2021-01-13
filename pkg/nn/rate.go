@@ -1,10 +1,10 @@
 package nn
 
-// Default learning rate
-const DefaultRate float64 = .3
+// DefaultRate default learning rate
+const DefaultRate float32 = .3
 
 // checkLearningRate
-func checkLearningRate(rate float64) floatType {
+func checkLearningRate(rate float32) floatType {
 	switch {
 	case rate < 0 || rate > 1:
 		return floatType(DefaultRate)

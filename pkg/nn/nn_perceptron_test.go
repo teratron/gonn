@@ -1,117 +1,64 @@
 package nn
 
+//go test -v ./...
+//go test ./pkg/nn/nn_perceptron_test.go
 import (
+	"reflect"
 	"testing"
 )
 
-/*func TestPerceptron(t *testing.T) {
-	tests := []struct {
+func TestPerceptron(t *testing.T) {
+	tests := struct {
 		name string
 		want *perceptron
 	}{
-		// TODO: Add test cases.
+		name: "Default perceptron",
+		want: &perceptron{
+			Name:       perceptronName,
+			Activation: ModeSIGMOID,
+			Loss:       ModeMSE,
+			Limit:      .1,
+			Rate:       floatType(DefaultRate),
+		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := Perceptron(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Perceptron() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}*/
-
-func Test_perceptron_ActivationMode(t *testing.T) {
-	tests := []struct {
-		name   string
-		fields *perceptron
-		want   uint8
-	}{
-		{
-			name:   "ModeLINEAR",
-			fields: &perceptron{Activation: ModeLINEAR},
-			want:   ModeLINEAR,
-		},
-		{
-			name:   "ModeRELU",
-			fields: &perceptron{Activation: ModeRELU},
-			want:   ModeRELU,
-		},
-		{
-			name:   "ModeLEAKYRELU",
-			fields: &perceptron{Activation: ModeLEAKYRELU},
-			want:   ModeLEAKYRELU,
-		},
-		{
-			name:   "ModeSIGMOID",
-			fields: &perceptron{Activation: ModeSIGMOID},
-			want:   ModeSIGMOID,
-		},
-		{
-			name:   "ModeTANH",
-			fields: &perceptron{Activation: ModeTANH},
-			want:   ModeTANH,
-		},
-		/*{
-			name:   "Error overflow",
-			fields: &perceptron{Activation: ModeTANH + 1},
-			want:   ModeTANH + 1,
-		},*/
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			p := &perceptron{Activation: tt.fields.Activation}
-			if got := p.ActivationMode(); got != tt.want || got > ModeTANH {
-				t.Errorf("\nActivationMode() = %v, want %v", got, tt.want)
-			}
-		})
-	}
+	t.Run(tests.name, func(t *testing.T) {
+		if got := Perceptron(); !reflect.DeepEqual(got, tests.want) {
+			t.Errorf("Perceptron() = %v, want %v", got, tests.want)
+		}
+	})
 }
 
-/*
 func Test_perceptron_HiddenLayer(t *testing.T) {
-	type fields struct {
-		Parameter      Parameter
-		Name           string
-		Bias           bool
-		Hidden         []int
-		Activation     uint8
-		Loss           uint8
-		Limit          float64
-		Rate           floatType
-		Weights        Float3Type
-		neuron         [][]*neuronPerceptron
-		lenInput       int
-		lenOutput      int
-		lastLayerIndex int
-		isInit         bool
-		jsonName       string
-	}
 	tests := []struct {
-		name   string
-		fields fields
-		want   []int
+		name  string
+		field *perceptron
+		want  []int
 	}{
-		// TODO: Add test cases.
+		{
+			name:  "nil",
+			field: &perceptron{Hidden: nil},
+			want:  nil,
+		},
+		{
+			name:  "[]",
+			field: &perceptron{Hidden: []int{}},
+			want:  []int{},
+		},
+		{
+			name:  "[0]",
+			field: &perceptron{Hidden: []int{0}},
+			want:  []int{0},
+		},
+		{
+			name:  "[5,3,1]",
+			field: &perceptron{Hidden: []int{3, 2, 1}},
+			want:  []int{3, 2, 1},
+		},
 	}
+	p := &perceptron{}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			p := &perceptron{
-				Parameter:      tt.fields.Parameter,
-				Name:           tt.fields.Name,
-				Bias:           tt.fields.Bias,
-				Hidden:         tt.fields.Hidden,
-				Activation:     tt.fields.Activation,
-				Loss:           tt.fields.Loss,
-				Limit:          tt.fields.Limit,
-				Rate:           tt.fields.Rate,
-				Weights:        tt.fields.Weights,
-				neuron:         tt.fields.neuron,
-				lenInput:       tt.fields.lenInput,
-				lenOutput:      tt.fields.lenOutput,
-				lastLayerIndex: tt.fields.lastLayerIndex,
-				isInit:         tt.fields.isInit,
-				jsonName:       tt.fields.jsonName,
-			}
+			p.Hidden = tt.field.Hidden
 			if got := p.HiddenLayer(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("HiddenLayer() = %v, want %v", got, tt.want)
 			}
@@ -119,50 +66,146 @@ func Test_perceptron_HiddenLayer(t *testing.T) {
 	}
 }
 
-func Test_perceptron_LearningRate(t *testing.T) {
-	type fields struct {
-		Parameter      Parameter
-		Name           string
-		Bias           bool
-		Hidden         []int
-		Activation     uint8
-		Loss           uint8
-		Limit          float64
-		Rate           floatType
-		Weights        Float3Type
-		neuron         [][]*neuronPerceptron
-		lenInput       int
-		lenOutput      int
-		lastLayerIndex int
-		isInit         bool
-		jsonName       string
-	}
+func Test_perceptron_SetHiddenLayer(t *testing.T) {
 	tests := []struct {
-		name   string
-		fields fields
-		want   float64
+		name  string
+		layer []int
+		want  *perceptron
 	}{
-		// TODO: Add test cases.
+		{
+			name:  "nil",
+			layer: nil,
+			want:  &perceptron{Hidden: []int{0}},
+		},
+		{
+			name:  "[]",
+			layer: []int{},
+			want:  &perceptron{Hidden: []int{0}},
+		},
+		{
+			name:  "[0]",
+			layer: []int{0},
+			want:  &perceptron{Hidden: []int{0}},
+		},
+		{
+			name:  "[1,2,3]",
+			layer: []int{1, 2, 3},
+			want:  &perceptron{Hidden: []int{1, 2, 3}},
+		},
 	}
+	p := &perceptron{}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			p := &perceptron{
-				Parameter:      tt.fields.Parameter,
-				Name:           tt.fields.Name,
-				Bias:           tt.fields.Bias,
-				Hidden:         tt.fields.Hidden,
-				Activation:     tt.fields.Activation,
-				Loss:           tt.fields.Loss,
-				Limit:          tt.fields.Limit,
-				Rate:           tt.fields.Rate,
-				Weights:        tt.fields.Weights,
-				neuron:         tt.fields.neuron,
-				lenInput:       tt.fields.lenInput,
-				lenOutput:      tt.fields.lenOutput,
-				lastLayerIndex: tt.fields.lastLayerIndex,
-				isInit:         tt.fields.isInit,
-				jsonName:       tt.fields.jsonName,
+			p.SetHiddenLayer(tt.layer...)
+			if got := checkHiddenLayer(tt.layer); !reflect.DeepEqual(got, tt.want.Hidden) {
+				t.Errorf("\nSetHiddenLayer(%v), want %v", got, tt.want.Hidden)
 			}
+		})
+	}
+}
+
+func Test_perceptron_ActivationMode(t *testing.T) {
+	tests := []struct {
+		name  string
+		field *perceptron
+		want  uint8
+	}{
+		{
+			name:  "ModeLINEAR",
+			field: &perceptron{Activation: ModeLINEAR},
+			want:  0,
+		},
+		{
+			name:  "ModeRELU",
+			field: &perceptron{Activation: ModeRELU},
+			want:  1,
+		},
+		{
+			name:  "ModeLEAKYRELU",
+			field: &perceptron{Activation: ModeLEAKYRELU},
+			want:  2,
+		},
+		{
+			name:  "ModeSIGMOID",
+			field: &perceptron{Activation: ModeSIGMOID},
+			want:  3,
+		},
+		{
+			name:  "ModeTANH",
+			field: &perceptron{Activation: ModeTANH},
+			want:  4,
+		},
+	}
+	p := &perceptron{}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			p.Activation = tt.field.Activation
+			if got := p.ActivationMode(); got != tt.want {
+				t.Errorf("\nActivationMode() = %d, want %d", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_perceptron_SetActivationMode(t *testing.T) {
+	tests := []struct {
+		name string
+		got  uint8
+		want *perceptron
+	}{
+		{
+			name: "ModeLINEAR",
+			got:  0,
+			want: &perceptron{Activation: ModeLINEAR},
+		},
+		{
+			name: "ModeRELU",
+			got:  1,
+			want: &perceptron{Activation: ModeRELU},
+		},
+		{
+			name: "ModeLEAKYRELU",
+			got:  2,
+			want: &perceptron{Activation: ModeLEAKYRELU},
+		},
+		{
+			name: "ModeSIGMOID",
+			got:  3,
+			want: &perceptron{Activation: ModeSIGMOID},
+		},
+		{
+			name: "ModeTANH",
+			got:  4,
+			want: &perceptron{Activation: ModeTANH},
+		},
+	}
+	p := &perceptron{}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			p.SetActivationMode(tt.got)
+			if tt.got != tt.want.Activation {
+				t.Errorf("\nSetActivationMode(%d), want %d", tt.got, tt.want.Activation)
+			}
+		})
+	}
+}
+
+func Test_perceptron_LearningRate(t *testing.T) {
+	tests := []struct {
+		name  string
+		field *perceptron
+		want  float32
+	}{
+		{
+			name:  "DefaultRate",
+			field: &perceptron{Rate: floatType(DefaultRate)},
+			want:  .3,
+		},
+	}
+	p := &perceptron{}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			p.Rate = tt.field.Rate
 			if got := p.LearningRate(); got != tt.want {
 				t.Errorf("LearningRate() = %v, want %v", got, tt.want)
 			}
@@ -170,6 +213,7 @@ func Test_perceptron_LearningRate(t *testing.T) {
 	}
 }
 
+/*
 func Test_perceptron_LossLimit(t *testing.T) {
 	type fields struct {
 		Parameter      Parameter
@@ -398,108 +442,6 @@ func Test_perceptron_Read(t *testing.T) {
 	}
 	type args struct {
 		reader Reader
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			p := &perceptron{
-				Parameter:      tt.fields.Parameter,
-				Name:           tt.fields.Name,
-				Bias:           tt.fields.Bias,
-				Hidden:         tt.fields.Hidden,
-				Activation:     tt.fields.Activation,
-				Loss:           tt.fields.Loss,
-				Limit:          tt.fields.Limit,
-				Rate:           tt.fields.Rate,
-				Weights:        tt.fields.Weights,
-				neuron:         tt.fields.neuron,
-				lenInput:       tt.fields.lenInput,
-				lenOutput:      tt.fields.lenOutput,
-				lastLayerIndex: tt.fields.lastLayerIndex,
-				isInit:         tt.fields.isInit,
-				jsonName:       tt.fields.jsonName,
-			}
-		})
-	}
-}
-
-func Test_perceptron_SetActivationMode(t *testing.T) {
-	type fields struct {
-		Parameter      Parameter
-		Name           string
-		Bias           bool
-		Hidden         []int
-		Activation     uint8
-		Loss           uint8
-		Limit          float64
-		Rate           floatType
-		Weights        Float3Type
-		neuron         [][]*neuronPerceptron
-		lenInput       int
-		lenOutput      int
-		lastLayerIndex int
-		isInit         bool
-		jsonName       string
-	}
-	type args struct {
-		mode uint8
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			p := &perceptron{
-				Parameter:      tt.fields.Parameter,
-				Name:           tt.fields.Name,
-				Bias:           tt.fields.Bias,
-				Hidden:         tt.fields.Hidden,
-				Activation:     tt.fields.Activation,
-				Loss:           tt.fields.Loss,
-				Limit:          tt.fields.Limit,
-				Rate:           tt.fields.Rate,
-				Weights:        tt.fields.Weights,
-				neuron:         tt.fields.neuron,
-				lenInput:       tt.fields.lenInput,
-				lenOutput:      tt.fields.lenOutput,
-				lastLayerIndex: tt.fields.lastLayerIndex,
-				isInit:         tt.fields.isInit,
-				jsonName:       tt.fields.jsonName,
-			}
-		})
-	}
-}
-
-func Test_perceptron_SetHiddenLayer(t *testing.T) {
-	type fields struct {
-		Parameter      Parameter
-		Name           string
-		Bias           bool
-		Hidden         []int
-		Activation     uint8
-		Loss           uint8
-		Limit          float64
-		Rate           floatType
-		Weights        Float3Type
-		neuron         [][]*neuronPerceptron
-		lenInput       int
-		lenOutput      int
-		lastLayerIndex int
-		isInit         bool
-		jsonName       string
-	}
-	type args struct {
-		layer []int
 	}
 	tests := []struct {
 		name   string
