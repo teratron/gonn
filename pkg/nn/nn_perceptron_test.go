@@ -8,22 +8,16 @@ import (
 )
 
 func TestPerceptron(t *testing.T) {
-	tests := struct {
-		name string
-		want *perceptron
-	}{
-		name: "Default perceptron",
-		want: &perceptron{
-			Name:       perceptronName,
-			Activation: ModeSIGMOID,
-			Loss:       ModeMSE,
-			Limit:      .1,
-			Rate:       floatType(DefaultRate),
-		},
+	want := &perceptron{
+		Name:       perceptronName,
+		Activation: ModeSIGMOID,
+		Loss:       ModeMSE,
+		Limit:      .1,
+		Rate:       floatType(DefaultRate),
 	}
-	t.Run(tests.name, func(t *testing.T) {
-		if got := Perceptron(); !reflect.DeepEqual(got, tests.want) {
-			t.Errorf("Perceptron() = %v, want %v", got, tests.want)
+	t.Run("Default perceptron", func(t *testing.T) {
+		if got := Perceptron(); !reflect.DeepEqual(got, want) {
+			t.Errorf("Perceptron() = %v, want %v", got, want)
 		}
 	})
 }
@@ -37,12 +31,12 @@ func Test_perceptron_HiddenLayer(t *testing.T) {
 		{
 			name:  "nil",
 			field: &perceptron{Hidden: nil},
-			want:  nil,
+			want:  []int{0},
 		},
 		{
 			name:  "[]",
 			field: &perceptron{Hidden: []int{}},
-			want:  []int{},
+			want:  []int{0},
 		},
 		{
 			name:  "[0]",
@@ -191,26 +185,27 @@ func Test_perceptron_SetActivationMode(t *testing.T) {
 }
 
 func Test_perceptron_LearningRate(t *testing.T) {
-	tests := []struct {
-		name  string
-		field *perceptron
-		want  float32
-	}{
-		{
-			name:  "DefaultRate",
-			field: &perceptron{Rate: floatType(DefaultRate)},
-			want:  .3,
-		},
-	}
+	field := &perceptron{Rate: floatType(DefaultRate)}
+	want := DefaultRate
 	p := &perceptron{}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			p.Rate = tt.field.Rate
-			if got := p.LearningRate(); got != tt.want {
-				t.Errorf("LearningRate() = %v, want %v", got, tt.want)
-			}
-		})
-	}
+	t.Run("DefaultRate", func(t *testing.T) {
+		p.Rate = field.Rate
+		if got := p.LearningRate(); got != want {
+			t.Errorf("LearningRate() = %.3f, want %.3f", got, want)
+		}
+	})
+}
+
+func Test_perceptron_SetLearningRate(t *testing.T) {
+	got := DefaultRate
+	want := &perceptron{Rate: floatType(DefaultRate)}
+	p := &perceptron{}
+	t.Run("DefaultRate", func(t *testing.T) {
+		p.SetLearningRate(got)
+		if got != float32(want.Rate) {
+			t.Errorf("\nSetLearningRate(%.3f), want %.3f", got, want.Rate)
+		}
+	})
 }
 
 /*
@@ -442,57 +437,6 @@ func Test_perceptron_Read(t *testing.T) {
 	}
 	type args struct {
 		reader Reader
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			p := &perceptron{
-				Parameter:      tt.fields.Parameter,
-				Name:           tt.fields.Name,
-				Bias:           tt.fields.Bias,
-				Hidden:         tt.fields.Hidden,
-				Activation:     tt.fields.Activation,
-				Loss:           tt.fields.Loss,
-				Limit:          tt.fields.Limit,
-				Rate:           tt.fields.Rate,
-				Weights:        tt.fields.Weights,
-				neuron:         tt.fields.neuron,
-				lenInput:       tt.fields.lenInput,
-				lenOutput:      tt.fields.lenOutput,
-				lastLayerIndex: tt.fields.lastLayerIndex,
-				isInit:         tt.fields.isInit,
-				jsonName:       tt.fields.jsonName,
-			}
-		})
-	}
-}
-
-func Test_perceptron_SetLearningRate(t *testing.T) {
-	type fields struct {
-		Parameter      Parameter
-		Name           string
-		Bias           bool
-		Hidden         []int
-		Activation     uint8
-		Loss           uint8
-		Limit          float64
-		Rate           floatType
-		Weights        Float3Type
-		neuron         [][]*neuronPerceptron
-		lenInput       int
-		lenOutput      int
-		lastLayerIndex int
-		isInit         bool
-		jsonName       string
-	}
-	type args struct {
-		rate float64
 	}
 	tests := []struct {
 		name   string

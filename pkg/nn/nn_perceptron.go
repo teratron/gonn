@@ -102,7 +102,7 @@ func (p *perceptron) SetNeuronBias(bias bool) {
 
 // HiddenLayer
 func (p *perceptron) HiddenLayer() []int {
-	return p.Hidden
+	return checkHiddenLayer(p.Hidden)
 }
 
 // SetHiddenLayer
