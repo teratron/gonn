@@ -204,7 +204,7 @@ func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, 
 	if len(input) > 0 {
 		if len(target) > 0 && len(target[0]) > 0 {
 			if !p.isInit {
-				p.init(len(input), len(target[0]))
+				p.initFromNew(len(input), len(target[0]))
 				if !p.isInit {
 					LogError(fmt.Errorf("train: %w", ErrInit))
 					return -1, 0
@@ -250,7 +250,7 @@ func (p *perceptron) Verify(input []float64, target ...[]float64) (loss float64)
 	if len(input) > 0 {
 		if len(target) > 0 && len(target[0]) > 0 {
 			if !p.isInit {
-				p.init(len(input), len(target[0]))
+				p.initFromNew(len(input), len(target[0]))
 				if !p.isInit {
 					LogError(fmt.Errorf("verify: %w", ErrInit))
 					return -1
@@ -300,8 +300,8 @@ func (p *perceptron) Query(input []float64) (output []float64) {
 	return
 }
 
-// init initialize
-func (p *perceptron) init(lenInput, lenTarget int) {
+// initFromNew initialize
+func (p *perceptron) initFromNew(lenInput, lenTarget int) {
 	p.lenInput = lenInput
 	p.lenOutput = lenTarget
 	p.lastLayerIndex = len(p.Hidden)
@@ -317,9 +317,6 @@ func (p *perceptron) init(lenInput, lenTarget int) {
 
 	p.Weights = make(Float3Type, lenLayer)
 	p.neuron = make([][]*neuronPerceptron, lenLayer)
-	//p.input = make([]float64, lenInput)
-	//p.target = make([]float64, lenTarget)
-
 	for i, v := range layer {
 		p.Weights[i] = make([][]floatType, v)
 		p.neuron[i] = make([]*neuronPerceptron, v)
@@ -333,7 +330,7 @@ func (p *perceptron) init(lenInput, lenTarget int) {
 				p.Weights[i][j] = make([]floatType, biasInput)
 			}
 			for k := range p.Weights[i][j] {
-				p.Weights[i][j][k] = .5 //getRand()
+				p.Weights[i][j][k] = randFloat() //.5 //getRandFloat()
 			}
 			p.neuron[i][j] = &neuronPerceptron{}
 		}

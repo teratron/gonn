@@ -1,15 +1,16 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/teratron/gonn/pkg/nn"
 )
 
 func main() {
 	n := nn.New( /*nn.Perceptron() nn.JSON("tmp.json")*/ )
 	//fmt.Println(len(n.HiddenLayer()))
-	fmt.Println(n)
+	for i := 0; i < 5; i++ {
+		nn.Debug()
+	}
+
 	//n.Read(nn.JSON("tmp.json"))
 	//fmt.Println(n, len([]float64{}))
 	//fmt.Println(n.Train([]float64{1, 0}, []float64{0, 1}))

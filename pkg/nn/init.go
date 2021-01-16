@@ -44,10 +44,20 @@ func getArchitecture(name string) NeuralNetwork {
 	}
 }
 
+var randFloat = getRandFloat
+
 // getRand return random number from -0.5 to 0.5
-func getRand() (r floatType) {
+func getRandFloat() (r floatType) {
 	for r == 0 {
 		r = floatType(rand.Float64() - .5)
 	}
 	return
+}
+
+func Debug() {
+	fmt.Println(randFloat())
+	/*randFloat = func() floatType {
+		return 42
+	}*/
+	fmt.Println(randFloat())
 }

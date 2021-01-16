@@ -7,6 +7,12 @@ import (
 	"testing"
 )
 
+func init() {
+	randFloat = func() floatType {
+		return .5
+	}
+}
+
 func TestPerceptron(t *testing.T) {
 	want := &perceptron{
 		Name:       perceptronName,
@@ -320,6 +326,22 @@ func Test_perceptron_SetWeight(t *testing.T) {
 			if !reflect.DeepEqual(p.Weights, tt.want) {
 				t.Errorf("SetWeight(%v), want %v", p.Weights, tt.want)
 			}
+		})
+	}
+}
+
+func Test_perceptron_initFromNew(t *testing.T) {
+	randFloat = func() floatType {
+		return .5
+	}
+	tests := []struct {
+		name   string
+		fields *perceptron
+	}{
+		{},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
 		})
 	}
 }
