@@ -1,17 +1,9 @@
 package nn
 
-//go test -v ./...
-//go test -v ./pkg/nn/nn_perceptron_test.go
 import (
 	"reflect"
 	"testing"
 )
-
-/*func init() {
-	randFloat = func() floatType {
-		return .5
-	}
-}*/
 
 func TestPerceptron(t *testing.T) {
 	want := &perceptron{
@@ -20,9 +12,7 @@ func TestPerceptron(t *testing.T) {
 		Loss:       ModeMSE,
 		Limit:      .1,
 		Rate:       floatType(DefaultRate),
-		//random: getRandFloat,
 	}
-	//println(want)
 	t.Run("Default perceptron", func(t *testing.T) {
 		if got := Perceptron(); !reflect.DeepEqual(got, want) {
 			t.Errorf("Perceptron()\ngot:\t%v\nwant:\t%v", got, want)
@@ -333,16 +323,33 @@ func Test_perceptron_SetWeight(t *testing.T) {
 }
 
 func Test_perceptron_initFromNew(t *testing.T) {
-	random := func() floatType {
-		return .5
-	}
 	tests := []struct {
 		name string
 		got  *perceptron
 		want *perceptron
 	}{
 		{
-			name: "",
+			name: "#1",
+			got:  &perceptron{},
+			want: &perceptron{
+				Bias:   false,
+				Hidden: []int{0},
+				Weights: Float3Type{
+					{
+						{.5, .5},
+						{.5, .5},
+					},
+				},
+				neuron: [][]*neuronPerceptron{
+					{&neuronPerceptron{}, &neuronPerceptron{}},
+				},
+				lenInput:  2,
+				lenOutput: 2,
+				isInit:    true,
+			},
+		},
+		{
+			name: "#2",
 			got:  &perceptron{},
 			want: &perceptron{
 				Bias:   true,
@@ -360,46 +367,25 @@ func Test_perceptron_initFromNew(t *testing.T) {
 					{&neuronPerceptron{}, &neuronPerceptron{}},
 					{&neuronPerceptron{}},
 				},
-				//random:    func() floatType { return .5 },
 				lenInput:  2,
 				lenOutput: 1,
 				isInit:    true,
 			},
 		},
 	}
+	random := func() floatType {
+		return .5
+	}
 	for _, tt := range tests {
 		tt.got.Bias = tt.want.Bias
 		tt.got.Hidden = tt.want.Hidden
-		//tt.got.random = tt.want.random
 		tt.want.lastLayerIndex = len(tt.want.Hidden)
+		//fmt.Println(tt.want.lastLayerIndex, tt.want.Hidden[0])
+		if tt.want.lastLayerIndex > 0 && tt.want.Hidden[0] == 0 {
+			tt.want.lastLayerIndex = 0
+		}
 		t.Run(tt.name, func(t *testing.T) {
-			tt.got.initFromNew(tt.want.lenInput, tt.want.lenOutput, random)
-
-			//fmt.Println(len(tt.got.Weights), cap(tt.got.Weights), len(tt.want.Weights), cap(tt.want.Weights))
-			/*println(tt.got.Weights, tt.want.Weights)
-			for i := 0; i < len(tt.got.Weights); i++ {
-				//fmt.Println(len(tt.got.Weights[i]), cap(tt.got.Weights[i]), len(tt.want.Weights[i]), cap(tt.want.Weights[i]))
-				println(tt.got.Weights[i], tt.want.Weights[i])
-				for j := 0; j < len(tt.got.Weights[i]); j++ {
-					println(len(tt.got.Weights[i][j]), cap(tt.got.Weights[i][j]), len(tt.want.Weights[i][j]), cap(tt.want.Weights[i][j]))
-				}
-			}*/
-
-			/*if lg, lw := len(tt.got.neuron), len(tt.want.neuron); lg == lw {
-				//fmt.Println(lg, cap(tt.got.neuron), lw, cap(tt.want.neuron))
-				for i := 0; i < lw; i++ {
-					if llg, llw := len(tt.got.neuron[i]), len(tt.want.neuron[i]); llg == llw {
-						//fmt.Println(i, llg, cap(tt.got.neuron[i]),llw, cap(tt.want.neuron[i]))
-						tt.want.neuron[i] = tt.got.neuron[i]
-					} else {
-						t.Errorf("the number of elements in the neural layer does not match, got: %d, want: %d", llg, llw)
-						break
-					}
-				}
-			} else {
-				t.Errorf("the number of neural layers does not match, got: %d, want: %d", lg, lw)
-			}*/
-			if !reflect.DeepEqual(tt.got, tt.want) {
+			if tt.got.initFromNew(tt.want.lenInput, tt.want.lenOutput, random); !reflect.DeepEqual(tt.got, tt.want) {
 				t.Errorf("initFromNew()\ngot:\t%v\nwant:\t%v", tt.got, tt.want)
 			}
 		})

@@ -42,7 +42,6 @@ type perceptron struct {
 	neuron [][]*neuronPerceptron
 
 	// Settings
-	//random         func() floatType
 	lenInput       int
 	lenOutput      int
 	lastLayerIndex int
@@ -64,7 +63,6 @@ func Perceptron() *perceptron {
 		Loss:       ModeMSE,
 		Limit:      .1,
 		Rate:       floatType(DefaultRate),
-		//random:     getRandFloat,
 	}
 }
 
@@ -307,7 +305,16 @@ func (p *perceptron) initFromNew(lenInput, lenTarget int, random func() floatTyp
 	p.lenInput = lenInput
 	p.lenOutput = lenTarget
 	p.lastLayerIndex = len(p.Hidden)
-	layer := append(p.Hidden, p.lenOutput)
+	if p.lastLayerIndex > 0 && p.Hidden[0] == 0 {
+		p.lastLayerIndex = 0
+	}
+
+	var layer []int
+	if p.lastLayerIndex > 0 {
+		layer = append(p.Hidden, p.lenOutput)
+	} else {
+		layer = []int{p.lenOutput}
+	}
 	lenLayer := len(layer)
 
 	bias := 0
