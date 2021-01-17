@@ -42,7 +42,7 @@ type perceptron struct {
 	neuron [][]*neuronPerceptron
 
 	// Settings
-	random         func() floatType
+	//random         func() floatType
 	lenInput       int
 	lenOutput      int
 	lastLayerIndex int
@@ -64,7 +64,7 @@ func Perceptron() *perceptron {
 		Loss:       ModeMSE,
 		Limit:      .1,
 		Rate:       floatType(DefaultRate),
-		random:     getRandFloat,
+		//random:     getRandFloat,
 	}
 }
 
@@ -206,7 +206,7 @@ func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, 
 	if len(input) > 0 {
 		if len(target) > 0 && len(target[0]) > 0 {
 			if !p.isInit {
-				p.initFromNew(len(input), len(target[0]))
+				p.initFromNew(len(input), len(target[0]), getRandFloat)
 				if !p.isInit {
 					LogError(fmt.Errorf("train: %w", ErrInit))
 					return -1, 0
@@ -252,7 +252,7 @@ func (p *perceptron) Verify(input []float64, target ...[]float64) (loss float64)
 	if len(input) > 0 {
 		if len(target) > 0 && len(target[0]) > 0 {
 			if !p.isInit {
-				p.initFromNew(len(input), len(target[0]))
+				p.initFromNew(len(input), len(target[0]), getRandFloat)
 				if !p.isInit {
 					LogError(fmt.Errorf("verify: %w", ErrInit))
 					return -1
@@ -303,7 +303,7 @@ func (p *perceptron) Query(input []float64) (output []float64) {
 }
 
 // initFromNew initialize
-func (p *perceptron) initFromNew(lenInput, lenTarget int) {
+func (p *perceptron) initFromNew(lenInput, lenTarget int, random func() floatType) {
 	p.lenInput = lenInput
 	p.lenOutput = lenTarget
 	p.lastLayerIndex = len(p.Hidden)
@@ -332,7 +332,7 @@ func (p *perceptron) initFromNew(lenInput, lenTarget int) {
 				p.Weights[i][j] = make([]floatType, biasInput)
 			}
 			for k := range p.Weights[i][j] {
-				p.Weights[i][j][k] = p.random() //randFloat() //.5 //getRandFloat()
+				p.Weights[i][j][k] = random() //.5//p.random() //randFloat() //.5 //getRandFloat()
 			}
 			p.neuron[i][j] = &neuronPerceptron{}
 		}

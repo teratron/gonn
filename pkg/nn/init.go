@@ -44,8 +44,6 @@ func getArchitecture(name string) NeuralNetwork {
 	}
 }
 
-//var randFloat = getRandFloat
-
 // getRand return random number from -0.5 to 0.5
 func getRandFloat() (r floatType) {
 	for r == 0 {
