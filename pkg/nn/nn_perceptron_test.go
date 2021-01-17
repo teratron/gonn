@@ -7,11 +7,11 @@ import (
 	"testing"
 )
 
-func init() {
+/*func init() {
 	randFloat = func() floatType {
 		return .5
 	}
-}
+}*/
 
 func TestPerceptron(t *testing.T) {
 	want := &perceptron{
@@ -330,21 +330,42 @@ func Test_perceptron_SetWeight(t *testing.T) {
 	}
 }
 
-func Test_perceptron_initFromNew(t *testing.T) {
-	randFloat = func() floatType {
-		return .5
-	}
+/*func Test_perceptron_initFromNew(t *testing.T) {
 	tests := []struct {
 		name   string
 		fields *perceptron
 	}{
 		{},
 	}
+	p := &perceptron{
+		//Parameter:      nil,
+		Name:           perceptronName,
+		Bias:           true,
+		Hidden:         []int{1, 2, 3},
+		Activation:     ModeSIGMOID,
+		Loss:           ModeMSE,
+		Limit:          .1,
+		Rate:           floatType(DefaultRate),
+		Weights:        Float3Type{},
+		neuron:         [][]*neuronPerceptron{},
+		random:         func() floatType { return .5 },
+		lenInput:       2,
+		lenOutput:      2,
+		//lastLayerIndex: 3,
+		isInit:         true,
+		//jsonName:       "perceptron.json",
+	}
+	p.lastLayerIndex = len(p.Hidden)
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			p.initFromNew(p.lenInput, p.lenOutput)
+			if got := Perceptron(); !reflect.DeepEqual(got, want) {
+				t.Errorf("Perceptron() = %v, want %v", got, want)
+			}
 		})
 	}
-}
+}*/
 
 /*
 func Test_perceptron_Query(t *testing.T) {

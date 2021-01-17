@@ -42,6 +42,7 @@ type perceptron struct {
 	neuron [][]*neuronPerceptron
 
 	// Settings
+	random         func() floatType
 	lenInput       int
 	lenOutput      int
 	lastLayerIndex int
@@ -63,6 +64,7 @@ func Perceptron() *perceptron {
 		Loss:       ModeMSE,
 		Limit:      .1,
 		Rate:       floatType(DefaultRate),
+		random:     getRandFloat,
 	}
 }
 
@@ -330,7 +332,7 @@ func (p *perceptron) initFromNew(lenInput, lenTarget int) {
 				p.Weights[i][j] = make([]floatType, biasInput)
 			}
 			for k := range p.Weights[i][j] {
-				p.Weights[i][j][k] = randFloat() //.5 //getRandFloat()
+				p.Weights[i][j][k] = p.random() //randFloat() //.5 //getRandFloat()
 			}
 			p.neuron[i][j] = &neuronPerceptron{}
 		}
