@@ -33,7 +33,7 @@ type perceptron struct {
 	Limit float64 `json:"limit"`
 
 	// Learning coefficient, from 0 to 1
-	Rate floatType `json:"rate"`
+	Rate float32 `json:"rate"`
 
 	// Weight value
 	Weights Float3Type `json:"weights,omitempty"`
@@ -51,8 +51,8 @@ type perceptron struct {
 
 // neuronPerceptron
 type neuronPerceptron struct {
-	value floatType
-	miss  floatType
+	value float32
+	miss  float32
 }
 
 // Perceptron return perceptron neural network
@@ -62,7 +62,7 @@ func Perceptron() *perceptron {
 		Activation: ModeSIGMOID,
 		Loss:       ModeMSE,
 		Limit:      .1,
-		Rate:       floatType(DefaultRate),
+		Rate:       DefaultRate,
 	}
 }
 
@@ -142,7 +142,7 @@ func (p *perceptron) SetLossLimit(limit float64) {
 
 // LearningRate
 func (p *perceptron) LearningRate() float32 {
-	return float32(p.Rate)
+	return p.Rate
 }
 
 // SetLearningRate
@@ -301,7 +301,7 @@ func (p *perceptron) Query(input []float64) (output []float64) {
 }
 
 // initFromNew initialize
-func (p *perceptron) initFromNew(lenInput, lenTarget int, random func() floatType) {
+func (p *perceptron) initFromNew(lenInput, lenTarget int, random func() float32) {
 	p.lenInput = lenInput
 	p.lenOutput = lenTarget
 	p.lastLayerIndex = len(p.Hidden)
@@ -327,16 +327,16 @@ func (p *perceptron) initFromNew(lenInput, lenTarget int, random func() floatTyp
 	p.Weights = make(Float3Type, lenLayer)
 	p.neuron = make([][]*neuronPerceptron, lenLayer)
 	for i, v := range layer {
-		p.Weights[i] = make([][]floatType, v)
+		p.Weights[i] = make([][]float32, v)
 		p.neuron[i] = make([]*neuronPerceptron, v)
 		if i > 0 {
 			biasLayer = layer[i-1] + bias
 		}
 		for j := 0; j < v; j++ {
 			if i > 0 {
-				p.Weights[i][j] = make([]floatType, biasLayer)
+				p.Weights[i][j] = make([]float32, biasLayer)
 			} else {
-				p.Weights[i][j] = make([]floatType, biasInput)
+				p.Weights[i][j] = make([]float32, biasInput)
 			}
 			for k := range p.Weights[i][j] {
 				p.Weights[i][j][k] = random() //.5//p.random() //randFloat() //.5 //getRandFloat()
@@ -402,13 +402,13 @@ func (p *perceptron) calcNeuron(input []float64) {
 						if i > 0 {
 							n.value += p.neuron[dec][k].value * w
 						} else {
-							n.value += floatType(input[k]) * w
+							n.value += float32(input[k]) * w
 						}
 					} else {
 						n.value += w
 					}
 				}
-				n.value = floatType(Activation(float64(n.value), p.Activation))
+				n.value = float32(Activation(float64(n.value), p.Activation))
 				wait <- true
 			}(j, n)
 		}
@@ -421,7 +421,7 @@ func (p *perceptron) calcNeuron(input []float64) {
 // calcLoss calculating the error of the output neuron
 func (p *perceptron) calcLoss(target []float64) (loss float64) {
 	for i, n := range p.neuron[p.lastLayerIndex] {
-		n.miss = floatType(target[i]) - n.value
+		n.miss = float32(target[i]) - n.value
 		switch p.Loss {
 		default:
 			fallthrough
@@ -430,7 +430,7 @@ func (p *perceptron) calcLoss(target []float64) (loss float64) {
 		case ModeARCTAN:
 			loss += math.Pow(math.Atan(float64(n.miss)), 2)
 		}
-		n.miss *= floatType(Derivative(float64(n.miss), p.Activation))
+		n.miss *= float32(Derivative(float64(n.miss), p.Activation))
 	}
 	loss /= float64(p.lenOutput)
 	if p.Loss == ModeRMSE {
@@ -452,7 +452,7 @@ func (p *perceptron) calcMiss() {
 				for k, m := range p.neuron[inc] {
 					n.miss += m.miss * p.Weights[inc][k][j]
 				}
-				n.miss *= floatType(Derivative(float64(n.value), p.Activation))
+				n.miss *= float32(Derivative(float64(n.value), p.Activation))
 				wait <- true
 			}(j, n)
 		}
@@ -476,13 +476,13 @@ func (p *perceptron) updWeight(input []float64) {
 			length = p.lenInput
 		}
 		for j, w := range v {
-			go func(i, j, dec, length int, grad floatType, w []floatType) {
+			go func(i, j, dec, length int, grad float32, w []float32) {
 				for k := range w {
 					if k < length {
 						if i > 0 {
 							p.Weights[i][j][k] += p.neuron[dec][k].value * grad
 						} else {
-							p.Weights[i][j][k] += floatType(input[k]) * grad
+							p.Weights[i][j][k] += float32(input[k]) * grad
 						}
 					} else {
 						p.Weights[i][j][k] += grad

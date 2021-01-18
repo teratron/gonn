@@ -6,22 +6,10 @@ type Floater interface {
 }
 
 type (
-	floatType  float32
-	Float1Type []floatType
-	Float2Type [][]floatType
-	Float3Type [][][]floatType
+	Float1Type []float32
+	Float2Type [][]float32
+	Float3Type [][][]float32
 )
-
-// SetFloatPrecision
-/*func SetFloatPrecision(prc string) {
-	switch prc {
-	default:
-		fallthrough
-	case "32":
-
-	case "64":
-	}
-}*/
 
 func (f Float1Type) length() int {
 	return len(f)

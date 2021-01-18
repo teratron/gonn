@@ -11,7 +11,7 @@ func TestPerceptron(t *testing.T) {
 		Activation: ModeSIGMOID,
 		Loss:       ModeMSE,
 		Limit:      .1,
-		Rate:       floatType(DefaultRate),
+		Rate:       DefaultRate,
 	}
 	t.Run("Default perceptron", func(t *testing.T) {
 		if got := Perceptron(); !reflect.DeepEqual(got, want) {
@@ -225,9 +225,9 @@ func Test_perceptron_SetLossLimit(t *testing.T) {
 }
 
 func Test_perceptron_LearningRate(t *testing.T) {
-	want := &perceptron{Rate: floatType(DefaultRate)}
+	want := &perceptron{Rate: DefaultRate}
 	t.Run("DefaultRate", func(t *testing.T) {
-		if got := want.LearningRate(); got != float32(want.Rate) {
+		if got := want.LearningRate(); got != want.Rate {
 			t.Errorf("LearningRate() = %.3f, want %.3f", got, want.Rate)
 		}
 	})
@@ -237,7 +237,7 @@ func Test_perceptron_SetLearningRate(t *testing.T) {
 	got := &perceptron{}
 	want := DefaultRate
 	t.Run("DefaultRate", func(t *testing.T) {
-		if got.SetLearningRate(want); got.Rate != floatType(want) {
+		if got.SetLearningRate(want); got.Rate != want {
 			t.Errorf("SetLearningRate(%.3f), want %.3f", got.Rate, want)
 		}
 	})
@@ -304,8 +304,8 @@ func Test_perceptron_SetWeight(t *testing.T) {
 }
 
 func Test_perceptron_initFromNew(t *testing.T) {
-	r := floatType(.5)
-	random := func() floatType {
+	r := float32(.5)
+	random := func() float32 {
 		return r
 	}
 	tests := []struct {

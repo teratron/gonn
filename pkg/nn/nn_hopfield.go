@@ -16,7 +16,7 @@ type hopfield struct {
 	Name string `json:"name" xml:"name"`
 
 	// Energy
-	Energy floatType `json:"energy" xml:"energy"`
+	Energy float32 `json:"energy" xml:"energy"`
 
 	// Weights values
 	Weights Float2Type `json:"weights" xml:"weights"`
@@ -32,7 +32,7 @@ type hopfield struct {
 
 // hopfieldNeuron
 type hopfieldNeuron struct {
-	value floatType
+	value float32
 }
 
 // Hopfield return
@@ -73,7 +73,7 @@ func (h *hopfield) NeuronEnergy() float64 {
 
 // SetNeuronEnergy
 func (h *hopfield) SetNeuronEnergy(energy float64) {
-	h.Energy = floatType(energy)
+	h.Energy = float32(energy)
 }
 
 // Weight

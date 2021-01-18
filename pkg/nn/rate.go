@@ -4,11 +4,11 @@ package nn
 const DefaultRate float32 = .3
 
 // checkLearningRate
-func checkLearningRate(rate float32) floatType {
+func checkLearningRate(rate float32) float32 {
 	switch {
 	case rate < 0 || rate > 1:
-		return floatType(DefaultRate)
+		return DefaultRate
 	default:
-		return floatType(rate)
+		return rate
 	}
 }
