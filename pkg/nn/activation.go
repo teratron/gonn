@@ -30,7 +30,7 @@ func checkActivationMode(mode uint8) uint8 {
 }
 
 // Activation activation function
-func Activation(value float64, mode uint8) float64 {
+func Activation(value float32, mode uint8) float32 {
 	switch mode {
 	default:
 		fallthrough
@@ -51,10 +51,10 @@ func Activation(value float64, mode uint8) float64 {
 			return value
 		}
 	case ModeSIGMOID:
-		return 1 / (1 + math.Exp(-value))
+		return float32(1 / (1 + math.Exp(float64(-value))))
 	case ModeTANH:
-		value = math.Exp(2 * value)
-		if math.IsInf(value, 1) {
+		value = float32(math.Exp(float64(2 * value)))
+		if math.IsInf(float64(value), 1) {
 			return 1
 		}
 		return (value - 1) / (value + 1)
@@ -62,7 +62,7 @@ func Activation(value float64, mode uint8) float64 {
 }
 
 // Derivative derivative activation function
-func Derivative(value float64, mode uint8) float64 {
+func Derivative(value float32, mode uint8) float32 {
 	switch mode {
 	default:
 		fallthrough
@@ -85,6 +85,6 @@ func Derivative(value float64, mode uint8) float64 {
 	case ModeSIGMOID:
 		return value * (1 - value)
 	case ModeTANH:
-		return 1 - math.Pow(value, 2)
+		return float32(1 - math.Pow(float64(value), 2))
 	}
 }

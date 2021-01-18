@@ -23,14 +23,14 @@ type Parameter interface {
 	LossMode() uint8
 	SetLossMode(uint8)
 
-	LossLimit() float64
-	SetLossLimit(float64)
+	LossLimit() float32
+	SetLossLimit(float32)
 
 	LearningRate() float32
 	SetLearningRate(float32)
 
-	NeuronEnergy() float64
-	SetNeuronEnergy(float64)
+	NeuronEnergy() float32
+	SetNeuronEnergy(float32)
 
 	Weight() Floater
 	SetWeight(Floater)

@@ -9,11 +9,11 @@ type NeuralNetwork interface {
 	ReadWriter
 
 	// Query
-	Query(input []float64) (output []float64)
+	Query(input []float32) (output []float32)
 
 	// Verify
-	Verify(input []float64, target ...[]float64) (loss float64)
+	Verify(input []float32, target ...[]float32) (loss float32)
 
 	// Train
-	Train(input []float64, target ...[]float64) (loss float64, count int)
+	Train(input []float32, target ...[]float32) (loss float32, count int)
 }

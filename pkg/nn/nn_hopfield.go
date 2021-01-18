@@ -67,13 +67,13 @@ func (h *hopfield) setNameJSON(name string) {
 }
 
 // NeuronEnergy
-func (h *hopfield) NeuronEnergy() float64 {
-	return float64(h.Energy)
+func (h *hopfield) NeuronEnergy() float32 {
+	return h.Energy
 }
 
 // SetNeuronEnergy
-func (h *hopfield) SetNeuronEnergy(energy float64) {
-	h.Energy = float32(energy)
+func (h *hopfield) SetNeuronEnergy(energy float32) {
+	h.Energy = energy
 }
 
 // Weight
