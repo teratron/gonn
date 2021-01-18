@@ -29,8 +29,8 @@ func checkActivationMode(mode uint8) uint8 {
 	}
 }
 
-// calcActivation activation function
-func calcActivation(value float64, mode uint8) float64 {
+// Activation activation function
+func Activation(value float64, mode uint8) float64 {
 	switch mode {
 	default:
 		fallthrough
@@ -61,8 +61,8 @@ func calcActivation(value float64, mode uint8) float64 {
 	}
 }
 
-// calcDerivative derivative activation function
-func calcDerivative(value float64, mode uint8) float64 {
+// Derivative derivative activation function
+func Derivative(value float64, mode uint8) float64 {
 	switch mode {
 	default:
 		fallthrough

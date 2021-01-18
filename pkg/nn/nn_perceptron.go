@@ -408,7 +408,7 @@ func (p *perceptron) calcNeuron(input []float64) {
 						n.value += w
 					}
 				}
-				n.value = floatType(calcActivation(float64(n.value), p.Activation))
+				n.value = floatType(Activation(float64(n.value), p.Activation))
 				wait <- true
 			}(j, n)
 		}
@@ -421,9 +421,7 @@ func (p *perceptron) calcNeuron(input []float64) {
 // calcLoss calculating the error of the output neuron
 func (p *perceptron) calcLoss(target []float64) (loss float64) {
 	for i, n := range p.neuron[p.lastLayerIndex] {
-		//fmt.Printf("%4.6f\n",n.miss)
 		n.miss = floatType(target[i]) - n.value
-		//fmt.Println(n.miss)
 		switch p.Loss {
 		default:
 			fallthrough
@@ -432,7 +430,7 @@ func (p *perceptron) calcLoss(target []float64) (loss float64) {
 		case ModeARCTAN:
 			loss += math.Pow(math.Atan(float64(n.miss)), 2)
 		}
-		n.miss *= floatType(calcDerivative(float64(n.miss), p.Activation))
+		n.miss *= floatType(Derivative(float64(n.miss), p.Activation))
 	}
 	loss /= float64(p.lenOutput)
 	if p.Loss == ModeRMSE {
@@ -454,7 +452,7 @@ func (p *perceptron) calcMiss() {
 				for k, m := range p.neuron[inc] {
 					n.miss += m.miss * p.Weights[inc][k][j]
 				}
-				n.miss *= floatType(calcDerivative(float64(n.value), p.Activation))
+				n.miss *= floatType(Derivative(float64(n.value), p.Activation))
 				wait <- true
 			}(j, n)
 		}

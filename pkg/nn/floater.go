@@ -12,6 +12,17 @@ type (
 	Float3Type [][][]floatType
 )
 
+// SetFloatPrecision
+/*func SetFloatPrecision(prc string) {
+	switch prc {
+	default:
+		fallthrough
+	case "32":
+
+	case "64":
+	}
+}*/
+
 func (f Float1Type) length() int {
 	return len(f)
 }
