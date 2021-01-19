@@ -6,9 +6,9 @@ type Floater interface {
 }
 
 type (
-	Float1Type []float32
-	Float2Type [][]float32
-	Float3Type [][][]float32
+	Float1Type []float64
+	Float2Type [][]float64
+	Float3Type [][][]float64
 )
 
 func (f Float1Type) length() int {

@@ -10,7 +10,7 @@ func main() {
 	for i := 0; i < 5; i++ {
 		nn.Debug()
 	}
-
+	//fmt.Println(floatType(calcActivation(.02, ModeSIGMOID)))
 	//n.Read(nn.JSON("tmp.json"))
 	//fmt.Println(n, len([]float64{}))
 	//fmt.Println(n.Train([]float64{1, 0}, []float64{0, 1}))

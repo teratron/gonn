@@ -209,17 +209,17 @@ func Test_perceptron_LossLimit(t *testing.T) {
 	want := &perceptron{Limit: .1}
 	t.Run("0.1", func(t *testing.T) {
 		if got := want.LossLimit(); got != want.Limit {
-			t.Errorf("LossLimit() = %.3f, want %.3f", got, want.Limit)
+			t.Errorf("LossLimit() = %f, want %f", got, want.Limit)
 		}
 	})
 }
 
 func Test_perceptron_SetLossLimit(t *testing.T) {
 	got := &perceptron{}
-	want := float32(.01)
+	want := .01
 	t.Run("0.01", func(t *testing.T) {
 		if got.SetLossLimit(want); got.Limit != want {
-			t.Errorf("SetLossLimit(%.3f), want %.3f", got.Limit, want)
+			t.Errorf("SetLossLimit(%f), want %f", got.Limit, want)
 		}
 	})
 }
@@ -228,7 +228,7 @@ func Test_perceptron_LearningRate(t *testing.T) {
 	want := &perceptron{Rate: DefaultRate}
 	t.Run("DefaultRate", func(t *testing.T) {
 		if got := want.LearningRate(); got != want.Rate {
-			t.Errorf("LearningRate() = %.3f, want %.3f", got, want.Rate)
+			t.Errorf("LearningRate() = %f, want %f", got, want.Rate)
 		}
 	})
 }
@@ -238,7 +238,7 @@ func Test_perceptron_SetLearningRate(t *testing.T) {
 	want := DefaultRate
 	t.Run("DefaultRate", func(t *testing.T) {
 		if got.SetLearningRate(want); got.Rate != want {
-			t.Errorf("SetLearningRate(%.3f), want %.3f", got.Rate, want)
+			t.Errorf("SetLearningRate(%f), want %f", got.Rate, want)
 		}
 	})
 }
@@ -304,8 +304,8 @@ func Test_perceptron_SetWeight(t *testing.T) {
 }
 
 func Test_perceptron_initFromNew(t *testing.T) {
-	r := float32(.5)
-	random := func() float32 {
+	r := .5
+	random := func() float64 {
 		return r
 	}
 	tests := []struct {
@@ -373,16 +373,112 @@ func Test_perceptron_initFromNew(t *testing.T) {
 	}
 }
 
+func Test_perceptron_Verify(t *testing.T) {
+	type args struct {
+		input  []float64
+		target []float64
+	}
+	tests := []struct {
+		name string
+		args
+		gave *perceptron
+		want float64
+	}{
+		{
+			name: "#1",
+			args: args{[]float64{.3}, []float64{.2}},
+			gave: &perceptron{
+				Activation: ModeLEAKYRELU,
+				Loss:       ModeRMSE,
+				Weights: Float3Type{
+					{
+						{.1},
+					},
+				},
+				neuron: [][]*neuronPerceptron{
+					{
+						&neuronPerceptron{},
+					},
+				},
+				lastLayerIndex: 0,
+				isInit:         true,
+			},
+			want: .17,
+		},
+		{
+			name: "#2",
+			args: args{[]float64{.3, .2}, []float64{.2, .3}},
+			gave: &perceptron{
+				Activation: ModeTANH,
+				Loss:       ModeARCTAN,
+				Weights: Float3Type{
+					{
+						{.1, .1},
+						{.1, .1},
+					},
+				},
+				neuron: [][]*neuronPerceptron{
+					{
+						&neuronPerceptron{},
+						&neuronPerceptron{},
+					},
+				},
+				lastLayerIndex: 0,
+				isInit:         true,
+			},
+			want: .041107040991293746,
+		},
+		{
+			name: "#3",
+			args: args{[]float64{.2, .3}, []float64{.2}},
+			gave: &perceptron{
+				Activation: ModeSIGMOID,
+				Loss:       ModeMSE,
+				Weights: Float3Type{
+					{
+						{.1, .1, .1},
+						{.1, .1, .1},
+					},
+					{
+						{.1, .1, .1},
+					},
+				},
+				neuron: [][]*neuronPerceptron{
+					{
+						&neuronPerceptron{},
+						&neuronPerceptron{},
+					},
+					{
+						&neuronPerceptron{},
+					},
+				},
+				lastLayerIndex: 1,
+				isInit:         true,
+			},
+			want: .1236831826342541,
+		},
+	}
+	for _, tt := range tests {
+		tt.gave.lenInput = len(tt.input)
+		tt.gave.lenOutput = len(tt.target)
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.gave.Verify(tt.input, tt.target); got != tt.want {
+				t.Errorf("Verify() = %f, want %f", got, tt.want)
+			}
+		})
+	}
+}
+
 func Test_perceptron_Query(t *testing.T) {
 	tests := []struct {
 		name  string
-		input []float32
+		input []float64
 		gave  *perceptron
-		want  []float32
+		want  []float64
 	}{
 		{
 			name:  "#1",
-			input: []float32{.2},
+			input: []float64{.2},
 			gave: &perceptron{
 				Activation: ModeLEAKYRELU,
 				Weights: Float3Type{
@@ -399,11 +495,11 @@ func Test_perceptron_Query(t *testing.T) {
 				lastLayerIndex: 0,
 				isInit:         true,
 			},
-			want: []float32{.020000001415610313},
+			want: []float64{.020000000000000004},
 		},
 		{
 			name:  "#2",
-			input: []float32{.2, .3},
+			input: []float64{.2, .3},
 			gave: &perceptron{
 				Activation: ModeTANH,
 				Weights: Float3Type{
@@ -422,11 +518,11 @@ func Test_perceptron_Query(t *testing.T) {
 				lastLayerIndex: 0,
 				isInit:         true,
 			},
-			want: []float32{.049958397, .049958397},
+			want: []float64{.04995837495788001, .04995837495788001},
 		},
 		{
 			name:  "#3",
-			input: []float32{.2, .3},
+			input: []float64{.2, .3},
 			gave: &perceptron{
 				Activation: ModeSIGMOID,
 				Weights: Float3Type{
@@ -451,7 +547,7 @@ func Test_perceptron_Query(t *testing.T) {
 				lastLayerIndex: 1,
 				isInit:         true,
 			},
-			want: []float32{.5516862273216248},
+			want: []float64{.5516861990955205},
 		},
 	}
 	for _, tt := range tests {
@@ -467,13 +563,13 @@ func Test_perceptron_Query(t *testing.T) {
 func Test_perceptron_calcNeuron(t *testing.T) {
 	tests := []struct {
 		name  string
-		input []float32
+		input []float64
 		got   *perceptron
 		want  [][]*neuronPerceptron
 	}{
 		{
 			name:  "#1",
-			input: []float32{.2},
+			input: []float64{.2},
 			got: &perceptron{
 				Activation: ModeLEAKYRELU,
 				Weights: Float3Type{
@@ -489,13 +585,13 @@ func Test_perceptron_calcNeuron(t *testing.T) {
 			},
 			want: [][]*neuronPerceptron{
 				{
-					{.020000001, 0},
+					{.020000000000000004, 0},
 				},
 			},
 		},
 		{
 			name:  "#2",
-			input: []float32{.2, .3},
+			input: []float64{.2, .3},
 			got: &perceptron{
 				Activation: ModeTANH,
 				Weights: Float3Type{
@@ -513,14 +609,14 @@ func Test_perceptron_calcNeuron(t *testing.T) {
 			},
 			want: [][]*neuronPerceptron{
 				{
-					{.049958397, 0},
-					{.049958397, 0},
+					{.04995837495788001, 0},
+					{.04995837495788001, 0},
 				},
 			},
 		},
 		{
 			name:  "#3",
-			input: []float32{.2, .3},
+			input: []float64{.2, .3},
 			got: &perceptron{
 				Activation: ModeSIGMOID,
 				Weights: Float3Type{
@@ -544,33 +640,24 @@ func Test_perceptron_calcNeuron(t *testing.T) {
 			},
 			want: [][]*neuronPerceptron{
 				{
-					{.53742987, 0},
-					{.53742987, 0},
+					{.5374298453437496, 0},
+					{.5374298453437496, 0},
 				},
 				{
-					{.5516862, 0},
+					{.5516861990955205, 0},
 				},
 			},
 		},
 	}
 	for _, tt := range tests {
 		tt.got.lenInput = len(tt.input)
-		/*tt.got.lastLayerIndex = len(tt.got.Hidden)
-		if tt.got.lastLayerIndex > 0 && tt.got.Hidden[0] == 0 {
-			tt.got.lastLayerIndex = 0
-		}*/
-
-		//fmt.Println(floatType(calcActivation(.02, ModeSIGMOID)))
-
 		t.Run(tt.name, func(t *testing.T) {
 			tt.got.calcNeuron(tt.input)
-
 			/*for _, n := range tt.got.neuron {
 				for _, m := range n {
 					fmt.Println(m)
 				}
 			}*/
-
 			if !reflect.DeepEqual(tt.got.neuron, tt.want) {
 				t.Errorf("calcNeuron()\ngot:\t%v\nwant:\t%v", tt.got.neuron, tt.want)
 			}
@@ -581,35 +668,175 @@ func Test_perceptron_calcNeuron(t *testing.T) {
 func Test_perceptron_calcLoss(t *testing.T) {
 	tests := []struct {
 		name   string
-		target []float32
+		target []float64
 		gave   *perceptron
-		want   float32
+		want   float64
 	}{
 		{
+			name:   "#1",
+			target: []float64{.2},
+			gave: &perceptron{
+				Activation: ModeLEAKYRELU,
+				Loss:       ModeRMSE,
+				neuron: [][]*neuronPerceptron{
+					{
+						{.5516861990955205, 0},
+					},
+				},
+			},
+			want: .3516861990955205,
+		},
+		{
+			name:   "#2",
+			target: []float64{.2, .3},
+			gave: &perceptron{
+				Activation: ModeTANH,
+				Loss:       ModeARCTAN,
+				neuron: [][]*neuronPerceptron{
+					{
+						{.5374298453437496, 0},
+						{.5374298453437496, 0},
+					},
+				},
+			},
+			want: .08012420394945846,
+		},
+		{
 			name:   "#3",
-			target: []float32{.2},
+			target: []float64{.2},
 			gave: &perceptron{
 				Activation: ModeSIGMOID,
 				Loss:       ModeMSE,
 				neuron: [][]*neuronPerceptron{
 					{
-						{.53742987, 0},
-						{.53742987, 0},
+						{.5374298453437496, 0},
+						{.5374298453437496, 0},
 					},
 					{
-						{.5516862, 0},
+						{.5516861990955205, 0},
 					},
 				},
 				lastLayerIndex: 1,
 			},
-			want: .12368321087257073,
+			want: .1236831826342541,
 		},
 	}
 	for _, tt := range tests {
 		tt.gave.lenOutput = len(tt.target)
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.gave.calcLoss(tt.target); got != tt.want {
-				t.Errorf("calcLoss() = %v, want %v", got, tt.want)
+				t.Errorf("calcLoss() = %f, want %f", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_perceptron_calcMiss(t *testing.T) {
+	tests := []struct {
+		name   string
+		target []float64
+		got    *perceptron
+		want   [][]*neuronPerceptron
+	}{
+		{
+			name:   "#1",
+			target: []float64{.2},
+			got: &perceptron{
+				Activation: ModeLEAKYRELU,
+				Loss:       ModeRMSE,
+				Weights: Float3Type{
+					{
+						{.1},
+					},
+				},
+				neuron: [][]*neuronPerceptron{
+					{
+						{.5516861990955205, 0},
+					},
+				},
+				lastLayerIndex: 0,
+			},
+			want: [][]*neuronPerceptron{
+				{
+					{.5516861990955205, -.003516861990955205},
+				},
+			},
+		},
+		{
+			name:   "#2",
+			target: []float64{.2, .3},
+			got: &perceptron{
+				Activation: ModeTANH,
+				Loss:       ModeARCTAN,
+				Weights: Float3Type{
+					{
+						{.1, .1},
+						{.1, .1},
+					},
+				},
+				neuron: [][]*neuronPerceptron{
+					{
+						{.5374298453437496, 0},
+						{.5374298453437496, 0},
+					},
+				},
+				lastLayerIndex: 0,
+			},
+			want: [][]*neuronPerceptron{
+				{
+					{.5374298453437496, -.29901045414733873},
+					{.5374298453437496, -.22404522894563828},
+				},
+			},
+		},
+		{
+			name:   "#3",
+			target: []float64{.2},
+			got: &perceptron{
+				Activation: ModeSIGMOID,
+				Loss:       ModeMSE,
+				Weights: Float3Type{
+					{
+						{.1, .1, .1},
+						{.1, .1, .1},
+					},
+					{
+						{.1, .1, .1},
+					},
+				},
+				neuron: [][]*neuronPerceptron{
+					{
+						{.5374298453437496, 0},
+						{.5374298453437496, 0},
+					},
+					{
+						{.5516861990955205, 0},
+					},
+				},
+				lastLayerIndex: 1,
+			},
+			want: [][]*neuronPerceptron{
+				{
+					{.5374298453437496, .004156099350080159},
+					{.5374298453437496, .004156099350080159},
+				},
+				{
+					{.5516861990955205, .167180851026932},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_ = tt.got.calcLoss(tt.target)
+			tt.got.calcMiss()
+			/*for _, n := range tt.got.neuron {
+				for _, m := range n {
+					fmt.Println(m)
+				}
+			}*/
+			if !reflect.DeepEqual(tt.got.neuron, tt.want) {
+				t.Errorf("calcNeuron()\ngot:\t%v\nwant:\t%v", tt.got.neuron, tt.want)
 			}
 		})
 	}
@@ -642,7 +869,7 @@ func Test_perceptron_Read(t *testing.T) {
 		Hidden         []int
 		Activation     uint8
 		Loss           uint8
-		Limit          float32
+		Limit          float64
 		Rate           floatType
 		Weights        Float3Type
 		neuron         [][]*neuronPerceptron
@@ -693,7 +920,7 @@ func Test_perceptron_Train(t *testing.T) {
 		Hidden         []int
 		Activation     uint8
 		Loss           uint8
-		Limit          float32
+		Limit          float64
 		Rate           floatType
 		Weights        Float3Type
 		neuron         [][]*neuronPerceptron
@@ -704,14 +931,14 @@ func Test_perceptron_Train(t *testing.T) {
 		jsonName       string
 	}
 	type args struct {
-		input  []float32
-		target [][]float32
+		input  []float64
+		target [][]float64
 	}
 	tests := []struct {
 		name      string
 		fields    fields
 		args      args
-		wantLoss  float32
+		wantLoss  float64
 		wantCount int
 	}{
 		// TODO: Add test cases.
@@ -746,62 +973,6 @@ func Test_perceptron_Train(t *testing.T) {
 	}
 }
 
-func Test_perceptron_Verify(t *testing.T) {
-	type fields struct {
-		Parameter      Parameter
-		Name           string
-		Bias           bool
-		Hidden         []int
-		Activation     uint8
-		Loss           uint8
-		Limit          float32
-		Rate           floatType
-		Weights        Float3Type
-		neuron         [][]*neuronPerceptron
-		lenInput       int
-		lenOutput      int
-		lastLayerIndex int
-		isInit         bool
-		jsonName       string
-	}
-	type args struct {
-		input  []float32
-		target [][]float32
-	}
-	tests := []struct {
-		name     string
-		fields   fields
-		args     args
-		wantLoss float32
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			p := &perceptron{
-				Parameter:      tt.fields.Parameter,
-				Name:           tt.fields.Name,
-				Bias:           tt.fields.Bias,
-				Hidden:         tt.fields.Hidden,
-				Activation:     tt.fields.Activation,
-				Loss:           tt.fields.Loss,
-				Limit:          tt.fields.Limit,
-				Rate:           tt.fields.Rate,
-				Weights:        tt.fields.Weights,
-				neuron:         tt.fields.neuron,
-				lenInput:       tt.fields.lenInput,
-				lenOutput:      tt.fields.lenOutput,
-				lastLayerIndex: tt.fields.lastLayerIndex,
-				isInit:         tt.fields.isInit,
-				jsonName:       tt.fields.jsonName,
-			}
-			if gotLoss := p.Verify(tt.args.input, tt.args.target...); gotLoss != tt.wantLoss {
-				t.Errorf("Verify() = %v, want %v", gotLoss, tt.wantLoss)
-			}
-		})
-	}
-}
-
 func Test_perceptron_Write(t *testing.T) {
 	type fields struct {
 		Parameter      Parameter
@@ -810,7 +981,7 @@ func Test_perceptron_Write(t *testing.T) {
 		Hidden         []int
 		Activation     uint8
 		Loss           uint8
-		Limit          float32
+		Limit          float64
 		Rate           floatType
 		Weights        Float3Type
 		neuron         [][]*neuronPerceptron
@@ -853,57 +1024,6 @@ func Test_perceptron_Write(t *testing.T) {
 	}
 }
 
-
-
-func Test_perceptron_calcMiss(t *testing.T) {
-	type fields struct {
-		Parameter      Parameter
-		Name           string
-		Bias           bool
-		Hidden         []int
-		Activation     uint8
-		Loss           uint8
-		Limit          float32
-		Rate           floatType
-		Weights        Float3Type
-		neuron         [][]*neuronPerceptron
-		lenInput       int
-		lenOutput      int
-		lastLayerIndex int
-		isInit         bool
-		jsonName       string
-	}
-	tests := []struct {
-		name   string
-		fields fields
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			p := &perceptron{
-				Parameter:      tt.fields.Parameter,
-				Name:           tt.fields.Name,
-				Bias:           tt.fields.Bias,
-				Hidden:         tt.fields.Hidden,
-				Activation:     tt.fields.Activation,
-				Loss:           tt.fields.Loss,
-				Limit:          tt.fields.Limit,
-				Rate:           tt.fields.Rate,
-				Weights:        tt.fields.Weights,
-				neuron:         tt.fields.neuron,
-				lenInput:       tt.fields.lenInput,
-				lenOutput:      tt.fields.lenOutput,
-				lastLayerIndex: tt.fields.lastLayerIndex,
-				isInit:         tt.fields.isInit,
-				jsonName:       tt.fields.jsonName,
-			}
-		})
-	}
-}
-
-
-
 func Test_perceptron_initFromWeight(t *testing.T) {
 	type fields struct {
 		Parameter      Parameter
@@ -912,7 +1032,7 @@ func Test_perceptron_initFromWeight(t *testing.T) {
 		Hidden         []int
 		Activation     uint8
 		Loss           uint8
-		Limit          float32
+		Limit          float64
 		Rate           floatType
 		Weights        Float3Type
 		neuron         [][]*neuronPerceptron
@@ -959,7 +1079,7 @@ func Test_perceptron_updWeight(t *testing.T) {
 		Hidden         []int
 		Activation     uint8
 		Loss           uint8
-		Limit          float32
+		Limit          float64
 		Rate           floatType
 		Weights        Float3Type
 		neuron         [][]*neuronPerceptron
@@ -970,7 +1090,7 @@ func Test_perceptron_updWeight(t *testing.T) {
 		jsonName       string
 	}
 	type args struct {
-		input []float32
+		input []float64
 	}
 	tests := []struct {
 		name   string

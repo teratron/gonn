@@ -75,7 +75,7 @@ func Test_getArchitecture(t *testing.T) {
 }
 
 func Test_getRand(t *testing.T) {
-	want := [3]float32{-.5, 0, .5}
+	want := [3]float64{-.5, 0, .5}
 	for i := range want {
 		t.Run("#"+strconv.Itoa(i+1), func(t *testing.T) {
 			if got := getRandFloat(); got < want[0] || got == want[1] || got > want[2] {
