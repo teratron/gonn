@@ -289,7 +289,6 @@ func (p *perceptron) Query(input []float64) (output []float64) {
 		}
 	} else {
 		LogError(fmt.Errorf("query: %w", ErrNoInput))
-		return nil
 	}
 	return
 }
@@ -380,10 +379,10 @@ func (p *perceptron) calcNeuron(input []float64) {
 	wait := make(chan bool)
 	defer close(wait)
 
-	var length int
+	var length, dec int
 	for i, v := range p.neuron {
-		dec := i - 1
 		if i > 0 {
+			dec = i - 1
 			length = len(p.neuron[dec])
 		} else {
 			length = p.lenInput
@@ -460,10 +459,11 @@ func (p *perceptron) calcMiss() {
 func (p *perceptron) updWeight(input []float64) {
 	wait := make(chan bool)
 	defer close(wait)
-	var length int
+
+	var length, dec int
 	for i, v := range p.Weights {
-		dec := i - 1
 		if i > 0 {
+			dec = i - 1
 			length = len(p.neuron[dec])
 		} else {
 			length = p.lenInput

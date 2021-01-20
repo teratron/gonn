@@ -22,7 +22,7 @@ const (
 // checkActivationMode
 func checkActivationMode(mode uint8) uint8 {
 	switch {
-	case mode < 0 || mode > ModeTANH:
+	case mode > ModeTANH:
 		return ModeSIGMOID
 	default:
 		return mode

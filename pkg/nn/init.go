@@ -52,10 +52,6 @@ func getRandFloat() (r float64) {
 	return
 }
 
-func Debug() {
-	//fmt.Println(randFloat())
-	/*randFloat = func() floatType {
-		return 42
-	}*/
-	//fmt.Println(randFloat())
-}
+/*func Debug() {
+	//fmt.Println()
+}*/

@@ -7,9 +7,9 @@ import (
 func main() {
 	n := nn.New( /*nn.Perceptron() nn.JSON("tmp.json")*/ )
 	//fmt.Println(len(n.HiddenLayer()))
-	for i := 0; i < 5; i++ {
+	/*for i := 0; i < 5; i++ {
 		nn.Debug()
-	}
+	}*/
 	//fmt.Println(floatType(calcActivation(.02, ModeSIGMOID)))
 	//n.Read(nn.JSON("tmp.json"))
 	//fmt.Println(n, len([]float64{}))
