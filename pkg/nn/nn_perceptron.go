@@ -460,7 +460,6 @@ func (p *perceptron) calcMiss() {
 func (p *perceptron) updWeight(input []float64) {
 	wait := make(chan bool)
 	defer close(wait)
-
 	var length int
 	for i, v := range p.Weights {
 		dec := i - 1
