@@ -224,13 +224,32 @@ func Test_perceptron_LossMode(t *testing.T) {
 }
 
 func Test_perceptron_SetLossMode(t *testing.T) {
-	got := &perceptron{}
-	want := ModeMSE
-	t.Run("ModeMSE", func(t *testing.T) {
-		if got.SetLossMode(want); got.Loss != want {
-			t.Errorf("SetLossMode() = %d, want %d", got.Loss, want)
-		}
-	})
+	tests := []struct {
+		name string
+		got  *perceptron
+		gave uint8
+		want uint8
+	}{
+		{
+			name: "#1_ModeARCTAN",
+			got:  &perceptron{},
+			gave: ModeARCTAN,
+			want: ModeARCTAN,
+		},
+		{
+			name: "#2_default",
+			got:  &perceptron{},
+			gave: 255,
+			want: ModeMSE,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.got.SetLossMode(tt.gave); tt.got.Loss != tt.want {
+				t.Errorf("SetLossMode() = %d, want %d", tt.got.Loss, tt.want)
+			}
+		})
+	}
 }
 
 func Test_perceptron_LossLimit(t *testing.T) {
@@ -478,17 +497,60 @@ func Test_perceptron_Train(t *testing.T) {
 			wantLoss:  .1236831826342541,
 			wantCount: 1,
 		},
+		{
+			name:      "#4_no_input",
+			args:      args{input: []float64{}},
+			wantLoss:  -1,
+			wantCount: 0,
+		},
+		{
+			name:      "#5_no_target",
+			args:      args{[]float64{.2}, []float64{}},
+			wantLoss:  -1,
+			wantCount: 0,
+		},
+		{
+			name: "#6_warning_len_input",
+			args: args{[]float64{.2}, []float64{.3}},
+			gave: &perceptron{
+				lenInput:  2,
+				lenOutput: 1,
+				isInit:    true,
+			},
+			wantLoss:  -1,
+			wantCount: 0,
+		},
+		{
+			name: "#7_warning_len_target",
+			args: args{[]float64{.2}, []float64{.3}},
+			gave: &perceptron{
+				lenInput:  1,
+				lenOutput: 2,
+				isInit:    true,
+			},
+			wantLoss:  -1,
+			wantCount: 0,
+		},
+		{
+			name: "#8_not_init",
+			args: args{[]float64{.2, .3}, []float64{.3}},
+			gave: &perceptron{
+				Bias:   true,
+				Hidden: []int{2},
+				Limit:  .95,
+			},
+			wantLoss:  .9025,
+			wantCount: 0,
+		},
 	}
 	for _, tt := range tests {
-		tt.gave.lenInput = len(tt.input)
-		tt.gave.lenOutput = len(tt.target)
 		t.Run(tt.name, func(t *testing.T) {
 			gotLoss, gotCount := tt.gave.Train(tt.input, tt.target)
 			if gotLoss != tt.wantLoss {
-				t.Errorf("Train() gotLoss = %f, want %f", gotLoss, tt.wantLoss)
+				t.Errorf("Train() gotLoss = %f, wantLoss %f", gotLoss, tt.wantLoss)
 			}
 			if gotCount != tt.wantCount {
-				t.Errorf("Train() gotCount = %d, want %d", gotCount, tt.wantCount)
+				t.Errorf("Train() gotCount = %d, wantCount %d", gotCount, tt.wantCount)
 			}
 		})
 	}
@@ -505,7 +567,7 @@ func Test_perceptron_Verify(t *testing.T) {
 		gave *perceptron
 		want float64
 	}{
-		{
+		/*{
 			name: "#1",
 			args: args{[]float64{.3}, []float64{.2}},
 			gave: &perceptron{
@@ -552,13 +614,13 @@ func Test_perceptron_Verify(t *testing.T) {
 				isInit:         true,
 			},
 			want: .041107040991293746,
-		},
+		},*/
 		{
 			name: "#3",
 			args: args{[]float64{.2, .3}, []float64{.2}},
 			gave: &perceptron{
 				Activation: ModeSIGMOID,
-				Loss:       3, // error, need ModeMSE
+				Loss:       255, // error, need ModeMSE
 				Weights: Float3Type{
 					{
 						{.1, .1, .1},
@@ -845,7 +907,7 @@ func Test_perceptron_Query(t *testing.T) {
 	}
 }*/
 
-/*func Test_perceptron_calcLoss(t *testing.T) {
+func Test_perceptron_calcLoss(t *testing.T) {
 	tests := []struct {
 		name   string
 		target []float64
@@ -909,7 +971,7 @@ func Test_perceptron_Query(t *testing.T) {
 			}
 		})
 	}
-}*/
+}
 
 func Test_perceptron_calcMiss(t *testing.T) {
 	tests := []struct {
