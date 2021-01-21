@@ -1,8 +1,5 @@
 package nn
 
-// MaxIteration the maximum number of iterations after which training is forcibly terminated
-const MaxIteration int = 10e+05
-
 // NeuralNetwork
 type NeuralNetwork interface {
 	Parameter

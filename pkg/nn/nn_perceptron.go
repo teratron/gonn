@@ -204,11 +204,7 @@ func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, 
 	if len(input) > 0 {
 		if len(target) > 0 && len(target[0]) > 0 {
 			if !p.isInit {
-				p.initFromNew(len(input), len(target[0]), getRandFloat)
-				if !p.isInit {
-					LogError(fmt.Errorf("train: %w", ErrInit))
-					return -1, 0
-				}
+				p.initFromNew(len(input), len(target[0]))
 			} else {
 				if p.lenInput != len(input) {
 					LogError(fmt.Errorf("train: invalid number of elements in the input data"))
@@ -219,7 +215,7 @@ func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, 
 					return -1, 0
 				}
 			}
-			for count < 1 /*MaxIteration*/ {
+			for count < maxIteration() {
 				p.calcNeuron(input)
 				if loss = p.calcLoss(target[0]); loss <= p.Limit {
 					break
@@ -244,11 +240,7 @@ func (p *perceptron) Verify(input []float64, target ...[]float64) (loss float64)
 	if len(input) > 0 {
 		if len(target) > 0 && len(target[0]) > 0 {
 			if !p.isInit {
-				p.initFromNew(len(input), len(target[0]), getRandFloat)
-				if !p.isInit {
-					LogError(fmt.Errorf("verify: %w", ErrInit))
-					return -1
-				}
+				p.initFromNew(len(input), len(target[0]))
 			} else {
 				if p.lenInput != len(input) {
 					LogError(fmt.Errorf("verify: invalid number of elements in the input data"))
@@ -294,7 +286,7 @@ func (p *perceptron) Query(input []float64) (output []float64) {
 }
 
 // initFromNew initialize
-func (p *perceptron) initFromNew(lenInput, lenTarget int, random func() float64) {
+func (p *perceptron) initFromNew(lenInput, lenTarget int /*, random func() float64*/) {
 	p.lenInput = lenInput
 	p.lenOutput = lenTarget
 	p.lastLayerIndex = len(p.Hidden)
@@ -332,7 +324,7 @@ func (p *perceptron) initFromNew(lenInput, lenTarget int, random func() float64)
 				p.Weights[i][j] = make([]float64, biasInput)
 			}
 			for k := range p.Weights[i][j] {
-				p.Weights[i][j][k] = random() //.5//p.random() //randFloat() //.5 //getRandFloat()
+				p.Weights[i][j][k] = randFloat() //random() //.5//p.random() //randFloat() //.5 //getRandFloat()
 			}
 			p.neuron[i][j] = &neuronPerceptron{}
 		}

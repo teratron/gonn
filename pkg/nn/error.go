@@ -8,10 +8,7 @@ import (
 )
 
 var (
-	ErrNoError       = errors.New("no error")
-	ErrNotFound      = errors.New("not found")
 	ErrInit          = errors.New("initialization error")
-	ErrNotTrained    = errors.New("not trained")
 	ErrNotRecognized = errors.New("not recognized")
 	ErrMissingType   = errors.New("type is missing")
 	ErrNoInput       = errors.New("no input data")

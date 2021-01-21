@@ -5,6 +5,15 @@ import (
 	"testing"
 )
 
+func init() {
+	maxIteration = func() int {
+		return 1
+	}
+	randFloat = func() float64 {
+		return .5
+	}
+}
+
 /*func TestPerceptron(t *testing.T) {
 	want := &perceptron{
 		Name:       perceptronName,
@@ -347,10 +356,7 @@ func Test_perceptron_SetWeight(t *testing.T) {
 }
 
 func Test_perceptron_initFromNew(t *testing.T) {
-	r := .5
-	random := func() float64 {
-		return r
-	}
+	r := randFloat()
 	tests := []struct {
 		name string
 		got  *perceptron
@@ -407,7 +413,7 @@ func Test_perceptron_initFromNew(t *testing.T) {
 		tt.got.Bias = tt.want.Bias
 		tt.got.Hidden = tt.want.Hidden
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.got.initFromNew(tt.want.lenInput, tt.want.lenOutput, random); !reflect.DeepEqual(tt.got, tt.want) {
+			if tt.got.initFromNew(tt.want.lenInput, tt.want.lenOutput); !reflect.DeepEqual(tt.got, tt.want) {
 				t.Errorf("initFromNew()\ngot:\t%v\nwant:\t%v", tt.got, tt.want)
 			}
 		})
@@ -428,15 +434,15 @@ func Test_perceptron_initFromNew(t *testing.T) {
 	}
 }*/
 
-/*func Test_perceptron_Train(t *testing.T) {
+func Test_perceptron_Train(t *testing.T) {
 	type args struct {
 		input  []float64
 		target []float64
 	}
 	tests := []struct {
-		name      string
+		name string
 		args
-		gave    *perceptron
+		gave      *perceptron
 		wantLoss  float64
 		wantCount int
 	}{
@@ -464,11 +470,13 @@ func Test_perceptron_initFromNew(t *testing.T) {
 						&neuronPerceptron{},
 					},
 				},
+				lenInput:       2,
+				lenOutput:      1,
 				lastLayerIndex: 1,
 				isInit:         true,
 			},
-			wantLoss: .1236831826342541,
-			wantCount: 1000,
+			wantLoss:  .1236831826342541,
+			wantCount: 1,
 		},
 	}
 	for _, tt := range tests {
@@ -485,7 +493,6 @@ func Test_perceptron_initFromNew(t *testing.T) {
 		})
 	}
 }
-*/
 
 func Test_perceptron_Verify(t *testing.T) {
 	type args struct {
@@ -576,6 +583,45 @@ func Test_perceptron_Verify(t *testing.T) {
 				isInit:         true,
 			},
 			want: .1236831826342541,
+		},
+		{
+			name: "#4_no_input",
+			args: args{input: []float64{}},
+			want: -1,
+		},
+		{
+			name: "#5_no_target",
+			args: args{[]float64{.2}, []float64{}},
+			want: -1,
+		},
+		{
+			name: "#6_warning_len_input",
+			args: args{[]float64{.2}, []float64{.3}},
+			gave: &perceptron{
+				lenInput:  2,
+				lenOutput: 1,
+				isInit:    true,
+			},
+			want: -1,
+		},
+		{
+			name: "#7_warning_len_target",
+			args: args{[]float64{.2}, []float64{.3}},
+			gave: &perceptron{
+				lenInput:  1,
+				lenOutput: 2,
+				isInit:    true,
+			},
+			want: -1,
+		},
+		{
+			name: "#8_not_init",
+			args: args{[]float64{.2, .3}, []float64{.3}},
+			gave: &perceptron{
+				Bias:   true,
+				Hidden: []int{2},
+			},
+			want: .9025,
 		},
 	}
 	for _, tt := range tests {
@@ -671,18 +717,18 @@ func Test_perceptron_Query(t *testing.T) {
 			want: []float64{.5516861990955205},
 		},
 		{
-			name:  "#4_warning",
+			name:  "#4_no_input",
 			input: []float64{},
 			want:  nil,
 		},
 		{
-			name:  "#5_warning",
+			name:  "#5_not_init",
 			input: []float64{.1},
 			gave:  &perceptron{isInit: false},
 			want:  nil,
 		},
 		{
-			name:  "#6_warning",
+			name:  "#6_warning_len_input",
 			input: []float64{.1},
 			gave: &perceptron{
 				lenInput: 2,
