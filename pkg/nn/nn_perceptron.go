@@ -174,10 +174,10 @@ func (p *perceptron) Read(reader Reader) {
 		case jsonString:
 			p.jsonName = string(s)
 		default:
-			LogError(fmt.Errorf("%T %w for file: %v", s, ErrMissingType, s))
+			LogError(fmt.Errorf("type %T %w for file: %v", s, ErrMissingType, s))
 		}
 	default:
-		LogError(fmt.Errorf("%T %w for read: %v", r, ErrMissingType, r))
+		LogError(fmt.Errorf("type %T %w for read: %v", r, ErrMissingType, r))
 	}
 }
 
@@ -191,7 +191,7 @@ func (p *perceptron) Write(writer ...Writer) {
 			case *report:
 				p.writeReport(v)
 			default:
-				LogError(fmt.Errorf("%T %w for write: %v", v, ErrMissingType, w))
+				LogError(fmt.Errorf("type %T %w for write: %v", v, ErrMissingType, w))
 			}
 		}
 	} else {
@@ -286,7 +286,7 @@ func (p *perceptron) Query(input []float64) (output []float64) {
 }
 
 // initFromNew initialize
-func (p *perceptron) initFromNew(lenInput, lenTarget int /*, random func() float64*/) {
+func (p *perceptron) initFromNew(lenInput, lenTarget int) {
 	p.lenInput = lenInput
 	p.lenOutput = lenTarget
 	p.lastLayerIndex = len(p.Hidden)
@@ -336,12 +336,8 @@ func (p *perceptron) initFromNew(lenInput, lenTarget int /*, random func() float
 func (p *perceptron) initFromWeight() {
 	length := len(p.Weights)
 
-	if !p.Bias {
-		if length > 1 {
-			if len(p.Weights[0])+1 == len(p.Weights[1][0]) {
-				p.Bias = true
-			}
-		}
+	if !p.Bias && length > 1 && len(p.Weights[0])+1 == len(p.Weights[1][0]) {
+		p.Bias = true
 	}
 
 	p.lastLayerIndex = length - 1
@@ -351,9 +347,13 @@ func (p *perceptron) initFromWeight() {
 		p.lenInput -= 1
 	}
 
-	p.Hidden = make([]int, p.lastLayerIndex)
-	for i := range p.Hidden {
-		p.Hidden[i] = len(p.Weights[i])
+	if p.lastLayerIndex > 0 {
+		p.Hidden = make([]int, p.lastLayerIndex)
+		for i := range p.Hidden {
+			p.Hidden[i] = len(p.Weights[i])
+		}
+	} else {
+		p.Hidden = []int{0}
 	}
 
 	p.neuron = make([][]*neuronPerceptron, length)

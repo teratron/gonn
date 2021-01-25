@@ -32,8 +32,6 @@ func checkActivationMode(mode uint8) uint8 {
 // Activation activation function
 func Activation(value float64, mode uint8) float64 {
 	switch mode {
-	default:
-		fallthrough
 	case ModeLINEAR:
 		return value
 	case ModeRELU:
@@ -50,13 +48,15 @@ func Activation(value float64, mode uint8) float64 {
 		default:
 			return value
 		}
+	default:
+		fallthrough
 	case ModeSIGMOID:
 		return 1 / (1 + math.Exp(-value))
 	case ModeTANH:
 		value = math.Exp(2 * value)
-		if math.IsInf(value, 1) {
+		/*if math.IsInf(value, 1) {
 			return 1
-		}
+		}*/
 		return (value - 1) / (value + 1)
 	}
 }

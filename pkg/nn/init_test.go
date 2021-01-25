@@ -74,7 +74,16 @@ func Test_getArchitecture(t *testing.T) {
 	}
 }
 
-func Test_getRand(t *testing.T) {
+func Test_getMaxIteration(t *testing.T) {
+	want := MaxIteration
+	t.Run("MaxIteration", func(t *testing.T) {
+		if got := getMaxIteration(); got != want {
+			t.Errorf("getMaxIteration() = %d, want %d", got, want)
+		}
+	})
+}
+
+func Test_getRandFloat(t *testing.T) {
 	want := [3]float64{-.5, 0, .5}
 	for i := range want {
 		t.Run("#"+strconv.Itoa(i+1), func(t *testing.T) {
