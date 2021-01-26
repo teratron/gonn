@@ -23,9 +23,8 @@ const (
 func checkActivationMode(mode uint8) uint8 {
 	if mode > ModeTANH {
 		return ModeSIGMOID
-	} else {
-		return mode
 	}
+	return mode
 }
 
 // Activation activation function
@@ -36,15 +35,13 @@ func Activation(value float64, mode uint8) float64 {
 	case ModeRELU:
 		if value < 0 {
 			return 0
-		} else {
-			return value
 		}
+		return value
 	case ModeLEAKYRELU:
 		if value < 0 {
 			return .01 * value
-		} else {
-			return value
 		}
+		return value
 	default:
 		fallthrough
 	case ModeSIGMOID:
@@ -68,15 +65,13 @@ func Derivative(value float64, mode uint8) float64 {
 	case ModeRELU:
 		if value < 0 {
 			return 0
-		} else {
-			return 1
 		}
+		return 1
 	case ModeLEAKYRELU:
 		if value < 0 {
 			return .01
-		} else {
-			return 1
 		}
+		return 1
 	case ModeSIGMOID:
 		return value * (1 - value)
 	case ModeTANH:

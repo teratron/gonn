@@ -15,7 +15,6 @@ const (
 func checkLossMode(mode uint8) uint8 {
 	if mode > ModeARCTAN {
 		return ModeMSE
-	} else {
-		return mode
 	}
+	return mode
 }

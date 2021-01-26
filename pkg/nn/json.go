@@ -25,18 +25,19 @@ func (j jsonString) getValue(key string) interface{} {
 	filename := string(j)
 	if len(filename) == 0 {
 		LogError(fmt.Errorf("json: file config is missing"))
+		return nil
 	}
-
 	b, err := ioutil.ReadFile(filename)
 	if err != nil {
 		LogError(err)
+		return nil
 	}
-
 	var data interface{}
 	if err = json.Unmarshal(b, &data); err != nil {
 		LogError(fmt.Errorf("read unmarshal %w", err))
+		//fmt.Println(err,"+-+-++-+-+-")
+		return nil
 	}
-
 	if value, ok := data.(map[string]interface{})[key]; ok {
 		return value
 	}
@@ -49,12 +50,10 @@ func (j jsonString) Read(reader Reader) {
 	if len(filename) == 0 {
 		LogError(fmt.Errorf("json: file config is missing"))
 	}
-
 	b, err := ioutil.ReadFile(filename)
 	if err != nil {
 		LogError(fmt.Errorf("read json file %w", err))
 	}
-
 	if err = json.Unmarshal(b, &reader); err != nil {
 		LogError(fmt.Errorf("json unmarshal %w", err))
 	}

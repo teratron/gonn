@@ -32,6 +32,7 @@ func main() {
 	lenOutput := 2 // Number of output data
 
 	// Training
+	var buff nn.Floater
 	minLoss := 1.
 	for epoch := 1; epoch <= 1000; epoch++ {
 		for i := lenInput; i <= len(dataSet)-lenOutput; i++ {
@@ -51,7 +52,7 @@ func main() {
 
 		// Weights are copied to the buffer at the minimum average error
 		if sum < minLoss {
-			//n.Copy(nn.Weight())
+			buff = n.Weight()
 			minLoss = sum
 		}
 
@@ -62,7 +63,7 @@ func main() {
 	}
 
 	// Returning weights for further recording from the buffer
-	//n.Paste(nn.Weight())
+	n.SetWeight(buff)
 
 	// Writing the neural network configuration to a file
 	n.Write(nn.JSON("perceptron.json"))
