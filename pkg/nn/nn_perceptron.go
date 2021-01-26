@@ -174,10 +174,10 @@ func (p *perceptron) Read(reader Reader) {
 		case jsonString:
 			p.jsonName = string(s)
 		default:
-			LogError(fmt.Errorf("type %T %w for file: %v", s, ErrMissingType, s))
+			LogError(fmt.Errorf("%T %w for file: %v", s, ErrMissingType, s))
 		}
 	default:
-		LogError(fmt.Errorf("type %T %w for read: %v", r, ErrMissingType, r))
+		LogError(fmt.Errorf("%T %w for read: %v", r, ErrMissingType, r))
 	}
 }
 
@@ -191,7 +191,7 @@ func (p *perceptron) Write(writer ...Writer) {
 			case *report:
 				p.writeReport(v)
 			default:
-				LogError(fmt.Errorf("type %T %w for write: %v", v, ErrMissingType, w))
+				LogError(fmt.Errorf("%T %w for write: %v", v, ErrMissingType, w))
 			}
 		}
 	} else {

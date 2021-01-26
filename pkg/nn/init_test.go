@@ -23,17 +23,22 @@ func TestNew(t *testing.T) {
 			want:   Perceptron(),
 		},
 		{
-			name:   "#3_" + perceptronName,
+			name:   "#3_default_" + perceptronName,
+			reader: []Reader{},
+			want:   Perceptron(),
+		},
+		{
+			name:   "#4_" + perceptronName,
 			reader: []Reader{Perceptron()},
 			want:   Perceptron(),
 		},
 		{
-			name:   hopfieldName,
+			name:   "#5_" + hopfieldName,
 			reader: []Reader{Hopfield()},
 			want:   Hopfield(),
 		},
 		/*{
-			name:   "#4_JSON",
+			name:   "#6_JSON",
 			reader: []Reader{JSON("tmp.json")},
 			want:   Hopfield(),
 		},*/

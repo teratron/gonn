@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-// MaxIteration the maximum number of iterations after which training is forcibly terminated
+// MaxIteration the maximum number of iterations after which training is forcibly terminated.
 const MaxIteration int = 10e+05
 
 var (
@@ -18,7 +18,7 @@ func init() {
 	rand.Seed(time.Now().UTC().UnixNano())
 }
 
-// New returns a new neural network instance
+// New returns a new neural network instance.
 func New(reader ...Reader) NeuralNetwork {
 	if len(reader) > 0 {
 		switch r := reader[0].(type) {
@@ -29,7 +29,7 @@ func New(reader ...Reader) NeuralNetwork {
 			n.Read(r)
 			return n
 		default:
-			LogError(fmt.Errorf("type %T %w for neural network", r, ErrMissingType))
+			LogError(fmt.Errorf("%T %w for neural network", r, ErrMissingType))
 			return nil
 		}
 	}
@@ -54,7 +54,7 @@ func getMaxIteration() int {
 	return MaxIteration
 }
 
-// getRand return random number from -0.5 to 0.5
+// getRand return random number from -0.5 to 0.5.
 func getRandFloat() (r float64) {
 	for r == 0 || r > .5 || r < -.5 {
 		r = rand.Float64() - .5

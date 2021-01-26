@@ -13,10 +13,9 @@ const (
 
 // checkLossMode
 func checkLossMode(mode uint8) uint8 {
-	switch {
-	case mode > ModeARCTAN:
+	if mode > ModeARCTAN {
 		return ModeMSE
-	default:
+	} else {
 		return mode
 	}
 }

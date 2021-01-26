@@ -565,7 +565,7 @@ func Test_perceptron_Train(t *testing.T) {
 		wantCount int
 	}{
 		{
-			name: "#3",
+			name: "#1",
 			args: args{[]float64{.2, .3}, []float64{.2}},
 			gave: &perceptron{
 				Activation: ModeSIGMOID,
@@ -597,19 +597,19 @@ func Test_perceptron_Train(t *testing.T) {
 			wantCount: 1,
 		},
 		{
-			name:      "#4_no_input",
+			name:      "#2_no_input",
 			args:      args{input: []float64{}},
 			wantLoss:  -1,
 			wantCount: 0,
 		},
 		{
-			name:      "#5_no_target",
+			name:      "#3_no_target",
 			args:      args{[]float64{.2}, []float64{}},
 			wantLoss:  -1,
 			wantCount: 0,
 		},
 		{
-			name: "#6_warning_len_input",
+			name: "#4_warning_len_input",
 			args: args{[]float64{.2}, []float64{.3}},
 			gave: &perceptron{
 				lenInput:  2,
@@ -620,7 +620,7 @@ func Test_perceptron_Train(t *testing.T) {
 			wantCount: 0,
 		},
 		{
-			name: "#7_warning_len_target",
+			name: "#5_warning_len_target",
 			args: args{[]float64{.2}, []float64{.3}},
 			gave: &perceptron{
 				lenInput:  1,
@@ -631,7 +631,7 @@ func Test_perceptron_Train(t *testing.T) {
 			wantCount: 0,
 		},
 		{
-			name: "#8_not_init",
+			name: "#6_not_init",
 			args: args{[]float64{.2, .3}, []float64{.3}},
 			gave: &perceptron{
 				Bias:   true,
@@ -718,7 +718,7 @@ func Test_perceptron_Verify(t *testing.T) {
 			name: "#3",
 			args: args{[]float64{.2, .3}, []float64{.2}},
 			gave: &perceptron{
-				Activation: ModeSIGMOID,
+				Activation: 255, // default ModeSIGMOID
 				Loss:       255, // default ModeMSE
 				Weights: Float3Type{
 					{
@@ -805,7 +805,7 @@ func Test_perceptron_Query(t *testing.T) {
 			name:  "#1",
 			input: []float64{.2},
 			gave: &perceptron{
-				Activation: ModeLEAKYRELU,
+				Activation: ModeRELU,
 				Weights: Float3Type{
 					{
 						{.1},
