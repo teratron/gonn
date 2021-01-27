@@ -35,7 +35,6 @@ func (j jsonString) getValue(key string) interface{} {
 	var data interface{}
 	if err = json.Unmarshal(b, &data); err != nil {
 		LogError(fmt.Errorf("read unmarshal %w", err))
-		//fmt.Println(err,"+-+-++-+-+-")
 		return nil
 	}
 	if value, ok := data.(map[string]interface{})[key]; ok {

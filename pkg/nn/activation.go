@@ -27,7 +27,7 @@ func checkActivationMode(mode uint8) uint8 {
 	return mode
 }
 
-// Activation activation function
+// Activation function
 func Activation(value float64, mode uint8) float64 {
 	switch mode {
 	case ModeLINEAR:
@@ -55,11 +55,9 @@ func Activation(value float64, mode uint8) float64 {
 	}
 }
 
-// Derivative derivative activation function
+// Derivative activation function
 func Derivative(value float64, mode uint8) float64 {
 	switch mode {
-	default:
-		fallthrough
 	case ModeLINEAR:
 		return 1
 	case ModeRELU:
@@ -72,6 +70,8 @@ func Derivative(value float64, mode uint8) float64 {
 			return .01
 		}
 		return 1
+	default:
+		fallthrough
 	case ModeSIGMOID:
 		return value * (1 - value)
 	case ModeTANH:
