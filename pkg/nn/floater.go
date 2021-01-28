@@ -11,14 +11,6 @@ type (
 	Float3Type [][][]float64
 )
 
-func (f Float1Type) length() int {
-	return len(f)
-}
-
-func (f Float2Type) length() int {
-	return len(f)
-}
-
-func (f Float3Type) length() int {
-	return len(f)
-}
+func (f Float1Type) length() int { return len(f) }
+func (f Float2Type) length() int { return len(f) }
+func (f Float3Type) length() int { return len(f) }

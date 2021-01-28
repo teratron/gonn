@@ -56,7 +56,7 @@ func TestActivation(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := Activation(tt.value, tt.mode); got != tt.want {
-				t.Errorf("Activation() = %f, want %f", got, tt.want)
+				t.Errorf("Activation() = %g, want %g", got, tt.want)
 			}
 		})
 	}
@@ -116,7 +116,7 @@ func TestDerivative(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := Derivative(tt.value, tt.mode); got != tt.want {
-				t.Errorf("Derivative() = %v, want %v", got, tt.want)
+				t.Errorf("Derivative() = %g, want %g", got, tt.want)
 			}
 		})
 	}

@@ -1,35 +1,42 @@
 package nn
 
 import (
+	"os"
 	"reflect"
 	"testing"
 )
 
+const testNameJSON = "./testdata/perceptron.json"
+
+func init() {
+	defaultNameJSON = "./testdata/tmp.json"
+}
+
 func TestJSON(t *testing.T) {
 	tests := []struct {
-		name     string
-		filename []string
-		want     jsonString
+		name string
+		file []string
+		want jsonString
 	}{
 		{
-			name:     "#1",
-			filename: []string{"perceptron.json"},
-			want:     jsonString("perceptron.json"),
+			name: "#1",
+			file: []string{testNameJSON},
+			want: jsonString(testNameJSON),
 		},
 		{
-			name:     "#2",
-			filename: []string{"perceptron.json", ""},
-			want:     jsonString("perceptron.json"),
+			name: "#2",
+			file: []string{testNameJSON, ""},
+			want: jsonString(testNameJSON),
 		},
 		{
-			name:     "#3",
-			filename: []string{},
-			want:     jsonString(""),
+			name: "#3",
+			file: []string{},
+			want: jsonString(""),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := JSON(tt.filename...); got != tt.want {
+			if got := JSON(tt.file...); got != tt.want {
 				t.Errorf("JSON() = %s, want %s", got, tt.want)
 			}
 		})
@@ -37,7 +44,7 @@ func TestJSON(t *testing.T) {
 }
 
 func Test_jsonString_toString(t *testing.T) {
-	want := "perceptron.json"
+	want := testNameJSON
 	t.Run(want, func(t *testing.T) {
 		if got := jsonString(want).toString(); got != want {
 			t.Errorf("toString() = %s, want %s", got, want)
@@ -49,100 +56,190 @@ func Test_jsonString_getValue(t *testing.T) {
 	tests := []struct {
 		name string
 		key  string
-		gave jsonString
+		file jsonString
 		want interface{}
 	}{
 		{
 			name: "#1_name",
 			key:  "name",
-			gave: jsonString("./testdata/perceptron.json"),
-			want: "perceptron",
+			file: jsonString(testNameJSON),
+			want: perceptronName,
 		},
 		{
 			name: "#2_bias",
 			key:  "bias",
-			gave: jsonString("./testdata/perceptron.json"),
+			file: jsonString(testNameJSON),
 			want: true,
 		},
 		{
 			name: "#3_hidden",
 			key:  "hidden",
-			gave: jsonString("./testdata/perceptron.json"),
-			want: []interface{}{5.},
+			file: jsonString(testNameJSON),
+			want: []interface{}{2.},
 		},
 		{
 			name: "#4_no_file",
 			key:  "",
-			gave: jsonString(""),
+			file: jsonString(""),
 			want: nil,
 		},
 		{
 			name: "#5_not_read_file",
 			key:  "",
-			gave: jsonString("perceptron"),
+			file: jsonString("perceptron"),
 			want: nil,
 		},
 		{
 			name: "#6_error_unmarshal",
 			key:  "",
-			gave: jsonString("./json.go"),
+			file: jsonString("./json.go"),
 			want: nil,
 		},
 		{
 			name: "#7_warning_key",
 			key:  "",
-			gave: jsonString("./testdata/perceptron.json"),
+			file: jsonString(testNameJSON),
 			want: nil,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := tt.gave.getValue(tt.key)
-			//fmt.Println(reflect.ValueOf(got).Type().Name())
-			/*if g, ok := got.([]interface{}); ok {
-				for _, i2 := range g {
-					fmt.Printf("%T - %v\n", i2, i2)
-				}
-			}*/
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("getValue() = %T - %v, want %T - %v", got, got, tt.want, tt.want)
+			if got := tt.file.getValue(tt.key); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("getValue() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
 func Test_jsonString_Read(t *testing.T) {
-	type args struct {
-		reader Reader
-	}
 	tests := []struct {
 		name string
-		j    jsonString
-		args args
+		file jsonString
+		got  Reader
+		want Reader
 	}{
-		// TODO: Add test cases.
-		{},
+		{
+			name: "#1_perceptron",
+			file: jsonString(testNameJSON),
+			got:  &perceptron{},
+			want: &perceptron{
+				Name:       perceptronName,
+				Bias:       true,
+				Hidden:     []int{2},
+				Activation: ModeSIGMOID,
+				Loss:       ModeMSE,
+				Limit:      .1,
+				Rate:       DefaultRate,
+				Weights: Float3Type{
+					{
+						{.1, .1, .1},
+						{.1, .1, .1},
+					},
+					{
+						{.1, .1, .1},
+					},
+				},
+			},
+		},
+		{
+			name: "#2_no_file",
+			file: jsonString(""),
+			want: nil,
+		},
+		{
+			name: "#3_not_read_file",
+			file: jsonString("perceptron"),
+			want: nil,
+		},
+		{
+			name: "#4_error_unmarshal",
+			file: jsonString("./json.go"),
+			want: nil,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			if tt.file.Read(tt.got); !reflect.DeepEqual(tt.got, tt.want) {
+				t.Errorf("Read()\ngot:\t%v\nwant:\t%v", tt.got, tt.want)
+			}
 		})
 	}
 }
 
 func Test_jsonString_Write(t *testing.T) {
-	type args struct {
-		writer []Writer
+	gave := &perceptron{
+		Name:       perceptronName,
+		Bias:       true,
+		Hidden:     []int{2},
+		Activation: ModeSIGMOID,
+		Loss:       ModeMSE,
+		Limit:      .1,
+		Rate:       DefaultRate,
+		Weights: Float3Type{
+			{
+				{.1, .1, .1},
+				{.1, .1, .1},
+			},
+			{
+				{.1, .1, .1},
+			},
+		},
 	}
 	tests := []struct {
 		name string
-		j    jsonString
-		args args
+		file jsonString
+		got  *perceptron
+		want []Writer
 	}{
-		// TODO: Add test cases.
-		{},
+		{
+			name: "#1_perceptron",
+			file: jsonString(defaultNameJSON),
+			got:  &perceptron{},
+			want: []Writer{gave},
+		},
+		{
+			name: "#2_no_args",
+			file: jsonString(""),
+			want: []Writer{},
+		},
+		{
+			name: "#3_no_filename",
+			file: jsonString(""),
+			got: &perceptron{
+				jsonName: defaultNameJSON,
+			},
+			want: []Writer{gave},
+		},
+		{
+			name: "#4_no_filename",
+			file: jsonString(""),
+			got:  &perceptron{},
+			want: []Writer{gave},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			if len(tt.file) == 0 && len(tt.want) > 0 {
+				if len(tt.got.jsonName) > 0 {
+					tt.want[0].(*perceptron).jsonName = defaultNameJSON
+				}
+			}
+			tt.file.Write(tt.want...)
+			if len(tt.want) > 0 {
+				defer func() {
+					if err := os.Remove(string(tt.file)); err != nil {
+						t.Errorf("%v", err)
+					}
+				}()
+				if len(tt.file) == 0 {
+					tt.file = jsonString(defaultNameJSON)
+				}
+				tt.file.Read(tt.got)
+
+				if !reflect.DeepEqual(tt.got, tt.want[0]) {
+					t.Errorf("Write()\ngot:\t%v\nwant:\t%v", tt.got, tt.want[0])
+				}
+			}
 		})
 	}
 }
