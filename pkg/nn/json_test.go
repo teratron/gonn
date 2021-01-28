@@ -83,12 +83,12 @@ func Test_jsonString_getValue(t *testing.T) {
 			file: jsonString(""),
 			want: nil,
 		},
-		{
+		/*{
 			name: "#5_not_read_file",
 			key:  "",
 			file: jsonString("perceptron"),
 			want: nil,
-		},
+		},*/
 		{
 			name: "#6_error_unmarshal",
 			key:  "",
@@ -167,24 +167,6 @@ func Test_jsonString_Read(t *testing.T) {
 }
 
 func Test_jsonString_Write(t *testing.T) {
-	gave := &perceptron{
-		Name:       perceptronName,
-		Bias:       true,
-		Hidden:     []int{2},
-		Activation: ModeSIGMOID,
-		Loss:       ModeMSE,
-		Limit:      .1,
-		Rate:       DefaultRate,
-		Weights: Float3Type{
-			{
-				{.1, .1, .1},
-				{.1, .1, .1},
-			},
-			{
-				{.1, .1, .1},
-			},
-		},
-	}
 	tests := []struct {
 		name string
 		file jsonString
@@ -195,7 +177,7 @@ func Test_jsonString_Write(t *testing.T) {
 			name: "#1_perceptron",
 			file: jsonString(defaultNameJSON),
 			got:  &perceptron{},
-			want: []Writer{gave},
+			want: []Writer{&perceptron{}},
 		},
 		{
 			name: "#2_no_args",
@@ -208,13 +190,13 @@ func Test_jsonString_Write(t *testing.T) {
 			got: &perceptron{
 				jsonName: defaultNameJSON,
 			},
-			want: []Writer{gave},
+			want: []Writer{&perceptron{}},
 		},
 		{
 			name: "#4_no_filename",
 			file: jsonString(""),
 			got:  &perceptron{},
-			want: []Writer{gave},
+			want: []Writer{&perceptron{}},
 		},
 	}
 	for _, tt := range tests {
@@ -235,7 +217,6 @@ func Test_jsonString_Write(t *testing.T) {
 					tt.file = jsonString(defaultNameJSON)
 				}
 				tt.file.Read(tt.got)
-
 				if !reflect.DeepEqual(tt.got, tt.want[0]) {
 					t.Errorf("Write()\ngot:\t%v\nwant:\t%v", tt.got, tt.want[0])
 				}
@@ -243,3 +224,22 @@ func Test_jsonString_Write(t *testing.T) {
 		})
 	}
 }
+
+/*gave := &perceptron{
+	Name:       perceptronName,
+	Bias:       true,
+	Hidden:     []int{2},
+	Activation: ModeSIGMOID,
+	Loss:       ModeMSE,
+	Limit:      .1,
+	Rate:       DefaultRate,
+	Weights: Float3Type{
+		{
+			{.1, .1, .1},
+			{.1, .1, .1},
+		},
+		{
+			{.1, .1, .1},
+		},
+	},
+}*/

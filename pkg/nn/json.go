@@ -26,7 +26,7 @@ func (j jsonString) toString() string {
 func (j jsonString) getValue(key string) interface{} {
 	filename := string(j)
 	if len(filename) == 0 {
-		LogError(fmt.Errorf("json: file config is missing"))
+		LogError(fmt.Errorf("json: file is missing"))
 		return nil
 	}
 	b, err := ioutil.ReadFile(filename)
@@ -65,18 +65,20 @@ func (j jsonString) Read(reader Reader) {
 // Write
 func (j jsonString) Write(writer ...Writer) {
 	if len(writer) > 0 {
-		if n, ok := writer[0].(*perceptron); ok {
+		if n, ok := writer[0].(NeuralNetwork); ok {
+			b, err := json.MarshalIndent(&n, "", "\t")
+			if err != nil {
+				LogError(fmt.Errorf("json marshal %w", err))
+			}
 			filename := string(j)
 			if len(filename) == 0 {
-				if len(n.jsonName) > 0 {
-					filename = n.jsonName
+				if name := n.nameJSON(); len(name) > 0 {
+					filename = name
 				} else {
 					filename = defaultNameJSON
 				}
 			}
-			if b, err := json.MarshalIndent(&n, "", "\t"); err != nil {
-				LogError(fmt.Errorf("json marshal %w", err))
-			} else if err = ioutil.WriteFile(filename, b, os.ModePerm); err != nil {
+			if err = ioutil.WriteFile(filename, b, os.ModePerm); err != nil {
 				LogError(fmt.Errorf("write json file %w", err))
 			}
 		}
