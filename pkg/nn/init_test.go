@@ -37,11 +37,42 @@ func TestNew(t *testing.T) {
 			reader: []Reader{Hopfield()},
 			want:   Hopfield(),
 		},
-		/*{
+		{
 			name:   "#6_JSON",
-			reader: []Reader{JSON("tmp.json")},
-			want:   Hopfield(),
-		},*/
+			reader: []Reader{JSON(testNameJSON)},
+			want: &perceptron{
+				Name:       perceptronName,
+				Bias:       true,
+				Hidden:     []int{2},
+				Activation: ModeSIGMOID,
+				Loss:       ModeMSE,
+				Limit:      .1,
+				Rate:       DefaultRate,
+				Weights: Float3Type{
+					{
+						{.1, .1, .1},
+						{.1, .1, .1},
+					},
+					{
+						{.1, .1, .1},
+					},
+				},
+				neuron: [][]*neuronPerceptron{
+					{
+						&neuronPerceptron{},
+						&neuronPerceptron{},
+					},
+					{
+						&neuronPerceptron{},
+					},
+				},
+				lenInput:       2,
+				lenOutput:      1,
+				lastLayerIndex: 1,
+				isInit:         true,
+				jsonName:       testNameJSON,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
