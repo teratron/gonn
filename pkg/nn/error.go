@@ -14,6 +14,7 @@ var (
 	ErrNoInput       = errors.New("no input data")
 	ErrNoTarget      = errors.New("no target data")
 	ErrEmpty         = errors.New("empty")
+	ErrNoFile        = errors.New("file is missing")
 )
 
 // LogError

@@ -43,13 +43,46 @@ func TestJSON(t *testing.T) {
 	}
 }
 
-func Test_jsonString_toString(t *testing.T) {
+/*func Test_jsonString_toString(t *testing.T) {
 	want := testNameJSON
 	t.Run(want, func(t *testing.T) {
 		if got := jsonString(want).toString(); got != want {
 			t.Errorf("toString() = %s, want %s", got, want)
 		}
 	})
+}*/
+
+func Test_jsonString_fileName(t *testing.T) {
+	tests := []struct {
+		name      string
+		file      jsonString
+		wantName  string
+		wantError error
+	}{
+		{
+			name:      "#1",
+			file:      jsonString(testNameJSON),
+			wantName:  testNameJSON,
+			wantError: nil,
+		},
+		{
+			name:      "#2",
+			file:      jsonString(""),
+			wantName:  "",
+			wantError: ErrNoFile,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotName, gotError := jsonString(tt.wantName).fileName()
+			if gotName != tt.wantName {
+				t.Errorf("fileName() = %s, want %s", gotName, tt.wantName)
+			}
+			if gotError != tt.wantError {
+				t.Errorf("fileName() = %v, want %v", gotError, tt.wantError)
+			}
+		})
+	}
 }
 
 func Test_jsonString_getValue(t *testing.T) {
@@ -88,13 +121,13 @@ func Test_jsonString_getValue(t *testing.T) {
 			key:  "",
 			file: jsonString("perceptron"),
 			want: nil,
-		},*/
+		},
 		{
 			name: "#6_error_unmarshal",
 			key:  "",
 			file: jsonString("./json.go"),
 			want: nil,
-		},
+		},*/
 		{
 			name: "#7_warning_key",
 			key:  "",
@@ -146,7 +179,7 @@ func Test_jsonString_Read(t *testing.T) {
 			file: jsonString(""),
 			want: nil,
 		},
-		{
+		/*{
 			name: "#3_not_read_file",
 			file: jsonString("perceptron"),
 			want: nil,
@@ -155,7 +188,7 @@ func Test_jsonString_Read(t *testing.T) {
 			name: "#4_error_unmarshal",
 			file: jsonString("./json.go"),
 			want: nil,
-		},
+		},*/
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -198,19 +231,29 @@ func Test_jsonString_Write(t *testing.T) {
 			got:  &perceptron{},
 			want: []Writer{&perceptron{}},
 		},
+		/*{
+			name: "#5_error_marshal",
+			file: jsonString(defaultNameJSON),
+			got:  &perceptron{},
+			want: []Writer{&perceptron{}},
+		},*/
+		/*{
+			name: "#5_not_write_file",
+			file: jsonString("./"),
+			got:  &perceptron{},
+			want: []Writer{&perceptron{}},
+		},*/
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if len(tt.file) == 0 && len(tt.want) > 0 {
-				if len(tt.got.jsonName) > 0 {
-					tt.want[0].(*perceptron).jsonName = defaultNameJSON
-				}
+			if len(tt.file) == 0 && len(tt.want) > 0 && len(tt.got.jsonName) > 0 {
+				tt.want[0].(*perceptron).jsonName = defaultNameJSON
 			}
 			tt.file.Write(tt.want...)
 			if len(tt.want) > 0 {
 				defer func() {
 					if err := os.Remove(string(tt.file)); err != nil {
-						t.Errorf("%v", err)
+						t.Error(err)
 					}
 				}()
 				if len(tt.file) == 0 {

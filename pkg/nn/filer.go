@@ -3,8 +3,9 @@ package nn
 // Filer
 type Filer interface {
 	ReadWriter
-	toString() string
 	getValue(key string) interface{}
+	//toString() string
+	//fileName() (string, error)
 }
 
 // File
