@@ -2,6 +2,7 @@ package nn
 
 import (
 	"fmt"
+	"log"
 	"math/rand"
 	"time"
 )
@@ -29,7 +30,7 @@ func New(reader ...Reader) NeuralNetwork {
 			n.Read(r)
 			return n
 		default:
-			LogError(fmt.Errorf("%T %w for neural network", r, ErrMissingType))
+			log.Println(fmt.Errorf("%T %w for neural network", r, ErrMissingType))
 			return nil
 		}
 	}
@@ -44,7 +45,7 @@ func getArchitecture(name string) NeuralNetwork {
 	case hopfieldName:
 		return Hopfield()
 	default:
-		LogError(fmt.Errorf("neural network is %w", ErrNotRecognized))
+		log.Println(fmt.Errorf("neural network is %w", ErrNotRecognized))
 		return nil
 	}
 }

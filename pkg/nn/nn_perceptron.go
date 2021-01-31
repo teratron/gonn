@@ -2,6 +2,7 @@ package nn
 
 import (
 	"fmt"
+	"log"
 	"math"
 )
 
@@ -174,10 +175,10 @@ func (p *perceptron) Read(reader Reader) {
 		case jsonString:
 			p.jsonName = string(s)
 		default:
-			LogError(fmt.Errorf("%T %w for file: %v", s, ErrMissingType, s))
+			log.Println(fmt.Errorf("%T %w for file: %v", s, ErrMissingType, s))
 		}
 	default:
-		LogError(fmt.Errorf("%T %w for read: %v", r, ErrMissingType, r))
+		log.Println(fmt.Errorf("%T %w for read: %v", r, ErrMissingType, r))
 	}
 }
 
@@ -188,14 +189,14 @@ func (p *perceptron) Write(writer ...Writer) {
 			switch v := w.(type) {
 			case Filer:
 				v.Write(p)
-			case *report:
-				p.writeReport(v)
+			/*case *report:
+			p.writeReport(v)*/
 			default:
-				LogError(fmt.Errorf("%T %w for write: %v", v, ErrMissingType, w))
+				log.Println(fmt.Errorf("%T %w for write: %v", v, ErrMissingType, w))
 			}
 		}
 	} else {
-		LogError(fmt.Errorf("%w for write", ErrEmpty))
+		log.Println(fmt.Errorf("%w for write", ErrEmpty))
 	}
 }
 
@@ -207,11 +208,11 @@ func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, 
 				p.initFromNew(len(input), len(target[0]))
 			} else {
 				if p.lenInput != len(input) {
-					LogError(fmt.Errorf("train: invalid number of elements in the input data"))
+					log.Println(fmt.Errorf("train: invalid number of elements in the input data"))
 					return -1, 0
 				}
 				if p.lenOutput != len(target[0]) {
-					LogError(fmt.Errorf("train: invalid number of elements in the target data"))
+					log.Println(fmt.Errorf("train: invalid number of elements in the target data"))
 					return -1, 0
 				}
 			}
@@ -225,11 +226,11 @@ func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, 
 				count++
 			}
 		} else {
-			LogError(fmt.Errorf("train: %w", ErrNoTarget))
+			log.Println(fmt.Errorf("train: %w", ErrNoTarget))
 			return -1, 0
 		}
 	} else {
-		LogError(fmt.Errorf("train: %w", ErrNoInput))
+		log.Println(fmt.Errorf("train: %w", ErrNoInput))
 		return -1, 0
 	}
 	return
@@ -243,22 +244,22 @@ func (p *perceptron) Verify(input []float64, target ...[]float64) (loss float64)
 				p.initFromNew(len(input), len(target[0]))
 			} else {
 				if p.lenInput != len(input) {
-					LogError(fmt.Errorf("verify: invalid number of elements in the input data"))
+					log.Println(fmt.Errorf("verify: invalid number of elements in the input data"))
 					return -1
 				}
 				if p.lenOutput != len(target[0]) {
-					LogError(fmt.Errorf("verify: invalid number of elements in the target data"))
+					log.Println(fmt.Errorf("verify: invalid number of elements in the target data"))
 					return -1
 				}
 			}
 			p.calcNeuron(input)
 			loss = p.calcLoss(target[0])
 		} else {
-			LogError(fmt.Errorf("verify: %w", ErrNoTarget))
+			log.Println(fmt.Errorf("verify: %w", ErrNoTarget))
 			return -1
 		}
 	} else {
-		LogError(fmt.Errorf("verify: %w", ErrNoInput))
+		log.Println(fmt.Errorf("verify: %w", ErrNoInput))
 		return -1
 	}
 	return
@@ -268,10 +269,10 @@ func (p *perceptron) Verify(input []float64, target ...[]float64) (loss float64)
 func (p *perceptron) Query(input []float64) (output []float64) {
 	if len(input) > 0 {
 		if !p.isInit {
-			LogError(fmt.Errorf("query: %w", ErrInit))
+			log.Println(fmt.Errorf("query: %w", ErrInit))
 			return nil
 		} else if p.lenInput != len(input) {
-			LogError(fmt.Errorf("query: invalid number of elements in the input data"))
+			log.Println(fmt.Errorf("query: invalid number of elements in the input data"))
 			return nil
 		}
 		p.calcNeuron(input)
@@ -280,7 +281,7 @@ func (p *perceptron) Query(input []float64) (output []float64) {
 			output[i] = n.value
 		}
 	} else {
-		LogError(fmt.Errorf("query: %w", ErrNoInput))
+		log.Println(fmt.Errorf("query: %w", ErrNoInput))
 	}
 	return
 }

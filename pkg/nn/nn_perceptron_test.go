@@ -14,7 +14,7 @@ func init() {
 	}
 }
 
-/*func TestPerceptron(t *testing.T) {
+func TestPerceptron(t *testing.T) {
 	want := &perceptron{
 		Name:       perceptronName,
 		Activation: ModeSIGMOID,
@@ -22,12 +22,12 @@ func init() {
 		Limit:      .1,
 		Rate:       DefaultRate,
 	}
-	t.Run("Default perceptron", func(t *testing.T) {
+	t.Run(want.Name, func(t *testing.T) {
 		if got := Perceptron(); !reflect.DeepEqual(got, want) {
 			t.Errorf("Perceptron()\ngot:\t%v\nwant:\t%v", got, want)
 		}
 	})
-}*/
+}
 
 func Test_perceptron_name(t *testing.T) {
 	want := &perceptron{Name: perceptronName}
@@ -907,7 +907,7 @@ func Test_perceptron_Query(t *testing.T) {
 	}
 }
 
-/*func Test_perceptron_calcNeuron(t *testing.T) {
+func Test_perceptron_calcNeuron(t *testing.T) {
 	tests := []struct {
 		name  string
 		input []float64
@@ -1004,9 +1004,9 @@ func Test_perceptron_Query(t *testing.T) {
 			}
 		})
 	}
-}*/
+}
 
-/*func Test_perceptron_calcLoss(t *testing.T) {
+func Test_perceptron_calcLoss(t *testing.T) {
 	tests := []struct {
 		name   string
 		target []float64
@@ -1070,9 +1070,9 @@ func Test_perceptron_Query(t *testing.T) {
 			}
 		})
 	}
-}*/
+}
 
-/*func Test_perceptron_calcMiss(t *testing.T) {
+func Test_perceptron_calcMiss(t *testing.T) {
 	tests := []struct {
 		name string
 		got  *perceptron
@@ -1120,9 +1120,9 @@ func Test_perceptron_Query(t *testing.T) {
 			}
 		})
 	}
-}*/
+}
 
-/*func Test_perceptron_updWeight(t *testing.T) {
+func Test_perceptron_updWeight(t *testing.T) {
 	tests := []struct {
 		name  string
 		input []float64
@@ -1219,33 +1219,4 @@ func Test_perceptron_Query(t *testing.T) {
 			}
 		})
 	}
-}*/
-
-/*
-for _, n := range tt.got.neuron {
-	for _, m := range n {
-		fmt.Println(m)
-	}
 }
-for _, n := range tt.got.Weights {
-	for _, m := range n {
-		fmt.Println(m)
-	}
-}
-&perceptron{
-Parameter:      nil,
-Name:           perceptronName,
-Bias:           true,
-Hidden:         []int{1, 2, 3},
-Activation:     ModeSIGMOID,
-Loss:           ModeMSE,
-Limit:          .1,
-Rate:           floatType(DefaultRate),
-Weights:        Float3Type{},
-neuron:         [][]*neuronPerceptron{},
-lenInput:       2,
-lenOutput:      2,
-lastLayerIndex: 3,
-isInit:         true,
-jsonName:       "perceptron.json",
-}*/

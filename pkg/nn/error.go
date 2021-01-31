@@ -1,10 +1,7 @@
 package nn
 
 import (
-	"encoding/json"
 	"errors"
-	"log"
-	"os"
 )
 
 var (
@@ -18,7 +15,8 @@ var (
 )
 
 // LogError
-func LogError(err error) {
+/*func LogError(err error) {
+	//log.Println(err)
 	switch e := err.(type) {
 
 	// OS
@@ -40,4 +38,4 @@ func LogError(err error) {
 	default:
 		log.Println(err)
 	}
-}
+}*/

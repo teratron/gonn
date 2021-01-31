@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 )
 
@@ -64,7 +65,7 @@ func (j jsonString) getValue(key string) interface{} {
 		}
 	}
 	if err != nil {
-		LogError(fmt.Errorf("json get value: %w", err))
+		log.Println(fmt.Errorf("json get value: %w", err))
 	}
 	return nil
 }
@@ -84,7 +85,7 @@ func (j jsonString) Read(reader Reader) {
 		}
 	}
 	if err != nil {
-		LogError(fmt.Errorf("json read: %w", err))
+		log.Println(fmt.Errorf("json read: %w", err))
 	}
 }
 
@@ -113,6 +114,6 @@ func (j jsonString) Write(writer ...Writer) {
 		err = ErrEmpty
 	}
 	if err != nil {
-		LogError(fmt.Errorf("json write: %w", err))
+		log.Println(fmt.Errorf("json write: %w", err))
 	}
 }

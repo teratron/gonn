@@ -1,8 +1,13 @@
 package nn
 
+import (
+	"fmt"
+	"log"
+)
+
 // Floater
 type Floater interface {
-	length() int
+	length(...uint) int
 }
 
 type (
@@ -11,6 +16,36 @@ type (
 	Float3Type [][][]float64
 )
 
-func (f Float1Type) length() int { return len(f) }
-func (f Float2Type) length() int { return len(f) }
-func (f Float3Type) length() int { return len(f) }
+func (f Float1Type) length(...uint) int {
+	return len(f)
+}
+
+func (f Float2Type) length(ind ...uint) int {
+	if len(ind) > 0 {
+		if len(f) > int(ind[0]) {
+			return len(f[ind[0]])
+		}
+		log.Println(fmt.Errorf("error: index exceeds array size"))
+		return 0
+	}
+	return len(f)
+}
+
+func (f Float3Type) length(ind ...uint) int {
+	switch len(ind) {
+	case 0:
+		return len(f)
+	case 1:
+		if len(f) > int(ind[0]) {
+			return len(f[ind[0]])
+		}
+	default:
+		fallthrough
+	case 2:
+		if len(f) > int(ind[0]) && len(f[ind[0]]) > int(ind[1]) {
+			return len(f[ind[0]][ind[1]])
+		}
+	}
+	log.Println(fmt.Errorf("error: index exceeds arrays size"))
+	return 0
+}
