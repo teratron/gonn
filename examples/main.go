@@ -35,7 +35,7 @@ func main() {
 	// Training
 	//var buff nn.Floater
 	minLoss := 1.
-	for epoch := 1; epoch <= 100; epoch++ {
+	for epoch := 1; epoch <= 1; epoch++ {
 		for i := lenInput; i <= limit; i++ {
 			_, _ = n.Train(dataSet[i-lenInput:i], dataSet[i:i+lenOutput])
 		}

@@ -219,6 +219,7 @@ func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, 
 				if loss = p.calcLoss(target[0]); loss <= p.Limit {
 					break
 				}
+				fmt.Println(count)
 				p.calcMiss()
 				p.updWeight(input)
 				count++

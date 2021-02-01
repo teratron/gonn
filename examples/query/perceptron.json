@@ -1,10 +1,10 @@
 {
   "name": "perceptron",
+  "bias": true,
   "hidden": [
     5,
     3
   ],
-  "bias": true,
   "activation": 3,
   "loss": 0,
   "limit": 0.001,
