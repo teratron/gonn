@@ -517,23 +517,30 @@ func Test_perceptron_initFromWeight(t *testing.T) {
 	}
 }
 
-/*func Test_perceptron_Read(t *testing.T) {
-	type args struct {
-		reader Reader
+func Test_perceptron_Read(t *testing.T) {
+	type file struct {
+		Filer
 	}
+	gave := &perceptron{}
 	tests := []struct {
 		name   string
-		fields fields
-		args   args
+		reader Reader
 	}{
-		// TODO: Add test cases.
+		{
+			name:   "#1_type_missing_read",
+			reader: Reader(nil),
+		},
+		/*{
+			name: "#2_type_missing_file",
+			reader: &file{},
+		},*/
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-
+			gave.Read(tt.reader)
 		})
 	}
-}*/
+}
 
 /*func Test_perceptron_Write(t *testing.T) {
 	type args struct {

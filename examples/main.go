@@ -21,7 +21,7 @@ func main() {
 	n.SetLossMode(nn.ModeMSE)
 
 	// Minimum (sufficient) limit of the average of the error during training
-	n.SetLossLimit(.01)
+	n.SetLossLimit(.1)
 
 	// Learning coefficient, from 0 to 1
 	n.SetLearningRate(nn.DefaultRate)
@@ -30,19 +30,20 @@ func main() {
 	dataSet := []float64{.27, .31, .52, .66, .81, .13, .2, .49, .11, .73, .28}
 	lenInput := 3  // Number of input data
 	lenOutput := 2 // Number of output data
+	limit := len(dataSet) - lenOutput
 
 	// Training
-	var buff nn.Floater
+	//var buff nn.Floater
 	minLoss := 1.
-	for epoch := 1; epoch <= 1000; epoch++ {
-		for i := lenInput; i <= len(dataSet)-lenOutput; i++ {
+	for epoch := 1; epoch <= 100; epoch++ {
+		for i := lenInput; i <= limit; i++ {
 			_, _ = n.Train(dataSet[i-lenInput:i], dataSet[i:i+lenOutput])
 		}
 
 		// Verifying
 		sum := 0.
 		num := 0
-		for i := lenInput; i <= len(dataSet)-lenOutput; i++ {
+		for i := lenInput; i <= limit; i++ {
 			sum += n.Verify(dataSet[i-lenInput:i], dataSet[i:i+lenOutput])
 			num++
 		}
@@ -52,7 +53,7 @@ func main() {
 
 		// Weights are copied to the buffer at the minimum average error
 		if sum < minLoss {
-			buff = n.Weight()
+			//buff = n.Weight()
 			minLoss = sum
 		}
 
@@ -63,8 +64,8 @@ func main() {
 	}
 
 	// Returning weights for further recording from the buffer
-	n.SetWeight(buff)
+	//n.SetWeight(buff)
 
 	// Writing the neural network configuration to a file
-	n.Write(nn.JSON("perceptron.json"))
+	n.Write(nn.JSON("./perceptron.json"))
 }

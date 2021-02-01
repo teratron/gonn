@@ -48,9 +48,6 @@ func Activation(value float64, mode uint8) float64 {
 		return 1 / (1 + math.Exp(-value))
 	case ModeTANH:
 		value = math.Exp(2 * value)
-		/*if math.IsInf(value, 1) {
-			return 1
-		}*/
 		return (value - 1) / (value + 1)
 	}
 }

@@ -189,8 +189,6 @@ func (p *perceptron) Write(writer ...Writer) {
 			switch v := w.(type) {
 			case Filer:
 				v.Write(p)
-			/*case *report:
-			p.writeReport(v)*/
 			default:
 				log.Println(fmt.Errorf("%T %w for write: %v", v, ErrMissingType, w))
 			}

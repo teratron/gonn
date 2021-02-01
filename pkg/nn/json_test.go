@@ -20,16 +20,11 @@ func TestJSON(t *testing.T) {
 	}{
 		{
 			name: "#1",
-			file: []string{testNameJSON},
-			want: jsonString(testNameJSON),
-		},
-		{
-			name: "#2",
 			file: []string{testNameJSON, ""},
 			want: jsonString(testNameJSON),
 		},
 		{
-			name: "#3",
+			name: "#2",
 			file: []string{},
 			want: jsonString(""),
 		},
@@ -42,15 +37,6 @@ func TestJSON(t *testing.T) {
 		})
 	}
 }
-
-/*func Test_jsonString_toString(t *testing.T) {
-	want := testNameJSON
-	t.Run(want, func(t *testing.T) {
-		if got := jsonString(want).toString(); got != want {
-			t.Errorf("toString() = %s, want %s", got, want)
-		}
-	})
-}*/
 
 func Test_jsonString_fileName(t *testing.T) {
 	tests := []struct {
@@ -116,7 +102,7 @@ func Test_jsonString_getValue(t *testing.T) {
 			file: jsonString(""),
 			want: nil,
 		},
-		/*{
+		{
 			name: "#5_not_read_file",
 			key:  "",
 			file: jsonString("perceptron"),
@@ -127,7 +113,7 @@ func Test_jsonString_getValue(t *testing.T) {
 			key:  "",
 			file: jsonString("./json.go"),
 			want: nil,
-		},*/
+		},
 		{
 			name: "#7_warning_key",
 			key:  "",
@@ -179,7 +165,7 @@ func Test_jsonString_Read(t *testing.T) {
 			file: jsonString(""),
 			want: nil,
 		},
-		/*{
+		{
 			name: "#3_not_read_file",
 			file: jsonString("perceptron"),
 			want: nil,
@@ -188,7 +174,7 @@ func Test_jsonString_Read(t *testing.T) {
 			name: "#4_error_unmarshal",
 			file: jsonString("./json.go"),
 			want: nil,
-		},*/
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -231,18 +217,6 @@ func Test_jsonString_Write(t *testing.T) {
 			got:  &perceptron{},
 			want: []Writer{&perceptron{}},
 		},
-		/*{
-			name: "#5_error_marshal",
-			file: jsonString(defaultNameJSON),
-			got:  &perceptron{},
-			want: []Writer{&perceptron{}},
-		},*/
-		/*{
-			name: "#5_not_write_file",
-			file: jsonString("./"),
-			got:  &perceptron{},
-			want: []Writer{&perceptron{}},
-		},*/
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -267,22 +241,3 @@ func Test_jsonString_Write(t *testing.T) {
 		})
 	}
 }
-
-/*gave := &perceptron{
-	Name:       perceptronName,
-	Bias:       true,
-	Hidden:     []int{2},
-	Activation: ModeSIGMOID,
-	Loss:       ModeMSE,
-	Limit:      .1,
-	Rate:       DefaultRate,
-	Weights: Float3Type{
-		{
-			{.1, .1, .1},
-			{.1, .1, .1},
-		},
-		{
-			{.1, .1, .1},
-		},
-	},
-}*/

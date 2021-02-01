@@ -10,19 +10,6 @@ import (
 
 type jsonString string
 
-/*type jsonFile struct {
-	name string
-	Err error
-}
-
-func (j jsonFile) fileName() (string, error) {
-	filename = string(j)
-	if len(filename) == 0 {
-		err = ErrNoFile
-	}
-	return j.name, j.Err
-}*/
-
 var defaultNameJSON = "./neural_network.json"
 
 // JSON
@@ -32,10 +19,6 @@ func JSON(filename ...string) ReadWriter {
 	}
 	return jsonString("")
 }
-
-/*func (j jsonString) toString() string {
-	return string(j)
-}*/
 
 func (j jsonString) fileName() (filename string, err error) {
 	filename = string(j)

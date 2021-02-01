@@ -1,8 +1,6 @@
 package nn
 
-import (
-	"errors"
-)
+import "errors"
 
 var (
 	ErrInit          = errors.New("initialization error")
@@ -13,29 +11,3 @@ var (
 	ErrEmpty         = errors.New("empty")
 	ErrNoFile        = errors.New("file is missing")
 )
-
-// LogError
-/*func LogError(err error) {
-	//log.Println(err)
-	switch e := err.(type) {
-
-	// OS
-	case *os.LinkError:
-		log.Println("link error:", e)
-	case *os.PathError:
-		log.Println("path error:", e)
-	case *os.SyscallError:
-		log.Println("syscall error:", e)
-
-	// JSON
-	case *json.SyntaxError:
-		log.Println("syntax json error:", e, "offset:", e.Offset)
-	case *json.UnmarshalTypeError:
-		log.Println("unmarshal json error:", e, "offset:", e.Offset)
-	case *json.MarshalerError:
-		log.Println("marshaling json error:", e)
-
-	default:
-		log.Println(err)
-	}
-}*/
