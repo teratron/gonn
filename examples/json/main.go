@@ -14,5 +14,5 @@ func main() {
 	_, _ = n.Train(input, target)
 
 	// Writing the neural network configuration to a file
-	n.Write(nn.JSON())
+	_ = n.Write(nn.JSON())
 }

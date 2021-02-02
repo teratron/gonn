@@ -8,10 +8,10 @@ type ReadWriter interface {
 
 // Reader
 type Reader interface {
-	Read(Reader)
+	Read(Reader) error
 }
 
 // Writer
 type Writer interface {
-	Write(...Writer)
+	Write(...Writer) error
 }

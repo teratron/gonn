@@ -10,8 +10,6 @@ import (
 
 type jsonString string
 
-var defaultNameJSON = "./neural_network.json"
-
 // JSON
 func JSON(filename ...string) ReadWriter {
 	if len(filename) > 0 {
@@ -44,20 +42,19 @@ func (j jsonString) getValue(key string) interface{} {
 				if value, ok := data.(map[string]interface{})[key]; ok {
 					return value
 				}
+				err = fmt.Errorf("key not found")
 			}
 		}
 	}
-	if err != nil {
-		log.Println(fmt.Errorf("json get value: %w", err))
-	}
-	return nil
+	err = fmt.Errorf("json get value: %w", err)
+	log.Println(err)
+	return err
 }
 
 // Read
-func (j jsonString) Read(reader Reader) {
+func (j jsonString) Read(reader Reader) (err error) {
 	var (
 		filename string
-		err      error
 		b        []byte
 	)
 	filename, err = j.fileName()
@@ -68,16 +65,17 @@ func (j jsonString) Read(reader Reader) {
 		}
 	}
 	if err != nil {
-		log.Println(fmt.Errorf("json read: %w", err))
+		err = fmt.Errorf("json read: %w", err)
+		log.Println(err)
 	}
+	return
 }
 
+var defaultNameJSON = "./neural_network.json"
+
 // Write
-func (j jsonString) Write(writer ...Writer) {
-	var (
-		err error
-		b   []byte
-	)
+func (j jsonString) Write(writer ...Writer) (err error) {
+	var b []byte
 	if len(writer) > 0 {
 		if n, ok := writer[0].(NeuralNetwork); ok {
 			b, err = json.MarshalIndent(&n, "", "\t")
@@ -97,6 +95,8 @@ func (j jsonString) Write(writer ...Writer) {
 		err = ErrEmpty
 	}
 	if err != nil {
-		log.Println(fmt.Errorf("json write: %w", err))
+		err = fmt.Errorf("json write: %w", err)
+		log.Println(err)
 	}
+	return
 }

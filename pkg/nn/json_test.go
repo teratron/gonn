@@ -123,8 +123,12 @@ func Test_jsonString_getValue(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.file.getValue(tt.key); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("getValue() = %v, want %v", got, tt.want)
+			got := tt.file.getValue(tt.key)
+			if _, ok := got.(error); ok {
+				got = nil
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("getValue()\ngot:\t%v\nwant:\t%v", got, tt.want)
 			}
 		})
 	}
@@ -178,7 +182,7 @@ func Test_jsonString_Read(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.file.Read(tt.got); !reflect.DeepEqual(tt.got, tt.want) {
+			if _ = tt.file.Read(tt.got); !reflect.DeepEqual(tt.got, tt.want) {
 				t.Errorf("Read()\ngot:\t%v\nwant:\t%v", tt.got, tt.want)
 			}
 		})
@@ -223,7 +227,7 @@ func Test_jsonString_Write(t *testing.T) {
 			if len(tt.file) == 0 && len(tt.want) > 0 && len(tt.got.jsonName) > 0 {
 				tt.want[0].(*perceptron).jsonName = defaultNameJSON
 			}
-			tt.file.Write(tt.want...)
+			_ = tt.file.Write(tt.want...)
 			if len(tt.want) > 0 {
 				defer func() {
 					if err := os.Remove(string(tt.file)); err != nil {
@@ -233,7 +237,7 @@ func Test_jsonString_Write(t *testing.T) {
 				if len(tt.file) == 0 {
 					tt.file = jsonString(defaultNameJSON)
 				}
-				tt.file.Read(tt.got)
+				_ = tt.file.Read(tt.got)
 				if !reflect.DeepEqual(tt.got, tt.want[0]) {
 					t.Errorf("Write()\ngot:\t%v\nwant:\t%v", tt.got, tt.want[0])
 				}

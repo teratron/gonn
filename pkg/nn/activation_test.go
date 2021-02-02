@@ -2,6 +2,32 @@ package nn
 
 import "testing"
 
+func Test_checkActivationMode(t *testing.T) {
+	tests := []struct {
+		name string
+		gave uint8
+		want uint8
+	}{
+		{
+			name: "#1_ModeTANH",
+			gave: ModeTANH,
+			want: ModeTANH,
+		},
+		{
+			name: "#2_overflow",
+			gave: 255,
+			want: ModeSIGMOID,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := checkActivationMode(tt.gave); got != tt.want {
+				t.Errorf("checkActivationMode() = %d, want %d", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestActivation(t *testing.T) {
 	type args struct {
 		value float64

@@ -164,38 +164,46 @@ func (p *perceptron) SetWeight(weight Floater) {
 }
 
 // Read
-func (p *perceptron) Read(reader Reader) {
+func (p *perceptron) Read(reader Reader) (err error) {
 	switch r := reader.(type) {
 	case Filer:
-		r.Read(p)
+		err = r.Read(p)
 		if len(p.Weights) > 0 {
 			p.initFromWeight()
 		}
 		switch s := r.(type) {
 		case jsonString:
 			p.jsonName = string(s)
-		default:
-			log.Println(fmt.Errorf("%T %w for file: %v", s, ErrMissingType, s))
 		}
 	default:
-		log.Println(fmt.Errorf("%T %w for read: %v", r, ErrMissingType, r))
+		err = fmt.Errorf("%T %w: %v", r, ErrMissingType, r)
 	}
+	if err != nil {
+		err = fmt.Errorf("perceptron read: %w", err)
+		log.Println(err)
+	}
+	return
 }
 
 // Write
-func (p *perceptron) Write(writer ...Writer) {
+func (p *perceptron) Write(writer ...Writer) (err error) {
 	if len(writer) > 0 {
 		for _, w := range writer {
 			switch v := w.(type) {
 			case Filer:
-				v.Write(p)
+				err = v.Write(p)
 			default:
-				log.Println(fmt.Errorf("%T %w for write: %v", v, ErrMissingType, w))
+				err = fmt.Errorf("%T %w: %v", v, ErrMissingType, w)
 			}
 		}
 	} else {
-		log.Println(fmt.Errorf("%w for write", ErrEmpty))
+		err = fmt.Errorf("%w", ErrEmpty)
 	}
+	if err != nil {
+		err = fmt.Errorf("perceptron write: %w", err)
+		log.Println(err)
+	}
+	return
 }
 
 // Train training dataset
