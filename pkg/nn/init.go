@@ -48,7 +48,7 @@ func getArchitecture(name string) NeuralNetwork {
 	case hopfieldName:
 		return Hopfield()
 	default:
-		log.Println(fmt.Errorf("neural network is %w", ErrNotRecognized))
+		log.Println(fmt.Errorf("get architecture: neural network is %w", ErrNotRecognized))
 		return nil
 	}
 }

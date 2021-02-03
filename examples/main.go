@@ -30,11 +30,11 @@ func main() {
 	dataSet := []float64{.27, .31, .52, .66, .81, .13, .2, .49, .11, .73, .28}
 	lenInput := 3  // Number of input data
 	lenOutput := 2 // Number of output data
-	limit := len(dataSet) - lenOutput
 
 	// Training
 	//var buff nn.Floater
 	minLoss := 1.
+	limit := len(dataSet) - lenOutput
 	for epoch := 1; epoch <= 1; epoch++ {
 		for i := lenInput; i <= limit; i++ {
 			_, _ = n.Train(dataSet[i-lenInput:i], dataSet[i:i+lenOutput])

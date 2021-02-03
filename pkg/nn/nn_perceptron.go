@@ -206,18 +206,19 @@ func (p *perceptron) Write(writer ...Writer) (err error) {
 
 // Train training dataset
 func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, count int) {
+	var err error
 	if len(input) > 0 {
 		if len(target) > 0 && len(target[0]) > 0 {
 			if !p.isInit {
 				p.initFromNew(len(input), len(target[0]))
 			} else {
 				if p.lenInput != len(input) {
-					log.Println(fmt.Errorf("train: invalid number of elements in the input data"))
-					return -1, 0
+					err = fmt.Errorf("invalid number of elements in the input data")
+					goto ERROR
 				}
 				if p.lenOutput != len(target[0]) {
-					log.Println(fmt.Errorf("train: invalid number of elements in the target data"))
-					return -1, 0
+					err = fmt.Errorf("invalid number of elements in the target data")
+					goto ERROR
 				}
 			}
 			for count < maxIteration() {
@@ -225,17 +226,19 @@ func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, 
 				if loss = p.calcLoss(target[0]); loss <= p.Limit {
 					break
 				}
-				fmt.Println(count)
 				p.calcMiss()
 				p.updWeight(input)
 				count++
 			}
 		} else {
-			log.Println(fmt.Errorf("train: %w", ErrNoTarget))
-			return -1, 0
+			err = ErrNoTarget
 		}
 	} else {
-		log.Println(fmt.Errorf("train: %w", ErrNoInput))
+		err = ErrNoInput
+	}
+ERROR:
+	if err != nil {
+		log.Println(fmt.Errorf("train: %w", err))
 		return -1, 0
 	}
 	return
@@ -243,28 +246,32 @@ func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, 
 
 // Verify verifying dataset
 func (p *perceptron) Verify(input []float64, target ...[]float64) (loss float64) {
+	var err error
 	if len(input) > 0 {
 		if len(target) > 0 && len(target[0]) > 0 {
 			if !p.isInit {
 				p.initFromNew(len(input), len(target[0]))
 			} else {
 				if p.lenInput != len(input) {
-					log.Println(fmt.Errorf("verify: invalid number of elements in the input data"))
-					return -1
+					err = fmt.Errorf("invalid number of elements in the input data")
+					goto ERROR
 				}
 				if p.lenOutput != len(target[0]) {
-					log.Println(fmt.Errorf("verify: invalid number of elements in the target data"))
-					return -1
+					err = fmt.Errorf("invalid number of elements in the target data")
+					goto ERROR
 				}
 			}
 			p.calcNeuron(input)
 			loss = p.calcLoss(target[0])
 		} else {
-			log.Println(fmt.Errorf("verify: %w", ErrNoTarget))
-			return -1
+			err = ErrNoTarget
 		}
 	} else {
-		log.Println(fmt.Errorf("verify: %w", ErrNoInput))
+		err = ErrNoInput
+	}
+ERROR:
+	if err != nil {
+		log.Println(fmt.Errorf("verify: %w", err))
 		return -1
 	}
 	return
@@ -272,13 +279,14 @@ func (p *perceptron) Verify(input []float64, target ...[]float64) (loss float64)
 
 // Query querying dataset
 func (p *perceptron) Query(input []float64) (output []float64) {
+	var err error
 	if len(input) > 0 {
 		if !p.isInit {
-			log.Println(fmt.Errorf("query: %w", ErrInit))
-			return nil
+			err = ErrInit
+			goto ERROR
 		} else if p.lenInput != len(input) {
-			log.Println(fmt.Errorf("query: invalid number of elements in the input data"))
-			return nil
+			err = fmt.Errorf("invalid number of elements in the input data")
+			goto ERROR
 		}
 		p.calcNeuron(input)
 		output = make([]float64, p.lenOutput)
@@ -286,7 +294,12 @@ func (p *perceptron) Query(input []float64) (output []float64) {
 			output[i] = n.value
 		}
 	} else {
-		log.Println(fmt.Errorf("query: %w", ErrNoInput))
+		err = ErrNoInput
+	}
+ERROR:
+	if err != nil {
+		log.Println(fmt.Errorf("query: %w", err))
+		return nil
 	}
 	return
 }
@@ -330,7 +343,7 @@ func (p *perceptron) initFromNew(lenInput, lenTarget int) {
 				p.Weights[i][j] = make([]float64, biasInput)
 			}
 			for k := range p.Weights[i][j] {
-				p.Weights[i][j][k] = randFloat() //random() //.5//p.random() //randFloat() //.5 //getRandFloat()
+				p.Weights[i][j][k] = randFloat()
 			}
 			p.neuron[i][j] = &neuronPerceptron{}
 		}

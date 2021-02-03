@@ -26,7 +26,7 @@ func (f Float2Type) length(ind ...uint) int {
 		if len(f) > int(ind[0]) {
 			return len(f[ind[0]])
 		}
-		log.Println(fmt.Errorf("error: index exceeds array size"))
+		log.Println(fmt.Errorf("error Float2Type length: index exceeds array size"))
 		return 0
 	}
 	return len(f)
@@ -47,6 +47,6 @@ func (f Float3Type) length(ind ...uint) int {
 			return len(f[ind[0]][ind[1]])
 		}
 	}
-	log.Println(fmt.Errorf("error: index exceeds arrays size"))
+	log.Println(fmt.Errorf("error Float3Type length: index exceeds arrays size"))
 	return 0
 }
