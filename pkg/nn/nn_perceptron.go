@@ -180,7 +180,6 @@ func (p *perceptron) Read(reader Reader) (err error) {
 	}
 	if err != nil {
 		err = fmt.Errorf("perceptron read: %w", err)
-		log.Println(err)
 	}
 	return
 }
@@ -197,11 +196,10 @@ func (p *perceptron) Write(writer ...Writer) (err error) {
 			}
 		}
 	} else {
-		err = fmt.Errorf("%w", ErrEmpty)
+		err = fmt.Errorf("%w args", ErrEmpty)
 	}
 	if err != nil {
 		err = fmt.Errorf("perceptron write: %w", err)
-		log.Println(err)
 	}
 	return
 }

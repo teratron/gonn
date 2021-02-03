@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 )
 
@@ -46,9 +45,7 @@ func (j jsonString) getValue(key string) interface{} {
 			}
 		}
 	}
-	err = fmt.Errorf("json get value: %w", err)
-	log.Println(err)
-	return err
+	return fmt.Errorf("json get value: %w", err)
 }
 
 // Read
@@ -66,7 +63,6 @@ func (j jsonString) Read(reader Reader) (err error) {
 	}
 	if err != nil {
 		err = fmt.Errorf("json read: %w", err)
-		log.Println(err)
 	}
 	return
 }
@@ -75,9 +71,9 @@ var defaultNameJSON = "./neural_network.json"
 
 // Write
 func (j jsonString) Write(writer ...Writer) (err error) {
-	var b []byte
 	if len(writer) > 0 {
 		if n, ok := writer[0].(NeuralNetwork); ok {
+			var b []byte
 			b, err = json.MarshalIndent(&n, "", "\t")
 			if err == nil {
 				filename := string(j)
@@ -92,11 +88,10 @@ func (j jsonString) Write(writer ...Writer) (err error) {
 			}
 		}
 	} else {
-		err = ErrEmpty
+		err = fmt.Errorf("%w args", ErrEmpty)
 	}
 	if err != nil {
 		err = fmt.Errorf("json write: %w", err)
-		log.Println(err)
 	}
 	return
 }

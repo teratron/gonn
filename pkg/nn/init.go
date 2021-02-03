@@ -22,7 +22,7 @@ func New(reader ...Reader) NeuralNetwork {
 			switch v := r.getValue("name").(type) {
 			case string:
 				n := getArchitecture(v)
-				if err = n.Read(r); err != nil {
+				if err = n.Read(r); err == nil {
 					return n
 				}
 			case error:

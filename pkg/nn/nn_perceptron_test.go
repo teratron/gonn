@@ -2,6 +2,7 @@ package nn
 
 import (
 	"fmt"
+	"os"
 	"reflect"
 	"testing"
 )
@@ -375,14 +376,44 @@ func Test_perceptron_Read(t *testing.T) {
 }
 
 func Test_perceptron_Write(t *testing.T) {
+	gave := &perceptron{}
 	tests := []struct {
 		name   string
 		writer []Writer
+		want   error
 	}{
-		{},
+		{
+			name:   "#1",
+			writer: []Writer{JSON(defaultNameJSON)},
+			want:   nil,
+		},
+		{
+			name:   "#2_no_args",
+			writer: nil,
+			want:   fmt.Errorf("perceptron write: %w", fmt.Errorf("%w args", ErrEmpty)),
+		},
+		{
+			name:   "#3_type_missing_write",
+			writer: []Writer{nil},
+			want:   fmt.Errorf("perceptron write: %w", fmt.Errorf("%T %w: %v", nil, ErrMissingType, nil)),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			got := gave.Write(tt.writer...)
+			if len(tt.writer) > 0 {
+				if w, ok := tt.writer[0].(jsonString); ok {
+					fmt.Println(w)
+					defer func() {
+						if err := os.Remove(string(w)); err != nil {
+							t.Error(err)
+						}
+					}()
+				}
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Write()\ngot:\t%v\nwant:\t%v", got, tt.want)
+			}
 		})
 	}
 }

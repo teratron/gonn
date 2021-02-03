@@ -1,6 +1,7 @@
 package nn
 
 import (
+	"fmt"
 	"os"
 	"reflect"
 	"testing"
@@ -135,11 +136,13 @@ func Test_jsonString_getValue(t *testing.T) {
 }
 
 func Test_jsonString_Read(t *testing.T) {
+	existErr := fmt.Errorf("error")
 	tests := []struct {
-		name string
-		file jsonString
-		got  Reader
-		want Reader
+		name    string
+		file    jsonString
+		got     Reader
+		want    Reader
+		wantErr error
 	}{
 		{
 			name: "#1_perceptron",
@@ -163,26 +166,34 @@ func Test_jsonString_Read(t *testing.T) {
 					},
 				},
 			},
+			wantErr: nil,
 		},
 		{
-			name: "#2_no_file",
-			file: jsonString(""),
-			want: nil,
+			name:    "#2_no_file",
+			file:    jsonString(""),
+			want:    nil,
+			wantErr: existErr,
 		},
 		{
-			name: "#3_not_read_file",
-			file: jsonString("perceptron"),
-			want: nil,
+			name:    "#3_not_read_file",
+			file:    jsonString("perceptron"),
+			want:    nil,
+			wantErr: existErr,
 		},
 		{
-			name: "#4_error_unmarshal",
-			file: jsonString("./json.go"),
-			want: nil,
+			name:    "#4_error_unmarshal",
+			file:    jsonString("./json.go"),
+			want:    nil,
+			wantErr: existErr,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if _ = tt.file.Read(tt.got); !reflect.DeepEqual(tt.got, tt.want) {
+			err := tt.file.Read(tt.got)
+			if (tt.wantErr == nil && err != nil) || (tt.wantErr != nil && err == nil) {
+				t.Errorf("Read()\ngot error:\t%v\nwant error:\t%v", err, tt.wantErr)
+			}
+			if !reflect.DeepEqual(tt.got, tt.want) {
 				t.Errorf("Read()\ngot:\t%v\nwant:\t%v", tt.got, tt.want)
 			}
 		})
@@ -191,21 +202,24 @@ func Test_jsonString_Read(t *testing.T) {
 
 func Test_jsonString_Write(t *testing.T) {
 	tests := []struct {
-		name string
-		file jsonString
-		got  *perceptron
-		want []Writer
+		name    string
+		file    jsonString
+		got     *perceptron
+		want    []Writer
+		wantErr error
 	}{
 		{
-			name: "#1_perceptron",
-			file: jsonString(defaultNameJSON),
-			got:  &perceptron{},
-			want: []Writer{&perceptron{}},
+			name:    "#1_perceptron",
+			file:    jsonString(defaultNameJSON),
+			got:     &perceptron{},
+			want:    []Writer{&perceptron{}},
+			wantErr: nil,
 		},
 		{
-			name: "#2_no_args",
-			file: jsonString(""),
-			want: []Writer{},
+			name:    "#2_no_args",
+			file:    jsonString(""),
+			want:    []Writer{},
+			wantErr: fmt.Errorf("error"),
 		},
 		{
 			name: "#3_no_filename",
@@ -213,13 +227,15 @@ func Test_jsonString_Write(t *testing.T) {
 			got: &perceptron{
 				jsonName: defaultNameJSON,
 			},
-			want: []Writer{&perceptron{}},
+			want:    []Writer{&perceptron{}},
+			wantErr: nil,
 		},
 		{
-			name: "#4_no_filename",
-			file: jsonString(""),
-			got:  &perceptron{},
-			want: []Writer{&perceptron{}},
+			name:    "#4_no_filename",
+			file:    jsonString(""),
+			got:     &perceptron{},
+			want:    []Writer{&perceptron{}},
+			wantErr: nil,
 		},
 	}
 	for _, tt := range tests {
@@ -227,7 +243,10 @@ func Test_jsonString_Write(t *testing.T) {
 			if len(tt.file) == 0 && len(tt.want) > 0 && len(tt.got.jsonName) > 0 {
 				tt.want[0].(*perceptron).jsonName = defaultNameJSON
 			}
-			_ = tt.file.Write(tt.want...)
+			err := tt.file.Write(tt.want...)
+			if (tt.wantErr == nil && err != nil) || (tt.wantErr != nil && err == nil) {
+				t.Errorf("Write()\ngot error:\t%v\nwant error:\t%v", err, tt.wantErr)
+			}
 			if len(tt.want) > 0 {
 				defer func() {
 					if err := os.Remove(string(tt.file)); err != nil {
