@@ -15,7 +15,7 @@ func main() {
 	n.SetHiddenLayer(5, 3)
 
 	// Activation function mode
-	n.SetActivationMode(nn.ModeSIGMOID)
+	n.SetActivationMode(nn.ModeTANH)
 
 	// The mode of calculation of the total error
 	n.SetLossMode(nn.ModeMSE)

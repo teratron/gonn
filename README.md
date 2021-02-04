@@ -13,8 +13,8 @@
 gonn - Neural Network for Golang
 
 # Install
-    
-    $ go get -u github.com/zigenzoog/gonn
+
+    $ go get github.com/zigenzoog/gonn
 
 # Getting Started
 
@@ -55,7 +55,7 @@ func main() {
 	_, _ = n.Train(input, target)
 
 	// Writing the neural network configuration to a file
-	n.Write(nn.JSON("perceptron.json"))
+	n.Write(nn.JSON("./perceptron.json"))
 }
 ```
 

@@ -368,7 +368,7 @@ func Test_perceptron_Read(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := gave.Read(tt.reader); !reflect.DeepEqual(got, tt.want) {
+			if got := gave.Read(tt.reader); !reflect.DeepEqual(got, tt.want) { //TODO: deep equal error
 				t.Errorf("Read()\ngot:\t%v\nwant:\t%v", got, tt.want)
 			}
 		})
@@ -411,7 +411,7 @@ func Test_perceptron_Write(t *testing.T) {
 					}()
 				}
 			}
-			if !reflect.DeepEqual(got, tt.want) {
+			if !reflect.DeepEqual(got, tt.want) { //TODO: deep equal error
 				t.Errorf("Write()\ngot:\t%v\nwant:\t%v", got, tt.want)
 			}
 		})
