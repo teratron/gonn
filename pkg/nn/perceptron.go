@@ -412,9 +412,7 @@ func (p *perceptron) calcNeuron(input []float64) {
 						n.value += w
 					}
 				}
-				//fmt.Println(i, j, n.value)
 				n.value = Activation(n.value, p.Activation)
-				//fmt.Println(i, j, n.value)
 				wait <- true
 			}(j, n)
 		}
@@ -436,9 +434,7 @@ func (p *perceptron) calcLoss(target []float64) (loss float64) {
 		case ModeARCTAN:
 			loss += math.Pow(math.Atan(n.miss), 2)
 		}
-		//fmt.Println(i, n.miss, loss)
-		n.miss *= Derivative(n.miss, p.Activation)
-		//mt.Println(i, n.miss, Derivative(n.value, p.Activation))
+		n.miss *= Derivative(n.value, p.Activation)
 	}
 	loss /= float64(p.lenOutput)
 	if p.Loss == ModeRMSE {

@@ -45,12 +45,12 @@ func Activation(value float64, mode uint8) float64 {
 	default:
 		fallthrough
 	case ModeSIGMOID:
-		value = 1 / (1 + math.Exp(-value))
+		/*value = math.Exp(-value)
 		if math.IsInf(value, 1) {
 			return 1
 		}
-		return value
-		//return 1 / (1 + math.Exp(-value))
+		return 1 / (1 + value)*/
+		return 1 / (1 + math.Exp(-value))
 	case ModeTANH:
 		value = math.Exp(2 * value)
 		/*if math.IsInf(value, 1) {
