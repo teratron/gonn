@@ -189,9 +189,9 @@ func Test_jsonString_Read(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := tt.file.Read(tt.got)
-			if (tt.wantErr == nil && err != nil) || (tt.wantErr != nil && err == nil) {
-				t.Errorf("Read()\ngot error:\t%v\nwant error:\t%v", err, tt.wantErr)
+			gotErr := tt.file.Read(tt.got)
+			if (gotErr != nil && tt.wantErr == nil) || (gotErr == nil && tt.wantErr != nil) {
+				t.Errorf("Read()\ngot error:\t%v\nwant error:\t%v", gotErr, tt.wantErr)
 			}
 			if !reflect.DeepEqual(tt.got, tt.want) {
 				t.Errorf("Read()\ngot:\t%v\nwant:\t%v", tt.got, tt.want)
@@ -243,9 +243,9 @@ func Test_jsonString_Write(t *testing.T) {
 			if len(tt.file) == 0 && len(tt.want) > 0 && len(tt.got.jsonName) > 0 {
 				tt.want[0].(*perceptron).jsonName = defaultNameJSON
 			}
-			err := tt.file.Write(tt.want...)
-			if (tt.wantErr == nil && err != nil) || (tt.wantErr != nil && err == nil) {
-				t.Errorf("Write()\ngot error:\t%v\nwant error:\t%v", err, tt.wantErr)
+			gotErr := tt.file.Write(tt.want...)
+			if (tt.wantErr == nil && gotErr != nil) || (tt.wantErr != nil && gotErr == nil) {
+				t.Errorf("Write()\ngot error:\t%v\nwant error:\t%v", gotErr, tt.wantErr)
 			}
 			if len(tt.want) > 0 {
 				defer func() {

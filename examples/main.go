@@ -21,7 +21,7 @@ func main() {
 	n.SetLossMode(nn.ModeMSE)
 
 	// Minimum (sufficient) limit of the average of the error during training
-	n.SetLossLimit(.1)
+	n.SetLossLimit(.001)
 
 	// Learning coefficient, from 0 to 1
 	n.SetLearningRate(nn.DefaultRate)
@@ -32,10 +32,10 @@ func main() {
 	lenOutput := 2 // Number of output data
 
 	// Training
-	//var buff nn.Floater
+	var buff nn.Floater
 	minLoss := 1.
 	limit := len(dataSet) - lenOutput
-	for epoch := 1; epoch <= 1; epoch++ {
+	for epoch := 1; epoch <= 1000; epoch++ {
 		for i := lenInput; i <= limit; i++ {
 			_, _ = n.Train(dataSet[i-lenInput:i], dataSet[i:i+lenOutput])
 		}
@@ -53,7 +53,7 @@ func main() {
 
 		// Weights are copied to the buffer at the minimum average error
 		if sum < minLoss {
-			//buff = n.Weight()
+			buff = n.Weight()
 			minLoss = sum
 		}
 
@@ -64,7 +64,7 @@ func main() {
 	}
 
 	// Returning weights for further recording from the buffer
-	//n.SetWeight(buff)
+	n.SetWeight(buff)
 
 	// Writing the neural network configuration to a file
 	_ = n.Write(nn.JSON("./perceptron.json"))

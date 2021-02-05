@@ -356,54 +356,55 @@ func Test_perceptron_SetWeight(t *testing.T) {
 func Test_perceptron_Read(t *testing.T) {
 	gave := &perceptron{}
 	tests := []struct {
-		name   string
-		reader Reader
-		want   error
+		name    string
+		reader  Reader
+		wantErr error
 	}{
 		{
-			name:   "#1_type_missing_read",
-			reader: Reader(nil),
-			want:   fmt.Errorf("perceptron read: %w", fmt.Errorf("%T %w: %v", nil, ErrMissingType, nil)),
+			name:    "#1_type_missing_read",
+			reader:  Reader(nil),
+			wantErr: fmt.Errorf("error"),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := gave.Read(tt.reader); !reflect.DeepEqual(got, tt.want) { //TODO: deep equal error
-				t.Errorf("Read()\ngot:\t%v\nwant:\t%v", got, tt.want)
+			gotErr := gave.Read(tt.reader)
+			if (gotErr != nil && tt.wantErr == nil) || (gotErr == nil && tt.wantErr != nil) {
+				t.Errorf("Read()\ngot error:\t%v\nwant error:\t%v", gotErr, tt.wantErr)
 			}
 		})
 	}
 }
 
 func Test_perceptron_Write(t *testing.T) {
+	existErr := fmt.Errorf("error")
 	gave := &perceptron{}
 	tests := []struct {
-		name   string
-		writer []Writer
-		want   error
+		name    string
+		writer  []Writer
+		wantErr error
 	}{
 		{
-			name:   "#1",
-			writer: []Writer{JSON(defaultNameJSON)},
-			want:   nil,
+			name:    "#1",
+			writer:  []Writer{JSON(defaultNameJSON)},
+			wantErr: nil,
 		},
 		{
-			name:   "#2_no_args",
-			writer: nil,
-			want:   fmt.Errorf("perceptron write: %w", fmt.Errorf("%w args", ErrEmpty)),
+			name:    "#2_no_args",
+			writer:  nil,
+			wantErr: existErr,
 		},
 		{
-			name:   "#3_type_missing_write",
-			writer: []Writer{nil},
-			want:   fmt.Errorf("perceptron write: %w", fmt.Errorf("%T %w: %v", nil, ErrMissingType, nil)),
+			name:    "#3_type_missing_write",
+			writer:  []Writer{nil},
+			wantErr: existErr,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := gave.Write(tt.writer...)
+			gotErr := gave.Write(tt.writer...)
 			if len(tt.writer) > 0 {
 				if w, ok := tt.writer[0].(jsonString); ok {
-					fmt.Println(w)
 					defer func() {
 						if err := os.Remove(string(w)); err != nil {
 							t.Error(err)
@@ -411,8 +412,8 @@ func Test_perceptron_Write(t *testing.T) {
 					}()
 				}
 			}
-			if !reflect.DeepEqual(got, tt.want) { //TODO: deep equal error
-				t.Errorf("Write()\ngot:\t%v\nwant:\t%v", got, tt.want)
+			if (gotErr != nil && tt.wantErr == nil) || (gotErr == nil && tt.wantErr != nil) {
+				t.Errorf("Write()\ngot error:\t%v\nwant error:\t%v", gotErr, tt.wantErr)
 			}
 		})
 	}
