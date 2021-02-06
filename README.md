@@ -1,9 +1,8 @@
 <div style="text-align: center">
-  <!--
   <a href="https://pkg.go.dev/zigenzoog/gonn?tab=doc" title="Go API Reference" rel="nofollow"><img src="https://img.shields.io/badge/go-documentation-blue.svg?style=flat" alt="Go API Reference"></a>
-  <a href="https://github.com/zigenzoog/gonn/releases/tag/v0.0.1" title="0.0.1 Release" rel="nofollow"><img src="https://img.shields.io/badge/version-0.0.1-blue.svg?style=flat" alt="0.0.1 release"></a>
+  <a href="https://github.com/zigenzoog/gonn/releases/tag/v0.2.0" title="0.2.0 Release" rel="nofollow"><img src="https://img.shields.io/badge/version-0.2.0-blue.svg?style=flat" alt="0.2.0 release"></a>
   <a href="https://goreportcard.com/report/zigenzoog/gonn"><img src="https://goreportcard.com/badge/zigenzoog/gonn" alt="Code Status" /></a>
-  -->
+
   <!--a href="https://travis-ci.org/zigenzoog/gonn"><img src="https://travis-ci.org/zigenzoog/gonn.svg" alt="Build Status" /></a-->
   <!--a href='https://coveralls.io/github/zigenzoog/gonn?branch=develop'><img src='https://coveralls.io/repos/github/zigenzoog/gonn/badge.svg?branch=develop' alt='Coverage Status' /></a-->
   <!--a href='https://sourcegraph.com/github.com/zigenzoog/gonn?badge'><img src='https://sourcegraph.com/github.com/zigenzoog/gonn/-/badge.svg' alt='Used By' /></a-->
@@ -13,51 +12,49 @@
 gonn - Neural Network for Golang
 
 # Install
-    
-    $ go get -u github.com/zigenzoog/gonn
+
+    $ go get github.com/zigenzoog/gonn
 
 # Getting Started
 
 ```go
 package main
 
-import (
-    "os"
-
-    "github.com/zigenzoog/gonn/pkg/nn"
-)
+import "github.com/zigenzoog/gonn/pkg/nn"
 
 func main() {
-	// New returns a new neural network instance with the default parameters,
+	// New returns a new neural network
+	// instance with the default parameters,
 	// same n := nn.New(nn.Perceptron())
 	n := nn.New()
 
-	// Set parameters:
-	// HiddenLayer    - Array of the number of neurons in each hidden layer
-	// Bias           - The neuron bias, false or true
-	// ActivationMode - Activation function mode
-	// LossMode       - The mode of calculation of the total error
-	// LossLevel      - Minimum (sufficient) level of the average of the error during training
-	// Rate           - Learning coefficient, from 0 to 1
-	n.Set(
-		nn.HiddenLayer(3, 2),
-		nn.Bias(true),
-		nn.ActivationMode(nn.ModeSIGMOID),
-		nn.LossMode(nn.ModeMSE),
-		nn.LossLevel(.1),
-		nn.Rate(nn.DefaultRate))
+	// The neuron bias, false or true
+	n.SetNeuronBias(true)
+
+	// Array of the number of neurons in each hidden layer
+	n.SetHiddenLayer(3)
+
+	// Activation function mode
+	n.SetActivationMode(nn.ModeSIGMOID)
+
+	// The mode of calculation of the total error
+	n.SetLossMode(nn.ModeMSE)
+
+	// Minimum (sufficient) limit of the average of the error during training
+	n.SetLossLimit(.0001)
+
+	// Learning coefficient, from 0 to 1
+	n.SetLearningRate(nn.DefaultRate)
 
 	// Training dataset
-	input  := []float64{1, 0}
-	target := []float64{0, 1}
+	input  := []float64{1, 1}
+	target := []float64{0}
 
 	// Training
-	loss, count := n.Train(input, target)
+	_, _ = n.Train(input, target)
 
 	// Writing the neural network configuration to a file
-	n.Write(
-		nn.JSON("perceptron.json"),
-		nn.Report(os.Stdout, input, loss, count))
+	_ = n.Write(nn.JSON("./perceptron.json"))
 }
 ```
 

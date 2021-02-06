@@ -16,7 +16,7 @@ jobs:
     - name: Set up Go 1.x
       uses: actions/setup-go@v2
       with:
-        go-version: ^1.15.6
+        go-version: ^1.15
       id: go
 
     - name: Check out code into the Go module directory
@@ -31,7 +31,7 @@ jobs:
         fi
 
     - name: Build
-      run: go build -v ./cmd/nn
+      run: go build -v ./...
 
     - name: Test
-      run: go test -v ./cmd/nn
+      run: go test -v ./...

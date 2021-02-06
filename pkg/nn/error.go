@@ -1,23 +1,13 @@
 package nn
 
-import (
-	"errors"
-	"log"
-)
+import "errors"
 
 var (
 	ErrInit          = errors.New("initialization error")
-	ErrNotTrained    = errors.New("network is not trained")
-	ErrNotRecognized = errors.New("network is not recognized")
+	ErrNotRecognized = errors.New("not recognized")
 	ErrMissingType   = errors.New("type is missing")
+	ErrNoInput       = errors.New("no input data")
 	ErrNoTarget      = errors.New("no target data")
 	ErrEmpty         = errors.New("empty")
+	ErrNoFile        = errors.New("file is missing")
 )
-
-// errNN
-func errNN(err error) {
-	switch err.(type) {
-	default:
-		log.Println(err)
-	}
-}
