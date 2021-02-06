@@ -1,23 +1,17 @@
 package nn
 
-import (
-	"fmt"
-
-	"github.com/zigenzoog/gonn/pkg"
-)
-
-// Read
-func (n *nn) Read(reader pkg.Reader) {
-	reader.Read(n)
+// ReadWriter
+type ReadWriter interface {
+	Reader
+	Writer
 }
 
-// Write
-func (n *nn) Write(writer ...pkg.Writer) {
-	if len(writer) > 0 {
-		for _, w := range writer {
-			w.Write(n)
-		}
-	} else {
-		errNN(fmt.Errorf("%w for write", ErrEmpty))
-	}
+// Reader
+type Reader interface {
+	Read(Reader) error
+}
+
+// Writer
+type Writer interface {
+	Write(...Writer) error
 }

@@ -1,25 +1,16 @@
 package nn
 
-import "github.com/zigenzoog/gonn/pkg"
-
-// Declare conformity with NeuralNetwork interface
-var _ NeuralNetwork = (*nn)(nil)
-
 // NeuralNetwork
 type NeuralNetwork interface {
 	Parameter
-	Constructor
-	pkg.Controller
-}
+	ReadWriter
 
-// nn
-type nn struct {
-	// Architecture of neural network
-	Architecture `json:"architecture,omitempty" xml:"architecture,omitempty"`
+	// Query
+	Query(input []float64) (output []float64)
 
-	// State of the neural network
-	IsInit  bool `json:"-" xml:"-"`             // Neural network initializing flag
-	IsTrain bool `json:"isTrain" xml:"isTrain"` // Neural network training flag
+	// Verify
+	Verify(input []float64, target ...[]float64) (loss float64)
 
-	json string
+	// Train
+	Train(input []float64, target ...[]float64) (loss float64, count int)
 }

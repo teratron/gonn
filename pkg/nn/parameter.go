@@ -2,16 +2,36 @@ package nn
 
 // Parameter
 type Parameter interface {
-	Weight() Floater
+	name() string
+	setName(string)
 
-	// Perceptron
-	HiddenLayer() []uint
-	Bias() bool
+	stateInit() bool
+	setStateInit(bool)
+
+	nameJSON() string
+	setNameJSON(string)
+
+	HiddenLayer() []int
+	SetHiddenLayer(...int)
+
+	NeuronBias() bool
+	SetNeuronBias(bool)
+
 	ActivationMode() uint8
-	LossMode() uint8
-	LossLevel() float64
-	Rate() float32
+	SetActivationMode(uint8)
 
-	// Hopfield
-	Energy() float32
+	LossMode() uint8
+	SetLossMode(uint8)
+
+	LossLimit() float64
+	SetLossLimit(float64)
+
+	LearningRate() float64
+	SetLearningRate(float64)
+
+	NeuronEnergy() float64
+	SetNeuronEnergy(float64)
+
+	Weight() Floater
+	SetWeight(Floater)
 }
