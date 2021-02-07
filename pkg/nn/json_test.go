@@ -156,7 +156,7 @@ func Test_jsonString_Read(t *testing.T) {
 				Loss:       ModeMSE,
 				Limit:      .1,
 				Rate:       DefaultRate,
-				Weights: Float3Type{
+				Weights: float3Type{
 					{
 						{.1, .1, .1},
 						{.1, .1, .1},

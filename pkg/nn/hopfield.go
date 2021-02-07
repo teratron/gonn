@@ -17,7 +17,7 @@ type hopfield struct {
 	Energy float64 `json:"energy" xml:"energy"`
 
 	// Weights values
-	Weights Float2Type `json:"weights" xml:"weights"`
+	Weights float2Type `json:"weights" xml:"weights"`
 
 	// Neuron
 	neuron []*hopfieldNeuron
