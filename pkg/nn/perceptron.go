@@ -37,7 +37,7 @@ type perceptron struct {
 	Rate float64 `json:"rate"`
 
 	// Weight value
-	Weights Float3Type `json:"weights,omitempty"`
+	Weights float3Type `json:"weights,omitempty"`
 
 	// Neuron
 	neuron [][]*neuronPerceptron
@@ -158,7 +158,7 @@ func (p *perceptron) Weight() Floater {
 
 // SetWeight
 func (p *perceptron) SetWeight(weight Floater) {
-	if w, ok := weight.(Float3Type); ok {
+	if w, ok := weight.(float3Type); ok {
 		p.Weights = w
 	}
 }
@@ -328,7 +328,7 @@ func (p *perceptron) initFromNew(lenInput, lenTarget int) {
 	biasInput := p.lenInput + bias
 	var biasLayer int
 
-	p.Weights = make(Float3Type, lenLayer)
+	p.Weights = make(float3Type, lenLayer)
 	p.neuron = make([][]*neuronPerceptron, lenLayer)
 	for i, v := range layer {
 		p.Weights[i] = make([][]float64, v)
