@@ -3,6 +3,7 @@ package nn
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"reflect"
 	"testing"
 )
@@ -65,7 +66,7 @@ func Test_perceptron_setStateInit(t *testing.T) {
 }
 
 func Test_perceptron_nameJSON(t *testing.T) {
-	want := &perceptron{jsonName: "./" + perceptronName + ".json"}
+	want := &perceptron{jsonName: filepath.Join(filepath.Join(".", perceptronName+".json"))}
 	t.Run(want.jsonName, func(t *testing.T) {
 		if got := want.nameJSON(); got != want.jsonName {
 			t.Errorf("nameJSON() = %s, want %s", got, want.jsonName)
@@ -75,7 +76,7 @@ func Test_perceptron_nameJSON(t *testing.T) {
 
 func Test_perceptron_setNameJSON(t *testing.T) {
 	got := &perceptron{}
-	want := "./" + perceptronName + ".json"
+	want := filepath.Join(".", perceptronName+".json")
 	t.Run(want, func(t *testing.T) {
 		if got.setNameJSON(want); got.jsonName != want {
 			t.Errorf("setNameJSON() = %s, want %s", got.jsonName, want)

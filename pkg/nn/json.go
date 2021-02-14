@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 )
 
 type jsonString string
@@ -67,7 +68,7 @@ func (j jsonString) Read(reader Reader) (err error) {
 	return
 }
 
-var defaultNameJSON = "./neural_network.json"
+var defaultNameJSON = filepath.Join(".", "neural_network.json")
 
 // Write
 func (j jsonString) Write(writer ...Writer) (err error) {
