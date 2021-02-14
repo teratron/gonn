@@ -21,7 +21,11 @@ gonn - Neural Network for Golang
 ```go
 package main
 
-import "github.com/zigenzoog/gonn/pkg/nn"
+import (
+	"path/filepath"
+
+	"github.com/teratron/gonn/pkg/nn"
+)
 
 func main() {
 	// New returns a new neural network
@@ -55,7 +59,7 @@ func main() {
 	_, _ = n.Train(input, target)
 
 	// Writing the neural network configuration to a file
-	_ = n.Write(nn.JSON("./perceptron.json"))
+	_ = n.Write(nn.JSON(filepath.Join(".", "perceptron.json")))
 }
 ```
 
