@@ -7,6 +7,14 @@ import (
 	"time"
 )
 
+// MaxIteration the maximum number of iterations after which training is forcibly terminated.
+const MaxIteration int = 10e+05
+
+var (
+	maxIteration = getMaxIteration
+	randFloat    = getRandFloat
+)
+
 func init() {
 	rand.Seed(time.Now().UTC().UnixNano())
 }
@@ -40,7 +48,6 @@ func New(reader ...Reader) NeuralNetwork {
 	return Perceptron()
 }
 
-// getArchitecture
 func getArchitecture(name string) NeuralNetwork {
 	switch name {
 	case perceptronName:
@@ -53,17 +60,9 @@ func getArchitecture(name string) NeuralNetwork {
 	}
 }
 
-// MaxIteration the maximum number of iterations after which training is forcibly terminated.
-const MaxIteration int = 10e+05
-
-var maxIteration = getMaxIteration
-
-// getMaxIteration
 func getMaxIteration() int {
 	return MaxIteration
 }
-
-var randFloat = getRandFloat
 
 // getRand return random number from -0.5 to 0.5.
 func getRandFloat() (r float64) {

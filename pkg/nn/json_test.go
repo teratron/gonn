@@ -3,6 +3,7 @@ package nn
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"reflect"
 	"testing"
 )
@@ -10,7 +11,7 @@ import (
 const testNameJSON = "./testdata/perceptron.json"
 
 func init() {
-	defaultNameJSON = "./testdata/tmp.json"
+	defaultNameJSON = filepath.Join(".", "testdata", "tmp.json")
 }
 
 func TestJSON(t *testing.T) {
