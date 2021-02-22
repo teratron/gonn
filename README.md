@@ -45,7 +45,7 @@ func main() {
 
 	_, _ = n.Train(input, target)
 
-	_ = n.Write(nn.JSON(filepath.Join(".", "perceptron.json")))
+	_ = n.Write(nn.JSON(filepath.Join("perceptron.json")))
 }
 ```
 
