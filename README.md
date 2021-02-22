@@ -34,7 +34,7 @@ func main() {
 	n := nn.New()
 
 	n.SetNeuronBias(true)
-	n.SetHiddenLayer(3)
+	n.SetHiddenLayer(3, 2)
 	n.SetActivationMode(nn.ModeSIGMOID)
 	n.SetLossMode(nn.ModeMSE)
 	n.SetLossLimit(.0001)
