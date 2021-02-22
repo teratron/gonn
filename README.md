@@ -24,7 +24,7 @@ package main
 import (
 	"path/filepath"
 
-	"github.com/teratron/gonn/pkg/nn"
+	"github.com/zigenzoog/gonn/pkg/nn"
 )
 
 func main() {
