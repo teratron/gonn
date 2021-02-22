@@ -33,32 +33,18 @@ func main() {
 	// same n := nn.New(nn.Perceptron())
 	n := nn.New()
 
-	// The neuron bias, false or true
 	n.SetNeuronBias(true)
-
-	// Array of the number of neurons in each hidden layer
 	n.SetHiddenLayer(3)
-
-	// Activation function mode
 	n.SetActivationMode(nn.ModeSIGMOID)
-
-	// The mode of calculation of the total error
 	n.SetLossMode(nn.ModeMSE)
-
-	// Minimum (sufficient) limit of the average of the error during training
 	n.SetLossLimit(.0001)
-
-	// Learning coefficient, from 0 to 1
 	n.SetLearningRate(nn.DefaultRate)
 
-	// Training dataset
 	input  := []float64{1, 1}
 	target := []float64{0}
 
-	// Training
 	_, _ = n.Train(input, target)
 
-	// Writing the neural network configuration to a file
 	_ = n.Write(nn.JSON(filepath.Join(".", "perceptron.json")))
 }
 ```
