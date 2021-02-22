@@ -8,7 +8,7 @@ import (
 
 func main() {
 	// New returns a new neural network
-	n := nn.New(nn.JSON(filepath.Join(".", "perceptron.json")))
+	n := nn.New(nn.JSON(filepath.Join("perceptron.json")))
 
 	// Training dataset
 	input := []float64{1, 1}
