@@ -28,14 +28,14 @@ func (j jsonString) fileName() (filename string, err error) {
 
 func (j jsonString) getValue(key string) interface{} {
 	var (
-		filename string
-		err      error
-		b        []byte
-		data     interface{}
+		file string
+		err  error
+		b    []byte
+		data interface{}
 	)
-	filename, err = j.fileName()
+	file, err = j.fileName()
 	if err == nil {
-		b, err = ioutil.ReadFile(filepath.Join(filename))
+		b, err = ioutil.ReadFile(file)
 		if err == nil {
 			err = json.Unmarshal(b, &data)
 			if err == nil {
@@ -52,12 +52,12 @@ func (j jsonString) getValue(key string) interface{} {
 // Read
 func (j jsonString) Read(reader Reader) (err error) {
 	var (
-		filename string
-		b        []byte
+		file string
+		b    []byte
 	)
-	filename, err = j.fileName()
+	file, err = j.fileName()
 	if err == nil {
-		b, err = ioutil.ReadFile(filepath.Join(filename))
+		b, err = ioutil.ReadFile(file)
 		if err == nil {
 			err = json.Unmarshal(b, &reader)
 		}
