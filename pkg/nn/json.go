@@ -35,7 +35,7 @@ func (j jsonString) getValue(key string) interface{} {
 	)
 	filename, err = j.fileName()
 	if err == nil {
-		b, err = ioutil.ReadFile(filename)
+		b, err = ioutil.ReadFile(filepath.Join(filename))
 		if err == nil {
 			err = json.Unmarshal(b, &data)
 			if err == nil {
@@ -57,7 +57,7 @@ func (j jsonString) Read(reader Reader) (err error) {
 	)
 	filename, err = j.fileName()
 	if err == nil {
-		b, err = ioutil.ReadFile(filename)
+		b, err = ioutil.ReadFile(filepath.Join(filename))
 		if err == nil {
 			err = json.Unmarshal(b, &reader)
 		}
