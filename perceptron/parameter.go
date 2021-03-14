@@ -1,15 +1,10 @@
-package nn
+package perceptron
+
+import "github.com/teratron/gonn"
 
 // Parameter
 type Parameter interface {
-	name() string
-	setName(string)
-
-	stateInit() bool
-	setStateInit(bool)
-
-	nameJSON() string
-	setNameJSON(string)
+	gonn.Parameter
 
 	HiddenLayer() []int
 	SetHiddenLayer(...int)
@@ -28,10 +23,4 @@ type Parameter interface {
 
 	LearningRate() float64
 	SetLearningRate(float64)
-
-	NeuronEnergy() float64
-	SetNeuronEnergy(float64)
-
-	Weight() Floater
-	SetWeight(Floater)
 }

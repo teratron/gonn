@@ -1,7 +1,7 @@
-package nn
+package parameter
 
 // checkHiddenLayer
-func checkHiddenLayer(layer []int) []int {
+func CheckHiddenLayer(layer []int) []int {
 	if len(layer) > 0 {
 		return layer
 	}

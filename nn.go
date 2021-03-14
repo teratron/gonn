@@ -1,4 +1,4 @@
-package nn
+package gonn
 
 // NeuralNetwork
 type NeuralNetwork interface {

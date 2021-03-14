@@ -1,19 +1,23 @@
-package nn
+package perceptron
 
 import (
 	"fmt"
 	"log"
 	"math"
+
+	"github.com/teratron/gonn"
+	param "github.com/teratron/gonn/parameter"
+	"github.com/teratron/gonn/util"
 )
 
-const perceptronName = "perceptron"
+//const perceptronName = "perceptron"
 
 // Declare conformity with NeuralNetwork interface
-var _ NeuralNetwork = (*perceptron)(nil)
+var _ gonn.NeuralNetwork = (*perceptron)(nil)
 
 // perceptron
 type perceptron struct {
-	Parameter `json:"-"`
+	//Parameter `json:"-"`
 
 	// Neural network architecture name
 	Name string `json:"name"`
@@ -37,10 +41,10 @@ type perceptron struct {
 	Rate float64 `json:"rate"`
 
 	// Weight value
-	Weights float3Type `json:"weights,omitempty"`
+	Weights gonn.Float3Type `json:"weights,omitempty"`
 
 	// Neuron
-	neuron [][]*neuronPerceptron
+	neuron [][]*neuron
 
 	// Settings
 	lenInput       int
@@ -48,16 +52,17 @@ type perceptron struct {
 	lastLayerIndex int
 	isInit         bool
 	jsonName       string
+	yamlName       string
 }
 
 // neuronPerceptron
-type neuronPerceptron struct {
+type neuron struct {
 	value float64
 	miss  float64
 }
 
 // Perceptron return perceptron neural network
-func Perceptron() *perceptron {
+/*func Perceptron() *perceptron {
 	return &perceptron{
 		Name:       perceptronName,
 		Activation: ModeSIGMOID,
@@ -65,30 +70,38 @@ func Perceptron() *perceptron {
 		Limit:      .1,
 		Rate:       DefaultRate,
 	}
-}
+}*/
 
-func (p *perceptron) name() string {
+func (p *perceptron) NameNN() string {
 	return p.Name
 }
 
-func (p *perceptron) setName(name string) {
+func (p *perceptron) SetNameNN(name string) {
 	p.Name = name
 }
 
-func (p *perceptron) stateInit() bool {
+func (p *perceptron) InitNN() bool {
 	return p.isInit
 }
 
-func (p *perceptron) setStateInit(state bool) {
+func (p *perceptron) SetInitNN(state bool) {
 	p.isInit = state
 }
 
-func (p *perceptron) nameJSON() string {
+func (p *perceptron) NameJSON() string {
 	return p.jsonName
 }
 
-func (p *perceptron) setNameJSON(name string) {
+func (p *perceptron) SetNameJSON(name string) {
 	p.jsonName = name
+}
+
+func (p *perceptron) NameYAML() string {
+	return p.yamlName
+}
+
+func (p *perceptron) SetNameYAML(name string) {
+	p.yamlName = name
 }
 
 // NeuronBias
@@ -103,12 +116,12 @@ func (p *perceptron) SetNeuronBias(bias bool) {
 
 // HiddenLayer
 func (p *perceptron) HiddenLayer() []int {
-	return checkHiddenLayer(p.Hidden)
+	return param.CheckHiddenLayer(p.Hidden)
 }
 
 // SetHiddenLayer
 func (p *perceptron) SetHiddenLayer(layer ...int) {
-	p.Hidden = checkHiddenLayer(layer)
+	p.Hidden = param.CheckHiddenLayer(layer)
 }
 
 // ActivationMode
@@ -118,7 +131,7 @@ func (p *perceptron) ActivationMode() uint8 {
 
 // SetActivationMode
 func (p *perceptron) SetActivationMode(mode uint8) {
-	p.Activation = checkActivationMode(mode)
+	p.Activation = param.CheckActivationMode(mode)
 }
 
 // LossMode
@@ -128,7 +141,7 @@ func (p *perceptron) LossMode() uint8 {
 
 // SetLossMode
 func (p *perceptron) SetLossMode(mode uint8) {
-	p.Loss = checkLossMode(mode)
+	p.Loss = param.CheckLossMode(mode)
 }
 
 // LossLimit
@@ -148,35 +161,35 @@ func (p *perceptron) LearningRate() float64 {
 
 // SetLearningRate
 func (p *perceptron) SetLearningRate(rate float64) {
-	p.Rate = checkLearningRate(rate)
+	p.Rate = param.CheckLearningRate(rate)
 }
 
 // Weight
-func (p *perceptron) Weight() Floater {
+func (p *perceptron) Weight() gonn.Floater {
 	return &p.Weights
 }
 
 // SetWeight
-func (p *perceptron) SetWeight(weight Floater) {
-	if w, ok := weight.(float3Type); ok {
+func (p *perceptron) SetWeight(weight gonn.Floater) {
+	if w, ok := weight.(gonn.Float3Type); ok {
 		p.Weights = w
 	}
 }
 
 // Read
-func (p *perceptron) Read(reader Reader) (err error) {
+func (p *perceptron) Read(reader gonn.Reader) (err error) {
 	switch r := reader.(type) {
-	case Filer:
+	case gonn.Filer:
 		err = r.Read(p)
 		if len(p.Weights) > 0 {
 			p.initFromWeight()
 		}
 		switch s := r.(type) {
-		case jsonString:
+		case util.JsonString:
 			p.jsonName = string(s)
 		}
 	default:
-		err = fmt.Errorf("%T %w: %v", r, ErrMissingType, r)
+		err = fmt.Errorf("%T %w: %v", r, gonn.ErrMissingType, r)
 	}
 	if err != nil {
 		err = fmt.Errorf("perceptron read: %w", err)
@@ -185,61 +198,21 @@ func (p *perceptron) Read(reader Reader) (err error) {
 }
 
 // Write
-func (p *perceptron) Write(writer ...Writer) (err error) {
+func (p *perceptron) Write(writer ...gonn.Writer) (err error) {
 	if len(writer) > 0 {
 		for _, w := range writer {
 			switch v := w.(type) {
-			case Filer:
+			case gonn.Filer:
 				err = v.Write(p)
 			default:
-				err = fmt.Errorf("%T %w: %v", v, ErrMissingType, w)
+				err = fmt.Errorf("%T %w: %v", v, gonn.ErrMissingType, w)
 			}
 		}
 	} else {
-		err = fmt.Errorf("%w args", ErrEmpty)
+		err = fmt.Errorf("%w args", gonn.ErrEmpty)
 	}
 	if err != nil {
 		err = fmt.Errorf("perceptron write: %w", err)
-	}
-	return
-}
-
-// Train training dataset
-func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, count int) {
-	var err error
-	if len(input) > 0 {
-		if len(target) > 0 && len(target[0]) > 0 {
-			if !p.isInit {
-				p.initFromNew(len(input), len(target[0]))
-			} else {
-				if p.lenInput != len(input) {
-					err = fmt.Errorf("invalid number of elements in the input data")
-					goto ERROR
-				}
-				if p.lenOutput != len(target[0]) {
-					err = fmt.Errorf("invalid number of elements in the target data")
-					goto ERROR
-				}
-			}
-			for count < maxIteration() {
-				p.calcNeuron(input)
-				if loss = p.calcLoss(target[0]); loss <= p.Limit {
-					break
-				}
-				p.calcMiss()
-				p.updWeight(input)
-				count++
-			}
-		} else {
-			err = ErrNoTarget
-		}
-	} else {
-		err = ErrNoInput
-	}
-ERROR:
-	if err != nil {
-		log.Println(fmt.Errorf("train: %w", err))
-		return -1, 0
 	}
 	return
 }
@@ -264,42 +237,15 @@ func (p *perceptron) Verify(input []float64, target ...[]float64) (loss float64)
 			p.calcNeuron(input)
 			loss = p.calcLoss(target[0])
 		} else {
-			err = ErrNoTarget
+			err = gonn.ErrNoTarget
 		}
 	} else {
-		err = ErrNoInput
+		err = gonn.ErrNoInput
 	}
 ERROR:
 	if err != nil {
 		log.Println(fmt.Errorf("verify: %w", err))
 		return -1
-	}
-	return
-}
-
-// Query querying dataset
-func (p *perceptron) Query(input []float64) (output []float64) {
-	var err error
-	if len(input) > 0 {
-		if !p.isInit {
-			err = ErrInit
-			goto ERROR
-		} else if p.lenInput != len(input) {
-			err = fmt.Errorf("invalid number of elements in the input data")
-			goto ERROR
-		}
-		p.calcNeuron(input)
-		output = make([]float64, p.lenOutput)
-		for i, n := range p.neuron[p.lastLayerIndex] {
-			output[i] = n.value
-		}
-	} else {
-		err = ErrNoInput
-	}
-ERROR:
-	if err != nil {
-		log.Println(fmt.Errorf("query: %w", err))
-		return nil
 	}
 	return
 }
@@ -328,11 +274,11 @@ func (p *perceptron) initFromNew(lenInput, lenTarget int) {
 	biasInput := p.lenInput + bias
 	var biasLayer int
 
-	p.Weights = make(float3Type, lenLayer)
-	p.neuron = make([][]*neuronPerceptron, lenLayer)
+	p.Weights = make(gonn.Float3Type, lenLayer)
+	p.neuron = make([][]*neuron, lenLayer)
 	for i, v := range layer {
 		p.Weights[i] = make([][]float64, v)
-		p.neuron[i] = make([]*neuronPerceptron, v)
+		p.neuron[i] = make([]*neuron, v)
 		if i > 0 {
 			biasLayer = layer[i-1] + bias
 		}
@@ -343,9 +289,9 @@ func (p *perceptron) initFromNew(lenInput, lenTarget int) {
 				p.Weights[i][j] = make([]float64, biasInput)
 			}
 			for k := range p.Weights[i][j] {
-				p.Weights[i][j][k] = randFloat()
+				p.Weights[i][j][k] = param.GetRandFloat()
 			}
-			p.neuron[i][j] = &neuronPerceptron{}
+			p.neuron[i][j] = &neuron{}
 		}
 	}
 	p.isInit = true
@@ -375,11 +321,11 @@ func (p *perceptron) initFromWeight() {
 		p.Hidden = []int{0}
 	}
 
-	p.neuron = make([][]*neuronPerceptron, length)
+	p.neuron = make([][]*neuron, length)
 	for i, v := range p.Weights {
-		p.neuron[i] = make([]*neuronPerceptron, len(v))
+		p.neuron[i] = make([]*neuron, len(v))
 		for j := range v {
-			p.neuron[i][j] = &neuronPerceptron{}
+			p.neuron[i][j] = &neuron{}
 		}
 	}
 	p.isInit = true
@@ -399,7 +345,7 @@ func (p *perceptron) calcNeuron(input []float64) {
 			length = p.lenInput
 		}
 		for j, n := range v {
-			go func(j int, n *neuronPerceptron) {
+			go func(j int, n *neuron) {
 				n.value = 0
 				for k, w := range p.Weights[i][j] {
 					if k < length {
@@ -412,7 +358,7 @@ func (p *perceptron) calcNeuron(input []float64) {
 						n.value += w
 					}
 				}
-				n.value = Activation(n.value, p.Activation)
+				n.value = param.Activation(n.value, p.Activation)
 				wait <- true
 			}(j, n)
 		}
@@ -429,15 +375,15 @@ func (p *perceptron) calcLoss(target []float64) (loss float64) {
 		switch p.Loss {
 		default:
 			fallthrough
-		case ModeMSE, ModeRMSE:
+		case param.ModeMSE, param.ModeRMSE:
 			loss += math.Pow(n.miss, 2)
-		case ModeARCTAN:
+		case param.ModeARCTAN:
 			loss += math.Pow(math.Atan(n.miss), 2)
 		}
-		n.miss *= Derivative(n.value, p.Activation)
+		n.miss *= param.Derivative(n.value, p.Activation)
 	}
 	loss /= float64(p.lenOutput)
-	if p.Loss == ModeRMSE {
+	if p.Loss == param.ModeRMSE {
 		loss = math.Sqrt(loss)
 	}
 	return
@@ -451,12 +397,12 @@ func (p *perceptron) calcMiss() {
 	for i := p.lastLayerIndex - 1; i >= 0; i-- {
 		inc := i + 1
 		for j, n := range p.neuron[i] {
-			go func(j int, n *neuronPerceptron) {
+			go func(j int, n *neuron) {
 				n.miss = 0
 				for k, m := range p.neuron[inc] {
 					n.miss += m.miss * p.Weights[inc][k][j]
 				}
-				n.miss *= Derivative(n.value, p.Activation)
+				n.miss *= param.Derivative(n.value, p.Activation)
 				wait <- true
 			}(j, n)
 		}

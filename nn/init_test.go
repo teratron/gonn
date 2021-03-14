@@ -48,7 +48,7 @@ func TestNew(t *testing.T) {
 				Loss:       ModeMSE,
 				Limit:      .1,
 				Rate:       DefaultRate,
-				Weights: float3Type{
+				Weights: Float3Type{
 					{
 						{.1, .1, .1},
 						{.1, .1, .1},
@@ -108,7 +108,7 @@ func Test_getArchitecture(t *testing.T) {
 	}
 	for i, tt := range tests {
 		t.Run("#"+strconv.Itoa(i+1)+"_"+tt.name, func(t *testing.T) {
-			if got := getArchitecture(tt.name); !reflect.DeepEqual(got, tt.want) {
+			if got := architecture(tt.name); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("getArchitecture(%s)\ngot:\t%v\nwant:\t%v", tt.name, got, tt.want)
 			}
 		})

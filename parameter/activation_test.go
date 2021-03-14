@@ -1,4 +1,4 @@
-package nn
+package parameter
 
 import "testing"
 
@@ -21,7 +21,7 @@ func Test_checkActivationMode(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := checkActivationMode(tt.gave); got != tt.want {
+			if got := CheckActivationMode(tt.gave); got != tt.want {
 				t.Errorf("checkActivationMode() = %d, want %d", got, tt.want)
 			}
 		})

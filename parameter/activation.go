@@ -1,4 +1,4 @@
-package nn
+package parameter
 
 import "math"
 
@@ -19,8 +19,8 @@ const (
 	ModeTANH
 )
 
-// checkActivationMode
-func checkActivationMode(mode uint8) uint8 {
+// CheckActivationMode
+func CheckActivationMode(mode uint8) uint8 {
 	if mode > ModeTANH {
 		return ModeSIGMOID
 	}

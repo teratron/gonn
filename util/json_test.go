@@ -1,4 +1,4 @@
-package nn
+package util
 
 import (
 	"fmt"
@@ -8,27 +8,27 @@ import (
 	"testing"
 )
 
-const testNameJSON = "./testdata/perceptron.json"
+var testNameJSON = filepath.Join("testdata", "perceptron.json")
 
 func init() {
-	defaultNameJSON = filepath.Join(".", "testdata", "tmp.json")
+	defaultNameJSON = filepath.Join("testdata", "tmp.json")
 }
 
 func TestJSON(t *testing.T) {
 	tests := []struct {
 		name string
 		file []string
-		want jsonString
+		want JsonString
 	}{
 		{
 			name: "#1",
 			file: []string{testNameJSON, ""},
-			want: jsonString(testNameJSON),
+			want: JsonString(testNameJSON),
 		},
 		{
 			name: "#2",
 			file: []string{},
-			want: jsonString(""),
+			want: JsonString(""),
 		},
 	}
 	for _, tt := range tests {
@@ -43,26 +43,26 @@ func TestJSON(t *testing.T) {
 func Test_jsonString_fileName(t *testing.T) {
 	tests := []struct {
 		name      string
-		file      jsonString
+		file      JsonString
 		wantName  string
 		wantError error
 	}{
 		{
 			name:      "#1",
-			file:      jsonString(testNameJSON),
+			file:      JsonString(testNameJSON),
 			wantName:  testNameJSON,
 			wantError: nil,
 		},
 		{
 			name:      "#2",
-			file:      jsonString(""),
+			file:      JsonString(""),
 			wantName:  "",
 			wantError: ErrNoFile,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotName, gotError := jsonString(tt.wantName).fileName()
+			gotName, gotError := JsonString(tt.wantName).FileName()
 			if gotName != tt.wantName {
 				t.Errorf("fileName() = %s, want %s", gotName, tt.wantName)
 			}
@@ -77,49 +77,49 @@ func Test_jsonString_getValue(t *testing.T) {
 	tests := []struct {
 		name string
 		key  string
-		file jsonString
+		file JsonString
 		want interface{}
 	}{
 		{
 			name: "#1_name",
 			key:  "name",
-			file: jsonString(testNameJSON),
+			file: JsonString(testNameJSON),
 			want: perceptronName,
 		},
 		{
 			name: "#2_bias",
 			key:  "bias",
-			file: jsonString(testNameJSON),
+			file: JsonString(testNameJSON),
 			want: true,
 		},
 		{
 			name: "#3_hidden",
 			key:  "hidden",
-			file: jsonString(testNameJSON),
+			file: JsonString(testNameJSON),
 			want: []interface{}{2.},
 		},
 		{
 			name: "#4_no_file",
 			key:  "",
-			file: jsonString(""),
+			file: JsonString(""),
 			want: nil,
 		},
 		{
 			name: "#5_not_read_file",
 			key:  "",
-			file: jsonString("perceptron"),
+			file: JsonString("perceptron"),
 			want: nil,
 		},
 		{
 			name: "#6_error_unmarshal",
 			key:  "",
-			file: jsonString("./json.go"),
+			file: JsonString("./json.go"),
 			want: nil,
 		},
 		{
 			name: "#7_warning_key",
 			key:  "",
-			file: jsonString(testNameJSON),
+			file: JsonString(testNameJSON),
 			want: nil,
 		},
 	}
@@ -140,14 +140,14 @@ func Test_jsonString_Read(t *testing.T) {
 	existErr := fmt.Errorf("error")
 	tests := []struct {
 		name    string
-		file    jsonString
+		file    JsonString
 		got     Reader
 		want    Reader
 		wantErr error
 	}{
 		{
 			name: "#1_perceptron",
-			file: jsonString(testNameJSON),
+			file: JsonString(testNameJSON),
 			got:  &perceptron{},
 			want: &perceptron{
 				Name:       perceptronName,
@@ -157,7 +157,7 @@ func Test_jsonString_Read(t *testing.T) {
 				Loss:       ModeMSE,
 				Limit:      .1,
 				Rate:       DefaultRate,
-				Weights: float3Type{
+				Weights: Float3Type{
 					{
 						{.1, .1, .1},
 						{.1, .1, .1},
@@ -171,19 +171,19 @@ func Test_jsonString_Read(t *testing.T) {
 		},
 		{
 			name:    "#2_no_file",
-			file:    jsonString(""),
+			file:    JsonString(""),
 			want:    nil,
 			wantErr: existErr,
 		},
 		{
 			name:    "#3_not_read_file",
-			file:    jsonString("perceptron"),
+			file:    JsonString("perceptron"),
 			want:    nil,
 			wantErr: existErr,
 		},
 		{
 			name:    "#4_error_unmarshal",
-			file:    jsonString("./json.go"),
+			file:    JsonString("./json.go"),
 			want:    nil,
 			wantErr: existErr,
 		},
@@ -204,27 +204,27 @@ func Test_jsonString_Read(t *testing.T) {
 func Test_jsonString_Write(t *testing.T) {
 	tests := []struct {
 		name    string
-		file    jsonString
+		file    JsonString
 		got     *perceptron
 		want    []Writer
 		wantErr error
 	}{
 		{
 			name:    "#1_perceptron",
-			file:    jsonString(defaultNameJSON),
+			file:    JsonString(defaultNameJSON),
 			got:     &perceptron{},
 			want:    []Writer{&perceptron{}},
 			wantErr: nil,
 		},
 		{
 			name:    "#2_no_args",
-			file:    jsonString(""),
+			file:    JsonString(""),
 			want:    []Writer{},
 			wantErr: fmt.Errorf("error"),
 		},
 		{
 			name: "#3_no_filename",
-			file: jsonString(""),
+			file: JsonString(""),
 			got: &perceptron{
 				jsonName: defaultNameJSON,
 			},
@@ -233,7 +233,7 @@ func Test_jsonString_Write(t *testing.T) {
 		},
 		{
 			name:    "#4_no_filename",
-			file:    jsonString(""),
+			file:    JsonString(""),
 			got:     &perceptron{},
 			want:    []Writer{&perceptron{}},
 			wantErr: nil,
@@ -255,7 +255,7 @@ func Test_jsonString_Write(t *testing.T) {
 					}
 				}()
 				if len(tt.file) == 0 {
-					tt.file = jsonString(defaultNameJSON)
+					tt.file = JsonString(defaultNameJSON)
 				}
 				_ = tt.file.Read(tt.got)
 				if !reflect.DeepEqual(tt.got, tt.want[0]) {

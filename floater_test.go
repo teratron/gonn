@@ -1,4 +1,4 @@
-package nn
+package gonn
 
 import "testing"
 
@@ -6,19 +6,19 @@ func TestFloat1Type_length(t *testing.T) {
 	tests := []struct {
 		name string
 		ind  []uint
-		gave float1Type
+		gave Float1Type
 		want int
 	}{
 		{
 			name: "#1",
 			ind:  []uint{},
-			gave: float1Type{1, 2},
+			gave: Float1Type{1, 2},
 			want: 2,
 		},
 		{
 			name: "#2",
 			ind:  []uint{5},
-			gave: float1Type{1, 2, 3},
+			gave: Float1Type{1, 2, 3},
 			want: 3,
 		},
 	}
@@ -35,13 +35,13 @@ func TestFloat2Type_length(t *testing.T) {
 	tests := []struct {
 		name string
 		ind  []uint
-		gave float2Type
+		gave Float2Type
 		want int
 	}{
 		{
 			name: "#1",
 			ind:  []uint{1},
-			gave: float2Type{
+			gave: Float2Type{
 				{1},
 				{1, 2},
 			},
@@ -50,7 +50,7 @@ func TestFloat2Type_length(t *testing.T) {
 		{
 			name: "#2_no_args",
 			ind:  []uint{},
-			gave: float2Type{
+			gave: Float2Type{
 				{1},
 				{1, 2},
 			},
@@ -59,7 +59,7 @@ func TestFloat2Type_length(t *testing.T) {
 		{
 			name: "#3_overflow",
 			ind:  []uint{3, 1},
-			gave: float2Type{
+			gave: Float2Type{
 				{1},
 				{1, 2},
 			},
@@ -68,7 +68,7 @@ func TestFloat2Type_length(t *testing.T) {
 		{
 			name: "#4_empty_array",
 			ind:  []uint{2},
-			gave: float2Type{},
+			gave: Float2Type{},
 			want: 0,
 		},
 	}
@@ -85,13 +85,13 @@ func TestFloat3Type_length(t *testing.T) {
 	tests := []struct {
 		name string
 		ind  []uint
-		gave float3Type
+		gave Float3Type
 		want int
 	}{
 		{
 			name: "#1",
 			ind:  []uint{1, 2},
-			gave: float3Type{
+			gave: Float3Type{
 				{
 					{1, 2},
 					{1, 2, 3},
@@ -107,7 +107,7 @@ func TestFloat3Type_length(t *testing.T) {
 		{
 			name: "#2",
 			ind:  []uint{0},
-			gave: float3Type{
+			gave: Float3Type{
 				{
 					{1, 2},
 					{1, 2, 3},
@@ -123,7 +123,7 @@ func TestFloat3Type_length(t *testing.T) {
 		{
 			name: "#3_no_args",
 			ind:  []uint{},
-			gave: float3Type{
+			gave: Float3Type{
 				{
 					{1, 2},
 					{1, 2, 3},
@@ -139,7 +139,7 @@ func TestFloat3Type_length(t *testing.T) {
 		{
 			name: "#4_overflow",
 			ind:  []uint{0, 3, 2},
-			gave: float3Type{
+			gave: Float3Type{
 				{
 					{1, 2},
 					{1, 2, 3},
@@ -155,7 +155,7 @@ func TestFloat3Type_length(t *testing.T) {
 		{
 			name: "#5_empty_array",
 			ind:  []uint{0, 3, 2},
-			gave: float3Type{},
+			gave: Float3Type{},
 			want: 0,
 		},
 	}

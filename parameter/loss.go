@@ -1,4 +1,4 @@
-package nn
+package parameter
 
 const (
 	// ModeMSE - Mean Squared Error
@@ -11,8 +11,8 @@ const (
 	ModeARCTAN
 )
 
-// checkLossMode
-func checkLossMode(mode uint8) uint8 {
+// CheckLossMode
+func CheckLossMode(mode uint8) uint8 {
 	if mode > ModeARCTAN {
 		return ModeMSE
 	}

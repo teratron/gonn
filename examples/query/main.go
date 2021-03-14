@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/teratron/gonn/pkg/nn"
+	"github.com/teratron/gonn/nn"
 )
 
 func main() {

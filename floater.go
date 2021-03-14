@@ -1,4 +1,4 @@
-package nn
+package gonn
 
 import (
 	"fmt"
@@ -11,16 +11,16 @@ type Floater interface {
 }
 
 type (
-	float1Type []float64
-	float2Type [][]float64
-	float3Type [][][]float64
+	Float1Type []float64
+	Float2Type [][]float64
+	Float3Type [][][]float64
 )
 
-func (f float1Type) length(...uint) int {
+func (f Float1Type) length(...uint) int {
 	return len(f)
 }
 
-func (f float2Type) length(ind ...uint) int {
+func (f Float2Type) length(ind ...uint) int {
 	if len(ind) > 0 {
 		if len(f) > int(ind[0]) {
 			return len(f[ind[0]])
@@ -31,7 +31,7 @@ func (f float2Type) length(ind ...uint) int {
 	return len(f)
 }
 
-func (f float3Type) length(ind ...uint) int {
+func (f Float3Type) length(ind ...uint) int {
 	switch len(ind) {
 	case 0:
 		return len(f)
