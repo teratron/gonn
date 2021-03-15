@@ -7,7 +7,7 @@ import (
 
 // Floater
 type Floater interface {
-	length(...uint) int
+	Length(...uint) int
 }
 
 type (
@@ -16,22 +16,22 @@ type (
 	Float3Type [][][]float64
 )
 
-func (f Float1Type) length(...uint) int {
+func (f Float1Type) Length(...uint) int {
 	return len(f)
 }
 
-func (f Float2Type) length(ind ...uint) int {
+func (f Float2Type) Length(ind ...uint) int {
 	if len(ind) > 0 {
 		if len(f) > int(ind[0]) {
 			return len(f[ind[0]])
 		}
-		log.Println(fmt.Errorf("error float2Type length: index exceeds array size"))
+		log.Println(fmt.Errorf("error Float2Type length: index exceeds array size"))
 		return 0
 	}
 	return len(f)
 }
 
-func (f Float3Type) length(ind ...uint) int {
+func (f Float3Type) Length(ind ...uint) int {
 	switch len(ind) {
 	case 0:
 		return len(f)
@@ -46,6 +46,6 @@ func (f Float3Type) length(ind ...uint) int {
 			return len(f[ind[0]][ind[1]])
 		}
 	}
-	log.Println(fmt.Errorf("error float3Type length: index exceeds arrays size"))
+	log.Println(fmt.Errorf("error Float3Type length: index exceeds arrays size"))
 	return 0
 }

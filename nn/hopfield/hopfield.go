@@ -4,13 +4,13 @@ import (
 	"github.com/teratron/gonn"
 )
 
-//const HopfieldName = "hopfield"
+const Title = "hopfield"
 
 // Declare conformity with NeuralNetwork interface
-var _ gonn.NeuralNetwork = (*Hopfield)(nil)
+var _ gonn.NeuralNetwork = (*hopfield)(nil)
 
 // hopfield
-type Hopfield struct {
+type hopfield struct {
 	//nn.NeuralNetwork `json:"-" xml:"-"`
 	gonn.NeuralNetwork `json:"-" xml:"-"`
 	//Parameter     `json:"-" xml:"-"`
@@ -25,7 +25,7 @@ type Hopfield struct {
 	Weights gonn.Float2Type `json:"weights" xml:"weights"`
 
 	// Neuron
-	neuron []*hopfieldNeuron
+	neuron []*neuron
 
 	// Settings
 	lenInput int
@@ -33,23 +33,14 @@ type Hopfield struct {
 	jsonName string
 }
 
-func (h Hopfield) Read(reader gonn.Reader) error {
-	panic("implement me")
-}
-
-func (h Hopfield) Write(writer ...gonn.Writer) error {
-	panic("implement me")
-}
-
-// hopfieldNeuron
-type hopfieldNeuron struct {
+// neuron
+type neuron struct {
 	value float64
 }
 
 // Hopfield return
-/*func Hopfield() *Hopfield {
-	return &Hopfield{
-		Name: HopfieldName,
+func Hopfield() *hopfield {
+	return &hopfield{
+		Name: Title,
 	}
 }
-*/

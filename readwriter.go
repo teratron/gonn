@@ -15,3 +15,10 @@ type Reader interface {
 type Writer interface {
 	Write(...Writer) error
 }
+
+// Filer
+type Filer interface {
+	ReadWriter
+	GetValue(key string) interface{}
+	FileName() (string, error)
+}

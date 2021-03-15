@@ -1,23 +1,21 @@
 package perceptron
 
 import (
-	"fmt"
-	"log"
 	"math"
 
 	"github.com/teratron/gonn"
 	param "github.com/teratron/gonn/parameter"
-	"github.com/teratron/gonn/util"
 )
 
-//const perceptronName = "perceptron"
+// Title of the neural network architecture.
+const Title = "perceptron"
 
 // Declare conformity with NeuralNetwork interface
 var _ gonn.NeuralNetwork = (*perceptron)(nil)
 
 // perceptron
 type perceptron struct {
-	//Parameter `json:"-"`
+	//param.Parameter `json:"-"`
 
 	// Neural network architecture name
 	Name string `json:"name"`
@@ -62,192 +60,14 @@ type neuron struct {
 }
 
 // Perceptron return perceptron neural network
-/*func Perceptron() *perceptron {
+func Perceptron() *perceptron {
 	return &perceptron{
-		Name:       perceptronName,
-		Activation: ModeSIGMOID,
-		Loss:       ModeMSE,
+		Name:       Title,
+		Activation: param.ModeSIGMOID,
+		Loss:       param.ModeMSE,
 		Limit:      .1,
-		Rate:       DefaultRate,
+		Rate:       param.DefaultRate,
 	}
-}*/
-
-func (p *perceptron) NameNN() string {
-	return p.Name
-}
-
-func (p *perceptron) SetNameNN(name string) {
-	p.Name = name
-}
-
-func (p *perceptron) InitNN() bool {
-	return p.isInit
-}
-
-func (p *perceptron) SetInitNN(state bool) {
-	p.isInit = state
-}
-
-func (p *perceptron) NameJSON() string {
-	return p.jsonName
-}
-
-func (p *perceptron) SetNameJSON(name string) {
-	p.jsonName = name
-}
-
-func (p *perceptron) NameYAML() string {
-	return p.yamlName
-}
-
-func (p *perceptron) SetNameYAML(name string) {
-	p.yamlName = name
-}
-
-// NeuronBias
-func (p *perceptron) NeuronBias() bool {
-	return p.Bias
-}
-
-// SetNeuronBias
-func (p *perceptron) SetNeuronBias(bias bool) {
-	p.Bias = bias
-}
-
-// HiddenLayer
-func (p *perceptron) HiddenLayer() []int {
-	return param.CheckHiddenLayer(p.Hidden)
-}
-
-// SetHiddenLayer
-func (p *perceptron) SetHiddenLayer(layer ...int) {
-	p.Hidden = param.CheckHiddenLayer(layer)
-}
-
-// ActivationMode
-func (p *perceptron) ActivationMode() uint8 {
-	return p.Activation
-}
-
-// SetActivationMode
-func (p *perceptron) SetActivationMode(mode uint8) {
-	p.Activation = param.CheckActivationMode(mode)
-}
-
-// LossMode
-func (p *perceptron) LossMode() uint8 {
-	return p.Loss
-}
-
-// SetLossMode
-func (p *perceptron) SetLossMode(mode uint8) {
-	p.Loss = param.CheckLossMode(mode)
-}
-
-// LossLimit
-func (p *perceptron) LossLimit() float64 {
-	return p.Limit
-}
-
-// SetLossLimit
-func (p *perceptron) SetLossLimit(limit float64) {
-	p.Limit = limit
-}
-
-// LearningRate
-func (p *perceptron) LearningRate() float64 {
-	return p.Rate
-}
-
-// SetLearningRate
-func (p *perceptron) SetLearningRate(rate float64) {
-	p.Rate = param.CheckLearningRate(rate)
-}
-
-// Weight
-func (p *perceptron) Weight() gonn.Floater {
-	return &p.Weights
-}
-
-// SetWeight
-func (p *perceptron) SetWeight(weight gonn.Floater) {
-	if w, ok := weight.(gonn.Float3Type); ok {
-		p.Weights = w
-	}
-}
-
-// Read
-func (p *perceptron) Read(reader gonn.Reader) (err error) {
-	switch r := reader.(type) {
-	case gonn.Filer:
-		err = r.Read(p)
-		if len(p.Weights) > 0 {
-			p.initFromWeight()
-		}
-		switch s := r.(type) {
-		case util.JsonString:
-			p.jsonName = string(s)
-		}
-	default:
-		err = fmt.Errorf("%T %w: %v", r, gonn.ErrMissingType, r)
-	}
-	if err != nil {
-		err = fmt.Errorf("perceptron read: %w", err)
-	}
-	return
-}
-
-// Write
-func (p *perceptron) Write(writer ...gonn.Writer) (err error) {
-	if len(writer) > 0 {
-		for _, w := range writer {
-			switch v := w.(type) {
-			case gonn.Filer:
-				err = v.Write(p)
-			default:
-				err = fmt.Errorf("%T %w: %v", v, gonn.ErrMissingType, w)
-			}
-		}
-	} else {
-		err = fmt.Errorf("%w args", gonn.ErrEmpty)
-	}
-	if err != nil {
-		err = fmt.Errorf("perceptron write: %w", err)
-	}
-	return
-}
-
-// Verify verifying dataset
-func (p *perceptron) Verify(input []float64, target ...[]float64) (loss float64) {
-	var err error
-	if len(input) > 0 {
-		if len(target) > 0 && len(target[0]) > 0 {
-			if !p.isInit {
-				p.initFromNew(len(input), len(target[0]))
-			} else {
-				if p.lenInput != len(input) {
-					err = fmt.Errorf("invalid number of elements in the input data")
-					goto ERROR
-				}
-				if p.lenOutput != len(target[0]) {
-					err = fmt.Errorf("invalid number of elements in the target data")
-					goto ERROR
-				}
-			}
-			p.calcNeuron(input)
-			loss = p.calcLoss(target[0])
-		} else {
-			err = gonn.ErrNoTarget
-		}
-	} else {
-		err = gonn.ErrNoInput
-	}
-ERROR:
-	if err != nil {
-		log.Println(fmt.Errorf("verify: %w", err))
-		return -1
-	}
-	return
 }
 
 // initFromNew initialize

@@ -1,44 +1,26 @@
 package nn
 
-import (
-	"fmt"
-	"log"
+import arch "github.com/teratron/gonn/architecture"
 
-	"github.com/teratron/gonn"
-	"github.com/teratron/gonn/hopfield"
-)
-
-const (
-	HopfieldName   = "hopfield"
-	PerceptronName = "perceptron"
-)
-
-func architecture(name string) gonn.NeuralNetwork {
-	switch name {
-	case PerceptronName:
-		return Perceptron()
-	case HopfieldName:
-		return Hopfield()
-	default:
-		log.Println(fmt.Errorf("get architecture: neural network is %w", ErrNotRecognized))
-		return nil
-	}
+func architecture(name ...string) NeuralNetwork {
+	/*return &NN{
+		NeuralNetwork: arch.Architecture(name[0]),
+	}*/
+	return arch.Architecture(name[0])
 }
 
-// Perceptron return perceptron neural network
-func Perceptron() *perceptron {
-	return &perceptron{
-		Name:       perceptronName,
-		Activation: ModeSIGMOID,
-		Loss:       ModeMSE,
-		Limit:      .1,
-		Rate:       DefaultRate,
-	}
+// Perceptron
+func Perceptron() NeuralNetwork {
+	/*return &NN{
+		NeuralNetwork: arch.Architecture(arch.Perceptron),
+	}*/
+	return arch.Architecture(arch.Perceptron)
 }
 
-// Hopfield return
-func Hopfield() *hopfield.Hopfield {
-	return &hopfield.Hopfield{
-		Name: HopfieldName,
-	}
+// Hopfield
+func Hopfield() NeuralNetwork {
+	/*return &NN{
+		NeuralNetwork: arch.Architecture(arch.Hopfield),
+	}*/
+	return arch.Architecture(arch.Hopfield)
 }

@@ -1,6 +1,8 @@
 package hopfield
 
-import "github.com/teratron/gonn"
+import (
+	"github.com/teratron/gonn"
+)
 
 // Parameter
 type Parameter interface {
