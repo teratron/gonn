@@ -5,10 +5,11 @@ import (
 	param "github.com/teratron/gonn/parameter"
 )
 
+// Declare conformity with Parameter interface
+var _ Parameter = (*perceptron)(nil)
+
 // Parameter
 type Parameter interface {
-	gonn.Parameter
-
 	HiddenLayer() []int
 	SetHiddenLayer(...int)
 

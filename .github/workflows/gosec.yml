@@ -22,3 +22,7 @@ jobs:
         uses: securego/gosec@master
         with:
           args: ./...
+
+      - name: Run Everything Except for Rule
+        with:
+          args: -exclude=G404 ./...

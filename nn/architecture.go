@@ -1,26 +1,29 @@
 package nn
 
-import arch "github.com/teratron/gonn/architecture"
+import (
+	"github.com/teratron/gonn"
+	zoo "github.com/teratron/gonn/architecture"
+)
 
-func architecture(name ...string) NeuralNetwork {
-	/*return &NN{
-		NeuralNetwork: arch.Architecture(name[0]),
+func architecture(name ...string) gonn.Architecture {
+	/*return &NeuralNetwork{
+		NeuralNetwork: zoo.Get(name[0]),
 	}*/
-	return arch.Architecture(name[0])
+	return zoo.Get(name[0])
 }
 
 // Perceptron
-func Perceptron() NeuralNetwork {
-	/*return &NN{
-		NeuralNetwork: arch.Architecture(arch.Perceptron),
+func Perceptron() gonn.Architecture {
+	/*return &NeuralNetwork{
+		NeuralNetwork: zoo.Get(zoo.Perceptron),
 	}*/
-	return arch.Architecture(arch.Perceptron)
+	return zoo.Get(zoo.Perceptron)
 }
 
 // Hopfield
-func Hopfield() NeuralNetwork {
-	/*return &NN{
-		NeuralNetwork: arch.Architecture(arch.Hopfield),
+func Hopfield() gonn.Architecture {
+	/*return &NeuralNetwork{
+		NeuralNetwork: zoo.Get(zoo.Hopfield),
 	}*/
-	return arch.Architecture(arch.Hopfield)
+	return zoo.Get(zoo.Hopfield)
 }

@@ -7,15 +7,15 @@ import (
 	param "github.com/teratron/gonn/parameter"
 )
 
-// Title of the neural network architecture.
-const Title = "perceptron"
+// Name of the neural network architecture.
+const Name = "perceptron"
 
 // Declare conformity with NeuralNetwork interface
 var _ gonn.NeuralNetwork = (*perceptron)(nil)
 
-// perceptron
 type perceptron struct {
-	//param.Parameter `json:"-"`
+	//gonn.NeuralNetwork
+	//Parameter
 
 	// Neural network architecture name
 	Name string `json:"name"`
@@ -53,7 +53,6 @@ type perceptron struct {
 	yamlName       string
 }
 
-// neuronPerceptron
 type neuron struct {
 	value float64
 	miss  float64
@@ -62,13 +61,20 @@ type neuron struct {
 // Perceptron return perceptron neural network
 func Perceptron() *perceptron {
 	return &perceptron{
-		Name:       Title,
+		Name:       Name,
 		Activation: param.ModeSIGMOID,
 		Loss:       param.ModeMSE,
 		Limit:      .1,
 		Rate:       param.DefaultRate,
 	}
 }
+
+func (p *perceptron) Get() gonn.Architecture {
+	return p
+}
+
+/*func (p *perceptron) Set(gonn.Architecture) {
+}*/
 
 // initFromNew initialize
 func (p *perceptron) initFromNew(lenInput, lenTarget int) {
@@ -102,6 +108,7 @@ func (p *perceptron) initFromNew(lenInput, lenTarget int) {
 		if i > 0 {
 			biasLayer = layer[i-1] + bias
 		}
+
 		for j := 0; j < v; j++ {
 			if i > 0 {
 				p.Weights[i][j] = make([]float64, biasLayer)
@@ -164,6 +171,7 @@ func (p *perceptron) calcNeuron(input []float64) {
 		} else {
 			length = p.lenInput
 		}
+
 		for j, n := range v {
 			go func(j int, n *neuron) {
 				n.value = 0
@@ -182,6 +190,7 @@ func (p *perceptron) calcNeuron(input []float64) {
 				wait <- true
 			}(j, n)
 		}
+
 		for range v {
 			<-wait
 		}
@@ -202,6 +211,7 @@ func (p *perceptron) calcLoss(target []float64) (loss float64) {
 		}
 		n.miss *= param.Derivative(n.value, p.Activation)
 	}
+
 	loss /= float64(p.lenOutput)
 	if p.Loss == param.ModeRMSE {
 		loss = math.Sqrt(loss)
@@ -226,6 +236,7 @@ func (p *perceptron) calcMiss() {
 				wait <- true
 			}(j, n)
 		}
+
 		for range p.neuron[i] {
 			<-wait
 		}
@@ -262,6 +273,7 @@ func (p *perceptron) updWeight(input []float64) {
 			}(i, j, dec, length, p.neuron[i][j].miss*p.Rate, w)
 		}
 	}
+
 	for _, v := range p.Weights {
 		for range v {
 			<-wait

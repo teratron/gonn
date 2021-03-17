@@ -4,7 +4,8 @@ import (
 	"github.com/teratron/gonn"
 )
 
-const Title = "hopfield"
+// Name of the neural network architecture.
+const Name = "hopfield"
 
 // Declare conformity with NeuralNetwork interface
 var _ gonn.NeuralNetwork = (*hopfield)(nil)
@@ -41,6 +42,13 @@ type neuron struct {
 // Hopfield return
 func Hopfield() *hopfield {
 	return &hopfield{
-		Name: Title,
+		Name: Name,
 	}
 }
+
+func (h *hopfield) Get() gonn.Architecture {
+	return h
+}
+
+/*func (h *hopfield) Set(gonn.Architecture) {
+}*/

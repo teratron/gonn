@@ -1,9 +1,9 @@
 package gonn
 
-// NeuralNetwork
+// NeuralNetwork neural network interface
 type NeuralNetwork interface {
-	ReadWriter
 	Parameter
+	ReadWriter
 
 	// Query
 	Query(input []float64) (output []float64)
