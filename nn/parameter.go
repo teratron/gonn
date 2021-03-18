@@ -1,6 +1,6 @@
 package nn
 
-import param "github.com/teratron/gonn/parameter"
+import param "github.com/teratron/gonn/nn/parameter"
 
 const (
 	//

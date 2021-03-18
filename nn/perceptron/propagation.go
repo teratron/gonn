@@ -3,7 +3,7 @@ package perceptron
 import (
 	"math"
 
-	param "github.com/teratron/gonn/parameter"
+	param "github.com/teratron/gonn/nn/parameter"
 )
 
 // calcNeuron

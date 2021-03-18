@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/teratron/gonn"
+	"github.com/teratron/gonn/nn/architecture"
 )
 
 // NeuralNetwork
@@ -28,7 +29,7 @@ type Floater interface {
 }
 
 // New returns a new neural network instance.
-func New(reader ...Reader) NeuralNetwork {
+func New(reader ...Reader) NeuralNetwork { //reader ...string
 	if len(reader) > 0 {
 		var err error
 		switch r := reader[0].(type) {
@@ -37,7 +38,7 @@ func New(reader ...Reader) NeuralNetwork {
 		case gonn.Filer:
 			switch v := r.GetValue("name").(type) {
 			case string:
-				n := architecture(v)
+				n := architecture.Get(v)
 				if err = n.Read(r); err == nil {
 					return n
 				}
@@ -54,5 +55,12 @@ func New(reader ...Reader) NeuralNetwork {
 		}
 		return nil
 	}
-	return Perceptron()
+	return architecture.Get(architecture.Perceptron)
+}
+
+func News(reader ...string) NeuralNetwork {
+	if len(reader) > 0 {
+
+	}
+	return architecture.Get(architecture.Perceptron)
 }

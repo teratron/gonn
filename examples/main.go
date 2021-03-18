@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/teratron/gonn/nn"
 )
 
@@ -69,7 +67,7 @@ func main() {
 
 	// Returning weights for further recording from the buffer
 	n.SetWeight(buff)
-	fmt.Println(buff)
+	//fmt.Println(buff)
 
 	// Writing the neural network configuration to a file
 	//_ = n.Write(nn.JSON(filepath.Join("perceptron.json")))

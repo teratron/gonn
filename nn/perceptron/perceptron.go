@@ -2,7 +2,7 @@ package perceptron
 
 import (
 	"github.com/teratron/gonn"
-	param "github.com/teratron/gonn/parameter"
+	param "github.com/teratron/gonn/nn/parameter"
 )
 
 // Name of the neural network architecture.
