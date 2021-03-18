@@ -1,8 +1,6 @@
 package perceptron
 
 import (
-	"math"
-
 	"github.com/teratron/gonn"
 	param "github.com/teratron/gonn/parameter"
 )
@@ -14,32 +12,31 @@ const Name = "perceptron"
 var _ gonn.NeuralNetwork = (*perceptron)(nil)
 
 type perceptron struct {
-	//gonn.NeuralNetwork
-	//Parameter
+	gonn.Parameter `json:"-" yaml:"-"`
 
 	// Neural network architecture name
-	Name string `json:"name"`
+	Name string `json:"name" yaml:"name"`
 
 	// The neuron bias, false or true
-	Bias bool `json:"bias"`
+	Bias bool `json:"bias" yaml:"bias"`
 
 	// Array of the number of neurons in each hidden layer
-	Hidden []int `json:"hidden,omitempty"`
+	Hidden []int `json:"hidden,omitempty" yaml:"hidden,omitempty"`
 
 	// Activation function mode
-	Activation uint8 `json:"activation"`
+	Activation uint8 `json:"activation" yaml:"activation"`
 
 	// The mode of calculation of the total error
-	Loss uint8 `json:"loss"`
+	Loss uint8 `json:"loss" yaml:"loss"`
 
 	// Minimum (sufficient) limit of the average of the error during training
-	Limit float64 `json:"limit"`
+	Limit float64 `json:"limit" yaml:"limit"`
 
 	// Learning coefficient, from 0 to 1
-	Rate float64 `json:"rate"`
+	Rate float64 `json:"rate" yaml:"rate"`
 
 	// Weight value
-	Weights gonn.Float3Type `json:"weights,omitempty"`
+	Weights gonn.Float3Type `json:"weights,omitempty" yaml:"weights,omitempty"`
 
 	// Neuron
 	neuron [][]*neuron
@@ -68,13 +65,6 @@ func Perceptron() *perceptron {
 		Rate:       param.DefaultRate,
 	}
 }
-
-func (p *perceptron) Get() gonn.Architecture {
-	return p
-}
-
-/*func (p *perceptron) Set(gonn.Architecture) {
-}*/
 
 // initFromNew initialize
 func (p *perceptron) initFromNew(lenInput, lenTarget int) {
@@ -156,127 +146,4 @@ func (p *perceptron) initFromWeight() {
 		}
 	}
 	p.isInit = true
-}
-
-// calcNeuron
-func (p *perceptron) calcNeuron(input []float64) {
-	wait := make(chan bool)
-	defer close(wait)
-
-	var length, dec int
-	for i, v := range p.neuron {
-		if i > 0 {
-			dec = i - 1
-			length = len(p.neuron[dec])
-		} else {
-			length = p.lenInput
-		}
-
-		for j, n := range v {
-			go func(j int, n *neuron) {
-				n.value = 0
-				for k, w := range p.Weights[i][j] {
-					if k < length {
-						if i > 0 {
-							n.value += p.neuron[dec][k].value * w
-						} else {
-							n.value += input[k] * w
-						}
-					} else {
-						n.value += w
-					}
-				}
-				n.value = param.Activation(n.value, p.Activation)
-				wait <- true
-			}(j, n)
-		}
-
-		for range v {
-			<-wait
-		}
-	}
-}
-
-// calcLoss calculating the error of the output neuron
-func (p *perceptron) calcLoss(target []float64) (loss float64) {
-	for i, n := range p.neuron[p.lastLayerIndex] {
-		n.miss = target[i] - n.value
-		switch p.Loss {
-		default:
-			fallthrough
-		case param.ModeMSE, param.ModeRMSE:
-			loss += math.Pow(n.miss, 2)
-		case param.ModeARCTAN:
-			loss += math.Pow(math.Atan(n.miss), 2)
-		}
-		n.miss *= param.Derivative(n.value, p.Activation)
-	}
-
-	loss /= float64(p.lenOutput)
-	if p.Loss == param.ModeRMSE {
-		loss = math.Sqrt(loss)
-	}
-	return
-}
-
-// calcMiss calculating the error of neurons in hidden layers
-func (p *perceptron) calcMiss() {
-	wait := make(chan bool)
-	defer close(wait)
-
-	for i := p.lastLayerIndex - 1; i >= 0; i-- {
-		inc := i + 1
-		for j, n := range p.neuron[i] {
-			go func(j int, n *neuron) {
-				n.miss = 0
-				for k, m := range p.neuron[inc] {
-					n.miss += m.miss * p.Weights[inc][k][j]
-				}
-				n.miss *= param.Derivative(n.value, p.Activation)
-				wait <- true
-			}(j, n)
-		}
-
-		for range p.neuron[i] {
-			<-wait
-		}
-	}
-}
-
-// updWeight update weights
-func (p *perceptron) updWeight(input []float64) {
-	wait := make(chan bool)
-	defer close(wait)
-
-	var length, dec int
-	for i, v := range p.Weights {
-		if i > 0 {
-			dec = i - 1
-			length = len(p.neuron[dec])
-		} else {
-			length = p.lenInput
-		}
-		for j, w := range v {
-			go func(i, j, dec, length int, grad float64, w []float64) {
-				for k := range w {
-					if k < length {
-						if i > 0 {
-							p.Weights[i][j][k] += p.neuron[dec][k].value * grad
-						} else {
-							p.Weights[i][j][k] += input[k] * grad
-						}
-					} else {
-						p.Weights[i][j][k] += grad
-					}
-				}
-				wait <- true
-			}(i, j, dec, length, p.neuron[i][j].miss*p.Rate, w)
-		}
-	}
-
-	for _, v := range p.Weights {
-		for range v {
-			<-wait
-		}
-	}
 }

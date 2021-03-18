@@ -2,6 +2,7 @@ package util
 
 import (
 	"fmt"
+	"path/filepath"
 )
 
 type DecodeEncoder interface {
@@ -22,11 +23,11 @@ type FileError struct {
 	Err error
 }
 
-func (f FileError) Error() string {
+func (f *FileError) Error() string {
 	return fmt.Sprintf("file type error: %v\n", f.Err)
 }
 
-/*func GetFileType(file string) DecodeEncoder {
+func GetFileType(file string) DecodeEncoder {
 	ext := filepath.Base(filepath.Ext(file))
 	switch ext {
 	case ".json":
@@ -36,4 +37,4 @@ func (f FileError) Error() string {
 	default:
 		return &FileError{Err: fmt.Errorf("extension isn't defined: %s", ext)}
 	}
-}*/
+}

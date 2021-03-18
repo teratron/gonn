@@ -7,7 +7,16 @@ import (
 	"github.com/teratron/gonn/util"
 )
 
-// Read
+// Reader
+type Reader interface {
+	gonn.Reader
+}
+
+// Writer
+type Writer interface {
+	gonn.Writer
+}
+
 func (p *perceptron) Read(reader gonn.Reader) (err error) {
 	switch r := reader.(type) {
 	case gonn.Filer:

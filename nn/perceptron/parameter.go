@@ -6,7 +6,7 @@ import (
 )
 
 // Declare conformity with Parameter interface
-var _ Parameter = (*perceptron)(nil)
+/*var _ Parameter = (*perceptron)(nil)
 
 // Parameter
 type Parameter interface {
@@ -27,7 +27,7 @@ type Parameter interface {
 
 	LearningRate() float64
 	SetLearningRate(float64)
-}
+}*/
 
 func (p *perceptron) NameNN() string {
 	return p.Name

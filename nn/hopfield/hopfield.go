@@ -1,8 +1,6 @@
 package hopfield
 
-import (
-	"github.com/teratron/gonn"
-)
+import "github.com/teratron/gonn"
 
 // Name of the neural network architecture.
 const Name = "hopfield"
@@ -10,20 +8,18 @@ const Name = "hopfield"
 // Declare conformity with NeuralNetwork interface
 var _ gonn.NeuralNetwork = (*hopfield)(nil)
 
-// hopfield
 type hopfield struct {
-	//nn.NeuralNetwork `json:"-" xml:"-"`
-	gonn.NeuralNetwork `json:"-" xml:"-"`
-	//Parameter     `json:"-" xml:"-"`
+	gonn.NeuralNetwork `json:"-" yaml:"-"`
+	//gonn.Parameter     `json:"-" yaml:"-"`
 
 	// Neural network architecture name
-	Name string `json:"name" xml:"name"`
+	Name string `json:"name" yaml:"name"`
 
 	// Energy
-	Energy float64 `json:"energy" xml:"energy"`
+	Energy float64 `json:"energy" yaml:"energy"`
 
 	// Weights values
-	Weights gonn.Float2Type `json:"weights" xml:"weights"`
+	Weights gonn.Float2Type `json:"weights,omitempty" yaml:"weights,omitempty"`
 
 	// Neuron
 	neuron []*neuron
@@ -32,9 +28,9 @@ type hopfield struct {
 	lenInput int
 	isInit   bool
 	jsonName string
+	yamlName string
 }
 
-// neuron
 type neuron struct {
 	value float64
 }
@@ -45,10 +41,3 @@ func Hopfield() *hopfield {
 		Name: Name,
 	}
 }
-
-func (h *hopfield) Get() gonn.Architecture {
-	return h
-}
-
-/*func (h *hopfield) Set(gonn.Architecture) {
-}*/

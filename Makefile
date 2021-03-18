@@ -5,10 +5,13 @@ run-example:
 run-example-hopfield:
 	go run ./examples/hopfield/main.go
 
-run-example-tmp:
-	go run ./examples/tmp/demo.go
+run-example-json:
+	go run ./examples/json/main.go
 
-mods:
+run-example-yaml:
+	go run ./examples/yaml/main.go
+
+deps:
 	go get -u gopkg.in/yaml.v2
 	go mod tidy
 	go mod vendor
