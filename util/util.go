@@ -3,23 +3,12 @@ package util
 import (
 	"fmt"
 	"path/filepath"
+
+	"github.com/teratron/gonn"
 )
 
-type DecodeEncoder interface {
-	Decoder
-	Encoder
-}
-
-type Decoder interface {
-	Decode(interface{}) error
-}
-
-type Encoder interface {
-	Encode(interface{}) error
-}
-
 type FileError struct {
-	DecodeEncoder
+	gonn.Filer
 	Err error
 }
 
@@ -27,13 +16,13 @@ func (f *FileError) Error() string {
 	return fmt.Sprintf("file type error: %v\n", f.Err)
 }
 
-func GetFileType(file string) DecodeEncoder {
-	ext := filepath.Base(filepath.Ext(file))
+func GetFileType(name string) gonn.Filer {
+	ext := filepath.Ext(name)
 	switch ext {
 	case ".json":
-		return &FileJSON{file}
-	case ".yml":
-		return &FileYAML{file}
+		return &FileJSON{name}
+	case ".yml", ".yaml":
+		return &FileYAML{name}
 	default:
 		return &FileError{Err: fmt.Errorf("extension isn't defined: %s", ext)}
 	}

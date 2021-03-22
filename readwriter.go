@@ -17,8 +17,8 @@ type Writer interface {
 }
 
 // Filer
-type Filer interface {
+/*type Filer interface {
 	ReadWriter
 	GetValue(key string) interface{}
 	FileName() (string, error)
-}
+}*/

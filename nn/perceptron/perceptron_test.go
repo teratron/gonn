@@ -7,21 +7,22 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/teratron/gonn/nn"
+	"github.com/teratron/gonn"
+	param "github.com/teratron/gonn/nn/parameter"
 )
 
 func init() {
-	nn.GetMaxIteration = func() int { return 1 }
-	nn.GetRandFloat = func() float64 { return .5 }
+	GetMaxIteration = func() int { return 1 }
+	param.GetRandFloat = func() float64 { return .5 }
 }
 
 func TestPerceptron(t *testing.T) {
 	want := &perceptron{
-		Name:       perceptronName,
-		Activation: ModeSIGMOID,
-		Loss:       ModeMSE,
+		Name:       Name,
+		Activation: param.ModeSIGMOID,
+		Loss:       param.ModeMSE,
 		Limit:      .1,
-		Rate:       DefaultRate,
+		Rate:       param.DefaultRate,
 	}
 	t.Run(want.Name, func(t *testing.T) {
 		if got := Perceptron(); !reflect.DeepEqual(got, want) {
@@ -31,9 +32,9 @@ func TestPerceptron(t *testing.T) {
 }
 
 func Test_perceptron_name(t *testing.T) {
-	want := &perceptron{Name: perceptronName}
+	want := &perceptron{Name: Name}
 	t.Run(want.Name, func(t *testing.T) {
-		if got := want.name(); got != want.Name {
+		if got := want.NameNN(); got != want.Name {
 			t.Errorf("name() = %s, want %s", got, want.Name)
 		}
 	})
@@ -41,9 +42,9 @@ func Test_perceptron_name(t *testing.T) {
 
 func Test_perceptron_setName(t *testing.T) {
 	got := &perceptron{}
-	want := perceptronName
+	want := Name
 	t.Run(want, func(t *testing.T) {
-		if got.setName(want); got.Name != want {
+		if got.SetNameNN(want); got.Name != want {
 			t.Errorf("setName() = %s, want %s", got.Name, want)
 		}
 	})
@@ -52,7 +53,7 @@ func Test_perceptron_setName(t *testing.T) {
 func Test_perceptron_stateInit(t *testing.T) {
 	want := &perceptron{isInit: true}
 	t.Run("true", func(t *testing.T) {
-		if !want.stateInit() {
+		if !want.InitNN() {
 			t.Errorf("stateInit() = %t, want %t", false, true)
 		}
 	})
@@ -61,16 +62,16 @@ func Test_perceptron_stateInit(t *testing.T) {
 func Test_perceptron_setStateInit(t *testing.T) {
 	want := &perceptron{}
 	t.Run("true", func(t *testing.T) {
-		if want.setStateInit(true); !want.isInit {
+		if want.SetInitNN(true); !want.isInit {
 			t.Errorf("setStateInit() = %t, want %t", true, false)
 		}
 	})
 }
 
 func Test_perceptron_nameJSON(t *testing.T) {
-	want := &perceptron{jsonName: filepath.Join(filepath.Join(perceptronName + ".json"))}
+	want := &perceptron{jsonName: filepath.Join(filepath.Join(Name + ".json"))}
 	t.Run(want.jsonName, func(t *testing.T) {
-		if got := want.nameJSON(); got != want.jsonName {
+		if got := want.NameJSON(); got != want.jsonName {
 			t.Errorf("nameJSON() = %s, want %s", got, want.jsonName)
 		}
 	})
@@ -78,9 +79,9 @@ func Test_perceptron_nameJSON(t *testing.T) {
 
 func Test_perceptron_setNameJSON(t *testing.T) {
 	got := &perceptron{}
-	want := filepath.Join(perceptronName + ".json")
+	want := filepath.Join(Name + ".json")
 	t.Run(want, func(t *testing.T) {
-		if got.setNameJSON(want); got.jsonName != want {
+		if got.SetNameJSON(want); got.jsonName != want {
 			t.Errorf("setNameJSON() = %s, want %s", got.jsonName, want)
 		}
 	})
@@ -178,7 +179,7 @@ func Test_perceptron_SetHiddenLayer(t *testing.T) {
 }
 
 func Test_perceptron_ActivationMode(t *testing.T) {
-	want := &perceptron{Activation: ModeSIGMOID}
+	want := &perceptron{Activation: param.ModeSIGMOID}
 	t.Run("ModeSIGMOID", func(t *testing.T) {
 		if got := want.ActivationMode(); got != want.Activation {
 			t.Errorf("ActivationMode() = %d, want %d", got, want.Activation)
@@ -188,7 +189,7 @@ func Test_perceptron_ActivationMode(t *testing.T) {
 
 func Test_perceptron_SetActivationMode(t *testing.T) {
 	got := &perceptron{}
-	want := ModeLINEAR
+	want := param.ModeLINEAR
 	t.Run("ModeLINEAR", func(t *testing.T) {
 		if got.SetActivationMode(want); got.Activation != want {
 			t.Errorf("SetActivationMode() = %d, want %d", got.Activation, want)
@@ -197,7 +198,7 @@ func Test_perceptron_SetActivationMode(t *testing.T) {
 }
 
 func Test_perceptron_LossMode(t *testing.T) {
-	want := &perceptron{Loss: ModeARCTAN}
+	want := &perceptron{Loss: param.ModeARCTAN}
 	t.Run("ModeARCTAN", func(t *testing.T) {
 		if got := want.LossMode(); got != want.Loss {
 			t.Errorf("LossMode() = %d, want %d", got, want.Loss)
@@ -215,14 +216,14 @@ func Test_perceptron_SetLossMode(t *testing.T) {
 		{
 			name: "#1_ModeARCTAN",
 			got:  &perceptron{},
-			gave: ModeARCTAN,
-			want: ModeARCTAN,
+			gave: param.ModeARCTAN,
+			want: param.ModeARCTAN,
 		},
 		{
 			name: "#2_default",
 			got:  &perceptron{},
 			gave: 255,
-			want: ModeMSE,
+			want: param.ModeMSE,
 		},
 	}
 	for _, tt := range tests {
@@ -254,7 +255,7 @@ func Test_perceptron_SetLossLimit(t *testing.T) {
 }
 
 func Test_perceptron_LearningRate(t *testing.T) {
-	want := &perceptron{Rate: DefaultRate}
+	want := &perceptron{Rate: param.DefaultRate}
 	t.Run("DefaultRate", func(t *testing.T) {
 		if got := want.LearningRate(); got != want.Rate {
 			t.Errorf("LearningRate() = %f, want %f", got, want.Rate)
@@ -272,20 +273,20 @@ func Test_perceptron_SetLearningRate(t *testing.T) {
 		{
 			name: "#1_DefaultRate",
 			got:  &perceptron{},
-			gave: DefaultRate,
-			want: DefaultRate,
+			gave: param.DefaultRate,
+			want: param.DefaultRate,
 		},
 		{
 			name: "#2_default",
 			got:  &perceptron{},
 			gave: -.1,
-			want: DefaultRate,
+			want: param.DefaultRate,
 		},
 		{
 			name: "#3_default",
 			got:  &perceptron{},
 			gave: 1.1,
-			want: DefaultRate,
+			want: param.DefaultRate,
 		},
 	}
 	for _, tt := range tests {
@@ -301,7 +302,7 @@ func Test_perceptron_Weight(t *testing.T) {
 	tests := []struct {
 		name string
 		gave *perceptron
-		want Float3Type
+		want gonn.Float3Type
 	}{
 		{
 			name: "#1_nil",
@@ -310,18 +311,18 @@ func Test_perceptron_Weight(t *testing.T) {
 		},
 		{
 			name: "#2_[]",
-			gave: &perceptron{Weights: Float3Type{}},
-			want: Float3Type{},
+			gave: &perceptron{Weights: gonn.Float3Type{}},
+			want: gonn.Float3Type{},
 		},
 		{
 			name: "#3_[[[0.1_0.2_0.3]]]",
-			gave: &perceptron{Weights: Float3Type{{{.1, .2, .3}}}},
-			want: Float3Type{{{.1, .2, .3}}},
+			gave: &perceptron{Weights: gonn.Float3Type{{{.1, .2, .3}}}},
+			want: gonn.Float3Type{{{.1, .2, .3}}},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := *tt.gave.Weight().(*Float3Type); !reflect.DeepEqual(got, tt.want) {
+			if got := *tt.gave.Weight().(*gonn.Float3Type); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Weight()\ngot:\t%v\nwant:\t%v", got, tt.want)
 			}
 		})
@@ -332,7 +333,7 @@ func Test_perceptron_SetWeight(t *testing.T) {
 	got := &perceptron{}
 	tests := []struct {
 		name string
-		want Float3Type
+		want gonn.Float3Type
 	}{
 		{
 			name: "#1_nil",
@@ -340,11 +341,11 @@ func Test_perceptron_SetWeight(t *testing.T) {
 		},
 		{
 			name: "#2_[]",
-			want: Float3Type{},
+			want: gonn.Float3Type{},
 		},
 		{
 			name: "#3_[[[0.1_0.2_0.3]]]",
-			want: Float3Type{{{.1, .2, .3}}},
+			want: gonn.Float3Type{{{.1, .2, .3}}},
 		},
 	}
 	for _, tt := range tests {
@@ -438,9 +439,9 @@ func Test_perceptron_Train(t *testing.T) {
 			name: "#1",
 			args: args{[]float64{.2, .3}, []float64{.2}},
 			gave: &perceptron{
-				Activation: ModeSIGMOID,
-				Loss:       ModeMSE,
-				Weights: Float3Type{
+				Activation: param.ModeSIGMOID,
+				Loss:       param.ModeMSE,
+				Weights: gonn.Float3Type{
 					{
 						{.1, .1, .1},
 						{.1, .1, .1},
@@ -542,7 +543,7 @@ func Test_perceptron_Verify(t *testing.T) {
 			gave: &perceptron{
 				Activation: 255, // default ModeSIGMOID
 				Loss:       255, // default ModeMSE
-				Weights: Float3Type{
+				Weights: gonn.Float3Type{
 					{
 						{.1, .1, .1},
 						{.1, .1, .1},
@@ -627,8 +628,8 @@ func Test_perceptron_Query(t *testing.T) {
 			name:  "#1",
 			input: []float64{.2, .3},
 			gave: &perceptron{
-				Activation: ModeSIGMOID,
-				Weights: Float3Type{
+				Activation: param.ModeSIGMOID,
+				Weights: gonn.Float3Type{
 					{
 						{.1, .1, .1},
 						{.1, .1, .1},
@@ -684,7 +685,7 @@ func Test_perceptron_Query(t *testing.T) {
 }
 
 func Test_perceptron_initFromNew(t *testing.T) {
-	r := randFloat()
+	r := param.GetRandFloat()
 	tests := []struct {
 		name string
 		got  *perceptron
@@ -696,7 +697,7 @@ func Test_perceptron_initFromNew(t *testing.T) {
 			want: &perceptron{
 				Bias:   false,
 				Hidden: []int{0},
-				Weights: Float3Type{
+				Weights: gonn.Float3Type{
 					{
 						{r, r},
 						{r, r},
@@ -720,7 +721,7 @@ func Test_perceptron_initFromNew(t *testing.T) {
 			want: &perceptron{
 				Bias:   true,
 				Hidden: []int{2},
-				Weights: Float3Type{
+				Weights: gonn.Float3Type{
 					{
 						{r, r, r},
 						{r, r, r},
@@ -767,7 +768,7 @@ func Test_perceptron_initFromWeight(t *testing.T) {
 			got:  &perceptron{},
 			want: &perceptron{
 				Hidden: []int{0},
-				Weights: Float3Type{
+				Weights: gonn.Float3Type{
 					{
 						{.1, .1},
 						{.1, .1},
@@ -791,7 +792,7 @@ func Test_perceptron_initFromWeight(t *testing.T) {
 			want: &perceptron{
 				Bias:   true,
 				Hidden: []int{2},
-				Weights: Float3Type{
+				Weights: gonn.Float3Type{
 					{
 						{.1, .1, .1},
 						{.1, .1, .1},
@@ -837,8 +838,8 @@ func Test_perceptron_calcNeuron(t *testing.T) {
 			name:  "#1",
 			input: []float64{.2},
 			got: &perceptron{
-				Activation: ModeLEAKYRELU,
-				Weights: Float3Type{
+				Activation: param.ModeLEAKYRELU,
+				Weights: gonn.Float3Type{
 					{
 						{.1},
 					},
@@ -860,8 +861,8 @@ func Test_perceptron_calcNeuron(t *testing.T) {
 			name:  "#2",
 			input: []float64{.2, .3},
 			got: &perceptron{
-				Activation: ModeTANH,
-				Weights: Float3Type{
+				Activation: param.ModeTANH,
+				Weights: gonn.Float3Type{
 					{
 						{.1, .1},
 						{.1, .1},
@@ -886,8 +887,8 @@ func Test_perceptron_calcNeuron(t *testing.T) {
 			name:  "#3",
 			input: []float64{.2, .3},
 			got: &perceptron{
-				Activation: ModeSIGMOID,
-				Weights: Float3Type{
+				Activation: param.ModeSIGMOID,
+				Weights: gonn.Float3Type{
 					{
 						{.1, .1, .1},
 						{.1, .1, .1},
@@ -938,8 +939,8 @@ func Test_perceptron_calcLoss(t *testing.T) {
 			name:   "#1",
 			target: []float64{.2},
 			gave: &perceptron{
-				Activation: ModeLEAKYRELU,
-				Loss:       ModeRMSE,
+				Activation: param.ModeLEAKYRELU,
+				Loss:       param.ModeRMSE,
 				neuron: [][]*neuron{
 					{
 						{.5516861990955205, 0},
@@ -954,8 +955,8 @@ func Test_perceptron_calcLoss(t *testing.T) {
 			name:   "#2",
 			target: []float64{.2, .3},
 			gave: &perceptron{
-				Activation: ModeTANH,
-				Loss:       ModeARCTAN,
+				Activation: param.ModeTANH,
+				Loss:       param.ModeARCTAN,
 				neuron: [][]*neuron{
 					{
 						{.5374298453437496, 0},
@@ -971,8 +972,8 @@ func Test_perceptron_calcLoss(t *testing.T) {
 			name:   "#3",
 			target: []float64{.2},
 			gave: &perceptron{
-				Activation: ModeSIGMOID,
-				Loss:       ModeMSE,
+				Activation: param.ModeSIGMOID,
+				Loss:       param.ModeMSE,
 				neuron: [][]*neuron{
 					{
 						{.5374298453437496, 0},
@@ -1006,8 +1007,8 @@ func Test_perceptron_calcMiss(t *testing.T) {
 		{
 			name: "1",
 			got: &perceptron{
-				Activation: ModeSIGMOID,
-				Weights: Float3Type{
+				Activation: param.ModeSIGMOID,
+				Weights: gonn.Float3Type{
 					{
 						{.1, .1, .1},
 						{.1, .1, .1},
@@ -1052,14 +1053,14 @@ func Test_perceptron_updWeight(t *testing.T) {
 		name  string
 		input []float64
 		got   *perceptron
-		want  Float3Type
+		want  gonn.Float3Type
 	}{
 		{
 			name:  "#1",
 			input: []float64{.2},
 			got: &perceptron{
-				Rate: DefaultRate,
-				Weights: Float3Type{
+				Rate: param.DefaultRate,
+				Weights: gonn.Float3Type{
 					{
 						{.1},
 					},
@@ -1071,7 +1072,7 @@ func Test_perceptron_updWeight(t *testing.T) {
 				},
 				lenInput: 1,
 			},
-			want: Float3Type{
+			want: gonn.Float3Type{
 				{
 					{.0997889882805427},
 				},
@@ -1081,8 +1082,8 @@ func Test_perceptron_updWeight(t *testing.T) {
 			name:  "#2",
 			input: []float64{.2, .3},
 			got: &perceptron{
-				Rate: DefaultRate,
-				Weights: Float3Type{
+				Rate: param.DefaultRate,
+				Weights: gonn.Float3Type{
 					{
 						{.1, .1, .1},
 						{.1, .1, .1},
@@ -1102,7 +1103,7 @@ func Test_perceptron_updWeight(t *testing.T) {
 				},
 				lenInput: 2,
 			},
-			want: Float3Type{
+			want: gonn.Float3Type{
 				{
 					{.10024936596100481, .10037404894150723, .10124682980502406},
 					{.10024936596100481, .10037404894150723, .10124682980502406},

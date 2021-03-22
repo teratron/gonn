@@ -1,13 +1,11 @@
 package main
 
-import (
-	"github.com/teratron/gonn/nn"
-)
+import "github.com/teratron/gonn/nn"
 
 func main() {
 	// New returns a new neural network
 	// instance with the default parameters,
-	// same n := nn.New(nn.Perceptron())
+	// same n := nn.New("perceptron")
 	n := nn.New()
 
 	// The neuron bias, false or true

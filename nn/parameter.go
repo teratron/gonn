@@ -15,6 +15,6 @@ const (
 	ModeRMSE   = param.ModeRMSE
 	ModeARCTAN = param.ModeARCTAN
 
-	//
+	// DefaultRate default learning rate
 	DefaultRate = param.DefaultRate
 )

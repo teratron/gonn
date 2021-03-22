@@ -19,6 +19,7 @@ func Test_checkActivationMode(t *testing.T) {
 			want: ModeSIGMOID,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := CheckActivationMode(tt.gave); got != tt.want {
@@ -33,6 +34,7 @@ func TestActivation(t *testing.T) {
 		value float64
 		mode  uint8
 	}
+
 	tests := []struct {
 		name string
 		args
@@ -79,6 +81,7 @@ func TestActivation(t *testing.T) {
 			want: .52497918747894,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := Activation(tt.value, tt.mode); got != tt.want {
@@ -93,6 +96,7 @@ func TestDerivative(t *testing.T) {
 		value float64
 		mode  uint8
 	}
+
 	tests := []struct {
 		name string
 		args
@@ -139,6 +143,7 @@ func TestDerivative(t *testing.T) {
 			want: .09000000000000001,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := Derivative(tt.value, tt.mode); got != tt.want {
