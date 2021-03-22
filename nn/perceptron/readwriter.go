@@ -1,10 +1,7 @@
 package perceptron
 
 import (
-	"fmt"
-
 	"github.com/teratron/gonn"
-	"github.com/teratron/gonn/util"
 )
 
 // Reader
@@ -17,7 +14,7 @@ type Writer interface {
 	gonn.Writer
 }
 
-func (p *perceptron) Read(reader gonn.Reader) (err error) {
+/*func (p *perceptron) Read(reader gonn.Reader) (err error) {
 	switch r := reader.(type) {
 	case gonn.Filer:
 		err = r.Read(p)
@@ -55,4 +52,4 @@ func (p *perceptron) Write(writer ...gonn.Writer) (err error) {
 		err = fmt.Errorf("perceptron write: %w", err)
 	}
 	return
-}
+}*/

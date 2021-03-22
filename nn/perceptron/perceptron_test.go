@@ -69,10 +69,10 @@ func Test_perceptron_setStateInit(t *testing.T) {
 }
 
 func Test_perceptron_nameJSON(t *testing.T) {
-	want := &perceptron{jsonName: filepath.Join(filepath.Join(Name + ".json"))}
-	t.Run(want.jsonName, func(t *testing.T) {
-		if got := want.NameJSON(); got != want.jsonName {
-			t.Errorf("nameJSON() = %s, want %s", got, want.jsonName)
+	want := &perceptron{jsonConfig: filepath.Join(filepath.Join(Name + ".json"))}
+	t.Run(want.jsonConfig, func(t *testing.T) {
+		if got := want.NameJSON(); got != want.jsonConfig {
+			t.Errorf("nameJSON() = %s, want %s", got, want.jsonConfig)
 		}
 	})
 }
@@ -81,8 +81,8 @@ func Test_perceptron_setNameJSON(t *testing.T) {
 	got := &perceptron{}
 	want := filepath.Join(Name + ".json")
 	t.Run(want, func(t *testing.T) {
-		if got.SetNameJSON(want); got.jsonName != want {
-			t.Errorf("setNameJSON() = %s, want %s", got.jsonName, want)
+		if got.SetNameJSON(want); got.jsonConfig != want {
+			t.Errorf("setNameJSON() = %s, want %s", got.jsonConfig, want)
 		}
 	})
 }

@@ -8,6 +8,8 @@ type Parameter interface {
 	InitNN() bool
 	SetInitNN(bool)
 
+	SetConfig(Filer)
+
 	NameJSON() string
 	SetNameJSON(string)
 

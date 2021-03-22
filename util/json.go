@@ -5,38 +5,35 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path/filepath"
-
-	"github.com/teratron/gonn"
 )
 
 type FileJSON struct {
-	name string
+	Name string
 }
 
 // Decode
 func (j *FileJSON) Decode(data interface{}) error {
-	file, err := os.OpenFile(j.name, os.O_RDONLY, 0600)
+	file, err := os.OpenFile(j.Name, os.O_RDONLY, 0600)
 	if err == nil {
 		defer func() { err = file.Close() }()
-		err = json.NewDecoder(file).Decode(&data)
+		err = json.NewDecoder(file).Decode(data)
 	}
 	return err
 }
 
 // Encode
 func (j *FileJSON) Encode(data interface{}) error {
-	file, err := os.OpenFile(j.name, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
+	file, err := os.OpenFile(j.Name, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 	if err == nil {
 		defer func() { err = file.Close() }()
-		err = json.NewEncoder(file).Encode(&data)
+		err = json.NewEncoder(file).Encode(data)
 	}
 	return err
 }
 
 // GetValue
 func (j *FileJSON) GetValue(key string) interface{} {
-	b, err := ioutil.ReadFile(j.name)
+	b, err := ioutil.ReadFile(j.Name)
 	if err == nil {
 		var data interface{}
 		err = json.Unmarshal(b, &data)
@@ -50,7 +47,7 @@ func (j *FileJSON) GetValue(key string) interface{} {
 	return fmt.Errorf("json get value: %w", err)
 }
 
-type JsonString string
+/*type JsonString string
 
 // JSON
 func JSON(filename ...string) gonn.ReadWriter {
@@ -142,3 +139,4 @@ func (j JsonString) Write(writer ...gonn.Writer) (err error) {
 	}
 	return
 }
+*/

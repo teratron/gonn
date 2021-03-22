@@ -68,5 +68,5 @@ func main() {
 	//fmt.Println(buff)
 
 	// Writing the neural network configuration to a file
-	//_ = n.Write(nn.JSON(filepath.Join("perceptron.json")))
+	//_ = n.Write(filepath.Join("perceptron.json"))
 }

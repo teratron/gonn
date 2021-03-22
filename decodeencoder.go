@@ -20,5 +20,4 @@ type Encoder interface {
 type Filer interface {
 	DecodeEncoder
 	GetValue(key string) interface{}
-	//FileName() (string, error)
 }

@@ -3,40 +3,41 @@ package perceptron
 import (
 	"github.com/teratron/gonn"
 	param "github.com/teratron/gonn/nn/parameter"
+	"github.com/teratron/gonn/util"
 )
 
 // Name of the neural network architecture.
 const Name = "perceptron"
 
-// Declare conformity with NeuralNetwork interface
+// Declare conformity with NeuralNetwork interface.
 var _ gonn.NeuralNetwork = (*perceptron)(nil)
 
 type perceptron struct {
 	gonn.Parameter `json:"-" yaml:"-"`
 
-	// Neural network architecture name
+	// Neural network architecture name.
 	Name string `json:"name" yaml:"name"`
 
-	// The neuron bias, false or true
+	// The neuron bias, false or true.
 	Bias bool `json:"bias" yaml:"bias"`
 
-	// Array of the number of neurons in each hidden layer
-	Hidden []int `json:"hidden,omitempty" yaml:"hidden,omitempty"`
+	// Array of the number of neurons in each hidden layer.
+	Hidden []int `json:"hidden,omitempty" yaml:"hidden"`
 
 	// Activation function mode
 	Activation uint8 `json:"activation" yaml:"activation"`
 
-	// The mode of calculation of the total error
+	// The mode of calculation of the total error.
 	Loss uint8 `json:"loss" yaml:"loss"`
 
-	// Minimum (sufficient) limit of the average of the error during training
+	// Minimum (sufficient) limit of the average of the error during training.
 	Limit float64 `json:"limit" yaml:"limit"`
 
-	// Learning coefficient, from 0 to 1
+	// Learning coefficient, from 0 to 1.
 	Rate float64 `json:"rate" yaml:"rate"`
 
-	// Weight value
-	Weights gonn.Float3Type `json:"weights,omitempty" yaml:"weights,omitempty"`
+	// Weight value.
+	Weights gonn.Float3Type `json:"weights,omitempty" yaml:"weights"`
 
 	// Neuron
 	neuron [][]*neuron
@@ -46,8 +47,8 @@ type perceptron struct {
 	lenOutput      int
 	lastLayerIndex int
 	isInit         bool
-	jsonName       string
-	yamlName       string
+	jsonConfig     *util.FileJSON
+	yamlConfig     *util.FileYAML
 }
 
 type neuron struct {
@@ -55,7 +56,7 @@ type neuron struct {
 	miss  float64
 }
 
-// Perceptron return perceptron neural network
+// Perceptron return perceptron neural network.
 func Perceptron() *perceptron {
 	return &perceptron{
 		Name:       Name,
@@ -66,7 +67,7 @@ func Perceptron() *perceptron {
 	}
 }
 
-// initFromNew initialize
+// initFromNew initialize.
 func (p *perceptron) initFromNew(lenInput, lenTarget int) {
 	p.lenInput = lenInput
 	p.lenOutput = lenTarget

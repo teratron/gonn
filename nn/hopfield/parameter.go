@@ -1,6 +1,9 @@
 package hopfield
 
-import "github.com/teratron/gonn"
+import (
+	"github.com/teratron/gonn"
+	"github.com/teratron/gonn/util"
+)
 
 // Declare conformity with Parameter interface
 /*var _ Parameter = (*hopfield)(nil)
@@ -27,20 +30,30 @@ func (h *hopfield) SetInitNN(state bool) {
 	h.isInit = state
 }
 
+// SetConfig
+func (h *hopfield) SetConfig(file gonn.Filer) {
+	switch cfg := file.(type) {
+	case *util.FileJSON:
+		h.jsonConfig = cfg
+	case *util.FileYAML:
+		h.yamlConfig = cfg
+	}
+}
+
 func (h *hopfield) NameJSON() string {
-	return h.jsonName
+	return h.jsonConfig.Name
 }
 
 func (h *hopfield) SetNameJSON(name string) {
-	h.jsonName = name
+	h.jsonConfig.Name = name
 }
 
 func (h *hopfield) NameYAML() string {
-	return h.yamlName
+	return h.yamlConfig.Name
 }
 
 func (h *hopfield) SetNameYAML(name string) {
-	h.yamlName = name
+	h.yamlConfig.Name = name
 }
 
 // LossLimit

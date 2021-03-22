@@ -3,6 +3,7 @@ package perceptron
 import (
 	"github.com/teratron/gonn"
 	param "github.com/teratron/gonn/nn/parameter"
+	"github.com/teratron/gonn/util"
 )
 
 // Declare conformity with Parameter interface
@@ -45,20 +46,30 @@ func (p *perceptron) SetInitNN(state bool) {
 	p.isInit = state
 }
 
+// SetConfig
+func (p *perceptron) SetConfig(file gonn.Filer) {
+	switch cfg := file.(type) {
+	case *util.FileJSON:
+		p.jsonConfig = cfg
+	case *util.FileYAML:
+		p.yamlConfig = cfg
+	}
+}
+
 func (p *perceptron) NameJSON() string {
-	return p.jsonName
+	return p.jsonConfig.Name
 }
 
 func (p *perceptron) SetNameJSON(name string) {
-	p.jsonName = name
+	p.jsonConfig.Name = name
 }
 
 func (p *perceptron) NameYAML() string {
-	return p.yamlName
+	return p.yamlConfig.Name
 }
 
 func (p *perceptron) SetNameYAML(name string) {
-	p.yamlName = name
+	p.yamlConfig.Name = name
 }
 
 // NeuronBias
