@@ -1,4 +1,4 @@
-package parameter
+package param
 
 // CheckHiddenLayer
 func CheckHiddenLayer(layer []int) []int {

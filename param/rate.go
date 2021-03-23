@@ -1,4 +1,4 @@
-package parameter
+package param
 
 // DefaultRate default learning rate
 const DefaultRate float64 = .3

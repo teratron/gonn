@@ -1,7 +1,7 @@
 package gonn
 
 // DecodeEncoder
-type DecodeEncoder interface {
+/*type DecodeEncoder interface {
 	Decoder
 	Encoder
 }
@@ -14,10 +14,12 @@ type Decoder interface {
 // Encoder
 type Encoder interface {
 	Encode(interface{}) error
-}
+}*/
 
 // Filer
-type Filer interface {
-	DecodeEncoder
+/*type Filer interface {
+	//DecodeEncoder
+	Decode(interface{}) error
+	Encode(interface{}) error
 	GetValue(key string) interface{}
-}
+}*/

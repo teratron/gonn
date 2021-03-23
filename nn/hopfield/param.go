@@ -1,20 +1,8 @@
 package hopfield
 
-import (
-	"github.com/teratron/gonn"
-	"github.com/teratron/gonn/util"
-)
+import "github.com/teratron/gonn"
 
-// Declare conformity with Parameter interface
-/*var _ Parameter = (*hopfield)(nil)
-
-// Parameter
-type Parameter interface {
-	NeuronEnergy() float64
-	SetNeuronEnergy(float64)
-}*/
-
-func (h *hopfield) NameNN() string {
+/*func (h *hopfield) NameNN() string {
 	return h.Name
 }
 
@@ -54,14 +42,14 @@ func (h *hopfield) NameYAML() string {
 
 func (h *hopfield) SetNameYAML(name string) {
 	h.yamlConfig.Name = name
-}
+}*/
 
-// LossLimit
+// NeuronEnergy
 func (h *hopfield) NeuronEnergy() float64 {
 	return h.Energy
 }
 
-// SetLossLimit
+// SetNeuronEnergy
 func (h *hopfield) SetNeuronEnergy(energy float64) {
 	h.Energy = energy
 }

@@ -22,3 +22,10 @@ type Writer interface {
 	GetValue(key string) interface{}
 	FileName() (string, error)
 }*/
+
+// Filer
+type Filer interface {
+	Decode(interface{}) error
+	Encode(interface{}) error
+	GetValue(key string) interface{}
+}

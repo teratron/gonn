@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/teratron/gonn"
-	param "github.com/teratron/gonn/nn/parameter"
+	"github.com/teratron/gonn/param"
 )
 
 func init() {

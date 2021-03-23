@@ -1,8 +1,6 @@
 package perceptron
 
-import (
-	"github.com/teratron/gonn"
-)
+import "github.com/teratron/gonn"
 
 // Reader
 type Reader interface {

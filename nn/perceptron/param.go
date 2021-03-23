@@ -2,61 +2,39 @@ package perceptron
 
 import (
 	"github.com/teratron/gonn"
-	param "github.com/teratron/gonn/nn/parameter"
-	"github.com/teratron/gonn/util"
+	"github.com/teratron/gonn/param"
 )
 
-// Declare conformity with Parameter interface
-/*var _ Parameter = (*perceptron)(nil)
-
-// Parameter
-type Parameter interface {
-	HiddenLayer() []int
-	SetHiddenLayer(...int)
-
-	NeuronBias() bool
-	SetNeuronBias(bool)
-
-	ActivationMode() uint8
-	SetActivationMode(uint8)
-
-	LossMode() uint8
-	SetLossMode(uint8)
-
-	LossLimit() float64
-	SetLossLimit(float64)
-
-	LearningRate() float64
-	SetLearningRate(float64)
-}*/
-
-func (p *perceptron) NameNN() string {
+/*func (p *perceptron) NameNN() string {
 	return p.Name
 }
 
 func (p *perceptron) SetNameNN(name string) {
 	p.Name = name
-}
+}*/
 
-func (p *perceptron) InitNN() bool {
+/*func (p *perceptron) InitNN() bool {
 	return p.isInit
 }
 
 func (p *perceptron) SetInitNN(state bool) {
 	p.isInit = state
-}
+}*/
 
 // SetConfig
-func (p *perceptron) SetConfig(file gonn.Filer) {
+/*func (p *perceptron) SetConfig(file gonn.Filer) {
+	p.config = file
 	switch cfg := file.(type) {
 	case *util.FileJSON:
 		p.jsonConfig = cfg
 	case *util.FileYAML:
 		p.yamlConfig = cfg
+	default:
+		log.Println(fmt.Errorf("set config: %T %w: %v", cfg, gonn.ErrMissingType, cfg))
 	}
-}
+}*/
 
-func (p *perceptron) NameJSON() string {
+/*func (p *perceptron) NameJSON() string {
 	return p.jsonConfig.Name
 }
 
@@ -70,7 +48,7 @@ func (p *perceptron) NameYAML() string {
 
 func (p *perceptron) SetNameYAML(name string) {
 	p.yamlConfig.Name = name
-}
+}*/
 
 // NeuronBias
 func (p *perceptron) NeuronBias() bool {

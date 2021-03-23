@@ -1,7 +1,7 @@
 package gonn
 
 import (
-	"fmt"
+	"errors"
 	"log"
 )
 
@@ -25,7 +25,7 @@ func (f Float2Type) Length(ind ...uint) int {
 		if len(f) > int(ind[0]) {
 			return len(f[ind[0]])
 		}
-		log.Println(fmt.Errorf("error Float2Type length: index exceeds array size"))
+		log.Println(errors.New("error Float2Type length: index exceeds array size"))
 		return 0
 	}
 	return len(f)
@@ -46,6 +46,6 @@ func (f Float3Type) Length(ind ...uint) int {
 			return len(f[ind[0]][ind[1]])
 		}
 	}
-	log.Println(fmt.Errorf("error Float3Type length: index exceeds arrays size"))
+	log.Println(errors.New("error Float3Type length: index exceeds arrays size"))
 	return 0
 }

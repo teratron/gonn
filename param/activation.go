@@ -1,22 +1,14 @@
-package parameter
+package param
 
 import "math"
 
+// Activation function mode.
 const (
-	// ModeLINEAR - Linear/identity
-	ModeLINEAR uint8 = iota
-
-	// ModeRELU - ReLu (rectified linear unit)
-	ModeRELU
-
-	// ModeLEAKYRELU - Leaky ReLu (leaky rectified linear unit)
-	ModeLEAKYRELU
-
-	// ModeSIGMOID - Logistic, a.k.a. sigmoid or soft step
-	ModeSIGMOID
-
-	// ModeTANH - TanH (hyperbolic tangent)
-	ModeTANH
+	ModeLINEAR    uint8 = iota // Linear/identity.
+	ModeRELU                   // ReLu (rectified linear unit).
+	ModeLEAKYRELU              // Leaky ReLu (leaky rectified linear unit).
+	ModeSIGMOID                // Logistic, a.k.a. sigmoid or soft step.
+	ModeTANH                   // TanH (hyperbolic tangent).
 )
 
 // CheckActivationMode
@@ -27,7 +19,7 @@ func CheckActivationMode(mode uint8) uint8 {
 	return mode
 }
 
-// Activation function
+// Activation function.
 func Activation(value float64, mode uint8) float64 {
 	switch mode {
 	case ModeLINEAR:
@@ -52,7 +44,7 @@ func Activation(value float64, mode uint8) float64 {
 	}
 }
 
-// Derivative activation function
+// Derivative activation function.
 func Derivative(value float64, mode uint8) float64 {
 	switch mode {
 	case ModeLINEAR:

@@ -1,4 +1,4 @@
-package parameter
+package param
 
 import (
 	"math/rand"
