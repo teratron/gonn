@@ -2,53 +2,8 @@ package perceptron
 
 import (
 	"github.com/teratron/gonn"
-	"github.com/teratron/gonn/param"
+	"github.com/teratron/gonn/params"
 )
-
-/*func (p *perceptron) NameNN() string {
-	return p.Name
-}
-
-func (p *perceptron) SetNameNN(name string) {
-	p.Name = name
-}*/
-
-/*func (p *perceptron) InitNN() bool {
-	return p.isInit
-}
-
-func (p *perceptron) SetInitNN(state bool) {
-	p.isInit = state
-}*/
-
-// SetConfig
-/*func (p *perceptron) SetConfig(file gonn.Filer) {
-	p.config = file
-	switch cfg := file.(type) {
-	case *util.FileJSON:
-		p.jsonConfig = cfg
-	case *util.FileYAML:
-		p.yamlConfig = cfg
-	default:
-		log.Println(fmt.Errorf("set config: %T %w: %v", cfg, gonn.ErrMissingType, cfg))
-	}
-}*/
-
-/*func (p *perceptron) NameJSON() string {
-	return p.jsonConfig.Name
-}
-
-func (p *perceptron) SetNameJSON(name string) {
-	p.jsonConfig.Name = name
-}
-
-func (p *perceptron) NameYAML() string {
-	return p.yamlConfig.Name
-}
-
-func (p *perceptron) SetNameYAML(name string) {
-	p.yamlConfig.Name = name
-}*/
 
 // NeuronBias
 func (p *perceptron) NeuronBias() bool {
@@ -62,12 +17,12 @@ func (p *perceptron) SetNeuronBias(bias bool) {
 
 // HiddenLayer
 func (p *perceptron) HiddenLayer() []int {
-	return param.CheckHiddenLayer(p.Hidden)
+	return params.CheckHiddenLayer(p.Hidden)
 }
 
 // SetHiddenLayer
 func (p *perceptron) SetHiddenLayer(layer ...int) {
-	p.Hidden = param.CheckHiddenLayer(layer)
+	p.Hidden = params.CheckHiddenLayer(layer)
 }
 
 // ActivationMode
@@ -77,7 +32,7 @@ func (p *perceptron) ActivationMode() uint8 {
 
 // SetActivationMode
 func (p *perceptron) SetActivationMode(mode uint8) {
-	p.Activation = param.CheckActivationMode(mode)
+	p.Activation = params.CheckActivationMode(mode)
 }
 
 // LossMode
@@ -87,7 +42,7 @@ func (p *perceptron) LossMode() uint8 {
 
 // SetLossMode
 func (p *perceptron) SetLossMode(mode uint8) {
-	p.Loss = param.CheckLossMode(mode)
+	p.Loss = params.CheckLossMode(mode)
 }
 
 // LossLimit
@@ -107,7 +62,7 @@ func (p *perceptron) LearningRate() float64 {
 
 // SetLearningRate
 func (p *perceptron) SetLearningRate(rate float64) {
-	p.Rate = param.CheckLearningRate(rate)
+	p.Rate = params.CheckLearningRate(rate)
 }
 
 // Weight

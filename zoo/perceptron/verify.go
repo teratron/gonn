@@ -7,17 +7,8 @@ import (
 	"github.com/teratron/gonn"
 )
 
-// MaxIteration the maximum number of iterations after which training is forcibly terminated.
-const MaxIteration = 10e+05
-
-var GetMaxIteration = getMaxIteration
-
-func getMaxIteration() int {
-	return MaxIteration
-}
-
-// Train training dataset
-func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, count int) {
+// Verify verifying dataset
+func (p *perceptron) Verify(input []float64, target ...[]float64) (loss float64) {
 	var err error
 	if len(input) > 0 {
 		if len(target) > 0 && len(target[0]) > 0 {
@@ -33,25 +24,20 @@ func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, 
 					goto ERROR
 				}
 			}
-			for count < GetMaxIteration() {
-				p.calcNeuron(input)
-				if loss = p.calcLoss(target[0]); loss <= p.Limit {
-					break
-				}
-				p.calcMiss()
-				p.updWeight(input)
-				count++
-			}
+
+			p.calcNeuron(input)
+			loss = p.calcLoss(target[0])
 		} else {
 			err = gonn.ErrNoTarget
 		}
 	} else {
 		err = gonn.ErrNoInput
 	}
+
 ERROR:
 	if err != nil {
-		log.Println(fmt.Errorf("train: %w", err))
-		return -1, 0
+		log.Println(fmt.Errorf("verify: %w", err))
+		return -1
 	}
 	return
 }

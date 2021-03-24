@@ -2,7 +2,8 @@ package perceptron
 
 import (
 	"github.com/teratron/gonn"
-	"github.com/teratron/gonn/param"
+	"github.com/teratron/gonn/params"
+	"github.com/teratron/gonn/utils"
 )
 
 // Name of the neural network architecture.
@@ -46,9 +47,7 @@ type perceptron struct {
 	lenOutput      int
 	lastLayerIndex int
 	isInit         bool
-	//jsonConfig     *util.FileJSON
-	//yamlConfig     *util.FileYAML
-	config gonn.Filer
+	config         utils.Filer
 }
 
 type neuron struct {
@@ -60,9 +59,9 @@ type neuron struct {
 func Perceptron() *perceptron {
 	return &perceptron{
 		Name:       Name,
-		Activation: param.ModeSIGMOID,
-		Loss:       param.ModeMSE,
+		Activation: params.ModeSIGMOID,
+		Loss:       params.ModeMSE,
 		Limit:      .1,
-		Rate:       param.DefaultRate,
+		Rate:       params.DefaultRate,
 	}
 }

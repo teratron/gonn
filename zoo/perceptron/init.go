@@ -4,14 +4,15 @@ import (
 	"fmt"
 
 	"github.com/teratron/gonn"
-	"github.com/teratron/gonn/param"
+	"github.com/teratron/gonn/params"
+	"github.com/teratron/gonn/utils"
 )
 
 // Init
 func (p *perceptron) Init(data ...interface{}) (err error) {
 	if len(data) > 0 {
 		switch value := data[0].(type) {
-		case gonn.Filer:
+		case utils.Filer:
 			if len(p.Weights) > 0 {
 				p.initFromWeight()
 			}
@@ -69,7 +70,7 @@ func (p *perceptron) initFromNew(lenInput, lenTarget int) {
 				p.Weights[i][j] = make([]float64, biasInput)
 			}
 			for k := range p.Weights[i][j] {
-				p.Weights[i][j][k] = param.GetRandFloat()
+				p.Weights[i][j][k] = params.GetRandFloat()
 			}
 			p.neuron[i][j] = &neuron{}
 		}

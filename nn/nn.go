@@ -10,16 +10,6 @@ type NeuralNetwork interface {
 	gonn.NeuralNetwork
 }
 
-// Reader
-/*type Reader interface {
-	gonn.Reader
-}
-
-// Writer
-type Writer interface {
-	gonn.Writer
-}*/
-
 // Floater
 type Floater interface {
 	gonn.Floater

@@ -18,6 +18,7 @@ func (p *perceptron) Query(input []float64) (output []float64) {
 			err = fmt.Errorf("invalid number of elements in the input data")
 			goto ERROR
 		}
+
 		p.calcNeuron(input)
 		output = make([]float64, p.lenOutput)
 		for i, n := range p.neuron[p.lastLayerIndex] {
@@ -26,6 +27,7 @@ func (p *perceptron) Query(input []float64) (output []float64) {
 	} else {
 		err = gonn.ErrNoInput
 	}
+
 ERROR:
 	if err != nil {
 		log.Println(fmt.Errorf("query: %w", err))

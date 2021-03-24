@@ -3,7 +3,7 @@ package perceptron
 import (
 	"math"
 
-	"github.com/teratron/gonn/param"
+	"github.com/teratron/gonn/params"
 )
 
 // calcNeuron
@@ -34,7 +34,7 @@ func (p *perceptron) calcNeuron(input []float64) {
 						n.value += w
 					}
 				}
-				n.value = param.Activation(n.value, p.Activation)
+				n.value = params.Activation(n.value, p.Activation)
 				wait <- true
 			}(j, n)
 		}
@@ -52,16 +52,16 @@ func (p *perceptron) calcLoss(target []float64) (loss float64) {
 		switch p.Loss {
 		default:
 			fallthrough
-		case param.ModeMSE, param.ModeRMSE:
+		case params.ModeMSE, params.ModeRMSE:
 			loss += math.Pow(n.miss, 2)
-		case param.ModeARCTAN:
+		case params.ModeARCTAN:
 			loss += math.Pow(math.Atan(n.miss), 2)
 		}
-		n.miss *= param.Derivative(n.value, p.Activation)
+		n.miss *= params.Derivative(n.value, p.Activation)
 	}
 
 	loss /= float64(p.lenOutput)
-	if p.Loss == param.ModeRMSE {
+	if p.Loss == params.ModeRMSE {
 		loss = math.Sqrt(loss)
 	}
 	return
@@ -80,7 +80,7 @@ func (p *perceptron) calcMiss() {
 				for k, m := range p.neuron[inc] {
 					n.miss += m.miss * p.Weights[inc][k][j]
 				}
-				n.miss *= param.Derivative(n.value, p.Activation)
+				n.miss *= params.Derivative(n.value, p.Activation)
 				wait <- true
 			}(j, n)
 		}

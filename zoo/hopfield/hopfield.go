@@ -2,7 +2,7 @@ package hopfield
 
 import (
 	"github.com/teratron/gonn"
-	"github.com/teratron/gonn/util"
+	"github.com/teratron/gonn/utils"
 )
 
 // Name of the neural network architecture.
@@ -28,10 +28,9 @@ type hopfield struct {
 	neuron []*neuron
 
 	// Settings
-	lenInput   int
-	isInit     bool
-	jsonConfig *util.FileJSON
-	yamlConfig *util.FileYAML
+	lenInput int
+	isInit   bool
+	config   utils.Filer
 }
 
 type neuron struct {

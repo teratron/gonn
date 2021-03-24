@@ -14,5 +14,5 @@ func main() {
 	_, _ = n.Train(input, target)
 
 	// Writing the neural network configuration to a file
-	_ = n.Write("perceptron.json")
+	_ = n.WriteWeight("perceptron_weights.json")
 }

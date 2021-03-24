@@ -1,14 +1,19 @@
-package util
+package utils
 
 import (
 	"fmt"
 	"path/filepath"
-
-	"github.com/teratron/gonn"
 )
 
+// Filer
+type Filer interface {
+	Decode(interface{}) error
+	Encode(interface{}) error
+	GetValue(key string) interface{}
+}
+
 type FileError struct {
-	gonn.Filer
+	Filer
 	Err error
 }
 
@@ -16,7 +21,7 @@ func (f *FileError) Error() string {
 	return fmt.Sprintf("file type error: %v\n", f.Err)
 }
 
-func GetFileType(name string) gonn.Filer {
+func GetFileType(name string) Filer {
 	ext := filepath.Ext(name)
 	switch ext {
 	case ".json":

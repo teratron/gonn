@@ -65,8 +65,7 @@ func main() {
 
 	// Returning weights for further recording from the buffer
 	n.SetWeight(buff)
-	//fmt.Println(buff)
 
 	// Writing the neural network configuration to a file
-	//_ = n.Write(filepath.Join("perceptron.json"))
+	_ = n.WriteConfig("perceptron.json")
 }

@@ -1,4 +1,4 @@
-package param
+package params
 
 import "testing"
 
