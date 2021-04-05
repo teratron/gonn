@@ -17,9 +17,9 @@ const (
 )
 
 // Get
-func Get(name string) gonn.NeuralNetwork {
+func Get(title string) gonn.NeuralNetwork {
 	var err error
-	d := utils.GetFileType(name)
+	d := utils.GetFileType(title)
 	if _, ok := d.(error); !ok {
 		switch v := d.GetValue("name").(type) {
 		case string:
@@ -34,11 +34,11 @@ func Get(name string) gonn.NeuralNetwork {
 			err = v
 		}
 	} else {
-		switch strings.ToLower(name) {
+		switch strings.ToLower(title) {
 		case Perceptron:
-			return perceptron.Perceptron()
+			return perceptron.New()
 		case Hopfield:
-			return hopfield.Hopfield()
+			return hopfield.New()
 		default:
 			err = fmt.Errorf("neural network is %w", gonn.ErrNotRecognized)
 		}

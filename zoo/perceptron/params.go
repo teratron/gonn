@@ -6,73 +6,73 @@ import (
 )
 
 // NeuronBias
-func (p *perceptron) NeuronBias() bool {
-	return p.Bias
+func (nn *NN) NeuronBias() bool {
+	return nn.Bias
 }
 
 // SetNeuronBias
-func (p *perceptron) SetNeuronBias(bias bool) {
-	p.Bias = bias
+func (nn *NN) SetNeuronBias(bias bool) {
+	nn.Bias = bias
 }
 
 // HiddenLayer
-func (p *perceptron) HiddenLayer() []int {
-	return params.CheckHiddenLayer(p.Hidden)
+func (nn *NN) HiddenLayer() []int {
+	return params.CheckHiddenLayer(nn.Hidden)
 }
 
 // SetHiddenLayer
-func (p *perceptron) SetHiddenLayer(layer ...int) {
-	p.Hidden = params.CheckHiddenLayer(layer)
+func (nn *NN) SetHiddenLayer(layer ...int) {
+	nn.Hidden = params.CheckHiddenLayer(layer)
 }
 
 // ActivationMode
-func (p *perceptron) ActivationMode() uint8 {
-	return p.Activation
+func (nn *NN) ActivationMode() uint8 {
+	return nn.Activation
 }
 
 // SetActivationMode
-func (p *perceptron) SetActivationMode(mode uint8) {
-	p.Activation = params.CheckActivationMode(mode)
+func (nn *NN) SetActivationMode(mode uint8) {
+	nn.Activation = params.CheckActivationMode(mode)
 }
 
 // LossMode
-func (p *perceptron) LossMode() uint8 {
-	return p.Loss
+func (nn *NN) LossMode() uint8 {
+	return nn.Loss
 }
 
 // SetLossMode
-func (p *perceptron) SetLossMode(mode uint8) {
-	p.Loss = params.CheckLossMode(mode)
+func (nn *NN) SetLossMode(mode uint8) {
+	nn.Loss = params.CheckLossMode(mode)
 }
 
 // LossLimit
-func (p *perceptron) LossLimit() float64 {
-	return p.Limit
+func (nn *NN) LossLimit() float64 {
+	return nn.Limit
 }
 
 // SetLossLimit
-func (p *perceptron) SetLossLimit(limit float64) {
-	p.Limit = limit
+func (nn *NN) SetLossLimit(limit float64) {
+	nn.Limit = limit
 }
 
 // LearningRate
-func (p *perceptron) LearningRate() float64 {
-	return p.Rate
+func (nn *NN) LearningRate() float64 {
+	return nn.Rate
 }
 
 // SetLearningRate
-func (p *perceptron) SetLearningRate(rate float64) {
-	p.Rate = params.CheckLearningRate(rate)
+func (nn *NN) SetLearningRate(rate float64) {
+	nn.Rate = params.CheckLearningRate(rate)
 }
 
 // Weight
-func (p *perceptron) Weight() gonn.Floater {
-	return &p.Weights
+func (nn *NN) Weight() gonn.Floater {
+	return &nn.Weights
 }
 
 // SetWeight
-func (p *perceptron) SetWeight(weight gonn.Floater) {
+func (nn *NN) SetWeight(weight gonn.Floater) {
 	if w, ok := weight.(gonn.Float3Type); ok {
-		p.Weights = w
+		nn.Weights = w
 	}
 }

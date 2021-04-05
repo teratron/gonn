@@ -7,16 +7,16 @@ import (
 )
 
 // WriteConfig writes the configuration and weights to the Filer interface object.
-func (p *perceptron) WriteConfig(name ...string) (err error) {
+func (nn *NN) WriteConfig(name ...string) (err error) {
 	if len(name) > 0 {
 		switch d := utils.GetFileType(name[0]).(type) {
 		case utils.Filer:
-			err = d.Encode(p)
+			err = d.Encode(nn)
 		case error:
 			err = d
 		}
-	} else if p.config != nil {
-		err = p.config.Encode(p)
+	} else if nn.config != nil {
+		err = nn.config.Encode(nn)
 	}
 
 	if err != nil {
@@ -26,10 +26,10 @@ func (p *perceptron) WriteConfig(name ...string) (err error) {
 }
 
 // WriteConfig writes weights to the Filer interface object.
-func (p *perceptron) WriteWeight(name string) (err error) {
+func (nn *NN) WriteWeight(name string) (err error) {
 	switch d := utils.GetFileType(name).(type) {
 	case utils.Filer:
-		err = d.Encode(p.Weights)
+		err = d.Encode(nn.Weights)
 	case error:
 		err = d
 	}

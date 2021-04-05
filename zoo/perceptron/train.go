@@ -17,30 +17,30 @@ func getMaxIteration() int {
 }
 
 // Train training dataset
-func (p *perceptron) Train(input []float64, target ...[]float64) (loss float64, count int) {
+func (nn *NN) Train(input []float64, target ...[]float64) (loss float64, count int) {
 	var err error
 	if len(input) > 0 {
 		if len(target) > 0 && len(target[0]) > 0 {
-			if !p.isInit {
-				p.initFromNew(len(input), len(target[0]))
+			if !nn.isInit {
+				nn.initFromNew(len(input), len(target[0]))
 			} else {
-				if p.lenInput != len(input) {
+				if nn.lenInput != len(input) {
 					err = fmt.Errorf("invalid number of elements in the input data")
 					goto ERROR
 				}
-				if p.lenOutput != len(target[0]) {
+				if nn.lenOutput != len(target[0]) {
 					err = fmt.Errorf("invalid number of elements in the target data")
 					goto ERROR
 				}
 			}
 
 			for count < GetMaxIteration() {
-				p.calcNeuron(input)
-				if loss = p.calcLoss(target[0]); loss <= p.Limit {
+				nn.calcNeuron(input)
+				if loss = nn.calcLoss(target[0]); loss <= nn.Limit {
 					break
 				}
-				p.calcMiss()
-				p.updWeight(input)
+				nn.calcMiss()
+				nn.updWeight(input)
 				count++
 			}
 		} else {

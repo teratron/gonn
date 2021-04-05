@@ -15,7 +15,7 @@ run-example-yaml:
 	go build -v -mod vendor ./examples/yaml/main.go
 
 deps:
-	go get -u gopkg.in/yaml.v2
+	go get
 	go mod verify
 	go mod tidy -v
 	go mod vendor -v

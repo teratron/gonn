@@ -3,23 +3,23 @@ package hopfield
 import "github.com/teratron/gonn"
 
 // NeuronEnergy
-func (h *hopfield) NeuronEnergy() float64 {
-	return h.Energy
+func (nn *NN) NeuronEnergy() float64 {
+	return nn.Energy
 }
 
 // SetNeuronEnergy
-func (h *hopfield) SetNeuronEnergy(energy float64) {
-	h.Energy = energy
+func (nn *NN) SetNeuronEnergy(energy float64) {
+	nn.Energy = energy
 }
 
 // Weight
-func (h *hopfield) Weight() gonn.Floater {
-	return &h.Weights
+func (nn *NN) Weight() gonn.Floater {
+	return &nn.Weights
 }
 
 // SetWeight
-func (h *hopfield) SetWeight(weight gonn.Floater) {
+func (nn *NN) SetWeight(weight gonn.Floater) {
 	if w, ok := weight.(gonn.Float2Type); ok {
-		h.Weights = w
+		nn.Weights = w
 	}
 }

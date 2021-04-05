@@ -9,18 +9,18 @@ import (
 )
 
 // Init
-func (p *perceptron) Init(data ...interface{}) (err error) {
+func (nn *NN) Init(data ...interface{}) (err error) {
 	if len(data) > 0 {
 		switch value := data[0].(type) {
 		case utils.Filer:
-			if len(p.Weights) > 0 {
-				p.initFromWeight()
+			if len(nn.Weights) > 0 {
+				nn.initFromWeight()
 			}
-			p.config = value
+			nn.config = value
 		case int:
 			if len(data) == 2 {
 				if v, ok := data[1].(int); ok {
-					p.initFromNew(value, v)
+					nn.initFromNew(value, v)
 				}
 			}
 		default:
@@ -31,83 +31,83 @@ func (p *perceptron) Init(data ...interface{}) (err error) {
 }
 
 // initFromNew initialize.
-func (p *perceptron) initFromNew(lenInput, lenTarget int) {
-	p.lenInput = lenInput
-	p.lenOutput = lenTarget
-	p.lastLayerIndex = len(p.Hidden)
-	if p.lastLayerIndex > 0 && p.Hidden[0] == 0 {
-		p.lastLayerIndex = 0
+func (nn *NN) initFromNew(lenInput, lenTarget int) {
+	nn.lenInput = lenInput
+	nn.lenOutput = lenTarget
+	nn.lastLayerIndex = len(nn.Hidden)
+	if nn.lastLayerIndex > 0 && nn.Hidden[0] == 0 {
+		nn.lastLayerIndex = 0
 	}
 
 	var layer []int
-	if p.lastLayerIndex > 0 {
-		layer = append(p.Hidden, p.lenOutput)
+	if nn.lastLayerIndex > 0 {
+		layer = append(nn.Hidden, nn.lenOutput)
 	} else {
-		layer = []int{p.lenOutput}
+		layer = []int{nn.lenOutput}
 	}
 	lenLayer := len(layer)
 
 	bias := 0
-	if p.Bias {
+	if nn.Bias {
 		bias = 1
 	}
-	biasInput := p.lenInput + bias
+	biasInput := nn.lenInput + bias
 	var biasLayer int
 
-	p.Weights = make(gonn.Float3Type, lenLayer)
-	p.neuron = make([][]*neuron, lenLayer)
+	nn.Weights = make(gonn.Float3Type, lenLayer)
+	nn.neuron = make([][]*neuron, lenLayer)
 	for i, v := range layer {
-		p.Weights[i] = make([][]float64, v)
-		p.neuron[i] = make([]*neuron, v)
+		nn.Weights[i] = make([][]float64, v)
+		nn.neuron[i] = make([]*neuron, v)
 		if i > 0 {
 			biasLayer = layer[i-1] + bias
 		}
 
 		for j := 0; j < v; j++ {
 			if i > 0 {
-				p.Weights[i][j] = make([]float64, biasLayer)
+				nn.Weights[i][j] = make([]float64, biasLayer)
 			} else {
-				p.Weights[i][j] = make([]float64, biasInput)
+				nn.Weights[i][j] = make([]float64, biasInput)
 			}
-			for k := range p.Weights[i][j] {
-				p.Weights[i][j][k] = params.GetRandFloat()
+			for k := range nn.Weights[i][j] {
+				nn.Weights[i][j][k] = params.GetRandFloat()
 			}
-			p.neuron[i][j] = &neuron{}
+			nn.neuron[i][j] = &neuron{}
 		}
 	}
-	p.isInit = true
+	nn.isInit = true
 }
 
 // initFromWeight
-func (p *perceptron) initFromWeight() {
-	length := len(p.Weights)
+func (nn *NN) initFromWeight() {
+	length := len(nn.Weights)
 
-	if !p.Bias && length > 1 && len(p.Weights[0])+1 == len(p.Weights[1][0]) {
-		p.Bias = true
+	if !nn.Bias && length > 1 && len(nn.Weights[0])+1 == len(nn.Weights[1][0]) {
+		nn.Bias = true
 	}
 
-	p.lastLayerIndex = length - 1
-	p.lenOutput = len(p.Weights[p.lastLayerIndex])
-	p.lenInput = len(p.Weights[0][0])
-	if p.Bias {
-		p.lenInput -= 1
+	nn.lastLayerIndex = length - 1
+	nn.lenOutput = len(nn.Weights[nn.lastLayerIndex])
+	nn.lenInput = len(nn.Weights[0][0])
+	if nn.Bias {
+		nn.lenInput -= 1
 	}
 
-	if p.lastLayerIndex > 0 {
-		p.Hidden = make([]int, p.lastLayerIndex)
-		for i := range p.Hidden {
-			p.Hidden[i] = len(p.Weights[i])
+	if nn.lastLayerIndex > 0 {
+		nn.Hidden = make([]int, nn.lastLayerIndex)
+		for i := range nn.Hidden {
+			nn.Hidden[i] = len(nn.Weights[i])
 		}
 	} else {
-		p.Hidden = []int{0}
+		nn.Hidden = []int{0}
 	}
 
-	p.neuron = make([][]*neuron, length)
-	for i, v := range p.Weights {
-		p.neuron[i] = make([]*neuron, len(v))
+	nn.neuron = make([][]*neuron, length)
+	for i, v := range nn.Weights {
+		nn.neuron[i] = make([]*neuron, len(v))
 		for j := range v {
-			p.neuron[i][j] = &neuron{}
+			nn.neuron[i][j] = &neuron{}
 		}
 	}
-	p.isInit = true
+	nn.isInit = true
 }

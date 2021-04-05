@@ -9,9 +9,9 @@ import (
 const Name = "hopfield"
 
 // Declare conformity with NeuralNetwork interface
-var _ gonn.NeuralNetwork = (*hopfield)(nil)
+var _ gonn.NeuralNetwork = (*NN)(nil)
 
-type hopfield struct {
+type NN struct {
 	gonn.NeuralNetwork `json:"-" yaml:"-"`
 	//gonn.Parameter     `json:"-" yaml:"-"`
 
@@ -37,9 +37,9 @@ type neuron struct {
 	value float64
 }
 
-// Hopfield return
-func Hopfield() *hopfield {
-	return &hopfield{
+// New return Hopfield neural network.
+func New() *NN {
+	return &NN{
 		Name: Name,
 	}
 }
