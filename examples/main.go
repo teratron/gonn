@@ -1,9 +1,6 @@
 package main
 
-import (
-	"github.com/teratron/gonn"
-	"github.com/teratron/gonn/nn"
-)
+import "github.com/teratron/gonn/nn"
 
 func main() {
 	// New returns a new neural network
@@ -35,7 +32,7 @@ func main() {
 	lenOutput := 2 // Number of output data
 
 	// Training
-	var buff gonn.Floater
+	var buff nn.Floater
 	minLoss := 1.
 	limit := len(dataSet) - lenOutput
 	for epoch := 1; epoch <= 1000; epoch++ {

@@ -21,6 +21,7 @@ func (f *FileError) Error() string {
 	return fmt.Sprintf("file type error: %v\n", f.Err)
 }
 
+// GetFileType
 func GetFileType(name string) Filer {
 	ext := filepath.Ext(name)
 	switch ext {

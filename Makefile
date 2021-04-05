@@ -22,3 +22,10 @@ deps:
 
 clean:
 	go clean -modcache
+
+clean-project:
+	for file in *.exe *.log *.synctex.gz *.aux *.out *.toc; do \
+		if [ -e "$file" ]; then rm "$$file" || exit 1; \
+        else printf 'No such file: %q\n' "$file" \
+        fi \
+	done

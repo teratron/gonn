@@ -6,7 +6,7 @@
 	],
 	"activation": 3,
 	"loss": 0,
-	"limit": 1e-7,
+	"limit": 1e-2,
 	"rate": 0.3,
 	"weights": [
 		[

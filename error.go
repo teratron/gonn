@@ -19,8 +19,8 @@ var (
 	ErrNoTarget = errors.New("no target data")
 
 	// ErrEmpty - empty
-	ErrEmpty = errors.New("empty")
+	//ErrEmpty = errors.New("empty")
 
 	// ErrNoFile - file is missing
-	ErrNoFile = errors.New("file is missing")
+	//ErrNoFile = errors.New("file is missing")
 )

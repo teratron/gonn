@@ -1,6 +1,6 @@
 package gonn
 
-// NeuralNetwork neural network interface.
+// NeuralNetwork interface.
 type NeuralNetwork interface {
 	Parameter
 
