@@ -1,4 +1,10 @@
 
+test:
+	go test -v -cover ./nn/... ./params/... ./utils/... ./zoo/...
+
+testing:
+	go test -v -cover $(go list ./... | grep -v /examples)
+
 run-example:
 	go run -v ./examples/main.go
 

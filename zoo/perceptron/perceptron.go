@@ -37,9 +37,7 @@ type NN struct {
 	Rate float64 `json:"rate" yaml:"rate"`
 
 	// Weight value.
-	Weights gonn.Float3Type `json:"weights,omitempty" yaml:"weights"`
-
-	//*Config
+	Weights gonn.Float3Type `json:"weights,omitempty" yaml:"weights,omitempty"`
 
 	// Neuron
 	neuron [][]*neuron
@@ -52,34 +50,6 @@ type NN struct {
 	config         utils.Filer
 }
 
-/*type Config struct {
-	gonn.Parameter `json:"-" yaml:"-"`
-
-	// Neural network architecture name.
-	Name string `json:"name" yaml:"name"`
-
-	// The neuron bias, false or true.
-	Bias bool `json:"bias" yaml:"bias"`
-
-	// Array of the number of neurons in each hidden layer.
-	Hidden []int `json:"hidden" yaml:"hidden"`
-
-	// Activation function mode.
-	Activation uint8 `json:"activation" yaml:"activation"`
-
-	// The mode of calculation of the total error.
-	Loss uint8 `json:"loss" yaml:"loss"`
-
-	// Minimum (sufficient) limit of the average of the error during training.
-	Limit float64 `json:"limit" yaml:"limit"`
-
-	// Learning coefficient, from 0 to 1.
-	Rate float64 `json:"rate" yaml:"rate"`
-
-	// Weight value.
-	Weights gonn.Float3Type `json:"weights,omitempty" yaml:"weights"`
-}*/
-
 type neuron struct {
 	value float64
 	miss  float64
@@ -88,19 +58,10 @@ type neuron struct {
 // New return Perceptron neural network.
 func New() *NN {
 	return &NN{
-
 		Name:       Name,
 		Activation: params.ModeSIGMOID,
 		Loss:       params.ModeMSE,
 		Limit:      .1,
 		Rate:       params.DefaultRate,
-
-		/*Config: &Config{
-			Name:       Name,
-			Activation: params.ModeSIGMOID,
-			Loss:       params.ModeMSE,
-			Limit:      .1,
-			Rate:       params.DefaultRate,
-		},*/
 	}
 }

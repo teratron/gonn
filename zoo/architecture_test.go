@@ -13,8 +13,8 @@ import (
 )
 
 var (
-	testJSON = filepath.Join("testdata", "perceptron.json")
-	testYAML = filepath.Join("testdata", "perceptron.yml")
+	testJSON = filepath.Join("..", "testdata", "perceptron.json")
+	testYAML = filepath.Join("..", "testdata", "perceptron.yml")
 )
 
 func TestGet(t *testing.T) {
