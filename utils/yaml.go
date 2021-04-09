@@ -47,3 +47,8 @@ func (y *FileYAML) GetValue(key string) interface{} {
 	}
 	return fmt.Errorf("yaml get value: %w", err)
 }
+
+// GetName
+func (y *FileYAML) GetName() string {
+	return y.Name
+}

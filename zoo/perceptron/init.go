@@ -2,6 +2,7 @@ package perceptron
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/teratron/gonn"
 	"github.com/teratron/gonn/params"
@@ -9,7 +10,8 @@ import (
 )
 
 // Init
-func (nn *NN) Init(data ...interface{}) (err error) {
+func (nn *NN) Init(data ...interface{}) {
+	var err error
 	if len(data) > 0 {
 		switch value := data[0].(type) {
 		case utils.Filer:
@@ -24,10 +26,16 @@ func (nn *NN) Init(data ...interface{}) (err error) {
 				}
 			}
 		default:
-			err = fmt.Errorf("init %T %w: %v", value, gonn.ErrMissingType, value)
+			err = fmt.Errorf("%T %w: %v", value, gonn.ErrMissingType, value)
 		}
+	} else {
+		err = gonn.ErrNoArgs
 	}
-	return
+
+	if err != nil {
+		err = fmt.Errorf("init: %w", err)
+		log.Println(err)
+	}
 }
 
 // initFromNew initialize.

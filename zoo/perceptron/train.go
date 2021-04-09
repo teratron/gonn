@@ -22,7 +22,7 @@ func (nn *NN) Train(input []float64, target ...[]float64) (loss float64, count i
 	if len(input) > 0 {
 		if len(target) > 0 && len(target[0]) > 0 {
 			if !nn.isInit {
-				nn.initFromNew(len(input), len(target[0]))
+				nn.Init(len(input), len(target[0]))
 			} else {
 				if nn.lenInput != len(input) {
 					err = fmt.Errorf("invalid number of elements in the input data")

@@ -10,6 +10,7 @@ type Filer interface {
 	Decode(interface{}) error
 	Encode(interface{}) error
 	GetValue(key string) interface{}
+	GetName() string
 }
 
 type FileError struct {

@@ -9,6 +9,33 @@ import (
 )
 
 func TestNN_Init(t *testing.T) {
+	tests := []struct {
+		name string
+		gave []interface{}
+		got  *NN
+		want *NN
+	}{
+		{
+			name: "#1_error_type",
+			gave: []interface{}{"error"},
+			got:  &NN{},
+			want: &NN{},
+		},
+		{
+			name: "#2_empty_arguments",
+			gave: []interface{}{},
+			got:  &NN{},
+			want: &NN{},
+		},
+	}
+	for _, tt := range tests {
+		tt.got.Weights = tt.want.Weights
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.got.Init(tt.gave...); !reflect.DeepEqual(tt.got, tt.want) {
+				t.Errorf("Init()\ngot:\t%v\nwant:\t%v", tt.got, tt.want)
+			}
+		})
+	}
 }
 
 func TestNN_initFromNew(t *testing.T) {

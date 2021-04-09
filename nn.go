@@ -5,7 +5,7 @@ type NeuralNetwork interface {
 	Parameter
 
 	// Init
-	Init(data ...interface{}) error
+	Init(data ...interface{})
 
 	// Query
 	Query(input []float64) (output []float64)

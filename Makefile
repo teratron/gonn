@@ -1,4 +1,7 @@
 
+task:
+	task build
+
 test:
 	go test -v -cover ./nn/... ./params/... ./utils/... ./zoo/...
 

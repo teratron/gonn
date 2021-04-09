@@ -48,3 +48,8 @@ func (j *FileJSON) GetValue(key string) interface{} {
 	}
 	return fmt.Errorf("json get value: %w", err)
 }
+
+// GetName
+func (j *FileJSON) GetName() string {
+	return j.Name
+}

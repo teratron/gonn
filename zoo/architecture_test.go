@@ -76,9 +76,7 @@ func TestGet(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.want != nil {
 				if nn, ok := tt.want.(*perceptron.NN); ok && len(nn.Weights) > 0 {
-					if err := nn.Init(utils.GetFileType(tt.gave)); err != nil {
-						t.Errorf("Init: %v\n", err)
-					}
+					nn.Init(utils.GetFileType(tt.gave))
 				}
 			}
 			if got := Get(tt.gave); !reflect.DeepEqual(got, tt.want) {

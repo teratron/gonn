@@ -22,16 +22,15 @@ func Get(title string) gonn.NeuralNetwork {
 	d := utils.GetFileType(title)
 	if _, ok := d.(error); !ok {
 		switch v := d.GetValue("name").(type) {
+		case error:
+			err = v
 		case string:
 			if n := Get(v); n != nil {
 				if err = d.Decode(n); err == nil {
-					if err = n.Init(d); err == nil {
-						return n
-					}
+					n.Init(d)
+					return n
 				}
 			}
-		case error:
-			err = v
 		}
 	} else {
 		switch strings.ToLower(title) {
