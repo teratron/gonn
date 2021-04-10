@@ -3,6 +3,7 @@ package nn
 import (
 	"github.com/teratron/gonn"
 	"github.com/teratron/gonn/zoo"
+	//"github.com/teratron/gonn/zoo"
 )
 
 // NeuralNetwork

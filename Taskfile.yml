@@ -4,7 +4,7 @@ tasks:
   build:
     cmds:
       - echo "Using Task"
-      - go build -v -i examples/main.go
+      - go build -v -i examples/perceptron/main.go
 
   test:
     cmds:

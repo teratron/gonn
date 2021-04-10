@@ -62,12 +62,17 @@ func TestGet(t *testing.T) {
 			want: testNN,
 		},
 		{
-			name: "#5_yaml",
+			name: "#5_json_error_type",
+			gave: ".json",
+			want: nil,
+		},
+		{
+			name: "#6_yaml",
 			gave: testYAML,
 			want: testNN,
 		},
 		{
-			name: "#6_error_type",
+			name: "#7_yaml_error_type",
 			gave: ".yaml",
 			want: nil,
 		},

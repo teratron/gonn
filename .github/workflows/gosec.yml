@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+
   pull_request:
     branches:
       - master
@@ -13,8 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GO111MODULE: on
-    steps:
 
+    steps:
       - name: Checkout Source
         uses: actions/checkout@v2
 

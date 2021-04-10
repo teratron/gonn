@@ -1,15 +1,12 @@
 
-task:
-	task build
-
 test:
 	go test -v -cover ./nn/... ./params/... ./utils/... ./zoo/...
 
 testing:
 	go test -v -cover $(go list ./... | grep -v /examples)
 
-run-example:
-	go run -v ./examples/main.go
+run-example-perceptron:
+	go run -v ./examples/perceptron/main.go
 
 run-example-hopfield:
 	go run -v ./examples/hopfield/main.go
@@ -31,10 +28,3 @@ deps:
 
 clean:
 	go clean -modcache
-
-clean-project:
-	for file in *.exe *.log *.synctex.gz *.aux *.out *.toc; do \
-		if [ -e "$file" ]; then rm "$$file" || exit 1; \
-        else printf 'No such file: %q\n' "$file" \
-        fi \
-	done

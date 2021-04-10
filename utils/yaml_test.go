@@ -6,13 +6,13 @@ import (
 	"testing"
 )
 
-var testJSON = filepath.Join("..", "testdata", "perceptron.json")
+var testYAML = filepath.Join("..", "testdata", "perceptron.yml")
 
-func TestFileJSON_GetValue(t *testing.T) {
-	testFile := &FileJSON{Name: testJSON}
+func TestFileYAML_GetValue(t *testing.T) {
+	testFile := &FileYAML{Name: testYAML}
 	tests := []struct {
 		name string
-		file *FileJSON
+		file *FileYAML
 		gave string
 		want interface{}
 	}{
@@ -26,7 +26,7 @@ func TestFileJSON_GetValue(t *testing.T) {
 			name: "#2_hidden",
 			file: testFile,
 			gave: "hidden",
-			want: []interface{}{2.},
+			want: []interface{}{2},
 		},
 		{
 			name: "#7_error_key",

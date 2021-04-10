@@ -8,7 +8,10 @@ import (
 	"github.com/teratron/gonn/utils"
 )
 
-var tmpJSON = "tmp.json"
+var (
+	tmpJSON = "tmp.json"
+	tmpYAML = "tmp.yml"
+)
 
 func TestNN_WriteConfig(t *testing.T) {
 	testErr := fmt.Errorf("error")
@@ -19,25 +22,37 @@ func TestNN_WriteConfig(t *testing.T) {
 		wantErr error
 	}{
 		{
-			name:    "#1",
+			name:    "#1_" + tmpJSON,
 			args:    []string{tmpJSON},
 			gave:    &NN{},
 			wantErr: nil,
 		},
 		{
-			name:    "#2_no_args",
+			name:    "#2_no_args_" + tmpJSON,
 			args:    []string{},
 			gave:    &NN{config: &utils.FileJSON{Name: tmpJSON}},
 			wantErr: nil,
 		},
 		{
-			name:    "#3_no_args",
+			name:    "#3_" + tmpYAML,
+			args:    []string{tmpYAML},
+			gave:    &NN{},
+			wantErr: nil,
+		},
+		{
+			name:    "#4_no_args_" + tmpYAML,
+			args:    []string{},
+			gave:    &NN{config: &utils.FileYAML{Name: tmpYAML}},
+			wantErr: nil,
+		},
+		{
+			name:    "#5_no_args",
 			args:    []string{},
 			gave:    &NN{},
 			wantErr: testErr,
 		},
 		{
-			name:    "#4_error_write",
+			name:    "#5_error_write",
 			args:    []string{"."},
 			gave:    &NN{},
 			wantErr: testErr,
@@ -72,26 +87,20 @@ func TestNN_WriteWeight(t *testing.T) {
 		wantErr error
 	}{
 		{
-			name:    "#1",
+			name:    "#1_" + tmpJSON,
 			args:    tmpJSON,
 			gave:    &NN{},
 			wantErr: nil,
 		},
 		{
-			name:    "#2_no_args",
-			args:    "",
-			gave:    &NN{config: &utils.FileJSON{Name: tmpJSON}},
+			name:    "#2_" + tmpYAML,
+			args:    tmpYAML,
+			gave:    &NN{},
 			wantErr: nil,
 		},
 		{
-			name:    "#3_no_args",
+			name:    "#3_no_args_error_write",
 			args:    "",
-			gave:    &NN{},
-			wantErr: testErr,
-		},
-		{
-			name:    "#4_error_write",
-			args:    ".",
 			gave:    &NN{},
 			wantErr: testErr,
 		},
@@ -101,9 +110,6 @@ func TestNN_WriteWeight(t *testing.T) {
 			gotErr := tt.gave.WriteWeight(tt.args)
 			if gotErr == nil {
 				defer func() {
-					if len(tt.args) == 0 {
-						tt.args = tt.gave.config.GetName()
-					}
 					if err := os.Remove(tt.args); err != nil {
 						t.Error(err)
 					}
