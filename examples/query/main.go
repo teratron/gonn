@@ -2,13 +2,14 @@ package main
 
 import (
 	"fmt"
+	"path/filepath"
 
 	"github.com/teratron/gonn/nn"
 )
 
 func main() {
 	// New returns a new neural network
-	n := nn.New("perceptron.json")
+	n := nn.New(filepath.Join("config", "perceptron.json"))
 
 	// Input dataset
 	input := []float64{.27, .31, .52}

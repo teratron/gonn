@@ -1,3 +1,5 @@
+# Installation, build from source:
+# go install github.com/go-task/task/v3/cmd/task@latest
 version: '3'
 
 tasks:
@@ -8,4 +10,5 @@ tasks:
 
   test:
     cmds:
+      # go test -v -cover ./nn/... ./params/... ./utils/... ./zoo/...
       - go test -v -cover $(go list ./... | grep -v /examples)

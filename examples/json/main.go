@@ -1,10 +1,14 @@
 package main
 
-import "github.com/teratron/gonn/nn"
+import (
+	"path/filepath"
+
+	"github.com/teratron/gonn/nn"
+)
 
 func main() {
 	// New returns a new neural network
-	n := nn.New("perceptron.json")
+	n := nn.New(filepath.Join("config", "perceptron.json"))
 
 	// Training dataset
 	input := []float64{1, 1}
