@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	// New returns a new neural network
+	// New returns a new neural network from config
 	n := nn.New(filepath.Join("config", "perceptron.json"))
 
 	// Input dataset

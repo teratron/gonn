@@ -12,5 +12,5 @@ func main() {
 	// for Hopfield neural network
 	n := nn.New("hopfield")
 	n.SetNeuronEnergy(.1)
-	fmt.Println("nn.New(nn.Hopfield():", n)
+	fmt.Println("nn.New(\"hopfield\"):", n)
 }

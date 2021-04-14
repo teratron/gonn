@@ -13,7 +13,6 @@ build-example-json:
 
 build-example-yaml:
 	go build -v -mod vendor -o ./examples/yaml ./examples/yaml/main.go
-	./examples/yaml/main
 
 setup:
 	go mod init

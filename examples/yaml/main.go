@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	// New returns a new neural network
+	// New returns a new neural network from config
 	n := nn.New(filepath.Join("config", "perceptron.yml"))
 
 	// Training dataset
@@ -17,6 +17,6 @@ func main() {
 	// Training
 	_, _ = n.Train(input, target)
 
-	// Writing the neural network configuration to a file
+	// Writing weights to a file
 	_ = n.WriteWeight("perceptron_weights.yml")
 }

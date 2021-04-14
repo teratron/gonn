@@ -21,7 +21,7 @@ gonn - Neural Network for Golang
 ```go
 package main
 
-import "github.com/teratron/gonn/nn"
+import "github.com/teratron/gonn/pkg/nn"
 
 func main() {
 	// New returns a new neural network
@@ -42,7 +42,7 @@ func main() {
 	n.SetLossMode(nn.ModeMSE)
 
 	// Minimum (sufficient) limit of the average of the error during training
-	n.SetLossLimit(.0001)
+	n.SetLossLimit(.001)
 
 	// Learning coefficient, from 0 to 1
 	n.SetLearningRate(nn.DefaultRate)
@@ -53,7 +53,7 @@ func main() {
 
 	_, _ = n.Train(input, target)
 
-	_ = n.Write("perceptron.json")
+	_ = n.WriteConfig("perceptron.json")
 }
 ```
 

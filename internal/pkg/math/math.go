@@ -2,7 +2,7 @@ package math
 
 import "math"
 
-// Rounded mode.
+// Rounding mode.
 const (
 	ModeRound uint8 = iota // Round (round to nearest).
 	ModeFloor              // Floor (round down).
