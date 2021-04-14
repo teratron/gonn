@@ -1,16 +1,25 @@
 package nn
 
+import (
+	"github.com/teratron/gonn/pkg"
+	"github.com/teratron/gonn/pkg/zoo"
+	//"github.com/teratron/gonn/zoo"
+)
+
 // NeuralNetwork
 type NeuralNetwork interface {
-	Parameter
-	ReadWriter
+	pkg.NeuralNetwork
+}
 
-	// Query
-	Query(input []float64) (output []float64)
+// Floater
+type Floater interface {
+	pkg.Floater
+}
 
-	// Verify
-	Verify(input []float64, target ...[]float64) (loss float64)
-
-	// Train
-	Train(input []float64, target ...[]float64) (loss float64, count int)
+// New returns a new neural network instance.
+func New(reader ...string) pkg.NeuralNetwork {
+	if len(reader) > 0 {
+		return zoo.Get(reader[0])
+	}
+	return zoo.Get(zoo.Perceptron)
 }

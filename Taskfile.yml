@@ -1,0 +1,13 @@
+# Installation, build from source:
+# go install github.com/go-task/task/v3/cmd/task@latest
+version: '3'
+
+tasks:
+  build:
+    cmds:
+      - echo "Using Task"
+      - go build -v -i examples/perceptron/main.go
+
+  test:
+    cmds:
+      - go test -v -cover $(go list ./... | grep -v -e /examples -e /internal)
