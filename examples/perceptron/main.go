@@ -1,6 +1,6 @@
 package main
 
-import "github.com/teratron/gonn/nn"
+import "github.com/teratron/gonn/pkg/nn"
 
 func main() {
 	// New returns a new neural network

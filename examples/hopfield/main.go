@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/teratron/gonn/nn"
+	"github.com/teratron/gonn/pkg/nn"
 )
 
 func main() {
