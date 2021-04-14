@@ -10,5 +10,4 @@ tasks:
 
   test:
     cmds:
-      # go test -v -cover ./nn/... ./params/... ./utils/... ./zoo/...
       - go test -v -cover $(go list ./... | grep -v -e /examples -e /internal)
