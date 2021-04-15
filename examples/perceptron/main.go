@@ -1,10 +1,6 @@
 package main
 
-import (
-	"path/filepath"
-
-	"github.com/teratron/gonn/pkg/nn"
-)
+import "github.com/teratron/gonn/pkg/nn"
 
 func main() {
 	// New returns a new neural network
@@ -71,5 +67,5 @@ func main() {
 	n.SetWeight(buff)
 
 	// Writing the neural network configuration to a file
-	_ = n.WriteConfig(filepath.Join("config", "perceptron.json"))
+	_ = n.WriteConfig("perceptron.json")
 }
