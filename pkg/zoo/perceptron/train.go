@@ -34,15 +34,18 @@ func (nn *NN) Train(input []float64, target ...[]float64) (loss float64, count i
 				}
 			}
 
+			_ = copy(nn.input, input)
+			_ = copy(nn.output, target[0])
 			for count < GetMaxIteration() {
-				nn.calcNeuron(input)
-				if loss = nn.calcLoss(target[0]); loss <= nn.Limit {
+				nn.calcNeuron()
+				if loss = nn.calcLoss(); loss <= nn.Limit {
 					break
 				}
 				nn.calcMiss()
-				nn.updWeight(input)
+				nn.updWeight()
 				count++
 			}
+			return
 		} else {
 			err = pkg.ErrNoTarget
 		}
@@ -51,9 +54,6 @@ func (nn *NN) Train(input []float64, target ...[]float64) (loss float64, count i
 	}
 
 ERROR:
-	if err != nil {
-		log.Println(fmt.Errorf("train: %w", err))
-		return -1, 0
-	}
-	return
+	log.Println(fmt.Errorf("train: %w", err))
+	return -1, 0
 }

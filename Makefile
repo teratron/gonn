@@ -1,4 +1,7 @@
 
+test:
+	go test -v -cover ./pkg/... ./internal/...
+
 build-example-perceptron:
 	go build -v -o ./examples/perceptron ./examples/perceptron/main.go
 

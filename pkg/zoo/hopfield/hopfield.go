@@ -15,13 +15,13 @@ type NN struct {
 	pkg.NeuralNetwork `json:"-" yaml:"-"`
 	//gonn.Parameter     `json:"-" yaml:"-"`
 
-	// Neural network architecture name
+	// Neural network architecture name (required field for config).
 	Name string `json:"name" yaml:"name"`
 
 	// Energy
 	Energy float64 `json:"energy" yaml:"energy"`
 
-	// Weights values
+	// Weights values.
 	Weights pkg.Float2Type `json:"weights,omitempty" yaml:"weights,omitempty"`
 
 	// Neuron

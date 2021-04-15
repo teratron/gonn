@@ -15,16 +15,16 @@ var _ pkg.NeuralNetwork = (*NN)(nil)
 type NN struct {
 	pkg.Parameter `json:"-" yaml:"-"`
 
-	// Neural network architecture name.
+	// Neural network architecture name (required field for config).
 	Name string `json:"name" yaml:"name"`
 
-	// The neuron bias, false or true.
+	// The neuron bias, false or true (required field for config).
 	Bias bool `json:"bias" yaml:"bias"`
 
 	// Array of the number of neurons in each hidden layer.
 	Hidden []int `json:"hidden" yaml:"hidden"`
 
-	// Activation function mode.
+	// Activation function mode (required field for config).
 	Activation uint8 `json:"activation" yaml:"activation"`
 
 	// The mode of calculation of the total error.
@@ -48,6 +48,11 @@ type NN struct {
 	lastLayerIndex int
 	isInit         bool
 	config         utils.Filer
+
+	// Transfer data
+	input  []float64
+	output []float64
+	//target []float64
 }
 
 type neuron struct {

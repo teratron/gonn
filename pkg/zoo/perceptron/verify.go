@@ -25,8 +25,10 @@ func (nn *NN) Verify(input []float64, target ...[]float64) (loss float64) {
 				}
 			}
 
-			nn.calcNeuron(input)
-			loss = nn.calcLoss(target[0])
+			_ = copy(nn.input, input)
+			_ = copy(nn.output, target[0])
+			nn.calcNeuron()
+			return nn.calcLoss()
 		} else {
 			err = pkg.ErrNoTarget
 		}
@@ -35,9 +37,6 @@ func (nn *NN) Verify(input []float64, target ...[]float64) (loss float64) {
 	}
 
 ERROR:
-	if err != nil {
-		log.Println(fmt.Errorf("verify: %w", err))
-		return -1
-	}
-	return
+	log.Println(fmt.Errorf("verify: %w", err))
+	return -1
 }

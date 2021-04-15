@@ -1,7 +1,7 @@
 <div style="text-align: center">
   <!--a href="https://pkg.go.dev/github.com/zigenzoog/gonn?tab=doc" title="Go API Reference" rel="nofollow"><img src="https://img.shields.io/badge/go-documentation-blue.svg?style=flat" alt="Go API Reference"></a-->
   <a href="https://pkg.go.dev/github.com/zigenzoog/gonn"><img src="https://pkg.go.dev/badge/github.com/zigenzoog/gonn.svg" alt="Go Reference"></a>
-  <a href="https://github.com/zigenzoog/gonn/releases/tag/v0.3.0" title="0.3.0" rel="nofollow"><img src="https://img.shields.io/badge/version-0.3.0-blue.svg?style=flat" alt="0.3.0"></a>
+  <a href="https://github.com/zigenzoog/gonn/releases/tag/v0.3.1" title="0.3.1" rel="nofollow"><img src="https://img.shields.io/badge/version-0.3.1-blue.svg?style=flat" alt="0.3.1"></a>
   <a href="https://goreportcard.com/report/github.com/zigenzoog/gonn"><img src="https://goreportcard.com/badge/github.com/zigenzoog/gonn" alt="Code Status" /></a>
 
   <!--a href="https://travis-ci.org/zigenzoog/gonn"><img src="https://travis-ci.org/zigenzoog/gonn.svg" alt="Build Status" /></a-->
@@ -47,12 +47,14 @@ func main() {
 	// Learning coefficient, from 0 to 1
 	n.SetLearningRate(nn.DefaultRate)
 
-	// Training dataset
+	// Dataset
 	input  := []float64{1, 1}
 	target := []float64{0}
 
+	// Training
 	_, _ = n.Train(input, target)
 
+	// Writing the neural network configuration to a file
 	_ = n.WriteConfig("perceptron.json")
 }
 ```

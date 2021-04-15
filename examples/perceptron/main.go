@@ -26,7 +26,7 @@ func main() {
 	// Learning coefficient, from 0 to 1
 	n.SetLearningRate(nn.DefaultRate)
 
-	// Training dataset
+	// Dataset
 	dataSet := []float64{.27, .31, .52, .66, .81, .13, .2, .49, .11, .73, .28}
 	lenInput := 3  // Number of input data
 	lenOutput := 2 // Number of output data
@@ -68,4 +68,7 @@ func main() {
 
 	// Writing the neural network configuration to a file
 	_ = n.WriteConfig("perceptron.json")
+
+	// Writing weights to a file
+	_ = n.WriteWeight("perceptron_weights.yml")
 }
