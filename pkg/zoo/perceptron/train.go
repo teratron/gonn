@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/teratron/gonn/pkg"
+	"github.com/zigenzoog/gonn/pkg"
 )
 
 // MaxIteration the maximum number of iterations after which training is forcibly terminated.
-const MaxIteration = 10e+05 // 1000000
+const MaxIteration = 10e+05
 
 var GetMaxIteration = getMaxIteration
 

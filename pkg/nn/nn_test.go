@@ -4,8 +4,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/teratron/gonn/pkg"
-	"github.com/teratron/gonn/pkg/zoo"
+	"github.com/zigenzoog/gonn/pkg"
+	"github.com/zigenzoog/gonn/pkg/zoo"
 )
 
 func TestNew(t *testing.T) {

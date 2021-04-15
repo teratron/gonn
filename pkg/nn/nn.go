@@ -1,9 +1,8 @@
 package nn
 
 import (
-	"github.com/teratron/gonn/pkg"
-	"github.com/teratron/gonn/pkg/zoo"
-	//"github.com/teratron/gonn/zoo"
+	"github.com/zigenzoog/gonn/pkg"
+	"github.com/zigenzoog/gonn/pkg/zoo"
 )
 
 // NeuralNetwork

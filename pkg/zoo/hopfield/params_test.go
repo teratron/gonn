@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/teratron/gonn/pkg"
+	"github.com/zigenzoog/gonn/pkg"
 )
 
 func TestNN_NeuronEnergy(t *testing.T) {

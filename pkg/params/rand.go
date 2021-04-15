@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/teratron/gonn/pkg"
+	"github.com/zigenzoog/gonn/pkg"
 )
 
 var GetRandFloat = getRandFloat

@@ -20,17 +20,9 @@ setup:
 	go mod vendor -v
 
 deps:
-	go get
 	go mod verify
 	go mod tidy -v
 	go mod vendor -v
 
 clean:
 	go clean -modcache
-
-#VERSION := $(shell cat ./VERSION)
-
-release:
-	git tag -a $(VERSION) -m "Release" || true
-	git push origin $(VERSION)
-	goreleaser --rm-dist

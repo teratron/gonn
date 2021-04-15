@@ -1,8 +1,8 @@
 package hopfield
 
 import (
-	"github.com/teratron/gonn/pkg"
-	"github.com/teratron/gonn/pkg/utils"
+	"github.com/zigenzoog/gonn/pkg"
+	"github.com/zigenzoog/gonn/pkg/utils"
 )
 
 // Name of the neural network architecture.
