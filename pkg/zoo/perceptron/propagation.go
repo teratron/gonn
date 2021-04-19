@@ -47,9 +47,9 @@ func (nn *NN) calcNeuron() {
 }
 
 // calcLoss calculating the error of the output neuron
-func (nn *NN) calcLoss( /*target []float64*/ ) (loss float64) {
+func (nn *NN) calcLoss() (loss float64) {
 	for i, n := range nn.neuron[nn.lastLayerIndex] {
-		n.miss = pkg.FloatType(nn.output[i] /*target[i]*/) - n.value
+		n.miss = pkg.FloatType(nn.output[i]) - n.value
 		switch nn.Loss {
 		default:
 			fallthrough
@@ -57,8 +57,11 @@ func (nn *NN) calcLoss( /*target []float64*/ ) (loss float64) {
 			loss += math.Pow(float64(n.miss), 2)
 		case params.ModeARCTAN:
 			loss += math.Pow(math.Atan(float64(n.miss)), 2)
+		case params.ModeAVG:
+			loss += float64(n.miss)
 		}
 		n.miss *= pkg.FloatType(params.Derivative(float64(n.value), nn.Activation))
+		//fmt.Println(pkg.FloatType(nn.output[i]), n.value, n.miss, loss)
 	}
 
 	loss /= float64(nn.lenOutput)
@@ -70,24 +73,26 @@ func (nn *NN) calcLoss( /*target []float64*/ ) (loss float64) {
 
 // calcMiss calculating the error of neurons in hidden layers
 func (nn *NN) calcMiss() {
-	wait := make(chan bool)
-	defer close(wait)
+	if nn.lastLayerIndex > 0 {
+		wait := make(chan bool)
+		defer close(wait)
 
-	for i := nn.lastLayerIndex - 1; i >= 0; i-- {
-		inc := i + 1
-		for j, n := range nn.neuron[i] {
-			go func(j int, n *neuron) {
-				n.miss = 0
-				for k, m := range nn.neuron[inc] {
-					n.miss += m.miss * nn.Weights[inc][k][j]
-				}
-				n.miss *= pkg.FloatType(params.Derivative(float64(n.value), nn.Activation))
-				wait <- true
-			}(j, n)
-		}
+		for i := nn.lastLayerIndex - 1; i >= 0; i-- {
+			inc := i + 1
+			for j, n := range nn.neuron[i] {
+				go func(j int, n *neuron) {
+					n.miss = 0
+					for k, m := range nn.neuron[inc] {
+						n.miss += m.miss * nn.Weights[inc][k][j]
+					}
+					n.miss *= pkg.FloatType(params.Derivative(float64(n.value), nn.Activation))
+					wait <- true
+				}(j, n)
+			}
 
-		for range nn.neuron[i] {
-			<-wait
+			for range nn.neuron[i] {
+				<-wait
+			}
 		}
 	}
 }

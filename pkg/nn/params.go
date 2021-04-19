@@ -14,6 +14,7 @@ const (
 	ModeMSE    = params.ModeMSE    // Mean Squared Error.
 	ModeRMSE   = params.ModeRMSE   // Root Mean Squared Error.
 	ModeARCTAN = params.ModeARCTAN // Arctan.
+	ModeAVG    = params.ModeAVG
 
 	// DefaultRate default learning rate.
 	DefaultRate = params.DefaultRate

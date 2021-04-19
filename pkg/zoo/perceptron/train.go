@@ -23,6 +23,8 @@ func (nn *NN) Train(input []float64, target ...[]float64) (loss float64, count i
 		if len(target) > 0 && len(target[0]) > 0 {
 			if !nn.isInit {
 				nn.Init(len(input), len(target[0]))
+
+				fmt.Println(nn.Weight())
 			} else {
 				if nn.lenInput != len(input) {
 					err = fmt.Errorf("invalid number of elements in the input data")
@@ -36,11 +38,13 @@ func (nn *NN) Train(input []float64, target ...[]float64) (loss float64, count i
 
 			_ = copy(nn.input, input)
 			_ = copy(nn.output, target[0])
+
 			for count < GetMaxIteration() {
 				nn.calcNeuron()
 				if loss = nn.calcLoss(); loss <= nn.Limit {
 					break
 				}
+				//fmt.Println(count, " -- ", loss)
 				nn.calcMiss()
 				nn.updWeight()
 				count++

@@ -22,7 +22,7 @@ type NN struct {
 	Bias bool `json:"bias" yaml:"bias"`
 
 	// Array of the number of neurons in each hidden layer.
-	Hidden []int `json:"hidden" yaml:"hidden"`
+	Hidden []int `json:"hidden,omitempty" yaml:"hidden,omitempty"`
 
 	// Activation function mode (required field for config).
 	Activation uint8 `json:"activation" yaml:"activation"`
