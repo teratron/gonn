@@ -5,7 +5,6 @@ const (
 	ModeMSE    uint8 = iota // Mean Squared Error.
 	ModeRMSE                // Root Mean Squared Error.
 	ModeARCTAN              // Arctan.
-	ModeAVG
 )
 
 // CheckLossMode

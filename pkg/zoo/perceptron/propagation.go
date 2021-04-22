@@ -23,6 +23,7 @@ func (nn *NN) calcNeuron() {
 
 		for j, n := range v {
 			go func(j int, n *neuron) {
+				var num pkg.FloatType = 0
 				n.value = 0
 				for k, w := range nn.Weights[i][j] {
 					if k < length {
@@ -34,8 +35,14 @@ func (nn *NN) calcNeuron() {
 					} else {
 						n.value += w
 					}
+					num++
 				}
-				n.value = pkg.FloatType(params.Activation(float64(n.value), nn.Activation))
+
+				if nn.Activation == params.ModeLINEAR {
+					n.value /= num
+				} else {
+					n.value = pkg.FloatType(params.Activation(float64(n.value), nn.Activation))
+				}
 				wait <- true
 			}(j, n)
 		}
@@ -57,11 +64,11 @@ func (nn *NN) calcLoss() (loss float64) {
 			loss += math.Pow(float64(n.miss), 2)
 		case params.ModeARCTAN:
 			loss += math.Pow(math.Atan(float64(n.miss)), 2)
-		case params.ModeAVG:
-			loss += float64(n.miss)
 		}
-		n.miss *= pkg.FloatType(params.Derivative(float64(n.value), nn.Activation))
-		//fmt.Println(pkg.FloatType(nn.output[i]), n.value, n.miss, loss)
+
+		if nn.Activation != params.ModeLINEAR {
+			n.miss *= pkg.FloatType(params.Derivative(float64(n.value), nn.Activation))
+		}
 	}
 
 	loss /= float64(nn.lenOutput)
@@ -115,10 +122,18 @@ func (nn *NN) updWeight() {
 			go func(i, j, dec, length int, grad pkg.FloatType, w []pkg.FloatType) {
 				for k := range w {
 					if k < length {
+						var value pkg.FloatType
 						if i > 0 {
-							nn.Weights[i][j][k] += nn.neuron[dec][k].value * grad
+							value = nn.neuron[dec][k].value
 						} else {
-							nn.Weights[i][j][k] += pkg.FloatType(nn.input[k]) * grad
+							value = pkg.FloatType(nn.input[k])
+						}
+
+						switch nn.Activation {
+						case params.ModeLINEAR, params.ModeSIGMOID:
+							nn.Weights[i][j][k] += grad / value
+						default:
+							nn.Weights[i][j][k] += grad * value
 						}
 					} else {
 						nn.Weights[i][j][k] += grad
