@@ -61,10 +61,10 @@ func main() {
 	}
 
 	// Writing the neural network configuration to a file.
-	//_ = n.WriteConfig("perceptron.json")
+	_ = n.WriteConfig("perceptron.json")
 
 	// Writing weights to a file.
-	//_ = n.WriteWeight("perceptron_weights.yml")
+	_ = n.WriteWeight("perceptron_weights.yml")
 
 	// Check the trained data, the result should be about [-0.13 0.2].
 	fmt.Println(n.Query([]float64{-.52, .66, .81}))
