@@ -26,35 +26,35 @@ import "github.com/teratron/gonn/pkg/nn"
 func main() {
 	// New returns a new neural network
 	// instance with the default parameters,
-	// same n := nn.New("perceptron")
+	// same n := nn.New("perceptron").
 	n := nn.New()
 
-	// The neuron bias, false or true
+	// The neuron bias, false or true.
 	n.SetNeuronBias(true)    
 
-	// Array of the number of neurons in each hidden layer
+	// Array of the number of neurons in each hidden layer.
 	n.SetHiddenLayer(3)           
 
-	// Activation function mode      
+	// Activation function mode.
 	n.SetActivationMode(nn.ModeSIGMOID)
 
-	// The mode of calculation of the total error
+	// The mode of calculation of the total error.
 	n.SetLossMode(nn.ModeMSE)
 
-	// Minimum (sufficient) limit of the average of the error during training
+	// Minimum (sufficient) limit of the average of the error during training.
 	n.SetLossLimit(.001)
 
-	// Learning coefficient, from 0 to 1
+	// Learning coefficient (greater than 0 and less than or equal to 1).
 	n.SetLearningRate(nn.DefaultRate)
 
-	// Dataset
+	// Dataset.
 	input  := []float64{1, 1}
 	target := []float64{0}
 
-	// Training
+	// Training dataset.
 	_, _ = n.Train(input, target)
 
-	// Writing the neural network configuration to a file
+	// Writing the neural network configuration to a file.
 	_ = n.WriteConfig("perceptron.json")
 }
 ```

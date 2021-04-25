@@ -1,74 +1,71 @@
 package main
 
-import "github.com/teratron/gonn/pkg/nn"
+import (
+	"fmt"
+
+	"github.com/teratron/gonn/pkg/nn"
+)
 
 func main() {
 	// New returns a new neural network
 	// instance with the default parameters,
-	// same n := nn.New("perceptron")
+	// same n := nn.New("perceptron").
 	n := nn.New()
 
-	// The neuron bias, false or true
+	// The neuron bias, false or true.
 	n.SetNeuronBias(true)
 
-	// Array of the number of neurons in each hidden layer
+	// Array of the number of neurons in each hidden layer.
 	n.SetHiddenLayer(5, 3)
 
-	// Activation function mode
+	// Activation function mode.
 	n.SetActivationMode(nn.ModeTANH)
 
-	// The mode of calculation of the total error
+	// The mode of calculation of the total error.
 	n.SetLossMode(nn.ModeMSE)
 
-	// Minimum (sufficient) limit of the average of the error during training
-	n.SetLossLimit(.001)
+	// Minimum (sufficient) limit of the average of the error during training.
+	lossLimit := .00001
+	n.SetLossLimit(lossLimit)
 
-	// Learning coefficient, from 0 to 1
+	// Learning coefficient (greater than 0 and less than or equal to 1).
 	n.SetLearningRate(nn.DefaultRate)
 
-	// Dataset
-	dataSet := []float64{.27, .31, .52, .66, .81, .13, .2, .49, .11, .73, .28}
-	lenInput := 3  // Number of input data
-	lenOutput := 2 // Number of output data
+	// Dataset.
+	dataSet := []float64{.27, -.31, -.52, .66, .81, -.13, .2, .49, .11, -.73, .28}
+	lenInput := 3  // Number of input data.
+	lenOutput := 2 // Number of output data.
 
-	// Training
-	var buff nn.Floater
-	minLoss := 1.
+	// Training.
 	limit := len(dataSet) - lenOutput
-	for epoch := 1; epoch <= 1000; epoch++ {
+	for epoch := 1; epoch <= 10000; epoch++ {
 		for i := lenInput; i <= limit; i++ {
 			_, _ = n.Train(dataSet[i-lenInput:i], dataSet[i:i+lenOutput])
 		}
 
-		// Verifying
-		sum := 0.
-		num := 0
+		// Verifying.
+		sum, num := 0., 0.
 		for i := lenInput; i <= limit; i++ {
 			sum += n.Verify(dataSet[i-lenInput:i], dataSet[i:i+lenOutput])
 			num++
 		}
 
-		// Average error for the entire epoch
-		sum /= float64(num)
+		// Average error for the entire epoch.
+		sum /= num
 
-		// Weights are copied to the buffer at the minimum average error
-		if sum < minLoss {
-			buff = n.Weight()
-			minLoss = sum
-		}
-
-		// Exiting the cycle of learning epochs, when the minimum error level is reached
-		if sum <= n.LossLimit() {
+		// Exiting the cycle of learning epochs, when the minimum error level is reached.
+		if sum < lossLimit {
+			fmt.Println(epoch, sum)
 			break
 		}
 	}
 
-	// Returning weights for further recording from the buffer
-	n.SetWeight(buff)
+	// Writing the neural network configuration to a file.
+	//_ = n.WriteConfig("perceptron.json")
 
-	// Writing the neural network configuration to a file
-	_ = n.WriteConfig("perceptron.json")
+	// Writing weights to a file.
+	//_ = n.WriteWeight("perceptron_weights.yml")
 
-	// Writing weights to a file
-	_ = n.WriteWeight("perceptron_weights.yml")
+	// Check the trained data, the result should be about [-0.13 0.2].
+	fmt.Println(n.Query([]float64{-.52, .66, .81}))
 }

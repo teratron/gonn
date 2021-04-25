@@ -11,7 +11,7 @@ type FileJSON struct {
 	Name string
 }
 
-// Decode
+// Decode.
 func (j *FileJSON) Decode(data interface{}) error {
 	file, err := os.OpenFile(j.Name, os.O_RDONLY, 0600)
 	if err == nil {
@@ -21,7 +21,7 @@ func (j *FileJSON) Decode(data interface{}) error {
 	return err
 }
 
-// Encode
+// Encode.
 func (j *FileJSON) Encode(data interface{}) error {
 	file, err := os.OpenFile(j.Name, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 	if err == nil {
@@ -33,7 +33,7 @@ func (j *FileJSON) Encode(data interface{}) error {
 	return err
 }
 
-// GetValue
+// GetValue.
 func (j *FileJSON) GetValue(key string) interface{} {
 	b, err := ioutil.ReadFile(j.Name)
 	if err == nil {
@@ -49,7 +49,7 @@ func (j *FileJSON) GetValue(key string) interface{} {
 	return fmt.Errorf("json get value: %w", err)
 }
 
-// GetName
+// GetName.
 func (j *FileJSON) GetName() string {
 	return j.Name
 }

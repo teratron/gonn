@@ -7,7 +7,7 @@ import (
 	"github.com/teratron/gonn/pkg"
 )
 
-// Query querying dataset
+// Query querying dataset.
 func (nn *NN) Query(input []float64) []float64 {
 	var err error
 	if len(input) > 0 {
@@ -31,6 +31,6 @@ func (nn *NN) Query(input []float64) []float64 {
 	}
 
 ERROR:
-	log.Println(fmt.Errorf("query: %w", err))
+	log.Printf("query: %v\n", err)
 	return nil
 }

@@ -9,7 +9,7 @@ import (
 func main() {
 	// New returns a new neural network
 	// instance with the default parameters
-	// for Hopfield neural network
+	// for Hopfield neural network.
 	n := nn.New("hopfield")
 	n.SetNeuronEnergy(.1)
 	fmt.Println("nn.New(\"hopfield\"):", n)

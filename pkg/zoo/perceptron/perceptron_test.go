@@ -27,7 +27,7 @@ func TestNew(t *testing.T) {
 		Name:       Name,
 		Activation: params.ModeSIGMOID,
 		Loss:       params.ModeMSE,
-		Limit:      .1,
+		Limit:      .01,
 		Rate:       pkg.FloatType(params.DefaultRate),
 	}
 	t.Run(want.Name, func(t *testing.T) {
@@ -125,7 +125,7 @@ func TestNN_Train(t *testing.T) {
 				Hidden: []int{2},
 				Limit:  .95,
 			},
-			wantLoss:  .9025,
+			wantLoss:  .0025,
 			wantCount: 0,
 		},
 	}
@@ -223,7 +223,7 @@ func TestNN_Verify(t *testing.T) {
 				Bias:   true,
 				Hidden: []int{2},
 			},
-			want: .9025,
+			want: .0025,
 		},
 	}
 	for _, tt := range tests {

@@ -17,7 +17,7 @@ func TestNN_Init(t *testing.T) {
 	}{
 		{
 			name: "#1_error_type",
-			gave: []interface{}{"error"},
+			gave: []interface{}{"test_error"},
 			got:  &NN{},
 			want: &NN{},
 		},

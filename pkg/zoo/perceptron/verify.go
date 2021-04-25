@@ -7,7 +7,7 @@ import (
 	"github.com/teratron/gonn/pkg"
 )
 
-// Verify verifying dataset
+// Verify verifying dataset.
 func (nn *NN) Verify(input []float64, target ...[]float64) (loss float64) {
 	var err error
 	if len(input) > 0 {
@@ -38,6 +38,6 @@ func (nn *NN) Verify(input []float64, target ...[]float64) (loss float64) {
 	}
 
 ERROR:
-	log.Println(fmt.Errorf("verify: %w", err))
+	log.Printf("verify: %v\n", err)
 	return -1
 }

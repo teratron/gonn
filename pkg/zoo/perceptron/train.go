@@ -3,6 +3,7 @@ package perceptron
 import (
 	"fmt"
 	"log"
+	"math"
 
 	"github.com/teratron/gonn/pkg"
 )
@@ -16,7 +17,7 @@ func getMaxIteration() int {
 	return MaxIteration
 }
 
-// Train training dataset
+// Train training dataset.
 func (nn *NN) Train(input []float64, target ...[]float64) (loss float64, count int) {
 	var err error
 	if len(input) > 0 {
@@ -39,10 +40,12 @@ func (nn *NN) Train(input []float64, target ...[]float64) (loss float64, count i
 
 			for count < GetMaxIteration() {
 				nn.calcNeuron()
-				if loss = nn.calcLoss(); loss <= nn.Limit {
-					break
+				switch loss = nn.calcLoss(); {
+				case loss < nn.Limit:
+					return
+				case math.IsNaN(loss):
+					log.Fatal("not optimal neural network parameters")
 				}
-				//fmt.Println(count, " -- ", loss)
 				nn.calcMiss()
 				nn.updWeight()
 				count++
@@ -56,6 +59,6 @@ func (nn *NN) Train(input []float64, target ...[]float64) (loss float64, count i
 	}
 
 ERROR:
-	log.Println(fmt.Errorf("train: %w", err))
+	log.Printf("train: %v\n", err)
 	return -1, 0
 }

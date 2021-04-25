@@ -33,26 +33,25 @@ type NN struct {
 	// Minimum (sufficient) limit of the average of the error during training.
 	Limit float64 `json:"limit" yaml:"limit"`
 
-	// Learning coefficient, from 0 to 1.
+	// Learning coefficient (greater than 0 and less than or equal to 1).
 	Rate pkg.FloatType `json:"rate" yaml:"rate"`
 
 	// Weight value.
 	Weights pkg.Float3Type `json:"weights,omitempty" yaml:"weights,omitempty"`
 
-	// Neuron
+	// Neuron.
 	neuron [][]*neuron
 
-	// Settings
+	// Settings.
 	lenInput       int
 	lenOutput      int
 	lastLayerIndex int
 	isInit         bool
 	config         utils.Filer
 
-	// Transfer data
+	// Transfer data.
 	input  []float64
 	output []float64
-	//target []float64
 }
 
 type neuron struct {
@@ -66,7 +65,7 @@ func New() *NN {
 		Name:       Name,
 		Activation: params.ModeSIGMOID,
 		Loss:       params.ModeMSE,
-		Limit:      .1,
+		Limit:      .01,
 		Rate:       pkg.FloatType(params.DefaultRate),
 	}
 }

@@ -9,7 +9,7 @@ import (
 	"github.com/teratron/gonn/pkg/utils"
 )
 
-// Init
+// Init.
 func (nn *NN) Init(data ...interface{}) {
 	var err error
 	if len(data) > 0 {
@@ -33,8 +33,7 @@ func (nn *NN) Init(data ...interface{}) {
 	}
 
 	if err != nil {
-		err = fmt.Errorf("init: %w", err)
-		log.Println(err)
+		log.Printf("init: %v\n", err)
 	}
 }
 
@@ -78,7 +77,11 @@ func (nn *NN) initFromNew(lenInput, lenTarget int) {
 				nn.Weights[i][j] = make(pkg.Float1Type, biasInput)
 			}
 			for k := range nn.Weights[i][j] {
-				nn.Weights[i][j][k] = params.GetRandFloat()
+				if nn.Activation == params.ModeLINEAR {
+					nn.Weights[i][j][k] = .5
+				} else {
+					nn.Weights[i][j][k] = params.GetRandFloat()
+				}
 			}
 			nn.neuron[i][j] = &neuron{}
 		}
@@ -88,7 +91,7 @@ func (nn *NN) initFromNew(lenInput, lenTarget int) {
 	nn.isInit = true
 }
 
-// initFromWeight
+// initFromWeight.
 func (nn *NN) initFromWeight() {
 	length := len(nn.Weights)
 

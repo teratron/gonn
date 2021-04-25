@@ -12,7 +12,7 @@ type FileYAML struct {
 	Name string
 }
 
-// Decode
+// Decode.
 func (y *FileYAML) Decode(data interface{}) error {
 	file, err := os.OpenFile(y.Name, os.O_RDONLY, 0600)
 	if err == nil {
@@ -22,7 +22,7 @@ func (y *FileYAML) Decode(data interface{}) error {
 	return err
 }
 
-// Encode
+// Encode.
 func (y *FileYAML) Encode(data interface{}) error {
 	file, err := os.OpenFile(y.Name, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 	if err == nil {
@@ -32,7 +32,7 @@ func (y *FileYAML) Encode(data interface{}) error {
 	return err
 }
 
-// GetValue
+// GetValue.
 func (y *FileYAML) GetValue(key string) interface{} {
 	b, err := ioutil.ReadFile(y.Name)
 	if err == nil {
@@ -48,7 +48,7 @@ func (y *FileYAML) GetValue(key string) interface{} {
 	return fmt.Errorf("yaml get value: %w", err)
 }
 
-// GetName
+// GetName.
 func (y *FileYAML) GetName() string {
 	return y.Name
 }

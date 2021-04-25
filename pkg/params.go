@@ -1,6 +1,6 @@
 package pkg
 
-// Parameter
+// Parameter.
 type Parameter interface {
 	Weight() Floater
 	SetWeight(Floater)

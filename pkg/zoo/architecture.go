@@ -16,7 +16,7 @@ const (
 	Hopfield   = hopfield.Name
 )
 
-// Get
+// Get.
 func Get(title string) pkg.NeuralNetwork {
 	var err error
 	d := utils.GetFileType(title)
@@ -44,7 +44,7 @@ func Get(title string) pkg.NeuralNetwork {
 	}
 
 	if err != nil {
-		log.Println(fmt.Errorf("get architecture: %w", err))
+		log.Println("get architecture: %w", err)
 	}
 	return nil
 }

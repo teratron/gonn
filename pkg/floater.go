@@ -5,7 +5,7 @@ import (
 	"log"
 )
 
-// Floater
+// Floater.
 type Floater interface {
 	Length(...uint) int
 }

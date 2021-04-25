@@ -7,7 +7,7 @@ import (
 	"github.com/teratron/gonn/pkg/params"
 )
 
-// calcNeuron
+// calcNeuron.
 func (nn *NN) calcNeuron() {
 	wait := make(chan bool)
 	defer close(wait)
@@ -38,9 +38,10 @@ func (nn *NN) calcNeuron() {
 					num++
 				}
 
-				if nn.Activation == params.ModeLINEAR {
+				switch nn.Activation {
+				case params.ModeLINEAR:
 					n.value /= num
-				} else {
+				default:
 					n.value = pkg.FloatType(params.Activation(float64(n.value), nn.Activation))
 				}
 				wait <- true
@@ -64,11 +65,10 @@ func (nn *NN) calcLoss() (loss float64) {
 			loss += math.Pow(float64(n.miss), 2)
 		case params.ModeARCTAN:
 			loss += math.Pow(math.Atan(float64(n.miss)), 2)
+		case params.ModeAVG:
+			loss += math.Abs(float64(n.miss))
 		}
-
-		if nn.Activation != params.ModeLINEAR {
-			n.miss *= pkg.FloatType(params.Derivative(float64(n.value), nn.Activation))
-		}
+		n.miss *= pkg.FloatType(params.Derivative(float64(n.value), nn.Activation))
 	}
 
 	loss /= float64(nn.lenOutput)
@@ -78,7 +78,7 @@ func (nn *NN) calcLoss() (loss float64) {
 	return
 }
 
-// calcMiss calculating the error of neurons in hidden layers
+// calcMiss calculating the error of neurons in hidden layers.
 func (nn *NN) calcMiss() {
 	if nn.lastLayerIndex > 0 {
 		wait := make(chan bool)
@@ -104,7 +104,7 @@ func (nn *NN) calcMiss() {
 	}
 }
 
-// updWeight update weights
+// updWeight update weights.
 func (nn *NN) updWeight() {
 	wait := make(chan bool)
 	defer close(wait)
@@ -131,7 +131,9 @@ func (nn *NN) updWeight() {
 
 						switch nn.Activation {
 						case params.ModeLINEAR, params.ModeSIGMOID:
-							nn.Weights[i][j][k] += grad / value
+							if value > 0 {
+								nn.Weights[i][j][k] += grad / value
+							}
 						default:
 							nn.Weights[i][j][k] += grad * value
 						}
