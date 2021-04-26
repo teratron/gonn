@@ -123,7 +123,7 @@ func TestNN_calcLoss(t *testing.T) {
 		want float64
 	}{
 		{
-			name: "#1",
+			name: "#1_RMSE",
 
 			gave: &NN{
 				Activation: params.ModeLEAKYRELU,
@@ -140,7 +140,7 @@ func TestNN_calcLoss(t *testing.T) {
 			want: .351686,
 		},
 		{
-			name: "#2",
+			name: "#2_ARCTAN",
 			gave: &NN{
 				Activation: params.ModeTANH,
 				Loss:       params.ModeARCTAN,
@@ -157,7 +157,7 @@ func TestNN_calcLoss(t *testing.T) {
 			want: .080124,
 		},
 		{
-			name: "#3",
+			name: "#3_MSE",
 			gave: &NN{
 				Activation: params.ModeSIGMOID,
 				Loss:       params.ModeMSE,
@@ -175,6 +175,26 @@ func TestNN_calcLoss(t *testing.T) {
 				output:         []float64{.2},
 			},
 			want: .123683,
+		},
+		{
+			name: "#4_AVG",
+			gave: &NN{
+				Activation: params.ModeLINEAR,
+				Loss:       params.ModeAVG,
+				neuron: [][]*neuron{
+					{
+						{.5374298453437496, 0},
+						{.5374298453437496, 0},
+					},
+					{
+						{.5516861990955205, 0},
+					},
+				},
+				lenOutput:      1,
+				lastLayerIndex: 1,
+				output:         []float64{.2},
+			},
+			want: .351686,
 		},
 	}
 	for _, tt := range tests {
@@ -275,7 +295,8 @@ func TestNN_updWeight(t *testing.T) {
 		{
 			name: "#2",
 			got: &NN{
-				Rate: pkg.FloatType(params.DefaultRate),
+				Activation: params.ModeTANH,
+				Rate:       pkg.FloatType(params.DefaultRate),
 				Weights: pkg.Float3Type{
 					{
 						{.1, .1, .1},
@@ -299,11 +320,11 @@ func TestNN_updWeight(t *testing.T) {
 			},
 			want: pkg.Float3Type{
 				{
-					{.106234, .104156, .101247},
-					{.106234, .104156, .101247},
+					{.100249, .100374, .101247},
+					{.100249, .100374, .101247},
 				},
 				{
-					{.193322, .193322, .150154},
+					{.126954, .126954, .150154},
 				},
 			},
 		},

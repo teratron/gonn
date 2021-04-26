@@ -47,10 +47,13 @@ func TestNN_initFromNew(t *testing.T) {
 	}{
 		{
 			name: "#1",
-			got:  &NN{},
+			got: &NN{
+				Activation: params.ModeSIGMOID,
+			},
 			want: &NN{
-				Bias:   false,
-				Hidden: []int{0},
+				Bias:       false,
+				Hidden:     []int{0},
+				Activation: params.ModeSIGMOID,
 				Weights: pkg.Float3Type{
 					{
 						{r, r},
