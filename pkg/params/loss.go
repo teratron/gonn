@@ -15,7 +15,3 @@ func CheckLossMode(mode uint8) uint8 {
 	}
 	return mode
 }
-
-/*func DynamicLossLimit(target []float64) float64 {
-	return 0
-}*/

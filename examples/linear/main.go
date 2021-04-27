@@ -24,6 +24,6 @@ func main() {
 	// Training dataset.
 	fmt.Println(n.Train(input, target))
 
-	// Check the trained data, the result should be about [5 50].
+	// Check the trained data, the result should be about [5 50.3].
 	fmt.Println(n.Query(input))
 }
