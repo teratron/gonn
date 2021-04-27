@@ -44,7 +44,7 @@ func (nn *NN) Train(input []float64, target ...[]float64) (loss float64, count i
 				case loss < nn.Limit:
 					return
 				case math.IsNaN(loss):
-					log.Fatal("not optimal neural network parameters")
+					log.Panic("train: not optimal neural network parameters")
 				}
 				nn.calcMiss()
 				nn.updWeight()
