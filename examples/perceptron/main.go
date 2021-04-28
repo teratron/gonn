@@ -55,7 +55,6 @@ func main() {
 
 		// Exiting the cycle of learning epochs, when the minimum error level is reached.
 		if sum < lossLimit {
-			fmt.Println(epoch, sum)
 			break
 		}
 	}
