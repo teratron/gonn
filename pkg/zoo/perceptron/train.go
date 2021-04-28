@@ -39,6 +39,7 @@ func (nn *NN) Train(input []float64, target ...[]float64) (loss float64, count i
 			_ = copy(nn.output, target[0])
 
 			for count < GetMaxIteration() {
+				count++
 				nn.calcNeuron()
 				switch loss = nn.calcLoss(); {
 				case loss < nn.Limit:
@@ -48,7 +49,6 @@ func (nn *NN) Train(input []float64, target ...[]float64) (loss float64, count i
 				}
 				nn.calcMiss()
 				nn.updWeight()
-				count++
 			}
 			return
 		} else {
