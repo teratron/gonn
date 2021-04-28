@@ -1,16 +1,16 @@
 package nn
 
 import (
-	"github.com/teratron/gonn/pkg"
-	"github.com/teratron/gonn/pkg/zoo"
+	"github.com/zigenzoog/gonn/pkg"
+	"github.com/zigenzoog/gonn/pkg/zoo"
 )
 
-// NeuralNetwork.
+// NeuralNetwork
 type NeuralNetwork interface {
 	pkg.NeuralNetwork
 }
 
-// Floater.
+// Floater
 type Floater interface {
 	pkg.Floater
 }
