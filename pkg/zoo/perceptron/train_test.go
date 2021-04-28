@@ -3,9 +3,9 @@ package perceptron
 import (
 	"testing"
 
-	round "github.com/teratron/gonn/internal/pkg/math"
-	"github.com/teratron/gonn/pkg"
-	"github.com/teratron/gonn/pkg/params"
+	round "github.com/zigenzoog/gonn/internal/pkg/math"
+	"github.com/zigenzoog/gonn/pkg"
+	"github.com/zigenzoog/gonn/pkg/params"
 )
 
 func TestNN_Train(t *testing.T) {

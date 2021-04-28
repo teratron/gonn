@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/teratron/gonn/pkg"
+	"github.com/zigenzoog/gonn/pkg"
 )
 
 func Test_getRandFloat(t *testing.T) {

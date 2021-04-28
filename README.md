@@ -1,5 +1,4 @@
 <div style="text-align: center">
-  <!--a href="https://pkg.go.dev/github.com/zigenzoog/gonn?tab=doc" title="Go API Reference" rel="nofollow"><img src="https://img.shields.io/badge/go-documentation-blue.svg?style=flat" alt="Go API Reference"></a-->
   <a href="https://pkg.go.dev/github.com/zigenzoog/gonn"><img src="https://pkg.go.dev/badge/github.com/zigenzoog/gonn.svg" alt="Go Reference"></a>
   <a href="https://github.com/zigenzoog/gonn/releases/tag/v0.3.1" title="0.3.1" rel="nofollow"><img src="https://img.shields.io/badge/version-0.3.1-blue.svg?style=flat" alt="0.3.1"></a>
   <a href="https://goreportcard.com/report/github.com/zigenzoog/gonn"><img src="https://goreportcard.com/badge/github.com/zigenzoog/gonn" alt="Code Status" /></a>
@@ -17,7 +16,7 @@ gonn - Neural Network for Golang
 ```go
 package main
 
-import "github.com/teratron/gonn/pkg/nn"
+import "github.com/zigenzoog/gonn/pkg/nn"
 
 func main() {
 	// New returns a new neural network

@@ -3,8 +3,8 @@ package perceptron
 import (
 	"testing"
 
-	"github.com/teratron/gonn/internal/pkg/math"
-	"github.com/teratron/gonn/pkg"
+	"github.com/zigenzoog/gonn/internal/pkg/math"
+	"github.com/zigenzoog/gonn/pkg"
 )
 
 func TestNN_Verify(t *testing.T) {

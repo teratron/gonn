@@ -3,8 +3,8 @@ package perceptron
 import (
 	"math"
 
-	"github.com/teratron/gonn/pkg"
-	"github.com/teratron/gonn/pkg/params"
+	"github.com/zigenzoog/gonn/pkg"
+	"github.com/zigenzoog/gonn/pkg/params"
 )
 
 // calcNeuron.
@@ -54,7 +54,7 @@ func (nn *NN) calcNeuron() {
 	}
 }
 
-// calcLoss calculating the error of the output neuron
+// calcLoss calculating the error of the output neuron.
 func (nn *NN) calcLoss() (loss float64) {
 	for i, n := range nn.neuron[nn.lastLayerIndex] {
 		n.miss = pkg.FloatType(nn.output[i]) - n.value

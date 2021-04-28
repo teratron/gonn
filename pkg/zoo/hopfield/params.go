@@ -1,6 +1,6 @@
 package hopfield
 
-import "github.com/teratron/gonn/pkg"
+import "github.com/zigenzoog/gonn/pkg"
 
 // NeuronEnergy.
 func (nn *NN) NeuronEnergy() float64 {

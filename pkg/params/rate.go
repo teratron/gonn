@@ -1,6 +1,6 @@
 package params
 
-import "github.com/teratron/gonn/pkg"
+import "github.com/zigenzoog/gonn/pkg"
 
 // DefaultRate default learning rate.
 const DefaultRate float64 = .3
