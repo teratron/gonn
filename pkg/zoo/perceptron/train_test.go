@@ -107,9 +107,7 @@ func TestNN_Train(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			defer func() {
-				_ = recover()
-			}()
+			defer func() { _ = recover() }()
 			gotLoss, gotCount := tt.gave.Train(tt.input, tt.target)
 			if round.Round(gotLoss, round.ModeRound, 6) != tt.wantLoss {
 				t.Errorf("Train() gotLoss = %f, wantLoss %f", gotLoss, tt.wantLoss)

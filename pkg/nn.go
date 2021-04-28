@@ -16,9 +16,9 @@ type NeuralNetwork interface {
 	// Train.
 	Train(input []float64, target ...[]float64) (loss float64, count int)
 
-	// WriteConfig writes the configuration and weights to the Filer interface object.
+	// WriteConfig writes the configuration and weights.
 	WriteConfig(name ...string) error
 
-	// WriteConfig writes weights to the Filer interface object.
+	// WriteConfig writes weights.
 	WriteWeight(name string) error
 }

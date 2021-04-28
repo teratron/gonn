@@ -13,11 +13,13 @@ type Filer interface {
 	GetName() string
 }
 
+// FileError.
 type FileError struct {
 	Filer
 	Err error
 }
 
+// Error.
 func (f *FileError) Error() string {
 	return fmt.Sprintf("file type error: %v\n", f.Err)
 }

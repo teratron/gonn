@@ -10,7 +10,7 @@ func main() {
 	// New returns a new neural network from config.
 	n := nn.New(filepath.Join("config", "perceptron.json"))
 
-	// Dataset
+	// Dataset.
 	input := []float64{1, 1}
 	target := []float64{0}
 
