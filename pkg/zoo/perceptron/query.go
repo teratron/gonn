@@ -7,8 +7,8 @@ import (
 	"github.com/zigenzoog/gonn/pkg"
 )
 
-// Query querying dataset
-func (nn *NN) Query(input []float64) (output []float64) {
+// Query querying dataset.
+func (nn *NN) Query(input []float64) []float64 {
 	var err error
 	if len(input) > 0 {
 		if !nn.isInit {
@@ -19,19 +19,18 @@ func (nn *NN) Query(input []float64) (output []float64) {
 			goto ERROR
 		}
 
-		nn.calcNeuron(input)
-		output = make([]float64, nn.lenOutput)
+		_ = copy(nn.input, input)
+
+		nn.calcNeuron()
 		for i, n := range nn.neuron[nn.lastLayerIndex] {
-			output[i] = float64(n.value)
+			nn.output[i] = float64(n.value)
 		}
+		return nn.output
 	} else {
 		err = pkg.ErrNoInput
 	}
 
 ERROR:
-	if err != nil {
-		log.Println(fmt.Errorf("query: %w", err))
-		return nil
-	}
-	return
+	log.Printf("query: %v\n", err)
+	return nil
 }

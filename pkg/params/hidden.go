@@ -1,6 +1,6 @@
 package params
 
-// CheckHiddenLayer
+// CheckHiddenLayer.
 func CheckHiddenLayer(layer []int) []int {
 	if len(layer) > 0 {
 		return layer

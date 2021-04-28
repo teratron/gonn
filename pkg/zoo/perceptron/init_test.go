@@ -17,7 +17,7 @@ func TestNN_Init(t *testing.T) {
 	}{
 		{
 			name: "#1_error_type",
-			gave: []interface{}{"error"},
+			gave: []interface{}{"test_error"},
 			got:  &NN{},
 			want: &NN{},
 		},
@@ -47,10 +47,13 @@ func TestNN_initFromNew(t *testing.T) {
 	}{
 		{
 			name: "#1",
-			got:  &NN{},
+			got: &NN{
+				Activation: params.ModeSIGMOID,
+			},
 			want: &NN{
-				Bias:   false,
-				Hidden: []int{0},
+				Bias:       false,
+				Hidden:     []int{0},
+				Activation: params.ModeSIGMOID,
 				Weights: pkg.Float3Type{
 					{
 						{r, r},
@@ -66,6 +69,8 @@ func TestNN_initFromNew(t *testing.T) {
 				lenInput:       2,
 				lenOutput:      2,
 				lastLayerIndex: 0,
+				input:          make([]float64, 2),
+				output:         make([]float64, 2),
 				isInit:         true,
 			},
 		},
@@ -96,6 +101,8 @@ func TestNN_initFromNew(t *testing.T) {
 				lenInput:       2,
 				lenOutput:      1,
 				lastLayerIndex: 1,
+				input:          make([]float64, 2),
+				output:         make([]float64, 1),
 				isInit:         true,
 			},
 		},
@@ -137,6 +144,8 @@ func TestNN_initFromWeight(t *testing.T) {
 				lenInput:       2,
 				lenOutput:      2,
 				lastLayerIndex: 0,
+				input:          make([]float64, 2),
+				output:         make([]float64, 2),
 				isInit:         true,
 			},
 		},
@@ -167,6 +176,8 @@ func TestNN_initFromWeight(t *testing.T) {
 				lenInput:       2,
 				lenOutput:      1,
 				lastLayerIndex: 1,
+				input:          make([]float64, 2),
+				output:         make([]float64, 1),
 				isInit:         true,
 			},
 		},

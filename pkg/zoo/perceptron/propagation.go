@@ -7,8 +7,8 @@ import (
 	"github.com/zigenzoog/gonn/pkg/params"
 )
 
-// calcNeuron
-func (nn *NN) calcNeuron(input []float64) {
+// calcNeuron.
+func (nn *NN) calcNeuron() {
 	wait := make(chan bool)
 	defer close(wait)
 
@@ -23,19 +23,27 @@ func (nn *NN) calcNeuron(input []float64) {
 
 		for j, n := range v {
 			go func(j int, n *neuron) {
+				var num pkg.FloatType = 0
 				n.value = 0
 				for k, w := range nn.Weights[i][j] {
 					if k < length {
 						if i > 0 {
 							n.value += nn.neuron[dec][k].value * w
 						} else {
-							n.value += pkg.FloatType(input[k]) * w
+							n.value += pkg.FloatType(nn.input[k]) * w
 						}
 					} else {
 						n.value += w
 					}
+					num++
 				}
-				n.value = pkg.FloatType(params.Activation(float64(n.value), nn.Activation))
+
+				switch nn.Activation {
+				case params.ModeLINEAR:
+					n.value /= num
+				default:
+					n.value = pkg.FloatType(params.Activation(float64(n.value), nn.Activation))
+				}
 				wait <- true
 			}(j, n)
 		}
@@ -46,10 +54,10 @@ func (nn *NN) calcNeuron(input []float64) {
 	}
 }
 
-// calcLoss calculating the error of the output neuron
-func (nn *NN) calcLoss(target []float64) (loss float64) {
+// calcLoss calculating the error of the output neuron.
+func (nn *NN) calcLoss() (loss float64) {
 	for i, n := range nn.neuron[nn.lastLayerIndex] {
-		n.miss = pkg.FloatType(target[i]) - n.value
+		n.miss = pkg.FloatType(nn.output[i]) - n.value
 		switch nn.Loss {
 		default:
 			fallthrough
@@ -57,6 +65,8 @@ func (nn *NN) calcLoss(target []float64) (loss float64) {
 			loss += math.Pow(float64(n.miss), 2)
 		case params.ModeARCTAN:
 			loss += math.Pow(math.Atan(float64(n.miss)), 2)
+		case params.ModeAVG:
+			loss += math.Abs(float64(n.miss))
 		}
 		n.miss *= pkg.FloatType(params.Derivative(float64(n.value), nn.Activation))
 	}
@@ -68,32 +78,34 @@ func (nn *NN) calcLoss(target []float64) (loss float64) {
 	return
 }
 
-// calcMiss calculating the error of neurons in hidden layers
+// calcMiss calculating the error of neurons in hidden layers.
 func (nn *NN) calcMiss() {
-	wait := make(chan bool)
-	defer close(wait)
+	if nn.lastLayerIndex > 0 {
+		wait := make(chan bool)
+		defer close(wait)
 
-	for i := nn.lastLayerIndex - 1; i >= 0; i-- {
-		inc := i + 1
-		for j, n := range nn.neuron[i] {
-			go func(j int, n *neuron) {
-				n.miss = 0
-				for k, m := range nn.neuron[inc] {
-					n.miss += m.miss * nn.Weights[inc][k][j]
-				}
-				n.miss *= pkg.FloatType(params.Derivative(float64(n.value), nn.Activation))
-				wait <- true
-			}(j, n)
-		}
+		for i := nn.lastLayerIndex - 1; i >= 0; i-- {
+			inc := i + 1
+			for j, n := range nn.neuron[i] {
+				go func(j int, n *neuron) {
+					n.miss = 0
+					for k, m := range nn.neuron[inc] {
+						n.miss += m.miss * nn.Weights[inc][k][j]
+					}
+					n.miss *= pkg.FloatType(params.Derivative(float64(n.value), nn.Activation))
+					wait <- true
+				}(j, n)
+			}
 
-		for range nn.neuron[i] {
-			<-wait
+			for range nn.neuron[i] {
+				<-wait
+			}
 		}
 	}
 }
 
-// updWeight update weights
-func (nn *NN) updWeight(input []float64) {
+// updWeight update weights.
+func (nn *NN) updWeight() {
 	wait := make(chan bool)
 	defer close(wait)
 
@@ -110,10 +122,20 @@ func (nn *NN) updWeight(input []float64) {
 			go func(i, j, dec, length int, grad pkg.FloatType, w []pkg.FloatType) {
 				for k := range w {
 					if k < length {
+						var value pkg.FloatType
 						if i > 0 {
-							nn.Weights[i][j][k] += nn.neuron[dec][k].value * grad
+							value = nn.neuron[dec][k].value
 						} else {
-							nn.Weights[i][j][k] += pkg.FloatType(input[k]) * grad
+							value = pkg.FloatType(nn.input[k])
+						}
+
+						switch nn.Activation {
+						case params.ModeLINEAR, params.ModeSIGMOID:
+							if value > 0 {
+								nn.Weights[i][j][k] += grad / value
+							}
+						default:
+							nn.Weights[i][j][k] += grad * value
 						}
 					} else {
 						nn.Weights[i][j][k] += grad

@@ -5,11 +5,12 @@ const (
 	ModeMSE    uint8 = iota // Mean Squared Error.
 	ModeRMSE                // Root Mean Squared Error.
 	ModeARCTAN              // Arctan.
+	ModeAVG                 // Average.
 )
 
-// CheckLossMode
+// CheckLossMode.
 func CheckLossMode(mode uint8) uint8 {
-	if mode > ModeARCTAN {
+	if mode > ModeAVG {
 		return ModeMSE
 	}
 	return mode
