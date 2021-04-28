@@ -11,7 +11,7 @@ const (
 	ModeTANH                   // TanH (hyperbolic tangent).
 )
 
-// CheckActivationMode
+// CheckActivationMode.
 func CheckActivationMode(mode uint8) uint8 {
 	if mode > ModeTANH {
 		return ModeSIGMOID

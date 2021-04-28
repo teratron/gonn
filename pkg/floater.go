@@ -1,11 +1,8 @@
 package pkg
 
-import (
-	"errors"
-	"log"
-)
+import "log"
 
-// Floater
+// Floater.
 type Floater interface {
 	Length(...uint) int
 }
@@ -17,36 +14,39 @@ type (
 	Float3Type [][][]FloatType
 )
 
+// Length.
 func (f Float1Type) Length(...uint) int {
 	return len(f)
 }
 
-func (f Float2Type) Length(ind ...uint) int {
-	if len(ind) > 0 {
-		if len(f) > int(ind[0]) {
-			return len(f[ind[0]])
+// Length.
+func (f Float2Type) Length(index ...uint) int {
+	if len(index) > 0 {
+		if len(f) > int(index[0]) {
+			return len(f[index[0]])
 		}
-		log.Println(errors.New("error Float2Type length: index exceeds array size"))
+		log.Println("error Float2Type length: index exceeds array size")
 		return 0
 	}
 	return len(f)
 }
 
-func (f Float3Type) Length(ind ...uint) int {
-	switch len(ind) {
+// Length.
+func (f Float3Type) Length(index ...uint) int {
+	switch len(index) {
 	case 0:
 		return len(f)
 	case 1:
-		if len(f) > int(ind[0]) {
-			return len(f[ind[0]])
+		if len(f) > int(index[0]) {
+			return len(f[index[0]])
 		}
 	default:
 		fallthrough
 	case 2:
-		if len(f) > int(ind[0]) && len(f[ind[0]]) > int(ind[1]) {
-			return len(f[ind[0]][ind[1]])
+		if len(f) > int(index[0]) && len(f[index[0]]) > int(index[1]) {
+			return len(f[index[0]][index[1]])
 		}
 	}
-	log.Println(errors.New("error Float3Type length: index exceeds arrays size"))
+	log.Println("error Float3Type length: index exceeds arrays size")
 	return 0
 }

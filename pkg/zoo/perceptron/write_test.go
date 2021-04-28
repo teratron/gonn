@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/zigenzoog/gonn/pkg/utils"
+	"github.com/teratron/gonn/pkg/utils"
 )
 
 var (

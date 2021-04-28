@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 )
 
-// Filer
+// Filer.
 type Filer interface {
 	Decode(interface{}) error
 	Encode(interface{}) error
@@ -13,16 +13,18 @@ type Filer interface {
 	GetName() string
 }
 
+// FileError.
 type FileError struct {
 	Filer
 	Err error
 }
 
+// Error.
 func (f *FileError) Error() string {
 	return fmt.Sprintf("file type error: %v\n", f.Err)
 }
 
-// GetFileType
+// GetFileType.
 func GetFileType(name string) Filer {
 	ext := filepath.Ext(name)
 	switch ext {

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/zigenzoog/gonn/pkg"
-	"github.com/zigenzoog/gonn/pkg/utils"
+	"github.com/teratron/gonn/pkg"
+	"github.com/teratron/gonn/pkg/utils"
 )
 
 // WriteConfig writes the configuration and weights to the Filer interface object.

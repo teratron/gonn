@@ -1,6 +1,6 @@
 package nn
 
-import "github.com/zigenzoog/gonn/pkg/params"
+import "github.com/teratron/gonn/pkg/params"
 
 const (
 	// Activation function mode.
@@ -14,6 +14,7 @@ const (
 	ModeMSE    = params.ModeMSE    // Mean Squared Error.
 	ModeRMSE   = params.ModeRMSE   // Root Mean Squared Error.
 	ModeARCTAN = params.ModeARCTAN // Arctan.
+	ModeAVG    = params.ModeAVG    // Average.
 
 	// DefaultRate default learning rate.
 	DefaultRate = params.DefaultRate

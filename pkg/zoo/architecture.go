@@ -5,10 +5,10 @@ import (
 	"log"
 	"strings"
 
-	"github.com/zigenzoog/gonn/pkg"
-	"github.com/zigenzoog/gonn/pkg/utils"
-	"github.com/zigenzoog/gonn/pkg/zoo/hopfield"
-	"github.com/zigenzoog/gonn/pkg/zoo/perceptron"
+	"github.com/teratron/gonn/pkg"
+	"github.com/teratron/gonn/pkg/utils"
+	"github.com/teratron/gonn/pkg/zoo/hopfield"
+	"github.com/teratron/gonn/pkg/zoo/perceptron"
 )
 
 const (
@@ -16,7 +16,7 @@ const (
 	Hopfield   = hopfield.Name
 )
 
-// Get
+// Get.
 func Get(title string) pkg.NeuralNetwork {
 	var err error
 	d := utils.GetFileType(title)
@@ -44,7 +44,7 @@ func Get(title string) pkg.NeuralNetwork {
 	}
 
 	if err != nil {
-		log.Println(fmt.Errorf("get architecture: %w", err))
+		log.Println("get architecture: %w", err)
 	}
 	return nil
 }

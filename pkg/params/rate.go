@@ -1,13 +1,13 @@
 package params
 
-import "github.com/zigenzoog/gonn/pkg"
+import "github.com/teratron/gonn/pkg"
 
-// DefaultRate default learning rate
+// DefaultRate default learning rate.
 const DefaultRate float64 = .3
 
-// CheckLearningRate
+// CheckLearningRate.
 func CheckLearningRate(rate pkg.FloatType) pkg.FloatType {
-	if rate < 0 || rate > 1 {
+	if rate <= 0 || rate > 1 {
 		return pkg.FloatType(DefaultRate)
 	}
 	return rate

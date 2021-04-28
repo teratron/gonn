@@ -1,9 +1,9 @@
 package perceptron
 
 import (
-	"github.com/zigenzoog/gonn/pkg"
-	"github.com/zigenzoog/gonn/pkg/params"
-	"github.com/zigenzoog/gonn/pkg/utils"
+	"github.com/teratron/gonn/pkg"
+	"github.com/teratron/gonn/pkg/params"
+	"github.com/teratron/gonn/pkg/utils"
 )
 
 // Name of the neural network architecture.
@@ -15,16 +15,16 @@ var _ pkg.NeuralNetwork = (*NN)(nil)
 type NN struct {
 	pkg.Parameter `json:"-" yaml:"-"`
 
-	// Neural network architecture name.
+	// Neural network architecture name (required field for config).
 	Name string `json:"name" yaml:"name"`
 
-	// The neuron bias, false or true.
+	// The neuron bias, false or true (required field for config).
 	Bias bool `json:"bias" yaml:"bias"`
 
 	// Array of the number of neurons in each hidden layer.
-	Hidden []int `json:"hidden" yaml:"hidden"`
+	Hidden []int `json:"hidden,omitempty" yaml:"hidden,omitempty"`
 
-	// Activation function mode.
+	// Activation function mode (required field for config).
 	Activation uint8 `json:"activation" yaml:"activation"`
 
 	// The mode of calculation of the total error.
@@ -33,21 +33,25 @@ type NN struct {
 	// Minimum (sufficient) limit of the average of the error during training.
 	Limit float64 `json:"limit" yaml:"limit"`
 
-	// Learning coefficient, from 0 to 1.
+	// Learning coefficient (greater than 0 and less than or equal to 1).
 	Rate pkg.FloatType `json:"rate" yaml:"rate"`
 
 	// Weight value.
 	Weights pkg.Float3Type `json:"weights,omitempty" yaml:"weights,omitempty"`
 
-	// Neuron
+	// Neuron.
 	neuron [][]*neuron
 
-	// Settings
+	// Settings.
 	lenInput       int
 	lenOutput      int
 	lastLayerIndex int
 	isInit         bool
 	config         utils.Filer
+
+	// Transfer data.
+	input  []float64
+	output []float64
 }
 
 type neuron struct {
@@ -61,7 +65,7 @@ func New() *NN {
 		Name:       Name,
 		Activation: params.ModeSIGMOID,
 		Loss:       params.ModeMSE,
-		Limit:      .1,
+		Limit:      .01,
 		Rate:       pkg.FloatType(params.DefaultRate),
 	}
 }
