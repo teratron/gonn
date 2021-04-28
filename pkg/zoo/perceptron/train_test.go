@@ -97,7 +97,7 @@ func TestNN_Train(t *testing.T) {
 				Limit:  .95,
 			},
 			wantLoss:  .0025,
-			wantCount: 0,
+			wantCount: 1,
 		},
 		{
 			name: "#7_NaN",
