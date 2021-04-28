@@ -17,7 +17,7 @@ gonn - Neural Network for Golang
 ```go
 package main
 
-import "github.com/zigenzoog/gonn/pkg/nn"
+import "github.com/teratron/gonn/pkg/nn"
 
 func main() {
 	// New returns a new neural network

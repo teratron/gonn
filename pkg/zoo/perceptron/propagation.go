@@ -3,8 +3,8 @@ package perceptron
 import (
 	"math"
 
-	"github.com/zigenzoog/gonn/pkg"
-	"github.com/zigenzoog/gonn/pkg/params"
+	"github.com/teratron/gonn/pkg"
+	"github.com/teratron/gonn/pkg/params"
 )
 
 // calcNeuron.

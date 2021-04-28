@@ -1,4 +1,4 @@
-module github.com/zigenzoog/gonn
+module github.com/teratron/gonn
 
 go 1.16
 

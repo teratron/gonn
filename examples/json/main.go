@@ -3,7 +3,7 @@ package main
 import (
 	"path/filepath"
 
-	"github.com/zigenzoog/gonn/pkg/nn"
+	"github.com/teratron/gonn/pkg/nn"
 )
 
 func main() {

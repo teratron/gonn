@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/zigenzoog/gonn/pkg"
+	"github.com/teratron/gonn/pkg"
 )
 
 // Verify verifying dataset.

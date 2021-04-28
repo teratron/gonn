@@ -1,6 +1,6 @@
 package nn
 
-import "github.com/zigenzoog/gonn/pkg/params"
+import "github.com/teratron/gonn/pkg/params"
 
 const (
 	// Activation function mode.

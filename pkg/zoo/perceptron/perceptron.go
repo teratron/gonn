@@ -1,9 +1,9 @@
 package perceptron
 
 import (
-	"github.com/zigenzoog/gonn/pkg"
-	"github.com/zigenzoog/gonn/pkg/params"
-	"github.com/zigenzoog/gonn/pkg/utils"
+	"github.com/teratron/gonn/pkg"
+	"github.com/teratron/gonn/pkg/params"
+	"github.com/teratron/gonn/pkg/utils"
 )
 
 // Name of the neural network architecture.
