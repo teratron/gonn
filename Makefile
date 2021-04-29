@@ -26,7 +26,6 @@ setup:
 	go mod vendor -v
 
 deps:
-	#go get
 	go mod verify
 	go mod tidy -v
 	go mod vendor -v

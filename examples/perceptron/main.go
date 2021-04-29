@@ -37,15 +37,15 @@ func main() {
 	lenOutput := 2 // Number of output data.
 
 	// Training.
-	limit := len(dataSet) - lenOutput
+	lenData := len(dataSet) - lenOutput
 	for epoch := 1; epoch <= 10000; epoch++ {
-		for i := lenInput; i <= limit; i++ {
+		for i := lenInput; i <= lenData; i++ {
 			_, _ = n.Train(dataSet[i-lenInput:i], dataSet[i:i+lenOutput])
 		}
 
 		// Verifying.
 		sum, num := 0., 0.
-		for i := lenInput; i <= limit; i++ {
+		for i := lenInput; i <= lenData; i++ {
 			sum += n.Verify(dataSet[i-lenInput:i], dataSet[i:i+lenOutput])
 			num++
 		}

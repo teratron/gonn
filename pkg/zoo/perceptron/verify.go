@@ -8,7 +8,7 @@ import (
 )
 
 // Verify verifying dataset.
-func (nn *NN) Verify(input []float64, target ...[]float64) (loss float64) {
+func (nn *NN) Verify(input []float64, target ...[]float64) float64 {
 	var err error
 	if len(input) > 0 {
 		if len(target) > 0 && len(target[0]) > 0 {
@@ -25,11 +25,11 @@ func (nn *NN) Verify(input []float64, target ...[]float64) (loss float64) {
 				}
 			}
 
-			_ = copy(nn.input, input)
-			_ = copy(nn.output, target[0])
+			//_ = copy(nn.input, input)
+			//_ = copy(nn.output, target[0])
 
-			nn.calcNeuron()
-			return nn.calcLoss()
+			nn.calcNeuron(&input)
+			return nn.calcLoss(&target[0])
 		} else {
 			err = pkg.ErrNoTarget
 		}

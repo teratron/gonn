@@ -35,20 +35,20 @@ func (nn *NN) Train(input []float64, target ...[]float64) (loss float64, count i
 				}
 			}
 
-			_ = copy(nn.input, input)
-			_ = copy(nn.output, target[0])
+			//_ = copy(nn.input, input)
+			//_ = copy(nn.output, target[0])
 
 			for count < GetMaxIteration() {
 				count++
-				nn.calcNeuron()
-				switch loss = nn.calcLoss(); {
+				nn.calcNeuron(&input)
+				switch loss = nn.calcLoss(&target[0]); {
 				case loss < nn.Limit:
 					return
 				case math.IsNaN(loss):
 					log.Panic("train: not optimal neural network parameters")
 				}
 				nn.calcMiss()
-				nn.updWeight()
+				nn.updWeight(&input)
 			}
 			return
 		} else {
