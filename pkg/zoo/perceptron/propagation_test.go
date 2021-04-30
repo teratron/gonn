@@ -11,12 +11,14 @@ import (
 
 func TestNN_calcNeuron(t *testing.T) {
 	tests := []struct {
-		name string
-		got  *NN
-		want [][]*neuron
+		name  string
+		input *[]float64
+		got   *NN
+		want  [][]*neuron
 	}{
 		{
-			name: "#1",
+			name:  "#1",
+			input: &[]float64{.2},
 			got: &NN{
 				Activation: params.ModeLEAKYRELU,
 				Weights: pkg.Float3Type{
@@ -30,7 +32,6 @@ func TestNN_calcNeuron(t *testing.T) {
 					},
 				},
 				lenInput: 1,
-				input:    []float64{.2},
 			},
 			want: [][]*neuron{
 				{
@@ -39,7 +40,8 @@ func TestNN_calcNeuron(t *testing.T) {
 			},
 		},
 		{
-			name: "#2",
+			name:  "#2",
+			input: &[]float64{.2, .3},
 			got: &NN{
 				Activation: params.ModeTANH,
 				Weights: pkg.Float3Type{
@@ -55,7 +57,6 @@ func TestNN_calcNeuron(t *testing.T) {
 					},
 				},
 				lenInput: 2,
-				input:    []float64{.2, .3},
 			},
 			want: [][]*neuron{
 				{
@@ -65,7 +66,8 @@ func TestNN_calcNeuron(t *testing.T) {
 			},
 		},
 		{
-			name: "#3",
+			name:  "#3",
+			input: &[]float64{.2, .3},
 			got: &NN{
 				Activation: params.ModeSIGMOID,
 				Weights: pkg.Float3Type{
@@ -87,7 +89,6 @@ func TestNN_calcNeuron(t *testing.T) {
 					},
 				},
 				lenInput: 2,
-				input:    []float64{.2, .3},
 			},
 			want: [][]*neuron{
 				{
@@ -102,7 +103,7 @@ func TestNN_calcNeuron(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tt.got.calcNeuron()
+			tt.got.calcNeuron(tt.input)
 			for i, v := range tt.got.neuron {
 				for j, n := range v {
 					tt.got.neuron[i][j].value = pkg.FloatType(math.Round(float64(n.value), math.ModeRound, 6))
@@ -118,13 +119,14 @@ func TestNN_calcNeuron(t *testing.T) {
 
 func TestNN_calcLoss(t *testing.T) {
 	tests := []struct {
-		name string
-		gave *NN
-		want float64
+		name   string
+		target *[]float64
+		gave   *NN
+		want   float64
 	}{
 		{
-			name: "#1_RMSE",
-
+			name:   "#1_RMSE",
+			target: &[]float64{.2},
 			gave: &NN{
 				Activation: params.ModeLEAKYRELU,
 				Loss:       params.ModeRMSE,
@@ -135,12 +137,12 @@ func TestNN_calcLoss(t *testing.T) {
 				},
 				lenOutput:      1,
 				lastLayerIndex: 0,
-				output:         []float64{.2},
 			},
 			want: .351686,
 		},
 		{
-			name: "#2_ARCTAN",
+			name:   "#2_ARCTAN",
+			target: &[]float64{.2, .3},
 			gave: &NN{
 				Activation: params.ModeTANH,
 				Loss:       params.ModeARCTAN,
@@ -152,12 +154,12 @@ func TestNN_calcLoss(t *testing.T) {
 				},
 				lenOutput:      2,
 				lastLayerIndex: 0,
-				output:         []float64{.2, .3},
 			},
 			want: .080124,
 		},
 		{
-			name: "#3_MSE",
+			name:   "#3_MSE",
+			target: &[]float64{.2},
 			gave: &NN{
 				Activation: params.ModeSIGMOID,
 				Loss:       params.ModeMSE,
@@ -172,12 +174,12 @@ func TestNN_calcLoss(t *testing.T) {
 				},
 				lenOutput:      1,
 				lastLayerIndex: 1,
-				output:         []float64{.2},
 			},
 			want: .123683,
 		},
 		{
-			name: "#4_AVG",
+			name:   "#4_AVG",
+			target: &[]float64{.2},
 			gave: &NN{
 				Activation: params.ModeLINEAR,
 				Loss:       params.ModeAVG,
@@ -192,14 +194,13 @@ func TestNN_calcLoss(t *testing.T) {
 				},
 				lenOutput:      1,
 				lastLayerIndex: 1,
-				output:         []float64{.2},
 			},
 			want: .351686,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.gave.calcLoss(); math.Round(got, math.ModeRound, 6) != tt.want {
+			if got := tt.gave.calcLoss(tt.target); math.Round(got, math.ModeRound, 6) != tt.want {
 				t.Errorf("calcLoss() = %f, want %f", got, tt.want)
 			}
 		})
@@ -265,12 +266,14 @@ func TestNN_calcMiss(t *testing.T) {
 
 func TestNN_updWeight(t *testing.T) {
 	tests := []struct {
-		name string
-		got  *NN
-		want pkg.Float3Type
+		name  string
+		input *[]float64
+		got   *NN
+		want  pkg.Float3Type
 	}{
 		{
-			name: "#1",
+			name:  "#1",
+			input: &[]float64{.2},
 			got: &NN{
 				Rate: pkg.FloatType(params.DefaultRate),
 				Weights: pkg.Float3Type{
@@ -284,7 +287,6 @@ func TestNN_updWeight(t *testing.T) {
 					},
 				},
 				lenInput: 1,
-				input:    []float64{.2},
 			},
 			want: pkg.Float3Type{
 				{
@@ -293,7 +295,8 @@ func TestNN_updWeight(t *testing.T) {
 			},
 		},
 		{
-			name: "#2",
+			name:  "#2",
+			input: &[]float64{.2, .3},
 			got: &NN{
 				Activation: params.ModeTANH,
 				Rate:       pkg.FloatType(params.DefaultRate),
@@ -316,7 +319,6 @@ func TestNN_updWeight(t *testing.T) {
 					},
 				},
 				lenInput: 2,
-				input:    []float64{.2, .3},
 			},
 			want: pkg.Float3Type{
 				{
@@ -331,7 +333,7 @@ func TestNN_updWeight(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tt.got.updWeight()
+			tt.got.updWeight(tt.input)
 			for i, v := range tt.got.Weights {
 				for j, w := range v {
 					for k, g := range w {
