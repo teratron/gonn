@@ -77,7 +77,7 @@ func (nn *NN) initFromNew(lenInput, lenTarget int) {
 				nn.Weights[i][j] = make(pkg.Float1Type, biasInput)
 			}
 			for k := range nn.Weights[i][j] {
-				if nn.Activation == params.ModeLINEAR {
+				if nn.Activation == params.LINEAR {
 					nn.Weights[i][j][k] = .5
 				} else {
 					nn.Weights[i][j][k] = params.GetRandFloat()

@@ -20,7 +20,7 @@ func TestNN_calcNeuron(t *testing.T) {
 			name:  "#1",
 			input: &[]float64{.2},
 			got: &NN{
-				Activation: params.ModeLEAKYRELU,
+				Activation: params.LEAKYRELU,
 				Weights: pkg.Float3Type{
 					{
 						{.1},
@@ -43,7 +43,7 @@ func TestNN_calcNeuron(t *testing.T) {
 			name:  "#2",
 			input: &[]float64{.2, .3},
 			got: &NN{
-				Activation: params.ModeTANH,
+				Activation: params.TANH,
 				Weights: pkg.Float3Type{
 					{
 						{.1, .1},
@@ -69,7 +69,7 @@ func TestNN_calcNeuron(t *testing.T) {
 			name:  "#3",
 			input: &[]float64{.2, .3},
 			got: &NN{
-				Activation: params.ModeSIGMOID,
+				Activation: params.SIGMOID,
 				Weights: pkg.Float3Type{
 					{
 						{.1, .1, .1},
@@ -128,8 +128,8 @@ func TestNN_calcLoss(t *testing.T) {
 			name:   "#1_RMSE",
 			target: &[]float64{.2},
 			gave: &NN{
-				Activation: params.ModeLEAKYRELU,
-				Loss:       params.ModeRMSE,
+				Activation: params.LEAKYRELU,
+				Loss:       params.RMSE,
 				neuron: [][]*neuron{
 					{
 						{.5516861990955205, 0},
@@ -144,8 +144,8 @@ func TestNN_calcLoss(t *testing.T) {
 			name:   "#2_ARCTAN",
 			target: &[]float64{.2, .3},
 			gave: &NN{
-				Activation: params.ModeTANH,
-				Loss:       params.ModeARCTAN,
+				Activation: params.TANH,
+				Loss:       params.ARCTAN,
 				neuron: [][]*neuron{
 					{
 						{.5374298453437496, 0},
@@ -161,8 +161,8 @@ func TestNN_calcLoss(t *testing.T) {
 			name:   "#3_MSE",
 			target: &[]float64{.2},
 			gave: &NN{
-				Activation: params.ModeSIGMOID,
-				Loss:       params.ModeMSE,
+				Activation: params.SIGMOID,
+				Loss:       params.MSE,
 				neuron: [][]*neuron{
 					{
 						{.5374298453437496, 0},
@@ -181,8 +181,8 @@ func TestNN_calcLoss(t *testing.T) {
 			name:   "#4_AVG",
 			target: &[]float64{.2},
 			gave: &NN{
-				Activation: params.ModeLINEAR,
-				Loss:       params.ModeAVG,
+				Activation: params.LINEAR,
+				Loss:       params.AVG,
 				neuron: [][]*neuron{
 					{
 						{.5374298453437496, 0},
@@ -216,7 +216,7 @@ func TestNN_calcMiss(t *testing.T) {
 		{
 			name: "#1",
 			got: &NN{
-				Activation: params.ModeSIGMOID,
+				Activation: params.SIGMOID,
 				Weights: pkg.Float3Type{
 					{
 						{.1, .1, .1},
@@ -275,7 +275,7 @@ func TestNN_updWeight(t *testing.T) {
 			name:  "#1",
 			input: &[]float64{.2},
 			got: &NN{
-				Rate: pkg.FloatType(params.DefaultRate),
+				Rate: .3,
 				Weights: pkg.Float3Type{
 					{
 						{.1},
@@ -298,8 +298,8 @@ func TestNN_updWeight(t *testing.T) {
 			name:  "#2",
 			input: &[]float64{.2, .3},
 			got: &NN{
-				Activation: params.ModeTANH,
-				Rate:       pkg.FloatType(params.DefaultRate),
+				Activation: params.TANH,
+				Rate:       .3,
 				Weights: pkg.Float3Type{
 					{
 						{.1, .1, .1},

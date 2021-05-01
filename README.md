@@ -1,7 +1,7 @@
 <div style="text-align: center">
   <!--a href="https://pkg.go.dev/github.com/zigenzoog/gonn?tab=doc" title="Go API Reference" rel="nofollow"><img src="https://img.shields.io/badge/go-documentation-blue.svg?style=flat" alt="Go API Reference"></a-->
   <a href="https://pkg.go.dev/github.com/zigenzoog/gonn"><img src="https://pkg.go.dev/badge/github.com/zigenzoog/gonn.svg" alt="Go Reference"></a>
-  <a href="https://github.com/zigenzoog/gonn/releases/tag/v0.3.2" title="0.3.2" rel="nofollow"><img src="https://img.shields.io/badge/version-0.3.2-blue.svg?style=flat" alt="0.3.2"></a>
+  <a href="https://github.com/zigenzoog/gonn/releases/tag/v0.4.0" title="0.4.0" rel="nofollow"><img src="https://img.shields.io/badge/version-0.4.0-blue.svg?style=flat" alt="0.4.0"></a>
   <a href="https://goreportcard.com/report/github.com/zigenzoog/gonn"><img src="https://goreportcard.com/badge/github.com/zigenzoog/gonn" alt="Code Status" /></a>
 </div>
 
@@ -32,16 +32,16 @@ func main() {
 	n.SetHiddenLayer(3)           
 
 	// Activation function mode.
-	n.SetActivationMode(nn.ModeSIGMOID)
+	n.SetActivationMode(nn.SIGMOID)
 
 	// The mode of calculation of the total error.
-	n.SetLossMode(nn.ModeMSE)
+	n.SetLossMode(nn.MSE)
 
 	// Minimum (sufficient) limit of the average of the error during training.
 	n.SetLossLimit(.001)
 
 	// Learning coefficient (greater than 0 and less than or equal to 1).
-	n.SetLearningRate(nn.DefaultRate)
+	n.SetLearningRate(.3)
 
 	// Dataset.
 	input  := []float64{1, 1}

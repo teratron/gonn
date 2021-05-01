@@ -10,13 +10,13 @@ func Test_checkActivationMode(t *testing.T) {
 	}{
 		{
 			name: "#1_ModeTANH",
-			gave: ModeTANH,
-			want: ModeTANH,
+			gave: TANH,
+			want: TANH,
 		},
 		{
 			name: "#2_overflow",
 			gave: 255,
-			want: ModeSIGMOID,
+			want: SIGMOID,
 		},
 	}
 	for _, tt := range tests {
@@ -40,37 +40,37 @@ func TestActivation(t *testing.T) {
 	}{
 		{
 			name: "#1_ModeLINEAR",
-			args: args{.1, ModeLINEAR},
+			args: args{.1, LINEAR},
 			want: .1,
 		},
 		{
 			name: "#2_ModeRELU",
-			args: args{.1, ModeRELU},
+			args: args{.1, RELU},
 			want: .1,
 		},
 		{
 			name: "#3_ModeRELU",
-			args: args{-.1, ModeRELU},
+			args: args{-.1, RELU},
 			want: 0,
 		},
 		{
 			name: "#4_ModeLEAKYRELU",
-			args: args{.1, ModeLEAKYRELU},
+			args: args{.1, LEAKYRELU},
 			want: .1,
 		},
 		{
 			name: "#5_ModeLEAKYRELU",
-			args: args{-.1, ModeLEAKYRELU},
+			args: args{-.1, LEAKYRELU},
 			want: -.001,
 		},
 		{
 			name: "#6_ModeSIGMOID",
-			args: args{.1, ModeSIGMOID},
+			args: args{.1, SIGMOID},
 			want: .52497918747894,
 		},
 		{
 			name: "#7_ModeTANH",
-			args: args{.1, ModeTANH},
+			args: args{.1, TANH},
 			want: .09966799462495583,
 		},
 		{
@@ -100,37 +100,37 @@ func TestDerivative(t *testing.T) {
 	}{
 		{
 			name: "#1_ModeLINEAR",
-			args: args{.1, ModeLINEAR},
+			args: args{.1, LINEAR},
 			want: 1,
 		},
 		{
 			name: "#2_ModeRELU",
-			args: args{.1, ModeRELU},
+			args: args{.1, RELU},
 			want: 1,
 		},
 		{
 			name: "#3_ModeRELU",
-			args: args{-.1, ModeRELU},
+			args: args{-.1, RELU},
 			want: 0,
 		},
 		{
 			name: "#4_ModeLEAKYRELU",
-			args: args{.1, ModeLEAKYRELU},
+			args: args{.1, LEAKYRELU},
 			want: 1,
 		},
 		{
 			name: "#5_ModeLEAKYRELU",
-			args: args{-.1, ModeLEAKYRELU},
+			args: args{-.1, LEAKYRELU},
 			want: .01,
 		},
 		{
 			name: "#6_ModeSIGMOID",
-			args: args{.1, ModeSIGMOID},
+			args: args{.1, SIGMOID},
 			want: .09000000000000001,
 		},
 		{
 			name: "#7_ModeTANH",
-			args: args{.1, ModeTANH},
+			args: args{.1, TANH},
 			want: .99,
 		},
 		{

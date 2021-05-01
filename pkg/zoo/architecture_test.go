@@ -22,10 +22,10 @@ func TestGet(t *testing.T) {
 		Name:       Perceptron,
 		Bias:       true,
 		Hidden:     []int{2},
-		Activation: params.ModeSIGMOID,
-		Loss:       params.ModeMSE,
+		Activation: params.SIGMOID,
+		Loss:       params.MSE,
 		Limit:      .1,
-		Rate:       pkg.FloatType(params.DefaultRate),
+		Rate:       .3,
 		Weights: pkg.Float3Type{
 			{
 				{.1, .1, .1},

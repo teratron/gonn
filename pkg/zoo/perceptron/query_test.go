@@ -20,7 +20,7 @@ func TestNN_Query(t *testing.T) {
 			name:  "#1",
 			input: []float64{.2, .3},
 			gave: &NN{
-				Activation: params.ModeSIGMOID,
+				Activation: params.SIGMOID,
 				Weights: pkg.Float3Type{
 					{
 						{.1, .1, .1},

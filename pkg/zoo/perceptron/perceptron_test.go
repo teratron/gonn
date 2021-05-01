@@ -24,10 +24,10 @@ func Test_getMaxIteration(t *testing.T) {
 func TestNew(t *testing.T) {
 	want := &NN{
 		Name:       Name,
-		Activation: params.ModeSIGMOID,
-		Loss:       params.ModeMSE,
+		Activation: params.SIGMOID,
+		Loss:       params.MSE,
 		Limit:      .01,
-		Rate:       pkg.FloatType(params.DefaultRate),
+		Rate:       .3,
 	}
 	t.Run(want.Name, func(t *testing.T) {
 		if got := New(); !reflect.DeepEqual(got, want) {

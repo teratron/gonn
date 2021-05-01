@@ -59,9 +59,9 @@ type neuron struct {
 func New() *NN {
 	return &NN{
 		Name:       Name,
-		Activation: params.ModeSIGMOID,
-		Loss:       params.ModeMSE,
+		Activation: params.SIGMOID,
+		Loss:       params.MSE,
 		Limit:      .01,
-		Rate:       pkg.FloatType(params.DefaultRate),
+		Rate:       .3,
 	}
 }

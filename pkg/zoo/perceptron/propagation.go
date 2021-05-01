@@ -39,7 +39,7 @@ func (nn *NN) calcNeuron(input *[]float64) {
 				}
 
 				switch nn.Activation {
-				case params.ModeLINEAR:
+				case params.LINEAR:
 					n.value /= num
 				default:
 					n.value = pkg.FloatType(params.Activation(float64(n.value), nn.Activation))
@@ -61,17 +61,17 @@ func (nn *NN) calcLoss(target *[]float64) (loss float64) {
 		switch nn.Loss {
 		default:
 			fallthrough
-		case params.ModeMSE, params.ModeRMSE:
+		case params.MSE, params.RMSE:
 			loss += math.Pow(float64(n.miss), 2)
-		case params.ModeARCTAN:
+		case params.ARCTAN:
 			loss += math.Pow(math.Atan(float64(n.miss)), 2)
-		case params.ModeAVG:
+		case params.AVG:
 			loss += math.Abs(float64(n.miss))
 		}
 	}
 
 	loss /= float64(nn.lenOutput)
-	if nn.Loss == params.ModeRMSE {
+	if nn.Loss == params.RMSE {
 		loss = math.Sqrt(loss)
 	}
 	return
@@ -117,6 +117,7 @@ func (nn *NN) updWeight(input *[]float64) {
 		}
 
 		for j, w := range v {
+			grad := nn.Rate * nn.neuron[i][j].miss * pkg.FloatType(params.Derivative(float64(nn.neuron[i][j].value), nn.Activation))
 			go func(i, j, dec, length int, grad pkg.FloatType, w []pkg.FloatType) {
 				for k := range w {
 					if k < length {
@@ -128,7 +129,7 @@ func (nn *NN) updWeight(input *[]float64) {
 						}
 
 						switch nn.Activation {
-						case params.ModeLINEAR, params.ModeSIGMOID:
+						case params.LINEAR, params.SIGMOID:
 							if value > 0 {
 								nn.Weights[i][j][k] += grad / value
 							}
@@ -140,7 +141,7 @@ func (nn *NN) updWeight(input *[]float64) {
 					}
 				}
 				wait <- true
-			}(i, j, dec, length, nn.neuron[i][j].miss*pkg.FloatType(params.Derivative(float64(nn.neuron[i][j].value), nn.Activation))*nn.Rate, w)
+			}(i, j, dec, length, grad, w)
 		}
 	}
 

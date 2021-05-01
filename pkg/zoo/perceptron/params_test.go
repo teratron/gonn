@@ -100,7 +100,7 @@ func TestNN_SetHiddenLayer(t *testing.T) {
 }
 
 func TestNN_ActivationMode(t *testing.T) {
-	want := &NN{Activation: params.ModeSIGMOID}
+	want := &NN{Activation: params.SIGMOID}
 	t.Run("ModeSIGMOID", func(t *testing.T) {
 		if got := want.ActivationMode(); got != want.Activation {
 			t.Errorf("ActivationMode() = %d, want %d", got, want.Activation)
@@ -110,7 +110,7 @@ func TestNN_ActivationMode(t *testing.T) {
 
 func TestNN_SetActivationMode(t *testing.T) {
 	got := &NN{}
-	want := params.ModeLINEAR
+	want := params.LINEAR
 	t.Run("ModeLINEAR", func(t *testing.T) {
 		if got.SetActivationMode(want); got.Activation != want {
 			t.Errorf("SetActivationMode() = %d, want %d", got.Activation, want)
@@ -119,7 +119,7 @@ func TestNN_SetActivationMode(t *testing.T) {
 }
 
 func TestNN_LossMode(t *testing.T) {
-	want := &NN{Loss: params.ModeARCTAN}
+	want := &NN{Loss: params.ARCTAN}
 	t.Run("ModeARCTAN", func(t *testing.T) {
 		if got := want.LossMode(); got != want.Loss {
 			t.Errorf("LossMode() = %d, want %d", got, want.Loss)
@@ -137,14 +137,14 @@ func TestNN_SetLossMode(t *testing.T) {
 		{
 			name: "#1_ModeARCTAN",
 			got:  &NN{},
-			gave: params.ModeARCTAN,
-			want: params.ModeARCTAN,
+			gave: params.ARCTAN,
+			want: params.ARCTAN,
 		},
 		{
 			name: "#2_default",
 			got:  &NN{},
 			gave: 255,
-			want: params.ModeMSE,
+			want: params.MSE,
 		},
 	}
 	for _, tt := range tests {
@@ -176,7 +176,7 @@ func TestNN_SetLossLimit(t *testing.T) {
 }
 
 func TestNN_LearningRate(t *testing.T) {
-	want := &NN{Rate: pkg.FloatType(params.DefaultRate)}
+	want := &NN{Rate: .3}
 	t.Run("DefaultRate", func(t *testing.T) {
 		if got := want.LearningRate(); got != float64(want.Rate) {
 			t.Errorf("LearningRate() = %f, want %f", got, want.Rate)
@@ -192,22 +192,22 @@ func TestNN_SetLearningRate(t *testing.T) {
 		want pkg.FloatType
 	}{
 		{
-			name: "#1_DefaultRate",
+			name: "#1_rate",
 			got:  &NN{},
-			gave: params.DefaultRate,
-			want: pkg.FloatType(params.DefaultRate),
+			gave: .3,
+			want: .3,
 		},
 		{
 			name: "#2_overflow",
 			got:  &NN{},
 			gave: -.1,
-			want: pkg.FloatType(params.DefaultRate),
+			want: .3,
 		},
 		{
 			name: "#3_overflow",
 			got:  &NN{},
 			gave: 1.1,
-			want: pkg.FloatType(params.DefaultRate),
+			want: .3,
 		},
 	}
 	for _, tt := range tests {

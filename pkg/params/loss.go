@@ -2,16 +2,16 @@ package params
 
 // The mode of calculation of the total error.
 const (
-	ModeMSE    uint8 = iota // Mean Squared Error.
-	ModeRMSE                // Root Mean Squared Error.
-	ModeARCTAN              // Arctan.
-	ModeAVG                 // Average.
+	MSE    uint8 = iota // Mean Squared Error.
+	RMSE                // Root Mean Squared Error.
+	ARCTAN              // Arctan.
+	AVG                 // Average.
 )
 
 // CheckLossMode.
 func CheckLossMode(mode uint8) uint8 {
-	if mode > ModeAVG {
-		return ModeMSE
+	if mode > AVG {
+		return MSE
 	}
 	return mode
 }

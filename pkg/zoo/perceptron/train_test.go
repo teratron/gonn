@@ -24,8 +24,8 @@ func TestNN_Train(t *testing.T) {
 			name: "#1",
 			args: args{[]float64{.2, .3}, []float64{.2}},
 			gave: &NN{
-				Activation: params.ModeSIGMOID,
-				Loss:       params.ModeMSE,
+				Activation: params.SIGMOID,
+				Loss:       params.MSE,
 				Weights: pkg.Float3Type{
 					{
 						{.1, .1, .1},
@@ -100,7 +100,7 @@ func TestNN_Train(t *testing.T) {
 		{
 			name: "#7_NaN",
 			args: args{[]float64{2358925515.52, .66, .81}, []float64{-.13, .2}},
-			gave: &NN{Activation: params.ModeTANH},
+			gave: &NN{Activation: params.TANH},
 		},
 	}
 	for _, tt := range tests {
