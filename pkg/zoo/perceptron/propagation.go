@@ -68,7 +68,6 @@ func (nn *NN) calcLoss(target *[]float64) (loss float64) {
 		case params.ModeAVG:
 			loss += math.Abs(float64(n.miss))
 		}
-		n.miss *= pkg.FloatType(params.Derivative(float64(n.value), nn.Activation))
 	}
 
 	loss /= float64(nn.lenOutput)
@@ -92,7 +91,6 @@ func (nn *NN) calcMiss() {
 					for k, m := range nn.neuron[inc] {
 						n.miss += m.miss * nn.Weights[inc][k][j]
 					}
-					n.miss *= pkg.FloatType(params.Derivative(float64(n.value), nn.Activation))
 					wait <- true
 				}(j, n)
 			}
@@ -142,7 +140,7 @@ func (nn *NN) updWeight(input *[]float64) {
 					}
 				}
 				wait <- true
-			}(i, j, dec, length, nn.neuron[i][j].miss*nn.Rate, w)
+			}(i, j, dec, length, nn.neuron[i][j].miss*pkg.FloatType(params.Derivative(float64(nn.neuron[i][j].value), nn.Activation))*nn.Rate, w)
 		}
 	}
 
