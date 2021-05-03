@@ -4,6 +4,10 @@ import (
 	"github.com/teratron/gonn/pkg"
 )
 
+// Neuroner
+type Neuroner interface {
+}
+
 // Synapser
 type Synapser interface {
 }
@@ -35,6 +39,8 @@ type neuron struct {
 	miss       pkg.FloatType // Miss (error)
 	axon       *[]axon       // All incoming axons
 	activation uint8
+
+	specific Neuroner // Specific option of neuron: miss (error) or other
 
 	Synapser
 }

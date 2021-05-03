@@ -106,8 +106,8 @@ func TestNN_calcNeuron(t *testing.T) {
 			tt.got.calcNeuron(tt.input)
 			for i, v := range tt.got.neuron {
 				for j, n := range v {
-					tt.got.neuron[i][j].value = pkg.FloatType(math.Round(float64(n.value), math.ModeRound, 6))
-					tt.got.neuron[i][j].miss = pkg.FloatType(math.Round(float64(n.miss), math.ModeRound, 6))
+					tt.got.neuron[i][j].value = pkg.FloatType(math.Round(float64(n.value), math.ROUND, 6))
+					tt.got.neuron[i][j].miss = pkg.FloatType(math.Round(float64(n.miss), math.ROUND, 6))
 				}
 			}
 			if !reflect.DeepEqual(tt.got.neuron, tt.want) {
@@ -200,7 +200,7 @@ func TestNN_calcLoss(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.gave.calcLoss(tt.target); math.Round(got, math.ModeRound, 6) != tt.want {
+			if got := tt.gave.calcLoss(tt.target); math.Round(got, math.ROUND, 6) != tt.want {
 				t.Errorf("calcLoss() = %f, want %f", got, tt.want)
 			}
 		})
@@ -253,8 +253,8 @@ func TestNN_calcMiss(t *testing.T) {
 			tt.got.calcMiss()
 			for i, v := range tt.got.neuron {
 				for j, n := range v {
-					tt.got.neuron[i][j].value = pkg.FloatType(math.Round(float64(n.value), math.ModeRound, 6))
-					tt.got.neuron[i][j].miss = pkg.FloatType(math.Round(float64(n.miss), math.ModeRound, 6))
+					tt.got.neuron[i][j].value = pkg.FloatType(math.Round(float64(n.value), math.ROUND, 6))
+					tt.got.neuron[i][j].miss = pkg.FloatType(math.Round(float64(n.miss), math.ROUND, 6))
 				}
 			}
 			if !reflect.DeepEqual(tt.got.neuron, tt.want) {
@@ -337,7 +337,7 @@ func TestNN_updWeight(t *testing.T) {
 			for i, v := range tt.got.Weights {
 				for j, w := range v {
 					for k, g := range w {
-						tt.got.Weights[i][j][k] = pkg.FloatType(math.Round(float64(g), math.ModeRound, 6))
+						tt.got.Weights[i][j][k] = pkg.FloatType(math.Round(float64(g), math.ROUND, 6))
 					}
 				}
 			}

@@ -12,6 +12,7 @@ const Name = "perceptron"
 // Declare conformity with NeuralNetwork interface.
 var _ pkg.NeuralNetwork = (*NN)(nil)
 
+// NN
 type NN struct {
 	pkg.Parameter `json:"-" yaml:"-"`
 

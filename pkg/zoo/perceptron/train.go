@@ -41,12 +41,14 @@ func (nn *NN) Train(input []float64, target ...[]float64) (loss float64, count i
 				switch loss = nn.calcLoss(&target[0]); {
 				case loss < nn.Limit:
 					return
-				case math.IsNaN(loss):
+				case math.IsNaN(loss), math.IsInf(loss, 0):
 					log.Panic("train: not optimal neural network parameters")
 				}
 				nn.calcMiss()
 				nn.updWeight(&input)
 			}
+			//fmt.Printf("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b")
+			//fmt.Printf("%d %.5f",count, loss)
 			return
 		} else {
 			err = pkg.ErrNoTarget

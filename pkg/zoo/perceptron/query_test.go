@@ -71,7 +71,7 @@ func TestNN_Query(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got := tt.gave.Query(tt.input)
 			for i, g := range got {
-				got[i] = math.Round(g, math.ModeRound, 6)
+				got[i] = math.Round(g, math.ROUND, 6)
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Query()\ngot:\t%v\nwant:\t%v", got, tt.want)

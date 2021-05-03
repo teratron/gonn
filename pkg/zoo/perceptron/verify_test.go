@@ -92,7 +92,7 @@ func TestNN_Verify(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := tt.gave.Verify(tt.input, tt.target)
-			if math.Round(got, math.ModeRound, 6) != tt.want {
+			if math.Round(got, math.ROUND, 6) != tt.want {
 				t.Errorf("Verify() = %f, want %f", got, tt.want)
 			}
 		})

@@ -18,18 +18,18 @@ func TestRound(t *testing.T) {
 		want float64
 	}{
 		{
-			name: "#1_ModeRound",
-			args: args{pi, ModeRound, 6},
+			name: "#1_ROUND",
+			args: args{pi, ROUND, 6},
 			want: 3.141593,
 		},
 		{
-			name: "#2_ModeFloor",
-			args: args{pi, ModeFloor, 6},
+			name: "#2_FLOOR",
+			args: args{pi, FLOOR, 6},
 			want: 3.141592,
 		},
 		{
-			name: "#3_ModeCeil",
-			args: args{pi, ModeCeil, 6},
+			name: "#3_CEIL",
+			args: args{pi, CEIL, 6},
 			want: 3.141593,
 		},
 		{
