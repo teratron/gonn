@@ -35,14 +35,10 @@ type NN struct {
 }
 
 type neuron struct {
-	value      pkg.FloatType // Neuron value
-	miss       pkg.FloatType // Miss (error)
-	axon       *[]axon       // All incoming axons
-	activation uint8
-
-	specific Neuroner // Specific option of neuron: miss (error) or other
-
 	Synapser
+	value    pkg.FloatType // Neuron value
+	axon     []*axon       // All incoming axons
+	specific Neuroner      // Specific option of neuron: miss (error) or other
 }
 
 type axon struct {

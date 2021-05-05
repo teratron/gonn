@@ -14,4 +14,5 @@ const (
 	MSE    = params.MSE    // Mean Squared Error.
 	RMSE   = params.RMSE   // Root Mean Squared Error.
 	ARCTAN = params.ARCTAN // Arctan.
+	AVG    = params.AVG    // Average.
 )

@@ -86,6 +86,8 @@ func (nn *NN) initFromNew(lenInput, lenTarget int) {
 			nn.neuron[i][j] = &neuron{}
 		}
 	}
+	//nn.input = make([]float64, nn.lenInput)
+	//nn.output = make([]float64, nn.lenOutput)
 	nn.isInit = true
 }
 
@@ -120,5 +122,7 @@ func (nn *NN) initFromWeight() {
 			nn.neuron[i][j] = &neuron{}
 		}
 	}
+	//nn.input = make([]float64, nn.lenInput)
+	//nn.output = make([]float64, nn.lenOutput)
 	nn.isInit = true
 }

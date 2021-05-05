@@ -49,6 +49,10 @@ type NN struct {
 	lastLayerIndex int
 	isInit         bool
 	config         utils.Filer
+
+	// Transfer data.
+	//input  []float64
+	//output []float64
 }
 
 type neuron struct {

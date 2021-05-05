@@ -15,6 +15,7 @@ func main() {
 	// Parameters.
 	n.SetHiddenLayer(3, 2)
 	n.SetActivationMode(nn.LINEAR)
+	n.SetLossMode(nn.RMSE)
 	n.SetLossLimit(.001)
 
 	// Dataset that doesn't need to be scaled.

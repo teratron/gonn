@@ -177,6 +177,26 @@ func TestNN_calcLoss(t *testing.T) {
 			},
 			want: .123683,
 		},
+		{
+			name:   "#4_AVG",
+			target: &[]float64{.2},
+			gave: &NN{
+				Activation: params.LINEAR,
+				Loss:       params.AVG,
+				neuron: [][]*neuron{
+					{
+						{.5374298453437496, 0},
+						{.5374298453437496, 0},
+					},
+					{
+						{.5516861990955205, 0},
+					},
+				},
+				lenOutput:      1,
+				lastLayerIndex: 1,
+			},
+			want: .351686,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
