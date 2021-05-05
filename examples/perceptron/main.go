@@ -22,10 +22,10 @@ func main() {
 	n.SetActivationMode(nn.TANH)
 
 	// The mode of calculation of the total error.
-	n.SetLossMode(nn.AVG)
+	n.SetLossMode(nn.MSE)
 
 	// Minimum (sufficient) limit of the average of the error during training.
-	lossLimit := .001
+	lossLimit := .00001
 	n.SetLossLimit(lossLimit)
 
 	// Learning coefficient (greater than 0 and less than or equal to 1).

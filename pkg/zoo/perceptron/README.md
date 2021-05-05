@@ -33,6 +33,7 @@ The mode of calculation of the total error.
 | 0    | MSE    | Mean Squared Error.      |
 | 1    | RMSE   | Root Mean Squared Error. |
 | 2    | ARCTAN | Arctan.                  |
+| 3    | AVG    | Average.                 |
 
 ### Limit
 

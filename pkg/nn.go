@@ -14,7 +14,7 @@ type NeuralNetwork interface {
 	Verify(input []float64, target ...[]float64) (loss float64)
 
 	// Train.
-	Train(input []float64, target ...[]float64) (loss float64, count int)
+	Train(input []float64, target ...[]float64) (count int, loss float64)
 
 	// WriteConfig writes the configuration and weights.
 	WriteConfig(name ...string) error

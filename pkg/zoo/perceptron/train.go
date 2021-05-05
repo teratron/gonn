@@ -18,7 +18,7 @@ func getMaxIteration() int {
 }
 
 // Train training dataset.
-func (nn *NN) Train(input []float64, target ...[]float64) (loss float64, count int) {
+func (nn *NN) Train(input []float64, target ...[]float64) (count int, loss float64) {
 	var err error
 	if len(input) > 0 {
 		if len(target) > 0 && len(target[0]) > 0 {
@@ -35,13 +35,13 @@ func (nn *NN) Train(input []float64, target ...[]float64) (loss float64, count i
 				}
 			}
 
-			//_ = copy(nn.input, input)
-			//_ = copy(nn.output, target[0])
+			_ = copy(nn.input, input)
+			_ = copy(nn.output, target[0])
 
 			for count < GetMaxIteration() {
 				count++
-				nn.calcNeuron(&input)
-				loss = nn.calcLoss(&target[0])
+				nn.calcNeuron( /*&input*/ )
+				loss = nn.calcLoss( /*&target[0]*/ )
 				//fmt.Printf("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b")
 				//fmt.Printf("%d %.5f\n",count, loss)
 
@@ -53,7 +53,7 @@ func (nn *NN) Train(input []float64, target ...[]float64) (loss float64, count i
 					log.Panic("train: not optimal neural network parameters")
 				}
 				nn.calcMiss()
-				nn.updWeight(&input)
+				nn.updWeight( /*&input*/ )
 			}
 			//fmt.Printf("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b")
 			//fmt.Printf("%d %.5f",count, loss)
@@ -67,21 +67,23 @@ func (nn *NN) Train(input []float64, target ...[]float64) (loss float64, count i
 
 ERROR:
 	log.Printf("train: %v\n", err)
-	return -1, 0
+	return 0, -1
 }
 
 // AndTrain training dataset.
-func (nn *NN) AndTrain(target ...[]float64) (loss float64, count int) {
+/*func (nn *NN) AndTrain(target ...[]float64) (loss float64, count int) {
+	_ = copy(nn.output, target[0])
+
 	for count < GetMaxIteration() {
 		count++
-		switch loss = nn.calcLoss(&target[0]); {
+		switch loss = nn.calcLoss(); {
 		case loss < nn.Limit:
 			return
 		case math.IsNaN(loss), math.IsInf(loss, 0):
 			log.Panic("train: not optimal neural network parameters")
 		}
 		nn.calcMiss()
-		//nn.updWeight(&input)
+		nn.updWeight()
 	}
 	return
-}
+}*/

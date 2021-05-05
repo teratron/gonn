@@ -45,6 +45,8 @@ func TestNN_Verify(t *testing.T) {
 				lenInput:       2,
 				lenOutput:      1,
 				lastLayerIndex: 1,
+				input:          make([]float64, 2),
+				output:         make([]float64, 1),
 				isInit:         true,
 			},
 			want: .123683,

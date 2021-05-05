@@ -8,7 +8,7 @@ import (
 )
 
 // Query querying dataset.
-func (nn *NN) Query(input []float64) (output []float64) {
+func (nn *NN) Query(input []float64) []float64 {
 	var err error
 	if len(input) > 0 {
 		if !nn.isInit {
@@ -19,15 +19,15 @@ func (nn *NN) Query(input []float64) (output []float64) {
 			goto ERROR
 		}
 
-		//_ = copy(nn.input, input)
+		_ = copy(nn.input, input)
 
-		nn.calcNeuron(&input)
-		output = make([]float64, nn.lenOutput)
+		nn.calcNeuron( /*&input*/ )
+		//output = make([]float64, nn.lenOutput)
 		for i, n := range nn.neuron[nn.lastLayerIndex] {
-			//nn.output[i] = float64(n.value)
-			output[i] = float64(n.value)
+			nn.output[i] = float64(n.value)
+			//output[i] = float64(n.value)
 		}
-		return
+		return nn.output
 	} else {
 		err = pkg.ErrNoInput
 	}
