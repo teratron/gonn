@@ -19,7 +19,8 @@ func (nn *NN) Query(input []float64) []float64 {
 			goto ERROR
 		}
 
-		_ = copy(nn.input, input)
+		//_ = copy(nn.input, input)
+		nn.input = input
 
 		nn.calcNeuron( /*&input*/ )
 		//output = make([]float64, nn.lenOutput)

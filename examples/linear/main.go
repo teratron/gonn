@@ -19,8 +19,8 @@ func main() {
 	n.SetLossLimit(.001)
 
 	// Dataset that doesn't need to be scaled.
-	input := []float64{10.6, 5, 200}
-	target := []float64{5, 50.3}
+	input := []float64{10.6, -5, 200}
+	target := []float64{5, -50.3}
 
 	// Training dataset.
 	fmt.Println(n.Train(input, target))

@@ -25,8 +25,10 @@ func (nn *NN) Verify(input []float64, target ...[]float64) float64 {
 				}
 			}
 
-			_ = copy(nn.input, input)
-			_ = copy(nn.output, target[0])
+			//_ = copy(nn.input, input)
+			//_ = copy(nn.output, target[0])
+			nn.input = input
+			nn.output = target[0]
 
 			nn.calcNeuron( /*&input*/ )
 			return nn.calcLoss( /*&target[0]*/ )

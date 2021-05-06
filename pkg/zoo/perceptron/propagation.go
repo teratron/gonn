@@ -57,7 +57,14 @@ func (nn *NN) calcNeuron() {
 // calcLoss calculating the error of the output neuron.
 func (nn *NN) calcLoss() (loss float64) {
 	for i, n := range nn.neuron[nn.lastLayerIndex] {
+		/*switch nn.Activation {
+		case params.LINEAR:
+			n.miss = pkg.FloatType(nn.output[i] - math.Abs(float64(n.value)))
+		default:
+			n.miss = pkg.FloatType(nn.output[i]) - n.value
+		}*/
 		n.miss = pkg.FloatType(nn.output[i]) - n.value
+
 		switch nn.Loss {
 		default:
 			fallthrough
@@ -131,8 +138,8 @@ func (nn *NN) updWeight() {
 
 						switch nn.Activation {
 						case params.LINEAR, params.SIGMOID:
-							if value > 0 {
-								nn.Weights[i][j][k] += grad / value
+							if value != 0 {
+								nn.Weights[i][j][k] += grad / value //pkg.FloatType(math.Abs(float64(value)))
 							}
 						default:
 							nn.Weights[i][j][k] += grad * value

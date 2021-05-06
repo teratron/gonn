@@ -4,7 +4,6 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/teratron/gonn/pkg"
 	"github.com/teratron/gonn/pkg/zoo"
 )
 
@@ -13,7 +12,7 @@ func TestNew(t *testing.T) {
 	tests := []struct {
 		name string
 		gave []string
-		want pkg.NeuralNetwork
+		want NeuralNetwork
 	}{
 		{
 			name: "#1_warning_empty",

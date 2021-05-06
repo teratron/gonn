@@ -19,17 +19,17 @@ func main() {
 	n.SetHiddenLayer(5, 3)
 
 	// Activation function mode.
-	n.SetActivationMode(nn.TANH)
+	n.SetActivationMode(nn.LINEAR)
 
 	// The mode of calculation of the total error.
-	n.SetLossMode(nn.MSE)
+	n.SetLossMode(nn.AVG)
 
 	// Minimum (sufficient) limit of the average of the error during training.
-	lossLimit := .00001
+	lossLimit := .001
 	n.SetLossLimit(lossLimit)
 
 	// Learning coefficient (greater than 0 and less than or equal to 1).
-	n.SetLearningRate(.3)
+	n.SetLearningRate(1)
 
 	// Dataset.
 	dataSet := []float64{.27, -.31, -.52, .66, .81, -.13, .2, .49, .11, -.73, .28}

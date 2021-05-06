@@ -16,7 +16,7 @@ type Floater interface {
 }
 
 // New returns a new neural network instance.
-func New(reader ...string) pkg.NeuralNetwork {
+func New(reader ...string) NeuralNetwork {
 	if len(reader) > 0 {
 		return zoo.Get(reader[0])
 	}
