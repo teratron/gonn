@@ -9,6 +9,12 @@ import (
 
 // Query querying dataset.
 func (nn *NN) Query(input []float64) []float64 {
+	//nn.wg.Wait()
+	//nn.wg.Add(1)
+	//defer nn.wg.Done()
+	nn.mutex.Lock()
+	defer nn.mutex.Unlock()
+
 	var err error
 	if len(input) > 0 {
 		if !nn.isInit {

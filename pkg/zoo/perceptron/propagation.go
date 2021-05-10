@@ -40,7 +40,9 @@ func (nn *NN) calcNeuron() {
 
 				switch nn.Activation {
 				case params.LINEAR:
-					n.value /= num
+					if num > 0 {
+						n.value /= num
+					}
 				default:
 					n.value = pkg.FloatType(params.Activation(float64(n.value), nn.Activation))
 				}

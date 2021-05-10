@@ -1,6 +1,8 @@
 package perceptron
 
 import (
+	"sync"
+
 	"github.com/teratron/gonn/pkg"
 	"github.com/teratron/gonn/pkg/params"
 	"github.com/teratron/gonn/pkg/utils"
@@ -49,6 +51,8 @@ type NN struct {
 	lastLayerIndex int
 	isInit         bool
 	config         utils.Filer
+	//wg             sync.WaitGroup
+	mutex sync.Mutex
 
 	// Transfer data.
 	input  []float64

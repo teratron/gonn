@@ -15,7 +15,7 @@ func main() {
 	// Parameters.
 	n.SetHiddenLayer(3, 2)
 	n.SetActivationMode(nn.LINEAR)
-	n.SetLossMode(nn.RMSE)
+	n.SetLossMode(nn.MSE)
 	n.SetLossLimit(.001)
 
 	// Dataset that doesn't need to be scaled.
@@ -25,6 +25,6 @@ func main() {
 	// Training dataset.
 	fmt.Println(n.Train(input, target))
 
-	// Check the trained data, the result should be about [5 50.3].
+	// Check the trained data, the result should be about [5 -50.3].
 	fmt.Println(n.Query(input))
 }
