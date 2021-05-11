@@ -51,8 +51,7 @@ type NN struct {
 	lastLayerIndex int
 	isInit         bool
 	config         utils.Filer
-	//wg             sync.WaitGroup
-	mutex sync.Mutex
+	mutex          sync.Mutex
 
 	// Transfer data.
 	input  []float64

@@ -22,6 +22,9 @@ func (nn *NN) Train(input []float64, target ...[]float64) (count int, loss float
 	var err error
 	if len(input) > 0 {
 		if len(target) > 0 && len(target[0]) > 0 {
+			nn.mutex.Lock()
+			defer nn.mutex.Unlock()
+
 			if !nn.isInit {
 				nn.Init(len(input), len(target[0]))
 			} else {
@@ -42,23 +45,17 @@ func (nn *NN) Train(input []float64, target ...[]float64) (count int, loss float
 
 			for count < GetMaxIteration() {
 				count++
-				nn.calcNeuron( /*&input*/ )
-				loss = nn.calcLoss( /*&target[0]*/ )
-				//fmt.Printf("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b")
-				//fmt.Printf("%d %.5f\n",count, loss)
-
+				nn.calcNeuron()
+				loss = nn.calcLoss()
 				switch {
 				case loss < nn.Limit:
-					//fmt.Printf("%d %.5f\n",count, loss)
 					return
 				case math.IsNaN(loss), math.IsInf(loss, 0):
 					log.Panic("train: not optimal neural network parameters")
 				}
 				nn.calcMiss()
-				nn.updWeight( /*&input*/ )
+				nn.updWeight()
 			}
-			//fmt.Printf("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b")
-			//fmt.Printf("%d %.5f",count, loss)
 			return
 		} else {
 			err = pkg.ErrNoTarget

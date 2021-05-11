@@ -9,14 +9,11 @@ import (
 
 // Query querying dataset.
 func (nn *NN) Query(input []float64) []float64 {
-	//nn.wg.Wait()
-	//nn.wg.Add(1)
-	//defer nn.wg.Done()
-	nn.mutex.Lock()
-	defer nn.mutex.Unlock()
-
 	var err error
 	if len(input) > 0 {
+		nn.mutex.Lock()
+		defer nn.mutex.Unlock()
+
 		if !nn.isInit {
 			err = pkg.ErrInit
 			goto ERROR
@@ -28,11 +25,9 @@ func (nn *NN) Query(input []float64) []float64 {
 		//_ = copy(nn.input, input)
 		nn.input = input
 
-		nn.calcNeuron( /*&input*/ )
-		//output = make([]float64, nn.lenOutput)
+		nn.calcNeuron()
 		for i, n := range nn.neuron[nn.lastLayerIndex] {
 			nn.output[i] = float64(n.value)
-			//output[i] = float64(n.value)
 		}
 		return nn.output
 	} else {

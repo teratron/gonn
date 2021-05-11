@@ -12,6 +12,9 @@ func (nn *NN) Verify(input []float64, target ...[]float64) float64 {
 	var err error
 	if len(input) > 0 {
 		if len(target) > 0 && len(target[0]) > 0 {
+			nn.mutex.Lock()
+			defer nn.mutex.Unlock()
+
 			if !nn.isInit {
 				nn.Init(len(input), len(target[0]))
 			} else {
@@ -30,8 +33,8 @@ func (nn *NN) Verify(input []float64, target ...[]float64) float64 {
 			nn.input = input
 			nn.output = target[0]
 
-			nn.calcNeuron( /*&input*/ )
-			return nn.calcLoss( /*&target[0]*/ )
+			nn.calcNeuron()
+			return nn.calcLoss()
 		} else {
 			err = pkg.ErrNoTarget
 		}

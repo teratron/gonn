@@ -1,6 +1,8 @@
 package hopfield
 
 import (
+	"sync"
+
 	"github.com/teratron/gonn/pkg"
 	"github.com/teratron/gonn/pkg/utils"
 )
@@ -31,6 +33,7 @@ type NN struct {
 	lenInput int
 	isInit   bool
 	config   utils.Filer
+	mutex    sync.Mutex
 }
 
 type neuron struct {
