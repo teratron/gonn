@@ -19,17 +19,17 @@ func main() {
 	n.SetHiddenLayer(5, 3)
 
 	// Activation function mode.
-	n.SetActivationMode(nn.LINEAR)
+	n.SetActivationMode(nn.TANH)
 
 	// The mode of calculation of the total error.
-	n.SetLossMode(nn.AVG)
+	n.SetLossMode(nn.MSE)
 
 	// Minimum (sufficient) limit of the average of the error during training.
-	lossLimit := .001
+	lossLimit := .00001
 	n.SetLossLimit(lossLimit)
 
 	// Learning coefficient (greater than 0 and less than or equal to 1).
-	n.SetLearningRate(1)
+	n.SetLearningRate(.3)
 
 	// Dataset.
 	dataSet := []float64{.27, -.31, -.52, .66, .81, -.13, .2, .49, .11, -.73, .28}
@@ -60,10 +60,10 @@ func main() {
 	}
 
 	// Writing the neural network configuration to a file.
-	//_ = n.WriteConfig("perceptron.json")
+	_ = n.WriteConfig("perceptron.json")
 
 	// Writing weights to a file.
-	//_ = n.WriteWeight("perceptron_weights.yml")
+	_ = n.WriteWeight("perceptron_weights.yml")
 
 	// Check the trained data, the result should be about [-0.13 0.2].
 	fmt.Println(n.Query([]float64{-.52, .66, .81}))
