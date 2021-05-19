@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/teratron/gonn/pkg"
+	"github.com/zigenzoog/gonn/pkg"
 )
 
 // Query querying dataset.

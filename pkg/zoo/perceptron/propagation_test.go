@@ -4,9 +4,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/teratron/gonn/internal/pkg/math"
-	"github.com/teratron/gonn/pkg"
-	"github.com/teratron/gonn/pkg/params"
+	"github.com/zigenzoog/gonn/internal/pkg/math"
+	"github.com/zigenzoog/gonn/pkg"
+	"github.com/zigenzoog/gonn/pkg/params"
 )
 
 func TestNN_calcNeuron(t *testing.T) {

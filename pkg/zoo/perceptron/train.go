@@ -5,7 +5,7 @@ import (
 	"log"
 	"math"
 
-	"github.com/teratron/gonn/pkg"
+	"github.com/zigenzoog/gonn/pkg"
 )
 
 // MaxIteration the maximum number of iterations after which training is forcibly terminated.
