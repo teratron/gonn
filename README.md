@@ -5,7 +5,7 @@
 </div>
 
 ## About
-gonn - Neural Network for Golang
+gonn - Neural Network Library
 
 ## Install
 
