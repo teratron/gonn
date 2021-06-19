@@ -22,8 +22,8 @@ func (nn *NN) Query(input []float64) []float64 {
 			goto ERROR
 		}
 
-		//_ = copy(nn.input, input)
-		nn.input = input
+		_ = copy(nn.input, input)
+		//nn.input = input
 
 		nn.calcNeuron()
 		for i, n := range nn.neuron[nn.lastLayerIndex] {
