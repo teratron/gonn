@@ -1,6 +1,6 @@
 <div style="text-align: center">
   <a href="https://pkg.go.dev/github.com/zigenzoog/gonn"><img src="https://pkg.go.dev/badge/github.com/zigenzoog/gonn.svg" alt="Go Reference"></a>
-  <a href="https://github.com/zigenzoog/gonn/releases/tag/v0.3.2" title="0.3.2" rel="nofollow"><img src="https://img.shields.io/badge/version-0.3.2-blue.svg?style=flat" alt="0.3.2"></a>
+  <a href="https://github.com/zigenzoog/gonn/releases/tag/v0.3.3" title="0.3.3" rel="nofollow"><img src="https://img.shields.io/badge/version-0.3.3-blue.svg?style=flat" alt="0.3.3"></a>
   <a href="https://goreportcard.com/report/github.com/zigenzoog/gonn"><img src="https://goreportcard.com/badge/github.com/zigenzoog/gonn" alt="Code Status" /></a>
 </div>
 
