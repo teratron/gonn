@@ -1,4 +1,4 @@
-package zoo
+package arch
 
 import (
 	"path/filepath"
@@ -6,10 +6,10 @@ import (
 	"testing"
 
 	"github.com/teratron/gonn/pkg"
+	"github.com/teratron/gonn/pkg/arch/hopfield"
+	"github.com/teratron/gonn/pkg/arch/perceptron"
 	"github.com/teratron/gonn/pkg/params"
 	"github.com/teratron/gonn/pkg/utils"
-	"github.com/teratron/gonn/pkg/zoo/hopfield"
-	"github.com/teratron/gonn/pkg/zoo/perceptron"
 )
 
 var (

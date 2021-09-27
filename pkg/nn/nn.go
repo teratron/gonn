@@ -2,7 +2,7 @@ package nn
 
 import (
 	"github.com/teratron/gonn/pkg"
-	"github.com/teratron/gonn/pkg/zoo"
+	"github.com/teratron/gonn/pkg/arch"
 )
 
 // NeuralNetwork.
@@ -18,7 +18,7 @@ type Floater interface {
 // New returns a new neural network instance.
 func New(reader ...string) NeuralNetwork {
 	if len(reader) > 0 {
-		return zoo.Get(reader[0])
+		return arch.Get(reader[0])
 	}
-	return zoo.Get(zoo.Perceptron)
+	return arch.Get(arch.Perceptron)
 }
