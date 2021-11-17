@@ -5,12 +5,12 @@ import (
 	"github.com/teratron/gonn/pkg/arch"
 )
 
-// NeuralNetwork.
+// NeuralNetwork interface.
 type NeuralNetwork interface {
 	pkg.NeuralNetwork
 }
 
-// Floater.
+// Floater interface.
 type Floater interface {
 	pkg.Floater
 }

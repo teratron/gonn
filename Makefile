@@ -3,22 +3,22 @@
 test: ## coverage test
 	go test -v -cover ./pkg/... ./internal/...
 
-build-example-perceptron: ## build
+build-example-perceptron: ## build example perceptron
 	go build -v -o ./examples/perceptron ./examples/perceptron/main.go
 
-build-example-hopfield: ## build
+build-example-hopfield: ## build example hopfield
 	go build -v -o ./examples/hopfield ./examples/hopfield/main.go
 
-build-example-linear: ## build
+build-example-linear: ## build example linear
 	go build -v -o ./examples/linear ./examples/linear/main.go
 
-build-example-query: ## build
+build-example-query: ## build example query
 	go build -v -o ./examples/query ./examples/query/main.go
 
-build-example-json: ## build
+build-example-json: ## build example json
 	go build -v -o ./examples/json ./examples/json/main.go
 
-build-example-yaml: ## build
+build-example-yaml: ## build example yaml
 	go build -v -mod vendor -o ./examples/yaml ./examples/yaml/main.go
 
 setup: ## setup
@@ -31,11 +31,10 @@ deps: ## setup deps
 	go mod tidy -v
 	go mod vendor -v
 
-clean: ## clean
+clean: ## clean cache
 	go clean -modcache
 
 #VERSION := $(shell cat ./VERSION)
-
 release: ## release
 	git tag -a $(VERSION) -m "Release" || true
 	git push origin $(VERSION)

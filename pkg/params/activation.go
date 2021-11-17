@@ -4,11 +4,11 @@ import "math"
 
 // Activation function mode.
 const (
-	LINEAR    uint8 = iota // Linear/identity.
-	RELU                   // ReLu (rectified linear unit).
-	LEAKYRELU              // Leaky ReLu (leaky rectified linear unit).
-	SIGMOID                // Logistic, a.k.a. sigmoid or soft step.
-	TANH                   // TanH (hyperbolic tangent).
+	LINEAR    uint8 = iota // LINEAR - Linear/identity.
+	RELU                   // RELU - ReLu (rectified linear unit).
+	LEAKYRELU              // LEAKYRELU - Leaky ReLu (leaky rectified linear unit).
+	SIGMOID                // SIGMOID - Logistic, a.k.a. sigmoid or soft step.
+	TANH                   // TANH - TanH (hyperbolic tangent).
 )
 
 // CheckActivationMode.

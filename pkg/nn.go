@@ -19,6 +19,6 @@ type NeuralNetwork interface {
 	// WriteConfig writes the configuration and weights.
 	WriteConfig(name ...string) error
 
-	// WriteConfig writes weights.
+	// WriteWeight writes weights.
 	WriteWeight(name string) error
 }

@@ -4,9 +4,9 @@ import "math"
 
 // Rounding mode.
 const (
-	ROUND uint8 = iota // Round (round to nearest).
-	FLOOR              // Floor (round down).
-	CEIL               // Ceil (round up).
+	ROUND uint8 = iota // ROUND - round to nearest.
+	FLOOR              // FLOOR - round down.
+	CEIL               // CEIL - round up.
 )
 
 // Round rounding to a floating-point value.
