@@ -23,6 +23,7 @@ func (nn *NN) Query(input []float64) []float64 {
 		}
 
 		_ = copy(nn.input, input)
+		// TODO:
 		//nn.input = input
 
 		nn.calcNeuron()

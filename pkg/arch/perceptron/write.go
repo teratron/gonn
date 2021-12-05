@@ -30,7 +30,7 @@ func (nn *NN) WriteConfig(name ...string) (err error) {
 	return
 }
 
-// WriteConfig writes weights to the Filer interface object.
+// WriteWeight writes weights to the Filer interface object.
 func (nn *NN) WriteWeight(name string) (err error) {
 	switch d := utils.GetFileType(name).(type) {
 	case error:

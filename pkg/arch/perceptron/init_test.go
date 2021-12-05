@@ -4,6 +4,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/teratron/gonn/pkg/utils"
+
 	"github.com/teratron/gonn/pkg"
 	"github.com/teratron/gonn/pkg/params"
 )
@@ -16,13 +18,19 @@ func TestNN_Init(t *testing.T) {
 		want *NN
 	}{
 		{
-			name: "#1_error_type",
+			name: "#1_",
+			gave: []interface{}{utils.FileJSON{Name: "name"}},
+			got:  &NN{},
+			want: &NN{},
+		},
+		{
+			name: "#2_error_type",
 			gave: []interface{}{"test_error"},
 			got:  &NN{},
 			want: &NN{},
 		},
 		{
-			name: "#2_empty_arguments",
+			name: "#3_empty_arguments",
 			gave: []interface{}{},
 			got:  &NN{},
 			want: &NN{},
