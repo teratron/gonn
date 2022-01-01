@@ -1,16 +1,38 @@
 package perceptron
 
 import (
+	"path/filepath"
 	"reflect"
 	"testing"
-
-	"github.com/teratron/gonn/pkg/utils"
 
 	"github.com/teratron/gonn/pkg"
 	"github.com/teratron/gonn/pkg/params"
 )
 
+var (
+	testJSON = filepath.Join("..", "..", "testdata", "perceptron.json")
+	testYAML = filepath.Join("..", "..", "testdata", "perceptron.yml")
+)
+
 func TestNN_Init(t *testing.T) {
+	testNN := &NN{
+		Name:       Name,
+		Bias:       true,
+		Hidden:     []int{2},
+		Activation: params.SIGMOID,
+		Loss:       params.MSE,
+		Limit:      .1,
+		Rate:       .3,
+		Weights: pkg.Float3Type{
+			{
+				{.1, .1, .1},
+				{.1, .1, .1},
+			},
+			{
+				{.1, .1, .1},
+			},
+		},
+	}
 	tests := []struct {
 		name string
 		gave []interface{}
@@ -18,19 +40,25 @@ func TestNN_Init(t *testing.T) {
 		want *NN
 	}{
 		{
-			name: "#1_",
-			gave: []interface{}{utils.FileJSON{Name: "name"}},
+			name: "#1_JSON",
+			gave: []interface{}{testJSON},
 			got:  &NN{},
-			want: &NN{},
+			want: testNN,
 		},
 		{
-			name: "#2_error_type",
+			name: "#2_YAML",
+			gave: []interface{}{testYAML},
+			got:  &NN{},
+			want: testNN,
+		},
+		{
+			name: "#3_error_type",
 			gave: []interface{}{"test_error"},
 			got:  &NN{},
 			want: &NN{},
 		},
 		{
-			name: "#3_empty_arguments",
+			name: "#4_empty_arguments",
 			gave: []interface{}{},
 			got:  &NN{},
 			want: &NN{},
