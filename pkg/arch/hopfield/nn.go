@@ -14,17 +14,17 @@ const Name = "hopfield"
 var _ pkg.NeuralNetwork = (*NN)(nil)
 
 type NN struct {
-	pkg.NeuralNetwork `json:"-" yaml:"-"`
-	//gonn.Parameter     `json:"-" yaml:"-"`
+	pkg.NeuralNetwork `json:"-"`
+	//gonn.Parameter     `json:"-"`
 
 	// Neural network architecture name (required field for config).
-	Name string `json:"name" yaml:"name"`
+	Name string `json:"name"`
 
 	// Energy.
-	Energy float64 `json:"energy" yaml:"energy"`
+	Energy float64 `json:"energy"`
 
 	// Weights values.
-	Weights pkg.Float2Type `json:"weights,omitempty" yaml:"weights,omitempty"`
+	Weights pkg.Float2Type `json:"weights,omitempty"`
 
 	// Neuron.
 	neuron []*neuron

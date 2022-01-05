@@ -9,10 +9,7 @@ import (
 	"github.com/teratron/gonn/pkg/params"
 )
 
-var (
-	testJSON = filepath.Join("..", "..", "testdata", "perceptron.json")
-	testYAML = filepath.Join("..", "..", "testdata", "perceptron.yml")
-)
+var testJSON = filepath.Join("..", "..", "testdata", "perceptron.json")
 
 func TestNN_Init(t *testing.T) {
 	testNN := &NN{
@@ -46,19 +43,13 @@ func TestNN_Init(t *testing.T) {
 			want: testNN,
 		},
 		{
-			name: "#2_YAML",
-			gave: []interface{}{testYAML},
-			got:  &NN{},
-			want: testNN,
-		},
-		{
-			name: "#3_error_type",
+			name: "#2_error_type",
 			gave: []interface{}{"test_error"},
 			got:  &NN{},
 			want: &NN{},
 		},
 		{
-			name: "#4_empty_arguments",
+			name: "#3_empty_arguments",
 			gave: []interface{}{},
 			got:  &NN{},
 			want: &NN{},

@@ -30,8 +30,6 @@ func GetFileType(name string) Filer {
 	switch ext {
 	case ".json":
 		return &FileJSON{name}
-	case ".yml", ".yaml":
-		return &FileYAML{name}
 	default:
 		return &FileError{Err: fmt.Errorf("extension isn't defined: %s", ext)}
 	}

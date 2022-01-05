@@ -8,10 +8,7 @@ import (
 	"github.com/teratron/gonn/pkg/utils"
 )
 
-var (
-	tmpJSON = "tmp.json"
-	tmpYAML = "tmp.yml"
-)
+var tmpJSON = "tmp.json"
 
 func TestNN_WriteConfig(t *testing.T) {
 	testErr := fmt.Errorf("error")
@@ -34,25 +31,13 @@ func TestNN_WriteConfig(t *testing.T) {
 			wantErr: nil,
 		},
 		{
-			name:    "#3_" + tmpYAML,
-			args:    []string{tmpYAML},
-			gave:    &NN{},
-			wantErr: nil,
-		},
-		{
-			name:    "#4_no_args_" + tmpYAML,
-			args:    []string{},
-			gave:    &NN{config: &utils.FileYAML{Name: tmpYAML}},
-			wantErr: nil,
-		},
-		{
-			name:    "#5_no_args",
+			name:    "#3_no_args",
 			args:    []string{},
 			gave:    &NN{},
 			wantErr: testErr,
 		},
 		{
-			name:    "#5_error_write",
+			name:    "#4_error_write",
 			args:    []string{"."},
 			gave:    &NN{},
 			wantErr: testErr,
@@ -93,13 +78,7 @@ func TestNN_WriteWeight(t *testing.T) {
 			wantErr: nil,
 		},
 		{
-			name:    "#2_" + tmpYAML,
-			args:    tmpYAML,
-			gave:    &NN{},
-			wantErr: nil,
-		},
-		{
-			name:    "#3_no_args_error_write",
+			name:    "#2_no_args_error_write",
 			args:    "",
 			gave:    &NN{},
 			wantErr: testErr,

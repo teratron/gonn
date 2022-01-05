@@ -12,10 +12,7 @@ import (
 	"github.com/teratron/gonn/pkg/utils"
 )
 
-var (
-	testJSON = filepath.Join("..", "testdata", "perceptron.json")
-	testYAML = filepath.Join("..", "testdata", "perceptron.yml")
-)
+var testJSON = filepath.Join("..", "testdata", "perceptron.json")
 
 func TestGet(t *testing.T) {
 	testNN := &perceptron.NN{
@@ -64,16 +61,6 @@ func TestGet(t *testing.T) {
 		{
 			name: "#5_json_error_type",
 			gave: ".json",
-			want: nil,
-		},
-		{
-			name: "#6_yaml",
-			gave: testYAML,
-			want: testNN,
-		},
-		{
-			name: "#7_yaml_error_type",
-			gave: ".yaml",
 			want: nil,
 		},
 	}

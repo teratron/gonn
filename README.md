@@ -16,12 +16,11 @@ gonn - Neural Network Library
 ```go
 package main
 
-import "github.com/teratron/gonn/pkg/nn"
+import "github.com/zigenzoog/gonn/pkg/nn"
 
 func main() {
 	// New returns a new neural network
-	// instance with the default parameters,
-	// same n := nn.New("perceptron").
+	// instance with the default parameters.
 	n := nn.New()
 
 	// Dataset.

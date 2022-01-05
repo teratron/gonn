@@ -18,9 +18,6 @@ build-example-query: ## build example query
 build-example-json: ## build example json
 	go build -v -o ./examples/json ./examples/json/main.go
 
-build-example-yaml: ## build example yaml
-	go build -v -mod vendor -o ./examples/yaml ./examples/yaml/main.go
-
 setup: ## setup
 	go mod init
 	go mod tidy -v
