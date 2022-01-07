@@ -16,6 +16,7 @@ func (nn *NN) Init(data ...interface{}) {
 		switch value := data[0].(type) {
 		case utils.Filer:
 			if len(nn.Weights) > 0 {
+				//print("*******************")
 				nn.initFromWeight()
 			}
 			nn.config = value

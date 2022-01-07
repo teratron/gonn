@@ -7,11 +7,13 @@ import (
 
 	"github.com/teratron/gonn/pkg"
 	"github.com/teratron/gonn/pkg/params"
+	"github.com/teratron/gonn/pkg/utils"
 )
 
 var testJSON = filepath.Join("..", "..", "testdata", "perceptron.json")
 
 func TestNN_Init(t *testing.T) {
+	testFile := &utils.FileJSON{Name: testJSON}
 	testNN := &NN{
 		Name:       Name,
 		Bias:       true,
@@ -38,7 +40,7 @@ func TestNN_Init(t *testing.T) {
 	}{
 		{
 			name: "#1_JSON",
-			gave: []interface{}{testJSON},
+			gave: []interface{}{testFile},
 			got:  &NN{},
 			want: testNN,
 		},
