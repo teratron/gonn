@@ -16,12 +16,6 @@ type NeuralNetwork interface {
 	// Train.
 	Train(input []float64, target ...[]float64) (count int, loss float64)
 
-	// ReadConfig reads the configuration and weights.
-	//ReadConfig(name string) (NeuralNetwork, error)
-
-	// ReadWeight reads weights.
-	//ReadWeight(name string) (Floater, error)
-
 	// WriteConfig writes the configuration and weights.
 	WriteConfig(name ...string) error
 

@@ -22,3 +22,8 @@ func New(reader ...string) NeuralNetwork {
 	}
 	return arch.Get(arch.Perceptron)
 }
+
+// ReadWeight reads and return array of weights.
+func ReadWeight(name string) (weights pkg.Floater, err error) {
+	return
+}
