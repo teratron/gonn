@@ -15,7 +15,7 @@ var testJSON = filepath.Join("..", "..", "testdata", "perceptron.json")
 func TestNN_Init(t *testing.T) {
 	testFile := &utils.FileJSON{Name: testJSON}
 	testNN := &NN{
-		Name:       Name,
+		Name:       NAME,
 		Bias:       true,
 		Hidden:     []int{2},
 		Activation: params.SIGMOID,

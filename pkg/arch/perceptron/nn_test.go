@@ -14,16 +14,16 @@ func init() {
 }
 
 func Test_getMaxIteration(t *testing.T) {
-	t.Run("MaxIteration", func(t *testing.T) {
-		if got := getMaxIteration(); got != MaxIteration {
-			t.Errorf("getMaxIteration() = %v, want %v", got, MaxIteration)
+	t.Run("MAXITERATION", func(t *testing.T) {
+		if got := getMaxIteration(); got != MAXITERATION {
+			t.Errorf("getMaxIteration() = %v, want %v", got, MAXITERATION)
 		}
 	})
 }
 
 func TestNew(t *testing.T) {
 	want := &NN{
-		Name:       Name,
+		Name:       NAME,
 		Activation: params.SIGMOID,
 		Loss:       params.MSE,
 		Limit:      .01,

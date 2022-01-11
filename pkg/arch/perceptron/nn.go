@@ -8,8 +8,8 @@ import (
 	"github.com/teratron/gonn/pkg/utils"
 )
 
-// Name of the neural network architecture.
-const Name = "perceptron"
+// NAME of the neural network architecture.
+const NAME = "perceptron"
 
 // Declare conformity with NeuralNetwork interface.
 var _ pkg.NeuralNetwork = (*NN)(nil)
@@ -66,7 +66,7 @@ type neuron struct {
 // New return Perceptron neural network.
 func New() *NN {
 	return &NN{
-		Name:       Name,
+		Name:       NAME,
 		Activation: params.SIGMOID,
 		Loss:       params.MSE,
 		Limit:      .01,
