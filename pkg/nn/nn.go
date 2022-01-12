@@ -20,7 +20,7 @@ func New(reader ...string) NeuralNetwork {
 	if len(reader) > 0 {
 		return arch.Get(reader[0])
 	}
-	return arch.Get(arch.PERCEPTRON)
+	return arch.Get(arch.Perceptron)
 }
 
 // ReadWeight reads and return array of weights.

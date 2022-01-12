@@ -8,7 +8,7 @@ import (
 )
 
 func TestNew(t *testing.T) {
-	testNN := arch.Get(arch.PERCEPTRON)
+	testNN := arch.Get(arch.Perceptron)
 	tests := []struct {
 		name string
 		gave []string
@@ -20,8 +20,8 @@ func TestNew(t *testing.T) {
 			want: testNN,
 		},
 		{
-			name: "#2_" + arch.PERCEPTRON,
-			gave: []string{arch.PERCEPTRON},
+			name: "#2_" + arch.Perceptron,
+			gave: []string{arch.Perceptron},
 			want: testNN,
 		},
 	}

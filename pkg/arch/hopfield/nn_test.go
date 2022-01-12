@@ -7,7 +7,7 @@ import (
 
 func TestNew(t *testing.T) {
 	want := &NN{
-		Name: NAME,
+		Name: Name,
 	}
 	t.Run(want.Name, func(t *testing.T) {
 		if got := New(); !reflect.DeepEqual(got, want) {

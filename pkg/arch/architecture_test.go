@@ -16,7 +16,7 @@ var testJSON = filepath.Join("..", "testdata", "perceptron.json")
 
 func TestGet(t *testing.T) {
 	testNN := &perceptron.NN{
-		Name:       PERCEPTRON,
+		Name:       Perceptron,
 		Bias:       true,
 		Hidden:     []int{2},
 		Activation: params.SIGMOID,
@@ -44,13 +44,13 @@ func TestGet(t *testing.T) {
 			want: nil,
 		},
 		{
-			name: "#2_" + PERCEPTRON,
-			gave: PERCEPTRON,
+			name: "#2_" + Perceptron,
+			gave: Perceptron,
 			want: perceptron.New(),
 		},
 		{
-			name: "#3_" + HOPFIELD,
-			gave: HOPFIELD,
+			name: "#3_" + Hopfield,
+			gave: Hopfield,
 			want: hopfield.New(),
 		},
 		{

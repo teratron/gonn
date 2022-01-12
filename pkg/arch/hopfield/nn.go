@@ -7,8 +7,8 @@ import (
 	"github.com/teratron/gonn/pkg/utils"
 )
 
-// NAME of the neural network architecture.
-const NAME = "hopfield"
+// Name of the neural network architecture.
+const Name = "hopfield"
 
 // Declare conformity with NeuralNetwork interface.
 var _ pkg.NeuralNetwork = (*NN)(nil)
@@ -43,6 +43,6 @@ type neuron struct {
 // New return Hopfield neural network.
 func New() *NN {
 	return &NN{
-		Name: NAME,
+		Name: Name,
 	}
 }

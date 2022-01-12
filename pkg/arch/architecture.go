@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	PERCEPTRON = perceptron.NAME
-	HOPFIELD   = hopfield.NAME
+	Perceptron = perceptron.Name
+	Hopfield   = hopfield.Name
 )
 
 // Get.
@@ -27,7 +27,6 @@ func Get(title string) pkg.NeuralNetwork {
 		case string:
 			if n := Get(v); n != nil {
 				if err = d.Decode(n); err == nil {
-					//log.Println("+++++++++++++++++ ", d)
 					n.Init(d)
 					return n
 				}
@@ -35,9 +34,9 @@ func Get(title string) pkg.NeuralNetwork {
 		}
 	} else {
 		switch strings.ToLower(title) {
-		case PERCEPTRON:
+		case Perceptron:
 			return perceptron.New()
-		case HOPFIELD:
+		case Hopfield:
 			return hopfield.New()
 		default:
 			err = fmt.Errorf("neural network is %w", pkg.ErrNotRecognized)

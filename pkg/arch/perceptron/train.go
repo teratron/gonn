@@ -8,13 +8,13 @@ import (
 	"github.com/teratron/gonn/pkg"
 )
 
-// MAXITERATION the maximum number of iterations after which training is forcibly terminated.
-const MAXITERATION = 10e+05
+// MaxIteration the maximum number of iterations after which training is forcibly terminated.
+const MaxIteration = 10e+05
 
 var GetMaxIteration = getMaxIteration
 
 func getMaxIteration() int {
-	return MAXITERATION
+	return MaxIteration
 }
 
 // Train training dataset.
