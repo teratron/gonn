@@ -25,8 +25,8 @@ func main() {
 	n.SetLossMode(nn.MSE)
 
 	// Minimum (sufficient) limit of the average of the error during training.
-	lossLimit := .00001
-	n.SetLossLimit(lossLimit)
+	lossLimit := .0001
+	//n.SetLossLimit(lossLimit)
 
 	// Learning coefficient (greater than 0 and less than or equal to 1).
 	n.SetLearningRate(.3)
@@ -42,7 +42,7 @@ func main() {
 		for i := lenInput; i <= lenData; i++ {
 			_, _ = n.Train(dataSet[i-lenInput:i], dataSet[i:i+lenOutput])
 		}
-
+		fmt.Println("epoch:", epoch)
 		// Verifying.
 		sum, num := 0., 0.
 		for i := lenInput; i <= lenData; i++ {
@@ -52,6 +52,8 @@ func main() {
 
 		// Average error for the entire epoch.
 		sum /= num
+
+		fmt.Println("                          epoch:", epoch, " ", sum)
 
 		// Exiting the cycle of learning epochs, when the minimum error level is reached.
 		if sum < lossLimit {

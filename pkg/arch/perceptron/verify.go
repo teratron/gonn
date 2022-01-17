@@ -34,6 +34,10 @@ func (nn *NN) Verify(input []float64, target ...[]float64) float64 {
 			_ = copy(nn.input, input)
 			_ = copy(nn.output, target[0])
 
+			if nn.Weights[0][0][0] != 0 {
+				_ = copy(nn.weight, nn.Weights)
+			}
+
 			nn.calcNeuron()
 			return nn.calcLoss()
 		} else {

@@ -22,10 +22,14 @@ func (nn *NN) Query(input []float64) []float64 {
 			goto ERROR
 		}
 
-		// TODO:
-		//nn.input = input
+		// TODO://nn.input = input
 		_ = copy(nn.input, input)
-		_ = copy(nn.weight, nn.Weights)
+
+		if nn.Weights[0][0][0] != 0 {
+			_ = copy(nn.weight, nn.Weights)
+		} else if nn.weight[0][0][0] != 0 {
+			_ = copy(nn.Weights, nn.weight)
+		}
 
 		nn.calcNeuron()
 		for i, n := range nn.neuron[nn.lastLayerIndex] {
