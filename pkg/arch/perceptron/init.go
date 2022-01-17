@@ -62,9 +62,11 @@ func (nn *NN) initFromNew(lenInput, lenTarget int) {
 	var biasLayer int
 
 	nn.Weights = make(pkg.Float3Type, lenLayer)
+	nn.weight = make(pkg.Float3Type, lenLayer)
 	nn.neuron = make([][]*neuron, lenLayer)
 	for i, v := range layer {
 		nn.Weights[i] = make(pkg.Float2Type, v)
+		nn.weight[i] = make(pkg.Float2Type, v)
 		nn.neuron[i] = make([]*neuron, v)
 		if i > 0 {
 			biasLayer = layer[i-1] + bias
@@ -73,23 +75,25 @@ func (nn *NN) initFromNew(lenInput, lenTarget int) {
 		for j := 0; j < v; j++ {
 			if i > 0 {
 				nn.Weights[i][j] = make(pkg.Float1Type, biasLayer)
+				nn.weight[i][j] = make(pkg.Float1Type, biasLayer)
 			} else {
 				nn.Weights[i][j] = make(pkg.Float1Type, biasInput)
+				nn.weight[i][j] = make(pkg.Float1Type, biasInput)
 			}
-			for k := range nn.Weights[i][j] {
+			for k := range nn.weight[i][j] {
 				if nn.Activation == params.LINEAR {
-					nn.Weights[i][j][k] = .5
+					//nn.Weights[i][j][k] = .5
+					nn.weight[i][j][k] = .5
 				} else {
-					nn.Weights[i][j][k] = params.GetRandFloat()
+					//nn.Weights[i][j][k] = params.GetRandFloat()
+					nn.weight[i][j][k] = params.GetRandFloat()
 				}
 			}
 			nn.neuron[i][j] = &neuron{}
 		}
 	}
 
-	nn.input = make([]float64, nn.lenInput)
-	nn.output = make([]float64, nn.lenOutput)
-	nn.isInit = true
+	nn.initCompletion()
 }
 
 // initFromWeight.
@@ -116,14 +120,24 @@ func (nn *NN) initFromWeight() {
 		nn.Hidden = []int{0}
 	}
 
+	nn.weight = make(pkg.Float3Type, length)
 	nn.neuron = make([][]*neuron, length)
 	for i, v := range nn.Weights {
-		nn.neuron[i] = make([]*neuron, len(v))
-		for j := range v {
+		length = len(v)
+		nn.weight[i] = make(pkg.Float2Type, length)
+		nn.neuron[i] = make([]*neuron, length)
+		for j, w := range v {
+			nn.weight[i][j] = make(pkg.Float1Type, len(w))
 			nn.neuron[i][j] = &neuron{}
 		}
 	}
+	_ = copy(nn.weight, nn.Weights)
 
+	nn.initCompletion()
+}
+
+// initCompletion.
+func (nn *NN) initCompletion() {
 	nn.input = make([]float64, nn.lenInput)
 	nn.output = make([]float64, nn.lenOutput)
 	nn.isInit = true

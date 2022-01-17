@@ -9,13 +9,16 @@ import (
 )
 
 // MaxIteration the maximum number of iterations after which training is forcibly terminated.
-const MaxIteration = 10e+05
+const MaxIteration int = 1e+06
 
 var GetMaxIteration = getMaxIteration
 
 func getMaxIteration() int {
 	return MaxIteration
 }
+
+// MinLossLimit.
+const MinLossLimit = 1e-16 // TODO:
 
 // Train training dataset.
 func (nn *NN) Train(input []float64, target ...[]float64) (count int, loss float64) {
@@ -38,18 +41,47 @@ func (nn *NN) Train(input []float64, target ...[]float64) (count int, loss float
 				}
 			}
 
-			_ = copy(nn.input, input)
-			_ = copy(nn.output, target[0])
 			// TODO:
 			//nn.input = input
 			//nn.output = target[0]
+			_ = copy(nn.input, input)
+			_ = copy(nn.output, target[0])
 
+			minLoss := 1.
+			minCount := 0
+			/*maxLoss := 1.
+			//maxLoss2 := [2]float64{1, 1}
+			resistance := 1.
+			var solid uint8 = 0*/
 			for count < GetMaxIteration() {
 				count++
 				nn.calcNeuron()
 				loss = nn.calcLoss()
+
+				if loss < minLoss {
+					minLoss = loss
+					minCount = count
+					_ = copy(nn.Weights, nn.weight)
+
+					/*if solid >= 100 {
+						maxLoss = resistance
+						solid = 0
+						fmt.Printf("\t\t\t%d: %.20f\n", count, loss)
+					}
+					resistance = minLoss*/
+					fmt.Printf("%d: %.30f\n", count, loss)
+				} /*else {
+					if loss > maxLoss {
+						return
+					}
+					if loss > resistance {
+						resistance = loss
+					}
+					solid++
+				}*/
+
 				switch {
-				case loss < nn.Limit:
+				case loss < MinLossLimit /*nn.Limit*/ :
 					return
 				case math.IsNaN(loss), math.IsInf(loss, 0):
 					log.Panic("train: not optimal neural network parameters")
@@ -57,7 +89,7 @@ func (nn *NN) Train(input []float64, target ...[]float64) (count int, loss float
 				nn.calcMiss()
 				nn.updWeight()
 			}
-			return
+			return minCount, minLoss
 		} else {
 			err = pkg.ErrNoTarget
 		}

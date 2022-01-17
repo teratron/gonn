@@ -34,6 +34,10 @@ type NN struct {
 	isInit   bool
 	config   utils.Filer
 	mutex    sync.Mutex
+
+	// Transfer data.
+	input  []float64
+	weight pkg.Float3Type
 }
 
 type neuron struct {

@@ -13,7 +13,6 @@ type FileJSON struct {
 
 // Decode.
 func (j *FileJSON) Decode(data interface{}) error {
-	print("*******************")
 	file, err := os.OpenFile(j.Name, os.O_RDONLY, 0600)
 	if err == nil {
 		defer func() { err = file.Close() }()

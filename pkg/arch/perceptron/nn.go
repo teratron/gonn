@@ -56,6 +56,7 @@ type NN struct {
 	// Transfer data.
 	input  []float64
 	output []float64
+	weight pkg.Float3Type
 }
 
 type neuron struct {
