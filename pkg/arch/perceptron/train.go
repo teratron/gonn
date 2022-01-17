@@ -17,8 +17,14 @@ func getMaxIteration() int {
 	return MaxIteration
 }
 
-// MinLossLimit.
-const MinLossLimit = 1e-16 // TODO:
+// MinLossLimit minimum (sufficient) limit of the average of the error during training.
+const MinLossLimit = 1e-24
+
+var GetMinLossLimit = getMinLossLimit
+
+func getMinLossLimit() float64 {
+	return MinLossLimit
+}
 
 // Train training dataset.
 func (nn *NN) Train(input []float64, target ...[]float64) (count int, loss float64) {
@@ -49,46 +55,64 @@ func (nn *NN) Train(input []float64, target ...[]float64) (count int, loss float
 
 			minLoss := 1.
 			minCount := 0
+
+			avgLoss := 0.
+			sumLoss := 0.
 			/*maxLoss := 1.
 			//maxLoss2 := [2]float64{1, 1}
-			resistance := 1.
-			var solid uint8 = 0*/
+			resistance := 1.*/
+			var solid uint32
 			for count < GetMaxIteration() {
 				count++
 				nn.calcNeuron()
 				loss = nn.calcLoss()
 
+				sumLoss += loss
+				avgLoss = sumLoss / float64(count)
+
+				if loss > avgLoss {
+					fmt.Println("!!!!!!!!avgLoss")
+				}
+
 				if loss < minLoss {
 					minLoss = loss
 					minCount = count
-					_ = copy(nn.Weights, nn.weight)
 
-					/*if solid >= 100 {
-						maxLoss = resistance
+					if solid >= 3 {
+						_ = copy(nn.Weights, nn.weight)
+						/*fmt.Printf("\t\t\t%d: %.20f\n", solid, resistance)
+						maxLoss = resistance*/
+
+						fmt.Printf("%d: %.30f\t%.30f\n", minCount, minLoss, avgLoss)
+						///fmt.Printf("\t\t\t%d\n", solid)
 						solid = 0
-						fmt.Printf("\t\t\t%d: %.20f\n", count, loss)
 					}
-					resistance = minLoss*/
-					fmt.Printf("%d: %.30f\n", count, loss)
-				} /*else {
-					if loss > maxLoss {
-						return
+					/*resistance = minLoss*/
+					//fmt.Printf("%d: %.30f\n", count, loss)
+				} else {
+					/*if loss > maxLoss {
+						fmt.Println("---maxLoss")
+						return minCount, minLoss
 					}
 					if loss > resistance {
 						resistance = loss
-					}
+					}*/
 					solid++
-				}*/
+				}
+				//fmt.Printf("\t\t\t%d\n", solid)
 
 				switch {
-				case loss < MinLossLimit /*nn.Limit*/ :
-					return
 				case math.IsNaN(loss), math.IsInf(loss, 0):
 					log.Panic("train: not optimal neural network parameters")
+				case loss < 0 /*GetMinLossLimit()*/ :
+					fmt.Println("---MinLossLimit")
+					return minCount, minLoss
 				}
 				nn.calcMiss()
 				nn.updWeight()
 			}
+			fmt.Println("+++++")
+			fmt.Printf("%d: %.30f\t%.30f\n", count, loss, avgLoss)
 			return minCount, minLoss
 		} else {
 			err = pkg.ErrNoTarget
