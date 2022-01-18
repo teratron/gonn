@@ -18,7 +18,7 @@ func getMaxIteration() int {
 }
 
 // MinLossLimit minimum (sufficient) limit of the average of the error during training.
-const MinLossLimit = 1e-10
+const MinLossLimit = 1e-15
 
 var GetMinLossLimit = getMinLossLimit
 
@@ -56,6 +56,7 @@ func (nn *NN) Train(input []float64, target ...[]float64) (count int, loss float
 			if nn.Weights[0][0][0] != 0 {
 				_ = copy(nn.weight, nn.Weights)
 			}
+			fmt.Println(nn.weight)
 
 			minLoss := 1.
 			minCount := 0
@@ -64,7 +65,7 @@ func (nn *NN) Train(input []float64, target ...[]float64) (count int, loss float
 				nn.calcNeuron()
 				loss = nn.calcLoss()
 
-				/*if math.IsNaN(loss) || math.IsInf(loss, 0) {
+				if math.IsNaN(loss) || math.IsInf(loss, 0) {
 					log.Panic("train: not optimal neural network parameters")
 				}
 				if loss < minLoss {
@@ -76,8 +77,8 @@ func (nn *NN) Train(input []float64, target ...[]float64) (count int, loss float
 						fmt.Println("---MinLossLimit")
 						return minCount, minLoss
 					}
-				}*/
-				switch {
+				}
+				/*switch {
 				case math.IsNaN(loss), math.IsInf(loss, 0):
 					log.Panic("train: not optimal neural network parameters")
 				case loss < minLoss:
@@ -86,10 +87,10 @@ func (nn *NN) Train(input []float64, target ...[]float64) (count int, loss float
 					// TODO://nn.Weights = nn.weight
 					_ = copy(nn.Weights, nn.weight)
 					if loss < GetMinLossLimit() {
-						//fmt.Println("---MinLossLimit")
+						fmt.Println("---MinLossLimit")
 						return minCount, minLoss
 					}
-				}
+				}*/
 				nn.calcMiss()
 				nn.updWeight()
 			}
@@ -109,11 +110,12 @@ ERROR:
 // TODO: // AndTrain training dataset.
 /*func (nn *NN) AndTrain(target ...[]float64) (loss float64, count int) {
 	_ = copy(nn.output, target[0])
+	loss = nn.calcLoss()
 
 	for count < GetMaxIteration() {
 		count++
-		switch loss = nn.calcLoss(); {
-		case loss < nn.Limit:
+		switch ; {
+		case loss < GetMinLossLimit():
 			return
 		case math.IsNaN(loss), math.IsInf(loss, 0):
 			log.Panic("train: not optimal neural network parameters")

@@ -45,16 +45,6 @@ func (nn *NN) SetLossMode(mode uint8) {
 	nn.Loss = params.CheckLossMode(mode)
 }
 
-// LossLimit.
-func (nn *NN) LossLimit() float64 {
-	return nn.Limit
-}
-
-// SetLossLimit.
-func (nn *NN) SetLossLimit(limit float64) {
-	nn.Limit = limit
-}
-
 // LearningRate.
 func (nn *NN) LearningRate() float64 {
 	return float64(nn.Rate)

@@ -156,25 +156,6 @@ func TestNN_SetLossMode(t *testing.T) {
 	}
 }
 
-func TestNN_LossLimit(t *testing.T) {
-	want := &NN{Limit: .1}
-	t.Run("0.1", func(t *testing.T) {
-		if got := want.LossLimit(); got != want.Limit {
-			t.Errorf("LossLimit() = %f, want %f", got, want.Limit)
-		}
-	})
-}
-
-func TestNN_SetLossLimit(t *testing.T) {
-	got := &NN{}
-	want := .01
-	t.Run("0.01", func(t *testing.T) {
-		if got.SetLossLimit(want); got.Limit != want {
-			t.Errorf("SetLossLimit() = %f, want %f", got.Limit, want)
-		}
-	})
-}
-
 func TestNN_LearningRate(t *testing.T) {
 	want := &NN{Rate: .3}
 	t.Run("DefaultRate", func(t *testing.T) {

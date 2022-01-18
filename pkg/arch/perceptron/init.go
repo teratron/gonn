@@ -82,11 +82,11 @@ func (nn *NN) initFromNew(lenInput, lenTarget int) {
 			}
 			for k := range nn.weight[i][j] {
 				if nn.Activation == params.LINEAR {
-					//nn.Weights[i][j][k] = .5
-					nn.weight[i][j][k] = .5
+					nn.Weights[i][j][k] = .5
+					//nn.weight[i][j][k] = .5
 				} else {
-					//nn.Weights[i][j][k] = params.GetRandFloat()
-					nn.weight[i][j][k] = params.GetRandFloat()
+					nn.Weights[i][j][k] = params.GetRandFloat()
+					//nn.weight[i][j][k] = params.GetRandFloat()
 				}
 			}
 			nn.neuron[i][j] = &neuron{}
@@ -131,7 +131,7 @@ func (nn *NN) initFromWeight() {
 			nn.neuron[i][j] = &neuron{}
 		}
 	}
-	_ = copy(nn.weight, nn.Weights)
+	//_ = copy(nn.weight, nn.Weights)
 
 	nn.initCompletion()
 }

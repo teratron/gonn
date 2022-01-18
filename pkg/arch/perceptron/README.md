@@ -35,10 +35,6 @@ The mode of calculation of the total error.
 | 2    | ARCTAN | Arctan.                  |
 | 3    | AVG    | Average.                 |
 
-### Limit
-
-Minimum (sufficient) limit of the average of the error during training.
-
 ### Rate
 
 Learning coefficient (greater than 0 and less than or equal to 1).

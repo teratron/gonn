@@ -26,7 +26,6 @@ func TestNew(t *testing.T) {
 		Name:       Name,
 		Activation: params.SIGMOID,
 		Loss:       params.MSE,
-		Limit:      .01,
 		Rate:       .3,
 	}
 	t.Run(want.Name, func(t *testing.T) {

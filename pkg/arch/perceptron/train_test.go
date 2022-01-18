@@ -94,7 +94,6 @@ func TestNN_Train(t *testing.T) {
 			gave: &NN{
 				Bias:   true,
 				Hidden: []int{2},
-				Limit:  .95,
 			},
 			wantLoss:  .0025,
 			wantCount: 1,

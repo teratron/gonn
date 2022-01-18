@@ -33,9 +33,6 @@ type NN struct {
 	// The mode of calculation of the total error.
 	Loss uint8 `json:"loss"`
 
-	// Minimum (sufficient) limit of the average of the error during training.
-	Limit float64 `json:"limit"`
-
 	// Learning coefficient (greater than 0 and less than or equal to 1).
 	Rate pkg.FloatType `json:"rate"`
 
@@ -70,7 +67,6 @@ func New() *NN {
 		Name:       Name,
 		Activation: params.SIGMOID,
 		Loss:       params.MSE,
-		Limit:      .01,
 		Rate:       .3,
 	}
 }

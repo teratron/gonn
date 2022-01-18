@@ -19,14 +19,10 @@ func main() {
 	n.SetHiddenLayer(5, 3)
 
 	// Activation function mode.
-	n.SetActivationMode(nn.SIGMOID)
+	n.SetActivationMode(nn.TANH)
 
 	// The mode of calculation of the total error.
 	n.SetLossMode(nn.MSE)
-
-	// Minimum (sufficient) limit of the average of the error during training.
-	lossLimit := .0001
-	//n.SetLossLimit(lossLimit)
 
 	// Learning coefficient (greater than 0 and less than or equal to 1).
 	n.SetLearningRate(.3)
@@ -37,12 +33,14 @@ func main() {
 	lenOutput := 2 // Number of output data.
 
 	// Training.
+	lossLimit := .0001
 	lenData := len(dataSet) - lenOutput
-	for epoch := 1; epoch <= 10000; epoch++ {
+	for epoch := 1; epoch <= 1; /*0000*/ epoch++ {
 		for i := lenInput; i <= lenData; i++ {
+			fmt.Println(i)
 			_, _ = n.Train(dataSet[i-lenInput:i], dataSet[i:i+lenOutput])
 		}
-		fmt.Println("epoch:", epoch)
+		//fmt.Println("epoch:", epoch)
 		// Verifying.
 		sum, num := 0., 0.
 		for i := lenInput; i <= lenData; i++ {

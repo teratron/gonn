@@ -21,7 +21,6 @@ func TestGet(t *testing.T) {
 		Hidden:     []int{2},
 		Activation: params.SIGMOID,
 		Loss:       params.MSE,
-		Limit:      .1,
 		Rate:       .3,
 		Weights: pkg.Float3Type{
 			{
