@@ -2,7 +2,6 @@ package params
 
 import (
 	"math/rand"
-	"time"
 
 	"github.com/teratron/gonn/pkg"
 )
@@ -10,7 +9,8 @@ import (
 var GetRandFloat = getRandFloat
 
 func init() {
-	rand.Seed(time.Now().UTC().UnixNano())
+	//TODO:
+	//rand.Seed(time.Now().UTC().UnixNano())
 }
 
 // getRandFloat return random number from -0.5 to 0.5.

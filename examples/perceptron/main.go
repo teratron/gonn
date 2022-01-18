@@ -33,9 +33,9 @@ func main() {
 	lenOutput := 2 // Number of output data.
 
 	// Training.
-	lossLimit := .0001
+	lossLimit := .00001
 	lenData := len(dataSet) - lenOutput
-	for epoch := 1; epoch <= 1; /*0000*/ epoch++ {
+	for epoch := 1; epoch <= 10000; /*0000*/ epoch++ {
 		for i := lenInput; i <= lenData; i++ {
 			fmt.Println(i)
 			_, _ = n.Train(dataSet[i-lenInput:i], dataSet[i:i+lenOutput])

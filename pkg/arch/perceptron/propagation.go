@@ -8,7 +8,7 @@ import (
 )
 
 // calcNeuron.
-func (nn *NN) calcNeuron() {
+/*func (nn *NN) calcNeuron() {
 	wait := make(chan bool)
 	defer close(wait)
 
@@ -54,13 +54,49 @@ func (nn *NN) calcNeuron() {
 			<-wait
 		}
 	}
+}*/
+func (nn *NN) calcNeuron() {
+	var length, dec int
+	for i, v := range nn.neuron {
+		if i > 0 {
+			dec = i - 1
+			length = len(nn.neuron[dec])
+		} else {
+			length = nn.lenInput
+		}
+
+		for j, n := range v {
+			var num pkg.FloatType = 0
+			n.value = 0
+			for k, w := range nn.weight[i][j] {
+				if k < length {
+					if i > 0 {
+						n.value += nn.neuron[dec][k].value * w
+					} else {
+						n.value += pkg.FloatType(nn.input[k]) * w
+					}
+				} else {
+					n.value += w
+				}
+				num++
+			}
+
+			switch nn.Activation {
+			case params.LINEAR:
+				if num > 0 {
+					n.value /= num
+				}
+			default:
+				n.value = pkg.FloatType(params.Activation(float64(n.value), nn.Activation))
+			}
+		}
+	}
 }
 
 // calcLoss calculating the error of the output neuron.
 func (nn *NN) calcLoss() (loss float64) {
 	for i, n := range nn.neuron[nn.lastLayerIndex] {
 		n.miss = pkg.FloatType(nn.output[i]) - n.value
-
 		switch nn.Loss {
 		default:
 			fallthrough
@@ -81,7 +117,7 @@ func (nn *NN) calcLoss() (loss float64) {
 }
 
 // calcMiss calculating the error of neurons in hidden layers.
-func (nn *NN) calcMiss() {
+/*func (nn *NN) calcMiss() {
 	if nn.lastLayerIndex > 0 {
 		wait := make(chan bool)
 		defer close(wait)
@@ -103,10 +139,23 @@ func (nn *NN) calcMiss() {
 			}
 		}
 	}
+}*/
+func (nn *NN) calcMiss() {
+	if nn.lastLayerIndex > 0 {
+		for i := nn.lastLayerIndex - 1; i >= 0; i-- {
+			inc := i + 1
+			for j, n := range nn.neuron[i] {
+				n.miss = 0
+				for k, m := range nn.neuron[inc] {
+					n.miss += m.miss * nn.weight[inc][k][j]
+				}
+			}
+		}
+	}
 }
 
 // updWeight update weights.
-func (nn *NN) updWeight() {
+/*func (nn *NN) updWeight() {
 	wait := make(chan bool)
 	defer close(wait)
 
@@ -151,6 +200,42 @@ func (nn *NN) updWeight() {
 	for _, v := range nn.weight {
 		for range v {
 			<-wait
+		}
+	}
+}*/
+func (nn *NN) updWeight() {
+	var length, dec int
+	for i, v := range nn.weight {
+		if i > 0 {
+			dec = i - 1
+			length = len(nn.neuron[dec])
+		} else {
+			length = nn.lenInput
+		}
+
+		for j, w := range v {
+			grad := nn.Rate * nn.neuron[i][j].miss * pkg.FloatType(params.Derivative(float64(nn.neuron[i][j].value), nn.Activation))
+			for k := range w {
+				if k < length {
+					var value pkg.FloatType
+					if i > 0 {
+						value = nn.neuron[dec][k].value
+					} else {
+						value = pkg.FloatType(nn.input[k])
+					}
+
+					switch nn.Activation {
+					case params.LINEAR:
+						if value != 0 {
+							nn.weight[i][j][k] += grad / value
+						}
+					default:
+						nn.weight[i][j][k] += grad * value
+					}
+				} else {
+					nn.weight[i][j][k] += grad
+				}
+			}
 		}
 	}
 }

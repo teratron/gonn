@@ -18,7 +18,7 @@ func getMaxIteration() int {
 }
 
 // MinLossLimit minimum (sufficient) limit of the average of the error during training.
-const MinLossLimit = 1e-15
+const MinLossLimit = 1e-10
 
 var GetMinLossLimit = getMinLossLimit
 
@@ -47,53 +47,46 @@ func (nn *NN) Train(input []float64, target ...[]float64) (count int, loss float
 				}
 			}
 
-			// TODO:
-			//nn.input = input
-			//nn.output = target[0]
 			_ = copy(nn.input, input)
 			_ = copy(nn.output, target[0])
 
 			if nn.Weights[0][0][0] != 0 {
 				_ = copy(nn.weight, nn.Weights)
 			}
-			fmt.Println(nn.weight)
+			//fmt.Println(nn.weight)
 
 			minLoss := 1.
 			minCount := 0
+			//sum, avg, prev := 0., 0., 1.
 			for count < GetMaxIteration() {
 				count++
 				nn.calcNeuron()
 				loss = nn.calcLoss()
 
-				if math.IsNaN(loss) || math.IsInf(loss, 0) {
-					log.Panic("train: not optimal neural network parameters")
+				/*sum += loss
+				avg = sum / float64(count)
+
+				if prev < 5 * avg {
+					fmt.Println(count, "Avg", avg, 5 * avg)
 				}
-				if loss < minLoss {
-					minLoss = loss
-					minCount = count
-					// TODO://nn.Weights = nn.weight
-					_ = copy(nn.Weights, nn.weight)
-					if loss < GetMinLossLimit() {
-						fmt.Println("---MinLossLimit")
-						return minCount, minLoss
-					}
-				}
-				/*switch {
+				prev = avg*/
+
+				switch {
 				case math.IsNaN(loss), math.IsInf(loss, 0):
 					log.Panic("train: not optimal neural network parameters")
 				case loss < minLoss:
 					minLoss = loss
 					minCount = count
-					// TODO://nn.Weights = nn.weight
 					_ = copy(nn.Weights, nn.weight)
 					if loss < GetMinLossLimit() {
-						fmt.Println("---MinLossLimit")
+						fmt.Println(count, "---MinLossLimit", minCount, minLoss)
 						return minCount, minLoss
 					}
-				}*/
+				}
 				nn.calcMiss()
 				nn.updWeight()
 			}
+			fmt.Println("+++++", minCount, minLoss)
 			return minCount, minLoss
 		} else {
 			err = pkg.ErrNoTarget
@@ -110,11 +103,11 @@ ERROR:
 // TODO: // AndTrain training dataset.
 /*func (nn *NN) AndTrain(target ...[]float64) (loss float64, count int) {
 	_ = copy(nn.output, target[0])
-	loss = nn.calcLoss()
 
 	for count < GetMaxIteration() {
 		count++
-		switch ; {
+		loss = nn.calcLoss()
+		switch {
 		case loss < GetMinLossLimit():
 			return
 		case math.IsNaN(loss), math.IsInf(loss, 0):
