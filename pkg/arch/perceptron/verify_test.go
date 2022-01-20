@@ -22,9 +22,9 @@ func TestNN_Verify(t *testing.T) {
 			name: "#1",
 			args: args{[]float64{.2, .3}, []float64{.2}},
 			gave: &NN{
-				Activation: 255, // default params.ModeSIGMOID
-				Loss:       255, // default params.ModeMSE
-				Weights: pkg.Float3Type{
+				ActivationMode: 255, // default params.ModeSIGMOID
+				LossMode:       255, // default params.ModeMSE
+				Weight: pkg.Float3Type{
 					{
 						{.1, .1, .1},
 						{.1, .1, .1},
@@ -85,8 +85,8 @@ func TestNN_Verify(t *testing.T) {
 			name: "#6_not_init",
 			args: args{[]float64{.2, .3}, []float64{.3}},
 			gave: &NN{
-				Bias:   true,
-				Hidden: []int{2},
+				Bias:        true,
+				HiddenLayer: []int{2},
 			},
 			want: .0025,
 		},

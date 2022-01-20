@@ -15,7 +15,7 @@ func (nn *NN) Init(data ...interface{}) {
 	if len(data) > 0 {
 		switch value := data[0].(type) {
 		case utils.Filer:
-			if len(nn.Weights) > 0 {
+			if len(nn.Weight) > 0 {
 				nn.initFromWeight()
 			}
 			nn.config = value
@@ -41,14 +41,14 @@ func (nn *NN) Init(data ...interface{}) {
 func (nn *NN) initFromNew(lenInput, lenTarget int) {
 	nn.lenInput = lenInput
 	nn.lenOutput = lenTarget
-	nn.lastLayerIndex = len(nn.Hidden)
-	if nn.lastLayerIndex > 0 && nn.Hidden[0] == 0 {
+	nn.lastLayerIndex = len(nn.HiddenLayer)
+	if nn.lastLayerIndex > 0 && nn.HiddenLayer[0] == 0 {
 		nn.lastLayerIndex = 0
 	}
 
 	var layer []int
 	if nn.lastLayerIndex > 0 {
-		layer = append(nn.Hidden, nn.lenOutput)
+		layer = append(nn.HiddenLayer, nn.lenOutput)
 	} else {
 		layer = []int{nn.lenOutput}
 	}
@@ -61,11 +61,11 @@ func (nn *NN) initFromNew(lenInput, lenTarget int) {
 	biasInput := nn.lenInput + bias
 	var biasLayer int
 
-	nn.Weights = make(pkg.Float3Type, lenLayer)
+	nn.Weight = make(pkg.Float3Type, lenLayer)
 	nn.weight = make(pkg.Float3Type, lenLayer)
 	nn.neuron = make([][]*neuron, lenLayer)
 	for i, v := range layer {
-		nn.Weights[i] = make(pkg.Float2Type, v)
+		nn.Weight[i] = make(pkg.Float2Type, v)
 		nn.weight[i] = make(pkg.Float2Type, v)
 		nn.neuron[i] = make([]*neuron, v)
 		if i > 0 {
@@ -74,18 +74,18 @@ func (nn *NN) initFromNew(lenInput, lenTarget int) {
 
 		for j := 0; j < v; j++ {
 			if i > 0 {
-				nn.Weights[i][j] = make(pkg.Float1Type, biasLayer)
+				nn.Weight[i][j] = make(pkg.Float1Type, biasLayer)
 				nn.weight[i][j] = make(pkg.Float1Type, biasLayer)
 			} else {
-				nn.Weights[i][j] = make(pkg.Float1Type, biasInput)
+				nn.Weight[i][j] = make(pkg.Float1Type, biasInput)
 				nn.weight[i][j] = make(pkg.Float1Type, biasInput)
 			}
 			for k := range nn.weight[i][j] {
-				if nn.Activation == params.LINEAR {
-					nn.Weights[i][j][k] = .5
+				if nn.ActivationMode == params.LINEAR {
+					nn.Weight[i][j][k] = .5
 					//nn.weight[i][j][k] = .5
 				} else {
-					nn.Weights[i][j][k] = params.GetRandFloat()
+					nn.Weight[i][j][k] = params.GetRandFloat() //TODO:
 					//nn.weight[i][j][k] = params.GetRandFloat()
 				}
 			}
@@ -98,31 +98,31 @@ func (nn *NN) initFromNew(lenInput, lenTarget int) {
 
 // initFromWeight.
 func (nn *NN) initFromWeight() {
-	length := len(nn.Weights)
+	length := len(nn.Weight)
 
-	if !nn.Bias && length > 1 && len(nn.Weights[0])+1 == len(nn.Weights[1][0]) {
+	if !nn.Bias && length > 1 && len(nn.Weight[0])+1 == len(nn.Weight[1][0]) {
 		nn.Bias = true
 	}
 
 	nn.lastLayerIndex = length - 1
-	nn.lenOutput = len(nn.Weights[nn.lastLayerIndex])
-	nn.lenInput = len(nn.Weights[0][0])
+	nn.lenOutput = len(nn.Weight[nn.lastLayerIndex])
+	nn.lenInput = len(nn.Weight[0][0])
 	if nn.Bias {
 		nn.lenInput -= 1
 	}
 
 	if nn.lastLayerIndex > 0 {
-		nn.Hidden = make([]int, nn.lastLayerIndex)
-		for i := range nn.Hidden {
-			nn.Hidden[i] = len(nn.Weights[i])
+		nn.HiddenLayer = make([]int, nn.lastLayerIndex)
+		for i := range nn.HiddenLayer {
+			nn.HiddenLayer[i] = len(nn.Weight[i])
 		}
 	} else {
-		nn.Hidden = []int{0}
+		nn.HiddenLayer = []int{0}
 	}
 
 	nn.weight = make(pkg.Float3Type, length)
 	nn.neuron = make([][]*neuron, length)
-	for i, v := range nn.Weights {
+	for i, v := range nn.Weight {
 		length = len(v)
 		nn.weight[i] = make(pkg.Float2Type, length)
 		nn.neuron[i] = make([]*neuron, length)
@@ -131,7 +131,7 @@ func (nn *NN) initFromWeight() {
 			nn.neuron[i][j] = &neuron{}
 		}
 	}
-	//_ = copy(nn.weight, nn.Weights)
+	//_ = copy(nn.weight, nn.Weight)
 
 	nn.initCompletion()
 }

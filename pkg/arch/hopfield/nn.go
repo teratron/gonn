@@ -13,6 +13,7 @@ const Name = "hopfield"
 // Declare conformity with NeuralNetwork interface.
 var _ pkg.NeuralNetwork = (*NN)(nil)
 
+// NN.
 type NN struct {
 	pkg.NeuralNetwork `json:"-"`
 	//gonn.Parameter     `json:"-"`
@@ -23,8 +24,8 @@ type NN struct {
 	// Energy.
 	Energy float64 `json:"energy"`
 
-	// Weights values.
-	Weights pkg.Float2Type `json:"weights,omitempty"`
+	// Weight values.
+	Weight pkg.Float2Type `json:"weight,omitempty"`
 
 	// Neuron.
 	neuron []*neuron
@@ -37,7 +38,7 @@ type NN struct {
 
 	// Transfer data.
 	input  []float64
-	weight pkg.Float3Type
+	weight pkg.Float2Type
 }
 
 type neuron struct {

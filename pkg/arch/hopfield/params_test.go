@@ -7,26 +7,26 @@ import (
 	"github.com/teratron/gonn/pkg"
 )
 
-func TestNN_NeuronEnergy(t *testing.T) {
+func TestNN_GetEnergy(t *testing.T) {
 	want := &NN{Energy: .015}
 	t.Run("0.015", func(t *testing.T) {
-		if got := want.NeuronEnergy(); got != want.Energy {
-			t.Errorf("NeuronEnergy() = %f, want %f", got, want.Energy)
+		if got := want.GetEnergy(); got != want.Energy {
+			t.Errorf("GetEnergy() = %f, want %f", got, want.Energy)
 		}
 	})
 }
 
-func TestNN_SetNeuronEnergy(t *testing.T) {
+func TestNN_SetEnergy(t *testing.T) {
 	got := &NN{}
 	want := .015
 	t.Run("0.015", func(t *testing.T) {
-		if got.SetNeuronEnergy(want); got.Energy != want {
-			t.Errorf("SetNeuronEnergy() = %f, want %f", got.Energy, want)
+		if got.SetEnergy(want); got.Energy != want {
+			t.Errorf("SetEnergy() = %f, want %f", got.Energy, want)
 		}
 	})
 }
 
-func TestNN_Weight(t *testing.T) {
+func TestNN_GetWeight(t *testing.T) {
 	tests := []struct {
 		name string
 		gave *NN
@@ -34,24 +34,24 @@ func TestNN_Weight(t *testing.T) {
 	}{
 		{
 			name: "#1_nil",
-			gave: &NN{Weights: nil},
+			gave: &NN{Weight: nil},
 			want: nil,
 		},
 		{
 			name: "#2_[]",
-			gave: &NN{Weights: pkg.Float2Type{}},
+			gave: &NN{Weight: pkg.Float2Type{}},
 			want: pkg.Float2Type{},
 		},
 		{
 			name: "#3_[[0.1_0.2_0.3]]",
-			gave: &NN{Weights: pkg.Float2Type{{.1, .2, .3}}},
+			gave: &NN{Weight: pkg.Float2Type{{.1, .2, .3}}},
 			want: pkg.Float2Type{{.1, .2, .3}},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := *tt.gave.Weight().(*pkg.Float2Type); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Weight()\ngot:\t%v\nwant:\t%v", got, tt.want)
+			if got := *tt.gave.GetWeight().(*pkg.Float2Type); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("GetWeight()\ngot:\t%v\nwant:\t%v", got, tt.want)
 			}
 		})
 	}
@@ -78,8 +78,8 @@ func TestNN_SetWeight(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got.SetWeight(tt.want); !reflect.DeepEqual(got.Weights, tt.want) {
-				t.Errorf("SetWeight()\ngot:\t%v\nwant:\t%v", got.Weights, tt.want)
+			if got.SetWeight(tt.want); !reflect.DeepEqual(got.Weight, tt.want) {
+				t.Errorf("SetWeight()\ngot:\t%v\nwant:\t%v", got.Weight, tt.want)
 			}
 		})
 	}

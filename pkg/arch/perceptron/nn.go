@@ -14,7 +14,7 @@ const Name = "perceptron"
 // Declare conformity with NeuralNetwork interface.
 var _ pkg.NeuralNetwork = (*NN)(nil)
 
-// NN
+// NN.
 type NN struct {
 	pkg.Parameter `json:"-"`
 
@@ -25,19 +25,22 @@ type NN struct {
 	Bias bool `json:"bias"`
 
 	// Array of the number of neurons in each hidden layer.
-	Hidden []int `json:"hidden,omitempty"`
+	HiddenLayer []int `json:"hiddenLayer,omitempty"`
 
 	// Activation function mode (required field for a config).
-	Activation uint8 `json:"activation"`
+	ActivationMode uint8 `json:"activationMode"`
 
 	// The mode of calculation of the total error.
-	Loss uint8 `json:"loss"`
+	LossMode uint8 `json:"lossMode"`
+
+	// Minimum (sufficient) limit of the average of the error during training.
+	LossLimit float64 `json:"lossLimit"`
 
 	// Learning coefficient (greater than 0 and less than or equal to 1).
 	Rate pkg.FloatType `json:"rate"`
 
 	// Weight value.
-	Weights pkg.Float3Type `json:"weights,omitempty"`
+	Weight pkg.Float3Type `json:"weight,omitempty"`
 
 	// Neuron.
 	neuron [][]*neuron
@@ -51,8 +54,8 @@ type NN struct {
 	mutex          sync.Mutex
 
 	// Transfer data.
-	input  []float64
-	output []float64
+	input  []float64 //TODO:
+	output []float64 //TODO:
 	weight pkg.Float3Type
 }
 
@@ -64,9 +67,10 @@ type neuron struct {
 // New return Perceptron neural network.
 func New() *NN {
 	return &NN{
-		Name:       Name,
-		Activation: params.SIGMOID,
-		Loss:       params.MSE,
-		Rate:       .3,
+		Name:           Name,
+		ActivationMode: params.SIGMOID,
+		LossMode:       params.MSE,
+		LossLimit:      .01,
+		Rate:           .3,
 	}
 }

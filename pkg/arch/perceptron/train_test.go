@@ -8,6 +8,18 @@ import (
 	"github.com/teratron/gonn/pkg/params"
 )
 
+func init() {
+	GetMaxIteration = func() int { return 1 }
+}
+
+func Test_getMaxIteration(t *testing.T) {
+	t.Run("MaxIteration", func(t *testing.T) {
+		if got := getMaxIteration(); got != MaxIteration {
+			t.Errorf("getMaxIteration() = %v, want %v", got, MaxIteration)
+		}
+	})
+}
+
 func TestNN_Train(t *testing.T) {
 	type args struct {
 		input  []float64
@@ -24,9 +36,9 @@ func TestNN_Train(t *testing.T) {
 			name: "#1",
 			args: args{[]float64{.2, .3}, []float64{.2}},
 			gave: &NN{
-				Activation: params.SIGMOID,
-				Loss:       params.MSE,
-				Weights: pkg.Float3Type{
+				ActivationMode: params.SIGMOID,
+				LossMode:       params.MSE,
+				Weight: pkg.Float3Type{
 					{
 						{.1, .1, .1},
 						{.1, .1, .1},
@@ -92,8 +104,9 @@ func TestNN_Train(t *testing.T) {
 			name: "#6_not_init",
 			args: args{[]float64{.2, .3}, []float64{.3}},
 			gave: &NN{
-				Bias:   true,
-				Hidden: []int{2},
+				Bias:        true,
+				HiddenLayer: []int{2},
+				LossLimit:   .95,
 			},
 			wantLoss:  .0025,
 			wantCount: 1,
@@ -101,7 +114,7 @@ func TestNN_Train(t *testing.T) {
 		{
 			name: "#7_NaN",
 			args: args{[]float64{2358925515.52, .66, .81}, []float64{-.13, .2}},
-			gave: &NN{Activation: params.TANH},
+			gave: &NN{ActivationMode: params.TANH},
 		},
 	}
 	for _, tt := range tests {

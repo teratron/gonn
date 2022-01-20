@@ -16,13 +16,14 @@ var testJSON = filepath.Join("..", "testdata", "perceptron.json")
 
 func TestGet(t *testing.T) {
 	testNN := &perceptron.NN{
-		Name:       Perceptron,
-		Bias:       true,
-		Hidden:     []int{2},
-		Activation: params.SIGMOID,
-		Loss:       params.MSE,
-		Rate:       .3,
-		Weights: pkg.Float3Type{
+		Name:           Perceptron,
+		Bias:           true,
+		HiddenLayer:    []int{2},
+		ActivationMode: params.SIGMOID,
+		LossMode:       params.MSE,
+		LossLimit:      .1,
+		Rate:           .3,
+		Weight: pkg.Float3Type{
 			{
 				{.1, .1, .1},
 				{.1, .1, .1},
@@ -66,7 +67,7 @@ func TestGet(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.want != nil {
-				if nn, ok := tt.want.(*perceptron.NN); ok && len(nn.Weights) > 0 {
+				if nn, ok := tt.want.(*perceptron.NN); ok && len(nn.Weight) > 0 {
 					nn.Init(utils.GetFileType(tt.gave))
 				}
 			}

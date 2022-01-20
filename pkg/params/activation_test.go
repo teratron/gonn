@@ -1,6 +1,10 @@
 package params
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/teratron/gonn/pkg"
+)
 
 func Test_checkActivationMode(t *testing.T) {
 	tests := []struct {
@@ -30,13 +34,13 @@ func Test_checkActivationMode(t *testing.T) {
 
 func TestActivation(t *testing.T) {
 	type args struct {
-		value float64
+		value pkg.FloatType
 		mode  uint8
 	}
 	tests := []struct {
 		name string
 		args
-		want float64
+		want pkg.FloatType
 	}{
 		{
 			name: "#1_ModeLINEAR",
@@ -90,13 +94,13 @@ func TestActivation(t *testing.T) {
 
 func TestDerivative(t *testing.T) {
 	type args struct {
-		value float64
+		value pkg.FloatType
 		mode  uint8
 	}
 	tests := []struct {
 		name string
 		args
-		want float64
+		want pkg.FloatType
 	}{
 		{
 			name: "#1_ModeLINEAR",

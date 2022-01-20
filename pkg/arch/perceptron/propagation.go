@@ -81,13 +81,13 @@ func (nn *NN) calcNeuron() {
 				num++
 			}
 
-			switch nn.Activation {
+			switch nn.ActivationMode {
 			case params.LINEAR:
 				if num > 0 {
 					n.value /= num
 				}
 			default:
-				n.value = pkg.FloatType(params.Activation(float64(n.value), nn.Activation))
+				n.value = params.Activation(n.value, nn.ActivationMode)
 			}
 		}
 	}
@@ -97,7 +97,7 @@ func (nn *NN) calcNeuron() {
 func (nn *NN) calcLoss() (loss float64) {
 	for i, n := range nn.neuron[nn.lastLayerIndex] {
 		n.miss = pkg.FloatType(nn.output[i]) - n.value
-		switch nn.Loss {
+		switch nn.LossMode {
 		default:
 			fallthrough
 		case params.MSE, params.RMSE:
@@ -110,7 +110,7 @@ func (nn *NN) calcLoss() (loss float64) {
 	}
 
 	loss /= float64(nn.lenOutput)
-	if nn.Loss == params.RMSE {
+	if nn.LossMode == params.RMSE {
 		loss = math.Sqrt(loss)
 	}
 	return
@@ -154,8 +154,8 @@ func (nn *NN) calcMiss() {
 	}
 }
 
-// updWeight update weights.
-/*func (nn *NN) updWeight() {
+// updateWeight update weights.
+/*func (nn *NN) updateWeight() {
 	wait := make(chan bool)
 	defer close(wait)
 
@@ -181,7 +181,7 @@ func (nn *NN) calcMiss() {
 						}
 
 						switch nn.Activation {
-						case params.LINEAR, params.SIGMOID:
+						case params.LINEAR:
 							if value != 0 {
 								nn.weight[i][j][k] += grad / value
 							}
@@ -203,7 +203,7 @@ func (nn *NN) calcMiss() {
 		}
 	}
 }*/
-func (nn *NN) updWeight() {
+func (nn *NN) updateWeight() {
 	var length, dec int
 	for i, v := range nn.weight {
 		if i > 0 {
@@ -214,7 +214,7 @@ func (nn *NN) updWeight() {
 		}
 
 		for j, w := range v {
-			grad := nn.Rate * nn.neuron[i][j].miss * pkg.FloatType(params.Derivative(float64(nn.neuron[i][j].value), nn.Activation))
+			grad := nn.Rate * nn.neuron[i][j].miss * params.Derivative(nn.neuron[i][j].value, nn.ActivationMode)
 			for k := range w {
 				if k < length {
 					var value pkg.FloatType
@@ -224,7 +224,7 @@ func (nn *NN) updWeight() {
 						value = pkg.FloatType(nn.input[k])
 					}
 
-					switch nn.Activation {
+					switch nn.ActivationMode {
 					case params.LINEAR:
 						if value != 0 {
 							nn.weight[i][j][k] += grad / value
@@ -239,3 +239,58 @@ func (nn *NN) updWeight() {
 		}
 	}
 }
+
+/*func (nn *NN) updateWeight() {
+	wait := make(chan bool)
+	defer close(wait)
+
+	var length, dec int
+	for i, v := range nn.weight {
+		if i > 0 {
+			dec = i - 1
+			length = len(nn.neuron[dec])
+		} else {
+			length = nn.lenInput
+		}
+
+		update := func(i, j, dec, length int, grad pkg.FloatType, w []pkg.FloatType) {
+			for k := range w {
+				if k < length {
+					var value pkg.FloatType
+					if i > 0 {
+						value = nn.neuron[dec][k].value
+					} else {
+						value = pkg.FloatType(nn.input[k])
+					}
+
+					switch nn.ActivationMode {
+					case params.LINEAR:
+						if value != 0 {
+							nn.weight[i][j][k] += grad / value
+						}
+					default:
+						nn.weight[i][j][k] += grad * value
+					}
+				} else {
+					nn.weight[i][j][k] += grad
+				}
+			}
+		}
+
+		routine := func(i, j, dec, length int, grad pkg.FloatType, w []pkg.FloatType) {
+			update(i, j, dec, length, grad, w)
+			wait <- true
+		}
+
+		for j, w := range v {
+			grad := nn.Rate * nn.neuron[i][j].miss * pkg.FloatType(params.Derivative(float64(nn.neuron[i][j].value), nn.ActivationMode))
+			go routine(i, j, dec, length, grad, w)
+		}
+	}
+
+	for _, v := range nn.weight {
+		for range v {
+			<-wait
+		}
+	}
+}*/

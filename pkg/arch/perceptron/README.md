@@ -8,15 +8,15 @@ Neural network architecture name (required field for a config).
 
 The neuron bias, false or true (required field for a config).
 
-### Hidden
+### HiddenLayer
 
 Array of the number of neurons in each hidden layer.
 
-### Activation
+### ActivationMode
 
-Activation function mode (required field for a config).
+ActivationMode function mode (required field for a config).
 
-| Code | Activation | Description                               |
+| Code | ActivationMode | Description                               |
 | ---- | ---------- | ----------------------------------------- |
 | 0    | LINEAR     | Linear/identity.                          |
 | 1    | RELU       | ReLu (rectified linear unit).             |
@@ -24,7 +24,7 @@ Activation function mode (required field for a config).
 | 3    | SIGMOID    | Logistic, a.k.a. sigmoid or soft step.    |
 | 4    | TANH       | TanH (hyperbolic tangent).                |
 
-### Loss
+### LossMode
 
 The mode of calculation of the total error.
 
@@ -34,6 +34,10 @@ The mode of calculation of the total error.
 | 1    | RMSE   | Root Mean Squared Error. |
 | 2    | ARCTAN | Arctan.                  |
 | 3    | AVG    | Average.                 |
+
+### LossLimit
+
+Minimum (sufficient) limit of the average of the error during training.
 
 ### Rate
 

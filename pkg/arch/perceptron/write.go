@@ -36,7 +36,7 @@ func (nn *NN) WriteWeight(name string) (err error) {
 	case error:
 		err = d
 	case utils.Filer:
-		err = d.Encode(nn.Weights)
+		err = d.Encode(nn.Weight)
 	}
 
 	if err != nil {

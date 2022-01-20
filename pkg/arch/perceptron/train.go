@@ -18,7 +18,7 @@ func getMaxIteration() int {
 }
 
 // MinLossLimit minimum (sufficient) limit of the average of the error during training.
-const MinLossLimit = 1e-10
+const MinLossLimit = 1e-15
 
 var GetMinLossLimit = getMinLossLimit
 
@@ -50,26 +50,17 @@ func (nn *NN) Train(input []float64, target ...[]float64) (count int, loss float
 			_ = copy(nn.input, input)
 			_ = copy(nn.output, target[0])
 
-			if nn.Weights[0][0][0] != 0 {
-				_ = copy(nn.weight, nn.Weights)
+			if nn.Weight[0][0][0] != 0 {
+				_ = copy(nn.weight, nn.Weight)
 			}
 			//fmt.Println(nn.weight)
 
 			minLoss := 1.
 			minCount := 0
-			//sum, avg, prev := 0., 0., 1.
 			for count < GetMaxIteration() {
 				count++
 				nn.calcNeuron()
 				loss = nn.calcLoss()
-
-				/*sum += loss
-				avg = sum / float64(count)
-
-				if prev < 5 * avg {
-					fmt.Println(count, "Avg", avg, 5 * avg)
-				}
-				prev = avg*/
 
 				switch {
 				case math.IsNaN(loss), math.IsInf(loss, 0):
@@ -77,14 +68,14 @@ func (nn *NN) Train(input []float64, target ...[]float64) (count int, loss float
 				case loss < minLoss:
 					minLoss = loss
 					minCount = count
-					_ = copy(nn.Weights, nn.weight)
-					if loss < GetMinLossLimit() {
+					_ = copy(nn.Weight, nn.weight)
+					if loss < nn.LossLimit || loss < GetMinLossLimit() {
 						fmt.Println(count, "---MinLossLimit", minCount, minLoss)
 						return minCount, minLoss
 					}
 				}
 				nn.calcMiss()
-				nn.updWeight()
+				nn.updateWeight()
 			}
 			fmt.Println("+++++", minCount, minLoss)
 			return minCount, minLoss
@@ -114,7 +105,7 @@ ERROR:
 			log.Panic("train: not optimal neural network parameters")
 		}
 		nn.calcMiss()
-		nn.updWeight()
+		nn.updateWeight()
 	}
 	return
 }*/

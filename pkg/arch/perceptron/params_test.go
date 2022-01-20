@@ -8,25 +8,25 @@ import (
 	"github.com/teratron/gonn/pkg/params"
 )
 
-func TestNN_NeuronBias(t *testing.T) {
+func TestNN_GetBias(t *testing.T) {
 	want := &NN{Bias: true}
 	t.Run("true", func(t *testing.T) {
-		if !want.NeuronBias() {
-			t.Errorf("NeuronBias() = %t, want %t", false, true)
+		if !want.GetBias() {
+			t.Errorf("GetBias() = %t, want %t", false, true)
 		}
 	})
 }
 
-func TestNN_SetNeuronBias(t *testing.T) {
+func TestNN_SetBias(t *testing.T) {
 	want := &NN{}
 	t.Run("true", func(t *testing.T) {
-		if want.SetNeuronBias(true); !want.Bias {
-			t.Errorf("SetNeuronBias() = %t, want %t", true, false)
+		if want.SetBias(true); !want.Bias {
+			t.Errorf("SetBias() = %t, want %t", true, false)
 		}
 	})
 }
 
-func TestNN_HiddenLayer(t *testing.T) {
+func TestNN_GetHiddenLayer(t *testing.T) {
 	tests := []struct {
 		name string
 		gave *NN
@@ -34,29 +34,29 @@ func TestNN_HiddenLayer(t *testing.T) {
 	}{
 		{
 			name: "#1_nil",
-			gave: &NN{Hidden: nil},
+			gave: &NN{HiddenLayer: nil},
 			want: []int{0},
 		},
 		{
 			name: "#2_[]",
-			gave: &NN{Hidden: []int{}},
+			gave: &NN{HiddenLayer: []int{}},
 			want: []int{0},
 		},
 		{
 			name: "#3_[0]",
-			gave: &NN{Hidden: []int{0}},
+			gave: &NN{HiddenLayer: []int{0}},
 			want: []int{0},
 		},
 		{
 			name: "#4_[3_2_1]",
-			gave: &NN{Hidden: []int{3, 2, 1}},
+			gave: &NN{HiddenLayer: []int{3, 2, 1}},
 			want: []int{3, 2, 1},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.gave.HiddenLayer(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("HiddenLayer()\ngot:\t%v\nwant:\t%v", got, tt.want)
+			if got := tt.gave.GetHiddenLayer(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("GetHiddenLayer()\ngot:\t%v\nwant:\t%v", got, tt.want)
 			}
 		})
 	}
@@ -92,18 +92,18 @@ func TestNN_SetHiddenLayer(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got.SetHiddenLayer(tt.gave...); !reflect.DeepEqual(got.Hidden, tt.want) {
-				t.Errorf("SetHiddenLayer()\ngot:\t%v\nwant:\t%v", got.Hidden, tt.want)
+			if got.SetHiddenLayer(tt.gave...); !reflect.DeepEqual(got.HiddenLayer, tt.want) {
+				t.Errorf("SetHiddenLayer()\ngot:\t%v\nwant:\t%v", got.HiddenLayer, tt.want)
 			}
 		})
 	}
 }
 
-func TestNN_ActivationMode(t *testing.T) {
-	want := &NN{Activation: params.SIGMOID}
+func TestNN_GetActivationMode(t *testing.T) {
+	want := &NN{ActivationMode: params.SIGMOID}
 	t.Run("ModeSIGMOID", func(t *testing.T) {
-		if got := want.ActivationMode(); got != want.Activation {
-			t.Errorf("ActivationMode() = %d, want %d", got, want.Activation)
+		if got := want.GetActivationMode(); got != want.ActivationMode {
+			t.Errorf("GetActivationMode() = %d, want %d", got, want.ActivationMode)
 		}
 	})
 }
@@ -112,17 +112,17 @@ func TestNN_SetActivationMode(t *testing.T) {
 	got := &NN{}
 	want := params.LINEAR
 	t.Run("ModeLINEAR", func(t *testing.T) {
-		if got.SetActivationMode(want); got.Activation != want {
-			t.Errorf("SetActivationMode() = %d, want %d", got.Activation, want)
+		if got.SetActivationMode(want); got.ActivationMode != want {
+			t.Errorf("SetActivationMode() = %d, want %d", got.ActivationMode, want)
 		}
 	})
 }
 
-func TestNN_LossMode(t *testing.T) {
-	want := &NN{Loss: params.ARCTAN}
+func TestNN_GetLossMode(t *testing.T) {
+	want := &NN{LossMode: params.ARCTAN}
 	t.Run("ModeARCTAN", func(t *testing.T) {
-		if got := want.LossMode(); got != want.Loss {
-			t.Errorf("LossMode() = %d, want %d", got, want.Loss)
+		if got := want.GetLossMode(); got != want.LossMode {
+			t.Errorf("GetLossMode() = %d, want %d", got, want.LossMode)
 		}
 	})
 }
@@ -149,23 +149,42 @@ func TestNN_SetLossMode(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.got.SetLossMode(tt.gave); tt.got.Loss != tt.want {
-				t.Errorf("SetLossMode() = %d, want %d", tt.got.Loss, tt.want)
+			if tt.got.SetLossMode(tt.gave); tt.got.LossMode != tt.want {
+				t.Errorf("SetLossMode() = %d, want %d", tt.got.LossMode, tt.want)
 			}
 		})
 	}
 }
 
-func TestNN_LearningRate(t *testing.T) {
-	want := &NN{Rate: .3}
-	t.Run("DefaultRate", func(t *testing.T) {
-		if got := want.LearningRate(); got != float64(want.Rate) {
-			t.Errorf("LearningRate() = %f, want %f", got, want.Rate)
+func TestNN_GetLossLimit(t *testing.T) {
+	want := &NN{LossLimit: .1}
+	t.Run("0.1", func(t *testing.T) {
+		if got := want.GetLossLimit(); got != want.LossLimit {
+			t.Errorf("GetLossLimit() = %f, want %f", got, want.LossLimit)
 		}
 	})
 }
 
-func TestNN_SetLearningRate(t *testing.T) {
+func TestNN_SetLossLimit(t *testing.T) {
+	got := &NN{}
+	want := .01
+	t.Run("0.01", func(t *testing.T) {
+		if got.SetLossLimit(want); got.LossLimit != want {
+			t.Errorf("SetLossLimit() = %f, want %f", got.LossLimit, want)
+		}
+	})
+}
+
+func TestNN_GetRate(t *testing.T) {
+	want := &NN{Rate: .3}
+	t.Run("DefaultRate", func(t *testing.T) {
+		if got := want.GetRate(); got != float64(want.Rate) {
+			t.Errorf("GetRate() = %f, want %f", got, want.Rate)
+		}
+	})
+}
+
+func TestNN_SetRate(t *testing.T) {
 	tests := []struct {
 		name string
 		got  *NN
@@ -193,14 +212,14 @@ func TestNN_SetLearningRate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.got.SetLearningRate(tt.gave); tt.got.Rate != tt.want {
-				t.Errorf("SetLearningRate() = %f, want %f", tt.got.Rate, tt.want)
+			if tt.got.SetRate(tt.gave); tt.got.Rate != tt.want {
+				t.Errorf("SetRate() = %f, want %f", tt.got.Rate, tt.want)
 			}
 		})
 	}
 }
 
-func TestNN_Weight(t *testing.T) {
+func TestNN_GetWeight(t *testing.T) {
 	tests := []struct {
 		name string
 		gave *NN
@@ -208,24 +227,24 @@ func TestNN_Weight(t *testing.T) {
 	}{
 		{
 			name: "#1_nil",
-			gave: &NN{Weights: nil},
+			gave: &NN{Weight: nil},
 			want: nil,
 		},
 		{
 			name: "#2_[]",
-			gave: &NN{Weights: pkg.Float3Type{}},
+			gave: &NN{Weight: pkg.Float3Type{}},
 			want: pkg.Float3Type{},
 		},
 		{
 			name: "#3_[[[0.1_0.2_0.3]]]",
-			gave: &NN{Weights: pkg.Float3Type{{{.1, .2, .3}}}},
+			gave: &NN{Weight: pkg.Float3Type{{{.1, .2, .3}}}},
 			want: pkg.Float3Type{{{.1, .2, .3}}},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := *tt.gave.Weight().(*pkg.Float3Type); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Weight()\ngot:\t%v\nwant:\t%v", got, tt.want)
+			if got := *tt.gave.GetWeight().(*pkg.Float3Type); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("GetWeight()\ngot:\t%v\nwant:\t%v", got, tt.want)
 			}
 		})
 	}
@@ -252,8 +271,8 @@ func TestNN_SetWeight(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got.SetWeight(tt.want); !reflect.DeepEqual(got.Weights, tt.want) {
-				t.Errorf("SetWeight()\ngot:\t%v\nwant:\t%v", got.Weights, tt.want)
+			if got.SetWeight(tt.want); !reflect.DeepEqual(got.Weight, tt.want) {
+				t.Errorf("SetWeight()\ngot:\t%v\nwant:\t%v", got.Weight, tt.want)
 			}
 		})
 	}

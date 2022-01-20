@@ -2,27 +2,27 @@ package pkg
 
 // Parameter.
 type Parameter interface {
-	Weight() Floater
+	GetWeight() Floater
 	SetWeight(Floater)
 
-	HiddenLayer() []int
+	GetHiddenLayer() []int
 	SetHiddenLayer(...int)
 
-	NeuronBias() bool
-	SetNeuronBias(bool)
+	GetBias() bool
+	SetBias(bool)
 
-	ActivationMode() uint8
+	GetActivationMode() uint8
 	SetActivationMode(uint8)
 
-	LossMode() uint8
+	GetLossMode() uint8
 	SetLossMode(uint8)
 
-	LossLimit() float64
+	GetLossLimit() float64
 	SetLossLimit(float64)
 
-	LearningRate() float64
-	SetLearningRate(float64)
+	GetRate() float64
+	SetRate(float64)
 
-	NeuronEnergy() float64
-	SetNeuronEnergy(float64)
+	GetEnergy() float64
+	SetEnergy(float64)
 }

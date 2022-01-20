@@ -12,16 +12,21 @@ import (
 
 var testJSON = filepath.Join("..", "..", "testdata", "perceptron.json")
 
+func init() {
+	params.GetRandFloat = func() pkg.FloatType { return .5 }
+}
+
 func TestNN_Init(t *testing.T) {
 	testFile := &utils.FileJSON{Name: testJSON}
 	testNN := &NN{
-		Name:       Name,
-		Bias:       true,
-		Hidden:     []int{2},
-		Activation: params.SIGMOID,
-		Loss:       params.MSE,
-		Rate:       .3,
-		Weights: pkg.Float3Type{
+		Name:           Name,
+		Bias:           true,
+		HiddenLayer:    []int{2},
+		ActivationMode: params.SIGMOID,
+		LossMode:       params.MSE,
+		LossLimit:      .1,
+		Rate:           .3,
+		Weight: pkg.Float3Type{
 			{
 				{.1, .1, .1},
 				{.1, .1, .1},
@@ -57,7 +62,7 @@ func TestNN_Init(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt.got.Weights = tt.want.Weights
+		tt.got.Weight = tt.want.Weight
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.got.Init(tt.gave...); !reflect.DeepEqual(tt.got, tt.want) {
 				t.Errorf("Init()\ngot:\t%v\nwant:\t%v", tt.got, tt.want)
@@ -76,13 +81,13 @@ func TestNN_initFromNew(t *testing.T) {
 		{
 			name: "#1",
 			got: &NN{
-				Activation: params.SIGMOID,
+				ActivationMode: params.SIGMOID,
 			},
 			want: &NN{
-				Bias:       false,
-				Hidden:     []int{0},
-				Activation: params.SIGMOID,
-				Weights: pkg.Float3Type{
+				Bias:           false,
+				HiddenLayer:    []int{0},
+				ActivationMode: params.SIGMOID,
+				Weight: pkg.Float3Type{
 					{
 						{r, r},
 						{r, r},
@@ -106,9 +111,9 @@ func TestNN_initFromNew(t *testing.T) {
 			name: "#2",
 			got:  &NN{},
 			want: &NN{
-				Bias:   true,
-				Hidden: []int{2},
-				Weights: pkg.Float3Type{
+				Bias:        true,
+				HiddenLayer: []int{2},
+				Weight: pkg.Float3Type{
 					{
 						{r, r, r},
 						{r, r, r},
@@ -137,7 +142,7 @@ func TestNN_initFromNew(t *testing.T) {
 	}
 	for _, tt := range tests {
 		tt.got.Bias = tt.want.Bias
-		tt.got.Hidden = tt.want.Hidden
+		tt.got.HiddenLayer = tt.want.HiddenLayer
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.got.initFromNew(tt.want.lenInput, tt.want.lenOutput); !reflect.DeepEqual(tt.got, tt.want) {
 				t.Errorf("initFromNew()\ngot:\t%v\nwant:\t%v", tt.got, tt.want)
@@ -156,8 +161,8 @@ func TestNN_initFromWeight(t *testing.T) {
 			name: "#1",
 			got:  &NN{},
 			want: &NN{
-				Hidden: []int{0},
-				Weights: pkg.Float3Type{
+				HiddenLayer: []int{0},
+				Weight: pkg.Float3Type{
 					{
 						{.1, .1},
 						{.1, .1},
@@ -181,9 +186,9 @@ func TestNN_initFromWeight(t *testing.T) {
 			name: "#2",
 			got:  &NN{},
 			want: &NN{
-				Bias:   true,
-				Hidden: []int{2},
-				Weights: pkg.Float3Type{
+				Bias:        true,
+				HiddenLayer: []int{2},
+				Weight: pkg.Float3Type{
 					{
 						{.1, .1, .1},
 						{.1, .1, .1},
@@ -211,7 +216,7 @@ func TestNN_initFromWeight(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt.got.Weights = tt.want.Weights
+		tt.got.Weight = tt.want.Weight
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.got.initFromWeight(); !reflect.DeepEqual(tt.got, tt.want) {
 				t.Errorf("initFromWeight()\ngot:\t%v\nwant:\t%v", tt.got, tt.want)

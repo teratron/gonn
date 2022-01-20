@@ -11,6 +11,6 @@ func main() {
 	// instance with the default parameters
 	// for Hopfield neural network.
 	n := nn.New("hopfield")
-	n.SetNeuronEnergy(.1)
+	n.SetEnergy(.1)
 	fmt.Println("nn.New(\"hopfield\"):", n)
 }
