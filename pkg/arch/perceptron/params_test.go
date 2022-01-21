@@ -30,27 +30,27 @@ func TestNN_GetHiddenLayer(t *testing.T) {
 	tests := []struct {
 		name string
 		gave *NN
-		want []int
+		want []uint
 	}{
 		{
 			name: "#1_nil",
 			gave: &NN{HiddenLayer: nil},
-			want: []int{0},
+			want: []uint{0},
 		},
 		{
 			name: "#2_[]",
-			gave: &NN{HiddenLayer: []int{}},
-			want: []int{0},
+			gave: &NN{HiddenLayer: []uint{}},
+			want: []uint{0},
 		},
 		{
 			name: "#3_[0]",
-			gave: &NN{HiddenLayer: []int{0}},
-			want: []int{0},
+			gave: &NN{HiddenLayer: []uint{0}},
+			want: []uint{0},
 		},
 		{
 			name: "#4_[3_2_1]",
-			gave: &NN{HiddenLayer: []int{3, 2, 1}},
-			want: []int{3, 2, 1},
+			gave: &NN{HiddenLayer: []uint{3, 2, 1}},
+			want: []uint{3, 2, 1},
 		},
 	}
 	for _, tt := range tests {
@@ -66,28 +66,28 @@ func TestNN_SetHiddenLayer(t *testing.T) {
 	got := &NN{}
 	tests := []struct {
 		name string
-		gave []int
-		want []int
+		gave []uint
+		want []uint
 	}{
 		{
 			name: "#1_nil",
 			gave: nil,
-			want: []int{0},
+			want: []uint{0},
 		},
 		{
 			name: "#2_[]",
-			gave: []int{},
-			want: []int{0},
+			gave: []uint{},
+			want: []uint{0},
 		},
 		{
 			name: "#3_[0]",
-			gave: []int{0},
-			want: []int{0},
+			gave: []uint{0},
+			want: []uint{0},
 		},
 		{
 			name: "#4_[1_2_3]",
-			gave: []int{1, 2, 3},
-			want: []int{1, 2, 3},
+			gave: []uint{1, 2, 3},
+			want: []uint{1, 2, 3},
 		},
 	}
 	for _, tt := range tests {

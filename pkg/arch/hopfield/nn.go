@@ -37,7 +37,7 @@ type NN struct {
 	mutex    sync.Mutex
 
 	// Transfer data.
-	input  []float64
+	input  pkg.Float1Type
 	weight pkg.Float2Type
 }
 

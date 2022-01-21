@@ -73,7 +73,7 @@ func (nn *NN) calcNeuron() {
 					if i > 0 {
 						n.value += nn.neuron[dec][k].value * w
 					} else {
-						n.value += pkg.FloatType(nn.input[k]) * w
+						n.value += nn.input[k] * w
 					}
 				} else {
 					n.value += w
@@ -96,7 +96,7 @@ func (nn *NN) calcNeuron() {
 // calcLoss calculating the error of the output neuron.
 func (nn *NN) calcLoss() (loss float64) {
 	for i, n := range nn.neuron[nn.lastLayerIndex] {
-		n.miss = pkg.FloatType(nn.output[i]) - n.value
+		n.miss = nn.output[i] - n.value
 		switch nn.LossMode {
 		default:
 			fallthrough
@@ -221,7 +221,7 @@ func (nn *NN) updateWeight() {
 					if i > 0 {
 						value = nn.neuron[dec][k].value
 					} else {
-						value = pkg.FloatType(nn.input[k])
+						value = nn.input[k]
 					}
 
 					switch nn.ActivationMode {

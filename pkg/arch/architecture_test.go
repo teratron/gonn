@@ -18,7 +18,7 @@ func TestGet(t *testing.T) {
 	testNN := &perceptron.NN{
 		Name:           Perceptron,
 		Bias:           true,
-		HiddenLayer:    []int{2},
+		HiddenLayer:    []uint{2},
 		ActivationMode: params.SIGMOID,
 		LossMode:       params.MSE,
 		LossLimit:      .1,

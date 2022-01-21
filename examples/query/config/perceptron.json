@@ -1,8 +1,8 @@
 {
   "name": "perceptron",
   "bias": true,
-  "activation": 3,
-  "weights": [
+  "activationMode": 3,
+  "weight": [
     [
       [
         -2.5128086,

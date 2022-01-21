@@ -28,13 +28,14 @@ func (nn *NN) Query(input []float64) []float64 {
 			_ = copy(nn.Weight, nn.weight)
 		}*/
 
-		_ = copy(nn.input, input)
+		_ = copy(nn.input, pkg.ToFloat1Type(input))
 
 		nn.calcNeuron()
+		output := make([]float64, nn.lenOutput)
 		for i, n := range nn.neuron[nn.lastLayerIndex] {
-			nn.output[i] = float64(n.value)
+			output[i] = float64(n.value)
 		}
-		return nn.output
+		return output
 	} else {
 		err = pkg.ErrNoInput
 	}

@@ -19,13 +19,13 @@ func main() {
 	n.SetHiddenLayer(5, 3)
 
 	// ActivationMode function mode.
-	n.SetActivationMode(nn.SIGMOID)
+	n.SetActivationMode(nn.TANH)
 
 	// The mode of calculation of the total error.
 	n.SetLossMode(nn.MSE)
 
 	// Minimum (sufficient) limit of the average of the error during training.
-	lossLimit := .0001
+	lossLimit := 1e-5
 	n.SetLossLimit(lossLimit)
 
 	// Learning coefficient (greater than 0 and less than or equal to 1).

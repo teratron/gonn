@@ -1,14 +1,14 @@
 {
   "name": "perceptron",
   "bias": true,
-  "hidden": [
+  "hiddenLayer": [
     2
   ],
-  "activation": 3,
-  "loss": 0,
-  "limit": 0.1,
+  "activationMode": 3,
+  "lossMode": 0,
+  "lossLimit": 0.1,
   "rate": 0.3,
-  "weights": [
+  "weight": [
     [
       [
         0.1,

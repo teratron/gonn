@@ -30,7 +30,7 @@ func TestNN_calcNeuron(t *testing.T) {
 					},
 				},
 				lenInput: 1,
-				input:    []float64{.2},
+				input:    pkg.Float1Type{.2},
 			},
 			want: [][]*neuron{
 				{
@@ -55,7 +55,7 @@ func TestNN_calcNeuron(t *testing.T) {
 					},
 				},
 				lenInput: 2,
-				input:    []float64{.2, .3},
+				input:    pkg.Float1Type{.2, .3},
 			},
 			want: [][]*neuron{
 				{
@@ -87,7 +87,7 @@ func TestNN_calcNeuron(t *testing.T) {
 					},
 				},
 				lenInput: 2,
-				input:    []float64{.2, .3},
+				input:    pkg.Float1Type{.2, .3},
 			},
 			want: [][]*neuron{
 				{
@@ -135,7 +135,7 @@ func TestNN_calcLoss(t *testing.T) {
 				},
 				lenOutput:      1,
 				lastLayerIndex: 0,
-				output:         []float64{.2},
+				output:         pkg.Float1Type{.2},
 			},
 			want: .351686,
 		},
@@ -152,7 +152,7 @@ func TestNN_calcLoss(t *testing.T) {
 				},
 				lenOutput:      2,
 				lastLayerIndex: 0,
-				output:         []float64{.2, .3},
+				output:         pkg.Float1Type{.2, .3},
 			},
 			want: .080124,
 		},
@@ -172,7 +172,7 @@ func TestNN_calcLoss(t *testing.T) {
 				},
 				lenOutput:      1,
 				lastLayerIndex: 1,
-				output:         []float64{.2},
+				output:         pkg.Float1Type{.2},
 			},
 			want: .123683,
 		},
@@ -192,7 +192,7 @@ func TestNN_calcLoss(t *testing.T) {
 				},
 				lenOutput:      1,
 				lastLayerIndex: 1,
-				output:         []float64{.2},
+				output:         pkg.Float1Type{.2},
 			},
 			want: .351686,
 		},
@@ -284,7 +284,7 @@ func TestNN_updWeight(t *testing.T) {
 					},
 				},
 				lenInput: 1,
-				input:    []float64{.2},
+				input:    pkg.Float1Type{.2},
 			},
 			want: pkg.Float3Type{
 				{
@@ -316,7 +316,7 @@ func TestNN_updWeight(t *testing.T) {
 					},
 				},
 				lenInput: 2,
-				input:    []float64{.2, .3},
+				input:    pkg.Float1Type{.2, .3},
 			},
 			want: pkg.Float3Type{
 				{

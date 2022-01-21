@@ -25,7 +25,7 @@ type NN struct {
 	Bias bool `json:"bias"`
 
 	// Array of the number of neurons in each hidden layer.
-	HiddenLayer []int `json:"hiddenLayer,omitempty"`
+	HiddenLayer []uint `json:"hiddenLayer,omitempty"`
 
 	// Activation function mode (required field for a config).
 	ActivationMode uint8 `json:"activationMode"`
@@ -54,8 +54,8 @@ type NN struct {
 	mutex          sync.Mutex
 
 	// Transfer data.
-	input  []float64 //TODO:
-	output []float64 //TODO:
+	input  pkg.Float1Type
+	output pkg.Float1Type
 	weight pkg.Float3Type
 }
 

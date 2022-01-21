@@ -5,8 +5,8 @@ type Parameter interface {
 	GetWeight() Floater
 	SetWeight(Floater)
 
-	GetHiddenLayer() []int
-	SetHiddenLayer(...int)
+	GetHiddenLayer() []uint
+	SetHiddenLayer(...uint)
 
 	GetBias() bool
 	SetBias(bool)

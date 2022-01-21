@@ -21,7 +21,7 @@ func TestNN_Init(t *testing.T) {
 	testNN := &NN{
 		Name:           Name,
 		Bias:           true,
-		HiddenLayer:    []int{2},
+		HiddenLayer:    []uint{2},
 		ActivationMode: params.SIGMOID,
 		LossMode:       params.MSE,
 		LossLimit:      .1,
@@ -85,7 +85,7 @@ func TestNN_initFromNew(t *testing.T) {
 			},
 			want: &NN{
 				Bias:           false,
-				HiddenLayer:    []int{0},
+				HiddenLayer:    []uint{0},
 				ActivationMode: params.SIGMOID,
 				Weight: pkg.Float3Type{
 					{
@@ -102,8 +102,8 @@ func TestNN_initFromNew(t *testing.T) {
 				lenInput:       2,
 				lenOutput:      2,
 				lastLayerIndex: 0,
-				input:          make([]float64, 2),
-				output:         make([]float64, 2),
+				input:          make(pkg.Float1Type, 2),
+				output:         make(pkg.Float1Type, 2),
 				isInit:         true,
 			},
 		},
@@ -112,7 +112,7 @@ func TestNN_initFromNew(t *testing.T) {
 			got:  &NN{},
 			want: &NN{
 				Bias:        true,
-				HiddenLayer: []int{2},
+				HiddenLayer: []uint{2},
 				Weight: pkg.Float3Type{
 					{
 						{r, r, r},
@@ -134,8 +134,8 @@ func TestNN_initFromNew(t *testing.T) {
 				lenInput:       2,
 				lenOutput:      1,
 				lastLayerIndex: 1,
-				input:          make([]float64, 2),
-				output:         make([]float64, 1),
+				input:          make(pkg.Float1Type, 2),
+				output:         make(pkg.Float1Type, 1),
 				isInit:         true,
 			},
 		},
@@ -161,7 +161,7 @@ func TestNN_initFromWeight(t *testing.T) {
 			name: "#1",
 			got:  &NN{},
 			want: &NN{
-				HiddenLayer: []int{0},
+				HiddenLayer: []uint{0},
 				Weight: pkg.Float3Type{
 					{
 						{.1, .1},
@@ -177,8 +177,8 @@ func TestNN_initFromWeight(t *testing.T) {
 				lenInput:       2,
 				lenOutput:      2,
 				lastLayerIndex: 0,
-				input:          make([]float64, 2),
-				output:         make([]float64, 2),
+				input:          make(pkg.Float1Type, 2),
+				output:         make(pkg.Float1Type, 2),
 				isInit:         true,
 			},
 		},
@@ -187,7 +187,7 @@ func TestNN_initFromWeight(t *testing.T) {
 			got:  &NN{},
 			want: &NN{
 				Bias:        true,
-				HiddenLayer: []int{2},
+				HiddenLayer: []uint{2},
 				Weight: pkg.Float3Type{
 					{
 						{.1, .1, .1},
@@ -209,8 +209,8 @@ func TestNN_initFromWeight(t *testing.T) {
 				lenInput:       2,
 				lenOutput:      1,
 				lastLayerIndex: 1,
-				input:          make([]float64, 2),
-				output:         make([]float64, 1),
+				input:          make(pkg.Float1Type, 2),
+				output:         make(pkg.Float1Type, 1),
 				isInit:         true,
 			},
 		},

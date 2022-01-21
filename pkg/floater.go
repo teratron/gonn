@@ -1,6 +1,8 @@
 package pkg
 
-import "log"
+import (
+	"log"
+)
 
 // Floater.
 type Floater interface {
@@ -19,6 +21,15 @@ func (f Float1Type) Length(...uint) int {
 	return len(f)
 }
 
+// ToFloat1Type.
+func ToFloat1Type(src []float64) Float1Type {
+	dst := make(Float1Type, len(src))
+	for i, v := range src {
+		dst[i] = FloatType(v)
+	}
+	return dst
+}
+
 // Length.
 func (f Float2Type) Length(index ...uint) int {
 	if len(index) > 0 {
@@ -29,6 +40,18 @@ func (f Float2Type) Length(index ...uint) int {
 		return 0
 	}
 	return len(f)
+}
+
+// ToFloat2Type.
+func ToFloat2Type(src [][]float64) Float2Type {
+	dst := make(Float2Type, len(src))
+	for i, v := range src {
+		dst[i] = make(Float1Type, len(v))
+		for j, w := range v {
+			dst[i][j] = FloatType(w)
+		}
+	}
+	return dst
 }
 
 // Length.
@@ -49,4 +72,19 @@ func (f Float3Type) Length(index ...uint) int {
 	}
 	log.Println("error Float3Type length: index exceeds arrays size")
 	return 0
+}
+
+// ToFloat3Type.
+func ToFloat3Type(src [][][]float64) Float3Type {
+	dst := make(Float3Type, len(src))
+	for i, u := range src {
+		dst[i] = make(Float2Type, len(u))
+		for j, v := range u {
+			dst[i][j] = make(Float1Type, len(v))
+			for k, w := range v {
+				dst[i][j][k] = FloatType(w)
+			}
+		}
+	}
+	return dst
 }

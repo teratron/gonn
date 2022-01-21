@@ -17,15 +17,6 @@ func getMaxIteration() int {
 	return MaxIteration
 }
 
-// MinLossLimit minimum (sufficient) limit of the average of the error during training.
-const MinLossLimit = 1e-15
-
-var GetMinLossLimit = getMinLossLimit
-
-func getMinLossLimit() float64 {
-	return MinLossLimit
-}
-
 // Train training dataset.
 func (nn *NN) Train(input []float64, target ...[]float64) (count int, loss float64) {
 	var err error
@@ -47,13 +38,12 @@ func (nn *NN) Train(input []float64, target ...[]float64) (count int, loss float
 				}
 			}
 
-			_ = copy(nn.input, input)
-			_ = copy(nn.output, target[0])
-
 			if nn.Weight[0][0][0] != 0 {
 				_ = copy(nn.weight, nn.Weight)
 			}
-			//fmt.Println(nn.weight)
+
+			_ = copy(nn.input, pkg.ToFloat1Type(input))
+			_ = copy(nn.output, pkg.ToFloat1Type(target[0]))
 
 			minLoss := 1.
 			minCount := 0
@@ -69,14 +59,16 @@ func (nn *NN) Train(input []float64, target ...[]float64) (count int, loss float
 					minLoss = loss
 					minCount = count
 					_ = copy(nn.Weight, nn.weight)
-					if loss < nn.LossLimit || loss < GetMinLossLimit() {
-						fmt.Println(count, "---MinLossLimit", minCount, minLoss)
+					if loss < nn.LossLimit {
+						//_ = copy(nn.Weight, nn.weight)
+						fmt.Println("---MinLossLimit", minCount, minLoss)
 						return minCount, minLoss
 					}
 				}
 				nn.calcMiss()
 				nn.updateWeight()
 			}
+			//_ = copy(nn.Weight, nn.weight)
 			fmt.Println("+++++", minCount, minLoss)
 			return minCount, minLoss
 		} else {

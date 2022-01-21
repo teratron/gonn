@@ -9,7 +9,7 @@ import (
 	"github.com/teratron/gonn/pkg/utils"
 )
 
-// Init.
+// Init initialize.
 func (nn *NN) Init(data ...interface{}) {
 	var err error
 	if len(data) > 0 {
@@ -46,11 +46,11 @@ func (nn *NN) initFromNew(lenInput, lenTarget int) {
 		nn.lastLayerIndex = 0
 	}
 
-	var layer []int
+	var layer []uint
 	if nn.lastLayerIndex > 0 {
-		layer = append(nn.HiddenLayer, nn.lenOutput)
+		layer = append(nn.HiddenLayer, uint(nn.lenOutput))
 	} else {
-		layer = []int{nn.lenOutput}
+		layer = []uint{uint(nn.lenOutput)}
 	}
 	lenLayer := len(layer)
 
@@ -69,10 +69,10 @@ func (nn *NN) initFromNew(lenInput, lenTarget int) {
 		nn.weight[i] = make(pkg.Float2Type, v)
 		nn.neuron[i] = make([]*neuron, v)
 		if i > 0 {
-			biasLayer = layer[i-1] + bias
+			biasLayer = int(layer[i-1]) + bias
 		}
 
-		for j := 0; j < v; j++ {
+		for j := 0; j < int(v); j++ {
 			if i > 0 {
 				nn.Weight[i][j] = make(pkg.Float1Type, biasLayer)
 				nn.weight[i][j] = make(pkg.Float1Type, biasLayer)
@@ -83,10 +83,8 @@ func (nn *NN) initFromNew(lenInput, lenTarget int) {
 			for k := range nn.weight[i][j] {
 				if nn.ActivationMode == params.LINEAR {
 					nn.Weight[i][j][k] = .5
-					//nn.weight[i][j][k] = .5
 				} else {
-					nn.Weight[i][j][k] = params.GetRandFloat() //TODO:
-					//nn.weight[i][j][k] = params.GetRandFloat()
+					nn.Weight[i][j][k] = params.GetRandFloat()
 				}
 			}
 			nn.neuron[i][j] = &neuron{}
@@ -112,12 +110,12 @@ func (nn *NN) initFromWeight() {
 	}
 
 	if nn.lastLayerIndex > 0 {
-		nn.HiddenLayer = make([]int, nn.lastLayerIndex)
+		nn.HiddenLayer = make([]uint, nn.lastLayerIndex)
 		for i := range nn.HiddenLayer {
-			nn.HiddenLayer[i] = len(nn.Weight[i])
+			nn.HiddenLayer[i] = uint(len(nn.Weight[i]))
 		}
 	} else {
-		nn.HiddenLayer = []int{0}
+		nn.HiddenLayer = []uint{0}
 	}
 
 	nn.weight = make(pkg.Float3Type, length)
@@ -131,14 +129,14 @@ func (nn *NN) initFromWeight() {
 			nn.neuron[i][j] = &neuron{}
 		}
 	}
-	//_ = copy(nn.weight, nn.Weight)
+	//_ = copy(nn.weight, nn.Weight)//TODO:
 
 	nn.initCompletion()
 }
 
 // initCompletion.
 func (nn *NN) initCompletion() {
-	nn.input = make([]float64, nn.lenInput)
-	nn.output = make([]float64, nn.lenOutput)
+	nn.input = make(pkg.Float1Type, nn.lenInput)
+	nn.output = make(pkg.Float1Type, nn.lenOutput)
 	nn.isInit = true
 }
