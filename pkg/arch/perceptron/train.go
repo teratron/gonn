@@ -47,23 +47,50 @@ func (nn *NN) Train(input []float64, target ...[]float64) (count int, loss float
 
 			minLoss := 1.
 			minCount := 0
+			var solid uint8
 			for count < GetMaxIteration() {
 				count++
 				nn.calcNeuron()
 				loss = nn.calcLoss()
 
-				switch {
-				case math.IsNaN(loss), math.IsInf(loss, 0):
-					log.Panic("train: not optimal neural network parameters")
-				case loss < minLoss:
+				if loss < minLoss {
 					minLoss = loss
 					minCount = count
-					_ = copy(nn.Weight, nn.weight)
+					if solid >= 1 {
+						_ = copy(nn.Weight, nn.weight)
+						fmt.Printf("%d:\t%d\n", count, solid)
+						solid = 0
+					} else {
+						//TODO:
+					}
 					if loss < nn.LossLimit {
-						//_ = copy(nn.Weight, nn.weight)
+						if solid == 0 {
+							_ = copy(nn.Weight, nn.weight)
+							fmt.Printf("--%d:\t%d\n", count, solid)
+						}
 						fmt.Println("---MinLossLimit", minCount, minLoss)
 						return minCount, minLoss
 					}
+				} else {
+					solid++
+				}
+
+				switch {
+				case math.IsNaN(loss), math.IsInf(loss, 0):
+					log.Panic("train: not optimal neural network parameters")
+					/*case loss < minLoss:
+						minLoss = loss
+						minCount = count
+						if count >= 100 {
+							_ = copy(nn.Weight, nn.weight)
+						}
+						if loss < nn.LossLimit {
+							//_ = copy(nn.Weight, nn.weight)
+							fmt.Println("---MinLossLimit", minCount, minLoss)
+							return minCount, minLoss
+						}
+					case loss >= minLoss:
+						fmt.Println("*****", count, loss)*/
 				}
 				nn.calcMiss()
 				nn.updateWeight()

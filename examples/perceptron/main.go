@@ -25,7 +25,7 @@ func main() {
 	n.SetLossMode(nn.MSE)
 
 	// Minimum (sufficient) limit of the average of the error during training.
-	lossLimit := 1e-5
+	lossLimit := 1e-10
 	n.SetLossLimit(lossLimit)
 
 	// Learning coefficient (greater than 0 and less than or equal to 1).
