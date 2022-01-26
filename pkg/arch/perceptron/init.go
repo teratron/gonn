@@ -129,7 +129,6 @@ func (nn *NN) initFromWeight() {
 			nn.neuron[i][j] = &neuron{}
 		}
 	}
-	//_ = copy(nn.weight, nn.Weight)//TODO:
 
 	nn.initCompletion()
 }

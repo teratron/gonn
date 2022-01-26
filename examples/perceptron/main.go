@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/teratron/gonn/pkg/nn"
 )
@@ -25,8 +26,8 @@ func main() {
 	n.SetLossMode(nn.MSE)
 
 	// Minimum (sufficient) limit of the average of the error during training.
-	lossLimit := 1e-10
-	n.SetLossLimit(lossLimit)
+	lossLimit := 1e-5
+	n.SetLossLimit(1e-5)
 
 	// Learning coefficient (greater than 0 and less than or equal to 1).
 	n.SetRate(.3)
@@ -35,6 +36,8 @@ func main() {
 	dataSet := []float64{.27, -.31, -.52, .66, .81, -.13, .2, .49, .11, -.73, .28}
 	lenInput := 3  // Number of input data.
 	lenOutput := 2 // Number of output data.
+
+	start := time.Now()
 
 	// Training.
 	lenData := len(dataSet) - lenOutput
@@ -50,6 +53,8 @@ func main() {
 			num++
 		}
 
+		//fmt.Println(epoch)
+
 		// Average error for the entire epoch.
 		// Exiting the cycle of learning epochs, when the minimum error level is reached.
 		if sum/num < lossLimit {
@@ -57,11 +62,13 @@ func main() {
 		}
 	}
 
+	fmt.Printf("Elapsed time: %v\n", time.Now().Sub(start))
+
 	// Writing the neural network configuration to a file.
-	_ = n.WriteConfig("perceptron.json")
+	//_ = n.WriteConfig("perceptron.json")
 
 	// Writing weights to a file.
-	_ = n.WriteWeight("perceptron_weights.json")
+	//_ = n.WriteWeight("perceptron_weights.json")
 
 	// Check the trained data, the result should be about [-0.13 0.2].
 	fmt.Println(n.Query([]float64{-.52, .66, .81}))

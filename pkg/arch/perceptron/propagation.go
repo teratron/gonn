@@ -169,7 +169,7 @@ func (nn *NN) calcMiss() {
 		}
 
 		for j, w := range v {
-			grad := nn.Rate * nn.neuron[i][j].miss * pkg.FloatType(params.Derivative(float64(nn.neuron[i][j].value), nn.Activation))
+			grad := nn.Rate * nn.neuron[i][j].miss * params.Derivative(nn.neuron[i][j].value, nn.ActivationMode)
 			go func(i, j, dec, length int, grad pkg.FloatType, w []pkg.FloatType) {
 				for k := range w {
 					if k < length {
@@ -283,7 +283,7 @@ func (nn *NN) updateWeight() {
 		}
 
 		for j, w := range v {
-			grad := nn.Rate * nn.neuron[i][j].miss * pkg.FloatType(params.Derivative(float64(nn.neuron[i][j].value), nn.ActivationMode))
+			grad := nn.Rate * nn.neuron[i][j].miss * params.Derivative(nn.neuron[i][j].value, nn.ActivationMode)
 			go routine(i, j, dec, length, grad, w)
 		}
 	}
