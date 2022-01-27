@@ -28,6 +28,9 @@ func (nn *NN) Init(data ...interface{}) {
 		default:
 			err = fmt.Errorf("%T %w: %v", value, pkg.ErrMissingType, value)
 		}
+		if err == nil {
+			nn.initCompletion()
+		}
 	} else {
 		err = pkg.ErrNoArgs
 	}
@@ -91,7 +94,7 @@ func (nn *NN) initFromNew(lenInput, lenTarget int) {
 		}
 	}
 
-	nn.initCompletion()
+	//nn.initCompletion()
 }
 
 // initFromWeight.
@@ -130,12 +133,13 @@ func (nn *NN) initFromWeight() {
 		}
 	}
 
-	nn.initCompletion()
+	//nn.initCompletion()
 }
 
 // initCompletion.
 func (nn *NN) initCompletion() {
 	nn.input = make(pkg.Float1Type, nn.lenInput)
-	nn.output = make(pkg.Float1Type, nn.lenOutput)
+	nn.target = make(pkg.Float1Type, nn.lenOutput)
+	nn.output = make([]float64, nn.lenOutput)
 	nn.isInit = true
 }

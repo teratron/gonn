@@ -60,7 +60,7 @@ func TestNN_Train(t *testing.T) {
 				lenOutput:      1,
 				lastLayerIndex: 1,
 				input:          make(pkg.Float1Type, 2),
-				output:         make(pkg.Float1Type, 1),
+				target:         make(pkg.Float1Type, 1),
 				isInit:         true,
 			},
 			wantLoss:  .123683,

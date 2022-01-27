@@ -39,14 +39,11 @@ func (nn *NN) Train(input []float64, target ...[]float64) (count int, loss float
 			}
 
 			if nn.Weight[0][0][0] != 0 {
-				//_ = copy(nn.weight, nn.Weight)
 				nn.weight = nn.Weight
 			}
 
-			//_ = copy(nn.input, pkg.ToFloat1Type(input))
-			//_ = copy(nn.output, pkg.ToFloat1Type(target[0]))
 			nn.input = pkg.ToFloat1Type(input)
-			nn.output = pkg.ToFloat1Type(target[0])
+			nn.target = pkg.ToFloat1Type(target[0])
 
 			minLoss := 1.
 			minCount := 0
@@ -56,12 +53,13 @@ func (nn *NN) Train(input []float64, target ...[]float64) (count int, loss float
 				loss = nn.calcLoss()
 
 				switch {
-				case math.IsNaN(loss), math.IsInf(loss, 0):
-					log.Panic("train: not optimal neural network parameters ", loss, math.IsNaN(loss), math.IsInf(loss, 0))
+				case math.IsNaN(loss):
+					log.Panic("train: loss not-a-number value")
+				case math.IsInf(loss, 0):
+					log.Panic("train: loss is infinity")
 				case loss < minLoss:
 					minLoss = loss
 					minCount = count
-					//_ = copy(nn.Weight, nn.weight)
 					nn.Weight = nn.weight
 					if loss < nn.LossLimit {
 						//fmt.Println("---MinLossLimit", minCount, minLoss)
@@ -87,8 +85,7 @@ ERROR:
 
 // TODO: // AndTrain training dataset.
 /*func (nn *NN) AndTrain(target ...[]float64) (loss float64, count int) {
-	//_ = copy(nn.output, target[0])
-	nn.output = target[0]
+	nn.target = target[0]
 
 	for count < GetMaxIteration() {
 		count++

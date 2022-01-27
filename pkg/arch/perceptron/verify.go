@@ -29,14 +29,11 @@ func (nn *NN) Verify(input []float64, target ...[]float64) float64 {
 			}
 
 			if nn.Weight[0][0][0] != 0 {
-				//_ = copy(nn.weight, nn.Weight)
 				nn.weight = nn.Weight
 			}
 
-			//_ = copy(nn.input, pkg.ToFloat1Type(input))
-			//_ = copy(nn.output, pkg.ToFloat1Type(target[0]))
 			nn.input = pkg.ToFloat1Type(input)
-			nn.output = pkg.ToFloat1Type(target[0])
+			nn.target = pkg.ToFloat1Type(target[0])
 
 			nn.calcNeuron()
 			return nn.calcLoss()

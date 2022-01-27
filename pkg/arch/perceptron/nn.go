@@ -54,9 +54,10 @@ type NN struct {
 	mutex          sync.Mutex
 
 	// Transfer data.
-	input  pkg.Float1Type
-	output pkg.Float1Type
 	weight pkg.Float3Type
+	input  pkg.Float1Type
+	target pkg.Float1Type
+	output []float64
 }
 
 type neuron struct {

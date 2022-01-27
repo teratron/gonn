@@ -96,7 +96,7 @@ func (nn *NN) calcNeuron() {
 // calcLoss calculating the error of the output neuron.
 func (nn *NN) calcLoss() (loss float64) {
 	for i, n := range nn.neuron[nn.lastLayerIndex] {
-		n.miss = nn.output[i] - n.value
+		n.miss = nn.target[i] - n.value
 		switch nn.LossMode {
 		default:
 			fallthrough

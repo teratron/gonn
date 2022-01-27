@@ -23,19 +23,16 @@ func (nn *NN) Query(input []float64) []float64 {
 		}
 
 		if nn.Weight[0][0][0] != 0 {
-			//_ = copy(nn.weight, nn.Weight)
 			nn.weight = nn.Weight
 		}
 
-		//_ = copy(nn.input, pkg.ToFloat1Type(input))
 		nn.input = pkg.ToFloat1Type(input)
 
 		nn.calcNeuron()
-		output := make([]float64, nn.lenOutput)
 		for i, n := range nn.neuron[nn.lastLayerIndex] {
-			output[i] = float64(n.value)
+			nn.output[i] = float64(n.value)
 		}
-		return output
+		return nn.output
 	} else {
 		err = pkg.ErrNoInput
 	}

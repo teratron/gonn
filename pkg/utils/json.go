@@ -17,6 +17,7 @@ func (j *FileJSON) Decode(data interface{}) error {
 	if err == nil {
 		defer func() { err = file.Close() }()
 		err = json.NewDecoder(file).Decode(data)
+		//TODO: dec := json.NewDecoder(strings.NewReader(jsonStream))
 	}
 	return err
 }

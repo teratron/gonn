@@ -46,7 +46,7 @@ func TestNN_Verify(t *testing.T) {
 				lenOutput:      1,
 				lastLayerIndex: 1,
 				input:          make(pkg.Float1Type, 2),
-				output:         make(pkg.Float1Type, 1),
+				target:         make(pkg.Float1Type, 1),
 				isInit:         true,
 			},
 			want: .123683,
