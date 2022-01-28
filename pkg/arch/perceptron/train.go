@@ -62,14 +62,12 @@ func (nn *NN) Train(input []float64, target ...[]float64) (count int, loss float
 					minCount = count
 					nn.Weight = nn.weight
 					if loss < nn.LossLimit {
-						//fmt.Println("---MinLossLimit", minCount, minLoss)
 						return minCount, minLoss
 					}
 				}
 				nn.calcMiss()
 				nn.updateWeight()
 			}
-			//fmt.Println("+++++", minCount, minLoss)
 			return minCount, minLoss
 		} else {
 			err = pkg.ErrNoTarget
