@@ -81,21 +81,35 @@ ERROR:
 	return 0, -1
 }
 
-// TODO: // AndTrain training dataset.
-/*func (nn *NN) AndTrain(target ...[]float64) (loss float64, count int) {
-	nn.target = target[0]
+// AndTrain training dataset.
+func (nn *NN) AndTrain(output ...[]float64) (count int, loss float64) {
+	if nn.Weight[0][0][0] != 0 {
+		nn.weight = nn.Weight
+	}
 
+	nn.output = output[0]
+
+	minLoss := 1.
+	minCount := 0
 	for count < GetMaxIteration() {
 		count++
 		loss = nn.calcLoss()
+
 		switch {
-		case loss < GetMinLossLimit():
-			return
-		case math.IsNaN(loss), math.IsInf(loss, 0):
-			log.Panic("train: not optimal neural network parameters")
+		case math.IsNaN(loss):
+			log.Panic("and train: loss not-a-number value")
+		case math.IsInf(loss, 0):
+			log.Panic("and train: loss is infinity")
+		case loss < minLoss:
+			minLoss = loss
+			minCount = count
+			nn.Weight = nn.weight
+			if loss < nn.LossLimit {
+				return minCount, minLoss
+			}
 		}
 		nn.calcMiss()
 		nn.updateWeight()
 	}
-	return
-}*/
+	return minCount, minLoss
+}
