@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"path/filepath"
-	"strings"
 
 	"github.com/teratron/gonn/pkg/nn"
 )
@@ -58,11 +57,18 @@ const jsonStream = `
 func main() {
 	// New returns a new neural network from config.
 	n := nn.New(filepath.Join("config", "perceptron.json"))
-	strings.NewReader(jsonStream)
+	//strings.NewReader(jsonStream)
 	// Input dataset.
 	input := []float64{.27, .31, .52}
 
 	// Getting the results of the trained network.
 	output := n.Query(input)
 	fmt.Println(output)
+
+	// Target dataset.
+	target := []float64{.7, .1}
+
+	//
+	count, loss := n.AndTrain(output, target)
+	fmt.Println(count, loss)
 }
