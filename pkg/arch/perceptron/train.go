@@ -82,15 +82,15 @@ ERROR:
 }
 
 // AndTrain training dataset.
-func (nn *NN) AndTrain(output []float64, target ...[]float64) (count int, loss float64) {
+func (nn *NN) AndTrain(target []float64) (count int, loss float64) {
 	if nn.Weight[0][0][0] != 0 {
 		nn.weight = nn.Weight
 	}
 
-	for i, n := range nn.neuron[nn.lastLayerIndex] {
+	/*for i, n := range nn.neuron[nn.lastLayerIndex] {
 		n.value = pkg.FloatType(output[i])
-	}
-	nn.target = pkg.ToFloat1Type(target[0])
+	}*/
+	nn.target = pkg.ToFloat1Type(target)
 
 	loss = nn.calcLoss()
 	nn.calcMiss()
@@ -103,7 +103,7 @@ func (nn *NN) AndTrain(output []float64, target ...[]float64) (count int, loss f
 		count++
 		nn.calcNeuron()
 		loss = nn.calcLoss()
-		fmt.Println(count, loss)
+		//fmt.Println(count, loss)
 
 		switch {
 		case math.IsNaN(loss):
@@ -114,15 +114,15 @@ func (nn *NN) AndTrain(output []float64, target ...[]float64) (count int, loss f
 			minLoss = loss
 			minCount = count
 			nn.Weight = nn.weight
-			fmt.Println("-----", minCount, minLoss)
+			//fmt.Println("-----", minCount, minLoss)
 			if loss < nn.LossLimit {
-				fmt.Println("-----")
+				fmt.Println("-----", "/", count, loss)
 				return minCount, minLoss
 			}
 		}
 		nn.calcMiss()
 		nn.updateWeight()
 	}
-	fmt.Println("+++++", minCount, minLoss)
+	fmt.Println("+++++", minCount, minLoss, "/", count, loss)
 	return minCount, minLoss
 }

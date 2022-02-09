@@ -57,18 +57,19 @@ const jsonStream = `
 func main() {
 	// New returns a new neural network from config.
 	n := nn.New(filepath.Join("config", "perceptron.json"))
-	//strings.NewReader(jsonStream)
-	// Input dataset.
-	input := []float64{.27, .31, .52}
+
+	// Dataset.
+	input := []float64{.27, .31, .52} // Input dataset.
+	target := []float64{.7, .1}       // Target dataset.
 
 	// Getting the results of the trained network.
 	output := n.Query(input)
 	fmt.Println(output)
 
-	// Target dataset.
-	target := []float64{.7, .1}
-
-	//
-	count, loss := n.AndTrain(output, target)
+	// TODO: Если есть целевые данные, то мы можем обучить полученные выходные данные.
+	count, loss := n.AndTrain(target)
 	fmt.Println(count, loss)
+
+	// Check the trained data, the result should be about [0.7 0.1].
+	fmt.Println(n.Query(input))
 }
