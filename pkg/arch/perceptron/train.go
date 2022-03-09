@@ -3,7 +3,6 @@ package perceptron
 import (
 	"fmt"
 	"log"
-	"math"
 
 	"github.com/teratron/gonn/pkg"
 )
@@ -50,14 +49,8 @@ func (nn *NN) Train(input []float64, target ...[]float64) (count int, loss float
 			for count < GetMaxIteration() {
 				count++
 				nn.calcNeuron()
-				loss = nn.calcLoss()
 
-				switch {
-				case math.IsNaN(loss):
-					log.Panic("train: loss not-a-number value")
-				case math.IsInf(loss, 0):
-					log.Panic("train: loss is infinity")
-				case loss < minLoss:
+				if loss = nn.calcLoss(); loss < minLoss {
 					minLoss = loss
 					minCount = count
 					nn.Weight = nn.weight
@@ -81,48 +74,58 @@ ERROR:
 	return 0, -1
 }
 
-// AndTrain training dataset.
+// AndTrain the training dataset after the query.
 func (nn *NN) AndTrain(target []float64) (count int, loss float64) {
-	if nn.Weight[0][0][0] != 0 {
-		nn.weight = nn.Weight
-	}
+	var err error
+	if len(target) > 0 {
+		nn.mutex.Lock()
+		defer nn.mutex.Unlock()
 
-	/*for i, n := range nn.neuron[nn.lastLayerIndex] {
-		n.value = pkg.FloatType(output[i])
-	}*/
-	nn.target = pkg.ToFloat1Type(target)
-
-	loss = nn.calcLoss()
-	nn.calcMiss()
-	nn.updateWeight()
-
-	count = 1
-	minLoss := 1.
-	minCount := 0
-	for count < GetMaxIteration() {
-		count++
-		nn.calcNeuron()
-		loss = nn.calcLoss()
-		//fmt.Println(count, loss)
-
-		switch {
-		case math.IsNaN(loss):
-			log.Panic("and train: loss not-a-number value")
-		case math.IsInf(loss, 0):
-			log.Panic("and train: loss is infinity")
-		case loss < minLoss:
-			minLoss = loss
-			minCount = count
-			nn.Weight = nn.weight
-			//fmt.Println("-----", minCount, minLoss)
-			if loss < nn.LossLimit {
-				fmt.Println("-----", "/", count, loss)
-				return minCount, minLoss
-			}
+		if !nn.isInit {
+			err = pkg.ErrInit
+			goto ERROR
+		} else if nn.lenOutput != len(target) {
+			err = fmt.Errorf("invalid number of elements in the target data")
+			goto ERROR
 		}
-		nn.calcMiss()
-		nn.updateWeight()
+
+		if nn.Weight[0][0][0] != 0 {
+			nn.weight = nn.Weight
+		}
+
+		nn.target = pkg.ToFloat1Type(target)
+
+		isStart := true
+		minLoss := 1.
+		minCount := 0
+		for count < GetMaxIteration() {
+			count++
+			if !isStart {
+				nn.calcNeuron()
+			} else {
+				isStart = false
+			}
+
+			if loss = nn.calcLoss(); loss < minLoss {
+				minLoss = loss
+				minCount = count
+				nn.Weight = nn.weight
+				//fmt.Println("-----", minCount, minLoss)
+				if loss < nn.LossLimit {
+					fmt.Println("-----", count, loss)
+					return minCount, minLoss
+				}
+			}
+			nn.calcMiss()
+			nn.updateWeight()
+		}
+		fmt.Println("+++++", minCount, minLoss, "/", count, loss)
+		return minCount, minLoss
+	} else {
+		err = pkg.ErrNoTarget
 	}
-	fmt.Println("+++++", minCount, minLoss, "/", count, loss)
-	return minCount, minLoss
+
+ERROR:
+	log.Printf("andTrain: %v\n", err)
+	return 0, -1
 }

@@ -24,8 +24,8 @@ func main() {
 	n := nn.New()
 
 	// Dataset.
-	input  := []float64{1, 1}
-	target := []float64{0}
+	input  := []float64{.27, .31}
+	target := []float64{.7}
 
 	// Training dataset.
 	_, _ = n.Train(input, target)

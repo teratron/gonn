@@ -58,6 +58,8 @@ func main() {
 	// New returns a new neural network from config.
 	n := nn.New(filepath.Join("config", "perceptron.json"))
 
+	fmt.Printf("%T\n", jsonStream)
+
 	// Dataset.
 	input := []float64{.27, .31, .52} // Input dataset.
 	target := []float64{.7, .1}       // Target dataset.
@@ -66,7 +68,7 @@ func main() {
 	output := n.Query(input)
 	fmt.Println(output)
 
-	// TODO: Если есть целевые данные, то мы можем обучить полученные выходные данные.
+	// If there is target data, then we can train the received output data.
 	count, loss := n.AndTrain(target)
 	fmt.Println(count, loss)
 

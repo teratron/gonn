@@ -1,6 +1,7 @@
 package perceptron
 
 import (
+	"log"
 	"math"
 
 	"github.com/teratron/gonn/pkg"
@@ -112,6 +113,13 @@ func (nn *NN) calcLoss() (loss float64) {
 	loss /= float64(nn.lenOutput)
 	if nn.LossMode == params.RMSE {
 		loss = math.Sqrt(loss)
+	}
+
+	switch {
+	case math.IsNaN(loss):
+		log.Panic("calcLoss: loss not-a-number value") // TODO: log.Panic (?)
+	case math.IsInf(loss, 0):
+		log.Panic("calcLoss: loss is infinity") // TODO: log.Panic (?)
 	}
 	return
 }
