@@ -123,6 +123,6 @@ func (nn *NN) AndTrain(target []float64) (count int, loss float64) {
 	}
 
 ERROR:
-	log.Printf("andTrain: %v\n", err)
+	log.Printf("and train: %v\n", err)
 	return 0, -1
 }

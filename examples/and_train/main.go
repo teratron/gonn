@@ -60,9 +60,10 @@ const jsonStream = `
 
 func main() {
 	// New returns a new neural network from config.
-	n := nn.New(filepath.Join("config", "perceptron.json"))
+	n := nn.New(filepath.Join("config", "perceptron.json") /*"perceptron.yaml"jsonStream*/)
 
-	fmt.Printf("%T\n", jsonStream)
+	//fmt.Printf("%v\n", []byte(jsonStream))
+	//fmt.Printf("%v\n", json.Valid([]byte(jsonStream)))
 
 	// Dataset.
 	input := []float64{.27, .31, .52} // Input dataset.

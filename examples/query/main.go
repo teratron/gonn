@@ -10,6 +10,8 @@ import (
 const jsonStream = `
 {
 	"name": "perceptron",
+	"bias": true,
+	"activationMode": 3,
 	"weight": [
 		[
 			[
