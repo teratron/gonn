@@ -110,16 +110,13 @@ func (nn *NN) AndTrain(target []float64) (count int, loss float64) {
 				minLoss = loss
 				minCount = count
 				nn.Weight = nn.weight
-				//fmt.Println("-----", minCount, minLoss)
 				if loss < nn.LossLimit {
-					fmt.Println("-----", count, loss)
 					return minCount, minLoss
 				}
 			}
 			nn.calcMiss()
 			nn.updateWeight()
 		}
-		fmt.Println("+++++", minCount, minLoss, "/", count, loss)
 		return minCount, minLoss
 	} else {
 		err = pkg.ErrNoTarget
