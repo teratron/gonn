@@ -18,11 +18,12 @@ const (
 
 // Get.
 func Get(title string) pkg.NeuralNetwork {
+	fmt.Printf("%T\n", utils.GetFileEncoding([]byte(title)))
 	var err error
 	d := utils.GetFileType(title)
-	if u, ok := d.(utils.Filer); ok {
-		fmt.Printf("%T, %v\n", d, d)
-		fmt.Printf("%T, %v\n", u, u)
+	if _, ok := d.(utils.Filer); ok {
+		//fmt.Printf("%T, %v\n", d, d)
+		//fmt.Printf("%T, %v\n", u, u)
 		switch w := d.(type) {
 		case *utils.FileError:
 			//fmt.Printf("%T, %v\n", w, w)

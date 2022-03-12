@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"encoding/json"
 	"fmt"
 	"path/filepath"
 )
@@ -29,8 +30,16 @@ func GetFileType(name string) Filer {
 	ext := filepath.Ext(name)
 	switch ext {
 	case ".json":
-		return &FileJSON{name}
+		return &FileJSON{Name: name}
 	default:
 		return &FileError{Err: fmt.Errorf("extension isn't defined: %s", ext)}
 	}
+}
+
+// GetFileEncoding.
+func GetFileEncoding(data []byte) Filer {
+	if json.Valid(data) {
+		return &FileJSON{data: data}
+	}
+	return &FileError{Err: fmt.Errorf("invalid encoding")}
 }

@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"path/filepath"
 
 	"github.com/teratron/gonn/pkg/nn"
 )
@@ -60,7 +59,7 @@ const jsonStream = `
 
 func main() {
 	// New returns a new neural network from config.
-	n := nn.New(filepath.Join("config", "perceptron.json") /*"perceptron.yaml"jsonStream*/)
+	n := nn.New( /*filepath.Join("config", "perceptron.json") "perceptron.yaml"*/ jsonStream)
 
 	//fmt.Printf("%v\n", []byte(jsonStream))
 	//fmt.Printf("%v\n", json.Valid([]byte(jsonStream)))

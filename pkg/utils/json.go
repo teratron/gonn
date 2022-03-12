@@ -9,6 +9,7 @@ import (
 
 type FileJSON struct {
 	Name string
+	data []byte
 }
 
 // Decode.
