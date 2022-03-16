@@ -31,15 +31,15 @@ func GetFileType(name string) Filer {
 	switch ext {
 	case ".json":
 		return &FileJSON{Name: name}
-	default:
-		return &FileError{Err: fmt.Errorf("extension isn't defined: %s", ext)}
 	}
+	return &FileError{Err: fmt.Errorf("extension isn't defined")}
 }
 
 // GetFileEncoding.
 func GetFileEncoding(data []byte) Filer {
-	if json.Valid(data) {
-		return &FileJSON{data: data}
+	switch {
+	case json.Valid(data):
+		return &FileJSON{Data: data}
 	}
-	return &FileError{Err: fmt.Errorf("invalid encoding")}
+	return &FileError{Err: fmt.Errorf("invalid encoding data")}
 }

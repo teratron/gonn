@@ -17,43 +17,50 @@ const (
 )
 
 // Get.
-func Get(title string) pkg.NeuralNetwork {
-	fmt.Printf("%T\n", utils.GetFileEncoding([]byte(title)))
+func Get(reader string) pkg.NeuralNetwork {
+	//fmt.Printf("%v\n", utils.GetFileEncoding([]byte(reader)).(*utils.FileJSON).Data)
 	var err error
-	d := utils.GetFileType(title)
-	if _, ok := d.(utils.Filer); ok {
-		//fmt.Printf("%T, %v\n", d, d)
-		//fmt.Printf("%T, %v\n", u, u)
-		switch w := d.(type) {
-		case *utils.FileError:
-			//fmt.Printf("%T, %v\n", w, w)
-			err = w
-		default:
-			switch v := d.GetValue("name").(type) {
+	f := utils.GetFileEncoding([]byte(reader))
+	if _, ok := f.(*utils.FileError); ok {
+		f = utils.GetFileType(reader)
+		if _, ok = f.(*utils.FileError); ok {
+			switch strings.ToLower(reader) {
+			case Perceptron:
+				return perceptron.New()
+			case Hopfield:
+				return hopfield.New()
+			default:
+				err = fmt.Errorf("neural network is %w", pkg.ErrNotRecognized)
+			}
+		} else {
+			switch v := f.GetValue("name").(type) {
 			case error:
 				err = v
 			case string:
 				if n := Get(v); n != nil {
-					if err = d.Decode(n); err == nil {
-						n.Init(d)
+					if err = f.Decode(n); err == nil {
+						n.Init(f)
 						return n
 					}
 				}
 			}
 		}
 	} else {
-		switch strings.ToLower(title) {
-		case Perceptron:
-			return perceptron.New()
-		case Hopfield:
-			return hopfield.New()
-		default:
-			err = fmt.Errorf("neural network is %w", pkg.ErrNotRecognized)
+		switch v := f.GetValue("name").(type) {
+		case error:
+			err = v
+		case string:
+			if n := Get(v); n != nil {
+				if err = f.Decode(n); err == nil {
+					n.Init(f)
+					return n
+				}
+			}
 		}
 	}
 
 	/*if _, ok := d.(error); ok {
-		switch strings.ToLower(title) {
+		switch strings.ToLower(reader) {
 		case Perceptron:
 			return perceptron.New()
 		case Hopfield:
