@@ -18,9 +18,10 @@ const (
 
 // Get.
 func Get(reader string) pkg.NeuralNetwork {
-	//fmt.Printf("%v\n", utils.GetFileEncoding([]byte(reader)).(*utils.FileJSON).Data)
+
 	var err error
 	f := utils.GetFileEncoding([]byte(reader))
+	//fmt.Printf("--- %v\n", f/*.(*utils.FileJSON).Data*/)
 	if _, ok := f.(*utils.FileError); ok {
 		f = utils.GetFileType(reader)
 		if _, ok = f.(*utils.FileError); ok {
@@ -50,6 +51,7 @@ func Get(reader string) pkg.NeuralNetwork {
 		case error:
 			err = v
 		case string:
+			//fmt.Printf("+++ %v\n", v)
 			if n := Get(v); n != nil {
 				if err = f.Decode(n); err == nil {
 					n.Init(f)
@@ -83,7 +85,7 @@ func Get(reader string) pkg.NeuralNetwork {
 	}*/
 
 	if err != nil {
-		log.Println("get architecture:", err)
+		log.Println("arch.Get:", err)
 	}
 	return nil
 }

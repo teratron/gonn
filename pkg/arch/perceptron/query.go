@@ -1,7 +1,6 @@
 package perceptron
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/teratron/gonn/pkg"
@@ -18,8 +17,9 @@ func (nn *NN) Query(input []float64) []float64 {
 			err = pkg.ErrInit
 			goto ERROR
 		} else if nn.lenInput != len(input) {
-			err = fmt.Errorf("invalid number of elements in the input data")
-			goto ERROR
+			panic("perceptron.NN.Query: invalid number of elements in the input data")
+			/*err = fmt.Errorf("invalid number of elements in the input data")
+			goto ERROR*/
 		}
 
 		if nn.Weight[0][0][0] != 0 {
@@ -38,6 +38,6 @@ func (nn *NN) Query(input []float64) []float64 {
 	}
 
 ERROR:
-	log.Printf("query: %v\n", err)
+	log.Printf("perceptron.NN.Query: %v\n", err)
 	return nil
 }

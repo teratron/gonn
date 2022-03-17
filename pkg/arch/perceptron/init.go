@@ -15,10 +15,13 @@ func (nn *NN) Init(data ...interface{}) {
 	if len(data) > 0 {
 		switch value := data[0].(type) {
 		case utils.Filer:
-			if len(nn.Weight) > 0 {
-				nn.initFromWeight()
+			if _, ok := value.(utils.FileError); !ok {
+				if len(nn.Weight) > 0 {
+					nn.initFromWeight()
+				}
+				nn.config = value
 			}
-			nn.config = value
+			//fmt.Printf("%T\n",value)
 		case int:
 			if len(data) == 2 {
 				if v, ok := data[1].(int); ok {

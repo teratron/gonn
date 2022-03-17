@@ -12,6 +12,7 @@ type Filer interface {
 	Encode(interface{}) error
 	GetValue(key string) interface{}
 	GetName() string
+	ClearData()
 }
 
 // FileError.
@@ -32,7 +33,7 @@ func GetFileType(name string) Filer {
 	case ".json":
 		return &FileJSON{Name: name}
 	}
-	return &FileError{Err: fmt.Errorf("extension isn't defined")}
+	return &FileError{Err: fmt.Errorf("utils.GetFileType extension isn't defined")}
 }
 
 // GetFileEncoding.
@@ -41,5 +42,5 @@ func GetFileEncoding(data []byte) Filer {
 	case json.Valid(data):
 		return &FileJSON{Data: data}
 	}
-	return &FileError{Err: fmt.Errorf("invalid encoding data")}
+	return &FileError{Err: fmt.Errorf("utils.GetFileEncoding invalid encoding data")}
 }
