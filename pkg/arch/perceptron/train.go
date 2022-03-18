@@ -70,7 +70,7 @@ func (nn *NN) Train(input []float64, target ...[]float64) (count int, loss float
 	}
 
 ERROR:
-	log.Printf("train: %v\n", err)
+	log.Printf("perceptron.NN.Train: %v\n", err)
 	return 0, -1
 }
 
@@ -123,6 +123,6 @@ func (nn *NN) AndTrain(target []float64) (count int, loss float64) {
 	}
 
 ERROR:
-	log.Printf("and train: %v\n", err)
+	log.Printf("perceptron.NN.AndTrain: %v\n", err)
 	return 0, -1
 }

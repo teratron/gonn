@@ -12,7 +12,6 @@ import (
 type FileJSON struct {
 	Name string
 	Data []byte
-	//Value map[string]interface{}
 }
 
 // Decode.
