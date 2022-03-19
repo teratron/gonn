@@ -21,7 +21,6 @@ func (nn *NN) Init(data ...interface{}) {
 				}
 				nn.config = value
 			}
-			//fmt.Printf("%T\n",value)
 		case int:
 			if len(data) == 2 {
 				if v, ok := data[1].(int); ok {
@@ -96,8 +95,6 @@ func (nn *NN) initFromNew(lenInput, lenTarget int) {
 			nn.neuron[i][j] = &neuron{}
 		}
 	}
-
-	//nn.initCompletion()
 }
 
 // initFromWeight.
@@ -135,8 +132,6 @@ func (nn *NN) initFromWeight() {
 			nn.neuron[i][j] = &neuron{}
 		}
 	}
-
-	//nn.initCompletion()
 }
 
 // initCompletion.

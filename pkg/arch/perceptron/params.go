@@ -76,3 +76,13 @@ func (nn *NN) SetWeight(weight pkg.Floater) {
 		nn.Weight = w
 	}
 }
+
+// GetLengthInput.
+func (nn *NN) GetLengthInput() int {
+	return nn.lenInput
+}
+
+// GetLengthOutput.
+func (nn *NN) GetLengthOutput() int {
+	return nn.lenOutput
+}

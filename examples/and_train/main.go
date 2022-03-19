@@ -84,6 +84,9 @@ func main() {
 	// New returns a new neural network from config.
 	n := nn.New(jsonStream)
 
+	fmt.Println(n.GetLengthInput())
+	fmt.Println(n.GetLengthOutput())
+
 	// Dataset.
 	input := []float64{.27, .31, .52} // Input dataset.
 	target := []float64{.7, .1}       // Target dataset.

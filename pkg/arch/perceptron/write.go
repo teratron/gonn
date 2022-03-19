@@ -25,7 +25,7 @@ func (nn *NN) WriteConfig(name ...string) (err error) {
 
 	if err != nil {
 		err = fmt.Errorf("write config: %w", err)
-		log.Print(err)
+		log.Printf("perceptron.NN.WriteConfig: %v", err)
 	}
 	return
 }
@@ -41,7 +41,7 @@ func (nn *NN) WriteWeight(name string) (err error) {
 
 	if err != nil {
 		err = fmt.Errorf("write weights: %w", err)
-		log.Print(err)
+		log.Printf("perceptron.NN.WriteWeight: %v", err)
 	}
 	return
 }

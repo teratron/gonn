@@ -26,7 +26,10 @@ func (j *FileJSON) Decode(value interface{}) (err error) {
 		r = bytes.NewReader(j.Data)
 	}
 
-	err = json.NewDecoder(r).Decode(value)
+	if r != nil {
+		err = json.NewDecoder(r).Decode(value)
+	}
+
 	if err != nil {
 		err = fmt.Errorf("utils.FileJSON.Decode: %v", err)
 	}
@@ -34,7 +37,7 @@ func (j *FileJSON) Decode(value interface{}) (err error) {
 }
 
 // Encode.
-func (j *FileJSON) Encode(value interface{}) error {
+func (j *FileJSON) Encode(value interface{}) (err error) {
 	file, err := os.OpenFile(j.Name, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 	if err == nil {
 		defer func() { err = file.Close() }()
@@ -42,7 +45,11 @@ func (j *FileJSON) Encode(value interface{}) error {
 		e.SetIndent("", "\t")
 		err = e.Encode(value)
 	}
-	return fmt.Errorf("utils.FileJSON.Encode: %v", err)
+
+	if err != nil {
+		err = fmt.Errorf("utils.FileJSON.Encode: %v", err)
+	}
+	return
 }
 
 // GetValue.

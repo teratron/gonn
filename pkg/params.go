@@ -2,6 +2,9 @@ package pkg
 
 // Parameter.
 type Parameter interface {
+	GetLengthInput() int
+	GetLengthOutput() int
+
 	GetWeight() Floater
 	SetWeight(Floater)
 

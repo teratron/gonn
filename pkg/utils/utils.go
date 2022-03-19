@@ -32,6 +32,8 @@ func GetFileType(name string) Filer {
 	switch ext {
 	case ".json":
 		return &FileJSON{Name: name}
+	case ".csv":
+		return nil
 	}
 	return &FileError{Err: fmt.Errorf("utils.GetFileType extension isn't defined")}
 }
