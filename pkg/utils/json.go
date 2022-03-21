@@ -24,6 +24,7 @@ func (j *FileJSON) Decode(value interface{}) (err error) {
 		}
 	} else if j.Data != nil {
 		r = bytes.NewReader(j.Data)
+		j.Data = nil
 	}
 
 	if r != nil {
@@ -87,5 +88,7 @@ func (j *FileJSON) GetName() string {
 
 // ClearData.
 func (j *FileJSON) ClearData() {
-	j.Data = nil
+	if j.Data != nil {
+		j.Data = nil
+	}
 }
