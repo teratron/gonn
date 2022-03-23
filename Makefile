@@ -12,6 +12,9 @@ build-example-hopfield: ## build example hopfield
 build-example-linear: ## build example linear
 	go build -v -o ./examples/linear ./examples/linear/main.go
 
+build-example-and-train: ## build example and_train
+	go build -v -o ./examples/and_train ./examples/and_train/main.go
+
 build-example-query: ## build example query
 	go build -v -o ./examples/query ./examples/query/main.go
 

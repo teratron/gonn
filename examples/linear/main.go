@@ -10,13 +10,13 @@ func main() {
 	// New returns a new neural network
 	// instance with the default parameters,
 	// same n := nn.New("perceptron").
-	n := nn.New()
+	n := nn.New("perceptron")
 
 	// Parameters.
 	n.SetHiddenLayer(3, 2)
 	n.SetActivationMode(nn.LINEAR)
 	n.SetLossMode(nn.MSE)
-	n.SetLossLimit(.001)
+	n.SetLossLimit(.0001)
 
 	// Dataset that doesn't need to be scaled.
 	input := []float64{10.6, -5, 200}
