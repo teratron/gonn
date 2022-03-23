@@ -26,14 +26,24 @@ func (f *FileError) Error() string {
 	return fmt.Sprintf("file type error: %v\n", f.Err)
 }
 
+// ReadFile.
+func ReadFile(data string) Filer {
+	f := GetFileEncoding([]byte(data))
+	if err, ok := f.(*FileError); ok {
+		f = GetFileType(data)
+		if _, ok = f.(*FileError); ok {
+			return &FileError{Err: fmt.Errorf("utils.ReadFile: %v and %v", err, f)}
+		}
+	}
+	return f
+}
+
 // GetFileType.
 func GetFileType(name string) Filer {
 	ext := filepath.Ext(name)
 	switch ext {
 	case ".json":
 		return &FileJSON{Name: name}
-	case ".csv":
-		return nil
 	}
 	return &FileError{Err: fmt.Errorf("utils.GetFileType extension isn't defined")}
 }
