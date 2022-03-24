@@ -38,7 +38,7 @@ func (nn *NN) Init(data ...interface{}) {
 	}
 
 	if err != nil {
-		log.Printf("init: %v\n", err)
+		log.Printf("perceptron.NN.Init: %v\n", err)
 	}
 }
 

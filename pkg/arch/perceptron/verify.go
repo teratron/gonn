@@ -45,6 +45,6 @@ func (nn *NN) Verify(input []float64, target ...[]float64) float64 {
 	}
 
 ERROR:
-	log.Printf("verify: %v\n", err)
+	log.Printf("perceptron.NN.Verify: %v\n", err)
 	return -1
 }
