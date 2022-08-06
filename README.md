@@ -5,11 +5,14 @@
 </div>
 
 ## About
-gonn - Neural Network Library
+
+**gonn** - Neural Network Library
 
 ## Install
 
-    $ go get -u github.com/zigenzoog/gonn
+```shell
+$ go get -u github.com/zigenzoog/gonn
+```
 
 ## Getting Started
 
@@ -33,7 +36,11 @@ func main() {
 ```
 
 ## Documentation
-More documentation is available at the [gonn website](https://zigenzoog.github.io/gonn/) or on [pkg.go.dev](https://pkg.go.dev/github.com/zigenzoog/gonn).
+
+More documentation is available at the [gonn website](https://zigenzoog.github.io/gonn/) or
+on [pkg.go.dev](https://pkg.go.dev/github.com/zigenzoog/gonn).
 
 ## Examples
-You can find examples of neural networks in the [examples directory](https://github.com/zigenzoog/gonn/tree/master/examples/).
+
+You can find examples of neural networks in
+the [example's directory](https://github.com/zigenzoog/gonn/tree/master/examples/).

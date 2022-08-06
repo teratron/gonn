@@ -40,6 +40,16 @@ release: ## release
 	git push origin $(VERSION)
 	goreleaser --rm-dist
 
+set_url: ## git remote set-url origin git@github.com:login/repo.git
+	git remote set-url origin git@github.com:teratron/gonn.git
+
+message = Update.
+branch = master
+add-commit-push: ## add commit push
+	git add -u
+	git commit -m "$(message)"
+	git push origin $(branch)
+
 .PHONY: help
 help:
 	@awk '                                             \
