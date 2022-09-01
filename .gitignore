@@ -160,3 +160,5 @@ dist/
 tmp/
 .tmp/
 .run/
+
+dist/
