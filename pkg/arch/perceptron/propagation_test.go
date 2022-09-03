@@ -100,6 +100,7 @@ func TestNN_calcNeuron(t *testing.T) {
 			},
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.got.calcNeuron()
@@ -197,6 +198,7 @@ func TestNN_calcLoss(t *testing.T) {
 			want: .351686,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.gave.calcLoss(); math.Round(got, math.ROUND, 6) != tt.want {
@@ -247,6 +249,7 @@ func TestNN_calcMiss(t *testing.T) {
 			},
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.got.calcMiss()
@@ -329,6 +332,7 @@ func TestNN_updWeight(t *testing.T) {
 			},
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.got.updateWeight()
