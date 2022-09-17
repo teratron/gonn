@@ -161,4 +161,4 @@ tmp/
 .tmp/
 .run/
 
-dist/
+examples/**/*.json
