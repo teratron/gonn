@@ -1,0 +1,12 @@
+<component name="ProjectRunConfigurationManager">
+    <configuration default="false" name="query" type="GoApplicationRunConfiguration" factoryName="Go Application">
+        <module name="gonn"/>
+        <working_directory value="$PROJECT_DIR$/examples/query"/>
+        <kind value="DIRECTORY"/>
+        <package value="github.com/teratron/gonn/examples/perceptron"/>
+        <directory value="$PROJECT_DIR$/examples/query"/>
+        <filePath value="$PROJECT_DIR$/examples/perceptron/main.go"/>
+        <output_directory value="$PROJECT_DIR$/examples/query/"/>
+        <method v="2"/>
+    </configuration>
+</component>
