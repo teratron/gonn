@@ -16,8 +16,8 @@ Array of the number of neurons in each hidden layer.
 
 ActivationMode function mode (required field for a config).
 
-| Code | ActivationMode | Description                          |
-| ---- | ---------- | ---------------------------------------- |
+| Code | Activation | Description                              |
+|------|------------|------------------------------------------|
 | 0    | LINEAR     | Linear/identity                          |
 | 1    | RELU       | ReLu (rectified linear unit)             |
 | 2    | LEAKYRELU  | Leaky ReLu (leaky rectified linear unit) |
@@ -29,7 +29,7 @@ ActivationMode function mode (required field for a config).
 The mode of calculation of the total error.
 
 | Code | Loss   | Description             |
-| ---- | ------ | ----------------------- |
+|------|--------|-------------------------|
 | 0    | MSE    | Mean Squared Error      |
 | 1    | RMSE   | Root Mean Squared Error |
 | 2    | ARCTAN | Arctan                  |
