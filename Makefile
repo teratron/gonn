@@ -1,4 +1,4 @@
-#
+# Makefile
 
 test: ## coverage test
 	go test -v -cover ./pkg/... ./internal/...

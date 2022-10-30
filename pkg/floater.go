@@ -1,8 +1,6 @@
 package pkg
 
-import (
-	"log"
-)
+import "log"
 
 // Floater.
 type Floater interface {
