@@ -13,7 +13,7 @@ func Test_checkActivationMode(t *testing.T) {
 		want uint8
 	}{
 		{
-			name: "#1_ModeTANH",
+			name: "#1_TANH",
 			gave: TANH,
 			want: TANH,
 		},
@@ -23,6 +23,7 @@ func Test_checkActivationMode(t *testing.T) {
 			want: SIGMOID,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := CheckActivationMode(tt.gave); got != tt.want {
@@ -43,39 +44,39 @@ func TestActivation(t *testing.T) {
 		want pkg.FloatType
 	}{
 		{
-			name: "#1_ModeLINEAR",
+			name: "#1_LINEAR",
 			args: args{.1, LINEAR},
 			want: .1,
 		},
 		{
-			name: "#2_ModeRELU",
+			name: "#2_RELU",
 			args: args{.1, RELU},
 			want: .1,
 		},
 		{
-			name: "#3_ModeRELU",
+			name: "#3_RELU",
 			args: args{-.1, RELU},
 			want: 0,
 		},
 		{
-			name: "#4_ModeLEAKYRELU",
+			name: "#4_LEAKYRELU",
 			args: args{.1, LEAKYRELU},
 			want: .1,
 		},
 		{
-			name: "#5_ModeLEAKYRELU",
+			name: "#5_LEAKYRELU",
 			args: args{-.1, LEAKYRELU},
 			want: -.001,
 		},
 		{
-			name: "#6_ModeSIGMOID",
+			name: "#6_SIGMOID",
 			args: args{.1, SIGMOID},
 			want: .52497918747894,
 		},
 		{
-			name: "#7_ModeTANH",
+			name: "#7_TANH",
 			args: args{.1, TANH},
-			want: .09966799462495583,
+			want: .099668,
 		},
 		{
 			name: "#8_default",
@@ -83,6 +84,7 @@ func TestActivation(t *testing.T) {
 			want: .52497918747894,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := Activation(tt.value, tt.mode); got != tt.want {
@@ -103,46 +105,47 @@ func TestDerivative(t *testing.T) {
 		want pkg.FloatType
 	}{
 		{
-			name: "#1_ModeLINEAR",
+			name: "#1_LINEAR",
 			args: args{.1, LINEAR},
 			want: 1,
 		},
 		{
-			name: "#2_ModeRELU",
+			name: "#2_RELU",
 			args: args{.1, RELU},
 			want: 1,
 		},
 		{
-			name: "#3_ModeRELU",
+			name: "#3_RELU",
 			args: args{-.1, RELU},
 			want: 0,
 		},
 		{
-			name: "#4_ModeLEAKYRELU",
+			name: "#4_LEAKYRELU",
 			args: args{.1, LEAKYRELU},
 			want: 1,
 		},
 		{
-			name: "#5_ModeLEAKYRELU",
+			name: "#5_LEAKYRELU",
 			args: args{-.1, LEAKYRELU},
 			want: .01,
 		},
 		{
-			name: "#6_ModeSIGMOID",
+			name: "#6_SIGMOID",
 			args: args{.1, SIGMOID},
-			want: .09000000000000001,
+			want: .089999996,
 		},
 		{
-			name: "#7_ModeTANH",
+			name: "#7_TANH",
 			args: args{.1, TANH},
 			want: .99,
 		},
 		{
 			name: "#8_default",
 			args: args{.1, 255},
-			want: .09000000000000001,
+			want: .089999996,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := Derivative(tt.value, tt.mode); got != tt.want {
