@@ -13,29 +13,9 @@ func TestActivation(t *testing.T) {
 		want float32
 	}{
 		{
-			name: "#1_LINEAR",
-			args: args{.6, LINEAR},
-			want: .6,
-		},
-		{
-			name: "#2_RELU",
-			args: args{-.6, RELU},
-			want: 0,
-		},
-		{
-			name: "#3_LEAKYRELU",
-			args: args{.6, LEAKYRELU},
-			want: .6,
-		},
-		{
-			name: "#4_SIGMOID",
+			name: "Activation_SIGMOID",
 			args: args{.6, SIGMOID},
 			want: .6456563,
-		},
-		{
-			name: "#5_TANH",
-			args: args{.6, TANH},
-			want: .5370496,
 		},
 	}
 
@@ -55,31 +35,11 @@ func TestDerivative(t *testing.T) {
 	}
 	tests := []struct {
 		name string
-		args args
+		args
 		want float32
 	}{
 		{
-			name: "#1_LINEAR",
-			args: args{.6, LINEAR},
-			want: 1,
-		},
-		{
-			name: "#2_RELU",
-			args: args{-.6, RELU},
-			want: 0,
-		},
-		{
-			name: "#3_LEAKYRELU",
-			args: args{.6, LEAKYRELU},
-			want: 1,
-		},
-		{
-			name: "#4_SIGMOID",
-			args: args{.6, SIGMOID},
-			want: .24,
-		},
-		{
-			name: "#5_TANH",
+			name: "Derivative_TANH",
 			args: args{.6, TANH},
 			want: .64,
 		},
