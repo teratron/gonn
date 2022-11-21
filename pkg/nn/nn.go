@@ -2,7 +2,7 @@ package nn
 
 import (
 	"github.com/teratron/gonn/pkg"
-	"github.com/teratron/gonn/pkg/arch"
+	arch "github.com/teratron/gonn/pkg/architecture"
 )
 
 // NeuralNetwork interface.

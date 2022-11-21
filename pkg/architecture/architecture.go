@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/teratron/gonn/pkg"
-	"github.com/teratron/gonn/pkg/arch/hopfield"
-	"github.com/teratron/gonn/pkg/arch/perceptron"
+	"github.com/teratron/gonn/pkg/architecture/hopfield"
+	"github.com/teratron/gonn/pkg/architecture/perceptron"
 	"github.com/teratron/gonn/pkg/utils"
 )
 

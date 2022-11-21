@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/teratron/gonn/pkg"
-	"github.com/teratron/gonn/pkg/arch/hopfield"
-	"github.com/teratron/gonn/pkg/arch/perceptron"
+	"github.com/teratron/gonn/pkg/architecture/hopfield"
+	"github.com/teratron/gonn/pkg/architecture/perceptron"
 	"github.com/teratron/gonn/pkg/params"
 	"github.com/teratron/gonn/pkg/utils"
 )
@@ -64,6 +64,7 @@ func TestGet(t *testing.T) {
 			want: nil,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.want != nil {

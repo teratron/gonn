@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/teratron/gonn/pkg/arch"
+	arch "github.com/teratron/gonn/pkg/architecture"
 )
 
 func TestNew(t *testing.T) {
@@ -25,6 +25,7 @@ func TestNew(t *testing.T) {
 			want: testNN,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := New(tt.gave...); !reflect.DeepEqual(got, tt.want) {
