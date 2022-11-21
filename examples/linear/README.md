@@ -1,1 +1,1 @@
-# Example
+# Example Linear Activation
