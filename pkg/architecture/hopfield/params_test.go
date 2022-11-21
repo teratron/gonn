@@ -9,6 +9,7 @@ import (
 
 func TestNN_GetEnergy(t *testing.T) {
 	want := &NN{Energy: .015}
+
 	t.Run("0.015", func(t *testing.T) {
 		if got := want.GetEnergy(); got != want.Energy {
 			t.Errorf("GetEnergy() = %f, want %f", got, want.Energy)
@@ -19,6 +20,7 @@ func TestNN_GetEnergy(t *testing.T) {
 func TestNN_SetEnergy(t *testing.T) {
 	got := &NN{}
 	want := .015
+
 	t.Run("0.015", func(t *testing.T) {
 		if got.SetEnergy(want); got.Energy != want {
 			t.Errorf("SetEnergy() = %f, want %f", got.Energy, want)
@@ -48,6 +50,7 @@ func TestNN_GetWeight(t *testing.T) {
 			want: pkg.Float2Type{{.1, .2, .3}},
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := *tt.gave.GetWeight().(*pkg.Float2Type); !reflect.DeepEqual(got, tt.want) {
@@ -76,6 +79,7 @@ func TestNN_SetWeight(t *testing.T) {
 			want: pkg.Float2Type{{.1, .2, .3}},
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got.SetWeight(tt.want); !reflect.DeepEqual(got.Weight, tt.want) {

@@ -10,6 +10,7 @@ import (
 
 func TestNN_GetBias(t *testing.T) {
 	want := &NN{Bias: true}
+
 	t.Run("true", func(t *testing.T) {
 		if !want.GetBias() {
 			t.Errorf("GetBias() = %t, want %t", false, true)
@@ -19,6 +20,7 @@ func TestNN_GetBias(t *testing.T) {
 
 func TestNN_SetBias(t *testing.T) {
 	want := &NN{}
+
 	t.Run("true", func(t *testing.T) {
 		if want.SetBias(true); !want.Bias {
 			t.Errorf("SetBias() = %t, want %t", true, false)
@@ -53,6 +55,7 @@ func TestNN_GetHiddenLayer(t *testing.T) {
 			want: []uint{3, 2, 1},
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.gave.GetHiddenLayer(); !reflect.DeepEqual(got, tt.want) {
@@ -90,6 +93,7 @@ func TestNN_SetHiddenLayer(t *testing.T) {
 			want: []uint{1, 2, 3},
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got.SetHiddenLayer(tt.gave...); !reflect.DeepEqual(got.HiddenLayer, tt.want) {
@@ -101,6 +105,7 @@ func TestNN_SetHiddenLayer(t *testing.T) {
 
 func TestNN_GetActivationMode(t *testing.T) {
 	want := &NN{ActivationMode: params.SIGMOID}
+
 	t.Run("ModeSIGMOID", func(t *testing.T) {
 		if got := want.GetActivationMode(); got != want.ActivationMode {
 			t.Errorf("GetActivationMode() = %d, want %d", got, want.ActivationMode)
@@ -111,6 +116,7 @@ func TestNN_GetActivationMode(t *testing.T) {
 func TestNN_SetActivationMode(t *testing.T) {
 	got := &NN{}
 	want := params.LINEAR
+
 	t.Run("ModeLINEAR", func(t *testing.T) {
 		if got.SetActivationMode(want); got.ActivationMode != want {
 			t.Errorf("SetActivationMode() = %d, want %d", got.ActivationMode, want)
@@ -120,6 +126,7 @@ func TestNN_SetActivationMode(t *testing.T) {
 
 func TestNN_GetLossMode(t *testing.T) {
 	want := &NN{LossMode: params.ARCTAN}
+
 	t.Run("ModeARCTAN", func(t *testing.T) {
 		if got := want.GetLossMode(); got != want.LossMode {
 			t.Errorf("GetLossMode() = %d, want %d", got, want.LossMode)
@@ -147,6 +154,7 @@ func TestNN_SetLossMode(t *testing.T) {
 			want: params.MSE,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.got.SetLossMode(tt.gave); tt.got.LossMode != tt.want {
@@ -158,6 +166,7 @@ func TestNN_SetLossMode(t *testing.T) {
 
 func TestNN_GetLossLimit(t *testing.T) {
 	want := &NN{LossLimit: .1}
+
 	t.Run("0.1", func(t *testing.T) {
 		if got := want.GetLossLimit(); got != want.LossLimit {
 			t.Errorf("GetLossLimit() = %f, want %f", got, want.LossLimit)
@@ -168,6 +177,7 @@ func TestNN_GetLossLimit(t *testing.T) {
 func TestNN_SetLossLimit(t *testing.T) {
 	got := &NN{}
 	want := .01
+
 	t.Run("0.01", func(t *testing.T) {
 		if got.SetLossLimit(want); got.LossLimit != want {
 			t.Errorf("SetLossLimit() = %f, want %f", got.LossLimit, want)
@@ -177,6 +187,7 @@ func TestNN_SetLossLimit(t *testing.T) {
 
 func TestNN_GetRate(t *testing.T) {
 	want := &NN{Rate: .3}
+
 	t.Run("DefaultRate", func(t *testing.T) {
 		if got := want.GetRate(); got != float64(want.Rate) {
 			t.Errorf("GetRate() = %f, want %f", got, want.Rate)
@@ -210,6 +221,7 @@ func TestNN_SetRate(t *testing.T) {
 			want: .3,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.got.SetRate(tt.gave); tt.got.Rate != tt.want {
@@ -241,6 +253,7 @@ func TestNN_GetWeight(t *testing.T) {
 			want: pkg.Float3Type{{{.1, .2, .3}}},
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := *tt.gave.GetWeight().(*pkg.Float3Type); !reflect.DeepEqual(got, tt.want) {
@@ -269,6 +282,7 @@ func TestNN_SetWeight(t *testing.T) {
 			want: pkg.Float3Type{{{.1, .2, .3}}},
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got.SetWeight(tt.want); !reflect.DeepEqual(got.Weight, tt.want) {

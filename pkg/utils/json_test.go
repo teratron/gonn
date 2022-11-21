@@ -35,6 +35,7 @@ func TestFileJSON_GetValue(t *testing.T) {
 			want: nil,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := tt.file.GetValue(tt.gave)

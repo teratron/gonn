@@ -22,6 +22,7 @@ func TestFloat1Type_length(t *testing.T) {
 			want:  3,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.gave.Length(tt.index...); got != tt.want {
@@ -72,6 +73,7 @@ func TestFloat2Type_length(t *testing.T) {
 			want:  0,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.gave.Length(tt.index...); got != tt.want {
@@ -159,6 +161,7 @@ func TestFloat3Type_length(t *testing.T) {
 			want:  0,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.gave.Length(tt.index...); got != tt.want {

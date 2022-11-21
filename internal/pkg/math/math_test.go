@@ -38,6 +38,7 @@ func TestRound(t *testing.T) {
 			want: math.NaN(),
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := Round(tt.f, tt.mode, tt.prec)

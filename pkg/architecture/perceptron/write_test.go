@@ -43,6 +43,7 @@ func TestNN_WriteConfig(t *testing.T) {
 			wantErr: testErr,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			gotErr := tt.gave.WriteConfig(tt.args...)
@@ -84,6 +85,7 @@ func TestNN_WriteWeight(t *testing.T) {
 			wantErr: testErr,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			gotErr := tt.gave.WriteWeight(tt.args)

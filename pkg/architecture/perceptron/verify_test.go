@@ -91,6 +91,7 @@ func TestNN_Verify(t *testing.T) {
 			want: .0025,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := tt.gave.Verify(tt.input, tt.target)

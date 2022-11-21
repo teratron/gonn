@@ -61,6 +61,7 @@ func TestNN_Init(t *testing.T) {
 			want: &NN{},
 		},
 	}
+
 	for _, tt := range tests {
 		tt.got.Weight = tt.want.Weight
 		t.Run(tt.name, func(t *testing.T) {
@@ -140,6 +141,7 @@ func TestNN_initFromNew(t *testing.T) {
 			},
 		},
 	}
+
 	for _, tt := range tests {
 		tt.got.Bias = tt.want.Bias
 		tt.got.HiddenLayer = tt.want.HiddenLayer
@@ -215,6 +217,7 @@ func TestNN_initFromWeight(t *testing.T) {
 			},
 		},
 	}
+
 	for _, tt := range tests {
 		tt.got.Weight = tt.want.Weight
 		t.Run(tt.name, func(t *testing.T) {
