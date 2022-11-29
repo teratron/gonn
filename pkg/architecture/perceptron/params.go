@@ -65,15 +65,15 @@ func (nn *NN) SetRate(rate float64) {
 	nn.Rate = params.CheckLearningRate(pkg.FloatType(rate))
 }
 
-// GetWeight.
-func (nn *NN) GetWeight() pkg.Floater {
-	return &nn.Weight
+// GetWeights.
+func (nn *NN) GetWeights() pkg.Floater {
+	return &nn.Weights
 }
 
-// SetWeight.
-func (nn *NN) SetWeight(weight pkg.Floater) {
+// SetWeights.
+func (nn *NN) SetWeights(weight pkg.Floater) {
 	if w, ok := weight.(pkg.Float3Type); ok {
-		nn.Weight = w
+		nn.Weights = w
 	}
 }
 

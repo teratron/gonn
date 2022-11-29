@@ -26,7 +26,7 @@ func TestNN_Init(t *testing.T) {
 		LossMode:       params.MSE,
 		LossLimit:      .1,
 		Rate:           .3,
-		Weight: pkg.Float3Type{
+		Weights: pkg.Float3Type{
 			{
 				{.1, .1, .1},
 				{.1, .1, .1},
@@ -63,7 +63,7 @@ func TestNN_Init(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt.got.Weight = tt.want.Weight
+		tt.got.Weights = tt.want.Weights
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.got.Init(tt.gave...); !reflect.DeepEqual(tt.got, tt.want) {
 				t.Errorf("Init()\ngot:\t%v\nwant:\t%v", tt.got, tt.want)
@@ -88,13 +88,13 @@ func TestNN_initFromNew(t *testing.T) {
 				Bias:           false,
 				HiddenLayer:    []uint{0},
 				ActivationMode: params.SIGMOID,
-				Weight: pkg.Float3Type{
+				Weights: pkg.Float3Type{
 					{
 						{r, r},
 						{r, r},
 					},
 				},
-				neuron: [][]*neuron{
+				neurons: [][]*neuron{
 					{
 						&neuron{},
 						&neuron{},
@@ -114,7 +114,7 @@ func TestNN_initFromNew(t *testing.T) {
 			want: &NN{
 				Bias:        true,
 				HiddenLayer: []uint{2},
-				Weight: pkg.Float3Type{
+				Weights: pkg.Float3Type{
 					{
 						{r, r, r},
 						{r, r, r},
@@ -123,7 +123,7 @@ func TestNN_initFromNew(t *testing.T) {
 						{r, r, r},
 					},
 				},
-				neuron: [][]*neuron{
+				neurons: [][]*neuron{
 					{
 						&neuron{},
 						&neuron{},
@@ -164,13 +164,13 @@ func TestNN_initFromWeight(t *testing.T) {
 			got:  &NN{},
 			want: &NN{
 				HiddenLayer: []uint{0},
-				Weight: pkg.Float3Type{
+				Weights: pkg.Float3Type{
 					{
 						{.1, .1},
 						{.1, .1},
 					},
 				},
-				neuron: [][]*neuron{
+				neurons: [][]*neuron{
 					{
 						&neuron{},
 						&neuron{},
@@ -190,7 +190,7 @@ func TestNN_initFromWeight(t *testing.T) {
 			want: &NN{
 				Bias:        true,
 				HiddenLayer: []uint{2},
-				Weight: pkg.Float3Type{
+				Weights: pkg.Float3Type{
 					{
 						{.1, .1, .1},
 						{.1, .1, .1},
@@ -199,7 +199,7 @@ func TestNN_initFromWeight(t *testing.T) {
 						{.1, .1, .1},
 					},
 				},
-				neuron: [][]*neuron{
+				neurons: [][]*neuron{
 					{
 						&neuron{},
 						&neuron{},
@@ -219,7 +219,7 @@ func TestNN_initFromWeight(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt.got.Weight = tt.want.Weight
+		tt.got.Weights = tt.want.Weights
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.got.initFromWeight(); !reflect.DeepEqual(tt.got, tt.want) {
 				t.Errorf("initFromWeight()\ngot:\t%v\nwant:\t%v", tt.got, tt.want)

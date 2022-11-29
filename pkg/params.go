@@ -5,8 +5,8 @@ type Parameter interface {
 	GetLengthInput() int
 	GetLengthOutput() int
 
-	GetWeight() Floater
-	SetWeight(Floater)
+	GetWeights() Floater
+	SetWeights(Floater)
 
 	GetHiddenLayer() []uint
 	SetHiddenLayer(...uint)

@@ -13,7 +13,7 @@ const jsonStream = `
 	"activationMode": 3,
 	"lossMode": 0,
 	"lossLimit": 1e-10,
-	"weight": [
+	"weights": [
 		[
 			[
 				-2.5128086,

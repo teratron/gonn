@@ -23,7 +23,7 @@ func TestGet(t *testing.T) {
 		LossMode:       params.MSE,
 		LossLimit:      .1,
 		Rate:           .3,
-		Weight: pkg.Float3Type{
+		Weights: pkg.Float3Type{
 			{
 				{.1, .1, .1},
 				{.1, .1, .1},
@@ -68,7 +68,7 @@ func TestGet(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.want != nil {
-				if nn, ok := tt.want.(*perceptron.NN); ok && len(nn.Weight) > 0 {
+				if nn, ok := tt.want.(*perceptron.NN); ok && len(nn.Weights) > 0 {
 					nn.Init(utils.GetFileType(tt.gave))
 				}
 			}

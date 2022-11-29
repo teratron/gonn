@@ -28,8 +28,8 @@ func (nn *NN) Verify(input []float64, target ...[]float64) float64 {
 				}
 			}
 
-			if nn.Weight[0][0][0] != 0 {
-				nn.weight = nn.Weight
+			if nn.Weights[0][0][0] != 0 {
+				nn.weights = nn.Weights
 			}
 
 			nn.input = pkg.ToFloat1Type(input)

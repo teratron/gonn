@@ -8,7 +8,7 @@
     "lossMode": 0,
     "lossLimit": 0.1,
     "rate": 0.3,
-    "weight": [
+    "weights": [
         [
             [
                 0.1,

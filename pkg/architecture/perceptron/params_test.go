@@ -231,7 +231,7 @@ func TestNN_SetRate(t *testing.T) {
 	}
 }
 
-func TestNN_GetWeight(t *testing.T) {
+func TestNN_GetWeights(t *testing.T) {
 	tests := []struct {
 		name string
 		gave *NN
@@ -239,31 +239,31 @@ func TestNN_GetWeight(t *testing.T) {
 	}{
 		{
 			name: "#1_nil",
-			gave: &NN{Weight: nil},
+			gave: &NN{Weights: nil},
 			want: nil,
 		},
 		{
 			name: "#2_[]",
-			gave: &NN{Weight: pkg.Float3Type{}},
+			gave: &NN{Weights: pkg.Float3Type{}},
 			want: pkg.Float3Type{},
 		},
 		{
 			name: "#3_[[[0.1_0.2_0.3]]]",
-			gave: &NN{Weight: pkg.Float3Type{{{.1, .2, .3}}}},
+			gave: &NN{Weights: pkg.Float3Type{{{.1, .2, .3}}}},
 			want: pkg.Float3Type{{{.1, .2, .3}}},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := *tt.gave.GetWeight().(*pkg.Float3Type); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("GetWeight()\ngot:\t%v\nwant:\t%v", got, tt.want)
+			if got := *tt.gave.GetWeights().(*pkg.Float3Type); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("GetWeights()\ngot:\t%v\nwant:\t%v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestNN_SetWeight(t *testing.T) {
+func TestNN_SetWeights(t *testing.T) {
 	got := &NN{}
 	tests := []struct {
 		name string
@@ -285,8 +285,8 @@ func TestNN_SetWeight(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got.SetWeight(tt.want); !reflect.DeepEqual(got.Weight, tt.want) {
-				t.Errorf("SetWeight()\ngot:\t%v\nwant:\t%v", got.Weight, tt.want)
+			if got.SetWeights(tt.want); !reflect.DeepEqual(got.Weights, tt.want) {
+				t.Errorf("SetWeights()\ngot:\t%v\nwant:\t%v", got.Weights, tt.want)
 			}
 		})
 	}

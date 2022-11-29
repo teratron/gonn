@@ -37,8 +37,8 @@ func (nn *NN) Train(input []float64, target ...[]float64) (count int, loss float
 				}
 			}
 
-			if nn.Weight[0][0][0] != 0 {
-				nn.weight = nn.Weight
+			if nn.Weights[0][0][0] != 0 {
+				nn.weights = nn.Weights
 			}
 
 			nn.input = pkg.ToFloat1Type(input)
@@ -53,7 +53,7 @@ func (nn *NN) Train(input []float64, target ...[]float64) (count int, loss float
 				if loss = nn.calcLoss(); loss < minLoss {
 					minLoss = loss
 					minCount = count
-					nn.Weight = nn.weight
+					nn.Weights = nn.weights
 					if loss < nn.LossLimit {
 						return minCount, minLoss
 					}
@@ -89,8 +89,8 @@ func (nn *NN) AndTrain(target []float64) (count int, loss float64) {
 			goto ERROR
 		}
 
-		if nn.Weight[0][0][0] != 0 {
-			nn.weight = nn.Weight
+		if nn.Weights[0][0][0] != 0 {
+			nn.weights = nn.Weights
 		}
 
 		nn.target = pkg.ToFloat1Type(target)
@@ -109,7 +109,7 @@ func (nn *NN) AndTrain(target []float64) (count int, loss float64) {
 			if loss = nn.calcLoss(); loss < minLoss {
 				minLoss = loss
 				minCount = count
-				nn.Weight = nn.weight
+				nn.Weights = nn.weights
 				if loss < nn.LossLimit {
 					return minCount, minLoss
 				}

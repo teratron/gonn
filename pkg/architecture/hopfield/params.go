@@ -12,14 +12,14 @@ func (nn *NN) SetEnergy(energy float64) {
 	nn.Energy = energy
 }
 
-// GetWeight.
-func (nn *NN) GetWeight() pkg.Floater {
-	return &nn.Weight
+// GetWeights.
+func (nn *NN) GetWeights() pkg.Floater {
+	return &nn.Weights
 }
 
-// SetWeight.
-func (nn *NN) SetWeight(weight pkg.Floater) {
+// SetWeights.
+func (nn *NN) SetWeights(weight pkg.Floater) {
 	if w, ok := weight.(pkg.Float2Type); ok {
-		nn.Weight = w
+		nn.Weights = w
 	}
 }

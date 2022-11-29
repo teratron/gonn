@@ -24,11 +24,11 @@ type NN struct {
 	// Energy.
 	Energy float64 `json:"energy"`
 
-	// Weight values.
-	Weight pkg.Float2Type `json:"weight,omitempty"`
+	// Weights values.
+	Weights pkg.Float2Type `json:"weights,omitempty"`
 
-	// Neuron.
-	neuron []*neuron
+	// Neurons.
+	neurons []*neuron
 
 	// Settings.
 	lenInput int
@@ -37,8 +37,8 @@ type NN struct {
 	mutex    sync.Mutex
 
 	// Transfer data.
-	input  pkg.Float1Type
-	weight pkg.Float2Type
+	weights pkg.Float2Type
+	input   pkg.Float1Type
 }
 
 type neuron struct {

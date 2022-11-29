@@ -24,7 +24,7 @@ func TestNN_Verify(t *testing.T) {
 			gave: &NN{
 				ActivationMode: 255, // default params.ModeSIGMOID
 				LossMode:       255, // default params.ModeMSE
-				Weight: pkg.Float3Type{
+				Weights: pkg.Float3Type{
 					{
 						{.1, .1, .1},
 						{.1, .1, .1},
@@ -33,7 +33,7 @@ func TestNN_Verify(t *testing.T) {
 						{.1, .1, .1},
 					},
 				},
-				neuron: [][]*neuron{
+				neurons: [][]*neuron{
 					{
 						&neuron{},
 						&neuron{},

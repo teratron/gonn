@@ -21,7 +21,7 @@ func TestNN_Query(t *testing.T) {
 			input: []float64{.2, .3},
 			gave: &NN{
 				ActivationMode: params.SIGMOID,
-				Weight: pkg.Float3Type{
+				Weights: pkg.Float3Type{
 					{
 						{.1, .1, .1},
 						{.1, .1, .1},
@@ -30,7 +30,7 @@ func TestNN_Query(t *testing.T) {
 						{.1, .1, .1},
 					},
 				},
-				neuron: [][]*neuron{
+				neurons: [][]*neuron{
 					{
 						&neuron{},
 						&neuron{},

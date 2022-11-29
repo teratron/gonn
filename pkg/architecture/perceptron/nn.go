@@ -21,7 +21,7 @@ type NN struct {
 	// Neural network architecture name (required field for a config).
 	Name string `json:"name"`
 
-	// The neuron bias, false or true (required field for a config).
+	// The neurons bias, false or true (required field for a config).
 	Bias bool `json:"bias"`
 
 	// Array of the number of neurons in each hidden layer.
@@ -39,11 +39,11 @@ type NN struct {
 	// Learning coefficient (greater than 0 and less than or equal to 1).
 	Rate pkg.FloatType `json:"rate"`
 
-	// Weight value.
-	Weight pkg.Float3Type `json:"weight,omitempty"`
+	// Weights value.
+	Weights pkg.Float3Type `json:"weights,omitempty"`
 
-	// Neuron.
-	neuron [][]*neuron
+	// Neurons.
+	neurons [][]*neuron
 
 	// Settings.
 	lenInput       int
@@ -54,10 +54,10 @@ type NN struct {
 	mutex          sync.Mutex
 
 	// Transfer data.
-	weight pkg.Float3Type
-	input  pkg.Float1Type
-	target pkg.Float1Type
-	output []float64
+	weights pkg.Float3Type
+	input   pkg.Float1Type
+	target  pkg.Float1Type
+	output  []float64
 }
 
 type neuron struct {

@@ -38,7 +38,7 @@ func TestNN_Train(t *testing.T) {
 			gave: &NN{
 				ActivationMode: params.SIGMOID,
 				LossMode:       params.MSE,
-				Weight: pkg.Float3Type{
+				Weights: pkg.Float3Type{
 					{
 						{.1, .1, .1},
 						{.1, .1, .1},
@@ -47,7 +47,7 @@ func TestNN_Train(t *testing.T) {
 						{.1, .1, .1},
 					},
 				},
-				neuron: [][]*neuron{
+				neurons: [][]*neuron{
 					{
 						&neuron{},
 						&neuron{},
