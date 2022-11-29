@@ -31,7 +31,7 @@ func (nn *NN) WriteConfig(name ...string) (err error) {
 }
 
 // WriteWeight writes weights to the Filer interface object.
-func (nn *NN) WriteWeight(name string) (err error) {
+func (nn *NN) WriteWeights(name string) (err error) {
 	switch d := utils.GetFileType(name).(type) {
 	case error:
 		err = d
@@ -40,7 +40,7 @@ func (nn *NN) WriteWeight(name string) (err error) {
 	}
 
 	if err != nil {
-		err = fmt.Errorf("perceptron.NN.WriteWeight: %w", err)
+		err = fmt.Errorf("perceptron.NN.WriteWeights: %w", err)
 		log.Print(err)
 	}
 	return

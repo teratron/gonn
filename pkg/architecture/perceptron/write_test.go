@@ -88,7 +88,7 @@ func TestNN_WriteWeight(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotErr := tt.gave.WriteWeight(tt.args)
+			gotErr := tt.gave.WriteWeights(tt.args)
 			if gotErr == nil {
 				defer func() {
 					if err := os.Remove(tt.args); err != nil {
@@ -97,7 +97,7 @@ func TestNN_WriteWeight(t *testing.T) {
 				}()
 			}
 			if (gotErr != nil && tt.wantErr == nil) || (gotErr == nil && tt.wantErr != nil) {
-				t.Errorf("WriteWeight()\ngot error:\t%v\nwant error:\t%v", gotErr, tt.wantErr)
+				t.Errorf("WriteWeights()\ngot error:\t%v\nwant error:\t%v", gotErr, tt.wantErr)
 			}
 		})
 	}
