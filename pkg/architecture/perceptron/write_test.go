@@ -64,7 +64,7 @@ func TestNN_WriteConfig(t *testing.T) {
 	}
 }
 
-func TestNN_WriteWeight(t *testing.T) {
+func TestNN_WriteWeights(t *testing.T) {
 	testErr := fmt.Errorf("error")
 	tests := []struct {
 		name    string
