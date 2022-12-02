@@ -103,7 +103,7 @@ func TestNN_calcNeuron(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tt.got.calcNeuron()
+			tt.got.calcNeurons()
 			for i, v := range tt.got.neurons {
 				for j, n := range v {
 					tt.got.neurons[i][j].value = pkg.FloatType(math.Round(float64(n.value), math.ROUND, 6))
@@ -111,7 +111,7 @@ func TestNN_calcNeuron(t *testing.T) {
 				}
 			}
 			if !reflect.DeepEqual(tt.got.neurons, tt.want) {
-				t.Errorf("calcNeuron()\ngot:\t%v\nwant:\t%v", tt.got.neurons, tt.want)
+				t.Errorf("calcNeurons()\ngot:\t%v\nwant:\t%v", tt.got.neurons, tt.want)
 			}
 		})
 	}
@@ -260,7 +260,7 @@ func TestNN_calcMiss(t *testing.T) {
 				}
 			}
 			if !reflect.DeepEqual(tt.got.neurons, tt.want) {
-				t.Errorf("calcNeuron()\ngot:\t%v\nwant:\t%v", tt.got.neurons, tt.want)
+				t.Errorf("calcNeurons()\ngot:\t%v\nwant:\t%v", tt.got.neurons, tt.want)
 			}
 		})
 	}
@@ -335,7 +335,7 @@ func TestNN_updWeight(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tt.got.updateWeight()
+			tt.got.updateWeights()
 			for i, v := range tt.got.Weights {
 				for j, w := range v {
 					for k, g := range w {
@@ -344,7 +344,7 @@ func TestNN_updWeight(t *testing.T) {
 				}
 			}
 			if !reflect.DeepEqual(tt.got.Weights, tt.want) {
-				t.Errorf("updateWeight()\ngot:\t%v\nwant:\t%v", tt.got.Weights, tt.want)
+				t.Errorf("updateWeights()\ngot:\t%v\nwant:\t%v", tt.got.Weights, tt.want)
 			}
 		})
 	}

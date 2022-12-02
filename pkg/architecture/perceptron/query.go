@@ -28,7 +28,7 @@ func (nn *NN) Query(input []float64) []float64 {
 
 		nn.input = pkg.ToFloat1Type(input)
 
-		nn.calcNeuron()
+		nn.calcNeurons()
 		for i, n := range nn.neurons[nn.lastLayerIndex] {
 			nn.output[i] = float64(n.value)
 		}

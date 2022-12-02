@@ -48,7 +48,7 @@ func (nn *NN) Train(input []float64, target ...[]float64) (count int, loss float
 			minCount := 0
 			for count < GetMaxIteration() {
 				count++
-				nn.calcNeuron()
+				nn.calcNeurons()
 
 				if loss = nn.calcLoss(); loss < minLoss {
 					minLoss = loss
@@ -59,7 +59,7 @@ func (nn *NN) Train(input []float64, target ...[]float64) (count int, loss float
 					}
 				}
 				nn.calcMiss()
-				nn.updateWeight()
+				nn.updateWeights()
 			}
 			return minCount, minLoss
 		} else {
@@ -101,7 +101,7 @@ func (nn *NN) AndTrain(target []float64) (count int, loss float64) {
 		for count < GetMaxIteration() {
 			count++
 			if !isStart {
-				nn.calcNeuron()
+				nn.calcNeurons()
 			} else {
 				isStart = false
 			}
@@ -115,7 +115,7 @@ func (nn *NN) AndTrain(target []float64) (count int, loss float64) {
 				}
 			}
 			nn.calcMiss()
-			nn.updateWeight()
+			nn.updateWeights()
 		}
 		return minCount, minLoss
 	} else {

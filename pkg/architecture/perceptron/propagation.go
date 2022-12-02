@@ -8,8 +8,8 @@ import (
 	"github.com/teratron/gonn/pkg/params"
 )
 
-// calcNeuron.
-/*func (nn *NN) calcNeuron() {
+// calcNeurons.
+/*func (nn *NN) calcNeurons() {
 	wait := make(chan bool)
 	defer close(wait)
 
@@ -56,7 +56,7 @@ import (
 		}
 	}
 }*/
-func (nn *NN) calcNeuron() {
+func (nn *NN) calcNeurons() {
 	var length, dec int
 	for i, v := range nn.neurons {
 		if i > 0 {
@@ -162,8 +162,8 @@ func (nn *NN) calcMiss() {
 	}
 }
 
-// updateWeight update weights.
-/*func (nn *NN) updateWeight() {
+// updateWeights update weights.
+/*func (nn *NN) updateWeights() {
 	wait := make(chan bool)
 	defer close(wait)
 
@@ -211,7 +211,7 @@ func (nn *NN) calcMiss() {
 		}
 	}
 }*/
-func (nn *NN) updateWeight() {
+func (nn *NN) updateWeights() {
 	var length, dec int
 	for i, v := range nn.weights {
 		if i > 0 {
@@ -248,7 +248,7 @@ func (nn *NN) updateWeight() {
 	}
 }
 
-/*func (nn *NN) updateWeight() {
+/*func (nn *NN) updateWeights() {
 	wait := make(chan bool)
 	defer close(wait)
 
