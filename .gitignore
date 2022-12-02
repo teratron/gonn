@@ -162,3 +162,9 @@ tmp/
 #.run/
 
 examples/**/*.json
+examples/json/json
+examples/query/query
+examples/linear/linear
+examples/and_train/and_train
+examples/hopfield/hopfield
+examples/perceptron/perceptron
