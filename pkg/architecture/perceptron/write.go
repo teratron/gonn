@@ -9,9 +9,9 @@ import (
 )
 
 // WriteConfig writes the configuration and weights to the Filer interface object.
-func (nn *NN) WriteConfig(name ...string) (err error) {
-	if len(name) > 0 {
-		switch d := utils.GetFileType(name[0]).(type) {
+func (nn *NN) WriteConfig(filename ...string) (err error) {
+	if len(filename) > 0 {
+		switch d := utils.GetFileType(filename[0]).(type) {
 		case error:
 			err = d
 		case utils.Filer:
@@ -31,8 +31,8 @@ func (nn *NN) WriteConfig(name ...string) (err error) {
 }
 
 // WriteWeights writes weights to the Filer interface object.
-func (nn *NN) WriteWeights(name string) (err error) {
-	switch d := utils.GetFileType(name).(type) {
+func (nn *NN) WriteWeights(filename string) (err error) {
+	switch d := utils.GetFileType(filename).(type) {
 	case error:
 		err = d
 	case utils.Filer:
