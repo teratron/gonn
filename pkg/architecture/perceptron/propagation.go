@@ -57,13 +57,11 @@ import (
 	}
 }*/
 func (nn *NN) calcNeurons() {
-	var length, dec int
+	length, dec := nn.lenInput, 0
 	for i, v := range nn.neurons {
 		if i > 0 {
 			dec = i - 1
 			length = len(nn.neurons[dec])
-		} else {
-			length = nn.lenInput
 		}
 
 		for j, n := range v {
@@ -82,12 +80,11 @@ func (nn *NN) calcNeurons() {
 				num++
 			}
 
-			switch nn.ActivationMode {
-			case params.LINEAR:
+			if nn.ActivationMode == params.LINEAR {
 				if num > 0 {
 					n.value /= num
 				}
-			default:
+			} else {
 				n.value = params.Activation(n.value, nn.ActivationMode)
 			}
 		}

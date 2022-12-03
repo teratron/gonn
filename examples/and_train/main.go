@@ -6,7 +6,7 @@ import (
 	"github.com/teratron/gonn/pkg/nn"
 )
 
-const jsonStream = `
+const streamJSON = `
 {
 	"name": "perceptron",
 	"bias": true,
@@ -82,7 +82,7 @@ const jsonStream = `
 
 func main() {
 	// New returns a new neural network from config.
-	n := nn.New(jsonStream)
+	n := nn.New(streamJSON)
 
 	// Dataset.
 	input := []float64{.27, .31, .52} // Input dataset.

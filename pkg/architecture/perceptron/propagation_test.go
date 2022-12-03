@@ -9,7 +9,7 @@ import (
 	"github.com/teratron/gonn/pkg/params"
 )
 
-func TestNN_calcNeuron(t *testing.T) {
+func TestNN_calcNeurons(t *testing.T) {
 	tests := []struct {
 		name string
 		got  *NN
@@ -19,7 +19,7 @@ func TestNN_calcNeuron(t *testing.T) {
 			name: "#1",
 			got: &NN{
 				ActivationMode: params.LEAKYRELU,
-				Weights: pkg.Float3Type{
+				weights: pkg.Float3Type{
 					{
 						{.1},
 					},
@@ -42,7 +42,7 @@ func TestNN_calcNeuron(t *testing.T) {
 			name: "#2",
 			got: &NN{
 				ActivationMode: params.TANH,
-				Weights: pkg.Float3Type{
+				weights: pkg.Float3Type{
 					{
 						{.1, .1},
 						{.1, .1},
@@ -68,7 +68,7 @@ func TestNN_calcNeuron(t *testing.T) {
 			name: "#3",
 			got: &NN{
 				ActivationMode: params.SIGMOID,
-				Weights: pkg.Float3Type{
+				weights: pkg.Float3Type{
 					{
 						{.1, .1, .1},
 						{.1, .1, .1},
@@ -218,7 +218,7 @@ func TestNN_calcMiss(t *testing.T) {
 			name: "#1",
 			got: &NN{
 				ActivationMode: params.SIGMOID,
-				Weights: pkg.Float3Type{
+				weights: pkg.Float3Type{
 					{
 						{.1, .1, .1},
 						{.1, .1, .1},
@@ -266,7 +266,7 @@ func TestNN_calcMiss(t *testing.T) {
 	}
 }
 
-func TestNN_updWeight(t *testing.T) {
+func TestNN_updateWeights(t *testing.T) {
 	tests := []struct {
 		name string
 		got  *NN
@@ -276,7 +276,7 @@ func TestNN_updWeight(t *testing.T) {
 			name: "#1",
 			got: &NN{
 				Rate: .3,
-				Weights: pkg.Float3Type{
+				weights: pkg.Float3Type{
 					{
 						{.1},
 					},
@@ -300,7 +300,7 @@ func TestNN_updWeight(t *testing.T) {
 			got: &NN{
 				ActivationMode: params.TANH,
 				Rate:           .3,
-				Weights: pkg.Float3Type{
+				weights: pkg.Float3Type{
 					{
 						{.1, .1, .1},
 						{.1, .1, .1},
@@ -336,15 +336,15 @@ func TestNN_updWeight(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.got.updateWeights()
-			for i, v := range tt.got.Weights {
+			for i, v := range tt.got.weights {
 				for j, w := range v {
 					for k, g := range w {
-						tt.got.Weights[i][j][k] = pkg.FloatType(math.Round(float64(g), math.ROUND, 6))
+						tt.got.weights[i][j][k] = pkg.FloatType(math.Round(float64(g), math.ROUND, 6))
 					}
 				}
 			}
-			if !reflect.DeepEqual(tt.got.Weights, tt.want) {
-				t.Errorf("updateWeights()\ngot:\t%v\nwant:\t%v", tt.got.Weights, tt.want)
+			if !reflect.DeepEqual(tt.got.weights, tt.want) {
+				t.Errorf("updateWeights()\ngot:\t%v\nwant:\t%v", tt.got.weights, tt.want)
 			}
 		})
 	}

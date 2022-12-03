@@ -1,4 +1,4 @@
-package arch
+package architecture
 
 import (
 	"path/filepath"
@@ -11,6 +11,40 @@ import (
 	"github.com/teratron/gonn/pkg/params"
 	"github.com/teratron/gonn/pkg/utils"
 )
+
+const testStreamJSON = `
+{
+    "name": "perceptron",
+    "bias": true,
+    "hiddenLayer": [
+        2
+    ],
+    "activationMode": 3,
+    "lossMode": 0,
+    "lossLimit": 0.1,
+    "rate": 0.3,
+    "weights": [
+        [
+            [
+                0.1,
+                0.1,
+                0.1
+            ],
+            [
+                0.1,
+                0.1,
+                0.1
+            ]
+        ],
+        [
+            [
+                0.1,
+                0.1,
+                0.1
+            ]
+        ]
+    ]
+}`
 
 var testJSON = filepath.Join("..", "testdata", "perceptron.json")
 
@@ -54,12 +88,17 @@ func TestGet(t *testing.T) {
 			want: hopfield.New(),
 		},
 		{
-			name: "#4_json",
+			name: "#4_json_file",
 			gave: testJSON,
 			want: testNN,
 		},
 		{
-			name: "#5_json_error_type",
+			name: "#5_json_stream",
+			gave: testStreamJSON,
+			want: testNN,
+		},
+		{
+			name: "#6_json_error_type",
 			gave: ".json",
 			want: nil,
 		},
