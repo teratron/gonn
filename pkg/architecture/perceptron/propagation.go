@@ -229,12 +229,11 @@ func (nn *NN) updateWeights() {
 						value = nn.input[k]
 					}
 
-					switch nn.ActivationMode {
-					case params.LINEAR:
+					if nn.ActivationMode == params.LINEAR {
 						if value != 0 {
 							nn.weights[i][j][k] += grad / value
 						}
-					default:
+					} else {
 						nn.weights[i][j][k] += grad * value
 					}
 				} else {
