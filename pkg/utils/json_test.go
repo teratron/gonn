@@ -8,6 +8,66 @@ import (
 
 var testJSON = filepath.Join("..", "testdata", "perceptron.json")
 
+func TestFileJSON_Decode(t *testing.T) {
+	type fields struct {
+		Name string
+		Data []byte
+	}
+	type args struct {
+		value interface{}
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			j := &FileJSON{
+				Name: tt.fields.Name,
+				Data: tt.fields.Data,
+			}
+			if err := j.Decode(tt.args.value); (err != nil) != tt.wantErr {
+				t.Errorf("Decode() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestFileJSON_Encode(t *testing.T) {
+	type fields struct {
+		Name string
+		Data []byte
+	}
+	type args struct {
+		value interface{}
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			j := &FileJSON{
+				Name: tt.fields.Name,
+				Data: tt.fields.Data,
+			}
+			if err := j.Encode(tt.args.value); (err != nil) != tt.wantErr {
+				t.Errorf("Encode() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
 func TestFileJSON_GetValue(t *testing.T) {
 	testFile := &FileJSON{Name: testJSON}
 	tests := []struct {
@@ -45,6 +105,55 @@ func TestFileJSON_GetValue(t *testing.T) {
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("GetValue()\ngot:\t%v\nwant:\t%v", got, tt.want)
 			}
+		})
+	}
+}
+
+func TestFileJSON_GetName(t *testing.T) {
+	type fields struct {
+		Name string
+		Data []byte
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   string
+	}{
+		// TODO: Add test cases.
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			j := &FileJSON{
+				Name: tt.fields.Name,
+				Data: tt.fields.Data,
+			}
+			if got := j.GetName(); got != tt.want {
+				t.Errorf("GetName() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestFileJSON_ClearData(t *testing.T) {
+	type fields struct {
+		Name string
+		Data []byte
+	}
+	tests := []struct {
+		name   string
+		fields fields
+	}{
+		// TODO: Add test cases.
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			j := &FileJSON{
+				Name: tt.fields.Name,
+				Data: tt.fields.Data,
+			}
+			j.ClearData()
 		})
 	}
 }
