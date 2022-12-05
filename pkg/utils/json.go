@@ -62,7 +62,7 @@ func (j *FileJSON) GetValue(key string) interface{} {
 	if j.Data != nil {
 		data = j.Data
 	} else if len(j.Name) > 0 {
-		data, err = ioutil.ReadFile(j.Name)
+		data, err = ioutil.ReadFile(j.Name) // TODO: deprecated
 		if err != nil {
 			j.Name = ""
 			goto ERROR
