@@ -81,7 +81,7 @@ const streamJSON = `
 }`
 
 func main() {
-	// New returns a new neural network from config.
+	// New returns a new neural network from json stream.
 	n := nn.New(streamJSON)
 
 	// Dataset.

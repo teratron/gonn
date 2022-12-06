@@ -83,9 +83,9 @@ func TestFileJSON_GetValue(t *testing.T) {
 			want: true,
 		},
 		{
-			name: "#2_hidden",
+			name: "#2_hiddenLayer",
 			file: testFile,
-			gave: "hidden",
+			gave: "hiddenLayer",
 			want: []interface{}{2.},
 		},
 		{

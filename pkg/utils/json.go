@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 )
 
@@ -23,7 +22,7 @@ func (j *FileJSON) Decode(value interface{}) (err error) {
 	} else if len(j.Name) > 0 {
 		r, err = os.OpenFile(j.Name, os.O_RDONLY, 0600)
 		if err == nil {
-			defer func() { err = r.(*os.File).Close() }() // TODO: Unresolved reference 'Close'
+			defer func() { err = r.(*os.File).Close() }()
 		}
 	}
 
@@ -41,7 +40,7 @@ func (j *FileJSON) Decode(value interface{}) (err error) {
 func (j *FileJSON) Encode(value interface{}) error {
 	file, err := os.OpenFile(j.Name, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 	if err == nil {
-		defer func() { err = file.Close() }() // TODO: Unresolved reference 'Close'
+		defer func() { err = file.Close() }()
 		e := json.NewEncoder(file)
 		e.SetIndent("", "\t")
 		err = e.Encode(value)
@@ -53,7 +52,7 @@ func (j *FileJSON) Encode(value interface{}) error {
 	return err
 }
 
-// GetValue.
+// GetValue returns value by key.
 func (j *FileJSON) GetValue(key string) interface{} {
 	var value interface{}
 	var data []byte
@@ -62,7 +61,8 @@ func (j *FileJSON) GetValue(key string) interface{} {
 	if j.Data != nil {
 		data = j.Data
 	} else if len(j.Name) > 0 {
-		data, err = ioutil.ReadFile(j.Name) // TODO: deprecated ReadFile
+		//data, err = ioutil.ReadFile(j.Name) // TODO: deprecated ReadFile
+		data, err = os.ReadFile(j.Name)
 		if err != nil {
 			j.Name = ""
 			goto ERROR
@@ -81,12 +81,12 @@ ERROR:
 	return fmt.Errorf("utils.FileJSON.GetValue: %v", err)
 }
 
-// GetName.
+// GetName returns filename.
 func (j *FileJSON) GetName() string {
 	return j.Name
 }
 
-// ClearData.
+// ClearData clears data.
 func (j *FileJSON) ClearData() {
 	if j.Data != nil {
 		j.Data = nil

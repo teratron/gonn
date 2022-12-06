@@ -9,6 +9,41 @@ import (
 )
 
 // calcNeurons.
+func (nn *NN) calcNeurons() {
+	length, dec := nn.lenInput, 0
+	for i, v := range nn.neurons {
+		if i > 0 {
+			dec = i - 1
+			length = len(nn.neurons[dec])
+		}
+
+		for j, n := range v {
+			var num pkg.FloatType = 0
+			n.value = 0
+			for k, w := range nn.weights[i][j] {
+				if k < length {
+					if i > 0 {
+						n.value += nn.neurons[dec][k].value * w
+					} else {
+						n.value += nn.input[k] * w
+					}
+				} else {
+					n.value += w
+				}
+				num++
+			}
+
+			if nn.ActivationMode == params.LINEAR {
+				if num > 0 {
+					n.value /= num
+				}
+			} else {
+				n.value = params.Activation(n.value, nn.ActivationMode)
+			}
+		}
+	}
+}
+
 /*func (nn *NN) calcNeurons() {
 	wait := make(chan bool)
 	defer close(wait)
@@ -56,40 +91,6 @@ import (
 		}
 	}
 }*/
-func (nn *NN) calcNeurons() {
-	length, dec := nn.lenInput, 0
-	for i, v := range nn.neurons {
-		if i > 0 {
-			dec = i - 1
-			length = len(nn.neurons[dec])
-		}
-
-		for j, n := range v {
-			var num pkg.FloatType = 0
-			n.value = 0
-			for k, w := range nn.weights[i][j] {
-				if k < length {
-					if i > 0 {
-						n.value += nn.neurons[dec][k].value * w
-					} else {
-						n.value += nn.input[k] * w
-					}
-				} else {
-					n.value += w
-				}
-				num++
-			}
-
-			if nn.ActivationMode == params.LINEAR {
-				if num > 0 {
-					n.value /= num
-				}
-			} else {
-				n.value = params.Activation(n.value, nn.ActivationMode)
-			}
-		}
-	}
-}
 
 // calcLoss calculating the error of the output neuron.
 func (nn *NN) calcLoss() (loss float64) {
@@ -122,6 +123,20 @@ func (nn *NN) calcLoss() (loss float64) {
 }
 
 // calcMiss calculating the error of neurons in hidden layers.
+func (nn *NN) calcMiss() {
+	if nn.lastLayerIndex > 0 {
+		for i := nn.lastLayerIndex - 1; i >= 0; i-- {
+			inc := i + 1
+			for j, n := range nn.neurons[i] {
+				n.miss = 0
+				for k, m := range nn.neurons[inc] {
+					n.miss += m.miss * nn.weights[inc][k][j]
+				}
+			}
+		}
+	}
+}
+
 /*func (nn *NN) calcMiss() {
 	if nn.lastLayerIndex > 0 {
 		wait := make(chan bool)
@@ -145,21 +160,44 @@ func (nn *NN) calcLoss() (loss float64) {
 		}
 	}
 }*/
-func (nn *NN) calcMiss() {
-	if nn.lastLayerIndex > 0 {
-		for i := nn.lastLayerIndex - 1; i >= 0; i-- {
-			inc := i + 1
-			for j, n := range nn.neurons[i] {
-				n.miss = 0
-				for k, m := range nn.neurons[inc] {
-					n.miss += m.miss * nn.weights[inc][k][j]
+
+// updateWeights update weights.
+func (nn *NN) updateWeights() {
+	var length, dec int
+	for i, v := range nn.weights {
+		if i > 0 {
+			dec = i - 1
+			length = len(nn.neurons[dec])
+		} else {
+			length = nn.lenInput
+		}
+
+		for j, w := range v {
+			grad := nn.Rate * nn.neurons[i][j].miss * params.Derivative(nn.neurons[i][j].value, nn.ActivationMode)
+			for k := range w {
+				if k < length {
+					var value pkg.FloatType
+					if i > 0 {
+						value = nn.neurons[dec][k].value
+					} else {
+						value = nn.input[k]
+					}
+
+					if nn.ActivationMode == params.LINEAR {
+						if value != 0 {
+							nn.weights[i][j][k] += grad / value
+						}
+					} else {
+						nn.weights[i][j][k] += grad * value
+					}
+				} else {
+					nn.weights[i][j][k] += grad
 				}
 			}
 		}
 	}
 }
 
-// updateWeights update weights.
 /*func (nn *NN) updateWeights() {
 	wait := make(chan bool)
 	defer close(wait)
@@ -208,42 +246,6 @@ func (nn *NN) calcMiss() {
 		}
 	}
 }*/
-func (nn *NN) updateWeights() {
-	var length, dec int
-	for i, v := range nn.weights {
-		if i > 0 {
-			dec = i - 1
-			length = len(nn.neurons[dec])
-		} else {
-			length = nn.lenInput
-		}
-
-		for j, w := range v {
-			grad := nn.Rate * nn.neurons[i][j].miss * params.Derivative(nn.neurons[i][j].value, nn.ActivationMode)
-			for k := range w {
-				if k < length {
-					var value pkg.FloatType
-					if i > 0 {
-						value = nn.neurons[dec][k].value
-					} else {
-						value = nn.input[k]
-					}
-
-					if nn.ActivationMode == params.LINEAR {
-						if value != 0 {
-							nn.weights[i][j][k] += grad / value
-						}
-					} else {
-						nn.weights[i][j][k] += grad * value
-					}
-				} else {
-					nn.weights[i][j][k] += grad
-				}
-			}
-		}
-	}
-}
-
 /*func (nn *NN) updateWeights() {
 	wait := make(chan bool)
 	defer close(wait)
