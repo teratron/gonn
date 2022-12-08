@@ -35,6 +35,7 @@ clean: ## clean cache
 	go clean -modcache
 
 #VERSION := $(shell cat ./VERSION)
+VERSION := 0.4.0
 release: ## release
 	git tag -a $(VERSION) -m "Release" || true
 	git push origin $(VERSION)

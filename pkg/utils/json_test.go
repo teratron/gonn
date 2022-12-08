@@ -110,50 +110,22 @@ func TestFileJSON_GetValue(t *testing.T) {
 }
 
 func TestFileJSON_GetName(t *testing.T) {
-	type fields struct {
-		Name string
-		Data []byte
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		want   string
-	}{
-		// TODO: Add test cases.
-	}
+	gave := &FileJSON{Name: testJSON}
+	want := testJSON
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			j := &FileJSON{
-				Name: tt.fields.Name,
-				Data: tt.fields.Data,
-			}
-			if got := j.GetName(); got != tt.want {
-				t.Errorf("GetName() = %v, want %v", got, tt.want)
-			}
-		})
-	}
+	t.Run("filename:../testdata/perceptron.json", func(t *testing.T) {
+		if got := gave.GetName(); got != want {
+			t.Errorf("GetName() = %s, want %s", got, want)
+		}
+	})
 }
 
 func TestFileJSON_ClearData(t *testing.T) {
-	type fields struct {
-		Name string
-		Data []byte
-	}
-	tests := []struct {
-		name   string
-		fields fields
-	}{
-		// TODO: Add test cases.
-	}
+	got := &FileJSON{Data: []byte{'{', 42, '}'}}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			j := &FileJSON{
-				Name: tt.fields.Name,
-				Data: tt.fields.Data,
-			}
-			j.ClearData()
-		})
-	}
+	t.Run("file_json_clear_data", func(t *testing.T) {
+		if got.ClearData(); got.Data != nil {
+			t.Errorf("ClearData() = %v, want %s", got.Data, "nil")
+		}
+	})
 }
