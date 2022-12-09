@@ -34,6 +34,11 @@ deps: ## setup deps
 clean: ## clean cache
 	go clean -modcache
 
+#@find . -path '/examples/**/*.exe' -delete
+#@find ./examples/perceptron/ -name "*.exe" -delete
+delete: ## delete garbage
+	@find . -empty -delete
+
 #VERSION := $(shell cat ./VERSION)
 VERSION := 0.4.0
 release: ## release
