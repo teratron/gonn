@@ -46,7 +46,7 @@ release: ## release
 	git push origin $(VERSION)
 	goreleaser --rm-dist
 
-set_url: ## git remote set-url origin git@github.com:login/repo.git
+set-url: ## git remote set-url origin git@github.com:login/repo.git
 	git remote set-url origin git@github.com:teratron/gonn.git
 
 message = Update.

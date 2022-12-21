@@ -1,4 +1,4 @@
-# GONN
+# GoNN
 
 <div>
   <a href="https://pkg.go.dev/github.com/zigenzoog/gonn?tab=doc" title="Go API Reference" rel="nofollow"><img src="https://pkg.go.dev/badge/github.com/zigenzoog/gonn.svg" alt="Go API Reference"></a>
@@ -8,7 +8,7 @@
 
 ## About
 
-**gonn** - Neural Network Library
+Neural network library for go.
 
 ## Install
 
