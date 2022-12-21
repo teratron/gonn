@@ -1,18 +1,18 @@
 # Perceptron Neural Network
 
-### Name
+### _Name_
 
 Neural network architecture name (required field for a config).
 
-### Bias
+### _Bias_
 
 The neuron bias, false or true (required field for a config).
 
-### HiddenLayer
+### _HiddenLayer_
 
 Array of the number of neurons in each hidden layer.
 
-### ActivationMode
+### _ActivationMode_
 
 ActivationMode function mode (required field for a config).
 
@@ -24,7 +24,7 @@ ActivationMode function mode (required field for a config).
 | 3    | SIGMOID    | Logistic, a.k.a. sigmoid or soft step    |
 | 4    | TANH       | TanH (hyperbolic tangent)                |
 
-### LossMode
+### _LossMode_
 
 The mode of calculation of the total error.
 
@@ -35,10 +35,10 @@ The mode of calculation of the total error.
 | 2    | ARCTAN | Arctan                  |
 | 3    | AVG    | Average                 |
 
-### LossLimit
+### _LossLimit_
 
 Minimum (sufficient) limit of the average of the error during training.
 
-### Rate
+### _Rate_
 
-Learning coefficient (greater than 0 and less than or equal to 1).
+Learning coefficient (greater than 0.0 and less than or equal to 1.0).
