@@ -3,7 +3,7 @@ package main
 import (
 	"path/filepath"
 
-	"github.com/zigenzoog/gonn/pkg/nn"
+	"github.com/teratron/gonn/pkg/nn"
 )
 
 func main() {
@@ -18,5 +18,5 @@ func main() {
 	_, _ = n.Train(input, target)
 
 	// Writing weights to a file.
-	_ = n.WriteWeight("perceptron_weights.json")
+	_ = n.WriteWeights("perceptron_weights.json")
 }

@@ -1,6 +1,6 @@
 package params
 
-import "github.com/zigenzoog/gonn/pkg"
+import "github.com/teratron/gonn/pkg"
 
 // CheckLearningRate.
 func CheckLearningRate(rate pkg.FloatType) pkg.FloatType {

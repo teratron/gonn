@@ -4,11 +4,11 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/teratron/gonn/pkg/zoo"
+	arch "github.com/teratron/gonn/pkg/architecture"
 )
 
 func TestNew(t *testing.T) {
-	testNN := zoo.Get(zoo.Perceptron)
+	testNN := arch.Get(arch.Perceptron)
 	tests := []struct {
 		name string
 		gave []string
@@ -20,11 +20,12 @@ func TestNew(t *testing.T) {
 			want: testNN,
 		},
 		{
-			name: "#2_" + zoo.Perceptron,
-			gave: []string{zoo.Perceptron},
+			name: "#2_" + arch.Perceptron,
+			gave: []string{arch.Perceptron},
 			want: testNN,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := New(tt.gave...); !reflect.DeepEqual(got, tt.want) {

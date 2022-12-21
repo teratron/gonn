@@ -1,14 +1,18 @@
 package params
 
-import "math"
+import (
+	"math"
+
+	"github.com/teratron/gonn/pkg"
+)
 
 // Activation function mode.
 const (
-	LINEAR    uint8 = iota // Linear/identity.
-	RELU                   // ReLu (rectified linear unit).
-	LEAKYRELU              // Leaky ReLu (leaky rectified linear unit).
-	SIGMOID                // Logistic, a.k.a. sigmoid or soft step.
-	TANH                   // TanH (hyperbolic tangent).
+	LINEAR    uint8 = iota // LINEAR - Linear/identity.
+	RELU                   // RELU - ReLu (rectified linear unit).
+	LEAKYRELU              // LEAKYRELU - Leaky ReLu (leaky rectified linear unit).
+	SIGMOID                // SIGMOID - Logistic, a.k.a. sigmoid or soft step.
+	TANH                   // TANH - TanH (hyperbolic tangent).
 )
 
 // CheckActivationMode.
@@ -20,7 +24,7 @@ func CheckActivationMode(mode uint8) uint8 {
 }
 
 // Activation function.
-func Activation(value float64, mode uint8) float64 {
+func Activation(value pkg.FloatType, mode uint8) pkg.FloatType {
 	switch mode {
 	case LINEAR:
 		return value
@@ -37,15 +41,15 @@ func Activation(value float64, mode uint8) float64 {
 	default:
 		fallthrough
 	case SIGMOID:
-		return 1 / (1 + math.Exp(-value))
+		return 1 / (1 + pkg.FloatType(math.Exp(float64(-value))))
 	case TANH:
-		value = math.Exp(2 * value)
+		value = pkg.FloatType(math.Exp(2 * float64(value)))
 		return (value - 1) / (value + 1)
 	}
 }
 
 // Derivative activation function.
-func Derivative(value float64, mode uint8) float64 {
+func Derivative(value pkg.FloatType, mode uint8) pkg.FloatType {
 	switch mode {
 	case LINEAR:
 		return 1
@@ -64,6 +68,6 @@ func Derivative(value float64, mode uint8) float64 {
 	case SIGMOID:
 		return value * (1 - value)
 	case TANH:
-		return 1 - math.Pow(value, 2)
+		return 1 - pkg.FloatType(math.Pow(float64(value), 2))
 	}
 }

@@ -1,16 +1,16 @@
 package nn
 
 import (
-	"github.com/zigenzoog/gonn/pkg"
-	"github.com/zigenzoog/gonn/pkg/zoo"
+	"github.com/teratron/gonn/pkg"
+	arch "github.com/teratron/gonn/pkg/architecture"
 )
 
-// NeuralNetwork.
+// NeuralNetwork interface.
 type NeuralNetwork interface {
 	pkg.NeuralNetwork
 }
 
-// Floater.
+// Floater interface.
 type Floater interface {
 	pkg.Floater
 }
@@ -18,7 +18,7 @@ type Floater interface {
 // New returns a new neural network instance.
 func New(reader ...string) NeuralNetwork {
 	if len(reader) > 0 {
-		return zoo.Get(reader[0])
+		return arch.Get(reader[0])
 	}
-	return zoo.Get(zoo.Perceptron)
+	return arch.Get(arch.Perceptron)
 }
