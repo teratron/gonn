@@ -46,9 +46,9 @@ func (nn *NN) Init(data ...interface{}) {
 func (nn *NN) initFromNew(lenInput, lenTarget int) {
 	nn.lenInput = lenInput
 	nn.lenOutput = lenTarget
-	nn.lastLayerIndex = len(nn.HiddenLayer)
-	if nn.lastLayerIndex > 0 && nn.HiddenLayer[0] == 0 {
-		nn.lastLayerIndex = 0
+	nn.lastLayerIndex = 0
+	if nn.HiddenLayer[0] > 0 {
+		nn.lastLayerIndex = len(nn.HiddenLayer)
 	}
 
 	var layer []uint

@@ -103,9 +103,16 @@ func TestNN_initFromNew(t *testing.T) {
 				lenInput:       2,
 				lenOutput:      2,
 				lastLayerIndex: 0,
-				input:          make(pkg.Float1Type, 2),
-				target:         make(pkg.Float1Type, 2),
 				isInit:         true,
+				weights: pkg.Float3Type{
+					{
+						{0, 0},
+						{0, 0},
+					},
+				},
+				input:  make(pkg.Float1Type, 2),
+				target: make(pkg.Float1Type, 2),
+				output: make([]float64, 2),
 			},
 		},
 		{
@@ -135,9 +142,19 @@ func TestNN_initFromNew(t *testing.T) {
 				lenInput:       2,
 				lenOutput:      1,
 				lastLayerIndex: 1,
-				input:          make(pkg.Float1Type, 2),
-				target:         make(pkg.Float1Type, 1),
 				isInit:         true,
+				weights: pkg.Float3Type{
+					{
+						{0, 0, 0},
+						{0, 0, 0},
+					},
+					{
+						{0, 0, 0},
+					},
+				},
+				input:  make(pkg.Float1Type, 2),
+				target: make(pkg.Float1Type, 1),
+				output: make([]float64, 1),
 			},
 		},
 	}
@@ -146,7 +163,9 @@ func TestNN_initFromNew(t *testing.T) {
 		tt.got.Bias = tt.want.Bias
 		tt.got.HiddenLayer = tt.want.HiddenLayer
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.got.initFromNew(tt.want.lenInput, tt.want.lenOutput); !reflect.DeepEqual(tt.got, tt.want) {
+			tt.got.initFromNew(tt.want.lenInput, tt.want.lenOutput)
+			tt.got.initCompletion()
+			if !reflect.DeepEqual(tt.got, tt.want) {
 				t.Errorf("initFromNew()\ngot:\t%v\nwant:\t%v", tt.got, tt.want)
 			}
 		})
@@ -179,9 +198,16 @@ func TestNN_initFromWeight(t *testing.T) {
 				lenInput:       2,
 				lenOutput:      2,
 				lastLayerIndex: 0,
-				input:          make(pkg.Float1Type, 2),
-				target:         make(pkg.Float1Type, 2),
 				isInit:         true,
+				weights: pkg.Float3Type{
+					{
+						{0, 0},
+						{0, 0},
+					},
+				},
+				input:  make(pkg.Float1Type, 2),
+				target: make(pkg.Float1Type, 2),
+				output: make([]float64, 2),
 			},
 		},
 		{
@@ -211,9 +237,19 @@ func TestNN_initFromWeight(t *testing.T) {
 				lenInput:       2,
 				lenOutput:      1,
 				lastLayerIndex: 1,
-				input:          make(pkg.Float1Type, 2),
-				target:         make(pkg.Float1Type, 1),
 				isInit:         true,
+				weights: pkg.Float3Type{
+					{
+						{0, 0, 0},
+						{0, 0, 0},
+					},
+					{
+						{0, 0, 0},
+					},
+				},
+				input:  make(pkg.Float1Type, 2),
+				target: make(pkg.Float1Type, 1),
+				output: make([]float64, 1),
 			},
 		},
 	}
@@ -221,7 +257,9 @@ func TestNN_initFromWeight(t *testing.T) {
 	for _, tt := range tests {
 		tt.got.Weights = tt.want.Weights
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.got.initFromWeight(); !reflect.DeepEqual(tt.got, tt.want) {
+			tt.got.initFromWeight()
+			tt.got.initCompletion()
+			if !reflect.DeepEqual(tt.got, tt.want) {
 				t.Errorf("initFromWeight()\ngot:\t%v\nwant:\t%v", tt.got, tt.want)
 			}
 		})
