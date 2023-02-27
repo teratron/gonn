@@ -43,12 +43,12 @@ func main() {
 
 	// Getting the results of the trained network.
 	output := n.Query(input)
-	fmt.Println(output)
+	fmt.Println("Query:", output)
 
 	// If there is target data, then we can train the received output data.
 	count, loss := n.AndTrain(target)
-	fmt.Println(count, loss)
+	fmt.Println("AndTrain:", count, loss)
 
 	// Check the trained data, the result should be about [0.7 0.1].
-	fmt.Println(n.Query(input))
+	fmt.Println("Check:", n.Query(input))
 }

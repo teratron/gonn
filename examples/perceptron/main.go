@@ -69,5 +69,5 @@ func main() {
 	_ = n.WriteWeights("perceptron_weights.json")
 
 	// Check the trained data, the result should be about [-0.13 0.2].
-	fmt.Println(n.Query([]float64{-.52, .66, .81}))
+	fmt.Println("Check:", n.Query([]float64{-.52, .66, .81}))
 }

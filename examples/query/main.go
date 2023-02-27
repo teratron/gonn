@@ -42,5 +42,5 @@ func main() {
 
 	// Getting the results of the trained network.
 	output := n.Query(input)
-	fmt.Println(output)
+	fmt.Println("Query:", output)
 }

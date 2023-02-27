@@ -95,16 +95,13 @@ func (nn *NN) AndTrain(target []float64) (count int, loss float64) {
 
 		nn.target = pkg.ToFloat1Type(target)
 
-		isStart := true
 		minLoss := 1.
 		minCount := 0
 		for count < GetMaxIteration() {
-			count++
-			if !isStart {
+			if count > 0 {
 				nn.calcNeurons()
-			} else {
-				isStart = false
 			}
+			count++
 
 			if loss = nn.calcLoss(); loss < minLoss {
 				minLoss = loss
