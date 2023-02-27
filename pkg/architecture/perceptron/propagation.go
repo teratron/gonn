@@ -40,6 +40,10 @@ func (nn *NN) calcNeurons() {
 			} else {
 				n.value = params.Activation(n.value, nn.ActivationMode)
 			}
+
+			if i == nn.lastLayerIndex {
+				nn.output[j] = float64(n.value)
+			}
 		}
 	}
 }

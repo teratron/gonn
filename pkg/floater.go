@@ -5,6 +5,7 @@ import "log"
 // Floater.
 type Floater interface {
 	Length(...uint) int
+	Copy(Floater)
 }
 
 type (
@@ -17,6 +18,14 @@ type (
 // Length.
 func (f Float1Type) Length(...uint) int {
 	return len(f)
+}
+
+// Copy.
+func (f Float1Type) Copy(src Floater) {
+	if s, ok := src.(Float1Type); ok {
+		_ = copy(f, s)
+	}
+
 }
 
 // ToFloat1Type.
@@ -38,6 +47,15 @@ func (f Float2Type) Length(index ...uint) int {
 		return 0
 	}
 	return len(f)
+}
+
+// Copy.
+func (f Float2Type) Copy(src Floater) {
+	if s, ok := src.(Float2Type); ok {
+		for i := range s {
+			_ = copy(f[i], s[i])
+		}
+	}
 }
 
 // ToFloat2Type.
@@ -70,6 +88,17 @@ func (f Float3Type) Length(index ...uint) int {
 	}
 	log.Println("pkg.Float3Type.Length error: index exceeds arrays size")
 	return 0
+}
+
+// Copy.
+func (f Float3Type) Copy(src Floater) {
+	if s, ok := src.(Float3Type); ok {
+		for i, v := range s {
+			for j := range v {
+				_ = copy(f[i][j], s[i][j])
+			}
+		}
+	}
 }
 
 // ToFloat3Type.

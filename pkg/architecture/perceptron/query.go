@@ -21,17 +21,22 @@ func (nn *NN) Query(input []float64) []float64 {
 			err = fmt.Errorf("invalid number of elements in the input data")
 			goto ERROR
 		}
-
+		//fmt.Println(&nn.weights[0][0][0], &nn.Weights[0][0][0])
 		if nn.Weights[0][0][0] != 0 {
-			nn.weights = nn.Weights
+			//nn.weights = nn.Weights
+			//_ = copy(nn.weights, nn.Weights)
+			nn.weights.Copy(nn.Weights)
 		}
+		//_ = copy(nn.weights[0][0], nn.Weights[0][0])
+		//nn.weights[0][0] = nn.Weights[0][0]
+		//nn.weights = append(nn.weights, nn.Weights...)
+		//nn.weights.Copy(nn.Weights)
+		//fmt.Println(nn.weights[0][0][0], nn.Weights[0][0][0])
+		//nn.Weights[0][0][0] = 42
+		//fmt.Println(&nn.weights[0][1][0], &nn.Weights[0][1][0])
 
 		nn.input = pkg.ToFloat1Type(input)
-
 		nn.calcNeurons()
-		for i, n := range nn.neurons[nn.lastLayerIndex] {
-			nn.output[i] = float64(n.value)
-		}
 		return nn.output
 	} else {
 		err = pkg.ErrNoInput
