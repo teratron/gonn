@@ -50,6 +50,7 @@ type NN struct {
 	lenOutput      int
 	lastLayerIndex int
 	isInit         bool
+	isQuery        bool
 	config         utils.Filer
 	mutex          sync.Mutex
 
@@ -69,6 +70,8 @@ type neuron struct {
 func New() *NN {
 	return &NN{
 		Name:           Name,
+		Bias:           false,
+		HiddenLayer:    []uint{0},
 		ActivationMode: params.SIGMOID,
 		LossMode:       params.MSE,
 		LossLimit:      .01,

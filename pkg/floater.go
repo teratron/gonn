@@ -1,11 +1,12 @@
 package pkg
 
-import "log"
+import (
+	"log"
+)
 
 // Floater.
 type Floater interface {
 	Length(...uint) int
-	Copy(Floater)
 }
 
 type (
@@ -18,14 +19,6 @@ type (
 // Length.
 func (f Float1Type) Length(...uint) int {
 	return len(f)
-}
-
-// Copy.
-func (f Float1Type) Copy(src Floater) {
-	if s, ok := src.(Float1Type); ok {
-		_ = copy(f, s)
-	}
-
 }
 
 // ToFloat1Type.
@@ -47,15 +40,6 @@ func (f Float2Type) Length(index ...uint) int {
 		return 0
 	}
 	return len(f)
-}
-
-// Copy.
-func (f Float2Type) Copy(src Floater) {
-	if s, ok := src.(Float2Type); ok {
-		for i := range s {
-			_ = copy(f[i], s[i])
-		}
-	}
 }
 
 // ToFloat2Type.
@@ -90,17 +74,6 @@ func (f Float3Type) Length(index ...uint) int {
 	return 0
 }
 
-// Copy.
-func (f Float3Type) Copy(src Floater) {
-	if s, ok := src.(Float3Type); ok {
-		for i, v := range s {
-			for j := range v {
-				_ = copy(f[i][j], s[i][j])
-			}
-		}
-	}
-}
-
 // ToFloat3Type.
 func ToFloat3Type(src [][][]float64) Float3Type {
 	dst := make(Float3Type, len(src))
@@ -114,4 +87,24 @@ func ToFloat3Type(src [][][]float64) Float3Type {
 		}
 	}
 	return dst
+}
+
+// DeepCopy.
+func DeepCopy(src Float3Type) (dst Float3Type) {
+	if len(dst) == 0 || dst == nil {
+		dst = make(Float3Type, len(src))
+		for i, v := range src {
+			dst[i] = make(Float2Type, len(v))
+			for j, w := range v {
+				dst[i][j] = make(Float1Type, len(w))
+			}
+		}
+	}
+
+	for i, v := range src {
+		for j := range v {
+			_ = copy(dst[i][j], src[i][j])
+		}
+	}
+	return
 }

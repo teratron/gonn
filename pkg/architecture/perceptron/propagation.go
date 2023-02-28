@@ -20,7 +20,7 @@ func (nn *NN) calcNeurons() {
 		for j, n := range v {
 			var num pkg.FloatType = 0
 			n.value = 0
-			for k, w := range nn.weights[i][j] {
+			for k, w := range nn.Weights[i][j] {
 				if k < length {
 					if i > 0 {
 						n.value += nn.neurons[dec][k].value * w
@@ -65,7 +65,7 @@ func (nn *NN) calcNeurons() {
 			go func(j int, n *neuron) {
 				var num pkg.FloatType = 0
 				n.value = 0
-				for k, w := range nn.weights[i][j] {
+				for k, w := range nn.Weights[i][j] {
 					if k < length {
 						if i > 0 {
 							n.value += nn.neurons[dec][k].value * w
@@ -134,7 +134,7 @@ func (nn *NN) calcMiss() {
 			for j, n := range nn.neurons[i] {
 				n.miss = 0
 				for k, m := range nn.neurons[inc] {
-					n.miss += m.miss * nn.weights[inc][k][j]
+					n.miss += m.miss * nn.Weights[inc][k][j]
 				}
 			}
 		}
@@ -152,7 +152,7 @@ func (nn *NN) calcMiss() {
 				go func(j int, n *neuron) {
 					n.miss = 0
 					for k, m := range nn.neurons[inc] {
-						n.miss += m.miss * nn.weights[inc][k][j]
+						n.miss += m.miss * nn.Weights[inc][k][j]
 					}
 					wait <- true
 				}(j, n)
@@ -168,7 +168,7 @@ func (nn *NN) calcMiss() {
 // updateWeights update weights.
 func (nn *NN) updateWeights() {
 	var length, dec int
-	for i, v := range nn.weights {
+	for i, v := range nn.Weights {
 		if i > 0 {
 			dec = i - 1
 			length = len(nn.neurons[dec])
@@ -189,13 +189,13 @@ func (nn *NN) updateWeights() {
 
 					if nn.ActivationMode == params.LINEAR {
 						if value != 0 {
-							nn.weights[i][j][k] += grad / value
+							nn.Weights[i][j][k] += grad / value
 						}
 					} else {
-						nn.weights[i][j][k] += grad * value
+						nn.Weights[i][j][k] += grad * value
 					}
 				} else {
-					nn.weights[i][j][k] += grad
+					nn.Weights[i][j][k] += grad
 				}
 			}
 		}
@@ -207,7 +207,7 @@ func (nn *NN) updateWeights() {
 	defer close(wait)
 
 	var length, dec int
-	for i, v := range nn.weights {
+	for i, v := range nn.Weights {
 		if i > 0 {
 			dec = i - 1
 			length = len(nn.neurons[dec])
@@ -230,13 +230,13 @@ func (nn *NN) updateWeights() {
 						switch nn.Activation {
 						case params.LINEAR:
 							if value != 0 {
-								nn.weights[i][j][k] += grad / value
+								nn.Weights[i][j][k] += grad / value
 							}
 						default:
-							nn.weights[i][j][k] += grad * value
+							nn.Weights[i][j][k] += grad * value
 						}
 					} else {
-						nn.weights[i][j][k] += grad
+						nn.Weights[i][j][k] += grad
 					}
 				}
 				wait <- true
@@ -244,7 +244,7 @@ func (nn *NN) updateWeights() {
 		}
 	}
 
-	for _, v := range nn.weights {
+	for _, v := range nn.Weights {
 		for range v {
 			<-wait
 		}
@@ -255,7 +255,7 @@ func (nn *NN) updateWeights() {
 	defer close(wait)
 
 	var length, dec int
-	for i, v := range nn.weights {
+	for i, v := range nn.Weights {
 		if i > 0 {
 			dec = i - 1
 			length = len(nn.neurons[dec])
@@ -276,13 +276,13 @@ func (nn *NN) updateWeights() {
 					switch nn.ActivationMode {
 					case params.LINEAR:
 						if value != 0 {
-							nn.weights[i][j][k] += grad / value
+							nn.Weights[i][j][k] += grad / value
 						}
 					default:
-						nn.weights[i][j][k] += grad * value
+						nn.Weights[i][j][k] += grad * value
 					}
 				} else {
-					nn.weights[i][j][k] += grad
+					nn.Weights[i][j][k] += grad
 				}
 			}
 		}
@@ -298,7 +298,7 @@ func (nn *NN) updateWeights() {
 		}
 	}
 
-	for _, v := range nn.weights {
+	for _, v := range nn.Weights {
 		for range v {
 			<-wait
 		}

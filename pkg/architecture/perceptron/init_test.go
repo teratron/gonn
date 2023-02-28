@@ -18,6 +18,8 @@ func init() {
 
 func TestNN_Init(t *testing.T) {
 	testFile := &utils.FileJSON{Name: testJSON}
+	testGot := &NN{}
+	_ = testFile.Decode(testGot)
 	testNN := &NN{
 		Name:           Name,
 		Bias:           true,
@@ -35,6 +37,32 @@ func TestNN_Init(t *testing.T) {
 				{.1, .1, .1},
 			},
 		},
+		neurons: [][]*neuron{
+			{
+				&neuron{},
+				&neuron{},
+			},
+			{
+				&neuron{},
+			},
+		},
+		lenInput:       2,
+		lenOutput:      1,
+		lastLayerIndex: 1,
+		isInit:         true,
+		config:         testFile,
+		weights: pkg.Float3Type{
+			{
+				{0, 0, 0},
+				{0, 0, 0},
+			},
+			{
+				{0, 0, 0},
+			},
+		},
+		input:  make(pkg.Float1Type, 2),
+		target: make(pkg.Float1Type, 1),
+		output: make([]float64, 1),
 	}
 	tests := []struct {
 		name string
@@ -45,7 +73,7 @@ func TestNN_Init(t *testing.T) {
 		{
 			name: "#1_JSON",
 			gave: []interface{}{testFile},
-			got:  &NN{},
+			got:  testGot,
 			want: testNN,
 		},
 		{
@@ -63,7 +91,6 @@ func TestNN_Init(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt.got.Weights = tt.want.Weights
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.got.Init(tt.gave...); !reflect.DeepEqual(tt.got, tt.want) {
 				t.Errorf("Init()\ngot:\t%v\nwant:\t%v", tt.got, tt.want)
@@ -82,6 +109,7 @@ func TestNN_initFromNew(t *testing.T) {
 		{
 			name: "#1",
 			got: &NN{
+				HiddenLayer:    []uint{0},
 				ActivationMode: params.SIGMOID,
 			},
 			want: &NN{
@@ -117,7 +145,9 @@ func TestNN_initFromNew(t *testing.T) {
 		},
 		{
 			name: "#2",
-			got:  &NN{},
+			got: &NN{
+				HiddenLayer: []uint{2},
+			},
 			want: &NN{
 				Bias:        true,
 				HiddenLayer: []uint{2},
@@ -161,7 +191,7 @@ func TestNN_initFromNew(t *testing.T) {
 
 	for _, tt := range tests {
 		tt.got.Bias = tt.want.Bias
-		tt.got.HiddenLayer = tt.want.HiddenLayer
+		_ = copy(tt.got.HiddenLayer, tt.want.HiddenLayer)
 		t.Run(tt.name, func(t *testing.T) {
 			tt.got.initFromNew(tt.want.lenInput, tt.want.lenOutput)
 			tt.got.initCompletion()
@@ -255,7 +285,7 @@ func TestNN_initFromWeight(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt.got.Weights = tt.want.Weights
+		tt.got.Weights = pkg.DeepCopy(tt.want.Weights)
 		t.Run(tt.name, func(t *testing.T) {
 			tt.got.initFromWeight()
 			tt.got.initCompletion()

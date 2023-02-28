@@ -45,7 +45,7 @@ func Get(reader string) pkg.NeuralNetwork {
 	}
 
 	if err != nil {
-		log.Printf("arch.Get: %v", err)
+		log.Printf("architecture.Get: %v", err)
 	}
 	return nil
 }

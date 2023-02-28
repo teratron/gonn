@@ -17,12 +17,12 @@ func (nn *NN) SetBias(bias bool) {
 
 // GetHiddenLayer.
 func (nn *NN) GetHiddenLayer() []uint {
-	return params.CheckHiddenLayer(nn.HiddenLayer)
+	return params.CheckLayer(nn.HiddenLayer)
 }
 
 // SetHiddenLayer.
 func (nn *NN) SetHiddenLayer(layer ...uint) {
-	nn.HiddenLayer = params.CheckHiddenLayer(layer)
+	nn.HiddenLayer = params.CheckLayer(layer)
 }
 
 // GetActivationMode.

@@ -23,7 +23,8 @@ func main() {
 	target := []float64{5, -50.3}
 
 	// Training dataset.
-	fmt.Println(n.Train(input, target))
+	count, loss := n.Train(input, target)
+	fmt.Println("Train:", count, loss)
 
 	// Check the trained data, the result should be about [5 -50.3].
 	fmt.Println("Check:", n.Query(input))
