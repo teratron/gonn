@@ -9,6 +9,7 @@ import (
 	"github.com/teratron/gonn/pkg/architecture/hopfield"
 	"github.com/teratron/gonn/pkg/architecture/perceptron"
 	"github.com/teratron/gonn/pkg/params"
+	"github.com/teratron/gonn/pkg/utils"
 )
 
 const testStreamJSON = `
@@ -105,11 +106,12 @@ func TestGet(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			//if tt.want != nil {
-			//	if nn, ok := tt.want.(*perceptron.NN); ok && len(nn.Weights) > 0 {
-			//		nn.Init(utils.GetFileType(tt.gave))
-			//	}
-			//}
+			if tt.gave == testJSON {
+				testNN.Init(&utils.FileJSON{Name: testJSON})
+			}
+			if tt.gave == testStreamJSON {
+				testNN.Init(&utils.FileJSON{Name: ""})
+			}
 			if got := Get(tt.gave); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Get()\ngot:\t%v\nwant:\t%v", got, tt.want)
 			}
