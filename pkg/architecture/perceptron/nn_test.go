@@ -10,6 +10,7 @@ import (
 func TestNew(t *testing.T) {
 	want := &NN{
 		Name:           Name,
+		HiddenLayer:    []uint{0},
 		ActivationMode: params.SIGMOID,
 		LossMode:       params.MSE,
 		LossLimit:      .01,
