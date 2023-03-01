@@ -102,15 +102,12 @@ func (nn *NN) initFromNew(lenInput, lenTarget int) {
 // initFromWeight.
 func (nn *NN) initFromWeight() {
 	length := len(nn.Weights)
-
-	if !nn.Bias && length > 1 && len(nn.Weights[0])+1 == len(nn.Weights[1][0]) {
-		nn.Bias = true
-	}
-
 	nn.lastLayerIndex = length - 1
 	nn.lenOutput = len(nn.Weights[nn.lastLayerIndex])
 	nn.lenInput = len(nn.Weights[0][0])
-	if nn.Bias {
+
+	if length > 1 && len(nn.Weights[0])+1 == len(nn.Weights[1][0]) {
+		nn.Bias = true
 		nn.lenInput -= 1
 	}
 
