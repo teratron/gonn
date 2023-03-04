@@ -8,7 +8,7 @@ import (
 )
 
 // MaxIteration the maximum number of iterations after which training is forcibly terminated.
-const MaxIteration int = 1e+06
+const MaxIteration int = 1e+09
 
 var GetMaxIteration = getMaxIteration
 

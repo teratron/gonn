@@ -135,6 +135,7 @@ func (nn *NN) initFromWeight() {
 
 // initCompletion.
 func (nn *NN) initCompletion() {
+	nn.prevLayerIndex = nn.lastLayerIndex - 1
 	nn.input = make(pkg.Float1Type, nn.lenInput)
 	nn.target = make(pkg.Float1Type, nn.lenOutput)
 	nn.output = make([]float64, nn.lenOutput)

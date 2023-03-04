@@ -112,6 +112,13 @@ func (nn *NN) calcLoss() (loss float64) {
 		}
 	}
 
+	switch { // TODO:
+	case math.IsNaN(loss):
+		log.Panic("1:perceptron.NN.calcLoss: loss not-a-number value") // TODO: log.Panic (?)
+	case math.IsInf(loss, 0):
+		log.Panic("1:perceptron.NN.calcLoss: loss is infinity") // TODO: log.Panic (?)
+	}
+
 	loss /= float64(nn.lenOutput)
 	if nn.LossMode == params.RMSE {
 		loss = math.Sqrt(loss)
@@ -128,17 +135,18 @@ func (nn *NN) calcLoss() (loss float64) {
 
 // calcMiss calculating the error of neurons in hidden layers.
 func (nn *NN) calcMiss() {
-	if nn.lastLayerIndex > 0 {
-		for i := nn.lastLayerIndex - 1; i >= 0; i-- {
-			inc := i + 1
-			for j, n := range nn.neurons[i] {
-				n.miss = 0
-				for k, m := range nn.neurons[inc] {
-					n.miss += m.miss * nn.Weights[inc][k][j]
-				}
+	//if nn.lastLayerIndex > 0 {
+	// for i := nn.lastLayerIndex - 1; i >= 0; i-- {
+	for i := nn.prevLayerIndex; i >= 0; i-- {
+		inc := i + 1
+		for j, n := range nn.neurons[i] {
+			n.miss = 0
+			for k, m := range nn.neurons[inc] {
+				n.miss += m.miss * nn.Weights[inc][k][j]
 			}
 		}
 	}
+	//}
 }
 
 /*func (nn *NN) calcMiss() {
@@ -167,13 +175,11 @@ func (nn *NN) calcMiss() {
 
 // updateWeights update weights.
 func (nn *NN) updateWeights() {
-	var length, dec int
+	length, dec := nn.lenInput, 0
 	for i, v := range nn.Weights {
 		if i > 0 {
 			dec = i - 1
 			length = len(nn.neurons[dec])
-		} else {
-			length = nn.lenInput
 		}
 
 		for j, w := range v {

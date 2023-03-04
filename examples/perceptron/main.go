@@ -41,7 +41,7 @@ func main() {
 
 	// Training.
 	lenData := len(dataSet) - lenOutput
-	for epoch := 1; epoch <= 10000; epoch++ {
+	for epoch := 1; epoch <= 100000; epoch++ {
 		for i := lenInput; i <= lenData; i++ {
 			_, _ = n.Train(dataSet[i-lenInput:i], dataSet[i:i+lenOutput])
 		}

@@ -49,6 +49,7 @@ type NN struct {
 	lenInput       int
 	lenOutput      int
 	lastLayerIndex int
+	prevLayerIndex int
 	isInit         bool
 	isQuery        bool
 	config         utils.Filer
