@@ -126,9 +126,9 @@ func (nn *NN) calcLoss() (loss float64) {
 
 	switch {
 	case math.IsNaN(loss):
-		log.Panic("perceptron.NN.calcLoss: loss not-a-number value") // TODO: log.Panic (?)
+		log.Panic("2:perceptron.NN.calcLoss: loss not-a-number value") // TODO: log.Panic (?)
 	case math.IsInf(loss, 0):
-		log.Panic("perceptron.NN.calcLoss: loss is infinity") // TODO: log.Panic (?)
+		log.Panic("2:perceptron.NN.calcLoss: loss is infinity") // TODO: log.Panic (?)
 	}
 	return
 }

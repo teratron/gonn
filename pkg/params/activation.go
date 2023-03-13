@@ -1,6 +1,7 @@
 package params
 
 import (
+	"log"
 	"math"
 
 	"github.com/teratron/gonn/pkg"
@@ -41,10 +42,29 @@ func Activation(value pkg.FloatType, mode uint8) pkg.FloatType {
 	default:
 		fallthrough
 	case SIGMOID:
-		return 1 / (1 + pkg.FloatType(math.Exp(float64(-value))))
+		value = 1 / (1 + pkg.FloatType(math.Exp(float64(-value))))
+		switch { // TODO:
+		case math.IsNaN(float64(value)):
+			log.Panic("SIGMOID:perceptron.NN.calcLoss: loss not-a-number value") // TODO: log.Panic (?)
+		case math.IsInf(float64(value), 0):
+			log.Panic("SIGMOID:perceptron.NN.calcLoss: loss is infinity") // TODO: log.Panic (?)
+		}
+		return value
+		//return 1 / (1 + pkg.FloatType(math.Exp(float64(-value))))
 	case TANH:
+		val0 := value
 		value = pkg.FloatType(math.Exp(2 * float64(value)))
-		return (value - 1) / (value + 1)
+		val1 := value
+		value = (value - 1) / (value + 1)
+		switch { // TODO:
+		case math.IsNaN(float64(value)):
+			log.Panic("TANH:perceptron.NN.calcLoss: loss not-a-number value", val0, val1) // TODO: log.Panic (?)
+		case math.IsInf(float64(value), 0):
+			log.Panic("TANH:perceptron.NN.calcLoss: loss is infinity") // TODO: log.Panic (?)
+		}
+		return value
+		//value = pkg.FloatType(math.Exp(2 * float64(value)))
+		//return (value - 1) / (value + 1)
 	}
 }
 
