@@ -37,6 +37,7 @@ func (nn *NN) calcNeurons() {
 				if num > 0 {
 					n.value /= num
 				}
+				n.value = 1 // TODO:
 			} else {
 				n.value = params.Activation(n.value, nn.ActivationMode)
 			}
@@ -111,6 +112,8 @@ func (nn *NN) calcLoss() (loss float64) {
 			loss += math.Abs(float64(n.miss))
 		}
 	}
+
+	// TODO: math.Copysign()
 
 	switch { // TODO:
 	case math.IsNaN(loss):

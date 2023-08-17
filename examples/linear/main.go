@@ -13,9 +13,10 @@ func main() {
 	n := nn.New("perceptron")
 
 	// Parameters.
-	n.SetHiddenLayer(3, 2)
+	n.SetBias(true)
+	n.SetHiddenLayer(3, 2, 5)
 	n.SetActivationMode(nn.LINEAR)
-	n.SetLossMode(nn.MSE)
+	n.SetLossMode(nn.AVG)
 	n.SetLossLimit(.0001)
 
 	// Dataset that doesn't need to be scaled.
