@@ -1,9 +1,9 @@
 # GoNN
 
 <div>
-  <a href="https://pkg.go.dev/github.com/zigenzoog/gonn?tab=doc" title="Go API Reference" rel="nofollow"><img src="https://pkg.go.dev/badge/github.com/zigenzoog/gonn.svg" alt="Go API Reference"></a>
-  <a href="https://github.com/zigenzoog/gonn/releases/tag/v0.4.0" title="0.4.0" rel="nofollow"><img src="https://img.shields.io/badge/version-0.4.0-blue.svg?style=flat" alt="0.4.0"></a>
-  <a href="https://goreportcard.com/report/github.com/zigenzoog/gonn"><img src="https://goreportcard.com/badge/github.com/zigenzoog/gonn" alt="Code Status" /></a>
+  <a href="https://pkg.go.dev/github.com/teratron/gonn?tab=doc" title="Go API Reference" rel="nofollow"><img src="https://pkg.go.dev/badge/github.com/teratron/gonn.svg" alt="Go API Reference"></a>
+  <a href="https://github.com/teratron/gonn/releases/tag/v0.4.0" title="0.4.0" rel="nofollow"><img src="https://img.shields.io/badge/version-0.4.0-blue.svg?style=flat" alt="0.4.0"></a>
+  <a href="https://goreportcard.com/report/github.com/teratron/gonn"><img src="https://goreportcard.com/badge/github.com/teratron/gonn" alt="Code Status" /></a>
 </div>
 
 ## About
@@ -13,7 +13,7 @@ Neural network library for go.
 ## Install
 
 ```shell
-$ go get -u github.com/zigenzoog/gonn
+$ go get -u github.com/teratron/gonn
 ```
 
 ## Getting Started
@@ -21,7 +21,7 @@ $ go get -u github.com/zigenzoog/gonn
 ```go
 package main
 
-import "github.com/zigenzoog/gonn/pkg/nn"
+import "github.com/teratron/gonn/pkg/nn"
 
 func main() {
 	// New returns a new neural network
@@ -39,10 +39,10 @@ func main() {
 
 ## Documentation
 
-More documentation is available at the [gonn website](https://zigenzoog.github.io/gonn) or
-on [pkg.go.dev](https://pkg.go.dev/github.com/zigenzoog/gonn).
+More documentation is available at the [gonn website](https://teratron.github.io/gonn) or
+on [pkg.go.dev](https://pkg.go.dev/github.com/teratron/gonn).
 
 ## Examples
 
 You can find examples of neural networks in
-the [example's directory](https://github.com/zigenzoog/gonn/tree/master/examples).
+the [example's directory](https://github.com/teratron/gonn/tree/master/examples).
