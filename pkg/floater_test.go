@@ -1,6 +1,9 @@
 package pkg
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+)
 
 func TestFloat1Type_length(t *testing.T) {
 	tests := []struct {
@@ -22,9 +25,10 @@ func TestFloat1Type_length(t *testing.T) {
 			want:  3,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.gave.Length(tt.index...); got != tt.want {
+			if got := tt.gave.Length(); got != tt.want {
 				t.Errorf("length() = %d, want %d", got, tt.want)
 			}
 		})
@@ -72,6 +76,7 @@ func TestFloat2Type_length(t *testing.T) {
 			want:  0,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.gave.Length(tt.index...); got != tt.want {
@@ -159,10 +164,57 @@ func TestFloat3Type_length(t *testing.T) {
 			want:  0,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.gave.Length(tt.index...); got != tt.want {
 				t.Errorf("length() = %d, want %d", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestDeepCopy(t *testing.T) {
+	tests := []struct {
+		name string
+		src  Float3Type
+		dst  Float3Type
+	}{
+		{
+			name: "#1_zero_length",
+			src: Float3Type{
+				{
+					{1, 2},
+					{1, 2, 3},
+				},
+				{
+					{1},
+					{1, 2},
+					{1, 2, 3},
+				},
+			},
+			dst: Float3Type{},
+		},
+		{
+			name: "#2_nil",
+			src: Float3Type{
+				{
+					{1, 2},
+					{1, 2, 3},
+				},
+				{
+					{1},
+					{1, 2},
+				},
+			},
+			dst: nil,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.dst = DeepCopy(tt.src); !reflect.DeepEqual(tt.dst, tt.src) {
+				t.Errorf("DeepCopy()\ndst:\t%v\nsrc:\t%v", tt.dst, tt.src)
 			}
 		})
 	}

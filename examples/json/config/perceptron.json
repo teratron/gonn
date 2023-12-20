@@ -1,34 +1,34 @@
 {
-	"name": "perceptron",
-	"bias": false,
-	"hidden": [
-		3
-	],
-	"activation": 3,
-	"loss": 0,
-	"limit": 1e-2,
-	"rate": 0.3,
-	"weights": [
-		[
-			[
-				0.8,
-				0.2
-			],
-			[
-				0.4,
-				0.9
-			],
-			[
-				0.3,
-				0.5
-			]
-		],
-		[
-			[
-				0.3,
-				0.5,
-				0.9
-			]
-		]
-	]
+    "name": "perceptron",
+    "bias": false,
+    "hiddenLayer": [
+        3
+    ],
+    "activationMode": 3,
+    "lossMode": 0,
+    "lossLimit": 1e-2,
+    "rate": 0.3,
+    "weights": [
+        [
+            [
+                0.8,
+                0.2
+            ],
+            [
+                0.4,
+                0.9
+            ],
+            [
+                0.3,
+                0.5
+            ]
+        ],
+        [
+            [
+                0.3,
+                0.5,
+                0.9
+            ]
+        ]
+    ]
 }

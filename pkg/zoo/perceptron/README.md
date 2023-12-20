@@ -1,3 +1,0 @@
-## Perceptron Neural Network
-
-

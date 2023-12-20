@@ -1,0 +1,12 @@
+<component name="ProjectRunConfigurationManager">
+    <configuration default="false" name="json" type="GoApplicationRunConfiguration" factoryName="Go Application">
+        <module name="gonn"/>
+        <working_directory value="$PROJECT_DIR$/examples/json"/>
+        <kind value="DIRECTORY"/>
+        <package value="github.com/teratron/gonn/examples/json"/>
+        <directory value="$PROJECT_DIR$/examples/json"/>
+        <filePath value="$PROJECT_DIR$/examples/json/main.go"/>
+        <output_directory value="$PROJECT_DIR$/examples/json/"/>
+        <method v="2"/>
+    </configuration>
+</component>

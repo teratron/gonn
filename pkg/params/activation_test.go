@@ -1,6 +1,10 @@
 package params
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/teratron/gonn/pkg"
+)
 
 func Test_checkActivationMode(t *testing.T) {
 	tests := []struct {
@@ -9,16 +13,17 @@ func Test_checkActivationMode(t *testing.T) {
 		want uint8
 	}{
 		{
-			name: "#1_ModeTANH",
-			gave: ModeTANH,
-			want: ModeTANH,
+			name: "#1_TANH",
+			gave: TANH,
+			want: TANH,
 		},
 		{
 			name: "#2_overflow",
 			gave: 255,
-			want: ModeSIGMOID,
+			want: SIGMOID,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := CheckActivationMode(tt.gave); got != tt.want {
@@ -30,48 +35,48 @@ func Test_checkActivationMode(t *testing.T) {
 
 func TestActivation(t *testing.T) {
 	type args struct {
-		value float64
+		value pkg.FloatType
 		mode  uint8
 	}
 	tests := []struct {
 		name string
 		args
-		want float64
+		want pkg.FloatType
 	}{
 		{
-			name: "#1_ModeLINEAR",
-			args: args{.1, ModeLINEAR},
+			name: "#1_LINEAR",
+			args: args{.1, LINEAR},
 			want: .1,
 		},
 		{
-			name: "#2_ModeRELU",
-			args: args{.1, ModeRELU},
+			name: "#2_RELU",
+			args: args{.1, RELU},
 			want: .1,
 		},
 		{
-			name: "#3_ModeRELU",
-			args: args{-.1, ModeRELU},
+			name: "#3_RELU",
+			args: args{-.1, RELU},
 			want: 0,
 		},
 		{
-			name: "#4_ModeLEAKYRELU",
-			args: args{.1, ModeLEAKYRELU},
+			name: "#4_LEAKYRELU",
+			args: args{.1, LEAKYRELU},
 			want: .1,
 		},
 		{
-			name: "#5_ModeLEAKYRELU",
-			args: args{-.1, ModeLEAKYRELU},
+			name: "#5_LEAKYRELU",
+			args: args{-.1, LEAKYRELU},
 			want: -.001,
 		},
 		{
-			name: "#6_ModeSIGMOID",
-			args: args{.1, ModeSIGMOID},
+			name: "#6_SIGMOID",
+			args: args{.1, SIGMOID},
 			want: .52497918747894,
 		},
 		{
-			name: "#7_ModeTANH",
-			args: args{.1, ModeTANH},
-			want: .09966799462495583,
+			name: "#7_TANH",
+			args: args{.1, TANH},
+			want: .099668,
 		},
 		{
 			name: "#8_default",
@@ -79,6 +84,7 @@ func TestActivation(t *testing.T) {
 			want: .52497918747894,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := Activation(tt.value, tt.mode); got != tt.want {
@@ -90,55 +96,56 @@ func TestActivation(t *testing.T) {
 
 func TestDerivative(t *testing.T) {
 	type args struct {
-		value float64
+		value pkg.FloatType
 		mode  uint8
 	}
 	tests := []struct {
 		name string
 		args
-		want float64
+		want pkg.FloatType
 	}{
 		{
-			name: "#1_ModeLINEAR",
-			args: args{.1, ModeLINEAR},
+			name: "#1_LINEAR",
+			args: args{.1, LINEAR},
 			want: 1,
 		},
 		{
-			name: "#2_ModeRELU",
-			args: args{.1, ModeRELU},
+			name: "#2_RELU",
+			args: args{.1, RELU},
 			want: 1,
 		},
 		{
-			name: "#3_ModeRELU",
-			args: args{-.1, ModeRELU},
+			name: "#3_RELU",
+			args: args{-.1, RELU},
 			want: 0,
 		},
 		{
-			name: "#4_ModeLEAKYRELU",
-			args: args{.1, ModeLEAKYRELU},
+			name: "#4_LEAKYRELU",
+			args: args{.1, LEAKYRELU},
 			want: 1,
 		},
 		{
-			name: "#5_ModeLEAKYRELU",
-			args: args{-.1, ModeLEAKYRELU},
+			name: "#5_LEAKYRELU",
+			args: args{-.1, LEAKYRELU},
 			want: .01,
 		},
 		{
-			name: "#6_ModeSIGMOID",
-			args: args{.1, ModeSIGMOID},
-			want: .09000000000000001,
+			name: "#6_SIGMOID",
+			args: args{.1, SIGMOID},
+			want: .089999996,
 		},
 		{
-			name: "#7_ModeTANH",
-			args: args{.1, ModeTANH},
+			name: "#7_TANH",
+			args: args{.1, TANH},
 			want: .99,
 		},
 		{
 			name: "#8_default",
 			args: args{.1, 255},
-			want: .09000000000000001,
+			want: .089999996,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := Derivative(tt.value, tt.mode); got != tt.want {
