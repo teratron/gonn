@@ -113,8 +113,8 @@ You can find examples of neural networks in the [example's directory](examples).
 
 ## Project status
 
-Project at the initial stage.
+_Project at the initial stage._
 
-See the latest commits on [https://github.com/teratron/pynumic](https://github.com/teratron/pynumic)
+See the latest [commits](https://github.com/teratron/gonn/commits/master).
 
 ---
