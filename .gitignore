@@ -159,7 +159,7 @@ fabric.properties
 dist/
 tmp/
 .tmp/
-#.run/
+.run/
 
 examples/**/*.json
 examples/json/json
