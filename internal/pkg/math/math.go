@@ -10,8 +10,8 @@ const (
 )
 
 // Round rounding to a floating-point value.
-func Round(f float64, mode uint8, prec uint) float64 {
-	d := math.Pow(10, float64(prec))
+func Round(f float64, mode uint8, precision uint) float64 {
+	d := math.Pow(10, float64(precision))
 	f *= d
 	switch mode {
 	case ROUND:

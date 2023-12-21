@@ -1,1 +1,0 @@
-# Example Hopfield Neural Network
