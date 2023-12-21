@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/teratron/gonn/pkg"
-	"github.com/teratron/gonn/pkg/architecture/hopfield"
 	"github.com/teratron/gonn/pkg/architecture/perceptron"
 	"github.com/teratron/gonn/pkg/params"
 	"github.com/teratron/gonn/pkg/utils"
@@ -81,11 +80,6 @@ func TestGet(t *testing.T) {
 			name: "#2_" + Perceptron,
 			gave: Perceptron,
 			want: perceptron.New(),
-		},
-		{
-			name: "#3_" + Hopfield,
-			gave: Hopfield,
-			want: hopfield.New(),
 		},
 		{
 			name: "#4_json_file",

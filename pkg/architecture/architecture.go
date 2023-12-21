@@ -6,15 +6,11 @@ import (
 	"strings"
 
 	"github.com/teratron/gonn/pkg"
-	"github.com/teratron/gonn/pkg/architecture/hopfield"
 	"github.com/teratron/gonn/pkg/architecture/perceptron"
 	"github.com/teratron/gonn/pkg/utils"
 )
 
-const (
-	Perceptron = perceptron.Name
-	Hopfield   = hopfield.Name
-)
+const Perceptron = perceptron.Name
 
 // Get.
 func Get(reader string) pkg.NeuralNetwork {
@@ -24,8 +20,6 @@ func Get(reader string) pkg.NeuralNetwork {
 		switch strings.ToLower(reader) {
 		case Perceptron:
 			return perceptron.New()
-		case Hopfield:
-			return hopfield.New()
 		default:
 			err = fmt.Errorf("neural network is %w", pkg.ErrNotRecognized)
 		}

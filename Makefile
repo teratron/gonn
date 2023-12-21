@@ -6,9 +6,6 @@ test: ## coverage test
 build-example-perceptron: ## build example perceptron
 	go build -v -o ./examples/perceptron ./examples/perceptron/main.go
 
-build-example-hopfield: ## build example hopfield
-	go build -v -o ./examples/hopfield ./examples/hopfield/main.go
-
 build-example-linear: ## build example linear
 	go build -v -o ./examples/linear ./examples/linear/main.go
 
