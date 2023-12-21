@@ -37,7 +37,7 @@ delete: ## delete garbage
 	@find . -empty -delete
 
 #VERSION := $(shell cat ./VERSION)
-VERSION := 0.4.0
+VERSION := 0.5.0
 release: ## release
 	git tag -a $(VERSION) -m "Release" || true
 	git push origin $(VERSION)
