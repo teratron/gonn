@@ -94,18 +94,18 @@ func CalcDerivative(value nn.FloatType, mode Type) nn.FloatType {
 }
 
 func IsNaN[T nn.Floater](value T) bool {
-	//switch f := nn.Floater(value).(type) {
-	//case float32:
-	//	return math.IsNaN(float64(f))
-	//case float64:
-	//	return math.IsNaN(f)
-	//default:
-	//	return false
-	//}
+	switch f := any(value).(type) {
+	case float32:
+		return math.IsNaN(float64(f))
+	case float64:
+		return math.IsNaN(f)
+	default:
+		return false
+	}
 
-	if v, ok := any(value).(float32); ok {
+	/*if v, ok := any(value).(float32); ok {
 		return math.IsNaN(float64(v))
 	}
 
-	return math.IsNaN(float64(value))
+	return math.IsNaN(float64(value))*/
 }
