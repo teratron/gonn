@@ -37,8 +37,8 @@ func (nn *NN) Train(input []float64, target ...[]float64) (count int, loss float
 				}
 			}
 
-			nn.input = pkg.ToFloat1Type(input)
-			nn.target = pkg.ToFloat1Type(target[0])
+			nn.input = nn.ToFloat1Type(input)
+			nn.target = nn.ToFloat1Type(target[0])
 
 			return nn.train()
 		} else {
@@ -68,7 +68,7 @@ func (nn *NN) AndTrain(target []float64) (count int, loss float64) {
 			goto ERROR
 		}
 
-		nn.target = pkg.ToFloat1Type(target)
+		nn.target = nn.ToFloat1Type(target)
 
 		return nn.train()
 	} else {
@@ -94,9 +94,9 @@ func (nn *NN) train() (count int, loss float64) {
 		if loss = nn.calcLoss(); loss < minLoss {
 			minLoss = loss
 			minCount = count
-			nn.weights = pkg.DeepCopy(nn.Weights)
+			nn.weights = nn.DeepCopy(nn.Weights)
 			if loss < nn.LossLimit {
-				nn.Weights = pkg.DeepCopy(nn.weights)
+				nn.Weights = nn.DeepCopy(nn.weights)
 				return minCount, minLoss
 			}
 		}
@@ -105,7 +105,7 @@ func (nn *NN) train() (count int, loss float64) {
 	}
 
 	if minCount > 0 {
-		nn.Weights = pkg.DeepCopy(nn.weights)
+		nn.Weights = nn.DeepCopy(nn.weights)
 	}
 	return minCount, minLoss
 }

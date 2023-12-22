@@ -2,6 +2,7 @@ package perceptron
 
 import (
 	"fmt"
+	"github.com/teratron/gonn/pkg/activation"
 	"log"
 
 	"github.com/teratron/gonn/pkg"
@@ -68,12 +69,12 @@ func (nn *NN) initFromNew(lenInput, lenTarget int) {
 	biasInput := nn.lenInput + bias
 	var biasLayer int
 
-	nn.Weights = make(pkg.Float3Type, lenLayer)
-	nn.weights = make(pkg.Float3Type, lenLayer)
+	nn.Weights = make(nn.Float3Type, lenLayer)
+	nn.weights = make(nn.Float3Type, lenLayer)
 	nn.neurons = make([][]*neuron, lenLayer)
 	for i, v := range layer {
-		nn.Weights[i] = make(pkg.Float2Type, v)
-		nn.weights[i] = make(pkg.Float2Type, v)
+		nn.Weights[i] = make(nn.Float2Type, v)
+		nn.weights[i] = make(nn.Float2Type, v)
 		nn.neurons[i] = make([]*neuron, v)
 		if i > 0 {
 			biasLayer = int(layer[i-1]) + bias
@@ -81,14 +82,14 @@ func (nn *NN) initFromNew(lenInput, lenTarget int) {
 
 		for j := 0; j < int(v); j++ {
 			if i > 0 {
-				nn.Weights[i][j] = make(pkg.Float1Type, biasLayer)
-				nn.weights[i][j] = make(pkg.Float1Type, biasLayer)
+				nn.Weights[i][j] = make(nn.Float1Type, biasLayer)
+				nn.weights[i][j] = make(nn.Float1Type, biasLayer)
 			} else {
-				nn.Weights[i][j] = make(pkg.Float1Type, biasInput)
-				nn.weights[i][j] = make(pkg.Float1Type, biasInput)
+				nn.Weights[i][j] = make(nn.Float1Type, biasInput)
+				nn.weights[i][j] = make(nn.Float1Type, biasInput)
 			}
 			for k := range nn.weights[i][j] {
-				if nn.ActivationMode == params.LINEAR {
+				if nn.ActivationMode == activation.LINEAR {
 					nn.Weights[i][j][k] = .5
 				} else {
 					nn.Weights[i][j][k] = params.GetRandFloat()
@@ -120,14 +121,14 @@ func (nn *NN) initFromWeight() {
 		nn.HiddenLayer = []uint{0}
 	}
 
-	nn.weights = make(pkg.Float3Type, length)
+	nn.weights = make(nn.Float3Type, length)
 	nn.neurons = make([][]*neuron, length)
 	for i, v := range nn.Weights {
 		length = len(v)
-		nn.weights[i] = make(pkg.Float2Type, length)
+		nn.weights[i] = make(nn.Float2Type, length)
 		nn.neurons[i] = make([]*neuron, length)
 		for j, w := range v {
-			nn.weights[i][j] = make(pkg.Float1Type, len(w))
+			nn.weights[i][j] = make(nn.Float1Type, len(w))
 			nn.neurons[i][j] = &neuron{}
 		}
 	}
@@ -136,8 +137,8 @@ func (nn *NN) initFromWeight() {
 // initCompletion.
 func (nn *NN) initCompletion() {
 	nn.prevLayerIndex = nn.lastLayerIndex - 1
-	nn.input = make(pkg.Float1Type, nn.lenInput)
-	nn.target = make(pkg.Float1Type, nn.lenOutput)
+	nn.input = make(nn.Float1Type, nn.lenInput)
+	nn.target = make(nn.Float1Type, nn.lenOutput)
 	nn.output = make([]float64, nn.lenOutput)
 	nn.isInit = true
 }

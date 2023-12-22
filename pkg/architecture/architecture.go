@@ -10,8 +10,6 @@ import (
 	"github.com/teratron/gonn/pkg/utils"
 )
 
-const Perceptron = perceptron.Name
-
 // Get.
 func Get(reader string) pkg.NeuralNetwork {
 	var err error

@@ -1,11 +1,12 @@
 package perceptron
 
 import (
+	"github.com/teratron/gonn/pkg/activation"
+	"github.com/teratron/gonn/pkg/loss"
+	"github.com/teratron/gonn/pkg/nn"
 	"testing"
 
 	round "github.com/teratron/gonn/internal/pkg/math"
-	"github.com/teratron/gonn/pkg"
-	"github.com/teratron/gonn/pkg/params"
 )
 
 func init() {
@@ -36,9 +37,9 @@ func TestNN_Train(t *testing.T) {
 			name: "#1",
 			args: args{[]float64{.2, .3}, []float64{.2}},
 			gave: &NN{
-				ActivationMode: params.SIGMOID,
-				LossMode:       params.MSE,
-				Weights: pkg.Float3Type{
+				ActivationMode: activation.SIGMOID,
+				LossMode:       loss.MSE,
+				Weights: nn.Float3Type{
 					{
 						{.1, .1, .1},
 						{.1, .1, .1},
@@ -59,8 +60,8 @@ func TestNN_Train(t *testing.T) {
 				lenInput:       2,
 				lenOutput:      1,
 				lastLayerIndex: 1,
-				input:          make(pkg.Float1Type, 2),
-				target:         make(pkg.Float1Type, 1),
+				input:          make(nn.Float1Type, 2),
+				target:         make(nn.Float1Type, 1),
 				isInit:         true,
 			},
 			wantLoss:  .123683,
@@ -114,7 +115,7 @@ func TestNN_Train(t *testing.T) {
 		{
 			name: "#7_NaN",
 			args: args{[]float64{2358925515.52, .66, .81}, []float64{-.13, .2}},
-			gave: &NN{ActivationMode: params.TANH},
+			gave: &NN{ActivationMode: activation.TANH},
 		},
 	}
 

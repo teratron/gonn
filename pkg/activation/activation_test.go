@@ -1,9 +1,8 @@
-package params
+package activation
 
 import (
+	"github.com/teratron/gonn/pkg/nn"
 	"testing"
-
-	"github.com/teratron/gonn/pkg"
 )
 
 func Test_checkActivationMode(t *testing.T) {
@@ -35,13 +34,13 @@ func Test_checkActivationMode(t *testing.T) {
 
 func TestActivation(t *testing.T) {
 	type args struct {
-		value pkg.FloatType
+		value nn.FloatType
 		mode  uint8
 	}
 	tests := []struct {
 		name string
 		args
-		want pkg.FloatType
+		want nn.FloatType
 	}{
 		{
 			name: "#1_LINEAR",
@@ -87,7 +86,7 @@ func TestActivation(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := Activation(tt.value, tt.mode); got != tt.want {
+			if got := CalcActivation(tt.value, tt.mode); got != tt.want {
 				t.Errorf("Activation() = %g, want %g", got, tt.want)
 			}
 		})
@@ -96,13 +95,13 @@ func TestActivation(t *testing.T) {
 
 func TestDerivative(t *testing.T) {
 	type args struct {
-		value pkg.FloatType
+		value nn.FloatType
 		mode  uint8
 	}
 	tests := []struct {
 		name string
 		args
-		want pkg.FloatType
+		want nn.FloatType
 	}{
 		{
 			name: "#1_LINEAR",
@@ -148,7 +147,7 @@ func TestDerivative(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := Derivative(tt.value, tt.mode); got != tt.want {
+			if got := CalcDerivative(tt.value, tt.mode); got != tt.want {
 				t.Errorf("Derivative() = %g, want %g", got, tt.want)
 			}
 		})

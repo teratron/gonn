@@ -1,13 +1,15 @@
 package architecture
 
 import (
+	"github.com/teratron/gonn/pkg/activation"
+	"github.com/teratron/gonn/pkg/loss"
+	"github.com/teratron/gonn/pkg/nn"
 	"path/filepath"
 	"reflect"
 	"testing"
 
 	"github.com/teratron/gonn/pkg"
 	"github.com/teratron/gonn/pkg/architecture/perceptron"
-	"github.com/teratron/gonn/pkg/params"
 	"github.com/teratron/gonn/pkg/utils"
 )
 
@@ -52,11 +54,11 @@ func TestGet(t *testing.T) {
 		Name:           Perceptron,
 		Bias:           true,
 		HiddenLayer:    []uint{2},
-		ActivationMode: params.SIGMOID,
-		LossMode:       params.MSE,
+		ActivationMode: activation.SIGMOID,
+		LossMode:       loss.MSE,
 		LossLimit:      .1,
 		Rate:           .3,
-		Weights: pkg.Float3Type{
+		Weights: nn.Float3Type{
 			{
 				{.1, .1, .1},
 				{.1, .1, .1},

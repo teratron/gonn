@@ -1,11 +1,9 @@
 package perceptron
 
 import (
+	"github.com/teratron/gonn/pkg/activation"
 	"log"
 	"math"
-
-	"github.com/teratron/gonn/pkg"
-	"github.com/teratron/gonn/pkg/params"
 )
 
 // calcNeurons.
@@ -18,7 +16,7 @@ func (nn *NN) calcNeurons() {
 		}
 
 		for j, n := range v {
-			var num pkg.FloatType = 0
+			var num nn.FloatType = 0
 			n.value = 0
 			for k, w := range nn.Weights[i][j] {
 				if k < length {
@@ -33,13 +31,13 @@ func (nn *NN) calcNeurons() {
 				num++
 			}
 
-			if nn.ActivationMode == params.LINEAR {
+			if nn.ActivationMode == activation.LINEAR {
 				if num > 0 {
 					n.value /= num
 				}
 				n.value = 1 // TODO:
 			} else {
-				n.value = params.Activation(n.value, nn.ActivationMode)
+				n.value = activation.CalcActivation(n.value, nn.ActivationMode)
 			}
 
 			if i == nn.lastLayerIndex {
@@ -104,11 +102,11 @@ func (nn *NN) calcLoss() (loss float64) {
 		switch nn.LossMode {
 		default:
 			fallthrough
-		case params.MSE, params.RMSE:
+		case loss.MSE, loss.RMSE:
 			loss += math.Pow(float64(n.miss), 2)
-		case params.ARCTAN:
+		case loss.ARCTAN:
 			loss += math.Pow(math.Atan(float64(n.miss)), 2)
-		case params.AVG:
+		case loss.AVG:
 			loss += math.Abs(float64(n.miss))
 		}
 	}
@@ -123,7 +121,7 @@ func (nn *NN) calcLoss() (loss float64) {
 	}
 
 	loss /= float64(nn.lenOutput)
-	if nn.LossMode == params.RMSE {
+	if nn.LossMode == loss.RMSE {
 		loss = math.Sqrt(loss)
 	}
 
@@ -186,17 +184,17 @@ func (nn *NN) updateWeights() {
 		}
 
 		for j, w := range v {
-			grad := nn.Rate * nn.neurons[i][j].miss * params.Derivative(nn.neurons[i][j].value, nn.ActivationMode)
+			grad := nn.Rate * nn.neurons[i][j].miss * activation.CalcDerivative(nn.neurons[i][j].value, nn.ActivationMode)
 			for k := range w {
 				if k < length {
-					var value pkg.FloatType
+					var value nn.FloatType
 					if i > 0 {
 						value = nn.neurons[dec][k].value
 					} else {
 						value = nn.input[k]
 					}
 
-					if nn.ActivationMode == params.LINEAR {
+					if nn.ActivationMode == activation.LINEAR {
 						if value != 0 {
 							nn.Weights[i][j][k] += grad / value
 						}

@@ -1,12 +1,12 @@
 package perceptron
 
 import (
+	"github.com/teratron/gonn/pkg/activation"
+	"github.com/teratron/gonn/pkg/nn"
 	"reflect"
 	"testing"
 
 	"github.com/teratron/gonn/internal/pkg/math"
-	"github.com/teratron/gonn/pkg"
-	"github.com/teratron/gonn/pkg/params"
 )
 
 func TestNN_Query(t *testing.T) {
@@ -20,8 +20,8 @@ func TestNN_Query(t *testing.T) {
 			name:  "#1",
 			input: []float64{.2, .3},
 			gave: &NN{
-				ActivationMode: params.SIGMOID,
-				Weights: pkg.Float3Type{
+				ActivationMode: activation.SIGMOID,
+				Weights: nn.Float3Type{
 					{
 						{.1, .1, .1},
 						{.1, .1, .1},
@@ -43,8 +43,8 @@ func TestNN_Query(t *testing.T) {
 				lenOutput:      1,
 				lastLayerIndex: 1,
 				isInit:         true,
-				input:          make(pkg.Float1Type, 2),
-				target:         make(pkg.Float1Type, 1),
+				input:          make(nn.Float1Type, 2),
+				target:         make(nn.Float1Type, 1),
 				output:         make([]float64, 1),
 			},
 			want: []float64{.551686},

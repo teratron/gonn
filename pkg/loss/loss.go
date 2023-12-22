@@ -1,4 +1,4 @@
-package params
+package loss
 
 // The mode of calculation of the total error.
 const (

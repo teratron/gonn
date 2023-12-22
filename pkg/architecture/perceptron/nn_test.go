@@ -1,18 +1,18 @@
 package perceptron
 
 import (
+	"github.com/teratron/gonn/pkg/activation"
+	"github.com/teratron/gonn/pkg/loss"
 	"reflect"
 	"testing"
-
-	"github.com/teratron/gonn/pkg/params"
 )
 
 func TestNew(t *testing.T) {
 	want := &NN{
 		Name:           Name,
 		HiddenLayer:    []uint{0},
-		ActivationMode: params.SIGMOID,
-		LossMode:       params.MSE,
+		ActivationMode: activation.SIGMOID,
+		LossMode:       loss.MSE,
 		LossLimit:      .01,
 		Rate:           .3,
 	}

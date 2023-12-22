@@ -11,7 +11,7 @@ func main() {
 	// New returns a new neural network
 	// instance with the default parameters,
 	// same n := nn.New("perceptron").
-	n := nn.New()
+	n := nn.New[float32]()
 
 	// The neuron bias, false or true.
 	n.SetBias(true)
@@ -33,7 +33,7 @@ func main() {
 	n.SetRate(.3)
 
 	// Dataset.
-	dataSet := []float64{.27, -.31, -.52, .66, .81, -.13, .2, .49, .11, -.73, .28}
+	dataSet := []float32{.27, -.31, -.52, .66, .81, -.13, .2, .49, .11, -.73, .28}
 	lenInput := 3  // Number of input data.
 	lenOutput := 2 // Number of output data.
 
@@ -69,5 +69,5 @@ func main() {
 	_ = n.WriteWeights("perceptron_weights.json")
 
 	// Check the trained data, the result should be about [-0.13 0.2].
-	fmt.Println("Check:", n.Query([]float64{-.52, .66, .81}))
+	fmt.Println("Check:", n.Query([]float32{-.52, .66, .81}))
 }

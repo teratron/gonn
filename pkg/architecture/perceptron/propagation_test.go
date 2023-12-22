@@ -1,12 +1,13 @@
 package perceptron
 
 import (
+	"github.com/teratron/gonn/pkg/activation"
+	"github.com/teratron/gonn/pkg/loss"
+	"github.com/teratron/gonn/pkg/nn"
 	"reflect"
 	"testing"
 
 	"github.com/teratron/gonn/internal/pkg/math"
-	"github.com/teratron/gonn/pkg"
-	"github.com/teratron/gonn/pkg/params"
 )
 
 func TestNN_calcNeurons(t *testing.T) {
@@ -18,8 +19,8 @@ func TestNN_calcNeurons(t *testing.T) {
 		{
 			name: "#1",
 			got: &NN{
-				ActivationMode: params.LEAKYRELU,
-				Weights: pkg.Float3Type{
+				ActivationMode: activation.LEAKYRELU,
+				Weights: nn.Float3Type{
 					{
 						{.1},
 					},
@@ -30,7 +31,7 @@ func TestNN_calcNeurons(t *testing.T) {
 					},
 				},
 				lenInput: 1,
-				input:    pkg.Float1Type{.2},
+				input:    nn.Float1Type{.2},
 				output:   make([]float64, 1),
 			},
 			want: [][]*neuron{
@@ -42,8 +43,8 @@ func TestNN_calcNeurons(t *testing.T) {
 		{
 			name: "#2",
 			got: &NN{
-				ActivationMode: params.TANH,
-				Weights: pkg.Float3Type{
+				ActivationMode: activation.TANH,
+				Weights: nn.Float3Type{
 					{
 						{.1, .1},
 						{.1, .1},
@@ -56,7 +57,7 @@ func TestNN_calcNeurons(t *testing.T) {
 					},
 				},
 				lenInput: 2,
-				input:    pkg.Float1Type{.2, .3},
+				input:    nn.Float1Type{.2, .3},
 				output:   make([]float64, 2),
 			},
 			want: [][]*neuron{
@@ -69,8 +70,8 @@ func TestNN_calcNeurons(t *testing.T) {
 		{
 			name: "#3",
 			got: &NN{
-				ActivationMode: params.SIGMOID,
-				Weights: pkg.Float3Type{
+				ActivationMode: activation.SIGMOID,
+				Weights: nn.Float3Type{
 					{
 						{.1, .1, .1},
 						{.1, .1, .1},
@@ -89,7 +90,7 @@ func TestNN_calcNeurons(t *testing.T) {
 					},
 				},
 				lenInput: 2,
-				input:    pkg.Float1Type{.2, .3},
+				input:    nn.Float1Type{.2, .3},
 				output:   make([]float64, 2),
 			},
 			want: [][]*neuron{
@@ -109,8 +110,8 @@ func TestNN_calcNeurons(t *testing.T) {
 			tt.got.calcNeurons()
 			for i, v := range tt.got.neurons {
 				for j, n := range v {
-					tt.got.neurons[i][j].value = pkg.FloatType(math.Round(float64(n.value), math.ROUND, 6))
-					tt.got.neurons[i][j].miss = pkg.FloatType(math.Round(float64(n.miss), math.ROUND, 6))
+					tt.got.neurons[i][j].value = nn.FloatType(math.Round(float64(n.value), math.ROUND, 6))
+					tt.got.neurons[i][j].miss = nn.FloatType(math.Round(float64(n.miss), math.ROUND, 6))
 				}
 			}
 			if !reflect.DeepEqual(tt.got.neurons, tt.want) {
@@ -130,8 +131,8 @@ func TestNN_calcLoss(t *testing.T) {
 			name: "#1_RMSE",
 
 			gave: &NN{
-				ActivationMode: params.LEAKYRELU,
-				LossMode:       params.RMSE,
+				ActivationMode: activation.LEAKYRELU,
+				LossMode:       loss.RMSE,
 				neurons: [][]*neuron{
 					{
 						{.5516861990955205, 0},
@@ -139,15 +140,15 @@ func TestNN_calcLoss(t *testing.T) {
 				},
 				lenOutput:      1,
 				lastLayerIndex: 0,
-				target:         pkg.Float1Type{.2},
+				target:         nn.Float1Type{.2},
 			},
 			want: .351686,
 		},
 		{
 			name: "#2_ARCTAN",
 			gave: &NN{
-				ActivationMode: params.TANH,
-				LossMode:       params.ARCTAN,
+				ActivationMode: activation.TANH,
+				LossMode:       loss.ARCTAN,
 				neurons: [][]*neuron{
 					{
 						{.5374298453437496, 0},
@@ -156,15 +157,15 @@ func TestNN_calcLoss(t *testing.T) {
 				},
 				lenOutput:      2,
 				lastLayerIndex: 0,
-				target:         pkg.Float1Type{.2, .3},
+				target:         nn.Float1Type{.2, .3},
 			},
 			want: .080124,
 		},
 		{
 			name: "#3_MSE",
 			gave: &NN{
-				ActivationMode: params.SIGMOID,
-				LossMode:       params.MSE,
+				ActivationMode: activation.SIGMOID,
+				LossMode:       loss.MSE,
 				neurons: [][]*neuron{
 					{
 						{.5374298453437496, 0},
@@ -176,15 +177,15 @@ func TestNN_calcLoss(t *testing.T) {
 				},
 				lenOutput:      1,
 				lastLayerIndex: 1,
-				target:         pkg.Float1Type{.2},
+				target:         nn.Float1Type{.2},
 			},
 			want: .123683,
 		},
 		{
 			name: "#4_AVG",
 			gave: &NN{
-				ActivationMode: params.LINEAR,
-				LossMode:       params.AVG,
+				ActivationMode: activation.LINEAR,
+				LossMode:       loss.AVG,
 				neurons: [][]*neuron{
 					{
 						{.5374298453437496, 0},
@@ -196,7 +197,7 @@ func TestNN_calcLoss(t *testing.T) {
 				},
 				lenOutput:      1,
 				lastLayerIndex: 1,
-				target:         pkg.Float1Type{.2},
+				target:         nn.Float1Type{.2},
 			},
 			want: .351686,
 		},
@@ -220,8 +221,8 @@ func TestNN_calcMiss(t *testing.T) {
 		{
 			name: "#1",
 			got: &NN{
-				ActivationMode: params.SIGMOID,
-				Weights: pkg.Float3Type{
+				ActivationMode: activation.SIGMOID,
+				Weights: nn.Float3Type{
 					{
 						{.1, .1, .1},
 						{.1, .1, .1},
@@ -258,8 +259,8 @@ func TestNN_calcMiss(t *testing.T) {
 			tt.got.calcMiss()
 			for i, v := range tt.got.neurons {
 				for j, n := range v {
-					tt.got.neurons[i][j].value = pkg.FloatType(math.Round(float64(n.value), math.ROUND, 6))
-					tt.got.neurons[i][j].miss = pkg.FloatType(math.Round(float64(n.miss), math.ROUND, 6))
+					tt.got.neurons[i][j].value = nn.FloatType(math.Round(float64(n.value), math.ROUND, 6))
+					tt.got.neurons[i][j].miss = nn.FloatType(math.Round(float64(n.miss), math.ROUND, 6))
 				}
 			}
 			if !reflect.DeepEqual(tt.got.neurons, tt.want) {
@@ -273,13 +274,13 @@ func TestNN_updateWeights(t *testing.T) {
 	tests := []struct {
 		name string
 		got  *NN
-		want pkg.Float3Type
+		want nn.Float3Type
 	}{
 		{
 			name: "#1",
 			got: &NN{
 				Rate: .3,
-				Weights: pkg.Float3Type{
+				Weights: nn.Float3Type{
 					{
 						{.1},
 					},
@@ -290,9 +291,9 @@ func TestNN_updateWeights(t *testing.T) {
 					},
 				},
 				lenInput: 1,
-				input:    pkg.Float1Type{.2},
+				input:    nn.Float1Type{.2},
 			},
-			want: pkg.Float3Type{
+			want: nn.Float3Type{
 				{
 					{.094725},
 				},
@@ -301,9 +302,9 @@ func TestNN_updateWeights(t *testing.T) {
 		{
 			name: "#2",
 			got: &NN{
-				ActivationMode: params.TANH,
+				ActivationMode: activation.TANH,
 				Rate:           .3,
-				Weights: pkg.Float3Type{
+				Weights: nn.Float3Type{
 					{
 						{.1, .1, .1},
 						{.1, .1, .1},
@@ -322,9 +323,9 @@ func TestNN_updateWeights(t *testing.T) {
 					},
 				},
 				lenInput: 2,
-				input:    pkg.Float1Type{.2, .3},
+				input:    nn.Float1Type{.2, .3},
 			},
-			want: pkg.Float3Type{
+			want: nn.Float3Type{
 				{
 					{.100177, .100266, .100887},
 					{.100177, .100266, .100887},
@@ -342,7 +343,7 @@ func TestNN_updateWeights(t *testing.T) {
 			for i, v := range tt.got.Weights {
 				for j, w := range v {
 					for k, g := range w {
-						tt.got.Weights[i][j][k] = pkg.FloatType(math.Round(float64(g), math.ROUND, 6))
+						tt.got.Weights[i][j][k] = nn.FloatType(math.Round(float64(g), math.ROUND, 6))
 					}
 				}
 			}

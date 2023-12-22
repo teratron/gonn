@@ -1,21 +1,19 @@
 package perceptron
 
 import (
+	"github.com/teratron/gonn/pkg/activation"
+	"github.com/teratron/gonn/pkg/loss"
 	"sync"
 
 	"github.com/teratron/gonn/pkg"
-	"github.com/teratron/gonn/pkg/params"
 	"github.com/teratron/gonn/pkg/utils"
 )
-
-// Name of the neural network architecture.
-const Name = "perceptron"
 
 // Declare conformity with NeuralNetwork interface.
 var _ pkg.NeuralNetwork = (*NN)(nil)
 
 // NN.
-type NN struct {
+type NN[T float32 | float64] struct {
 	pkg.Parameter `json:"-"`
 
 	// Neural network architecture name (required field for a config).
@@ -28,22 +26,25 @@ type NN struct {
 	HiddenLayer []uint `json:"hiddenLayer,omitempty"`
 
 	// Activation function mode (required field for a config).
-	ActivationMode uint8 `json:"activationMode"`
+	ActivationMode activation.Type `json:"activationMode"`
 
 	// The mode of calculation of the total error.
 	LossMode uint8 `json:"lossMode"`
 
 	// Minimum (sufficient) limit of the average of the error during training.
-	LossLimit float64 `json:"lossLimit"`
+	//LossLimit float64 `json:"lossLimit"`
+	LossLimit T `json:"lossLimit"`
 
 	// Learning coefficient (greater than 0 and less than or equal to 1).
-	Rate pkg.FloatType `json:"rate"`
+	//Rate pkg.FloatType `json:"rate"`
+	Rate T `json:"rate"`
 
 	// Weights value.
-	Weights pkg.Float3Type `json:"weights,omitempty"`
+	//Weights pkg.Float3Type `json:"weights,omitempty"`
+	Weights [][][]T `json:"weights,omitempty"`
 
 	// Neurons.
-	neurons [][]*neuron
+	neurons [][]*neuron[T]
 
 	// Settings.
 	lenInput       int
@@ -56,25 +57,30 @@ type NN struct {
 	mutex          sync.Mutex
 
 	// Transfer data.
-	weights pkg.Float3Type
-	input   pkg.Float1Type
-	target  pkg.Float1Type
-	output  []float64
+	//weights pkg.Float3Type
+	//input   pkg.Float1Type
+	//target  pkg.Float1Type
+	//output  []float64
+	weights [][][]T
+	input   []T
+	target  []T
+	output  []T
 }
 
-type neuron struct {
-	value pkg.FloatType
-	miss  pkg.FloatType
+type neuron[T float32 | float64] struct {
+	//value pkg.FloatType
+	//miss  pkg.FloatType
+	value T
+	miss  T
 }
 
 // New return Perceptron neural network.
-func New() *NN {
-	return &NN{
-		Name:           Name,
+func New[T float32 | float64]() *NN[T] {
+	return &NN[T]{
 		Bias:           false,
 		HiddenLayer:    []uint{0},
-		ActivationMode: params.SIGMOID,
-		LossMode:       params.MSE,
+		ActivationMode: activation.SIGMOID,
+		LossMode:       loss.MSE,
 		LossLimit:      .01,
 		Rate:           .3,
 	}

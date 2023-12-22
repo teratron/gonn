@@ -11,14 +11,15 @@ type NeuralNetwork interface {
 }
 
 // Floater interface.
-type Floater interface {
-	pkg.Floater
-}
+/*type Floater interface {
+	Floater
+}*/
 
 // New returns a new neural network instance.
-func New(reader ...string) NeuralNetwork {
+func New[T float32 | float64](reader ...string) NeuralNetwork {
 	if len(reader) > 0 {
 		return arch.Get(reader[0])
 	}
+
 	return arch.Get(arch.Perceptron)
 }

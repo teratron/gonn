@@ -1,10 +1,10 @@
 package perceptron
 
 import (
+	"github.com/teratron/gonn/pkg/nn"
 	"testing"
 
 	"github.com/teratron/gonn/internal/pkg/math"
-	"github.com/teratron/gonn/pkg"
 )
 
 func TestNN_Verify(t *testing.T) {
@@ -24,7 +24,7 @@ func TestNN_Verify(t *testing.T) {
 			gave: &NN{
 				ActivationMode: 255, // default params.ModeSIGMOID
 				LossMode:       255, // default params.ModeMSE
-				Weights: pkg.Float3Type{
+				Weights: nn.Float3Type{
 					{
 						{.1, .1, .1},
 						{.1, .1, .1},
@@ -46,8 +46,8 @@ func TestNN_Verify(t *testing.T) {
 				lenOutput:      1,
 				lastLayerIndex: 1,
 				isInit:         true,
-				input:          make(pkg.Float1Type, 2),
-				target:         make(pkg.Float1Type, 1),
+				input:          make(nn.Float1Type, 2),
+				target:         make(nn.Float1Type, 1),
 				output:         make([]float64, 1),
 			},
 			want: .123683,

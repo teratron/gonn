@@ -1,12 +1,14 @@
 package pkg
 
+import "github.com/teratron/gonn/pkg/nn"
+
 // Parameter.
 type Parameter interface {
 	GetLengthInput() int
 	GetLengthOutput() int
 
-	GetWeights() Floater
-	SetWeights(Floater)
+	GetWeights() nn.Floater
+	SetWeights(nn.Floater)
 
 	GetHiddenLayer() []uint
 	SetHiddenLayer(...uint)

@@ -22,7 +22,7 @@ func (nn *NN) Query(input []float64) []float64 {
 			goto ERROR
 		}
 
-		nn.input = pkg.ToFloat1Type(input)
+		nn.input = nn.ToFloat1Type(input)
 		nn.calcNeurons()
 		nn.isQuery = true
 

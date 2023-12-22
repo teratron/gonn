@@ -1,7 +1,9 @@
 package perceptron
 
 import (
-	"github.com/teratron/gonn/pkg"
+	"github.com/teratron/gonn/pkg/activation"
+	"github.com/teratron/gonn/pkg/loss"
+	"github.com/teratron/gonn/pkg/nn"
 	"github.com/teratron/gonn/pkg/params"
 )
 
@@ -32,7 +34,7 @@ func (nn *NN) GetActivationMode() uint8 {
 
 // SetActivationMode.
 func (nn *NN) SetActivationMode(mode uint8) {
-	nn.ActivationMode = params.CheckActivationMode(mode)
+	nn.ActivationMode = activation.CheckActivationMode(mode)
 }
 
 // GetLossMode.
@@ -42,7 +44,7 @@ func (nn *NN) GetLossMode() uint8 {
 
 // SetLossMode.
 func (nn *NN) SetLossMode(mode uint8) {
-	nn.LossMode = params.CheckLossMode(mode)
+	nn.LossMode = loss.CheckLossMode(mode)
 }
 
 // GetLossLimit.
@@ -62,17 +64,17 @@ func (nn *NN) GetRate() float64 {
 
 // SetRate.
 func (nn *NN) SetRate(rate float64) {
-	nn.Rate = params.CheckLearningRate(pkg.FloatType(rate))
+	nn.Rate = rate.CheckLearningRate(nn.FloatType(rate))
 }
 
 // GetWeights.
-func (nn *NN) GetWeights() pkg.Floater {
+func (nn *NN) GetWeights() nn.Floater {
 	return &nn.Weights
 }
 
 // SetWeights.
-func (nn *NN) SetWeights(weight pkg.Floater) {
-	if w, ok := weight.(pkg.Float3Type); ok {
+func (nn *NN) SetWeights(weight nn.Floater) {
+	if w, ok := weight.(nn.Float3Type); ok {
 		nn.Weights = w
 	}
 }
