@@ -9,8 +9,7 @@ import (
 
 func main() {
 	// New returns a new neural network
-	// instance with the default parameters,
-	// same n := nn.New("perceptron").
+	// instance with the default parameters.
 	n := nn.New[float32]()
 
 	// The neuron bias, false or true.

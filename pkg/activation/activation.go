@@ -1,9 +1,9 @@
 package activation
 
 import (
-	"github.com/teratron/gonn/pkg/nn"
+	"github.com/teratron/gonn/pkg"
+	"github.com/teratron/gonn/pkg/utils"
 	"log"
-	"math"
 )
 
 type Type uint8
@@ -22,11 +22,12 @@ func CheckActivationMode(mode Type) Type {
 	if mode > TANH {
 		return SIGMOID
 	}
+
 	return mode
 }
 
 // Activation function.
-func CalcActivation[T float32 | float64](value T, mode Type) T {
+func Activation[T pkg.Floater](value T, mode Type) T {
 	switch mode {
 	case LINEAR:
 		return value
@@ -43,34 +44,34 @@ func CalcActivation[T float32 | float64](value T, mode Type) T {
 	default:
 		fallthrough
 	case SIGMOID:
-		value = 1 / (1 + math.Exp(-value))
+		value = 1 / (1 + utils.Exp(-value))
 		switch { // TODO:
-		case math.IsNaN(value):
-			log.Panic("SIGMOID:perceptron.NN.calcLoss: loss not-a-number value") // TODO: log.Panic (?)
-		case math.IsInf(value, 0):
-			log.Panic("SIGMOID:perceptron.NN.calcLoss: loss is infinity") // TODO: log.Panic (?)
+		case utils.IsNaN(value):
+			log.Panic("SIGMOID: loss not-a-number value") // TODO: log.Panic (?)
+		case utils.IsInf(value, 0):
+			log.Panic("SIGMOID: loss is infinity") // TODO: log.Panic (?)
 		}
 		return value
-		//return 1 / (1 + pkg.FloatType(math.Exp(float64(-value))))
+		//return 1 / (1 + Exp(-value))
 	case TANH:
 		val0 := value
-		value = nn.FloatType(math.Exp(2 * float64(value)))
+		value = utils.Exp(2 * value)
 		val1 := value
 		value = (value - 1) / (value + 1)
 		switch { // TODO:
-		case IsNaN(float64(value)):
-			log.Panic("TANH:perceptron.NN.calcLoss: loss not-a-number value", val0, val1) // TODO: log.Panic (?)
-		case math.IsInf(float64(value), 0):
-			log.Panic("TANH:perceptron.NN.calcLoss: loss is infinity") // TODO: log.Panic (?)
+		case utils.IsNaN(value):
+			log.Panic("TANH: loss not-a-number value", val0, val1) // TODO: log.Panic (?)
+		case utils.IsInf(value, 0):
+			log.Panic("TANH: loss is infinity") // TODO: log.Panic (?)
 		}
 		return value
-		//value = pkg.FloatType(math.Exp(2 * float64(value)))
+		//value = Exp(2 * value)
 		//return (value - 1) / (value + 1)
 	}
 }
 
 // Derivative activation function.
-func CalcDerivative(value nn.FloatType, mode Type) nn.FloatType {
+func Derivative[T pkg.Floater](value T, mode Type) T {
 	switch mode {
 	case LINEAR:
 		return 1
@@ -89,23 +90,6 @@ func CalcDerivative(value nn.FloatType, mode Type) nn.FloatType {
 	case SIGMOID:
 		return value * (1 - value)
 	case TANH:
-		return 1 - nn.FloatType(math.Pow(float64(value), 2))
+		return 1 - utils.Pow(value, 2)
 	}
-}
-
-func IsNaN[T nn.Floater](value T) bool {
-	switch f := any(value).(type) {
-	case float32:
-		return math.IsNaN(float64(f))
-	case float64:
-		return math.IsNaN(f)
-	default:
-		return false
-	}
-
-	/*if v, ok := any(value).(float32); ok {
-		return math.IsNaN(float64(v))
-	}
-
-	return math.IsNaN(float64(value))*/
 }

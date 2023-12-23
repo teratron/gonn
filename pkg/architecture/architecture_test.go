@@ -3,7 +3,6 @@ package architecture
 import (
 	"github.com/teratron/gonn/pkg/activation"
 	"github.com/teratron/gonn/pkg/loss"
-	"github.com/teratron/gonn/pkg/nn"
 	"path/filepath"
 	"reflect"
 	"testing"
@@ -58,7 +57,7 @@ func TestGet(t *testing.T) {
 		LossMode:       loss.MSE,
 		LossLimit:      .1,
 		Rate:           .3,
-		Weights: nn.Float3Type{
+		Weights: pkg.Float3Type{
 			{
 				{.1, .1, .1},
 				{.1, .1, .1},

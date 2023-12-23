@@ -1,9 +1,9 @@
 package perceptron
 
 import (
+	"github.com/teratron/gonn/pkg"
 	"github.com/teratron/gonn/pkg/activation"
 	"github.com/teratron/gonn/pkg/loss"
-	"github.com/teratron/gonn/pkg/nn"
 	"reflect"
 	"testing"
 )
@@ -200,7 +200,7 @@ func TestNN_SetRate(t *testing.T) {
 		name string
 		got  *NN
 		gave float64
-		want nn.FloatType
+		want pkg.FloatType
 	}{
 		{
 			name: "#1_rate",
@@ -235,7 +235,7 @@ func TestNN_GetWeights(t *testing.T) {
 	tests := []struct {
 		name string
 		gave *NN
-		want nn.Float3Type
+		want pkg.Float3Type
 	}{
 		{
 			name: "#1_nil",
@@ -244,19 +244,19 @@ func TestNN_GetWeights(t *testing.T) {
 		},
 		{
 			name: "#2_[]",
-			gave: &NN{Weights: nn.Float3Type{}},
-			want: nn.Float3Type{},
+			gave: &NN{Weights: pkg.Float3Type{}},
+			want: pkg.Float3Type{},
 		},
 		{
 			name: "#3_[[[0.1_0.2_0.3]]]",
-			gave: &NN{Weights: nn.Float3Type{{{.1, .2, .3}}}},
-			want: nn.Float3Type{{{.1, .2, .3}}},
+			gave: &NN{Weights: pkg.Float3Type{{{.1, .2, .3}}}},
+			want: pkg.Float3Type{{{.1, .2, .3}}},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := *tt.gave.GetWeights().(*nn.Float3Type); !reflect.DeepEqual(got, tt.want) {
+			if got := *tt.gave.GetWeights().(*pkg.Float3Type); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("GetWeights()\ngot:\t%v\nwant:\t%v", got, tt.want)
 			}
 		})
@@ -267,7 +267,7 @@ func TestNN_SetWeights(t *testing.T) {
 	got := &NN{}
 	tests := []struct {
 		name string
-		want nn.Float3Type
+		want pkg.Float3Type
 	}{
 		{
 			name: "#1_nil",
@@ -275,11 +275,11 @@ func TestNN_SetWeights(t *testing.T) {
 		},
 		{
 			name: "#2_[]",
-			want: nn.Float3Type{},
+			want: pkg.Float3Type{},
 		},
 		{
 			name: "#3_[[[0.1_0.2_0.3]]]",
-			want: nn.Float3Type{{{.1, .2, .3}}},
+			want: pkg.Float3Type{{{.1, .2, .3}}},
 		},
 	}
 

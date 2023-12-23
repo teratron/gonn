@@ -1,9 +1,9 @@
 package perceptron
 
 import (
+	"github.com/teratron/gonn/pkg"
 	"github.com/teratron/gonn/pkg/activation"
 	"github.com/teratron/gonn/pkg/loss"
-	"github.com/teratron/gonn/pkg/nn"
 	"path/filepath"
 	"reflect"
 	"testing"
@@ -15,7 +15,7 @@ import (
 var testJSON = filepath.Join("..", "..", "testdata", "perceptron.json")
 
 func init() {
-	params.GetRandFloat = func() nn.FloatType { return .5 }
+	params.GetRandFloat = func() pkg.FloatType { return .5 }
 }
 
 func TestNN_Init(t *testing.T) {
@@ -30,7 +30,7 @@ func TestNN_Init(t *testing.T) {
 		LossMode:       loss.MSE,
 		LossLimit:      .1,
 		Rate:           .3,
-		Weights: nn.Float3Type{
+		Weights: pkg.Float3Type{
 			{
 				{.1, .1, .1},
 				{.1, .1, .1},
@@ -53,7 +53,7 @@ func TestNN_Init(t *testing.T) {
 		lastLayerIndex: 1,
 		isInit:         true,
 		config:         testFile,
-		weights: nn.Float3Type{
+		weights: pkg.Float3Type{
 			{
 				{0, 0, 0},
 				{0, 0, 0},
@@ -62,8 +62,8 @@ func TestNN_Init(t *testing.T) {
 				{0, 0, 0},
 			},
 		},
-		input:  make(nn.Float1Type, 2),
-		target: make(nn.Float1Type, 1),
+		input:  make(pkg.Float1Type, 2),
+		target: make(pkg.Float1Type, 1),
 		output: make([]float64, 1),
 	}
 	tests := []struct {
@@ -118,7 +118,7 @@ func TestNN_initFromNew(t *testing.T) {
 				Bias:           false,
 				HiddenLayer:    []uint{0},
 				ActivationMode: activation.SIGMOID,
-				Weights: nn.Float3Type{
+				Weights: pkg.Float3Type{
 					{
 						{r, r},
 						{r, r},
@@ -134,14 +134,14 @@ func TestNN_initFromNew(t *testing.T) {
 				lenOutput:      2,
 				lastLayerIndex: 0,
 				isInit:         true,
-				weights: nn.Float3Type{
+				weights: pkg.Float3Type{
 					{
 						{0, 0},
 						{0, 0},
 					},
 				},
-				input:  make(nn.Float1Type, 2),
-				target: make(nn.Float1Type, 2),
+				input:  make(pkg.Float1Type, 2),
+				target: make(pkg.Float1Type, 2),
 				output: make([]float64, 2),
 			},
 		},
@@ -153,7 +153,7 @@ func TestNN_initFromNew(t *testing.T) {
 			want: &NN{
 				Bias:        true,
 				HiddenLayer: []uint{2},
-				Weights: nn.Float3Type{
+				Weights: pkg.Float3Type{
 					{
 						{r, r, r},
 						{r, r, r},
@@ -175,7 +175,7 @@ func TestNN_initFromNew(t *testing.T) {
 				lenOutput:      1,
 				lastLayerIndex: 1,
 				isInit:         true,
-				weights: nn.Float3Type{
+				weights: pkg.Float3Type{
 					{
 						{0, 0, 0},
 						{0, 0, 0},
@@ -184,8 +184,8 @@ func TestNN_initFromNew(t *testing.T) {
 						{0, 0, 0},
 					},
 				},
-				input:  make(nn.Float1Type, 2),
-				target: make(nn.Float1Type, 1),
+				input:  make(pkg.Float1Type, 2),
+				target: make(pkg.Float1Type, 1),
 				output: make([]float64, 1),
 			},
 		},
@@ -215,7 +215,7 @@ func TestNN_initFromWeight(t *testing.T) {
 			got:  &NN{},
 			want: &NN{
 				HiddenLayer: []uint{0},
-				Weights: nn.Float3Type{
+				Weights: pkg.Float3Type{
 					{
 						{.1, .1},
 						{.1, .1},
@@ -231,14 +231,14 @@ func TestNN_initFromWeight(t *testing.T) {
 				lenOutput:      2,
 				lastLayerIndex: 0,
 				isInit:         true,
-				weights: nn.Float3Type{
+				weights: pkg.Float3Type{
 					{
 						{0, 0},
 						{0, 0},
 					},
 				},
-				input:  make(nn.Float1Type, 2),
-				target: make(nn.Float1Type, 2),
+				input:  make(pkg.Float1Type, 2),
+				target: make(pkg.Float1Type, 2),
 				output: make([]float64, 2),
 			},
 		},
@@ -248,7 +248,7 @@ func TestNN_initFromWeight(t *testing.T) {
 			want: &NN{
 				Bias:        true,
 				HiddenLayer: []uint{2},
-				Weights: nn.Float3Type{
+				Weights: pkg.Float3Type{
 					{
 						{.1, .1, .1},
 						{.1, .1, .1},
@@ -270,7 +270,7 @@ func TestNN_initFromWeight(t *testing.T) {
 				lenOutput:      1,
 				lastLayerIndex: 1,
 				isInit:         true,
-				weights: nn.Float3Type{
+				weights: pkg.Float3Type{
 					{
 						{0, 0, 0},
 						{0, 0, 0},
@@ -279,15 +279,15 @@ func TestNN_initFromWeight(t *testing.T) {
 						{0, 0, 0},
 					},
 				},
-				input:  make(nn.Float1Type, 2),
-				target: make(nn.Float1Type, 1),
+				input:  make(pkg.Float1Type, 2),
+				target: make(pkg.Float1Type, 1),
 				output: make([]float64, 1),
 			},
 		},
 	}
 
 	for _, tt := range tests {
-		tt.got.Weights = nn.DeepCopy(tt.want.Weights)
+		tt.got.Weights = pkg.DeepCopy(tt.want.Weights)
 		t.Run(tt.name, func(t *testing.T) {
 			tt.got.initFromWeight()
 			tt.got.initCompletion()

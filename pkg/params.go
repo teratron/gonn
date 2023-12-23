@@ -1,14 +1,17 @@
 package pkg
 
-import "github.com/teratron/gonn/pkg/nn"
+import (
+	"github.com/teratron/gonn/pkg/activation"
+	"github.com/teratron/gonn/pkg/loss"
+)
 
 // Parameter.
 type Parameter interface {
 	GetLengthInput() int
 	GetLengthOutput() int
 
-	GetWeights() nn.Floater
-	SetWeights(nn.Floater)
+	GetWeights() Floater
+	SetWeights(Floater)
 
 	GetHiddenLayer() []uint
 	SetHiddenLayer(...uint)
@@ -16,11 +19,11 @@ type Parameter interface {
 	GetBias() bool
 	SetBias(bool)
 
-	GetActivationMode() uint8
-	SetActivationMode(uint8)
+	GetActivationMode() activation.Type
+	SetActivationMode(activation.Type)
 
-	GetLossMode() uint8
-	SetLossMode(uint8)
+	GetLossMode() loss.Type
+	SetLossMode(loss.Type)
 
 	GetLossLimit() float64
 	SetLossLimit(float64)

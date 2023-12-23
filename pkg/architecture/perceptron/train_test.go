@@ -1,9 +1,9 @@
 package perceptron
 
 import (
+	"github.com/teratron/gonn/pkg"
 	"github.com/teratron/gonn/pkg/activation"
 	"github.com/teratron/gonn/pkg/loss"
-	"github.com/teratron/gonn/pkg/nn"
 	"testing"
 
 	round "github.com/teratron/gonn/internal/pkg/math"
@@ -39,7 +39,7 @@ func TestNN_Train(t *testing.T) {
 			gave: &NN{
 				ActivationMode: activation.SIGMOID,
 				LossMode:       loss.MSE,
-				Weights: nn.Float3Type{
+				Weights: pkg.Float3Type{
 					{
 						{.1, .1, .1},
 						{.1, .1, .1},
@@ -60,8 +60,8 @@ func TestNN_Train(t *testing.T) {
 				lenInput:       2,
 				lenOutput:      1,
 				lastLayerIndex: 1,
-				input:          make(nn.Float1Type, 2),
-				target:         make(nn.Float1Type, 1),
+				input:          make(pkg.Float1Type, 2),
+				target:         make(pkg.Float1Type, 1),
 				isInit:         true,
 			},
 			wantLoss:  .123683,

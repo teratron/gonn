@@ -1,9 +1,9 @@
 package perceptron
 
 import (
+	"github.com/teratron/gonn/pkg"
 	"github.com/teratron/gonn/pkg/activation"
 	"github.com/teratron/gonn/pkg/loss"
-	"github.com/teratron/gonn/pkg/nn"
 	"github.com/teratron/gonn/pkg/params"
 )
 
@@ -68,12 +68,12 @@ func (nn *NN) SetRate(rate float64) {
 }
 
 // GetWeights.
-func (nn *NN) GetWeights() nn.Floater {
+func (nn *NN) GetWeights() pkg.Floater {
 	return &nn.Weights
 }
 
 // SetWeights.
-func (nn *NN) SetWeights(weight nn.Floater) {
+func (nn *NN) SetWeights(weight pkg.Floater) {
 	if w, ok := weight.(nn.Float3Type); ok {
 		nn.Weights = w
 	}
