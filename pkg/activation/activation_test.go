@@ -39,7 +39,6 @@ func TestCheckActivationMode(t *testing.T) {
 			want: SIGMOID,
 		},
 	}
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := CheckActivationMode(tt.gave); got != tt.want {
@@ -93,7 +92,6 @@ func TestActivation(t *testing.T) {
 			want: .52497918747894,
 		},
 	}
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := Activation(tt.value, tt.mode); got != tt.want {
@@ -154,7 +152,6 @@ func TestDerivative(t *testing.T) {
 			want: .089999996,
 		},
 	}
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := Derivative(tt.value, tt.mode); got != tt.want {

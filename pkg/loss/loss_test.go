@@ -30,7 +30,6 @@ func TestCheckLossMode(t *testing.T) {
 			want: MSE,
 		},
 	}
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := CheckLossMode(tt.gave); got != tt.want {

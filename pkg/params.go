@@ -30,7 +30,4 @@ type Parameter interface {
 
 	GetRate() float64
 	SetRate(float64)
-
-	GetEnergy() float64
-	SetEnergy(float64)
 }
