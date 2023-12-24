@@ -10,14 +10,11 @@ import (
 )
 
 // Declare conformity with NeuralNetwork interface.
-var _ pkg.NeuralNetwork = (*NN)(nil)
+//var _ pkg.NeuralNetwork = (*NN)(nil)
 
 // NN.
-type NN[T float32 | float64] struct {
+type NN[T pkg.Floater] struct {
 	pkg.Parameter `json:"-"`
-
-	// Neural network architecture name (required field for a config).
-	Name string `json:"name"`
 
 	// The neurons bias, false or true (required field for a config).
 	Bias bool `json:"bias"`
@@ -29,7 +26,7 @@ type NN[T float32 | float64] struct {
 	ActivationMode activation.Type `json:"activationMode"`
 
 	// The mode of calculation of the total error.
-	LossMode uint8 `json:"lossMode"`
+	LossMode loss.Type `json:"lossMode"`
 
 	// Minimum (sufficient) limit of the average of the error during training.
 	//LossLimit float64 `json:"lossLimit"`
@@ -67,7 +64,7 @@ type NN[T float32 | float64] struct {
 	output  []T
 }
 
-type neuron[T float32 | float64] struct {
+type neuron[T pkg.Floater] struct {
 	//value pkg.FloatType
 	//miss  pkg.FloatType
 	value T
@@ -75,7 +72,7 @@ type neuron[T float32 | float64] struct {
 }
 
 // New return Perceptron neural network.
-func New[T float32 | float64]() *NN[T] {
+func New[T pkg.Floater]() *NN[T] {
 	return &NN[T]{
 		Bias:           false,
 		HiddenLayer:    []uint{0},

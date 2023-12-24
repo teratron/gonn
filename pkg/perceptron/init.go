@@ -11,7 +11,7 @@ import (
 )
 
 // Init initialize.
-func (nn *NN) Init(data ...interface{}) {
+func (nn *NN[T]) Init(data ...interface{}) {
 	var err error
 	if len(data) > 0 {
 		switch value := data[0].(type) {
@@ -44,7 +44,7 @@ func (nn *NN) Init(data ...interface{}) {
 }
 
 // initFromNew initialize.
-func (nn *NN) initFromNew(lenInput, lenTarget int) {
+func (nn *NN[T]) initFromNew(lenInput, lenTarget int) {
 	nn.lenInput = lenInput
 	nn.lenOutput = lenTarget
 
@@ -101,7 +101,7 @@ func (nn *NN) initFromNew(lenInput, lenTarget int) {
 }
 
 // initFromWeight.
-func (nn *NN) initFromWeight() {
+func (nn *NN[T]) initFromWeight() {
 	length := len(nn.Weights)
 	nn.lastLayerIndex = length - 1
 	nn.lenOutput = len(nn.Weights[nn.lastLayerIndex])

@@ -2,11 +2,11 @@ package architecture
 
 import (
 	"fmt"
+	"github.com/teratron/gonn/pkg/perceptron"
 	"log"
 	"strings"
 
 	"github.com/teratron/gonn/pkg"
-	"github.com/teratron/gonn/pkg/architecture/perceptron"
 	"github.com/teratron/gonn/pkg/utils"
 )
 

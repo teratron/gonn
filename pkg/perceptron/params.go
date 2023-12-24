@@ -5,6 +5,7 @@ import (
 	"github.com/teratron/gonn/pkg/activation"
 	"github.com/teratron/gonn/pkg/loss"
 	"github.com/teratron/gonn/pkg/params"
+	"github.com/teratron/gonn/pkg/rate"
 )
 
 // GetBias.
@@ -63,8 +64,8 @@ func (nn *NN) GetRate() float64 {
 }
 
 // SetRate.
-func (nn *NN) SetRate(rate float64) {
-	nn.Rate = rate.CheckLearningRate(nn.FloatType(rate))
+func (nn *NN[T]) SetRate(r T) {
+	nn.Rate = rate.CheckLearningRate[](r)
 }
 
 // GetWeights.
