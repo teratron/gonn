@@ -65,7 +65,7 @@ func (nn *NN[T]) GetRate() T {
 
 // SetRate.
 func (nn *NN[T]) SetRate(r T) {
-	nn.Rate = rate.CheckLearningRate[](r)
+	nn.Rate = rate.CheckLearningRate(r)
 }
 
 // GetWeights.
