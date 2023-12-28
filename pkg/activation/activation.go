@@ -1,9 +1,10 @@
 package activation
 
 import (
+	"log"
+
 	"github.com/teratron/gonn/pkg"
 	"github.com/teratron/gonn/pkg/utils"
-	"log"
 )
 
 type Type uint8

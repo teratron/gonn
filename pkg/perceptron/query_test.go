@@ -1,10 +1,11 @@
 package perceptron
 
 import (
-	"github.com/teratron/gonn/pkg"
-	"github.com/teratron/gonn/pkg/activation"
 	"reflect"
 	"testing"
+
+	"github.com/teratron/gonn/pkg"
+	"github.com/teratron/gonn/pkg/activation"
 
 	"github.com/teratron/gonn/internal/pkg/math"
 )

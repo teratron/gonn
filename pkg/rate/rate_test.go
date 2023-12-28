@@ -1,8 +1,9 @@
 package rate
 
 import (
-	"github.com/teratron/gonn/pkg"
 	"testing"
+
+	"github.com/teratron/gonn/pkg"
 )
 
 func TestCheckLearningRate(t *testing.T) {

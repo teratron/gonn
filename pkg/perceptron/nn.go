@@ -1,9 +1,10 @@
 package perceptron
 
 import (
+	"sync"
+
 	"github.com/teratron/gonn/pkg/activation"
 	"github.com/teratron/gonn/pkg/loss"
-	"sync"
 
 	"github.com/teratron/gonn/pkg"
 	"github.com/teratron/gonn/pkg/utils"

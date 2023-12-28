@@ -1,8 +1,9 @@
 package params
 
 import (
-	"github.com/teratron/gonn/pkg"
 	"math/rand"
+
+	"github.com/teratron/gonn/pkg"
 )
 
 var GetRandFloat = getRandFloat

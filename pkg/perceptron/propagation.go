@@ -1,9 +1,10 @@
 package perceptron
 
 import (
-	"github.com/teratron/gonn/pkg/activation"
 	"log"
 	"math"
+
+	"github.com/teratron/gonn/pkg/activation"
 )
 
 // calcNeurons.

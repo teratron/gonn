@@ -1,10 +1,11 @@
 package perceptron
 
 import (
-	"github.com/teratron/gonn/pkg/activation"
-	"github.com/teratron/gonn/pkg/loss"
 	"reflect"
 	"testing"
+
+	"github.com/teratron/gonn/pkg/activation"
+	"github.com/teratron/gonn/pkg/loss"
 )
 
 func TestNew(t *testing.T) {

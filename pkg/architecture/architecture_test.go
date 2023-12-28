@@ -1,12 +1,13 @@
 package architecture
 
 import (
-	"github.com/teratron/gonn/pkg/activation"
-	"github.com/teratron/gonn/pkg/loss"
-	"github.com/teratron/gonn/pkg/perceptron"
 	"path/filepath"
 	"reflect"
 	"testing"
+
+	"github.com/teratron/gonn/pkg/activation"
+	"github.com/teratron/gonn/pkg/loss"
+	"github.com/teratron/gonn/pkg/perceptron"
 
 	"github.com/teratron/gonn/pkg"
 	"github.com/teratron/gonn/pkg/utils"

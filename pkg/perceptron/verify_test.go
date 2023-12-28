@@ -1,8 +1,9 @@
 package perceptron
 
 import (
-	"github.com/teratron/gonn/pkg"
 	"testing"
+
+	"github.com/teratron/gonn/pkg"
 
 	"github.com/teratron/gonn/internal/pkg/math"
 )

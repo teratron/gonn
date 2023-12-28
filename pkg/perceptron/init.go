@@ -2,8 +2,9 @@ package perceptron
 
 import (
 	"fmt"
-	"github.com/teratron/gonn/pkg/activation"
 	"log"
+
+	"github.com/teratron/gonn/pkg/activation"
 
 	"github.com/teratron/gonn/pkg"
 	"github.com/teratron/gonn/pkg/params"

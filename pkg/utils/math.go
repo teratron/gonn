@@ -1,8 +1,9 @@
 package utils
 
 import (
-	"github.com/teratron/gonn/pkg"
 	"math"
+
+	"github.com/teratron/gonn/pkg"
 )
 
 func Pow[T pkg.Floater](x T, y float64) T {

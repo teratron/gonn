@@ -1,9 +1,10 @@
 package params
 
 import (
-	"github.com/teratron/gonn/pkg"
 	"strconv"
 	"testing"
+
+	"github.com/teratron/gonn/pkg"
 )
 
 func Test_getRandFloat(t *testing.T) {

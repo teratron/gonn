@@ -1,11 +1,12 @@
 package perceptron
 
 import (
+	"reflect"
+	"testing"
+
 	"github.com/teratron/gonn/pkg"
 	"github.com/teratron/gonn/pkg/activation"
 	"github.com/teratron/gonn/pkg/loss"
-	"reflect"
-	"testing"
 )
 
 func TestNN_GetBias(t *testing.T) {

@@ -1,32 +1,32 @@
 {
-    "name": "perceptron",
-    "bias": true,
-    "hiddenLayer": [
-        2
+  "name": "perceptron",
+  "bias": true,
+  "hiddenLayer": [
+    2
+  ],
+  "activationMode": 3,
+  "lossMode": 0,
+  "lossLimit": 0.1,
+  "rate": 0.3,
+  "weights": [
+    [
+      [
+        0.1,
+        0.1,
+        0.1
+      ],
+      [
+        0.1,
+        0.1,
+        0.1
+      ]
     ],
-    "activationMode": 3,
-    "lossMode": 0,
-    "lossLimit": 0.1,
-    "rate": 0.3,
-    "weights": [
-        [
-            [
-                0.1,
-                0.1,
-                0.1
-            ],
-            [
-                0.1,
-                0.1,
-                0.1
-            ]
-        ],
-        [
-            [
-                0.1,
-                0.1,
-                0.1
-            ]
-        ]
+    [
+      [
+        0.1,
+        0.1,
+        0.1
+      ]
     ]
+  ]
 }
