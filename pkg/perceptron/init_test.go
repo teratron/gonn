@@ -9,14 +9,13 @@ import (
 	"github.com/teratron/gonn/pkg/activation"
 	"github.com/teratron/gonn/pkg/loss"
 
-	"github.com/teratron/gonn/pkg/params"
 	"github.com/teratron/gonn/pkg/utils"
 )
 
 var testJSON = filepath.Join("..", "..", "testdata", "perceptron.json")
 
 func init() {
-	params.GetRandFloat = func() pkg.FloatType { return .5 }
+	utils.GetRandFloat = func() pkg.FloatType { return .5 }
 }
 
 func TestNN_Init(t *testing.T) {
@@ -103,7 +102,7 @@ func TestNN_Init(t *testing.T) {
 }
 
 func TestNN_initFromNew(t *testing.T) {
-	r := params.GetRandFloat()
+	r := utils.GetRandFloat()
 	tests := []struct {
 		name string
 		got  *NN

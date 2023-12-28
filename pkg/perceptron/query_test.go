@@ -6,8 +6,7 @@ import (
 
 	"github.com/teratron/gonn/pkg"
 	"github.com/teratron/gonn/pkg/activation"
-
-	"github.com/teratron/gonn/internal/pkg/math"
+	"github.com/teratron/gonn/pkg/utils"
 )
 
 func TestNN_Query(t *testing.T) {
@@ -76,7 +75,7 @@ func TestNN_Query(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got := tt.gave.Query(tt.input)
 			for i, g := range got {
-				got[i] = math.Round(g, math.ROUND, 6)
+				got[i] = utils.Round(g, utils.ROUND, 6)
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Query()\ngot:\t%v\nwant:\t%v", got, tt.want)

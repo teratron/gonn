@@ -7,8 +7,7 @@ import (
 	"github.com/teratron/gonn/pkg"
 	"github.com/teratron/gonn/pkg/activation"
 	"github.com/teratron/gonn/pkg/loss"
-
-	"github.com/teratron/gonn/internal/pkg/math"
+	"github.com/teratron/gonn/pkg/utils"
 )
 
 func TestNN_calcNeurons(t *testing.T) {
@@ -111,8 +110,8 @@ func TestNN_calcNeurons(t *testing.T) {
 			tt.got.calcNeurons()
 			for i, v := range tt.got.neurons {
 				for j, n := range v {
-					tt.got.neurons[i][j].value = pkg.FloatType(math.Round(float64(n.value), math.ROUND, 6))
-					tt.got.neurons[i][j].miss = pkg.FloatType(math.Round(float64(n.miss), math.ROUND, 6))
+					tt.got.neurons[i][j].value = pkg.FloatType(utils.Round(float64(n.value), utils.ROUND, 6))
+					tt.got.neurons[i][j].miss = pkg.FloatType(utils.Round(float64(n.miss), utils.ROUND, 6))
 				}
 			}
 			if !reflect.DeepEqual(tt.got.neurons, tt.want) {
@@ -206,7 +205,7 @@ func TestNN_calcLoss(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.gave.calcLoss(); math.Round(got, math.ROUND, 6) != tt.want {
+			if got := tt.gave.calcLoss(); utils.Round(got, utils.ROUND, 6) != tt.want {
 				t.Errorf("calcLoss() = %f, want %f", got, tt.want)
 			}
 		})
@@ -260,8 +259,8 @@ func TestNN_calcMiss(t *testing.T) {
 			tt.got.calcMiss()
 			for i, v := range tt.got.neurons {
 				for j, n := range v {
-					tt.got.neurons[i][j].value = pkg.FloatType(math.Round(float64(n.value), math.ROUND, 6))
-					tt.got.neurons[i][j].miss = pkg.FloatType(math.Round(float64(n.miss), math.ROUND, 6))
+					tt.got.neurons[i][j].value = pkg.FloatType(utils.Round(float64(n.value), utils.ROUND, 6))
+					tt.got.neurons[i][j].miss = pkg.FloatType(utils.Round(float64(n.miss), utils.ROUND, 6))
 				}
 			}
 			if !reflect.DeepEqual(tt.got.neurons, tt.want) {
@@ -344,7 +343,7 @@ func TestNN_updateWeights(t *testing.T) {
 			for i, v := range tt.got.Weights {
 				for j, w := range v {
 					for k, g := range w {
-						tt.got.Weights[i][j][k] = pkg.FloatType(math.Round(float64(g), math.ROUND, 6))
+						tt.got.Weights[i][j][k] = pkg.FloatType(utils.Round(float64(g), utils.ROUND, 6))
 					}
 				}
 			}

@@ -6,6 +6,7 @@ import (
 	"github.com/teratron/gonn/pkg"
 )
 
+// Pow returns x**y, the base-x exponential of y.
 func Pow[T pkg.Floater](x T, y float64) T {
 	switch v := any(x).(type) {
 	case float32:
@@ -47,5 +48,44 @@ func IsInf[T pkg.Floater](f T, sign int) bool {
 		return math.IsInf(v, sign)
 	default:
 		return false
+	}
+}
+
+func Round[T pkg.Floater](x T, precision uint) T {
+	d := Pow[T](10, float64(precision))
+	x *= d
+	switch v := any(x).(type) {
+	case float32:
+		return T(math.Round(float64(v))) / d
+	case float64:
+		return T(math.Round(v)) / d
+	default:
+		panic(x) // TODO:
+	}
+}
+
+func Floor[T pkg.Floater](x T, precision uint) T {
+	d := Pow[T](10, float64(precision))
+	x *= d
+	switch v := any(x).(type) {
+	case float32:
+		return T(math.Floor(float64(v))) / d
+	case float64:
+		return T(math.Floor(v)) / d
+	default:
+		panic(x) // TODO:
+	}
+}
+
+func Ceil[T pkg.Floater](x T, precision uint) T {
+	d := Pow[T](10, float64(precision))
+	x *= d
+	switch v := any(x).(type) {
+	case float32:
+		return T(math.Ceil(float64(v))) / d
+	case float64:
+		return T(math.Ceil(v)) / d
+	default:
+		panic(x) // TODO:
 	}
 }

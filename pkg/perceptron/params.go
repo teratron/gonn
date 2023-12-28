@@ -3,8 +3,8 @@ package perceptron
 import (
 	"github.com/teratron/gonn/pkg"
 	"github.com/teratron/gonn/pkg/activation"
+	"github.com/teratron/gonn/pkg/layers"
 	"github.com/teratron/gonn/pkg/loss"
-	"github.com/teratron/gonn/pkg/params"
 	"github.com/teratron/gonn/pkg/rate"
 )
 
@@ -20,12 +20,12 @@ func (nn *NN[T]) SetBias(bias bool) {
 
 // GetHiddenLayer.
 func (nn *NN[T]) GetHiddenLayer() []uint {
-	return params.CheckLayer(nn.HiddenLayer)
+	return layers.CheckLayers(nn.HiddenLayer)
 }
 
 // SetHiddenLayer.
 func (nn *NN[T]) SetHiddenLayer(layer ...uint) {
-	nn.HiddenLayer = params.CheckLayer(layer)
+	nn.HiddenLayer = layers.CheckLayers(layer)
 }
 
 // GetActivationMode.

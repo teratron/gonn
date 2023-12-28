@@ -1,5 +1,4 @@
 {
-  "name": "perceptron",
   "bias": true,
   "hiddenLayer": [
     2

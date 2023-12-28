@@ -1,6 +1,10 @@
-package math
+package utils
 
-import "math"
+import (
+	"math"
+
+	"github.com/teratron/gonn/pkg"
+)
 
 // Rounding mode.
 const (
@@ -10,8 +14,8 @@ const (
 )
 
 // Round rounding to a floating-point value.
-func Round(f float64, mode uint8, precision uint) float64 {
-	d := math.Pow(10, float64(precision))
+func Round2[T pkg.Floater](f T, mode uint8, precision uint) T {
+	d := Pow[T](10, float64(precision))
 	f *= d
 	switch mode {
 	case ROUND:
@@ -21,5 +25,6 @@ func Round(f float64, mode uint8, precision uint) float64 {
 	case CEIL:
 		return math.Ceil(f) / d
 	}
+
 	return math.NaN()
 }

@@ -7,7 +7,6 @@ import (
 	"github.com/teratron/gonn/pkg/activation"
 
 	"github.com/teratron/gonn/pkg"
-	"github.com/teratron/gonn/pkg/params"
 	"github.com/teratron/gonn/pkg/utils"
 )
 
@@ -93,7 +92,7 @@ func (nn *NN[T]) initFromNew(lenInput, lenTarget int) {
 				if nn.ActivationMode == activation.LINEAR {
 					nn.Weights[i][j][k] = .5
 				} else {
-					nn.Weights[i][j][k] = params.GetRandFloat()
+					nn.Weights[i][j][k] = utils.GetRandFloat()
 				}
 			}
 			nn.neurons[i][j] = &neuron{}

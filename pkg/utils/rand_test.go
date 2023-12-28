@@ -1,4 +1,4 @@
-package params
+package utils
 
 import (
 	"strconv"

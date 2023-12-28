@@ -1,12 +1,13 @@
-package math
+package utils
 
 import (
 	"math"
 	"testing"
 )
 
-func TestRound(t *testing.T) {
+func TestRound2(t *testing.T) {
 	pi := 3.14159265358979323846264
+	//p := math.Pi
 	type args struct {
 		f    float64
 		mode uint8

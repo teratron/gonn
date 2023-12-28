@@ -8,7 +8,6 @@ import (
 
 const streamJSON = `
 {
-	"name": "perceptron",
 	"bias": true,
 	"activationMode": 3,
 	"lossMode": 0,
