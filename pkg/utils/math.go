@@ -14,7 +14,7 @@ func Pow[T pkg.Floater](x T, y float64) T {
 	case float64:
 		return T(math.Pow(v, y))
 	default:
-		panic(x) // TODO:
+		panic(v) // TODO:
 	}
 }
 
@@ -25,7 +25,7 @@ func Exp[T pkg.Floater](x T) T {
 	case float64:
 		return T(math.Exp(v))
 	default:
-		panic(x) // TODO:
+		panic(v) // TODO:
 	}
 }
 
@@ -60,7 +60,7 @@ func Round[T pkg.Floater](x T, precision uint) T {
 	case float64:
 		return T(math.Round(v)) / d
 	default:
-		panic(x) // TODO:
+		panic(v) // TODO:
 	}
 }
 
@@ -73,7 +73,7 @@ func Floor[T pkg.Floater](x T, precision uint) T {
 	case float64:
 		return T(math.Floor(v)) / d
 	default:
-		panic(x) // TODO:
+		panic(v) // TODO:
 	}
 }
 
@@ -86,6 +86,22 @@ func Ceil[T pkg.Floater](x T, precision uint) T {
 	case float64:
 		return T(math.Ceil(v)) / d
 	default:
-		panic(x) // TODO:
+		panic(v) // TODO:
+	}
+}
+
+type Caller interface {
+	func(float64) float64 | func(float64, float64) float64
+	// | func(float64) bool | func(float64, int) bool
+}
+
+func to[T pkg.Floater, U Caller](value T, call U) T {
+	switch v := any(value).(type) {
+	case float32:
+		return T(call(float64(v)))
+	case float64:
+		return T(call(v))
+	default:
+		panic(v) // TODO:
 	}
 }
