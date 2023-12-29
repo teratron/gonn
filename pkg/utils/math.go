@@ -98,6 +98,7 @@ type Caller interface {
 func to[T pkg.Floater, U Caller](value T, call U) T {
 	switch v := any(value).(type) {
 	case float32:
+
 		return T(call(float64(v)))
 	case float64:
 		return T(call(v))
