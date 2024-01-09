@@ -5,10 +5,11 @@ import (
 	"math"
 
 	"github.com/teratron/gonn/pkg/activation"
+	"github.com/teratron/gonn/pkg/utils"
 )
 
 // calcNeurons.
-func (nn *NN) calcNeurons() {
+func (nn *NN[T]) calcNeurons() {
 	length, dec := nn.lenInput, 0
 	for i, v := range nn.neurons {
 		if i > 0 {
@@ -17,7 +18,7 @@ func (nn *NN) calcNeurons() {
 		}
 
 		for j, n := range v {
-			var num nn.FloatType = 0
+			var num T = 0
 			n.value = 0
 			for k, w := range nn.Weights[i][j] {
 				if k < length {
@@ -42,23 +43,23 @@ func (nn *NN) calcNeurons() {
 			}
 
 			if i == nn.lastLayerIndex {
-				nn.output[j] = float64(n.value)
+				nn.output[j] = n.value
 			}
 		}
 	}
 }
 
 // calcLoss calculating the error of the output neuron.
-func (nn *NN) calcLoss() (loss float64) {
+func (nn *NN[T]) calcLoss() (loss T) {
 	for i, n := range nn.neurons[nn.lastLayerIndex] {
 		n.miss = nn.target[i] - n.value
 		switch nn.LossMode {
 		default:
 			fallthrough
 		case loss.MSE, loss.RMSE:
-			loss += math.Pow(float64(n.miss), 2)
+			loss += utils.Pow(n.miss, 2)
 		case loss.ARCTAN:
-			loss += math.Pow(math.Atan(float64(n.miss)), 2)
+			loss += utils.Pow(math.Atan(float64(n.miss)), 2)
 		case loss.AVG:
 			loss += math.Abs(float64(n.miss))
 		}
