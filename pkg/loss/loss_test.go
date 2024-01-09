@@ -3,36 +3,39 @@ package loss
 import "testing"
 
 func TestCheckLossMode(t *testing.T) {
+	type args struct {
+		mode Type
+	}
 	tests := []struct {
 		name string
-		gave Type
+		args
 		want Type
 	}{
 		{
 			name: "#1_MSE",
-			gave: MSE,
+			args: args{MSE},
 			want: MSE,
 		}, {
 			name: "#2_RMSE",
-			gave: RMSE,
+			args: args{RMSE},
 			want: RMSE,
 		}, {
 			name: "#3_ARCTAN",
-			gave: ARCTAN,
+			args: args{ARCTAN},
 			want: ARCTAN,
 		}, {
 			name: "#4_AVG",
-			gave: AVG,
+			args: args{AVG},
 			want: AVG,
 		}, {
 			name: "#5_overflow",
-			gave: 255,
+			args: args{255},
 			want: MSE,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := CheckLossMode(tt.gave); got != tt.want {
+			if got := CheckLossMode(tt.args.mode); got != tt.want {
 				t.Errorf("CheckLossMode() = %d, want %d", got, tt.want)
 			}
 		})

@@ -5,6 +5,7 @@ import (
 
 	"github.com/teratron/gonn/pkg/activation"
 	"github.com/teratron/gonn/pkg/loss"
+	"github.com/teratron/gonn/pkg/rate"
 
 	"github.com/teratron/gonn/pkg"
 	"github.com/teratron/gonn/pkg/utils"
@@ -55,10 +56,6 @@ type NN[T pkg.Floater] struct {
 	mutex          sync.Mutex
 
 	// Transfer data.
-	//weights pkg.Float3Type
-	//input   pkg.Float1Type
-	//target  pkg.Float1Type
-	//output  []float64
 	weights [][][]T
 	input   []T
 	target  []T
@@ -66,8 +63,6 @@ type NN[T pkg.Floater] struct {
 }
 
 type neuron[T pkg.Floater] struct {
-	//value pkg.FloatType
-	//miss  pkg.FloatType
 	value T
 	miss  T
 }
@@ -79,7 +74,7 @@ func New[T pkg.Floater]() *NN[T] {
 		HiddenLayer:    []uint{0},
 		ActivationMode: activation.SIGMOID,
 		LossMode:       loss.MSE,
-		LossLimit:      .01,
-		Rate:           .3,
+		LossLimit:      .001,
+		Rate:           rate.DEFAULT,
 	}
 }

@@ -15,7 +15,6 @@ import (
 
 const testStreamJSON = `
 {
-    "name": "perceptron",
     "bias": true,
     "hiddenLayer": [
         2
@@ -50,7 +49,7 @@ const testStreamJSON = `
 var testJSON = filepath.Join("..", "testdata", "perceptron.json")
 
 func TestGet(t *testing.T) {
-	testNN := &perceptron.NN{
+	testNN := &perceptron.NN[float32]{
 		Name:           Perceptron,
 		Bias:           true,
 		HiddenLayer:    []uint{2},

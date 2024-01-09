@@ -75,7 +75,7 @@ func (nn *NN[T]) initFromNew(lenInput, lenTarget int) {
 	for i, v := range layer {
 		nn.Weights[i] = make(nn.Float2Type, v)
 		nn.weights[i] = make(nn.Float2Type, v)
-		nn.neurons[i] = make([]*neuron, v)
+		nn.neurons[i] = make([]*neuron[T], v)
 		if i > 0 {
 			biasLayer = int(layer[i-1]) + bias
 		}
@@ -129,16 +129,16 @@ func (nn *NN[T]) initFromWeight() {
 		nn.neurons[i] = make([]*neuron, length)
 		for j, w := range v {
 			nn.weights[i][j] = make(nn.Float1Type, len(w))
-			nn.neurons[i][j] = &neuron{}
+			nn.neurons[i][j] = &neuron[T]{}
 		}
 	}
 }
 
 // initCompletion.
-func (nn *NN) initCompletion() {
+func (nn *NN[T]) initCompletion() {
 	nn.prevLayerIndex = nn.lastLayerIndex - 1
-	nn.input = make(nn.Float1Type, nn.lenInput)
-	nn.target = make(nn.Float1Type, nn.lenOutput)
-	nn.output = make([]float64, nn.lenOutput)
+	nn.input = make([]T, nn.lenInput)
+	nn.target = make([]T, nn.lenOutput)
+	nn.output = make([]T, nn.lenOutput)
 	nn.isInit = true
 }

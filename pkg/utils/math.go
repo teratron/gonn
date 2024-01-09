@@ -18,6 +18,10 @@ func Pow[T pkg.Floater](x T, y float64) T {
 	}
 }
 
+func Pow2[T pkg.Floater](x T, y float64) T {
+	return T(math.Pow(float64(x), y))
+}
+
 func Exp[T pkg.Floater](x T) T {
 	switch v := any(x).(type) {
 	case float32:
@@ -90,7 +94,7 @@ func Ceil[T pkg.Floater](x T, precision uint) T {
 	}
 }
 
-type Caller interface {
+/*type Caller interface {
 	func(float64) float64 | func(float64, float64) float64
 	// | func(float64) bool | func(float64, int) bool
 }
@@ -105,4 +109,4 @@ func to[T pkg.Floater, U Caller](value T, call U) T {
 	default:
 		panic(v) // TODO:
 	}
-}
+}*/

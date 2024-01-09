@@ -8,7 +8,7 @@ import (
 )
 
 // Query querying dataset.
-func (nn *NN) Query(input []float64) []float64 {
+func (nn *NN[T]) Query(input []T) []T {
 	var err error
 	if len(input) > 0 {
 		nn.mutex.Lock()
