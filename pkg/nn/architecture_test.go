@@ -1,7 +1,6 @@
 package nn
 
 import (
-	"path/filepath"
 	"reflect"
 	"testing"
 
@@ -44,13 +43,13 @@ const testStreamJSON = `
     ]
 }`
 
-var testJSON = filepath.Join("..", "testdata", "perceptron.json")
+//var testJSON = filepath.Join("..", "testdata", "perceptron.json")
 
 func TestGet(t *testing.T) {
 	testNN := &NN[float32]{
 		Name:           Perceptron,
 		Bias:           true,
-		HiddenLayer:    []uint{2},
+		HiddenLayers:   []uint{2},
 		ActivationMode: activation.SIGMOID,
 		LossMode:       loss.MSE,
 		LossLimit:      .1,

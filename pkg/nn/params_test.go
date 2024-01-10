@@ -29,7 +29,7 @@ func TestNN_SetBias(t *testing.T) {
 	})
 }
 
-func TestNN_GetHiddenLayer(t *testing.T) {
+func TestNN_GetHiddenLayers(t *testing.T) {
 	tests := []struct {
 		name string
 		gave *NN
@@ -37,36 +37,36 @@ func TestNN_GetHiddenLayer(t *testing.T) {
 	}{
 		{
 			name: "#1_nil",
-			gave: &NN{HiddenLayer: nil},
+			gave: &NN{HiddenLayers: nil},
 			want: []uint{0},
 		},
 		{
 			name: "#2_[]",
-			gave: &NN{HiddenLayer: []uint{}},
+			gave: &NN{HiddenLayers: []uint{}},
 			want: []uint{0},
 		},
 		{
 			name: "#3_[0]",
-			gave: &NN{HiddenLayer: []uint{0}},
+			gave: &NN{HiddenLayers: []uint{0}},
 			want: []uint{0},
 		},
 		{
 			name: "#4_[3_2_1]",
-			gave: &NN{HiddenLayer: []uint{3, 2, 1}},
+			gave: &NN{HiddenLayers: []uint{3, 2, 1}},
 			want: []uint{3, 2, 1},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.gave.GetHiddenLayer(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("GetHiddenLayer()\ngot:\t%v\nwant:\t%v", got, tt.want)
+			if got := tt.gave.GetHiddenLayers(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("GetHiddenLayers()\ngot:\t%v\nwant:\t%v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestNN_SetHiddenLayer(t *testing.T) {
+func TestNN_SetHiddenLayers(t *testing.T) {
 	got := &NN{}
 	tests := []struct {
 		name string
@@ -97,8 +97,40 @@ func TestNN_SetHiddenLayer(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got.SetHiddenLayer(tt.gave...); !reflect.DeepEqual(got.HiddenLayer, tt.want) {
-				t.Errorf("SetHiddenLayer()\ngot:\t%v\nwant:\t%v", got.HiddenLayer, tt.want)
+			if got.SetHiddenLayers(tt.gave...); !reflect.DeepEqual(got.HiddenLayers, tt.want) {
+				t.Errorf("SetHiddenLayers()\ngot:\t%v\nwant:\t%v", got.HiddenLayers, tt.want)
+			}
+		})
+	}
+}
+
+func TestCheckLayers(t *testing.T) {
+	type args struct {
+		layers []uint
+	}
+	tests := []struct {
+		name string
+		args
+		want []uint
+	}{
+		{
+			name: "#1_normal",
+			args: args{[]uint{1, 2, 3}},
+			want: []uint{1, 2, 3},
+		}, {
+			name: "#2_length_0",
+			args: args{[]uint{}},
+			want: []uint{0},
+		}, {
+			name: "#3_nil",
+			args: args{nil},
+			want: []uint{0},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := CheckLayers(tt.args.layers); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("CheckLayers() = %v, want %v", got, tt.want)
 			}
 		})
 	}

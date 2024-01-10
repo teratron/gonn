@@ -11,18 +11,14 @@ import (
 	"github.com/teratron/gonn/pkg/utils"
 )
 
-// Declare conformity with NeuralNetwork interface.
-//var _ pkg.NeuralNetwork = (*NN)(nil)
-
 // NN.
 type NN[T pkg.Floater] struct {
-	pkg.Parameter `json:"-"`
 
 	// The neurons bias, false or true (required field for a config).
 	Bias bool `json:"bias"`
 
 	// Array of the number of neurons in each hidden layer.
-	HiddenLayer []uint `json:"hiddenLayer,omitempty"`
+	HiddenLayers []uint `json:"hiddenLayers,omitempty"`
 
 	// Activation function mode (required field for a config).
 	ActivationMode activation.Type `json:"activationMode"`
@@ -71,7 +67,7 @@ type neuron[T pkg.Floater] struct {
 func perceptron[T pkg.Floater]() *NN[T] {
 	return &NN[T]{
 		Bias:           false,
-		HiddenLayer:    []uint{0},
+		HiddenLayers:   []uint{0},
 		ActivationMode: activation.SIGMOID,
 		LossMode:       loss.MSE,
 		LossLimit:      .001,

@@ -105,9 +105,9 @@ func TestNN_Train(t *testing.T) {
 			name: "#6_not_init",
 			args: args{[]float64{.2, .3}, []float64{.3}},
 			gave: &NN{
-				Bias:        true,
-				HiddenLayer: []uint{2},
-				LossLimit:   .95,
+				Bias:         true,
+				HiddenLayers: []uint{2},
+				LossLimit:    .95,
 			},
 			wantLoss:  .0025,
 			wantCount: 1,

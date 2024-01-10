@@ -86,6 +86,7 @@ func (nn *NN[T]) calcLoss() (los T) {
 	case math.IsInf(los, 0):
 		log.Panic("2:perceptron.NN.calcLoss: loss is infinity") // TODO: log.Panic (?)
 	}
+
 	return
 }
 

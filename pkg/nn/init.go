@@ -48,15 +48,15 @@ func (nn *NN[T]) initFromNew(lenInput, lenTarget int) {
 	nn.lenInput = lenInput
 	nn.lenOutput = lenTarget
 
-	if nn.HiddenLayer[0] > 0 {
-		nn.lastLayerIndex = len(nn.HiddenLayer)
+	if nn.HiddenLayers[0] > 0 {
+		nn.lastLayerIndex = len(nn.HiddenLayers)
 	} else {
 		nn.lastLayerIndex = 0
 	}
 
 	var layer []uint
 	if nn.lastLayerIndex > 0 {
-		layer = append(nn.HiddenLayer, uint(nn.lenOutput))
+		layer = append(nn.HiddenLayers, uint(nn.lenOutput))
 	} else {
 		layer = []uint{uint(nn.lenOutput)}
 	}
@@ -69,12 +69,12 @@ func (nn *NN[T]) initFromNew(lenInput, lenTarget int) {
 	biasInput := nn.lenInput + bias
 	var biasLayer int
 
-	nn.Weights = make(nn.Float3Type, lenLayer)
-	nn.weights = make(nn.Float3Type, lenLayer)
-	nn.neurons = make([][]*neuron, lenLayer)
+	nn.Weights = make([][][]T, lenLayer)
+	nn.weights = make([][][]T, lenLayer)
+	nn.neurons = make([][]*neuron[T], lenLayer)
 	for i, v := range layer {
-		nn.Weights[i] = make(nn.Float2Type, v)
-		nn.weights[i] = make(nn.Float2Type, v)
+		nn.Weights[i] = make([][]T, v)
+		nn.weights[i] = make([][]T, v)
 		nn.neurons[i] = make([]*neuron[T], v)
 		if i > 0 {
 			biasLayer = int(layer[i-1]) + bias
@@ -82,20 +82,20 @@ func (nn *NN[T]) initFromNew(lenInput, lenTarget int) {
 
 		for j := 0; j < int(v); j++ {
 			if i > 0 {
-				nn.Weights[i][j] = make(nn.Float1Type, biasLayer)
-				nn.weights[i][j] = make(nn.Float1Type, biasLayer)
+				nn.Weights[i][j] = make([]T, biasLayer)
+				nn.weights[i][j] = make([]T, biasLayer)
 			} else {
-				nn.Weights[i][j] = make(nn.Float1Type, biasInput)
-				nn.weights[i][j] = make(nn.Float1Type, biasInput)
+				nn.Weights[i][j] = make([]T, biasInput)
+				nn.weights[i][j] = make([]T, biasInput)
 			}
 			for k := range nn.weights[i][j] {
 				if nn.ActivationMode == activation.LINEAR {
 					nn.Weights[i][j][k] = .5
 				} else {
-					nn.Weights[i][j][k] = utils.GetRandFloat()
+					nn.Weights[i][j][k] = utils.GetRandFloat[T]()
 				}
 			}
-			nn.neurons[i][j] = &neuron{}
+			nn.neurons[i][j] = &neuron[T]{}
 		}
 	}
 }
@@ -113,12 +113,12 @@ func (nn *NN[T]) initFromWeight() {
 	}
 
 	if nn.lastLayerIndex > 0 {
-		nn.HiddenLayer = make([]uint, nn.lastLayerIndex)
-		for i := range nn.HiddenLayer {
-			nn.HiddenLayer[i] = uint(len(nn.Weights[i]))
+		nn.HiddenLayers = make([]uint, nn.lastLayerIndex)
+		for i := range nn.HiddenLayers {
+			nn.HiddenLayers[i] = uint(len(nn.Weights[i]))
 		}
 	} else {
-		nn.HiddenLayer = []uint{0}
+		nn.HiddenLayers = []uint{0}
 	}
 
 	nn.weights = make(nn.Float3Type, length)

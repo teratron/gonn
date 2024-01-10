@@ -3,15 +3,15 @@ package utils
 import (
 	"math/rand"
 
-	"github.com/teratron/gonn/pkg"
+	. "github.com/teratron/gonn/pkg"
 )
 
-var GetRandFloat = getRandFloat
+var getRandFloat = GetRandFloat[float32]
 
-// getRandFloat return random number from -0.5 to 0.5.
-func getRandFloat() (r pkg.FloatType) {
+// GetRandFloat return random number from -0.5 to 0.5.
+func GetRandFloat[T Floater]() (r T) {
 	for r == 0 {
-		r = pkg.FloatType(rand.Float64() - .5)
+		r = T(rand.Float64() - .5)
 	}
 
 	return

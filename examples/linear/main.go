@@ -13,7 +13,7 @@ func main() {
 
 	// Parameters.
 	n.SetBias(true)
-	n.SetHiddenLayer(3, 2, 5)
+	n.SetHiddenLayers(3, 2, 5)
 	n.SetActivationMode(nn.LINEAR)
 	n.SetLossMode(nn.AVG)
 	n.SetLossLimit(.0001)

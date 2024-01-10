@@ -11,7 +11,7 @@ import (
 func TestNew(t *testing.T) {
 	want := &NN{
 		Name:           Name,
-		HiddenLayer:    []uint{0},
+		HiddenLayers:   []uint{0},
 		ActivationMode: activation.SIGMOID,
 		LossMode:       loss.MSE,
 		LossLimit:      .01,

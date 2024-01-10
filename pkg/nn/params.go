@@ -1,9 +1,7 @@
 package nn
 
 import (
-	"github.com/teratron/gonn/pkg"
 	"github.com/teratron/gonn/pkg/activation"
-	"github.com/teratron/gonn/pkg/layers"
 	"github.com/teratron/gonn/pkg/loss"
 	"github.com/teratron/gonn/pkg/rate"
 )
@@ -18,14 +16,22 @@ func (nn *NN[T]) SetBias(bias bool) {
 	nn.Bias = bias
 }
 
-// GetHiddenLayer.
-func (nn *NN[T]) GetHiddenLayer() []uint {
-	return layers.CheckLayers(nn.HiddenLayer)
+// GetHiddenLayers.
+func (nn *NN[T]) GetHiddenLayers() []uint {
+	return checkLayers(nn.HiddenLayers)
 }
 
-// SetHiddenLayer.
-func (nn *NN[T]) SetHiddenLayer(layer ...uint) {
-	nn.HiddenLayer = layers.CheckLayers(layer)
+// SetHiddenLayers.
+func (nn *NN[T]) SetHiddenLayers(layers ...uint) {
+	nn.HiddenLayers = checkLayers(layers)
+}
+
+func checkLayers(layers []uint) []uint {
+	if layers != nil && len(layers) > 0 {
+		return layers
+	}
+
+	return []uint{0}
 }
 
 // GetActivationMode.

@@ -16,7 +16,7 @@ func main() {
 	n.SetBias(true)
 
 	// Array of the number of neurons in each hidden layer.
-	n.SetHiddenLayer(5, 3)
+	n.SetHiddenLayers(5, 3)
 
 	// ActivationMode function mode.
 	n.SetActivationMode(nn.TANH)

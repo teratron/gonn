@@ -22,10 +22,9 @@ func TestNN_Init(t *testing.T) {
 	testFile := &utils.FileJSON{Name: testJSON}
 	testGot := &NN{}
 	_ = testFile.Decode(testGot)
-	testNN := &NN{
-		Name:           Name,
+	testNN := &NN[float32]{
 		Bias:           true,
-		HiddenLayer:    []uint{2},
+		HiddenLayers:   []uint{2},
 		ActivationMode: activation.SIGMOID,
 		LossMode:       loss.MSE,
 		LossLimit:      .1,
@@ -111,12 +110,12 @@ func TestNN_initFromNew(t *testing.T) {
 		{
 			name: "#1",
 			got: &NN{
-				HiddenLayer:    []uint{0},
+				HiddenLayers:   []uint{0},
 				ActivationMode: activation.SIGMOID,
 			},
 			want: &NN{
 				Bias:           false,
-				HiddenLayer:    []uint{0},
+				HiddenLayers:   []uint{0},
 				ActivationMode: activation.SIGMOID,
 				Weights: pkg.Float3Type{
 					{
@@ -148,11 +147,11 @@ func TestNN_initFromNew(t *testing.T) {
 		{
 			name: "#2",
 			got: &NN{
-				HiddenLayer: []uint{2},
+				HiddenLayers: []uint{2},
 			},
 			want: &NN{
-				Bias:        true,
-				HiddenLayer: []uint{2},
+				Bias:         true,
+				HiddenLayers: []uint{2},
 				Weights: pkg.Float3Type{
 					{
 						{r, r, r},
@@ -193,7 +192,7 @@ func TestNN_initFromNew(t *testing.T) {
 
 	for _, tt := range tests {
 		tt.got.Bias = tt.want.Bias
-		_ = copy(tt.got.HiddenLayer, tt.want.HiddenLayer)
+		_ = copy(tt.got.HiddenLayers, tt.want.HiddenLayers)
 		t.Run(tt.name, func(t *testing.T) {
 			tt.got.initFromNew(tt.want.lenInput, tt.want.lenOutput)
 			tt.got.initCompletion()
@@ -214,7 +213,7 @@ func TestNN_initFromWeight(t *testing.T) {
 			name: "#1",
 			got:  &NN{},
 			want: &NN{
-				HiddenLayer: []uint{0},
+				HiddenLayers: []uint{0},
 				Weights: pkg.Float3Type{
 					{
 						{.1, .1},
@@ -246,8 +245,8 @@ func TestNN_initFromWeight(t *testing.T) {
 			name: "#2",
 			got:  &NN{},
 			want: &NN{
-				Bias:        true,
-				HiddenLayer: []uint{2},
+				Bias:         true,
+				HiddenLayers: []uint{2},
 				Weights: pkg.Float3Type{
 					{
 						{.1, .1, .1},
