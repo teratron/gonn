@@ -1,15 +1,13 @@
-package architecture
+package nn
 
 import (
 	"path/filepath"
 	"reflect"
 	"testing"
 
+	"github.com/teratron/gonn/pkg"
 	"github.com/teratron/gonn/pkg/activation"
 	"github.com/teratron/gonn/pkg/loss"
-	"github.com/teratron/gonn/pkg/perceptron"
-
-	"github.com/teratron/gonn/pkg"
 	"github.com/teratron/gonn/pkg/utils"
 )
 
@@ -49,7 +47,7 @@ const testStreamJSON = `
 var testJSON = filepath.Join("..", "testdata", "perceptron.json")
 
 func TestGet(t *testing.T) {
-	testNN := &perceptron.NN[float32]{
+	testNN := &NN[float32]{
 		Name:           Perceptron,
 		Bias:           true,
 		HiddenLayer:    []uint{2},
@@ -80,7 +78,7 @@ func TestGet(t *testing.T) {
 		{
 			name: "#2_" + Perceptron,
 			gave: Perceptron,
-			want: perceptron.New(),
+			want: New(),
 		},
 		{
 			name: "#4_json_file",

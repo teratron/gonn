@@ -1,24 +1,22 @@
-package architecture
+package nn
 
 import (
 	"fmt"
 	"log"
 	"strings"
 
-	"github.com/teratron/gonn/pkg/perceptron"
-
 	"github.com/teratron/gonn/pkg"
 	"github.com/teratron/gonn/pkg/utils"
 )
 
 // Get.
-func Get(reader string) pkg.NeuralNetwork {
+func Get(reader string) NN[float32] {
 	var err error
 	r := utils.ReadFile(reader)
 	if _, ok := r.(*utils.FileError); ok {
 		switch strings.ToLower(reader) {
 		case Perceptron:
-			return perceptron.New()
+			return perceptron[float32]()
 		default:
 			err = fmt.Errorf("neural network is %w", pkg.ErrNotRecognized)
 		}

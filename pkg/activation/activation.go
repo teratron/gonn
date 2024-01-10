@@ -3,7 +3,7 @@ package activation
 import (
 	"log"
 
-	"github.com/teratron/gonn/pkg"
+	. "github.com/teratron/gonn/pkg"
 	"github.com/teratron/gonn/pkg/utils"
 )
 
@@ -28,7 +28,7 @@ func CheckActivationMode(mode Type) Type {
 }
 
 // Activation function.
-func Activation[T pkg.Floater](value T, mode Type) T {
+func Activation[T Floater](value T, mode Type) T {
 	switch mode {
 	case LINEAR:
 		return value
@@ -72,7 +72,7 @@ func Activation[T pkg.Floater](value T, mode Type) T {
 }
 
 // Derivative activation function.
-func Derivative[T pkg.Floater](value T, mode Type) T {
+func Derivative[T Floater](value T, mode Type) T {
 	switch mode {
 	case LINEAR:
 		return 1

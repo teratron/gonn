@@ -1,4 +1,4 @@
-package perceptron
+package nn
 
 import (
 	"reflect"
@@ -20,7 +20,7 @@ func TestNew(t *testing.T) {
 
 	t.Run(want.Name, func(t *testing.T) {
 		if got := New(); !reflect.DeepEqual(got, want) {
-			t.Errorf("New()\ngot:\t%v\nwant:\t%v", got, want)
+			t.Errorf("perceptron()\ngot:\t%v\nwant:\t%v", got, want)
 		}
 	})
 }

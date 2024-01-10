@@ -1,10 +1,11 @@
-package perceptron
+package nn
 
 import (
 	"log"
 	"math"
 
 	"github.com/teratron/gonn/pkg/activation"
+	"github.com/teratron/gonn/pkg/loss"
 	"github.com/teratron/gonn/pkg/utils"
 )
 
@@ -50,39 +51,39 @@ func (nn *NN[T]) calcNeurons() {
 }
 
 // calcLoss calculating the error of the output neuron.
-func (nn *NN[T]) calcLoss() (loss T) {
+func (nn *NN[T]) calcLoss() (los T) {
 	for i, n := range nn.neurons[nn.lastLayerIndex] {
 		n.miss = nn.target[i] - n.value
 		switch nn.LossMode {
 		default:
 			fallthrough
 		case loss.MSE, loss.RMSE:
-			loss += utils.Pow(n.miss, 2)
+			los += utils.Pow(n.miss, 2)
 		case loss.ARCTAN:
-			loss += utils.Pow(math.Atan(float64(n.miss)), 2)
+			los += utils.Pow(math.Atan(float64(n.miss)), 2)
 		case loss.AVG:
-			loss += math.Abs(float64(n.miss))
+			los += math.Abs(float64(n.miss))
 		}
 	}
 
 	// TODO: math.Copysign()
 
 	switch { // TODO:
-	case math.IsNaN(loss):
+	case utils.IsNaN(los):
 		log.Panic("1:perceptron.NN.calcLoss: loss not-a-number value") // TODO: log.Panic (?)
-	case math.IsInf(loss, 0):
+	case utils.IsInf(los, 0):
 		log.Panic("1:perceptron.NN.calcLoss: loss is infinity") // TODO: log.Panic (?)
 	}
 
-	loss /= float64(nn.lenOutput)
+	los /= T(nn.lenOutput)
 	if nn.LossMode == loss.RMSE {
-		loss = math.Sqrt(loss)
+		los = math.Sqrt(los)
 	}
 
 	switch {
-	case math.IsNaN(loss):
+	case math.IsNaN(los):
 		log.Panic("2:perceptron.NN.calcLoss: loss not-a-number value") // TODO: log.Panic (?)
-	case math.IsInf(loss, 0):
+	case math.IsInf(los, 0):
 		log.Panic("2:perceptron.NN.calcLoss: loss is infinity") // TODO: log.Panic (?)
 	}
 	return

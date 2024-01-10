@@ -1,4 +1,4 @@
-package perceptron
+package nn
 
 import (
 	"sync"
@@ -68,7 +68,7 @@ type neuron[T pkg.Floater] struct {
 }
 
 // New return Perceptron neural network.
-func New[T pkg.Floater]() *NN[T] {
+func perceptron[T pkg.Floater]() *NN[T] {
 	return &NN[T]{
 		Bias:           false,
 		HiddenLayer:    []uint{0},

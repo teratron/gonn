@@ -26,7 +26,7 @@ package main
 import "github.com/teratron/gonn/pkg/nn"
 
 func main() {
-	// New returns a new neural network
+	// New returns a perceptron neural network
 	// instance with the default parameters.
 	n := nn.New()
 
