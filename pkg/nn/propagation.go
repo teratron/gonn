@@ -81,9 +81,9 @@ func (nn *NN[T]) calcLoss() (los T) {
 	}
 
 	switch {
-	case math.IsNaN(los):
+	case utils.IsNaN(los):
 		log.Panic("2:perceptron.NN.calcLoss: loss not-a-number value") // TODO: log.Panic (?)
-	case math.IsInf(los, 0):
+	case utils.IsInf(los, 0):
 		log.Panic("2:perceptron.NN.calcLoss: loss is infinity") // TODO: log.Panic (?)
 	}
 
@@ -91,7 +91,7 @@ func (nn *NN[T]) calcLoss() (los T) {
 }
 
 // calcMiss calculating the error of neurons in hidden layers.
-func (nn *NN) calcMiss() {
+func (nn *NN[_]) calcMiss() {
 	//if nn.lastLayerIndex > 0 {
 	// for i := nn.lastLayerIndex - 1; i >= 0; i-- {
 	for i := nn.prevLayerIndex; i >= 0; i-- {
@@ -107,7 +107,7 @@ func (nn *NN) calcMiss() {
 }
 
 // updateWeights update weights.
-func (nn *NN) updateWeights() {
+func (nn *NN[T]) updateWeights() {
 	length, dec := nn.lenInput, 0
 	for i, v := range nn.Weights {
 		if i > 0 {
@@ -119,7 +119,7 @@ func (nn *NN) updateWeights() {
 			grad := nn.Rate * nn.neurons[i][j].miss * activation.Derivative(nn.neurons[i][j].value, nn.ActivationMode)
 			for k := range w {
 				if k < length {
-					var value nn.FloatType
+					var value T
 					if i > 0 {
 						value = nn.neurons[dec][k].value
 					} else {
