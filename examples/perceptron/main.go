@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/teratron/gonn/pkg/activation"
+	"github.com/teratron/gonn/pkg/loss"
 	"github.com/teratron/gonn/pkg/nn"
 )
 
@@ -19,13 +21,13 @@ func main() {
 	n.SetHiddenLayers(5, 3)
 
 	// ActivationMode function mode.
-	n.SetActivationMode(nn.TANH)
+	n.SetActivationMode(activation.TANH)
 
 	// The mode of calculation of the total error.
-	n.SetLossMode(nn.MSE)
+	n.SetLossMode(loss.MSE)
 
 	// Minimum (sufficient) limit of the average of the error during training.
-	lossLimit := 1e-6
+	var lossLimit float32 = 1e-6
 	n.SetLossLimit(lossLimit)
 
 	// Learning coefficient (greater than 0 and less than or equal to 1).

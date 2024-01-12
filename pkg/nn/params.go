@@ -12,8 +12,8 @@ func (nn *NN[T]) GetBias() bool {
 }
 
 // SetBias.
-func (nn *NN[T]) SetBias(bias bool) {
-	nn.Bias = bias
+func (nn *NN[T]) SetBias(state bool) {
+	nn.Bias = state
 }
 
 // GetHiddenLayers.
@@ -22,13 +22,13 @@ func (nn *NN[T]) GetHiddenLayers() []uint {
 }
 
 // SetHiddenLayers.
-func (nn *NN[T]) SetHiddenLayers(layers ...uint) {
-	nn.HiddenLayers = checkLayers(layers)
+func (nn *NN[T]) SetHiddenLayers(data ...uint) {
+	nn.HiddenLayers = checkLayers(data)
 }
 
-func checkLayers(layers []uint) []uint {
-	if layers != nil && len(layers) > 0 {
-		return layers
+func checkLayers(data []uint) []uint {
+	if data != nil && len(data) > 0 {
+		return data
 	}
 
 	return []uint{0}
@@ -60,8 +60,8 @@ func (nn *NN[T]) GetLossLimit() T {
 }
 
 // SetLossLimit.
-func (nn *NN[T]) SetLossLimit(limit T) {
-	nn.LossLimit = limit
+func (nn *NN[T]) SetLossLimit(value T) {
+	nn.LossLimit = value
 }
 
 // GetRate.
@@ -70,20 +70,18 @@ func (nn *NN[T]) GetRate() T {
 }
 
 // SetRate.
-func (nn *NN[T]) SetRate(r T) {
-	nn.Rate = rate.CheckLearningRate(r)
+func (nn *NN[T]) SetRate(value T) {
+	nn.Rate = rate.CheckLearningRate(value)
 }
 
 // GetWeights.
-func (nn *NN[T]) GetWeights() [][][]T {
+func (nn *NN[T]) GetWeights() *[][][]T {
 	return &nn.Weights
 }
 
 // SetWeights.
-func (nn *NN[T]) SetWeights(weight T) {
-	if w, ok := weight.([][][]T); ok {
-		nn.Weights = w
-	}
+func (nn *NN[T]) SetWeights(data [][][]T) {
+	nn.Weights = data // TODO:
 }
 
 // GetLengthInput.

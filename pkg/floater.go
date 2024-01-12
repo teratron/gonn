@@ -4,13 +4,13 @@ import "log"
 
 // Floater.
 type Floater interface {
-	//Length(...uint) int
-	~float32 | ~float64
+	// Length(...uint) int
+	float32 | float64
 }
 
 type (
-	//FloatType2[T Floater]  T
-	//Float1Type2[T Floater] []T
+	// FloatType2[T Floater]  T
+	// Float1Type2[T Floater] []T
 
 	FloatType  float32
 	Float1Type []FloatType

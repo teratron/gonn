@@ -1,7 +1,7 @@
 package nn
 
 import (
-	arch "github.com/teratron/gonn/pkg/architecture"
+	"github.com/teratron/gonn/pkg/utils"
 )
 
 // NeuralNetwork interface.
@@ -32,10 +32,25 @@ const (
 )*/
 
 // New returns a new neural network instance.
-func New[T float32 | float64](reader ...string) NN[T] {
+func New[T float32 | float64](reader ...string) *NN[T] {
 	if len(reader) > 0 {
-		return Get(reader[0])
+		// return Get(reader[0])
+		var err error
+		r := utils.ReadFile(reader[0])
+		switch v := r.GetValue("name").(type) {
+		case error:
+			err = v
+		case string:
+			if n := Get(v); n != nil {
+				if err = r.Decode(n); err == nil {
+					r.ClearData()
+					n.Init(r)
+					return n
+				}
+			}
+		}
+
 	}
 
-	return Get(arch.Perceptron)
+	return perceptron[T]()
 }
