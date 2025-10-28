@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"github.com/teratron/gonn/pkg/nn"
+	//"github.com/teratron/gonn/pkg/loss"
+	//"github.com/teratron/gonn/pkg/activation"
 )
 
 func main() {
@@ -15,6 +17,26 @@ func main() {
 	lenOutput := 2                                                                 // Number of output data.
 	lenData := len(dataSet) - lenOutput
 	start := time.Now() // Starting the timer.
+
+	// Set properties.
+	// n.set_hidden_layers(&[
+	//     // (neurons, activation, bias)
+	//     (3, Activation::Sigmoid, true),
+	//     (5, Activation::ReLU, true),
+	//     (3, Activation::Sigmoid, false),
+	// ])
+	// .set_output_layer(
+	//     // neurons, activation, loss, bias
+	//     len_output,
+	//     Activation::Sigmoid,
+	//     Loss::Arctan,
+	//     false,
+	// );
+	// .set_bias(true)
+	// .set_rate(0.3)
+	// .set_activation_mode(Activation::Sigmoid)
+	// .set_loss_mode(Loss::MSE);
+	//println!("{:?} {}", rn, Rustunumic::Sigmoid);
 
 	// Training.
 	for epoch := 1; epoch <= 100_000; epoch++ {
