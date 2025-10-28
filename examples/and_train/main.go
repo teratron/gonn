@@ -8,7 +8,6 @@ import (
 
 const streamJSON = `
 {
-	"name": "perceptron",
 	"bias": true,
 	"activationMode": 3,
 	"lossMode": 0,
@@ -35,7 +34,7 @@ const streamJSON = `
 
 func main() {
 	// New returns a new neural network from json stream.
-	n := nn.New(streamJSON)
+	n := nn.New[float64](streamJSON)
 
 	// Dataset.
 	input := []float64{.27, .31, .52} // Input dataset.

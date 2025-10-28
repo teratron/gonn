@@ -8,13 +8,12 @@ import (
 
 func main() {
 	// New returns a new neural network
-	// instance with the default parameters,
-	// same n := nn.New("perceptron").
-	n := nn.New("perceptron")
+	// instance with the default parameters.
+	n := nn.New()
 
 	// Parameters.
 	n.SetBias(true)
-	n.SetHiddenLayer(3, 2, 5)
+	n.SetHiddenLayers(3, 2, 5)
 	n.SetActivationMode(nn.LINEAR)
 	n.SetLossMode(nn.AVG)
 	n.SetLossLimit(.0001)

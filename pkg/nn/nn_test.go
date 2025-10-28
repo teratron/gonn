@@ -8,7 +8,7 @@ import (
 )
 
 func TestNew(t *testing.T) {
-	testNN := arch.Get(arch.Perceptron)
+	testNN := Get(arch.Perceptron)
 	tests := []struct {
 		name string
 		gave []string
@@ -29,7 +29,7 @@ func TestNew(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := New(tt.gave...); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("New()\ngot:\t%v\nwant:\t%v", got, tt.want)
+				t.Errorf("perceptron()\ngot:\t%v\nwant:\t%v", got, tt.want)
 			}
 		})
 	}

@@ -8,11 +8,11 @@ import (
 
 func main() {
 	// New returns a new neural network from config.
-	n := nn.New(filepath.Join("config", "perceptron.json"))
+	n := nn.New[float32](filepath.Join("config", "perceptron.json"))
 
 	// Dataset.
-	input := []float64{1, 1}
-	target := []float64{0}
+	input := []float32{1, 1}
+	target := []float32{0}
 
 	// Training dataset.
 	_, _ = n.Train(input, target)

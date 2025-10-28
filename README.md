@@ -1,7 +1,7 @@
 # GoNN
 
 [![Go API Reference](https://pkg.go.dev/badge/github.com/teratron/gonn.svg)](https://pkg.go.dev/github.com/teratron/gonn?tab=doc)
-[![0.4.0](https://img.shields.io/badge/version-0.4.0-blue.svg?style=flat)](https://github.com/teratron/gonn/releases/tag/v0.4.0)
+[![0.5.0](https://img.shields.io/badge/version-0.5.0-blue.svg?style=flat)](https://github.com/teratron/gonn/releases/tag/v0.5.0)
 [![Go Code Status](https://goreportcard.com/badge/github.com/teratron/gonn)](https://goreportcard.com/report/github.com/teratron/gonn)
 
 ---
@@ -26,7 +26,7 @@ package main
 import "github.com/teratron/gonn/pkg/nn"
 
 func main() {
-	// New returns a new neural network
+	// New returns a perceptron neural network
 	// instance with the default parameters.
 	n := nn.New()
 

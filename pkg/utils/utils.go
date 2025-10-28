@@ -35,6 +35,7 @@ func ReadFile(data string) Filer {
 			return &FileError{Err: fmt.Errorf("utils.ReadFile: %v and %v", err, f)}
 		}
 	}
+
 	return f
 }
 
@@ -45,6 +46,7 @@ func GetFileType(name string) Filer {
 	case ".json":
 		return &FileJSON{Name: name}
 	}
+
 	return &FileError{Err: fmt.Errorf("utils.GetFileType extension isn't defined")}
 }
 
@@ -54,5 +56,6 @@ func GetFileEncoding(data []byte) Filer {
 	case json.Valid(data):
 		return &FileJSON{Data: data}
 	}
+
 	return &FileError{Err: fmt.Errorf("utils.GetFileEncoding invalid encoding data")}
 }
