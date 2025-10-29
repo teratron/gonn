@@ -6,6 +6,6 @@ func linearActivation[T float32 | float64](value T, slope, offset float64) T {
 }
 
 // Linear derivative function
-func linearDerivative(slope float64) float64 {
-	return slope
+func linearDerivative[T float32 | float64](slope float64) T {
+	return T(slope)
 }
