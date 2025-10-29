@@ -17,6 +17,11 @@ const (
 	TANH                            // TANH - TanH (hyperbolic tangent).
 )
 
+type ActivationFunction[T float32 | float64] interface {
+	activation(value T) T
+	derivative(value T) T
+}
+
 // Activation function with parameters.
 func Activation[T float32 | float64](value T, mode ActivationType, params ...float64) T {
 	switch mode {
