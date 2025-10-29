@@ -36,7 +36,6 @@ func main() {
 	// .set_rate(0.3)
 	// .set_activation_mode(Activation::Sigmoid)
 	// .set_loss_mode(Loss::MSE);
-	//println!("{:?} {}", rn, Rustunumic::Sigmoid);
 
 	// Training.
 	for epoch := 1; epoch <= 100_000; epoch++ {
