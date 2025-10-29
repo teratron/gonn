@@ -15,7 +15,7 @@ func main() {
 	dataSet := []float32{.27, -.31, -.52, .66, .81, -.13, .2, .49, .11, -.73, .28} // Dataset.
 	lenInput := 3                                                                  // Number of input data.
 	lenOutput := 2                                                                 // Number of output data.
-	lenData := len(dataSet) - lenOutput
+	lenData := len(dataSet) - int(lenOutput)
 	start := time.Now() // Starting the timer.
 
 	// Set properties.
@@ -26,19 +26,8 @@ func main() {
 		nn.HiddenLayer{Number: 3, Activation: activation.SIGMOID, Bias: false},
 	).SetOutputLayer(
 		// neurons, activation, loss, bias
-		2, activation.SIGMOID, loss.ARCTAN, false,
-	)
-	// .set_output_layer(
-	//     // neurons, activation, loss, bias
-	//     len_output,
-	//     Activation::Sigmoid,
-	//     Loss::Arctan,
-	//     false,
-	// );
-	// .set_bias(true)
-	// .set_rate(0.3)
-	// .set_activation_mode(Activation::Sigmoid)
-	// .set_loss_mode(Loss::MSE);
+		uint(lenOutput), activation.SIGMOID, loss.ARCTAN, false,
+	).SetRate(0.3)
 
 	// Training.
 	for epoch := 1; epoch <= 100_000; epoch++ {
@@ -55,7 +44,7 @@ func main() {
 
 		// Average error for the entire epoch.
 		// Exiting the cycle of learning epochs, when the minimum error level is reached.
-		if sum/num < 1e-6 /*n.GetLossLimit*/ {
+		if num > 0 && sum/num < 1e-6 /*n.GetLossLimit*/ {
 			break
 		}
 	}
