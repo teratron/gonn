@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/teratron/gonn/pkg/activation"
+	"github.com/teratron/gonn/pkg/loss"
 	"github.com/teratron/gonn/pkg/nn"
-	//"github.com/teratron/gonn/pkg/loss"
-	//"github.com/teratron/gonn/pkg/activation"
 )
 
 func main() {
-	_ /*n :*/ = nn.New[float32]()
+	n := nn.New[float32]()
 
 	dataSet := []float32{.27, -.31, -.52, .66, .81, -.13, .2, .49, .11, -.73, .28} // Dataset.
 	lenInput := 3                                                                  // Number of input data.
@@ -19,12 +19,15 @@ func main() {
 	start := time.Now() // Starting the timer.
 
 	// Set properties.
-	// n.set_hidden_layers(&[
-	//     // (neurons, activation, bias)
-	//     (3, Activation::Sigmoid, true),
-	//     (5, Activation::ReLU, true),
-	//     (3, Activation::Sigmoid, false),
-	// ])
+	n.SetHiddenLayers(
+		// neurons, activation, bias
+		nn.HiddenLayer{Number: 3, Activation: activation.SIGMOID, Bias: true},
+		nn.HiddenLayer{Number: 5, Activation: activation.RELU, Bias: true},
+		nn.HiddenLayer{Number: 3, Activation: activation.SIGMOID, Bias: false},
+	).SetOutputLayer(
+		// neurons, activation, loss, bias
+		2, activation.SIGMOID, loss.ARCTAN, false,
+	)
 	// .set_output_layer(
 	//     // neurons, activation, loss, bias
 	//     len_output,

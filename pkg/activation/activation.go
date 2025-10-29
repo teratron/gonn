@@ -5,20 +5,20 @@ import (
 )
 
 // ActivationType represents different activation functions.
-type ActivationType uint8
+type Type uint8
 
 // Activation function mode.
 const (
-	ELISH     ActivationType = iota // ELISH - Exponential Linear Unit + Sigmoid.
-	ELU                             // ELU - Exponential Linear Unit.
-	LINEAR                          // LINEAR - Linear/identity.
-	LEAKYRELU                       // LEAKYRELU - Leaky ReLu (leaky rectified linear unit).
-	RELU                            // RELU - ReLu (rectified linear unit).
-	SELU                            // SELU - Scaled Exponential Linear Unit.
-	SIGMOID                         // SIGMOID - Logistic, a.k.a. sigmoid or soft step.
-	SOFTMAX                         // SOFTMAX - Softmax (Note: Current implementation is a placeholder for single values, requires vector for full functionality).
-	SWISH                           // SWISH - Swish-function.
-	TANH                            // TANH - TanH (hyperbolic tangent).
+	ELISH     Type = iota // ELISH - Exponential Linear Unit + Sigmoid.
+	ELU                   // ELU - Exponential Linear Unit.
+	LINEAR                // LINEAR - Linear/identity.
+	LEAKYRELU             // LEAKYRELU - Leaky ReLu (leaky rectified linear unit).
+	RELU                  // RELU - ReLu (rectified linear unit).
+	SELU                  // SELU - Scaled Exponential Linear Unit.
+	SIGMOID               // SIGMOID - Logistic, a.k.a. sigmoid or soft step.
+	SOFTMAX               // SOFTMAX - Softmax (Note: Current implementation is a placeholder for single values, requires vector for full functionality).
+	SWISH                 // SWISH - Swish-function.
+	TANH                  // TANH - TanH (hyperbolic tangent).
 )
 
 type ActivationFunction[T utils.Float] interface {
@@ -27,7 +27,7 @@ type ActivationFunction[T utils.Float] interface {
 }
 
 // Activation function with parameters.
-func Activation[T utils.Float](value T, mode ActivationType, params ...float64) T {
+func Activation[T utils.Float](value T, mode Type, params ...float64) T {
 	switch mode {
 	case ELISH:
 		return T(elishActivation(float64(value)))
@@ -87,7 +87,7 @@ func Activation[T utils.Float](value T, mode ActivationType, params ...float64) 
 }
 
 // Derivative activation function with parameters.
-func Derivative[T utils.Float](value T, mode ActivationType, params ...float64) T {
+func Derivative[T utils.Float](value T, mode Type, params ...float64) T {
 	switch mode {
 	case ELISH:
 		return T(elishDerivative(float64(value)))

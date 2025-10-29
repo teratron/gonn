@@ -10,7 +10,7 @@ func TestActivationFunctions(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		mode     ActivationType
+		mode     Type
 		value    float64
 		params   []float64
 		expected float64
@@ -74,7 +74,7 @@ func TestDerivativeFunctions(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		mode     ActivationType
+		mode     Type
 		value    float64
 		params   []float64
 		expected float64

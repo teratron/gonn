@@ -3,31 +3,31 @@ package loss
 import "math"
 
 // LossType represents different loss functions.
-type LossType uint8
+type Type uint8
 
 // Loss function mode.
 const (
-	MSE       LossType = iota // MSE - Mean Squared Error
-	MAE                       // MAE - Mean Absolute Error (equivalent to Avg)
-	CCE                       // CCE - Categorical Cross-Entropy
-	BCE                       // BCE - Binary Cross-Entropy
-	MAPE                      // MAPE - Mean Absolute Percentage Error
-	MSLE                      // MSLE - Mean Squared Logarithmic Error
-	KLD                       // KLD - Kullback-Leibler Divergence
-	COSINE                    // COSINE - Cosine Similarity/Distance
-	POISSON                   // POISSON - Poisson Loss Function
-	HINGE                     // HINGE - Hinge Loss
-	SQ_HINGE                  // SQ_HINGE - Squared Hinge Loss
-	CAT_HINGE                 // CAT_HINGE - Categorical Hinge Loss
-	LOG_COSH                  // LOG_COSH - Log-Cosh Loss
-	HUBER                     // HUBER - Huber Loss
-	AVG                       // AVG - Average Error (Mean Absolute Error)
-	RMSE                      // RMSE - Root Mean Squared Error
-	ARCTAN                    // ARCTAN - Arctan Error
+	MSE       Type = iota // MSE - Mean Squared Error
+	MAE                   // MAE - Mean Absolute Error (equivalent to Avg)
+	CCE                   // CCE - Categorical Cross-Entropy
+	BCE                   // BCE - Binary Cross-Entropy
+	MAPE                  // MAPE - Mean Absolute Percentage Error
+	MSLE                  // MSLE - Mean Squared Logarithmic Error
+	KLD                   // KLD - Kullback-Leibler Divergence
+	COSINE                // COSINE - Cosine Similarity/Distance
+	POISSON               // POISSON - Poisson Loss Function
+	HINGE                 // HINGE - Hinge Loss
+	SQ_HINGE              // SQ_HINGE - Squared Hinge Loss
+	CAT_HINGE             // CAT_HINGE - Categorical Hinge Loss
+	LOG_COSH              // LOG_COSH - Log-Cosh Loss
+	HUBER                 // HUBER - Huber Loss
+	AVG                   // AVG - Average Error (Mean Absolute Error)
+	RMSE                  // RMSE - Root Mean Squared Error
+	ARCTAN                // ARCTAN - Arctan Error
 )
 
 // Loss function for single values.
-func Loss[T float32 | float64](predicted, target T, mode LossType, params ...float64) T {
+func Loss[T float32 | float64](predicted, target T, mode Type, params ...float64) T {
 	switch mode {
 	case MSE:
 		return mseLoss(predicted, target)
@@ -69,7 +69,7 @@ func Loss[T float32 | float64](predicted, target T, mode LossType, params ...flo
 }
 
 // LossVector function for vector inputs (slices).
-func LossVector[T float32 | float64](predicted, target []T, mode LossType, params ...float64) T {
+func LossVector[T float32 | float64](predicted, target []T, mode Type, params ...float64) T {
 	if len(predicted) != len(target) {
 		// Return zero if slices have different lengths
 		return T(0)
