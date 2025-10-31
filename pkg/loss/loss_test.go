@@ -10,7 +10,7 @@ func TestLossFunctions(t *testing.T) {
 
 	tests := []struct {
 		name      string
-		mode      LossType
+		mode      Type
 		predicted float64
 		target    float64
 		expected  float64

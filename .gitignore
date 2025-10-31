@@ -85,3 +85,7 @@ build/
 .cursor/commands/
 .qwen/commands/
 .kilocode/workflows/
+
+# Rust
+rust/
+*.rs

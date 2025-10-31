@@ -18,7 +18,7 @@ func NewSigmoid[T utils.Float](slope T) *Sigmoid[T] {
 
 // Activation applies the sigmoid activation function: f(x) = 1 / (1 + exp(-slope * x))
 func (s *Sigmoid[T]) Activation(value T) T {
-	return T(1.0) / (T(1.0) + T(math.Exp(float64(-s.slope*value))))
+	return 1.0 / (1.0 + T(math.Exp(float64(-s.slope*value))))
 }
 
 // Derivative calculates the derivative of the sigmoid function

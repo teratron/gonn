@@ -9,6 +9,5 @@ func tanhActivation[T float32 | float64](value T) T {
 
 // TanH derivative function: f'(x) = 1 - tanh(x)^2
 func tanhDerivative[T float32 | float64](value T) T {
-	tanhVal := tanhActivation(value)
-	return T(1.0) - tanhVal*tanhVal
+	return T(1.0) - value*value
 }
