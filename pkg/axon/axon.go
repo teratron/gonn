@@ -19,10 +19,10 @@ type Axon[T utils.Float] struct {
 	Weight T
 
 	// Входная клетка: HiddenCell, InputCell, BiasCell
-	IncomingCell pkg.Nucleus[T]
+	IncomingCell *pkg.Nucleus[T]
 
 	// Выходная клетка: HiddenCell, OutputCell
-	OutgoingCell pkg.Neuron[T]
+	OutgoingCell *pkg.Neuron[T]
 }
 
 // New создает новый аксон со случайной инициализацией веса в диапазоне [-0.5, 0.5]
