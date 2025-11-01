@@ -1,6 +1,10 @@
+
 package cell
 
 import (
+	"github.com/teratron/gonn/pkg/activation"
+	"github.com/teratron/gonn/pkg/axon"
+	"github.com/teratron/gonn/pkg/nn"
 	"github.com/teratron/gonn/pkg/utils"
 )
 
@@ -9,14 +13,13 @@ import (
 // Аналог Rust HiddenCell
 type HiddenCell[T utils.Float] struct {
 	Core         *CoreCell[T]
-	OutgoingAxons []*Axon[T]
+	OutgoingAxons []*axon.Axon[T]
 }
 
 // NewHiddenCell создает новую скрытую клетку
-func NewHiddenCell[T utils.Float](activationMode ActivationMode) *HiddenCell[T] {
 	return &HiddenCell[T]{
-		Core:         NewCoreCell[T](activationMode),
-		OutgoingAxons: make([]*Axon[T], 0),
+		Core:          NewCoreCell[T](activationMode),
+		OutgoingAxons: make([]*axon.Axon[T], 0),
 	}
 }
 
@@ -56,25 +59,26 @@ func (h *HiddenCell[T]) Backward(target T) T {
 }
 
 // AddOutgoingConnection добавляет исходящую связь
-func (h *HiddenCell[T]) AddOutgoingConnection(target Neuron[T], weight T) {
-	axon := NewAxon[T](target, weight)
-	h.OutgoingAxons = append(h.OutgoingAxons, axon)
+func (h *HiddenCell[T]) AddOutgoingConnection(target nn.Neuron[T], weight T) {
+	newAxon := axon.New[T](h.Core, target)
+	newAxon.Weight = weight
+	h.OutgoingAxons = append(h.OutgoingAxons, newAxon)
 }
 
-// PropagateForward распространяет сигнал вперед по всем исходящим связям
+// PropagateForward распространует сигнал вперед по всем исходящим связям
 func (h *HiddenCell[T]) PropagateForward() {
 	h.Forward()
-	for _, axon := range h.OutgoingAxons {
-		axon.Target.Forward()
+	for _, a := range h.OutgoingAxons {
+		_ = a.CalculateValue()
 		// Здесь можно добавить логику накопления входных сигналов
 	}
 }
 
-// PropagateBackward распространяет ошибку назад по всем исходящим связям
+// PropagateBackward распространует ошибку назад по всем исходящим связям
 func (h *HiddenCell[T]) PropagateBackward(learningRate T) {
-	for _, axon := range h.OutgoingAxons {
+	for _, a := range h.OutgoingAxons {
 		// Вычисляем градиент для связи
-		axon.Delta = h.GetMiss() * axon.Target.GetValue()
-		axon.UpdateWeight(learningRate)
+		gradient := h.GetMiss() * *a.OutgoingCell.GetValue()
+		a.CalculateWeight(gradient * learningRate)
 	}
 }

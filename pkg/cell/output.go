@@ -1,6 +1,8 @@
 package cell
 
 import (
+	"github.com/teratron/gonn/pkg/activation"
+	"github.com/teratron/gonn/pkg/nn"
 	"github.com/teratron/gonn/pkg/utils"
 )
 
@@ -14,7 +16,7 @@ type OutputCell[T utils.Float] struct {
 }
 
 // NewOutputCell создает новую выходную клетку
-func NewOutputCell[T utils.Float](activationMode ActivationMode) *OutputCell[T] {
+func NewOutputCell[T utils.Float](activationMode activation.Type) *OutputCell[T] {
 	return &OutputCell[T]{
 		Core:      NewCoreCell[T](activationMode),
 		Target:    0,
@@ -81,7 +83,7 @@ func (o *OutputCell[T]) ClearTarget() {
 }
 
 // AddIncomingConnection добавляет входящую связь
-func (o *OutputCell[T]) AddIncomingConnection(source Neuron[T], weight T) {
+func (o *OutputCell[T]) AddIncomingConnection(source nn.Neuron[T], weight T) {
 	o.Core.AddIncomingConnection(source, weight)
 }
 
@@ -110,16 +112,19 @@ func (o *OutputCell[T]) GetSquaredError() T {
 
 // Reset сбрасывает состояние выходной клетки
 func (o *OutputCell[T]) Reset() {
-	o.Core.Reset()
+	o.Core.Miss = 0
+	o.Core.Value = 0
 	o.HasTarget = false
 }
 
 // SetBias устанавливает значение смещения
 func (o *OutputCell[T]) SetBias(bias T) {
-	o.Core.SetBias(bias)
+	// CoreCell[T] не имеет поля Bias, поэтому просто устанавливаем значение
+	o.Core.Value = bias
 }
 
 // GetBias возвращает текущее значение смещения
 func (o *OutputCell[T]) GetBias() T {
-	return o.Core.GetBias()
+	// CoreCell[T] не имеет поля Bias, возвращаем текущее значение
+	return o.Core.Value
 }

@@ -1,4 +1,4 @@
-package pkg
+package nn
 
 import (
 	"github.com/teratron/gonn/pkg/utils"
@@ -16,19 +16,19 @@ type Nucleus[T utils.Float] interface {
 // Содержит методы для прямого и обратного распространения
 type Neuron[T utils.Float] interface {
 	Nucleus[T]
-	
+
 	// GetMiss возвращает ошибку (разницу между целевым и полученным значением)
 	GetMiss() *T
-	
+
 	// CalculateValue вычисляет значение нейрона на основе входных сигналов
 	CalculateValue() *T
-	
+
 	// CalculateWeight вычисляет вес нейрона на основе ошибки
 	CalculateWeight(*T) T
-	
+
 	// Forward выполняет прямое распространение сигнала
 	//Forward() *T
-	
+
 	// Backward выполняет обратное распространение ошибки
 	//Backward(target *T) *T
 }

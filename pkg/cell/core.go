@@ -1,9 +1,9 @@
 package cell
 
 import (
-	"github.com/teratron/gonn/pkg"
 	"github.com/teratron/gonn/pkg/activation"
 	"github.com/teratron/gonn/pkg/axon"
+	"github.com/teratron/gonn/pkg/nn"
 	"github.com/teratron/gonn/pkg/utils"
 )
 
@@ -11,10 +11,10 @@ import (
 // Содержит value, miss, activation_mode, incoming_axons
 // Аналог Rust CoreCell
 type CoreCell[T utils.Float] struct {
-	Value          T                    // Текущее значение клетки
-	Miss           T                    // Ошибка (разница между целевым и полученным значением)
-	ActivationMode activation.Type      // Тип функции активации
-	IncomingAxons  axon.AxonBundle[T]  // Входящие связи от других клеток
+	Value          T               // Текущее значение клетки
+	Miss           T               // Ошибка (разница между целевым и полученным значением)
+	ActivationMode activation.Type // Тип функции активации
+	IncomingAxons  axon.Bundle[T]  // Входящие связи от других клеток
 }
 
 // NewCoreCell создает новую клетку с указанным типом активации
@@ -23,22 +23,22 @@ func NewCoreCell[T utils.Float](activationMode activation.Type) *CoreCell[T] {
 		Value:          0,
 		Miss:           0,
 		ActivationMode: activationMode,
-		IncomingAxons:  make(axon.AxonBundle[T], 0),
+		IncomingAxons:  make(axon.Bundle[T], 0),
 	}
 }
 
 // GetValue возвращает текущее значение клетки
-func (c *CoreCell[T]) GetValue() T {
-	return c.Value
+func (c *CoreCell[T]) GetValue() *T {
+	return &c.Value
 }
 
 // GetMiss возвращает текущую ошибку клетки
-func (c *CoreCell[T]) GetMiss() T {
-	return c.Miss
+func (c *CoreCell[T]) GetMiss() *T {
+	return &c.Miss
 }
 
 // AddIncomingConnection добавляет входящую связь
-func (c *CoreCell[T]) AddIncomingConnection(incoming pkg.Nucleus[T], outgoing pkg.Neuron[T]) {
+func (c *CoreCell[T]) AddIncomingConnection(incoming nn.Nucleus[T], outgoing nn.Neuron[T]) {
 	axon := axon.New[T](incoming, outgoing)
 	c.IncomingAxons = append(c.IncomingAxons, *axon)
 }
@@ -62,4 +62,3 @@ func (c *CoreCell[T]) CalculateWeight(rate T) T {
 	}
 	return gradient
 }
-
