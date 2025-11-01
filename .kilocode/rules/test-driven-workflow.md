@@ -4,7 +4,7 @@
 
 This document outlines the test-driven development (TDD) workflow for this Go project. Adherence to these rules is mandatory to ensure code quality, maintainability, and robustness. Every change must be validated through this process.
 
-## Core Principles
+## core Principles
 
 - **Test-First Approach**: All code modifications (bug fixes, new features, refactoring) must be covered by Go unit tests. If tests are missing for the modified code, the first step is to write them using the standard `testing` package.
 - **Isolate and Conquer**: When tests reveal failures in unrelated modules, create a new, dedicated task to debug and fix the separate problem. Do not proceed with the original task until the blocking issue is resolved.

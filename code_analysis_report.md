@@ -1,20 +1,20 @@
-# Отчет анализа кода - GoNN проект
+# Code Analysis Report - GoNN Project
 
-## Обзор анализа
+## Analysis Overview
 
-Проведен комплексный анализ кода проекта GoNN (нейронная сеть на Go) на предмет выявления синтаксических ошибок, логических проблем и нарушений best practices.
+A comprehensive analysis of the GoNN project code (Go neural network) was conducted to identify syntax errors, logical issues, and violations of best practices.
 
-## Критические проблемы
+## Critical Issues
 
-### 1. Синтаксические ошибки в примере
+### 1. Syntax errors in the example
 
-**Файл:** `examples/perceptron/main.go`
-**Строки:** 22-27
+**File:** `examples/perceptron/main.go`
+**Lines:** 22-27
 
-**Проблема:** Используется некорректный синтаксис, напоминающий C++ вместо Go:
+**Problem:** Incorrect syntax is used, resembling C++ instead of Go:
 
 ```go
-// НЕПРАВИЛЬНО:
+// INCORRECT:
 n.SetHiddenLayers(&[
     (3, Activation::Sigmoid, true),
     (5, Activation::ReLU, true),
@@ -22,13 +22,13 @@ n.SetHiddenLayers(&[
 ])
 ```
 
-**Ошибки:**
+**Errors:**
 
-- `&[` - не является корректным синтаксисом Go
-- `Activation::Sigmoid` - используется C++-подобный синтаксис
-- Go не поддерживает кортежи в таком формате
+- `&[` is not valid Go syntax
+- `Activation::Sigmoid` uses C++-like syntax
+- Go does not support tuples in this format
 
-**Решение:** Использовать правильный Go синтаксис с структурой:
+**Solution:** Use proper Go syntax with a structure:
 
 ```go
 n.SetHiddenLayers(
@@ -38,99 +38,99 @@ n.SetHiddenLayers(
 )
 ```
 
-### 2. Проблемы именования типов
+### 2. Type naming problems
 
-**Файл:** `pkg/nn/nn.go`
-**Строка:** 18
+**File:** `pkg/nn/nn.go`
+**Line:** 18
 
-**Проблема:** Несоответствие в именовании типа активации:
+**Problem:** Inconsistency in activation type naming:
 
-- В `pkg/activation/activation.go` тип определен как `Type`
-- В `pkg/nn/nn.go` ожидается `ActivationType`
+- In `pkg/activation/activation.go` type is defined as `Type`
+- In `pkg/nn.go` `ActivationType` is expected
 
-**Решение:** Привести к единообразию - использовать `activation.Type` или переименовать в `activation.ActivationType`.
+**Solution:** Standardize to use `activation.Type` or rename to `activation.ActivationType`.
 
-### 3. Незавершенная реализация методов
+### 3. Unfinished method implementations
 
-**Файл:** `pkg/nn/nn.go`
-**Функции:** `New()`, `SetHiddenLayers()`
+**File:** `pkg/nn/nn.go`
+**Functions:** `New()`, `SetHiddenLayers()`
 
-**Проблемы:**
+**Problems:**
 
-- `New()` создает пустую структуру без инициализации
-- `SetHiddenLayers()` игнорирует входные параметры и возвращает пустую структуру
-- Отсутствует реальная логика нейронной сети
+- `New()` creates an empty structure without initialization
+- `SetHiddenLayers()` ignores input parameters and returns an empty structure
+- Missing actual neural network logic
 
-### 4. Несоответствие в использовании дженериков
+### 4. Inconsistency in using generics
 
-**Найдены смешанные подходы:**
+**Mixed approaches found:**
 
-1. **Старый стиль (в некоторых файлах):**
+1. **Old style (in some files):**
 
     ```go
     func elishActivation[T float32 | float64](value T) T
     ```
 
-2. **Новый стиль (в других файлах):**
+2. **New style (in other files):**
 
     ```go
     func Activation[T utils.Float](value T, mode Type, params ...float64) T
     ```
 
-**Проблема:** Непоследовательность в использовании ограничений типов.
+**Problem:** Inconsistency in using type constraints.
 
-## Минорные проблемы
+## Minor Issues
 
-### 1. Импорты
+### 1. Imports
 
-- В `examples/perceptron/main.go` закомментированы импорты `loss` и `activation`
-- Это указывает на незавершенную функциональность
+- In `examples/perceptron/main.go`, imports for `loss` and `activation` are commented out
+- This indicates incomplete functionality
 
-### 2. Форматирование кода
+### 2. Code formatting
 
-- Некоторые файлы имеют неравномерные отступы
-- В `pkg/activation/activation.go` есть проблемы с форматированием switch-case блоков
+- Some files have uneven indentation
+- In `pkg/activation/activation.go` there are formatting issues with switch-case blocks
 
-## Проблемы с производительностью
+## Performance Issues
 
-### 1. Повторные вычисления
+### 1. Repetitive calculations
 
-В `pkg/activation/sigmoid.go`:
+In `pkg/activation/sigmoid.go`:
 
 ```go
-// Неэффективно:
+// Inefficient:
 sigmoidValue := s.Activation(value)
 return s.slope * sigmoidValue * (T(1.0) - sigmoidValue)
 ```
 
-**Улучшение:** Кэширование промежуточных результатов.
+**Improvement:** Caching intermediate results.
 
-### 2. Отсутствие проверок
+### 2. Missing checks
 
-В `pkg/loss/loss.go` функция `LossVector` не проверяет входные параметры на `nil`.
+In `pkg/loss/loss.go` function `LossVector` does not check input parameters for `nil`.
 
-## Рекомендации по исправлению
+## Recommendations for fixes
 
-### Высокий приоритет
+### High priority
 
-1. **Исправить синтаксические ошибки** в `examples/perceptron/main.go`
-2. **Привести к единообразию именование типов** активации
-3. **Реализовать базовую логику** методов в `pkg/nn/nn.go`
+1. **Fix syntax errors** in `examples/perceptron/main.go`
+2. **Standardize activation type naming**
+3. **Implement basic logic** for methods in `pkg/nn/nn.go`
 
-### Средний приоритет
+### Medium priority
 
-1. **Стандартизировать использование дженериков** во всем проекте
-2. **Добавить проверки ошибок** и валидацию входных данных
-3. **Улучшить форматирование кода**
+1. **Standardize use of generics** throughout the project
+2. **Add error checks** and input validation
+3. **Improve code formatting**
 
-### Низкий приоритет
+### Low priority
 
-1. **Добавить документацию** к экспортируемым функциям
-2. **Оптимизировать производительность** критических функций
-3. **Добавить unit тесты** для всех публичных функций
+1. **Add documentation** to exported functions
+2. **Optimize performance** of critical functions
+3. **Add unit tests** for all public functions
 
-## Заключение
+## Conclusion
 
-Проект имеет хорошую структуру и архитектуру, но содержит несколько критических ошибок, которые препятствуют компиляции. Основные проблемы связаны с синтаксическими ошибками в примерах и незавершенной реализацией основной логики нейронной сети.
+The project has a good structure and architecture, but contains several critical errors that prevent compilation. The main issues are related to syntax errors in examples and incomplete implementation of core neural network logic.
 
-После исправления критических ошибок проект будет готов к дальнейшей разработке и тестированию.
+After fixing critical errors, the project will be ready for further development and testing.

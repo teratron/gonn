@@ -7,19 +7,18 @@ import (
 	"github.com/teratron/gonn/pkg/utils"
 )
 
-// CoreCell представляет основную функциональность нейронной клетки
-// Содержит value, miss, activation_mode, incoming_axons
-// Аналог Rust CoreCell
-type CoreCell[T utils.Float] struct {
+// core represents the core functionality of a neural cell
+// Contains value, miss, activation_mode, incoming_axons
+type core[T utils.Float] struct {
 	Value          T               // Текущее значение клетки
 	Miss           T               // Ошибка (разница между целевым и полученным значением)
 	ActivationMode activation.Type // Тип функции активации
 	IncomingAxons  axon.Bundle[T]  // Входящие связи от других клеток
 }
 
-// NewCoreCell создает новую клетку с указанным типом активации
-func NewCoreCell[T utils.Float](activationMode activation.Type) *CoreCell[T] {
-	return &CoreCell[T]{
+// newCore creates a new cell with specified activation type
+func newCore[T utils.Float](activationMode activation.Type) *core[T] {
+	return &core[T]{
 		Value:          0,
 		Miss:           0,
 		ActivationMode: activationMode,
@@ -27,24 +26,23 @@ func NewCoreCell[T utils.Float](activationMode activation.Type) *CoreCell[T] {
 	}
 }
 
-// GetValue возвращает текущее значение клетки
-func (c *CoreCell[T]) GetValue() *T {
+// GetValue returns the current cell value
+func (c *core[T]) GetValue() *T {
 	return &c.Value
 }
 
-// GetMiss возвращает текущую ошибку клетки
-func (c *CoreCell[T]) GetMiss() *T {
+// GetMiss returns the current cell error
+func (c *core[T]) GetMiss() *T {
 	return &c.Miss
 }
 
-// AddIncomingConnection добавляет входящую связь
-func (c *CoreCell[T]) AddIncomingConnection(incoming nn.Nucleus[T], outgoing nn.Neuron[T]) {
-	axon := axon.New[T](incoming, outgoing)
-	c.IncomingAxons = append(c.IncomingAxons, *axon)
+// AddIncomingConnection adds an incoming connection
+func (c *core[T]) AddIncomingConnection(incoming nn.Nucleus[T], outgoing nn.Neuron[T]) {
+	c.IncomingAxons = append(c.IncomingAxons, *axon.New[T](incoming, outgoing))
 }
 
-// CalculateValue вычисляет значение клетки на основе входящих сигналов (прямое распространение)
-func (c *CoreCell[T]) CalculateValue() T {
+// CalculateValue calculates the cell value based on incoming signals (forward propagation)
+func (c *core[T]) CalculateValue() T {
 	c.Value = 0
 	for _, a := range c.IncomingAxons {
 		c.Value += a.CalculateValue()
@@ -53,8 +51,8 @@ func (c *CoreCell[T]) CalculateValue() T {
 	return c.Value
 }
 
-// CalculateWeight вычисляет вес на основе ошибки (обратное распространение)
-func (c *CoreCell[T]) CalculateWeight(rate T) T {
+// CalculateWeight calculates weight based on error (backward propagation)
+func (c *core[T]) CalculateWeight(rate T) T {
 	derivative := activation.Derivative(c.Value, c.ActivationMode)
 	gradient := rate * c.Miss * derivative
 	for i := range c.IncomingAxons {

@@ -11,8 +11,7 @@ import (
 // Bundle представляет коллекцию аксонов
 type Bundle[T utils.Float] []Axon[T]
 
-// Axon представляет связь между клетками нейронной сети
-// Аналог Rust структуры Axon<T>
+// Axon represents a connection between neural network cells
 type Axon[T utils.Float] struct {
 	// Вес аксона
 	Weight T
@@ -24,13 +23,11 @@ type Axon[T utils.Float] struct {
 	OutgoingCell nn.Neuron[T]
 }
 
-// New создает новый аксон со случайной инициализацией веса в диапазоне [-0.5, 0.5]
-// Аналог Rust конструктора pub(super) fn new()
+// New creates a new axon with random weight initialization in range [-0.5, 0.5]
 func New[T utils.Float](
 	incomingCell nn.Nucleus[T],
 	outgoingCell nn.Neuron[T],
 ) *Axon[T] {
-	// Инициализация генератора случайных чисел с текущим временем
 	// Create a local random generator with current time as seed
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
 
@@ -41,23 +38,20 @@ func New[T utils.Float](
 	}
 }
 
-// CalculateValue выполняет прямое распространение сигнала
-// Аналог Rust метода pub(super) fn calculate_value(&self) -> T
-// Формула: *incoming_cell.GetValue() * weight
+// CalculateValue performs forward propagation of the signal
+// Formula: *incoming_cell.GetValue() * weight
 func (a *Axon[T]) CalculateValue() T {
 	return *a.IncomingCell.GetValue() * a.Weight
 }
 
-// CalculateMiss выполняет обратное распространение ошибки
-// Аналог Rust метода pub(super) fn calculate_miss(&self) -> T
-// Формула: *outgoing_cell.GetMiss() * weight
+// CalculateMiss performs backward propagation of the error
+// Formula: *outgoing_cell.GetMiss() * weight
 func (a *Axon[T]) CalculateMiss() T {
 	return *a.OutgoingCell.GetMiss() * a.Weight
 }
 
-// CalculateWeight обновляет вес аксона на основе градиента
-// Аналог Rust метода pub(super) fn calculate_weight(&mut self, gradient: &T)
-// Формула: weight += gradient * *incoming_cell.GetValue()
+// CalculateWeight updates the axon weight based on gradient
+// Formula: weight += gradient * *incoming_cell.GetValue()
 func (a *Axon[T]) CalculateWeight(gradient T) {
 	a.Weight += gradient * *a.IncomingCell.GetValue()
 }

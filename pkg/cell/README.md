@@ -46,7 +46,7 @@ type Neuron[T utils.Float] interface {
 
 ## Типы клеток
 
-### InputCell
+### Input
 
 Входная клетка, которая содержит ссылку на исходные данные и не обучается.
 
@@ -68,7 +68,7 @@ value := inputCell.GetValue()
 - Может содержать ссылку на исходные данные
 - Поддерживает прямое и обратное распространение
 
-### HiddenCell
+### Hidden
 
 Скрытая клетка, которая содержит основную функциональность и исходящие связи.
 
@@ -77,7 +77,7 @@ value := inputCell.GetValue()
 hiddenCell := cell.NewHiddenCell[float32](cell.SIGMOID)
 
 // Добавление входящей связи
-hiddenCell.Core.AddIncomingConnection(inputCell, 0.8)
+hiddenCell.core.AddIncomingConnection(inputCell, 0.8)
 
 // Добавление исходящей связи
 hiddenCell.AddOutgoingConnection(outputCell, 0.6)
@@ -91,7 +91,7 @@ weight := hiddenCell.Backward(0.1)
 
 **Особенности:**
 
-- Содержит `CoreCell` с базовой функциональностью
+- Содержит `core` с базовой функциональностью
 - Поддерживает множественные входящие и исходящие связи
 - Использует функции активации
 
@@ -141,7 +141,7 @@ value := biasCell.GetValue()
 - Не обучается
 - Используется для добавления смещения к нейронам
 
-### CoreCell
+### core
 
 Базовая структура, которая содержит общую функциональность для всех клеток.
 
@@ -245,10 +245,10 @@ func main() {
     output := cell.NewOutputCell[float32](cell.SIGMOID)
     
     // Устанавливаем связи
-    hidden.Core.AddIncomingConnection(input1, 0.8)
-    hidden.Core.AddIncomingConnection(input2, 0.6)
+    hidden.core.AddIncomingConnection(input1, 0.8)
+    hidden.core.AddIncomingConnection(input2, 0.6)
     
-    output.Core.AddIncomingConnection(hidden, 0.7)
+    output.core.AddIncomingConnection(hidden, 0.7)
     
     // Прямое распространение
     hidden.Forward()
@@ -273,8 +273,8 @@ tanhCell := cell.NewHiddenCell[float32](cell.TANH)
 linearCell := cell.NewHiddenCell[float32](cell.LINEAR)
 
 // Устанавливаем значения и вычисляем
-for _, cell := range []*cell.HiddenCell[float32]{sigmoidCell, reluCell, tanhCell, linearCell} {
-    cell.Core.SetBias(1.0)
+for _, cell := range []*cell.Hidden[float32]{sigmoidCell, reluCell, tanhCell, linearCell} {
+    cell.core.SetBias(1.0)
     value := cell.Forward()
     fmt.Printf("Значение: %f\n", value)
 }
@@ -324,18 +324,18 @@ go test -v ./pkg/cell/... -run TestNeuronInterface
 ### Основные файлы
 
 - `cell.go` - определения интерфейсов и базовых структур
-- `core.go` - реализация CoreCell
-- `input.go` - реализация InputCell
-- `hidden.go` - реализация HiddenCell
+- `core.go` - реализация core
+- `input.go` - реализация Input
+- `hidden.go` - реализация Hidden
 - `output.go` - реализация OutputCell
 - `bias.go` - реализация BiasCell
 
 ### Тестовые файлы
 
 - `cell_test.go` - общие тесты интерфейсов и связей
-- `core_test.go` - тесты CoreCell
-- `input_test.go` - тесты InputCell
-- `hidden_test.go` - тесты HiddenCell
+- `core_test.go` - тесты core
+- `input_test.go` - тесты Input
+- `hidden_test.go` - тесты Hidden
 - `output_test.go` - тесты OutputCell
 - `bias_test.go` - тесты BiasCell
 
