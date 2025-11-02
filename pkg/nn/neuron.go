@@ -21,14 +21,14 @@ type Neuron[T utils.Float] interface {
 	GetMiss() *T
 
 	// CalculateValue calculates the neuron value based on input signals
-	CalculateValue() *T
+	CalculateValue()
 
 	// CalculateWeight calculates the neuron weight based on error
-	CalculateWeight(*T) T
+	CalculateWeight(*T)
 
-	// Forward performs forward propagation of the signal
+	// Forward performs propagation of the signal
 	//Forward() *T
 
-	// Backward performs backward propagation of the error
+	// Backward performs propagation of the error
 	//Backward(target *T) *T
 }

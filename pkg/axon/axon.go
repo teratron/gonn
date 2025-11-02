@@ -16,10 +16,10 @@ type Axon[T utils.Float] struct {
 	// Вес аксона
 	Weight T
 
-	// Входная клетка: HiddenCell, InputCell, BiasCell
+	// Входная клетка: Hidden, Input, Bias
 	IncomingCell nn.Nucleus[T]
 
-	// Выходная клетка: HiddenCell, OutputCell
+	// Выходная клетка: Hidden, Output
 	OutgoingCell nn.Neuron[T]
 }
 
@@ -52,6 +52,6 @@ func (a *Axon[T]) CalculateMiss() T {
 
 // CalculateWeight updates the axon weight based on gradient
 // Formula: weight += gradient * *incoming_cell.GetValue()
-func (a *Axon[T]) CalculateWeight(gradient T) {
-	a.Weight += gradient * *a.IncomingCell.GetValue()
+func (a *Axon[T]) CalculateWeight(gradient *T) {
+	a.Weight += *gradient * *a.IncomingCell.GetValue()
 }
