@@ -1,7 +1,7 @@
 package nn
 
 import (
-	"log"
+	"log/slog"
 	"os"
 
 	"github.com/teratron/gonn/pkg/activation"
@@ -11,29 +11,28 @@ import (
 )
 
 type NN[T utils.Float] struct {
-	*log.Logger
-
 	Bias       bool
 	Rate       T
 	Activation activation.Type
 	Loss       loss.Type
 	Network    []network.Network[T]
 
+	logger *slog.Logger
 	isInit  bool
 	isQuery bool
 }
 
 func New[T utils.Float]() *NN[T] {
-	logger := log.New(os.Stdout, "", log.LstdFlags)
-	logger.Println("Neural network initialized")
+	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
+	logger.Info("Neural network initialized")
 
 	return &NN[T]{
-		Logger:     logger,
 		Bias:       true,
 		Rate:       T(0.01),
 		Activation: activation.RELU,
 		Loss:       loss.MSE,
 		Network:    []network.Network[T]{},
+		logger:     logger,
 		isInit:     false,
 		isQuery:    false,
 	}
