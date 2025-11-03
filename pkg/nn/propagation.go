@@ -2,66 +2,54 @@ package nn
 
 import (
 	"github.com/teratron/gonn/pkg/loss"
-	//"github.com/teratron/gonn/pkg/utils"
-	//"github.com/teratron/gonn/pkg/network"
+	"github.com/teratron/gonn/pkg/utils"
+	"github.com/teratron/gonn/pkg/cell"
 )
 
+// Forward propagation methods
+
+// CalculateValues calculates the value of all neurons in the network
 func (n *NN[T]) calculateValues() {
     for _, cell := range n.Network.Cells {
         cell.CalculateValue()
     }
 }
 
-func (n *NN[T]) calculateLoss() {
-    loss.CalculateTotalLoss(n.Network.Output.GetMisses(), n.Loss)
+// CalculateLoss calculates and returns the total error of the output neurons
+func (n *NN[T]) calculateLoss() T {
+    return loss.CalculateTotalLoss(n.Network.Output.GetMisses(), n.Loss)
 }
 
-/*
-use super::loss::get_total_loss;
-use super::{Float, Rustunumic};
-use tracing::{trace};
+// Backward propagation methods
 
-impl<T: Float> Rustunumic<'_, T> {
-    //////////////////////////////////////////////////////////////////////////
-    // Forward propagation.
-    //////////////////////////////////////////////////////////////////////////
-
-    /// Calculating neuron's value.
-    pub(super) fn calculate_values(&mut self) {
-        self.network
-            .cells
-            .iter_mut()
-            .for_each(|n| n.calculate_value())
+// CalculateMisses calculates the error of hidden neurons
+// Implements backward propagation by processing neurons in reverse order
+func (n *NN[T]) calculateMisses() *NN[T] {
+    // Process hidden neurons in reverse order for backpropagation
+    cells := n.Network.Hidden.Cells
+    for i := len(cells) - 1; i >= 0; i-- {
+        calculateMissForHidden(cells[i])
     }
+    return n
+}
 
-    /// Calculating and return the total error of the output neurons.
-    pub(super) fn calculate_loss(&self) -> T {
-        get_total_loss(self.network.output.get_misses(), &self.loss_mode)
-    }
-
-    //////////////////////////////////////////////////////////////////////////
-    // Backward propagation.
-    //////////////////////////////////////////////////////////////////////////
-
-    /// Calculating the error of neuron.
-    pub(super) fn calculate_misses(&mut self) -> &mut Self {
-        self.network
-            .hidden
-            .cells
-            .iter_mut()
-            .rev()
-            .for_each(|n| n.calculate_miss());
-        self
-    }
-
-    /// Update weights.
-    pub(super) fn calculate_weights(&mut self) {
-        trace!("Updating weights for {} cells", self.network.cells.len());
-        self.network
-            .cells
-            .iter_mut()
-            .for_each(|n| n.calculate_weight(&self.rate));
-        trace!("Weight update completed");
+// Helper function to calculate miss for a hidden neuron
+// This simulates the calculate_miss() method from the Rust implementation
+func calculateMissForHidden[T utils.Float](neuron *cell.Hidden[T]) {
+    // Accumulate error from each outgoing connection using the axon's CalculateMiss method logic
+    // In backpropagation, the error contribution from each outgoing axon is:
+    // error_from_next_layer * weight_of_connection
+    neuron.Core.Miss = 0 // Reset miss before accumulating
+    for _, axon := range neuron.OutgoingAxons {
+        // Calculate the error contribution from this axon to the current neuron
+        neuron.Core.Miss += axon.CalculateMiss()
     }
 }
-*/
+
+// CalculateWeights updates weights of all neurons in the network
+func (n *NN[T]) calculateWeights() {
+    // Update weights for all neurons in the network
+    for _, neuron := range n.Network.Cells {
+        neuron.CalculateWeight(&n.Rate)
+    }
+}
