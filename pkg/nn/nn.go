@@ -17,7 +17,7 @@ func init() {
 }
 
 type NN[T utils.Float] struct {
-	Network    []network.Network[T]
+	Network    network.Network[T]
 	Activation activation.Type
 	Loss       loss.Type
 	Rate       T
@@ -32,7 +32,7 @@ func New[T utils.Float]() *NN[T] {
 	Logger.Info("Neural network initialized")
 
 	return &NN[T]{
-		Network:    []network.Network[T]{},
+		Network:    network.New[T](),
 		Activation: activation.DEFAULT,
 		Loss:       loss.DEFAULT,
 		Rate:       0.3,

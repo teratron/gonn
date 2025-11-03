@@ -1,6 +1,10 @@
 package loss
 
-import "math"
+import (
+	"math"
+
+	"github.com/teratron/gonn/pkg/utils"
+)
 
 // LossType represents different loss functions.
 type Type uint8
@@ -26,6 +30,27 @@ const (
 	ARCTAN                // ARCTAN - Arctan Error
 	DEFAULT   = MSE
 )
+
+func CalculateTotalLoss[T utils.Float](misses []T, mode *Type) T {
+    var loss T = 0.0
+    var count T = 0.0
+	for _, miss := range misses {
+		loss += Loss(miss, mode)
+		count += 1.0
+	}
+
+    // misses.into_iter().for_each(|m| {
+    //     loss += get_loss(m, mode);
+    //     count += 1.0;
+    // })
+    if count > 1.0 {
+        loss /= count
+    }
+    if *mode == RMSE {
+        loss = T(math.Sqrt(loss))
+    }
+    return loss
+}
 
 // Loss function for single values.
 func Loss[T float32 | float64](predicted, target T, mode Type, params ...float64) T {
@@ -70,42 +95,42 @@ func Loss[T float32 | float64](predicted, target T, mode Type, params ...float64
 }
 
 // LossVector function for vector inputs (slices).
-func LossVector[T float32 | float64](predicted, target []T, mode Type, params ...float64) T {
-	if len(predicted) != len(target) {
-		// Return zero if slices have different lengths
-		return T(0)
-	}
+// func LossVector[T float32 | float64](predicted, target []T, mode Type, params ...float64) T {
+// 	if len(predicted) != len(target) {
+// 		// Return zero if slices have different lengths
+// 		return T(0)
+// 	}
 
-	switch mode {
-	case CCE:
-		// CCE has special implementation for vectors
-		return cceLoss(predicted, target)
-	case COSINE:
-		// Cosine similarity/distance needs special handling
-		return cosineLossVector(predicted, target)
-	default:
-		// For other functions, calculate as before
-		var total T
-		n := len(predicted)
-		for i := 0; i < n; i++ {
-			total += Loss(predicted[i], target[i], mode, params...)
-		}
+// 	switch mode {
+// 	case CCE:
+// 		// CCE has special implementation for vectors
+// 		return cceLoss(predicted, target)
+// 	case COSINE:
+// 		// Cosine similarity/distance needs special handling
+// 		return cosineLossVector(predicted, target)
+// 	default:
+// 		// For other functions, calculate as before
+// 		var total T
+// 		n := len(predicted)
+// 		for i := 0; i < n; i++ {
+// 			total += Loss(predicted[i], target[i], mode, params...)
+// 		}
 
-		switch mode {
-		case MSE, MSLE, LOG_COSH:
-			// For squared error functions, return the mean
-			return total / T(n)
-		case RMSE:
-			// For RMSE, return the square root of the mean squared error
-			return T(math.Sqrt(float64(total / T(n))))
-		case MAE, AVG, MAPE, ARCTAN:
-			// For absolute error functions, return the mean
-			return total / T(n)
-		case BCE, KLD, POISSON, HINGE, SQ_HINGE, CAT_HINGE, HUBER:
-			// For other loss functions, return the mean
-			return total / T(n)
-		default:
-			return total / T(n)
-		}
-	}
-}
+// 		switch mode {
+// 		case MSE, MSLE, LOG_COSH:
+// 			// For squared error functions, return the mean
+// 			return total / T(n)
+// 		case RMSE:
+// 			// For RMSE, return the square root of the mean squared error
+// 			return T(math.Sqrt(float64(total / T(n))))
+// 		case MAE, AVG, MAPE, ARCTAN:
+// 			// For absolute error functions, return the mean
+// 			return total / T(n)
+// 		case BCE, KLD, POISSON, HINGE, SQ_HINGE, CAT_HINGE, HUBER:
+// 			// For other loss functions, return the mean
+// 			return total / T(n)
+// 		default:
+// 			return total / T(n)
+// 		}
+// 	}
+// }

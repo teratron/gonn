@@ -6,6 +6,7 @@ import (
 
 // Nucleus - base interface for all neural network cells
 // Interface for neural network cells with method GetValue()
+// For types: Hidden, Input, Output, Bias.
 type Nucleus[T utils.Float] interface {
 	// GetValue возвращает текущее значение клетки
 	GetValue() *T
@@ -14,6 +15,7 @@ type Nucleus[T utils.Float] interface {
 // Neuron - interface for neurons with learning capability
 // Interface for neurons (inherits from Nucleus)
 // Contains methods for forward and backward propagation
+// For types: Hidden, Output.
 type Neuron[T utils.Float] interface {
 	Nucleus[T]
 

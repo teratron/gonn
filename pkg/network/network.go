@@ -9,7 +9,7 @@ import (
 // Network
 type Network[T utils.Float] struct {
 	// All working neurons.
-	cells []neuron.Neuron[T]
+	Cells []neuron.Neuron[T]
 
 	// Input neurons.
 	input *Bundle[T, *cell.Input[T]]
@@ -22,8 +22,8 @@ type Network[T utils.Float] struct {
 }
 
 // NewNetwork
-func NewNetwork[T utils.Float]() *Network[T] {
-	return &Network[T]{
+func New[T utils.Float]() Network[T] {
+	return Network[T]{
 		cells:  make([]neuron.Neuron[T], 0),
 		input:  NewBundle[T, *cell.Input[T]](),
 		output: NewBundle[T, *cell.Output[T]](),
