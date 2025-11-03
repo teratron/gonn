@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/teratron/gonn/pkg/nn"
+	"github.com/teratron/gonn/pkg/neuron"
 	"github.com/teratron/gonn/pkg/utils"
 )
 
@@ -17,16 +17,16 @@ type Axon[T utils.Float] struct {
 	Weight T
 
 	// Входная клетка: Hidden, Input, Bias
-	IncomingCell nn.Nucleus[T]
+	IncomingCell neuron.Nucleus[T]
 
 	// Выходная клетка: Hidden, Output
-	OutgoingCell nn.Neuron[T]
+	OutgoingCell neuron.Neuron[T]
 }
 
 // New creates a new axon with random weight initialization in range [-0.5, 0.5]
 func New[T utils.Float](
-	incomingCell nn.Nucleus[T],
-	outgoingCell nn.Neuron[T],
+	incomingCell neuron.Nucleus[T],
+	outgoingCell neuron.Neuron[T],
 ) *Axon[T] {
 	// Create a local random generator with current time as seed
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))

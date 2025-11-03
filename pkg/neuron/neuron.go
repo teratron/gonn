@@ -1,4 +1,4 @@
-package nn
+package neuron
 
 import (
 	"github.com/teratron/gonn/pkg/utils"

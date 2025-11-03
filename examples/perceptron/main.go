@@ -15,15 +15,15 @@ func main() {
 	dataSet := []float32{.27, -.31, -.52, .66, .81, -.13, .2, .49, .11, -.73, .28} // Dataset.
 	lenInput := 3                                                                  // Number of input data.
 	lenOutput := 2                                                                 // Number of output data.
-	lenData := len(dataSet) - int(lenOutput)
+	lenData := len(dataSet) - lenOutput
 	start := time.Now() // Starting the timer.
 
 	// Set properties.
 	n.SetHiddenLayers(
 		// neurons, activation, bias
-		nn.HiddenLayer{Number: 3, Activation: activation.SIGMOID, Bias: true},
-		nn.HiddenLayer{Number: 5, Activation: activation.RELU, Bias: true},
-		nn.HiddenLayer{Number: 3, Activation: activation.SIGMOID, Bias: false},
+		nn.HiddenLayer{Number: 3, Activation: activation.SIGMOID, Bias: true},  // 1st hidden layer.
+		nn.HiddenLayer{Number: 5, Activation: activation.RELU, Bias: true},     // 2nd hidden layer.
+		nn.HiddenLayer{Number: 3, Activation: activation.SIGMOID, Bias: false}, // 3rd hidden layer.
 	).SetOutputLayer(
 		// neurons, activation, loss, bias
 		uint(lenOutput), activation.SIGMOID, loss.ARCTAN, false,
@@ -36,7 +36,7 @@ func main() {
 		}
 
 		// Verifying.
-		sum, num := 0., 0.
+		sum, num := 0.0, 0.0
 		for i := lenInput; i <= lenData; i++ {
 			//sum += n.Verify(dataSet[i-lenInput:i], dataSet[i:i+lenOutput])
 			num++
@@ -44,7 +44,7 @@ func main() {
 
 		// Average error for the entire epoch.
 		// Exiting the cycle of learning epochs, when the minimum error level is reached.
-		if num > 0 && sum/num < 1e-6 /*n.GetLossLimit*/ {
+		if num > 0.0 && sum/num < 1e-6 /*n.GetLossLimit*/ {
 			break
 		}
 	}
