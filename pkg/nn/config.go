@@ -33,7 +33,7 @@ func (n *NN[T]) SetOutputLayer(number uint, activation activation.Type, loss los
 // SetRate sets the learning rate for the neural network
 func (n *NN[T]) SetRate(value float64) *NN[T] {
 	if value < 0.0 {
-		n.logger.Warn("Rate cannot be negative", "value", value)
+		Logger.Warn("Rate cannot be negative", "value", value)
 		return n
 	}
 	n.Rate = T(value)

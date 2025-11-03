@@ -6,7 +6,7 @@ import (
 	"github.com/teratron/gonn/pkg/utils"
 )
 
-// Network is the Go equivalent of the Rust Network struct
+// Network
 type Network[T utils.Float] struct {
 	// All working neurons.
 	cells []neuron.Neuron[T]
@@ -21,7 +21,7 @@ type Network[T utils.Float] struct {
 	hidden *Bundle[T, *cell.Hidden[T]]
 }
 
-// NewNetwork is the Go equivalent of the Rust new() function
+// NewNetwork
 func NewNetwork[T utils.Float]() *Network[T] {
 	return &Network[T]{
 		cells:  make([]neuron.Neuron[T], 0),

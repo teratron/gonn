@@ -19,6 +19,7 @@ const (
 	SOFTMAX               // SOFTMAX - Softmax (Note: Current implementation is a placeholder for single values, requires vector for full functionality).
 	SWISH                 // SWISH - Swish-function.
 	TANH                  // TANH - TanH (hyperbolic tangent).
+	DEFAULT   = LINEAR
 )
 
 type ActivationFunction[T utils.Float] interface {

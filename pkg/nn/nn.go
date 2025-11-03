@@ -10,29 +10,34 @@ import (
 	"github.com/teratron/gonn/pkg/utils"
 )
 
+var Logger *slog.Logger
+
+func init() {
+	Logger = slog.New(slog.NewTextHandler(os.Stdout, nil))
+}
+
 type NN[T utils.Float] struct {
-	Bias       bool
-	Rate       T
+	Network    []network.Network[T]
 	Activation activation.Type
 	Loss       loss.Type
-	Network    []network.Network[T]
-
-	logger *slog.Logger
-	isInit  bool
-	isQuery bool
+	Rate       T
+	Bias       bool
+	//logger     *slog.Logger
+	isInit     bool
+	isQuery    bool
 }
 
 func New[T utils.Float]() *NN[T] {
-	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
-	logger.Info("Neural network initialized")
+	//logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
+	Logger.Info("Neural network initialized")
 
 	return &NN[T]{
-		Bias:       true,
-		Rate:       T(0.01),
-		Activation: activation.RELU,
-		Loss:       loss.MSE,
 		Network:    []network.Network[T]{},
-		logger:     logger,
+		Activation: activation.DEFAULT,
+		Loss:       loss.DEFAULT,
+		Rate:       0.3,
+		Bias:       false,
+		//logger:     logger,
 		isInit:     false,
 		isQuery:    false,
 	}

@@ -24,6 +24,7 @@ const (
 	AVG                   // AVG - Average Error (Mean Absolute Error)
 	RMSE                  // RMSE - Root Mean Squared Error
 	ARCTAN                // ARCTAN - Arctan Error
+	DEFAULT   = MSE
 )
 
 // Loss function for single values.
