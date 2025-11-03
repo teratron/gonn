@@ -31,12 +31,12 @@ const (
 	DEFAULT   = MSE
 )
 
-func CalculateTotalLoss[T utils.Float](misses []T, mode *Type) T {
+func CalculateTotalLoss[T utils.Float](misses []T, mode Type) T {
     var loss T = 0.0
     var count T = 0.0
 	for _, miss := range misses {
-		loss += Loss(miss, mode)
-		count += 1.0
+		loss += Loss(0.0, miss, mode)
+		count++
 	}
 
     // misses.into_iter().for_each(|m| {
@@ -46,8 +46,8 @@ func CalculateTotalLoss[T utils.Float](misses []T, mode *Type) T {
     if count > 1.0 {
         loss /= count
     }
-    if *mode == RMSE {
-        loss = T(math.Sqrt(loss))
+    if mode == RMSE {
+        loss = T(math.Sqrt(float64(loss)))
     }
     return loss
 }
