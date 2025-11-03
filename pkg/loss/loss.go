@@ -31,18 +31,13 @@ const (
 	DEFAULT   = MSE
 )
 
-func CalculateTotalLoss[T utils.Float](misses []T, mode Type) T {
+func CalculateTotalLoss[T utils.Float](misses []*T, mode Type) T {
     var loss T = 0.0
     var count T = 0.0
 	for _, miss := range misses {
-		loss += Loss(0.0, miss, mode)
+		loss += Loss(0.0, *miss, mode)
 		count++
 	}
-
-    // misses.into_iter().for_each(|m| {
-    //     loss += get_loss(m, mode);
-    //     count += 1.0;
-    // })
     if count > 1.0 {
         loss /= count
     }
@@ -53,7 +48,7 @@ func CalculateTotalLoss[T utils.Float](misses []T, mode Type) T {
 }
 
 // Loss function for single values.
-func Loss[T float32 | float64](predicted, target T, mode Type, params ...float64) T {
+func Loss[T utils.Float](predicted, target T, mode Type) T {
 	switch mode {
 	case MSE:
 		return mseLoss(predicted, target)
@@ -76,9 +71,9 @@ func Loss[T float32 | float64](predicted, target T, mode Type, params ...float64
 	case CCE:
 		return cceLossSingle(predicted, target) // CCE requires vector inputs, so return 0 for single values
 	case POISSON:
-		return poissonLoss(predicted, target)
+	return poissonLoss(predicted, target)
 	case HINGE:
-		return hingeLoss(predicted, target)
+	return hingeLoss(predicted, target)
 	case SQ_HINGE:
 		return sqHingeLoss(predicted, target)
 	case CAT_HINGE:
@@ -95,7 +90,7 @@ func Loss[T float32 | float64](predicted, target T, mode Type, params ...float64
 }
 
 // LossVector function for vector inputs (slices).
-// func LossVector[T float32 | float64](predicted, target []T, mode Type, params ...float64) T {
+// func LossVector[T utils.Float](predicted, target []T, mode Type) T {
 // 	if len(predicted) != len(target) {
 // 		// Return zero if slices have different lengths
 // 		return T(0)
@@ -113,7 +108,7 @@ func Loss[T float32 | float64](predicted, target T, mode Type, params ...float64
 // 		var total T
 // 		n := len(predicted)
 // 		for i := 0; i < n; i++ {
-// 			total += Loss(predicted[i], target[i], mode, params...)
+// 			total += Loss(predicted[i], target[i], mode)
 // 		}
 
 // 		switch mode {

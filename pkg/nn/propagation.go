@@ -2,7 +2,7 @@ package nn
 
 import (
 	"github.com/teratron/gonn/pkg/loss"
-	"github.com/teratron/gonn/pkg/utils"
+	//"github.com/teratron/gonn/pkg/utils"
 	//"github.com/teratron/gonn/pkg/network"
 )
 
@@ -13,7 +13,7 @@ func (n *NN[T]) calculateValues() {
 }
 
 func (n *NN[T]) calculateLoss() {
-    loss.CalculateTotalLoss(n.Network.Output.Cells.GetMisses(), n.Loss)
+    loss.CalculateTotalLoss(n.Network.Output.GetMisses(), n.Loss)
 }
 
 /*
