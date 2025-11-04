@@ -1,6 +1,6 @@
 package utils
 
-// Define constraints for floating point types
+// Float
 type Float interface {
 	float32 | float64
 }
