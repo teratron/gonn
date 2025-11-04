@@ -4,19 +4,19 @@ import (
 	"github.com/teratron/gonn/pkg/utils"
 )
 
-// Bias представляет клетку смещения (bias)
+// Bias
 type Bias[T utils.Float] struct {
-	value T // Всегда равно 1.0
+	value T
 }
 
-// NewBias создает новую клетку смещения
+// NewBias
 func NewBias[T utils.Float]() *Bias[T] {
 	return &Bias[T]{
 		value: 1.0,
 	}
 }
 
-// GetValue возвращает значение клетки смещения (всегда 1.0)
+// GetValue
 func (b *Bias[T]) GetValue() *T {
 	return &b.value
 }

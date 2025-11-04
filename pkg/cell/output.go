@@ -4,46 +4,50 @@ import (
 	"github.com/teratron/gonn/pkg/utils"
 )
 
-// Output represents an output cell of the neural network
-// Contains core and target (desired value)
+// Output
 type Output[T utils.Float] struct {
-	Core   *core[T] // Основная функциональность клетки
-	Target *T       // Целевое значение для обучения
+	*core[T]
+	Target *T
 }
 
-// NewOutput creates a new output cell
+// NewOutput
 func NewOutput[T utils.Float](target *T) *Output[T] {
 	return &Output[T]{
-		Core:   newCore[T](),
+		core:   newCore[T](),
 		Target: target,
 	}
 }
 
-// GetValue returns the value of the output cell
-func (o *Output[T]) GetValue() *T {
-	return &o.Core.Value
-}
+// GetValue
+//func (o *Output[T]) GetValue() *T {
+//	return &o.value
+//}
+//
+//// GetMiss
+//func (o *Output[T]) GetMiss() *T {
+//	return &o.miss
+//}
 
-// GetMiss returns the error of the output cell
-func (o *Output[T]) GetMiss() *T {
-	return &o.Core.Miss
-}
+// SetMiss
+//func (o *Output[T]) SetMiss(miss T) {
+//	o.miss = miss
+//}
 
-// CalculateValue calculates the value of the output cell
+// CalculateValue
 func (o *Output[T]) CalculateValue() {
-	o.Core.CalculateValue()
-	o.Core.Miss = *o.Target - o.Core.Value
+	o.core.CalculateValue()
+	o.SetMiss(*o.Target - o.value)
 }
 
-// CalculateWeight calculates the weight of the output cell
-func (o *Output[T]) CalculateWeight(rate *T) {
-	o.Core.CalculateWeight(rate)
-}
+// CalculateWeight
+//func (o *Output[T]) CalculateWeight(rate *T) {
+//	_ = o.calculateWeight(rate)
+//}
 
 // Forward performs propagation for the output cell
 //func (o *Output[T]) Forward() T {
 //	value := o.CalculateValue()
-//	o.Core.Value = value
+//	o.core.value = value
 //	return value
 //}
 //
@@ -53,7 +57,7 @@ func (o *Output[T]) CalculateWeight(rate *T) {
 //
 //	// Вычисляем ошибку
 //	miss := o.GetMiss()
-//	o.Core.Miss = miss
+//	o.core.miss = miss
 //
 //	// Возвращаем вес для обратного распространения
 //	return o.CalculateWeight(miss)
@@ -77,7 +81,7 @@ func (o *Output[T]) CalculateWeight(rate *T) {
 //
 //// AddIncomingConnection adds an incoming connection
 //func (o *Output[T]) AddIncomingConnection(source nn.Neuron[T], weight T) {
-//	o.Core.AddIncomingConnection(source, weight)
+//	o.core.AddIncomingConnection(source, weight)
 //}
 //
 //// GetError returns the current error of the output cell
@@ -105,19 +109,19 @@ func (o *Output[T]) CalculateWeight(rate *T) {
 //
 //// Reset resets the state of the output cell
 //func (o *Output[T]) Reset() {
-//	o.Core.Miss = 0
-//	o.Core.Value = 0
+//	o.core.miss = 0
+//	o.core.value = 0
 //	o.HasTarget = false
 //}
 //
 //// SetBias sets the bias value
 //func (o *Output[T]) SetBias(bias T) {
 //	// core[T] не имеет поля Bias, поэтому просто устанавливаем значение
-//	o.Core.Value = bias
+//	o.core.value = bias
 //}
 //
 //// GetBias returns the current bias value
 //func (o *Output[T]) GetBias() T {
 //	// core[T] не имеет поля Bias, возвращаем текущее значение
-//	return o.Core.Value
+//	return o.core.value
 //}

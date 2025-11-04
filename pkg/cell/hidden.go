@@ -5,45 +5,49 @@ import (
 	"github.com/teratron/gonn/pkg/utils"
 )
 
-// Hidden represents a hidden layer of the neural network
-// Contains core and outgoing connections (outgoing_axons)
+// Hidden
 type Hidden[T utils.Float] struct {
-	Core          *core[T]
+	*core[T]
 	OutgoingAxons []*axon.Axon[T]
 }
 
-// NewHidden creates a new hidden cell
+// NewHidden
 func NewHidden[T utils.Float]() *Hidden[T] {
 	return &Hidden[T]{
-		Core:          newCore[T](),
+		core:          newCore[T](),
 		OutgoingAxons: make([]*axon.Axon[T], 0),
 	}
 }
 
-// GetValue returns the value of the hidden cell
-func (h *Hidden[T]) GetValue() *T {
-	return &h.Core.Value
-}
+// GetValue
+//func (h *Hidden[T]) GetValue() *T {
+//	return &h.value
+//}
+//
+//// GetMiss
+//func (h *Hidden[T]) GetMiss() *T {
+//	return &h.miss
+//}
 
-// GetMiss returns the error of the hidden cell
-func (h *Hidden[T]) GetMiss() *T {
-	return &h.Core.Miss
-}
+// SetMiss
+//func (h *Hidden[T]) SetMiss(miss T) {
+//	h.miss = miss
+//}
 
-// CalculateValue calculates the value of the hidden cell
-func (h *Hidden[T]) CalculateValue() {
-	h.Core.CalculateValue()
-}
+// CalculateValue
+//func (h *Hidden[T]) CalculateValue() {
+//	h.calculateValue()
+//}
 
-// CalculateWeight calculates the weight of the hidden cell
-func (h *Hidden[T]) CalculateWeight(rate *T) {
-	h.Core.CalculateWeight(rate)
-}
+// CalculateWeight
+//func (h *Hidden[T]) CalculateWeight(rate *T) {
+//	h.calculateWeight(rate)
+//}
 
 // Forward performs propagation for the hidden cell
 //func (h *Hidden[T]) Forward() T {
 //	value := h.CalculateValue()
-//	h.Core.Value = value
+//	h.core.value = value
 //	return value
 //}
 //
@@ -51,13 +55,13 @@ func (h *Hidden[T]) CalculateWeight(rate *T) {
 //func (h *Hidden[T]) Backward(target T) T {
 //	// For hidden layers, target is not used directly
 //	// Error is calculated based on gradients from the next layer
-//	h.Core.Miss = target
+//	h.core.miss = target
 //	return h.CalculateWeight(target)
 //}
 
 // AddOutgoingConnection adds an outgoing connection
 //func (h *Hidden[T]) AddOutgoingConnection(target nn.Neuron[T], weight T) {
-//	newAxon := axon.New[T](h.Core, target)
+//	newAxon := axon.New[T](h.core, target)
 //	newAxon.Weight = weight
 //	h.OutgoingAxons = append(h.OutgoingAxons, newAxon)
 //}

@@ -30,7 +30,6 @@ func New[T utils.Float](
 ) *Axon[T] {
 	// Create a local random generator with current time as seed
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
-
 	return &Axon[T]{
 		Weight:       T(rng.Float64()*1.0 - 0.5), // Случайное значение в диапазоне [-0.5, 0.5]
 		IncomingCell: incomingCell,
@@ -38,20 +37,17 @@ func New[T utils.Float](
 	}
 }
 
-// CalculateValue performs forward propagation of the signal
-// Formula: *incoming_cell.GetValue() * weight
+// CalculateValue
 func (a *Axon[T]) CalculateValue() T {
 	return *a.IncomingCell.GetValue() * a.Weight
 }
 
-// CalculateMiss performs backward propagation of the error
-// Formula: *outgoing_cell.GetMiss() * weight
+// CalculateMiss
 func (a *Axon[T]) CalculateMiss() T {
 	return *a.OutgoingCell.GetMiss() * a.Weight
 }
 
-// CalculateWeight updates the axon weight based on gradient
-// Formula: weight += gradient * *incoming_cell.GetValue()
+// CalculateWeight
 func (a *Axon[T]) CalculateWeight(gradient *T) {
 	a.Weight += *gradient * *a.IncomingCell.GetValue()
 }

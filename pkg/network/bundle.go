@@ -1,6 +1,8 @@
 package network
 
 import (
+	"fmt"
+
 	"github.com/teratron/gonn/pkg/cell"
 	"github.com/teratron/gonn/pkg/neuron"
 	"github.com/teratron/gonn/pkg/utils"
@@ -127,6 +129,16 @@ func (b *OutputBundle[T]) SetTargets(data []T) {
 	}
 }
 
+// ---------------------------------------------------------
+func (b *Bundle[T, S]) SetTargets(data []T) {
+	n := b.Cells[0]
+	if output, ok := any(n).(*cell.Output[T]); ok {
+		// Работа с `*cell.Output[T]`
+		fmt.Println("Это Output cell", output)
+	}
+}
+
+// ---------------------------------------------------------
 // Hidden Bundle specific methods
 type HiddenBundle[T utils.Float] struct {
 	Bundle[T, *cell.Hidden[T]]
