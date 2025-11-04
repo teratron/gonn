@@ -8,14 +8,14 @@ import (
 // Hidden
 type Hidden[T utils.Float] struct {
 	*core[T]
-	OutgoingAxons []*axon.Axon[T]
+	OutgoingAxons axon.Bundle[T]
 }
 
 // NewHidden
 func NewHidden[T utils.Float]() *Hidden[T] {
 	return &Hidden[T]{
 		core:          newCore[T](),
-		OutgoingAxons: make([]*axon.Axon[T], 0),
+		OutgoingAxons: make(axon.Bundle[T], 0),
 	}
 }
 

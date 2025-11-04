@@ -9,7 +9,7 @@ import (
 )
 
 // Bundle представляет коллекцию аксонов
-type Bundle[T utils.Float] []Axon[T]
+type Bundle[T utils.Float] []*Axon[T]
 
 // Axon represents a connection between neural network cells
 type Axon[T utils.Float] struct {

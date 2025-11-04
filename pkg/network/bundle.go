@@ -132,8 +132,7 @@ func (b *OutputBundle[T]) SetTargets(data []T) {
 
 // ---------------------------------------------------------
 func (b *Bundle[T, S]) SetTargets(data []T) {
-	n := b.Cells[0]
-	if output, ok := any(n).(*cell.Output[T]); ok {
+	if output, ok := neuron.Nucleus[T](b.Cells[0]).(*cell.Output[T]); ok {
 		// Работа с `*cell.Output[T]`
 		fmt.Println("Это Output cell", output)
 	}
