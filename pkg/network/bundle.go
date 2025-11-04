@@ -3,8 +3,8 @@ package network
 import (
 	"fmt"
 
-	"github.com/teratron/gonn/pkg/cell"
 	"github.com/teratron/gonn/pkg/neuron"
+	"github.com/teratron/gonn/pkg/neuron/cell"
 	"github.com/teratron/gonn/pkg/utils"
 )
 

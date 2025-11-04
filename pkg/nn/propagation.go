@@ -1,8 +1,8 @@
 package nn
 
 import (
-	"github.com/teratron/gonn/pkg/cell"
 	"github.com/teratron/gonn/pkg/loss"
+	"github.com/teratron/gonn/pkg/neuron/cell"
 	"github.com/teratron/gonn/pkg/utils"
 )
 

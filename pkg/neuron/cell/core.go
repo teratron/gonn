@@ -2,7 +2,7 @@ package cell
 
 import (
 	"github.com/teratron/gonn/pkg/activation"
-	"github.com/teratron/gonn/pkg/axon"
+	"github.com/teratron/gonn/pkg/neuron/axon"
 	"github.com/teratron/gonn/pkg/utils"
 )
 
