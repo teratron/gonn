@@ -7,15 +7,25 @@ import (
 // Output
 type Output[T utils.Float] struct {
 	*core[T]
-	Target *T
+	target *T
 }
 
 // NewOutput
 func NewOutput[T utils.Float](target *T) *Output[T] {
 	return &Output[T]{
 		core:   newCore[T](),
-		Target: target,
+		target: target,
 	}
+}
+
+// GetTarget
+//func (o *Output[T]) GetTarget() *T {
+//	return o.target
+//}
+
+// SetTarget
+func (o *Output[T]) SetTarget(value *T) {
+	o.target = value
 }
 
 // GetValue
@@ -33,11 +43,19 @@ func NewOutput[T utils.Float](target *T) *Output[T] {
 //	o.miss = miss
 //}
 
+// ----------------------------------------------------------------------------
+// Forward propagation methods
+// ----------------------------------------------------------------------------
+
 // CalculateValue
 func (o *Output[T]) CalculateValue() {
 	o.core.CalculateValue()
-	o.SetMiss(*o.Target - o.value)
+	o.SetMiss(*o.target - o.value)
 }
+
+// ----------------------------------------------------------------------------
+// Backward propagation methods
+// ----------------------------------------------------------------------------
 
 // CalculateWeight
 //func (o *Output[T]) CalculateWeight(rate *T) {
@@ -65,13 +83,13 @@ func (o *Output[T]) CalculateValue() {
 //
 //// SetTarget sets the target value
 //func (o *Output[T]) SetTarget(target T) {
-//	o.Target = target
+//	o.target = target
 //	o.HasTarget = true
 //}
 //
 //// GetTarget returns the target value
 //func (o *Output[T]) GetTarget() T {
-//	return o.Target
+//	return o.target
 //}
 //
 //// ClearTarget clears the target value

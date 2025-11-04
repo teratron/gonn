@@ -23,8 +23,8 @@ type NN[T utils.Float] struct {
 	Rate       T
 	Bias       bool
 	//logger     *slog.Logger
-	isInit     bool
-	isQuery    bool
+	isInit  bool
+	isQuery bool
 }
 
 func New[T utils.Float]() *NN[T] {
@@ -38,7 +38,7 @@ func New[T utils.Float]() *NN[T] {
 		Rate:       0.3,
 		Bias:       false,
 		//logger:     logger,
-		isInit:     false,
-		isQuery:    false,
+		isInit:  false,
+		isQuery: false,
 	}
 }

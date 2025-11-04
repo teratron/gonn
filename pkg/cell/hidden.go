@@ -34,10 +34,18 @@ func NewHidden[T utils.Float]() *Hidden[T] {
 //	h.miss = miss
 //}
 
+// ----------------------------------------------------------------------------
+// Forward propagation methods
+// ----------------------------------------------------------------------------
+
 // CalculateValue
 //func (h *Hidden[T]) CalculateValue() {
 //	h.calculateValue()
 //}
+
+// ----------------------------------------------------------------------------
+// Backward propagation methods
+// ----------------------------------------------------------------------------
 
 // CalculateWeight
 //func (h *Hidden[T]) CalculateWeight(rate *T) {

@@ -10,7 +10,7 @@ import (
 type Nucleus[T utils.Float] interface {
 	// GetValue возвращает текущее значение клетки
 	GetValue() *T
-	SetValue(T)
+	//SetValue(T)
 }
 
 // Neuron - interface for neurons with learning capability

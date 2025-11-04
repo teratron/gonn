@@ -9,8 +9,6 @@
 *.prof
 .coverprofile
 coverage.out
-go.mod
-go.sum
 vendor/
 
 # Environment variables
@@ -69,11 +67,7 @@ build/
 *.min.js
 *.min.css
 
-# Git
-.git/
-
 # Editor backup files
-*~
 *.bak
 *.tmp
 

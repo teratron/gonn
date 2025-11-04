@@ -6,7 +6,9 @@ import (
 	"github.com/teratron/gonn/pkg/utils"
 )
 
+// ----------------------------------------------------------------------------
 // Forward propagation methods
+// ----------------------------------------------------------------------------
 
 // CalculateValues calculates the value of all neurons in the network
 func (n *NN[T]) calculateValues() {
@@ -20,7 +22,9 @@ func (n *NN[T]) calculateLoss() T {
 	return loss.CalculateTotalLoss(n.Network.Output.GetMisses(), n.Loss)
 }
 
+// ----------------------------------------------------------------------------
 // Backward propagation methods
+// ----------------------------------------------------------------------------
 
 // CalculateMisses calculates the error of hidden neurons
 // Implements backward propagation by processing neurons in reverse order

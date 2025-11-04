@@ -32,19 +32,19 @@ const (
 )
 
 func CalculateTotalLoss[T utils.Float](misses []*T, mode Type) T {
-    var loss T = 0.0
-    var count T = 0.0
+	var loss T = 0.0
+	var count T = 0.0
 	for _, miss := range misses {
 		loss += Loss(0.0, *miss, mode)
 		count++
 	}
-    if count > 1.0 {
-        loss /= count
-    }
-    if mode == RMSE {
-        loss = T(math.Sqrt(float64(loss)))
-    }
-    return loss
+	if count > 1.0 {
+		loss /= count
+	}
+	if mode == RMSE {
+		loss = T(math.Sqrt(float64(loss)))
+	}
+	return loss
 }
 
 // Loss function for single values.
@@ -71,9 +71,9 @@ func Loss[T utils.Float](predicted, target T, mode Type) T {
 	case CCE:
 		return cceLossSingle(predicted, target) // CCE requires vector inputs, so return 0 for single values
 	case POISSON:
-	return poissonLoss(predicted, target)
+		return poissonLoss(predicted, target)
 	case HINGE:
-	return hingeLoss(predicted, target)
+		return hingeLoss(predicted, target)
 	case SQ_HINGE:
 		return sqHingeLoss(predicted, target)
 	case CAT_HINGE:

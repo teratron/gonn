@@ -124,7 +124,8 @@ func NewOutputBundle[T utils.Float](data []T) OutputBundle[T] {
 func (b *OutputBundle[T]) SetTargets(data []T) {
 	for i, v := range data {
 		if i < len(b.Cells) {
-			b.Cells[i].Target = &v
+			//b.Cells[i].target = &v
+			b.Cells[i].SetTarget(&v)
 		}
 	}
 }

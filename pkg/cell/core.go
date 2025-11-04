@@ -40,9 +40,13 @@ func (c *core[T]) GetMiss() *T {
 }
 
 // SetMiss
-func (c *core[T]) SetMiss(miss T) {
-	c.miss = miss
+func (c *core[T]) SetMiss(value T) {
+	c.miss = value
 }
+
+// ----------------------------------------------------------------------------
+// Forward propagation methods
+// ----------------------------------------------------------------------------
 
 // CalculateValue
 func (c *core[T]) CalculateValue() {
@@ -52,6 +56,10 @@ func (c *core[T]) CalculateValue() {
 	}
 	c.value = activation.Activation(c.value, c.ActivationMode)
 }
+
+// ----------------------------------------------------------------------------
+// Backward propagation methods
+// ----------------------------------------------------------------------------
 
 // CalculateWeight
 func (c *core[T]) CalculateWeight(rate *T) {

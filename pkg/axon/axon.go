@@ -37,10 +37,18 @@ func New[T utils.Float](
 	}
 }
 
+// ----------------------------------------------------------------------------
+// Forward propagation methods
+// ----------------------------------------------------------------------------
+
 // CalculateValue
 func (a *Axon[T]) CalculateValue() T {
 	return *a.IncomingCell.GetValue() * a.Weight
 }
+
+// ----------------------------------------------------------------------------
+// Backward propagation methods
+// ----------------------------------------------------------------------------
 
 // CalculateMiss
 func (a *Axon[T]) CalculateMiss() T {
