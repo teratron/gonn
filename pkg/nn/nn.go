@@ -8,12 +8,13 @@ import (
 )
 
 type NN[T utils.Float] struct {
-	Network    network.Network[T]
+	Network    network.Network[T] `json:"network,omitempty" yaml:"network,omitempty" toml:"network,omitempty" xml:"network,omitempty"`
 	Activation activation.Type
 	Loss       loss.Type
 	Rate       T
 	Bias       bool
 	isInit     bool
+	isTrain    bool
 	isQuery    bool
 }
 
@@ -27,6 +28,7 @@ func New[T utils.Float]() *NN[T] {
 		Rate:       0.3,
 		Bias:       false,
 		isInit:     false,
+		isTrain:    false,
 		isQuery:    false,
 	}
 }

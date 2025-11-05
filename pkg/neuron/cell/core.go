@@ -2,9 +2,13 @@ package cell
 
 import (
 	"github.com/teratron/gonn/pkg/activation"
+	"github.com/teratron/gonn/pkg/neuron"
 	"github.com/teratron/gonn/pkg/neuron/axon"
 	"github.com/teratron/gonn/pkg/utils"
 )
+
+var _ neuron.Neuron[float32] = (*core[float32])(nil)
+var _ neuron.Neuron[float64] = (*core[float64])(nil)
 
 // core
 type core[T utils.Float] struct {

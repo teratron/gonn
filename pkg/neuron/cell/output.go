@@ -1,8 +1,12 @@
 package cell
 
 import (
+	"github.com/teratron/gonn/pkg/neuron"
 	"github.com/teratron/gonn/pkg/utils"
 )
+
+var _ neuron.Neuron[float32] = (*Output[float32])(nil)
+var _ neuron.Neuron[float64] = (*Output[float64])(nil)
 
 // Output
 type Output[T utils.Float] struct {

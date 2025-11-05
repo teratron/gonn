@@ -12,13 +12,13 @@ type Network[T utils.Float] struct {
 	Cells []neuron.Neuron[T]
 
 	// Input neurons.
-	Input Bundle[T, *cell.Input[T]]
+	Input Bundle[T, *cell.Input[T]] `json:"input" yaml:"input" toml:"input" xml:"input"`
 
 	// Output neurons.
-	Output Bundle[T, *cell.Output[T]]
+	Output Bundle[T, *cell.Output[T]] `json:"output" yaml:"output" toml:"output" xml:"output"`
 
 	// Hidden neurons.
-	Hidden Bundle[T, *cell.Hidden[T]]
+	Hidden Bundle[T, *cell.Hidden[T]] `json:"hidden" yaml:"hidden" toml:"hidden" xml:"hidden"`
 }
 
 // NewNetwork

@@ -1,9 +1,13 @@
 package cell
 
 import (
+	"github.com/teratron/gonn/pkg/neuron"
 	"github.com/teratron/gonn/pkg/neuron/axon"
 	"github.com/teratron/gonn/pkg/utils"
 )
+
+var _ neuron.Neuron[float32] = (*Hidden[float32])(nil)
+var _ neuron.Neuron[float64] = (*Hidden[float64])(nil)
 
 // Hidden
 type Hidden[T utils.Float] struct {

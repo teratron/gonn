@@ -1,8 +1,12 @@
 package cell
 
 import (
+	"github.com/teratron/gonn/pkg/neuron"
 	"github.com/teratron/gonn/pkg/utils"
 )
+
+var _ neuron.Nucleus[float32] = (*Bias[float32])(nil)
+var _ neuron.Nucleus[float64] = (*Bias[float64])(nil)
 
 // Bias
 type Bias[T utils.Float] struct {
