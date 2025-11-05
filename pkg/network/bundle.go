@@ -40,8 +40,8 @@ func (b *Bundle[T, S]) Add(cell S) {
 // Bundle for Output or Hidden.
 func (b *Bundle[T, S]) GetValues() []*T {
 	values := make([]*T, len(b.Cells))
-	for i, cell := range b.Cells {
-		values[i] = cell.GetValue()
+	for i, c := range b.Cells {
+		values[i] = c.GetValue()
 	}
 	return values
 }
@@ -49,9 +49,9 @@ func (b *Bundle[T, S]) GetValues() []*T {
 // Bundle for Output or Hidden.
 func (b *Bundle[T, S]) GetMisses() []*T {
 	misses := make([]*T, len(b.Cells))
-	for i, cell := range b.Cells {
-		if neuron, ok := any(cell).(neuron.Neuron[T]); ok {
-			misses[i] = neuron.GetMiss()
+	for i, c := range b.Cells {
+		if n, ok := any(c).(neuron.Neuron[T]); ok {
+			misses[i] = n.GetMiss()
 		} else {
 			// For non-Neuron types, return nil or zero value
 			zero := T(0)

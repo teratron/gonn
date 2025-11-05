@@ -12,8 +12,8 @@ import (
 
 // CalculateValues calculates the value of all neurons in the network
 func (n *Network[T]) calculateValues() {
-	for _, neuron := range n.Cells {
-		neuron.CalculateValue()
+	for _, c := range n.Cells {
+		c.CalculateValue()
 	}
 }
 
@@ -44,9 +44,9 @@ func calculateMissForHidden[T utils.Float](neuron *cell.Hidden[T]) {
 	// In backpropagation, the error contribution from each outgoing axon is:
 	// error_from_next_layer * weight_of_connection
 	var cum T = 0.0
-	for _, axon := range neuron.OutgoingAxons {
+	for _, a := range neuron.OutgoingAxons {
 		// Calculate the error contribution from this axon to the current neuron
-		cum += axon.CalculateMiss()
+		cum += a.CalculateMiss()
 
 	}
 	neuron.SetMiss(cum)
@@ -55,7 +55,7 @@ func calculateMissForHidden[T utils.Float](neuron *cell.Hidden[T]) {
 // CalculateWeights updates weights of all neurons in the network
 func (n *Network[T]) calculateWeights() {
 	// Update weights for all neurons in the network
-	for _, neuron := range n.Cells {
-		neuron.CalculateWeight(&n.Rate)
+	for _, c := range n.Cells {
+		c.CalculateWeight(&n.Rate)
 	}
 }
