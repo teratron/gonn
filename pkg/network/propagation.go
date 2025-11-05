@@ -1,4 +1,4 @@
-package nn
+package network
 
 import (
 	"github.com/teratron/gonn/pkg/loss"
@@ -11,15 +11,15 @@ import (
 // ----------------------------------------------------------------------------
 
 // CalculateValues calculates the value of all neurons in the network
-func (n *NN[T]) calculateValues() {
-	for _, neuron := range n.Network.Cells {
+func (n *Network[T]) calculateValues() {
+	for _, neuron := range n.Cells {
 		neuron.CalculateValue()
 	}
 }
 
 // CalculateLoss calculates and returns the total error of the output neurons
-func (n *NN[T]) calculateLoss() T {
-	return loss.CalculateTotalLoss(n.Network.Output.GetMisses(), n.Loss)
+func (n *Network[T]) calculateLoss() T {
+	return loss.CalculateTotalLoss(n.Output.GetMisses(), n.Loss)
 }
 
 // ----------------------------------------------------------------------------
@@ -28,9 +28,9 @@ func (n *NN[T]) calculateLoss() T {
 
 // CalculateMisses calculates the error of hidden neurons
 // Implements backward propagation by processing neurons in reverse order
-func (n *NN[T]) calculateMisses() *NN[T] {
+func (n *Network[T]) calculateMisses() *Network[T] {
 	// Process hidden neurons in reverse order for backpropagation
-	cells := n.Network.Hidden.Cells
+	cells := n.Hidden.Cells
 	for i := len(cells) - 1; i >= 0; i-- {
 		calculateMissForHidden(cells[i])
 	}
@@ -53,9 +53,9 @@ func calculateMissForHidden[T utils.Float](neuron *cell.Hidden[T]) {
 }
 
 // CalculateWeights updates weights of all neurons in the network
-func (n *NN[T]) calculateWeights() {
+func (n *Network[T]) calculateWeights() {
 	// Update weights for all neurons in the network
-	for _, neuron := range n.Network.Cells {
+	for _, neuron := range n.Cells {
 		neuron.CalculateWeight(&n.Rate)
 	}
 }
