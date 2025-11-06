@@ -8,7 +8,7 @@ import (
 
 type Bundle[T utils.Float, S neuron.Nucleus[T]] struct {
 	Cells       []S
-	number      uint
+	number      int
 	numberFloat T
 }
 
@@ -21,7 +21,7 @@ func NewBundle[T utils.Float, S neuron.Nucleus[T]]() Bundle[T, S] {
 }
 
 func NewBundleWithData[T utils.Float, S neuron.Nucleus[T]](data []T) Bundle[T, S] {
-	number := uint(len(data))
+	number := int(len(data))
 	return Bundle[T, S]{
 		Cells:       make([]S, 0),
 		number:      number,
