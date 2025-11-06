@@ -7,9 +7,6 @@ import (
 
 // Network
 type Network[T utils.Float] struct {
-	// All working neurons.
-	//Cells []neuron.Neuron[T]
-
 	// Input neurons.
 	Input Bundle[T, *cell.Input[T]] `json:"input" yaml:"input" toml:"input" xml:"input"`
 
@@ -23,7 +20,6 @@ type Network[T utils.Float] struct {
 // NewNetwork
 func New[T utils.Float]() Network[T] {
 	return Network[T]{
-		//Cells:  make([]neuron.Neuron[T], 0),
 		Input:  NewBundle[T, *cell.Input[T]](),
 		Output: NewBundle[T, *cell.Output[T]](),
 		Hidden: NewBundle[T, *cell.Hidden[T]](),

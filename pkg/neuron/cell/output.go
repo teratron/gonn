@@ -123,27 +123,9 @@ func (o *Output[T]) CalculateValue() {
 //	return absMiss <= tolerance
 //}
 //
-//// GetSquaredError returns the squared error
-//func (o *Output[T]) GetSquaredError() T {
-//	miss := o.GetMiss()
-//	return miss * miss
-//}
-//
 //// Reset resets the state of the output cell
 //func (o *Output[T]) Reset() {
 //	o.core.miss = 0
 //	o.core.value = 0
 //	o.HasTarget = false
-//}
-//
-//// SetBias sets the bias value
-//func (o *Output[T]) SetBias(bias T) {
-//	// core[T] не имеет поля Bias, поэтому просто устанавливаем значение
-//	o.core.value = bias
-//}
-//
-//// GetBias returns the current bias value
-//func (o *Output[T]) GetBias() T {
-//	// core[T] не имеет поля Bias, возвращаем текущее значение
-//	return o.core.value
 //}

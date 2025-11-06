@@ -15,7 +15,6 @@ type Nucleus[T utils.Float] interface {
 
 // Neuron - interface for neurons with learning capability
 // Interface for neurons (inherits from Nucleus)
-// Contains methods for forward and backward propagation
 // For types: Hidden, Output.
 type Neuron[T utils.Float] interface {
 	Nucleus[T]
@@ -30,10 +29,4 @@ type Neuron[T utils.Float] interface {
 
 	// CalculateWeight calculates the neuron weight based on error
 	CalculateWeight(*T)
-
-	// Forward performs propagation of the signal
-	//Forward() *T
-
-	// Backward performs propagation of the error
-	//Backward(target *T) *T
 }

@@ -64,6 +64,7 @@ func (b *Bundle[T, S]) GetValues() []*T {
 //
 //		return bundle
 //	}
+
 func (b *Bundle[T, _]) SetInputs(data *[]T) {
 	if i, ok := any(b).(*cell.Input[T]); ok {
 		for j, v := range *data {
