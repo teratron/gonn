@@ -163,10 +163,21 @@ func NewHiddenBundle[T utils.Float](data []T) HiddenBundle[T] {
 	return bundle
 }
 
-func (b Bundle[T, S]) Default() Bundle[T, S] {
+func (b *Bundle[T, S]) Default() Bundle[T, S] {
 	return Bundle[T, S]{
 		Cells:        make([]S, 0),
 		_number:      0,
 		_numberFloat: T(0),
+	}
+}
+
+// ----------------------------------------------------------------------------
+//
+// ----------------------------------------------------------------------------
+func (b *Bundle[T, _]) calculateValues() {
+	for _, c := range b.Cells {
+		if n, ok := any(c).(neuron.Neuron[T]); ok {
+			n.CalculateValue()
+		}
 	}
 }

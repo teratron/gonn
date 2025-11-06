@@ -12,14 +12,16 @@ import (
 
 // CalculateValues calculates the value of all neurons in the network
 func (n *Network[T]) calculateValues() {
-	for _, c := range n.Cells {
-		c.CalculateValue()
-	}
+	//for _, c := range n.Cells {
+	//	c.CalculateValue()
+	//}
+	n.Hidden.calculateValues()
+	n.Output.calculateValues()
 }
 
 // CalculateLoss calculates and returns the total error of the output neurons
-func (n *Network[T]) calculateLoss() T {
-	return loss.CalculateTotalLoss(n.Output.GetMisses(), n.Loss)
+func (n *Network[T]) calculateLoss(mode loss.Type) T {
+	return loss.CalculateTotalLoss(n.Output.GetMisses(), mode)
 }
 
 // ----------------------------------------------------------------------------
@@ -53,9 +55,9 @@ func calculateMissForHidden[T utils.Float](neuron *cell.Hidden[T]) {
 }
 
 // CalculateWeights updates weights of all neurons in the network
-func (n *Network[T]) calculateWeights() {
+func (n *Network[T]) calculateWeights(rate *T) {
 	// Update weights for all neurons in the network
 	for _, c := range n.Cells {
-		c.CalculateWeight(&n.Rate)
+		c.CalculateWeight(rate)
 	}
 }
