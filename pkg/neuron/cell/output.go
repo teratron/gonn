@@ -48,7 +48,7 @@ func (o *Output[T]) SetTarget(value *T) {
 //}
 
 // ----------------------------------------------------------------------------
-// Forward propagation methods
+// FORWARD PROPAGATION METHODS
 // ----------------------------------------------------------------------------
 
 // CalculateValue
@@ -58,7 +58,7 @@ func (o *Output[T]) CalculateValue() {
 }
 
 // ----------------------------------------------------------------------------
-// Backward propagation methods
+// BACKWARD PROPAGATION METHODS
 // ----------------------------------------------------------------------------
 
 // CalculateWeight

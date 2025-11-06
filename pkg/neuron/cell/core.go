@@ -49,7 +49,7 @@ func (c *core[T]) SetMiss(value T) {
 }
 
 // ----------------------------------------------------------------------------
-// Forward propagation methods
+// FORWARD PROPAGATION METHODS
 // ----------------------------------------------------------------------------
 
 // CalculateValue
@@ -62,7 +62,7 @@ func (c *core[T]) CalculateValue() {
 }
 
 // ----------------------------------------------------------------------------
-// Backward propagation methods
+// BACKWARD PROPAGATION METHODS
 // ----------------------------------------------------------------------------
 
 // CalculateWeight

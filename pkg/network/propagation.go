@@ -7,7 +7,7 @@ import (
 )
 
 // ----------------------------------------------------------------------------
-// Forward propagation methods
+// FORWARD PROPAGATION METHODS
 // ----------------------------------------------------------------------------
 
 // CalculateValues calculates the value of all neurons in the network
@@ -25,7 +25,7 @@ func (n *Network[T]) calculateLoss(mode loss.Type) T {
 }
 
 // ----------------------------------------------------------------------------
-// Backward propagation methods
+// BACKWARD PROPAGATION METHODS
 // ----------------------------------------------------------------------------
 
 // CalculateMisses calculates the error of hidden neurons
@@ -57,7 +57,9 @@ func calculateMissForHidden[T utils.Float](neuron *cell.Hidden[T]) {
 // CalculateWeights updates weights of all neurons in the network
 func (n *Network[T]) calculateWeights(rate *T) {
 	// Update weights for all neurons in the network
-	for _, c := range n.Cells {
-		c.CalculateWeight(rate)
-	}
+	//for _, c := range n.Cells {
+	//	c.CalculateWeight(rate)
+	//}
+	n.Hidden.calculateWeights(rate)
+	n.Output.calculateWeights(rate)
 }

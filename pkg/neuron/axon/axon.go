@@ -38,7 +38,7 @@ func New[T utils.Float](
 }
 
 // ----------------------------------------------------------------------------
-// Forward propagation methods
+// FORWARD PROPAGATION METHODS
 // ----------------------------------------------------------------------------
 
 // CalculateValue
@@ -47,7 +47,7 @@ func (a *Axon[T]) CalculateValue() T {
 }
 
 // ----------------------------------------------------------------------------
-// Backward propagation methods
+// BACKWARD PROPAGATION METHODS
 // ----------------------------------------------------------------------------
 
 // CalculateMiss

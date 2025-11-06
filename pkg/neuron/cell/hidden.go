@@ -39,7 +39,7 @@ func NewHidden[T utils.Float]() *Hidden[T] {
 //}
 
 // ----------------------------------------------------------------------------
-// Forward propagation methods
+// FORWARD PROPAGATION METHODS
 // ----------------------------------------------------------------------------
 
 // CalculateValue
@@ -48,7 +48,7 @@ func NewHidden[T utils.Float]() *Hidden[T] {
 //}
 
 // ----------------------------------------------------------------------------
-// Backward propagation methods
+// BACKWARD PROPAGATION METHODS
 // ----------------------------------------------------------------------------
 
 // CalculateWeight
