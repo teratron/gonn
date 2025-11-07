@@ -8,20 +8,20 @@ import (
 // Network
 type Network[T utils.Float] struct {
 	// Input neurons.
-	Input Bundle[T, *cell.Input[T]] `json:"input" yaml:"input" toml:"input" xml:"input"`
+	Input bundle[T, *cell.Input[T]] `json:"input" toml:"input" xml:"input"`
 
 	// Output neurons.
-	Output Bundle[T, *cell.Output[T]] `json:"output" yaml:"output" toml:"output" xml:"output"`
+	Output bundle[T, *cell.Output[T]] `json:"output" toml:"output" xml:"output"`
 
 	// Hidden neurons.
-	Hidden Bundle[T, *cell.Hidden[T]] `json:"hidden" yaml:"hidden" toml:"hidden" xml:"hidden"`
+	Hidden bundle[T, *cell.Hidden[T]] `json:"hidden" toml:"hidden" xml:"hidden"`
 }
 
-// NewNetwork
+// New
 func New[T utils.Float]() Network[T] {
 	return Network[T]{
-		Input:  NewBundle[T, *cell.Input[T]](),
-		Output: NewBundle[T, *cell.Output[T]](),
-		Hidden: NewBundle[T, *cell.Hidden[T]](),
+		Input:  newBundle[T, *cell.Input[T]](),
+		Output: newBundle[T, *cell.Output[T]](),
+		Hidden: newBundle[T, *cell.Hidden[T]](),
 	}
 }

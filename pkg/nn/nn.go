@@ -8,7 +8,7 @@ import (
 )
 
 type NN[T utils.Float] struct {
-	Network    network.Network[T] `json:"network,omitempty" yaml:"network,omitempty" toml:"network,omitempty" xml:"network,omitempty"`
+	Network    network.Network[T] `json:"network,omitempty" toml:"network,omitempty" xml:"network,omitempty"`
 	Activation activation.Type
 	Loss       loss.Type
 	Rate       T

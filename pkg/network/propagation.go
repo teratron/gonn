@@ -22,9 +22,9 @@ func (n *Network[T]) CalculateLoss(mode loss.Type) T {
 // ----------------------------------------------------------------------------
 
 func (n *Network[T]) CalculateMisses() {
-	for i := n.Hidden.number-1; i >= 0; i-- {
+	for i := n.Hidden.number - 1; i >= 0; i-- {
 		var cum T = 0.0
-		for _, a := range n.Hidden.Cells[i].OutgoingAxons {
+		for _, a := range n.Hidden.cells[i].OutgoingAxons {
 			cum += a.CalculateMiss()
 		}
 	}
