@@ -31,20 +31,19 @@ const (
 	DEFAULT   = MSE
 )
 
-func CalculateTotalLoss[T utils.Float](misses []*T, mode Type) T {
-	var loss T = 0.0
+func CalculateTotalLoss[T utils.Float](misses *[]*T, mode Type) (loss T) {
 	var count T = 0.0
-	for _, miss := range misses {
+	for _, miss := range *misses {
 		loss += Loss(0.0, *miss, mode)
 		count++
 	}
 	if count > 1.0 {
 		loss /= count
 	}
-	if mode == RMSE {
+	if mode == RMSE || mode == MSLE || mode == LOG_COSH || mode == HUBER {
 		loss = T(math.Sqrt(float64(loss)))
 	}
-	return loss
+	return
 }
 
 // Loss function for single values.

@@ -8,6 +8,7 @@ import (
 
 type bundle[T utils.Float, S neuron.Nucleus[T]] struct {
 	cells       []S
+	cache       []*T
 	number      int
 	numberFloat T
 }
@@ -15,6 +16,7 @@ type bundle[T utils.Float, S neuron.Nucleus[T]] struct {
 func newBundle[T utils.Float, S neuron.Nucleus[T]]() bundle[T, S] {
 	return bundle[T, S]{
 		cells:       make([]S, 0),
+		cache:       make([]*T, 0),
 		number:      0,
 		numberFloat: T(0),
 	}
@@ -35,12 +37,13 @@ func (b *bundle[T, S]) Add(cell S) {
 	b.numberFloat = T(b.number)
 }
 
-func (b *bundle[T, S]) GetValues() []*T {
-	values := make([]*T, len(b.cells))
+func (b *bundle[T, S]) GetValues() *[]*T {
+	//values := make([]*T, len(b.cells))
 	for i, c := range b.cells {
-		values[i] = c.GetValue()
+		//values[i] = c.GetValue()
+		b.cache[i] = c.GetValue()
 	}
-	return values
+	return &b.cache
 }
 
 // Input bundle specific methods
@@ -136,14 +139,15 @@ func (b *bundle[T, _]) SetTargets(data *[]T) {
 
 // bundle for Output or Hidden
 
-func (b *bundle[T, _]) GetMisses() []*T {
-	misses := make([]*T, b.number)
+func (b *bundle[T, _]) GetMisses() *[]*T {
+	//misses := make([]*T, b.number)
 	if c, ok := any(b.cells).([]neuron.Neuron[T]); ok {
 		for i, n := range c {
-			misses[i] = n.GetMiss()
+			//misses[i] = n.GetMiss()
+			b.cache[i] = n.GetMiss()
 		}
 	}
-	return misses
+	return &b.cache
 }
 
 func (b *bundle[T, _]) calculateValues() {
