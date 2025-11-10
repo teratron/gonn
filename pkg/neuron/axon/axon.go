@@ -2,6 +2,7 @@ package axon
 
 import (
 	"math/rand"
+	"sync"
 	"time"
 
 	"github.com/teratron/gonn/pkg/neuron"
@@ -23,15 +24,23 @@ type Axon[T utils.Float] struct {
 	OutgoingCell neuron.Neuron[T]
 }
 
+var (
+	rng = rand.New(rand.NewSource(time.Now().UnixNano()))
+	mu  sync.Mutex
+)
+
 // New creates a new axon with random weight initialization in range [-0.5, 0.5]
 func New[T utils.Float](
 	incomingCell neuron.Nucleus[T],
 	outgoingCell neuron.Neuron[T],
 ) *Axon[T] {
 	// Create a local random generator with current time as seed
-	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
+	//rng := rand.New(rand.NewSource(time.Now().UnixNano()))
+	mu.Lock()
+	weight := T(rng.Float64()*1.0 - 0.5)
+	mu.Unlock()
 	return &Axon[T]{
-		Weight:       T(rng.Float64()*1.0 - 0.5), // Случайное значение в диапазоне [-0.5, 0.5]
+		Weight:       weight, //T(rng.Float64()*1.0 - 0.5), // Случайное значение в диапазоне [-0.5, 0.5]
 		IncomingCell: incomingCell,
 		OutgoingCell: outgoingCell,
 	}

@@ -1,6 +1,7 @@
 package network
 
 import (
+	"github.com/teratron/gonn/pkg/neuron/axon"
 	"github.com/teratron/gonn/pkg/neuron/cell"
 	"github.com/teratron/gonn/pkg/utils"
 )
@@ -24,4 +25,18 @@ func New[T utils.Float]() Network[T] {
 		Output: newBundle[T, *cell.Output[T]](),
 		Hidden: newBundle[T, *cell.Hidden[T]](),
 	}
+}
+
+func (n *Network[T]) Build() error {
+	// Создаем связи между Input -> первый Hidden
+	for _, i := range n.Input.cells {
+		for _, h := range n.Hidden.cells {
+			h.IncomingAxons = append(h.IncomingAxons, axon.New(i, h))
+		}
+	}
+
+	// Создаем связи между Hidden слоями и Output
+	// ... аналогично
+
+	return nil
 }

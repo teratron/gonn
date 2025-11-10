@@ -7,34 +7,35 @@ import (
 )
 
 type bundle[T utils.Float, S neuron.Nucleus[T]] struct {
-	cells       []S
-	cache       []*T
-	number      int
-	numberFloat T
+	cells     []S
+	cache     []*T
+	size      int
+	sizeFloat T
 }
 
 func newBundle[T utils.Float, S neuron.Nucleus[T]]() bundle[T, S] {
 	return bundle[T, S]{
-		cells:       make([]S, 0),
-		cache:       make([]*T, 0),
-		number:      0,
-		numberFloat: T(0),
+		cells:     make([]S, 0),
+		cache:     make([]*T, 0),
+		size:      0,
+		sizeFloat: T(0),
 	}
 }
 
 //func newBundleWithData[T utils.Float, S neuron.Nucleus[T]](data []T) bundle[T, S] {
-//	number := len(data)
+//	size := len(data)
 //	return bundle[T, S]{
 //		cells:       make([]S, 0),
-//		number:      number,
-//		numberFloat: T(float64(number)),
+//		size:      size,
+//		sizeFloat: T(float64(size)),
 //	}
 //}
 
 func (b *bundle[T, S]) Add(cell S) {
 	b.cells = append(b.cells, cell)
-	b.number++
-	b.numberFloat = T(b.number)
+	b.cache = append(b.cache, nil)
+	b.size++
+	b.sizeFloat = T(b.size)
 }
 
 func (b *bundle[T, S]) GetValues() *[]*T {
@@ -47,12 +48,12 @@ func (b *bundle[T, S]) GetValues() *[]*T {
 // Input bundle specific methods
 
 //	func NewInputBundle[T utils.Float](data []T) InputBundle[T] {
-//		number := uint(len(data))
+//		size := uint(len(data))
 //		bundle := InputBundle[T]{
 //			bundle: bundle[T, *cell.Input[T]]{
 //				cells:        make([]*cell.Input[T], 0),
-//				number:      number,
-//				numberFloat: T(float64(number)),
+//				size:      size,
+//				sizeFloat: T(float64(size)),
 //			},
 //		}
 //
@@ -67,10 +68,11 @@ func (b *bundle[T, S]) GetValues() *[]*T {
 //	}
 
 func (b *bundle[T, _]) SetInputs(data *[]T) {
-	if len(*data) > len(b.cells) {
+	if len(*data) > b.size {
 		utils.Logger.Error("data length is greater than bundle length")
+		return
 	}
-	if i, ok := any(b).(*cell.Input[T]); ok {
+	if i, ok := any(b.cells[0]).(*cell.Input[T]); ok {
 		for _, v := range *data {
 			i.SetValue(&v)
 		}
@@ -80,12 +82,12 @@ func (b *bundle[T, _]) SetInputs(data *[]T) {
 // Output bundle specific methods
 
 //func NewOutputBundle[T utils.Float](data []T) *cell.Output[T] {
-//	number := uint(len(data))
+//	size := uint(len(data))
 //	bundle := OutputBundle[T]{
 //		bundle: bundle[T, *cell.Output[T]]{
 //			cells:        make([]*cell.Output[T], 0),
-//			number:      number,
-//			numberFloat: T(float64(number)),
+//			size:      size,
+//			sizeFloat: T(float64(size)),
 //		},
 //	}
 //
@@ -100,8 +102,9 @@ func (b *bundle[T, _]) SetInputs(data *[]T) {
 //}
 
 func (b *bundle[T, _]) SetTargets(data *[]T) {
-	if len(*data) > len(b.cells) {
+	if len(*data) > b.size {
 		utils.Logger.Error("data length is greater than bundle length")
+		return
 	}
 	if o, ok := any(b).(*cell.Output[T]); ok {
 		for _, v := range *data {
@@ -113,12 +116,12 @@ func (b *bundle[T, _]) SetTargets(data *[]T) {
 // Hidden bundle specific methods
 
 //func NewHiddenBundle[T utils.Float](data []T) HiddenBundle[T] {
-//	number := uint(len(data))
+//	size := uint(len(data))
 //	bundle := HiddenBundle[T]{
 //		bundle: bundle[T, *cell.Hidden[T]]{
 //			cells:        make([]*cell.Hidden[T], 0),
-//			number:      number,
-//			numberFloat: T(float64(number)),
+//			size:      size,
+//			sizeFloat: T(float64(size)),
 //		},
 //	}
 //

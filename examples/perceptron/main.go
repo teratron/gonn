@@ -10,24 +10,32 @@ import (
 )
 
 func main() {
-	n := nn.New[float32]()
-
 	dataSet := []float32{.27, -.31, -.52, .66, .81, -.13, .2, .49, .11, -.73, .28} // Dataset.
 	lenInput := 3                                                                  // Number of input data.
 	lenOutput := 2                                                                 // Number of output data.
 	lenData := len(dataSet) - lenOutput
-	start := time.Now() // Starting the timer.
+
+	n := nn.New[float32]().
+		Input(uint(lenInput)).
+		Dense(5, activation.SIGMOID, true).
+		Dense(10, activation.RELU, true).
+		Dense(5, activation.SIGMOID, false).
+		Output(uint(lenOutput), activation.SOFTMAX).
+		Compile(loss.ARCTAN, 0.3) // loss, learning rate
 
 	// Set properties.
-	n.SetHiddenLayers(
-		// neurons, activation, bias
-		nn.HiddenLayer{Number: 3, Activation: activation.SIGMOID, Bias: true},  // 1st hidden layer.
-		nn.HiddenLayer{Number: 5, Activation: activation.RELU, Bias: true},     // 2nd hidden layer.
-		nn.HiddenLayer{Number: 3, Activation: activation.SIGMOID, Bias: false}, // 3rd hidden layer.
-	).SetOutputLayer(
-		// neurons, activation, loss, bias
-		uint(lenOutput), activation.SIGMOID, loss.ARCTAN, false,
-	).SetRate(0.3)
+	//n.SetHiddenLayers(
+	//	// neurons, activation, bias
+	//	nn.HiddenLayer{Number: 3, Activation: activation.SIGMOID, Bias: true},  // 1st hidden layer.
+	//	nn.HiddenLayer{Number: 5, Activation: activation.RELU, Bias: true},     // 2nd hidden layer.
+	//	nn.HiddenLayer{Number: 3, Activation: activation.SIGMOID, Bias: false}, // 3rd hidden layer.
+	//).SetOutputLayer(
+	//	// neurons, activation, loss, bias
+	//	uint(lenOutput), activation.SIGMOID, loss.ARCTAN, false,
+	//).SetRate(0.3)
+
+	// Starting the timer.
+	start := time.Now()
 
 	// Training.
 	for epoch := 1; epoch <= 100_000; epoch++ {
