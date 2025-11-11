@@ -20,7 +20,7 @@
 nn := NewBuilder[float32]().
     Input(2).
     Dense(4, activation.SIGMOID).
-    Dense(4, activation.RELU).
+Dense(4, activation.ReLU).
     Output(1, activation.SIGMOID).
     WithLearningRate(0.3).
     WithLoss(loss.MSE).
@@ -106,7 +106,7 @@ nn := MustNewNetwork[float32](
 // С комбинированными опциями
 nn := MustNewNetwork[float32](
     WithInput[float32](784),
-    DeepNetwork[float32](128, 3, activation.RELU),
+DeepNetwork[float32](128, 3, activation.ReLU),
     WithOutput[float32](10, activation.SOFTMAX),
     StandardSetup[float32](0.001),
 )
@@ -154,7 +154,7 @@ nn := nn.NewBuilder[float32]().
 // Вариант 3 - Functional Options
 nn := nn.MustNew[float32](
     nn.WithInput[float32](784),
-    nn.DeepNetwork[float32](128, 3, activation.RELU),
+nn.DeepNetwork[float32](128, 3, activation.ReLU),
     nn.WithOutput[float32](10, activation.SOFTMAX),
     nn.StandardSetup[float32](0.001),
     nn.WithEpochCallback[float32](logProgress),
@@ -284,8 +284,8 @@ nn := nn.NewBuilder[float32]().
 ```go
 nn := nn.NewBuilder[float32]().
     Input(784).
-    Dense(128, activation.RELU).
-    Dense(64, activation.RELU).
+	Dense(128, activation.ReLU).
+Dense(64, activation.ReLU).
     Output(10, activation.SOFTMAX).
     WithLearningRate(0.001).
     MustCompile()
@@ -296,9 +296,9 @@ nn := nn.NewBuilder[float32]().
 ```go
 nn := nn.NewBuilder[float64]().
     Input(5).
-    Dense(20, activation.RELU).
-    Dense(10, activation.RELU).
-    Output(1, activation.LINEAR).
+	Dense(20, activation.ReLU).
+Dense(10, activation.ReLU).
+Output(1, activation.Linear).
     WithLearningRate(0.01).
     MustCompile()
 ```

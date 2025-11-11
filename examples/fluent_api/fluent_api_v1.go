@@ -159,9 +159,9 @@ func ExampleSimpleXOR() *NN[float32] {
 func ExampleDeepNetwork() *NN[float32] {
 	return NewBuilder[float32]().
 		Input(784). // MNIST
-		Dense(128, activation.RELU).
-		Dense(64, activation.RELU).
-		Dense(32, activation.RELU).
+		Dense(128, activation.ReLU).
+		Dense(64, activation.ReLU).
+		Dense(32, activation.ReLU).
 		Output(10, activation.SOFTMAX).
 		WithLearningRate(0.001).
 		WithLoss(loss.CROSS_ENTROPY).
@@ -174,9 +174,9 @@ func ExampleNoBias() *NN[float64] {
 	return NewBuilder[float64]().
 		Input(10).
 		WithBias(false).
-		Dense(20, activation.TANH).
-		Dense(15, activation.TANH).
-		Output(5, activation.LINEAR).
+		Dense(20, activation.TanH).
+		Dense(15, activation.TanH).
+		Output(5, activation.Linear).
 		WithLearningRate(0.01).
 		MustCompile()
 }
@@ -185,9 +185,9 @@ func ExampleNoBias() *NN[float64] {
 func ExampleRegression() *NN[float32] {
 	return NewBuilder[float32]().
 		Input(5).
-		Dense(10, activation.RELU).
-		Dense(10, activation.RELU).
-		Output(1, activation.LINEAR). // Linear для регрессии
+		Dense(10, activation.ReLU).
+		Dense(10, activation.ReLU).
+		Output(1, activation.Linear). // Linear для регрессии
 		WithLearningRate(0.01).
 		WithLoss(loss.MSE).
 		MustCompile()
@@ -197,8 +197,8 @@ func ExampleRegression() *NN[float32] {
 func ExampleBinaryClassification() *NN[float32] {
 	return NewBuilder[float32]().
 		Input(20).
-		Dense(16, activation.RELU).
-		Dense(8, activation.RELU).
+		Dense(16, activation.ReLU).
+		Dense(8, activation.ReLU).
 		Output(1, activation.SIGMOID). // Sigmoid для бинарной классификации
 		WithLearningRate(0.001).
 		WithLoss(loss.BINARY_CROSS_ENTROPY).
@@ -209,8 +209,8 @@ func ExampleBinaryClassification() *NN[float32] {
 func ExampleMulticlassClassification() *NN[float64] {
 	return NewBuilder[float64]().
 		Input(100).
-		Dense(64, activation.RELU).
-		Dense(32, activation.RELU).
+		Dense(64, activation.ReLU).
+		Dense(32, activation.ReLU).
 		Output(10, activation.SOFTMAX). // Softmax для мультиклассовой
 		WithLearningRate(0.001).
 		WithLoss(loss.CROSS_ENTROPY).

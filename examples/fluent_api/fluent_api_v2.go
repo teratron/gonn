@@ -1,6 +1,8 @@
 package nn
 
 import (
+	"encoding/json"
+
 	"github.com/teratron/gonn/pkg/activation"
 	"github.com/teratron/gonn/pkg/loss"
 	"github.com/teratron/gonn/pkg/utils"
@@ -16,22 +18,22 @@ type LayerConfig struct {
 
 // NetworkConfig конфигурация всей сети
 type NetworkConfig[T utils.Float] struct {
-	InputSize    int
-	Layers       []LayerConfig
-	OutputSize   int
+	InputSize        int
+	Layers           []LayerConfig
+	OutputSize       int
 	OutputActivation activation.Type
-	LossFunction loss.Type
-	LearningRate T
-	
+	LossFunction     loss.Type
+	LearningRate     T
+
 	// Дополнительные параметры
-	WeightInit   string
-	Optimizer    string // "sgd", "adam", "rmsprop"
-	Momentum     T
-	
+	WeightInit string
+	Optimizer  string // "sgd", "adam", "rmsprop"
+	Momentum   T
+
 	// Регуляризация
-	L1           T
-	L2           T
-	Dropout      T
+	L1      T
+	L2      T
+	Dropout T
 }
 
 // ConfigBuilder строит NetworkConfig с fluent API
@@ -207,14 +209,14 @@ func ExampleWithConfig() *NN[float32] {
 func ExampleNamedLayers() *NN[float32] {
 	nn, _ := NewConfig[float32]().
 		Input(784).
-		AddLayerWithName(128, activation.RELU, "hidden1").
-		AddLayerWithName(64, activation.RELU, "hidden2").
-		AddLayerWithName(32, activation.RELU, "hidden3").
+		AddLayerWithName(128, activation.ReLU, "hidden1").
+		AddLayerWithName(64, activation.ReLU, "hidden2").
+		AddLayerWithName(32, activation.ReLU, "hidden3").
 		Output(10, activation.SOFTMAX).
 		LearningRate(0.001).
 		Loss(loss.CROSS_ENTROPY).
 		BuildAndCreate()
-	
+
 	return nn
 }
 
@@ -222,8 +224,8 @@ func ExampleNamedLayers() *NN[float32] {
 func ExampleAdvancedConfig() *NN[float64] {
 	nn, _ := NewConfig[float64]().
 		Input(100).
-		AddLayer(64, activation.RELU).
-		AddLayer(32, activation.RELU).
+		AddLayer(64, activation.ReLU).
+		AddLayer(32, activation.ReLU).
 		Output(10, activation.SOFTMAX).
 		LearningRate(0.001).
 		Loss(loss.CROSS_ENTROPY).
@@ -233,7 +235,7 @@ func ExampleAdvancedConfig() *NN[float64] {
 		L2Regularization(0.01).
 		Dropout(0.5).
 		BuildAndCreate()
-	
+
 	return nn
 }
 
@@ -242,7 +244,7 @@ func ExampleReuseConfig() {
 	// Создаем базовую конфигурацию
 	baseConfig := NewConfig[float32]().
 		Input(10).
-		AddLayer(20, activation.RELU).
+		AddLayer(20, activation.ReLU).
 		Output(5, activation.SOFTMAX).
 		LearningRate(0.01).
 		Build()
@@ -250,12 +252,12 @@ func ExampleReuseConfig() {
 	// Создаем несколько сетей с одинаковой архитектурой
 	nn1, _ := CreateFromConfig(baseConfig)
 	nn2, _ := CreateFromConfig(baseConfig)
-	
+
 	// Можно модифицировать конфигурацию
 	modifiedConfig := baseConfig
 	modifiedConfig.LearningRate = 0.001
 	nn3, _ := CreateFromConfig(modifiedConfig)
-	
+
 	_, _, _ = nn1, nn2, nn3
 }
 
@@ -279,7 +281,7 @@ func (c NetworkConfig[T]) Validate() error {
 }
 
 // Пример 6: Сохранение/загрузка конфигурации (JSON)
-import "encoding/json"
+//import "encoding/json"
 
 func (c NetworkConfig[T]) ToJSON() ([]byte, error) {
 	return json.MarshalIndent(c, "", "  ")

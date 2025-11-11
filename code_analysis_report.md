@@ -33,7 +33,7 @@ n.SetHiddenLayers(&[
 ```go
 n.SetHiddenLayers(
     nn.HiddenLayer{Number: 3, Activation: activation.SIGMOID, Bias: true},
-    nn.HiddenLayer{Number: 5, Activation: activation.RELU, Bias: true},
+    nn.HiddenLayer{Number: 5, Activation: activation.ReLU, Bias: true},
     nn.HiddenLayer{Number: 3, Activation: activation.SIGMOID, Bias: false},
 )
 ```

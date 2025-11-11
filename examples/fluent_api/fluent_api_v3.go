@@ -221,7 +221,7 @@ func ExampleSimpleXOR() *NN[float32] {
 func ExampleDeepNetworkWithOptions() *NN[float32] {
 	return MustNewNetwork[float32](
 		WithInput[float32](784),
-		DeepNetwork[float32](128, 3, activation.RELU), // 3 слоя: 128, 64, 32
+		DeepNetwork[float32](128, 3, activation.ReLU), // 3 слоя: 128, 64, 32
 		WithOutput[float32](10, activation.SOFTMAX),
 		StandardSetup[float32](0.001),
 	)
@@ -231,8 +231,8 @@ func ExampleDeepNetworkWithOptions() *NN[float32] {
 func ExampleWithCallbacks() *NN[float32] {
 	return MustNewNetwork[float32](
 		WithInput[float32](10),
-		WithHiddenLayer[float32](20, activation.RELU),
-		WithHiddenLayer[float32](15, activation.RELU),
+		WithHiddenLayer[float32](20, activation.ReLU),
+		WithHiddenLayer[float32](15, activation.ReLU),
 		WithOutput[float32](5, activation.SOFTMAX),
 		WithLearningRate[float32](0.01),
 		WithEpochCallback[float32](func(epoch int, loss float32) {
@@ -247,7 +247,7 @@ func ExampleWithCallbacks() *NN[float32] {
 func ExampleSequential() *NN[float64] {
 	return MustNewNetwork[float64](
 		WithInput[float64](100),
-		Sequential[float64](5, 50, activation.RELU), // 5 слоев по 50 нейронов
+		Sequential[float64](5, 50, activation.ReLU), // 5 слоев по 50 нейронов
 		WithOutput[float64](10, activation.SOFTMAX),
 		WithLearningRate[float64](0.001),
 		WithLoss[float64](loss.CROSS_ENTROPY),
@@ -258,7 +258,7 @@ func ExampleSequential() *NN[float64] {
 func ExampleWithErrorHandling() (*NN[float32], error) {
 	nn, err := NewNetwork[float32](
 		WithInput[float32](5),
-		WithHiddenLayer[float32](10, activation.TANH),
+		WithHiddenLayer[float32](10, activation.TanH),
 		WithOutput[float32](2, activation.SIGMOID),
 		WithLearningRate[float32](0.05),
 	)
@@ -276,9 +276,9 @@ func ExampleNoBias() *NN[float32] {
 	return MustNewNetwork[float32](
 		WithInput[float32](3),
 		WithBias[float32](false), // Отключаем bias для всех слоев
-		WithHiddenLayer[float32](5, activation.RELU),
-		WithHiddenLayer[float32](5, activation.RELU),
-		WithOutput[float32](1, activation.LINEAR),
+		WithHiddenLayer[float32](5, activation.ReLU),
+		WithHiddenLayer[float32](5, activation.ReLU),
+		WithOutput[float32](1, activation.Linear),
 		WithLearningRate[float32](0.01),
 	)
 }
@@ -295,15 +295,15 @@ func ExampleSharedOptions() []*NN[float32] {
 	// Сеть 1
 	nn1 := MustNewNetwork[float32](append(commonOpts,
 		WithInput[float32](10),
-		WithHiddenLayer[float32](20, activation.RELU),
-		WithOutput[float32](5, activation.LINEAR),
+		WithHiddenLayer[float32](20, activation.ReLU),
+		WithOutput[float32](5, activation.Linear),
 	)...)
 
 	// Сеть 2
 	nn2 := MustNewNetwork[float32](append(commonOpts,
 		WithInput[float32](15),
-		WithHiddenLayer[float32](30, activation.RELU),
-		WithOutput[float32](8, activation.LINEAR),
+		WithHiddenLayer[float32](30, activation.ReLU),
+		WithOutput[float32](8, activation.Linear),
 	)...)
 
 	return []*NN[float32]{nn1, nn2}
@@ -328,8 +328,8 @@ func PresetXOR[T utils.Float]() *NN[T] {
 func PresetMNIST[T utils.Float]() *NN[T] {
 	return MustNewNetwork[T](
 		WithInput[T](784),
-		WithHiddenLayer[T](128, activation.RELU),
-		WithHiddenLayer[T](64, activation.RELU),
+		WithHiddenLayer[T](128, activation.ReLU),
+		WithHiddenLayer[T](64, activation.ReLU),
 		WithOutput[T](10, activation.SOFTMAX),
 		WithLearningRate[T](0.001),
 		WithLoss[T](loss.CROSS_ENTROPY),
@@ -341,9 +341,9 @@ func PresetMNIST[T utils.Float]() *NN[T] {
 func PresetRegression[T utils.Float](inputSize, hiddenSize int) *NN[T] {
 	return MustNewNetwork[T](
 		WithInput[T](inputSize),
-		WithHiddenLayer[T](hiddenSize, activation.RELU),
-		WithHiddenLayer[T](hiddenSize/2, activation.RELU),
-		WithOutput[T](1, activation.LINEAR),
+		WithHiddenLayer[T](hiddenSize, activation.ReLU),
+		WithHiddenLayer[T](hiddenSize/2, activation.ReLU),
+		WithOutput[T](1, activation.Linear),
 		WithLearningRate[T](0.01),
 		WithLoss[T](loss.MSE),
 	)

@@ -18,7 +18,7 @@ func main() {
 	n := nn.New[float32]().
 		Input(uint(lenInput)).
 		Dense(5, activation.SIGMOID, true).
-		Dense(10, activation.RELU, true).
+		Dense(10, activation.ReLU, true).
 		Dense(5, activation.SIGMOID, false).
 		Output(uint(lenOutput), activation.SOFTMAX).
 		Compile(loss.ARCTAN, 0.3) // loss, learning rate
@@ -27,7 +27,7 @@ func main() {
 	//n.SetHiddenLayers(
 	//	// neurons, activation, bias
 	//	nn.HiddenLayer{Number: 3, Activation: activation.SIGMOID, Bias: true},  // 1st hidden layer.
-	//	nn.HiddenLayer{Number: 5, Activation: activation.RELU, Bias: true},     // 2nd hidden layer.
+	//	nn.HiddenLayer{Number: 5, Activation: activation.ReLU, Bias: true},     // 2nd hidden layer.
 	//	nn.HiddenLayer{Number: 3, Activation: activation.SIGMOID, Bias: false}, // 3rd hidden layer.
 	//).SetOutputLayer(
 	//	// neurons, activation, loss, bias

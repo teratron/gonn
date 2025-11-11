@@ -23,7 +23,7 @@ func New[T utils.Float]() *NN[T] {
 
 	return &NN[T]{
 		Network:    network.New[T](),
-		Activation: activation.DEFAULT,
+		Activation: activation.Default,
 		Loss:       loss.DEFAULT,
 		Rate:       0.3,
 		Bias:       false,
