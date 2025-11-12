@@ -8,6 +8,8 @@ import (
 
 // Network
 type Network[T utils.Float] struct {
+	Rate T
+
 	// Input neurons.
 	Input bundle[T, *cell.Input[T]] `json:"input" toml:"input" xml:"input"`
 

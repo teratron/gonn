@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/teratron/gonn/pkg/activation"
-	"github.com/teratron/gonn/pkg/loss"
+	//"github.com/teratron/gonn/pkg/loss"
 	"github.com/teratron/gonn/pkg/nn"
 )
 
@@ -16,12 +16,12 @@ func main() {
 	lenData := len(dataSet) - lenOutput
 
 	n := nn.New[float32]().
-		Input(uint(lenInput)).
+		//Input(uint(lenInput)).
 		Dense(5, activation.SIGMOID, true).
 		Dense(10, activation.ReLU, true).
-		Dense(5, activation.SIGMOID, false).
-		Output(uint(lenOutput), activation.SOFTMAX).
-		Compile(loss.ARCTAN, 0.3) // loss, learning rate
+		Dense(5, activation.SIGMOID, false) //.
+	//Output(uint(lenOutput), activation.SOFTMAX).
+	//Compile(loss.ARCTAN, 0.3) // loss, learning rate
 
 	// Set properties.
 	//n.SetHiddenLayers(
@@ -40,7 +40,7 @@ func main() {
 	// Training.
 	for epoch := 1; epoch <= 100_000; epoch++ {
 		for i := lenInput; i <= lenData; i++ {
-			//_, _ = n.Train(dataSet[i-lenInput:i], dataSet[i:i+lenOutput])
+			_, _ = n.Train(dataSet[i-lenInput:i], dataSet[i:i+lenOutput])
 		}
 
 		// Verifying.

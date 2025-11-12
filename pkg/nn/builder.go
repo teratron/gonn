@@ -1,6 +1,6 @@
 package nn
 
-import (
+/*import (
 	"github.com/teratron/gonn/pkg/activation"
 	"github.com/teratron/gonn/pkg/loss"
 )
@@ -103,3 +103,4 @@ func (n *NN[T]) Compile() (*NN[T], error) {
 
 	return nn, nil
 }
+*/

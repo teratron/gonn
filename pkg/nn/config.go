@@ -1,5 +1,6 @@
 package nn
 
+/*
 import (
 	"github.com/teratron/gonn/pkg/activation"
 	"github.com/teratron/gonn/pkg/loss"
@@ -42,3 +43,4 @@ func (n *NN[T]) SetRate(value float64) *NN[T] {
 	n.Rate = T(value)
 	return n
 }
+*/
