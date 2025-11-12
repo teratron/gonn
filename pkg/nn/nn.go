@@ -38,6 +38,7 @@ func (n *NN[T]) Dense(size uint, activation activation.Type, bias bool) *NN[T] {
 		Activation: activation,
 		Bias:       bias, //n.useBias,
 	})*/
+	//n.Network.Hidden.
 	network.NewLayer[T](size, activation, bias)
 	return n
 }
