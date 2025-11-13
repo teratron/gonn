@@ -22,9 +22,9 @@ const (
 	Default   = Linear
 )
 
-type ActivationFunction[T utils.Float] interface {
-	activation(value T) T
-	derivative(value T) T
+type Function[T utils.Float] interface {
+	Activation(value *T)
+	Derivative(value *T)
 }
 
 // Activation function with parameters.

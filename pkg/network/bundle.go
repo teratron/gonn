@@ -46,31 +46,20 @@ func (b *bundle[T, S]) GetValues() *[]*T {
 	return &b.cache
 }
 
-func (b *bundle[T, S]) Init(size int, function activation.Type, bias bool) {
+func (b *bundle[T, S]) Init(size int, activationMode activation.Type, bias bool) {
 	b.size = b.size + size
 	b.sizeFloat = T(b.size)
-	b.cells = make([]S, b.size)
-	b.cache = make([]*T, b.size)
-	//if hidden, ok := any(cell.NewHidden[T](function, bias)).(*cell.Hidden[T]); ok {
-	//	for range data {
-	//		b.cells = append(b.cells, hidden)
-	//	}
-	//}
 
-	//tmp := make([]S, size)
 	for i := 0; i < size; i++ {
-		if n, ok := any(cell.NewHidden[T](function, bias)).(S); ok {
-			//tmp[i] = h
+		if n, ok := any(cell.NewHidden[T](activationMode, bias)).(S); ok {
 			b.cells = append(b.cells, n)
+			b.cache = append(b.cache, nil)
 		}
 	}
 	if len(b.cells) != b.size {
 		utils.Logger.Error("bundle size mismatch")
 		return
 	}
-	//b.cells = append(b.cells, tmp...)
-	//delete(tmp)
-
 }
 
 // Input bundle specific methods
@@ -163,7 +152,7 @@ func (b *bundle[T, _]) SetTargets(data *[]T) {
 //}
 
 // ----------------------------------------------------------------------------
-// FORWARD PROPAGATION METHODS
+// FORWARD PROPAGATION
 // ----------------------------------------------------------------------------
 
 // bundle for Output or Hidden
@@ -186,7 +175,7 @@ func (b *bundle[T, _]) calculateValues() {
 }
 
 // ----------------------------------------------------------------------------
-// BACKWARD PROPAGATION METHODS
+// BACKWARD PROPAGATION
 // ----------------------------------------------------------------------------
 
 // bundle for Output or Hidden

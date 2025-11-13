@@ -40,7 +40,7 @@ func NewHidden[T utils.Float](activationMode activation.Type, bias bool) *Hidden
 //}
 
 // ----------------------------------------------------------------------------
-// FORWARD PROPAGATION METHODS
+// FORWARD PROPAGATION
 // ----------------------------------------------------------------------------
 
 // CalculateValue
@@ -49,7 +49,7 @@ func NewHidden[T utils.Float](activationMode activation.Type, bias bool) *Hidden
 //}
 
 // ----------------------------------------------------------------------------
-// BACKWARD PROPAGATION METHODS
+// BACKWARD PROPAGATION
 // ----------------------------------------------------------------------------
 
 // CalculateWeight

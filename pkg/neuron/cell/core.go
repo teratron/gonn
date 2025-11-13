@@ -16,6 +16,7 @@ type core[T utils.Float] struct {
 	miss           T
 	activationMode activation.Type
 	IncomingAxons  axon.Bundle[T]
+	activation     activation.Function[T]
 	//bias           bool
 }
 
@@ -51,7 +52,7 @@ func (c *core[T]) SetMiss(value T) {
 }
 
 // ----------------------------------------------------------------------------
-// FORWARD PROPAGATION METHODS
+// FORWARD PROPAGATION
 // ----------------------------------------------------------------------------
 
 // CalculateValue
@@ -60,17 +61,17 @@ func (c *core[T]) CalculateValue() {
 	for _, a := range c.IncomingAxons {
 		c.value += a.CalculateValue()
 	}
-	c.value = activation.Activation(c.value, c.activationMode)
+	//c.value = activation.Activation(c.value, c.activationMode)
+	c.activation.Activation(&c.value)
 }
 
 // ----------------------------------------------------------------------------
-// BACKWARD PROPAGATION METHODS
+// BACKWARD PROPAGATION
 // ----------------------------------------------------------------------------
 
 // CalculateWeight
 func (c *core[T]) CalculateWeight(rate *T) {
-	derivative := activation.Derivative(c.value, c.activationMode)
-	gradient := *rate * c.miss * derivative
+	gradient := *rate * c.miss * activation.Derivative(c.value, c.activationMode)
 	for i := range c.IncomingAxons {
 		c.IncomingAxons[i].CalculateWeight(&gradient)
 	}

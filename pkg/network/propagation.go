@@ -5,7 +5,7 @@ import (
 )
 
 // ----------------------------------------------------------------------------
-// FORWARD PROPAGATION METHODS
+// FORWARD PROPAGATION
 // ----------------------------------------------------------------------------
 
 func (n *Network[T]) CalculateValues() {
@@ -14,11 +14,11 @@ func (n *Network[T]) CalculateValues() {
 }
 
 func (n *Network[T]) CalculateLoss(mode loss.Type) T {
-	return loss.CalculateTotalLoss(n.Output.GetMisses(), n.Output.cells.LossMode)
+	return loss.CalculateTotalLoss(n.Output.GetMisses(), n.LossMode)
 }
 
 // ----------------------------------------------------------------------------
-// BACKWARD PROPAGATION METHODS
+// BACKWARD PROPAGATION
 // ----------------------------------------------------------------------------
 
 func (n *Network[T]) CalculateMisses() {

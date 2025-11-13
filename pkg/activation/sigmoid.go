@@ -6,6 +6,9 @@ import (
 	"github.com/teratron/gonn/pkg/utils"
 )
 
+var _ Function[float32] = (*Sigmoid[float32])(nil)
+var _ Function[float64] = (*Sigmoid[float64])(nil)
+
 // Sigmoid represents the sigmoid activation function with a configurable slope parameter
 type Sigmoid[T utils.Float] struct {
 	slope T
@@ -17,14 +20,14 @@ func NewSigmoid[T utils.Float](slope T) *Sigmoid[T] {
 }
 
 // Activation applies the sigmoid activation function: f(x) = 1 / (1 + exp(-slope * x))
-func (s *Sigmoid[T]) Activation(value T) T {
-	return 1.0 / (1.0 + T(math.Exp(float64(-s.slope*value))))
+func (s *Sigmoid[T]) Activation(value *T) {
+	*value = 1.0 / (1.0 + T(math.Exp(float64(-s.slope**value))))
 }
 
 // Derivative calculates the derivative of the sigmoid function
-func (s *Sigmoid[T]) Derivative(value T) T {
-	sigmoidValue := s.Activation(value)
-	return s.slope * sigmoidValue * (T(1.0) - sigmoidValue)
+func (s *Sigmoid[T]) Derivative(value *T) {
+	//sigmoidValue := s.Activation(value)
+	*value = s.slope * *value * (T(1.0) - *value)
 }
 
 // Sigmoid activation function: f(x) = 1 / (1 + exp(-slope * x))
