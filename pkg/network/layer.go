@@ -6,15 +6,15 @@ import (
 )
 
 type Layer[T utils.Float] struct {
-	size       uint
-	Activation activation.Type
-	Bias       bool
+	size           uint
+	activationMode activation.Type
+	Bias           bool
 }
 
-func NewLayer[T utils.Float](size uint, activation activation.Type, bias bool) *Layer[T] {
+func NewLayer[T utils.Float](size uint, activationMode activation.Type, bias bool) *Layer[T] {
 	return &Layer[T]{
-		size:       size,
-		Activation: activation,
-		Bias:       bias,
+		size:           size,
+		activationMode: activationMode,
+		Bias:           bias,
 	}
 }

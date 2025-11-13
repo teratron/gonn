@@ -14,7 +14,7 @@ func (n *Network[T]) CalculateValues() {
 }
 
 func (n *Network[T]) CalculateLoss(mode loss.Type) T {
-	return loss.CalculateTotalLoss(n.Output.GetMisses(), mode)
+	return loss.CalculateTotalLoss(n.Output.GetMisses(), n.Output.cells.LossMode)
 }
 
 // ----------------------------------------------------------------------------

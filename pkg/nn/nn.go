@@ -32,13 +32,13 @@ func New[T utils.Float]() *NN[T] {
 	}
 }
 
-func (n *NN[T]) Dense(size uint, activation activation.Type, bias bool) *NN[T] {
+func (n *NN[T]) Dense(size uint, activationMode activation.Type, bias bool) *NN[T] {
 	/*n.hiddenLayers = append(n.hiddenLayers, HiddenLayer{
 		Number:     size,
 		Activation: activation,
 		Bias:       bias, //n.useBias,
 	})*/
-	//n.Network.Hidden.
-	network.NewLayer[T](size, activation, bias)
+	n.Network.Hidden.Init(int(size), activationMode, bias)
+	//network.NewLayer[T](size, activation, bias)
 	return n
 }

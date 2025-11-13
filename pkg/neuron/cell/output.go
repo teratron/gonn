@@ -1,6 +1,7 @@
 package cell
 
 import (
+	"github.com/teratron/gonn/pkg/activation"
 	"github.com/teratron/gonn/pkg/neuron"
 	"github.com/teratron/gonn/pkg/utils"
 )
@@ -15,9 +16,9 @@ type Output[T utils.Float] struct {
 }
 
 // NewOutput
-func NewOutput[T utils.Float](target *T) *Output[T] {
+func NewOutput[T utils.Float](target *T, activationMode activation.Type, bias bool) *Output[T] {
 	return &Output[T]{
-		core:   newCore[T](),
+		core:   newCore[T](activationMode, bias),
 		target: target,
 	}
 }

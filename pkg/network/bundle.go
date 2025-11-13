@@ -1,6 +1,7 @@
 package network
 
 import (
+	"github.com/teratron/gonn/pkg/activation"
 	"github.com/teratron/gonn/pkg/neuron"
 	"github.com/teratron/gonn/pkg/neuron/cell"
 	"github.com/teratron/gonn/pkg/utils"
@@ -43,6 +44,33 @@ func (b *bundle[T, S]) GetValues() *[]*T {
 		b.cache[i] = c.GetValue()
 	}
 	return &b.cache
+}
+
+func (b *bundle[T, S]) Init(size int, function activation.Type, bias bool) {
+	b.size = b.size + size
+	b.sizeFloat = T(b.size)
+	b.cells = make([]S, b.size)
+	b.cache = make([]*T, b.size)
+	//if hidden, ok := any(cell.NewHidden[T](function, bias)).(*cell.Hidden[T]); ok {
+	//	for range data {
+	//		b.cells = append(b.cells, hidden)
+	//	}
+	//}
+
+	//tmp := make([]S, size)
+	for i := 0; i < size; i++ {
+		if n, ok := any(cell.NewHidden[T](function, bias)).(S); ok {
+			//tmp[i] = h
+			b.cells = append(b.cells, n)
+		}
+	}
+	if len(b.cells) != b.size {
+		utils.Logger.Error("bundle size mismatch")
+		return
+	}
+	//b.cells = append(b.cells, tmp...)
+	//delete(tmp)
+
 }
 
 // Input bundle specific methods

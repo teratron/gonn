@@ -1,6 +1,7 @@
 package cell
 
 import (
+	"github.com/teratron/gonn/pkg/activation"
 	"github.com/teratron/gonn/pkg/neuron"
 	"github.com/teratron/gonn/pkg/neuron/axon"
 	"github.com/teratron/gonn/pkg/utils"
@@ -16,9 +17,9 @@ type Hidden[T utils.Float] struct {
 }
 
 // NewHidden
-func NewHidden[T utils.Float]() *Hidden[T] {
+func NewHidden[T utils.Float](activationMode activation.Type, bias bool) *Hidden[T] {
 	return &Hidden[T]{
-		core:          newCore[T](),
+		core:          newCore[T](activationMode, bias),
 		OutgoingAxons: make(axon.Bundle[T], 0),
 	}
 }

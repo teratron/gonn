@@ -14,17 +14,19 @@ var _ neuron.Neuron[float64] = (*core[float64])(nil)
 type core[T utils.Float] struct {
 	value          T
 	miss           T
-	ActivationMode activation.Type
+	activationMode activation.Type
 	IncomingAxons  axon.Bundle[T]
+	//bias           bool
 }
 
 // newCore
-func newCore[T utils.Float]() *core[T] {
+func newCore[T utils.Float](activationMode activation.Type, bias bool) *core[T] {
 	return &core[T]{
 		value:          0.0,
 		miss:           0.0,
-		ActivationMode: activation.SIGMOID,
+		activationMode: activationMode,
 		IncomingAxons:  make(axon.Bundle[T], 0),
+		//bias:           bias,
 	}
 }
 
@@ -58,7 +60,7 @@ func (c *core[T]) CalculateValue() {
 	for _, a := range c.IncomingAxons {
 		c.value += a.CalculateValue()
 	}
-	c.value = activation.Activation(c.value, c.ActivationMode)
+	c.value = activation.Activation(c.value, c.activationMode)
 }
 
 // ----------------------------------------------------------------------------
@@ -67,7 +69,7 @@ func (c *core[T]) CalculateValue() {
 
 // CalculateWeight
 func (c *core[T]) CalculateWeight(rate *T) {
-	derivative := activation.Derivative(c.value, c.ActivationMode)
+	derivative := activation.Derivative(c.value, c.activationMode)
 	gradient := *rate * c.miss * derivative
 	for i := range c.IncomingAxons {
 		c.IncomingAxons[i].CalculateWeight(&gradient)
