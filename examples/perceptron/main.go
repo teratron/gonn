@@ -16,11 +16,11 @@ func main() {
 	lenData := len(dataSet) - lenOutput
 
 	n := nn.New[float32]().
-		//Input(uint(lenInput)).
+		Input(uint(lenInput)).
 		Dense(5, activation.SIGMOID, true).
 		Dense(10, activation.ReLU, true).
-		Dense(5, activation.SIGMOID, false) //.
-	//Output(uint(lenOutput), activation.SOFTMAX).
+		Dense(5, activation.SIGMOID, false).
+		Output(uint(lenOutput), activation.SOFTMAX, true) //.
 	//Compile(loss.ARCTAN, 0.3) // loss, learning rate
 
 	// Set properties.

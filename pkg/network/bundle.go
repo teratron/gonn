@@ -12,6 +12,7 @@ type bundle[T utils.Float, S neuron.Nucleus[T]] struct {
 	cache     []*T
 	size      int
 	sizeFloat T
+	isInit    bool
 }
 
 func newBundle[T utils.Float, S neuron.Nucleus[T]]() bundle[T, S] {
