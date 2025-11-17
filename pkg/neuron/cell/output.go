@@ -14,6 +14,10 @@ type _Output[T utils.Float] struct {
 	target *T
 }
 
+func _NewOutput[T utils.Float]() *_Output[T] {
+	return &_Output[T]{}
+}
+
 // Output
 type Output[T utils.Float] struct {
 	*core[T]

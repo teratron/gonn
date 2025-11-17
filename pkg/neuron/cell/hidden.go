@@ -13,7 +13,7 @@ var _ neuron.Neuron[float64] = (*Hidden[float64])(nil)
 type Dense[T utils.Float] struct {
 	*_core[T]
 	miss  T
-	Axons axon.Bundle[T]
+	Axons axon.Bundle[T] `json:"axons" xml:"axons"`
 }
 
 func NewDense[T utils.Float](number uint) *Dense[T] {

@@ -11,7 +11,7 @@ var _ neuron.Neuron[float32] = (*core[float32])(nil)
 var _ neuron.Neuron[float64] = (*core[float64])(nil)
 
 type _core[T utils.Float] struct {
-	id    [2]uint
+	Id    [2]uint `json:"id" xml:"id"`
 	value T
 }
 

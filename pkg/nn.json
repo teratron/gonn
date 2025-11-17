@@ -16,7 +16,8 @@
         "id": 1,
         "size": 2,
         "activationMode": 3,
-        "lossMode": 1
+        "lossMode": 1,
+        "bias": true
       },
       "dense": [
         {
