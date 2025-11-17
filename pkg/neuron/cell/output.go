@@ -9,6 +9,11 @@ import (
 var _ neuron.Neuron[float32] = (*Output[float32])(nil)
 var _ neuron.Neuron[float64] = (*Output[float64])(nil)
 
+type _Output[T utils.Float] struct {
+	*Dense[T]
+	target *T
+}
+
 // Output
 type Output[T utils.Float] struct {
 	*core[T]

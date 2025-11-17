@@ -10,6 +10,20 @@ import (
 var _ neuron.Neuron[float32] = (*Hidden[float32])(nil)
 var _ neuron.Neuron[float64] = (*Hidden[float64])(nil)
 
+type Dense[T utils.Float] struct {
+	*_core[T]
+	miss  T
+	Axons axon.Bundle[T]
+}
+
+func NewDense[T utils.Float](number uint) *Dense[T] {
+	return &Dense[T]{
+		_core: _newCore[T]([2]uint{neuron.DENSE, number}),
+		miss:  0.0,
+		Axons: make(axon.Bundle[T], 0),
+	}
+}
+
 // Hidden
 type Hidden[T utils.Float] struct {
 	*core[T]

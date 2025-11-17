@@ -10,6 +10,15 @@ import (
 var _ neuron.Neuron[float32] = (*core[float32])(nil)
 var _ neuron.Neuron[float64] = (*core[float64])(nil)
 
+type _core[T utils.Float] struct {
+	id    [2]uint
+	value T
+}
+
+func _newCore[T utils.Float](id [2]uint) *_core[T] {
+	return &_core[T]{id, 0.0}
+}
+
 // core
 type core[T utils.Float] struct {
 	value          T
@@ -17,7 +26,6 @@ type core[T utils.Float] struct {
 	activationMode activation.Type
 	IncomingAxons  axon.Bundle[T]
 	activation     activation.Function[T]
-	//bias           bool
 }
 
 // newCore
@@ -27,7 +35,6 @@ func newCore[T utils.Float](activationMode activation.Type, bias bool) *core[T] 
 		miss:           0.0,
 		activationMode: activationMode,
 		IncomingAxons:  make(axon.Bundle[T], 0),
-		//bias:           bias,
 	}
 }
 

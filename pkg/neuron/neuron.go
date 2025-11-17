@@ -4,6 +4,13 @@ import (
 	"github.com/teratron/gonn/pkg/utils"
 )
 
+const (
+	INPUT uint = iota
+	OUTPUT
+	BIAS
+	DENSE
+)
+
 // Nucleus - base interface for all neural network cells
 // Interface for neural network cells with method GetValue()
 // For types: Input, Hidden, Output, Bias.

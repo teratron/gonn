@@ -14,13 +14,13 @@ type Network[T utils.Float] struct {
 	Bias         bool
 
 	// Input neurons.
-	Input bundle[T, *cell.Input[T]] `json:"input" toml:"input" xml:"input"`
+	Input bundle[T, *cell.Input[T]] `json:"input" xml:"input"`
 
 	// Output neurons.
-	Output bundle[T, *cell.Output[T]] `json:"output" toml:"output" xml:"output"`
+	Output bundle[T, *cell.Output[T]] `json:"output" xml:"output"`
 
 	// Hidden neurons.
-	Hidden bundle[T, *cell.Hidden[T]] `json:"hidden" toml:"hidden" xml:"hidden"`
+	Hidden bundle[T, *cell.Hidden[T]] `json:"hidden" xml:"hidden"`
 }
 
 // New

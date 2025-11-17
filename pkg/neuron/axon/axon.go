@@ -12,6 +12,11 @@ import (
 // Bundle представляет коллекцию аксонов
 type Bundle[T utils.Float] []*Axon[T]
 
+type _Axon[T utils.Float] struct {
+	Weight T       `json:"weight" xml:"weight"`
+	CellId [2]uint `json:"cellId" xml:"cellId"`
+}
+
 // Axon represents a connection between neural network cells
 type Axon[T utils.Float] struct {
 	// Вес аксона

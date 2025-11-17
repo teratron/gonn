@@ -8,6 +8,16 @@ import (
 var _ neuron.Nucleus[float32] = (*Input[float32])(nil)
 var _ neuron.Nucleus[float64] = (*Input[float64])(nil)
 
+type _Input[T utils.Float] struct {
+	*_core[T]
+}
+
+func _NewInput[T utils.Float]() *_Input[T] {
+	return &_Input[T]{
+		_newCore[T]([2]uint{neuron.INPUT, 0}),
+	}
+}
+
 // Input
 type Input[T utils.Float] struct {
 	value *T
