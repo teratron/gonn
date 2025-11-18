@@ -68,8 +68,8 @@ func (c *core[T]) CalculateValue() {
 	for _, a := range c.IncomingAxons {
 		c.value += a.CalculateValue()
 	}
-	//c.value = activation.Activation(c.value, c.activationMode)
-	c.activation.Activation(&c.value)
+	c.value = activation.Activation(c.value, c.activationMode)
+	//c.activation.Activation(&c.value)
 }
 
 // ----------------------------------------------------------------------------
