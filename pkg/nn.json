@@ -47,17 +47,17 @@
           {
             "_comment": "Axon connection with weight and incoming neuron Id",
             "weight": 0.42,
-            "cellId": [0, 0]
+            "id": [0, 0]
           },
           {
             "_comment": "Axon connection with weight and incoming neuron Id",
             "weight": 0.24,
-            "cellId": [0, 1]
+            "id": [0, 1]
           },
           {
             "_comment": "Axon connection to bias neuron",
             "weight": 0.42,
-            "cellId": [2, 0]
+            "id": [2, 0]
           }
         ]
       },
@@ -68,7 +68,7 @@
           {
             "_comment": "Axon connection",
             "weight": 0.42,
-            "cellId": [0, 0]
+            "id": [0, 0]
           },
           {
             "_comment": "Axon connection",
@@ -84,12 +84,12 @@
           {
             "_comment": "Axon connection",
             "weight": 0.42,
-            "cellId": [2, 0]
+            "id": [2, 0]
           },
           {
             "_comment": "Axon connection",
             "weight": 0.24,
-            "cellId": [2, 1]
+            "id": [2, 1]
           }
         ]
       },
@@ -100,12 +100,12 @@
           {
             "_comment": "Axon connection",
             "weight": 0.42,
-            "cellId": [2, 0]
+            "id": [2, 0]
           },
           {
             "_comment": "Axon connection",
             "weight": 0.24,
-            "cellId": [2, 1]
+            "id": [2, 1]
           }
         ]
       }
