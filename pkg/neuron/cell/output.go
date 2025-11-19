@@ -15,7 +15,7 @@ type Output[T utils.Float] struct {
 
 func NewOutput[T utils.Float](target *T) *Output[T] {
 	return &Output[T]{
-		Dense: NewDense[T](1),
+		Dense:  NewDense[T](neuron.OUTPUT),
 		target: target,
 	}
 }

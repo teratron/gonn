@@ -17,6 +17,10 @@ func newCore[T utils.Float](id [2]uint) *core[T] {
 	return &core[T]{id, 0.0}
 }
 
+//func (c *core[T]) GetId() [2]uint {
+//	return c.Id
+//}
+
 func (c *core[T]) GetValue() *T {
 	return &c.value
 }

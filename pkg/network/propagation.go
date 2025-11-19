@@ -29,6 +29,12 @@ func (n *Network[T]) CalculateMisses() {
 		}
 		n.Hidden.cells[i].SetMiss(cum)
 	}
+
+	for i := n.Hidden.size - 1; i >= 0; i-- {
+		for _, a := range n.Output.cells[i].Axons {
+			a.Cell.AddMiss(a.Cell.GetMiss() * a.Weight)
+		}
+	}
 }
 
 func (n *Network[T]) CalculateWeights(rate *T) {
