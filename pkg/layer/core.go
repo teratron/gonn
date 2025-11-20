@@ -1,15 +1,20 @@
 package layer
 
 import (
-	"github.com/teratron/gonn/pkg/activation"
+	"github.com/teratron/gonn/pkg/neuron"
 	"github.com/teratron/gonn/pkg/utils"
 )
 
-type core struct {
-	Id   uint `json:"id" xml:"id"`
-	Size uint `json:"size" xml:"size"`
+type core[T utils.Float, S neuron.Nucleus[T]] struct {
+	Id    uint `json:"id" xml:"id"`
+	Size  uint `json:"size" xml:"size"`
+	cells []S
 }
 
-func newCore[T utils.Float](size uint, activationMode activation.Type, bias bool) *core {
-	return &core{}
+func newCore[T utils.Float, S neuron.Nucleus[T]](size uint) *core[T, S] {
+	return &core[T, S]{
+		Id:    0,
+		Size:  size,
+		cells: make([]S, size),
+	}
 }
