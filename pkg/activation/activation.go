@@ -142,3 +142,31 @@ func Derivative[T utils.Float](value T, mode Type, params ...float64) T {
 		return 1.0 // Default derivative if unknown
 	}
 }
+
+// String returns the string representation of the activation type
+func (a Type) String() string {
+	switch a {
+	case ELISH:
+		return "ELISH"
+	case ELU:
+		return "ELU"
+	case Linear:
+		return "Linear"
+	case LeakyReLU:
+		return "LeakyReLU"
+	case ReLU:
+		return "ReLU"
+	case SELU:
+		return "SELU"
+	case SIGMOID:
+		return "SIGMOID"
+	case SOFTMAX:
+		return "SOFTMAX"
+	case SWISH:
+		return "SWISH"
+	case TanH:
+		return "TanH"
+	default:
+		return "Unknown"
+	}
+}

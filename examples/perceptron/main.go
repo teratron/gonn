@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/teratron/gonn/pkg/activation"
+	"github.com/teratron/gonn/pkg/loss"
 	//"github.com/teratron/gonn/pkg/loss"
 	"github.com/teratron/gonn/pkg/nn"
 )
@@ -20,8 +21,8 @@ func main() {
 		Dense(5, activation.SIGMOID, true).
 		Dense(10, activation.ReLU, true).
 		Dense(5, activation.SIGMOID, false).
-		Output(uint(lenOutput), activation.SOFTMAX, true) //.
-	//Compile(loss.ARCTAN, 0.3) // loss, learning rate
+		Output(uint(lenOutput), activation.SOFTMAX, loss.ARCTAN, true) //.
+	//Compile(0.3) // learning rate
 
 	// Set properties.
 	//n.SetHiddenLayers(

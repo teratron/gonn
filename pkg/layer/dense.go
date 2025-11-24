@@ -3,19 +3,31 @@ package layer
 import (
 	"github.com/teratron/gonn/pkg/activation"
 	"github.com/teratron/gonn/pkg/neuron"
+	"github.com/teratron/gonn/pkg/neuron/cell"
 	"github.com/teratron/gonn/pkg/utils"
 )
 
-type Dense[T utils.Float, S neuron.Nucleus[T]] struct {
+type Dense[T utils.Float, S neuron.Neuron[T]] struct {
 	*core[T, S]
-	Bias           bool            `json:"bias" xml:"bias"`
-	ActivationMode activation.Type `json:"activation" xml:"activation"`
+	Bias       bool            `json:"bias" xml:"bias"`
+	Activation activation.Type `json:"activation" xml:"activation"`
 }
 
-func (d *Dense[T, S]) Init(size int, activationMode activation.Type, bias bool) {
-	d.Size = uint(size)
-	d.ActivationMode = activationMode
-	d.Bias = bias
+func NewDense[T utils.Float](size int, activation activation.Type, bias bool) *Dense[T, *cell.Dense[T]] {
+	d := &Dense[T, *cell.Dense[T]]{}
+	d.Init(size, activation, bias)
+	utils.Logger.Info("Dense layer created", "size", size, "activation", activation.String(), "bias", bias)
+	return d
+}
 
-	d.core = newCore[T, S](d.Id)
+func (d *Dense[T, S]) Init(size int, activation activation.Type, bias bool) {
+	if d.Id >= neuron.DENSE {
+		d.Id = 0
+	} else {
+		d.Id++
+	}
+	d.Size = uint(size)
+	d.Activation = activation
+	d.Bias = bias
+	d.cells = make([]S, size)
 }

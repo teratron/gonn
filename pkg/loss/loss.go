@@ -126,5 +126,46 @@ func Loss[T utils.Float](predicted, target T, mode Type) T {
 // 		default:
 // 			return total / T(n)
 // 		}
-// 	}
 // }
+
+// String returns the string representation of the loss type
+func (l Type) String() string {
+	switch l {
+	case MSE:
+		return "MSE"
+	case MAE:
+		return "MAE"
+	case CCE:
+		return "CCE"
+	case BCE:
+		return "BCE"
+	case MAPE:
+		return "MAPE"
+	case MSLE:
+		return "MSLE"
+	case KLD:
+		return "KLD"
+	case COSINE:
+		return "COSINE"
+	case POISSON:
+		return "POISSON"
+	case HINGE:
+		return "HINGE"
+	case SQ_HINGE:
+		return "SQ_HINGE"
+	case CAT_HINGE:
+		return "CAT_HINGE"
+	case LOG_COSH:
+		return "LOG_COSH"
+	case HUBER:
+		return "HUBER"
+	case AVG:
+		return "AVG"
+	case RMSE:
+		return "RMSE"
+	case ARCTAN:
+		return "ARCTAN"
+	default:
+		return "Unknown"
+	}
+}

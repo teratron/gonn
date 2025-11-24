@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	INPUT uint = iota
+	INPUT uint = iota + 1
 	OUTPUT
 	BIAS
 	DENSE
