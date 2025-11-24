@@ -5,10 +5,10 @@ import (
 )
 
 const (
-	INPUT uint = iota + 1
+	INPUT uint8 = iota
 	OUTPUT
-	BIAS
 	DENSE
+	BIAS
 )
 
 // Nucleus - base interface for all neural network cells

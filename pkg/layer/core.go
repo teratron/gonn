@@ -6,8 +6,9 @@ import (
 )
 
 type core[T utils.Float, S neuron.Nucleus[T]] struct {
-	Id    uint `json:"id" xml:"id"`
-	Size  uint `json:"size" xml:"size"`
+	Type  uint8 `json:"type" xml:"type"`
+	Id    uint  `json:"id" xml:"id"`
+	Size  uint  `json:"size" xml:"size"`
 	cells []S
 }
 
