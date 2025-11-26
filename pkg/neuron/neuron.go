@@ -5,7 +5,8 @@ import (
 )
 
 const (
-	INPUT uint8 = iota
+	UNKNOWN uint8 = iota
+	INPUT
 	OUTPUT
 	DENSE
 	BIAS

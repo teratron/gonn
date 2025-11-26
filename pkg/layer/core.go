@@ -14,6 +14,7 @@ type core[T utils.Float, S neuron.Nucleus[T]] struct {
 
 func newCore[T utils.Float, S neuron.Nucleus[T]](size uint) *core[T, S] {
 	return &core[T, S]{
+		Type:  neuron.UNKNOWN,
 		Id:    0,
 		Size:  size,
 		cells: make([]S, size),

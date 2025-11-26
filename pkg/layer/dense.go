@@ -21,11 +21,8 @@ func NewDense[T utils.Float](size int, activation activation.Type, bias bool) *D
 }
 
 func (d *Dense[T, S]) Init(size int, activation activation.Type, bias bool) {
-	if d.Id >= neuron.DENSE {
-		d.Id = 0
-	} else {
-		d.Id++
-	}
+	d.Type = neuron.DENSE
+	d.Id = 0
 	d.Size = uint(size)
 	d.Activation = activation
 	d.Bias = bias

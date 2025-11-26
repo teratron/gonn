@@ -16,7 +16,8 @@ func NewInput[T utils.Float](size int) *Input[T, *cell.Input[T]] {
 }
 
 func (i *Input[T, S]) Init(size int) {
-	i.Id = neuron.INPUT
+	i.Type = neuron.INPUT
+	i.Id = 0
 	i.Size = uint(size)
 	i.cells = make([]S, size)
 	utils.Logger.Info("Input layer created", "size", size)

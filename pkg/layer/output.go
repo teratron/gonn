@@ -21,7 +21,8 @@ func NewOutput[T utils.Float](size int, activation activation.Type, loss loss.Ty
 }
 
 func (o *Output[T, S]) Init(size int, activation activation.Type, loss loss.Type, bias bool) {
-	o.Id = neuron.OUTPUT
+	o.Type = neuron.OUTPUT
+	o.Id = 0
 	o.Dense.Init(size, activation, bias)
 	o.Loss = loss
 }
