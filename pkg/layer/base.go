@@ -15,7 +15,6 @@ type base[T utils.Float, S neuron.Neuron[T]] struct {
 func newBase[T utils.Float, S neuron.Neuron[T]](size int, activation activation.Type, bias bool) *base[T, S] {
 	d := &base[T, S]{}
 	d.Init(size, activation, bias)
-	utils.Logger.Info("Dense layer created", "size", size, "activation", activation.String(), "bias", bias)
 	return d
 }
 
