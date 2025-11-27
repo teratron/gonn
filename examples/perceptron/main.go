@@ -6,7 +6,6 @@ import (
 
 	"github.com/teratron/gonn/pkg/activation"
 	"github.com/teratron/gonn/pkg/loss"
-	//"github.com/teratron/gonn/pkg/loss"
 	"github.com/teratron/gonn/pkg/nn"
 )
 

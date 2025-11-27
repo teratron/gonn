@@ -9,7 +9,7 @@ import (
 )
 
 type Output[T utils.Float] struct {
-	*Dense[T, *cell.Output[T]]
+	*base[T, *cell.Output[T]]
 	Loss loss.Type `json:"loss" xml:"loss"`
 }
 
@@ -23,6 +23,7 @@ func NewOutput[T utils.Float](size int, activation activation.Type, loss loss.Ty
 func (o *Output[T]) Init(size int, activation activation.Type, loss loss.Type, bias bool) {
 	o.Type = neuron.OUTPUT
 	o.Id = 0
-	o.Dense.Init(size, activation, bias)
+	o.base.Init(size, activation, bias)
 	o.Loss = loss
+	o.cells = make([]*cell.Output[T], size)
 }
