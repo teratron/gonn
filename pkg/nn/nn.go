@@ -9,7 +9,7 @@ import (
 )
 
 type NN[T utils.Float] struct {
-	Network network.Network[T] `json:"network" xml:"network"`
+	network.Network[T] `json:"network" xml:"network"`
 
 	isInit  bool
 	isTrain bool
