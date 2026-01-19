@@ -83,3 +83,6 @@ build/
 # Rust
 rust/
 *.rs
+
+.gemini/
+gha-creds-*.json
