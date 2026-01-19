@@ -12,7 +12,7 @@ import (
 type Bundle[T utils.Float] []*Axon[T]
 
 type Axon[T utils.Float] struct {
-	Weight       T                 `json:"weight" xml:"weight"`
+	Weight T `json:"weight" xml:"weight"`
 	//OutgoingCell neuron.Nucleus[T] `json:"-" xml:"-"`
 	//CellId [2]uint           `json:"cellId" xml:"cellId"`
 	Cell neuron.Nucleus[T] `json:"-" xml:"-"` // Incoming cell: Hidden, Input, Bias
@@ -31,7 +31,7 @@ func New[T utils.Float](cell, outgoingCell neuron.Nucleus[T]) *Axon[T] {
 	//weight := T(rng.Float64()*1.0 - 0.5)
 	defer mu.Unlock()
 	return &Axon[T]{
-		Weight:       T(rng.Float64()*1.0 - 0.5), // weight, //Случайное значение в диапазоне [-0.5, 0.5]
+		Weight: T(rng.Float64()*1.0 - 0.5), // weight, //Случайное значение в диапазоне [-0.5, 0.5]
 		//OutgoingCell: outgoingCell,
 		//CellId: cell.GetId(),
 		Cell: cell,
