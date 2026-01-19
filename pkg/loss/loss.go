@@ -15,6 +15,7 @@ const (
 	MAE                   // MAE - Mean Absolute Error (equivalent to Avg)
 	CCE                   // CCE - Categorical Cross-Entropy
 	BCE                   // BCE - Binary Cross-Entropy
+	CROSS_ENTROPY         // CROSS_ENTROPY - Cross-Entropy (alias for CCE)
 	MAPE                  // MAPE - Mean Absolute Percentage Error
 	MSLE                  // MSLE - Mean Squared Logarithmic Error
 	KLD                   // KLD - Kullback-Leibler Divergence
@@ -67,7 +68,7 @@ func Loss[T utils.Float](predicted, target T, mode Type) T {
 		return msleLoss(predicted, target)
 	case KLD:
 		return kldLoss(predicted, target)
-	case CCE:
+	case CCE, CROSS_ENTROPY:
 		return cceLossSingle(predicted, target) // CCE requires vector inputs, so return 0 for single values
 	case POISSON:
 		return poissonLoss(predicted, target)
@@ -135,8 +136,8 @@ func (l Type) String() string {
 		return "MSE"
 	case MAE:
 		return "MAE"
-	case CCE:
-		return "CCE"
+	case CCE, CROSS_ENTROPY:
+		return "CROSS_ENTROPY"
 	case BCE:
 		return "BCE"
 	case MAPE:
