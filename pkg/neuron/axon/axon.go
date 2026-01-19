@@ -31,7 +31,7 @@ func New[T utils.Float](cell, outgoingCell neuron.Nucleus[T]) *Axon[T] {
 	//weight := T(rng.Float64()*1.0 - 0.5)
 	defer mu.Unlock()
 	return &Axon[T]{
-		Weight: T(rng.Float64()*1.0 - 0.5), // weight, //Случайное значение в диапазоне [-0.5, 0.5]
+		Weight: T(rng.Float64()*1.0 - 0.5), // weight, // Случайное значение в диапазоне [-0.5, 0.5]
 		//OutgoingCell: outgoingCell,
 		//CellId: cell.GetId(),
 		Cell: cell,

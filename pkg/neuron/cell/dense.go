@@ -17,7 +17,7 @@ type Dense[T utils.Float] struct {
 
 func NewDense[T utils.Float](number uint) *Dense[T] {
 	return &Dense[T]{
-		core:  newCore[T]([2]uint{neuron.DENSE, number}),
+		core:  newCore[T]([2]uint{uint(neuron.DENSE), number}),
 		miss:  0.0,
 		Axons: make(axon.Bundle[T], 0),
 	}

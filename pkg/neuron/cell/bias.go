@@ -12,7 +12,7 @@ type Bias[T utils.Float] core[T]
 
 func _NewBias[T utils.Float]() *Bias[T] {
 	return &Bias[T]{
-		Id:    [2]uint{neuron.BIAS, 0},
+		Id:    [2]uint{uint(neuron.BIAS), 0},
 		value: 1.0,
 	}
 }

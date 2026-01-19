@@ -12,7 +12,7 @@ type Input[T utils.Float] core[T]
 
 func NewInput[T utils.Float](value T) *Input[T] {
 	return &Input[T]{
-		Id:    [2]uint{neuron.INPUT, 0},
+		Id:    [2]uint{uint(neuron.INPUT), 0},
 		value: value,
 	}
 }
