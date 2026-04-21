@@ -60,6 +60,7 @@ coverage/
 # Temporary folders
 tmp/
 temp/
+.references/
 
 # Build outputs
 dist/
