@@ -72,18 +72,31 @@ build/
 *.bak
 *.tmp
 
-# Spec Kit
-.github/prompts/
-.codex/prompts/
-.claude/commands/
-.gemini/commands/
-.cursor/commands/
-.qwen/commands/
-.kilocode/workflows/
-
 # Rust
 rust/
 *.rs
 
 .gemini/
 gha-creds-*.json
+
+# Local settings
+*/settings.json
+*/settings.*.json
+
+# Agents
+CLAUDE.md
+GEMINI.md
+QWEN.md
+.*/workflows/
+.*/commands/
+.*/prompts/
+.*/skills/
+.*/rules/
+!.agents/workflows/
+!.agents/skills/
+!.agents/rules/
+.agents/skills/magic.*
+
+# Magic Spec
+.magic/
+.agents/workflows/magic.*.md
