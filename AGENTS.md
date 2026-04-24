@@ -64,16 +64,6 @@ Consistency in communication and code is paramount.
 - **Microservices**: Decouple by domain. Use lightweight communication and implement observability (tracing, metrics, logs).
 - **Web**: Use `net/http` for simple services; use frameworks like Gin or Echo for complex routing/middleware while maintaining clean architecture.
 
-### 4.6 ECS Design Principles (Best Practices)
-
-- **Component Granularity**: Favor small, specialized components (e.g., `JumpComponent`, `ControlComponent`) over monolithic "God" components.
-- **Tag Components**: Use empty structs as tags for filtering (e.g., `DisabledTag`, `EnemyTag`) instead of boolean flags inside larger components.
-- **Command Components**: Use components as one-time signals for systems to process and then remove/cleanup.
-- **Logic in Components**: Components should be pure data. Simple read-only helper methods (e.g., `IsExpired() bool`) are acceptable, but any state mutation must happen in systems.
-- **Entities for Abstract Concepts**: Use entities to represent higher-level concepts like `Squad`, `Formation`, or `GameSession` to manage shared state and relationships.
-- **System Separation**: Split complex logic into multiple systems that each depend on the minimum set of components.
-- **Lazy Initialization**: Delay creating expensive visual or OS resources until the entity is actually needed for rendering or physics.
-
 ## 5. Completion Protocol (Mandatory Checklist)
 
 Before finishing any task, the agent MUST verify the following:
