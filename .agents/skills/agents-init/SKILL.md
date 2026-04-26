@@ -4,10 +4,7 @@ description: >
   Universal agent environment initializer. Creates junctions/symlinks and
   hardlinks so any supported AI agent can discover workflows, skills, and
   rules from the canonical .agents/ directory.
-triggers:
-  - /agents-init
-  - /agents-init <agent…>
-  - /agents-init all
+argument-hint: "[claude|gemini|qwen|copilot|codex|kilocode|all] (default: claude)"
 ---
 
 # Agents Init Skill
