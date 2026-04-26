@@ -96,7 +96,7 @@ QWEN.md
 !.agents/workflows/
 !.agents/skills/
 !.agents/rules/
-.agents/skills/magic.*
+.agents/skills/magic*
 
 # Magic Spec
 .magic/
