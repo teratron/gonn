@@ -89,7 +89,7 @@ CLAUDE.md
 GEMINI.md
 CODEX.md
 QWEN.md
-COPILOT.md
+copilot-instructions.md
 .*/workflows/
 .*/commands/
 .*/prompts/

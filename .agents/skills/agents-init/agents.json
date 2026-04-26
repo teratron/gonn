@@ -35,7 +35,7 @@
         "skills": "skills",
         "rules": "rules",
         "files": [
-            "COPILOT.md"
+            "copilot-instructions.md"
         ],
         "description": "GitHub Copilot"
     },
@@ -56,15 +56,5 @@
         "rules": "rules",
         "files": [],
         "description": "Kilo Code"
-    },
-    "lingma": {
-        "dir": ".lingma",
-        "workflows": "commands",
-        "skills": "skills",
-        "rules": "rules",
-        "files": [
-            "QWEN.md"
-        ],
-        "description": "Lingma IDE (Alibaba)"
     }
 }
