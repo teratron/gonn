@@ -3,8 +3,10 @@
         "dir": ".claude",
         "workflows": "commands",
         "skills": "skills",
-        "rules": null,
-        "files": ["CLAUDE.md"],
+        "rules": "rules",
+        "files": [
+            "CLAUDE.md"
+        ],
         "description": "Claude Code (Anthropic)"
     },
     "gemini": {
@@ -12,47 +14,57 @@
         "workflows": null,
         "skills": null,
         "rules": null,
-        "files": ["GEMINI.md"],
+        "files": [
+            "GEMINI.md"
+        ],
         "description": "Gemini CLI (Google)"
     },
     "qwen": {
         "dir": ".qwen",
         "workflows": "commands",
         "skills": "skills",
-        "rules": null,
-        "files": ["QWEN.md"],
+        "rules": "rules",
+        "files": [
+            "QWEN.md"
+        ],
         "description": "Qwen Code (Alibaba)"
     },
     "copilot": {
         "dir": ".github",
         "workflows": "prompts",
-        "skills": null,
-        "rules": null,
-        "files": ["COPILOT.md"],
+        "skills": "skills",
+        "rules": "rules",
+        "files": [
+            "COPILOT.md"
+        ],
         "description": "GitHub Copilot"
     },
     "codex": {
         "dir": ".codex",
         "workflows": "prompts",
-        "skills": null,
-        "rules": null,
-        "files": ["CODEX.md"],
+        "skills": "skills",
+        "rules": "rules",
+        "files": [
+            "CODEX.md"
+        ],
         "description": "Codex CLI (OpenAI)"
     },
     "kilocode": {
         "dir": ".kilocode",
         "workflows": "workflows",
         "skills": "skills",
-        "rules": null,
+        "rules": "rules",
         "files": [],
         "description": "Kilo Code"
     },
     "lingma": {
         "dir": ".lingma",
         "workflows": "commands",
-        "skills": null,
-        "rules": null,
-        "files": [],
+        "skills": "skills",
+        "rules": "rules",
+        "files": [
+            "QWEN.md"
+        ],
         "description": "Lingma IDE (Alibaba)"
     }
 }

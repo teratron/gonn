@@ -87,7 +87,9 @@ gha-creds-*.json
 # Agents
 CLAUDE.md
 GEMINI.md
+CODEX.md
 QWEN.md
+COPILOT.md
 .*/workflows/
 .*/commands/
 .*/prompts/
