@@ -30,7 +30,7 @@ The `.design/`, `.agents/`, and `.magic/` directories are part of the **Specific
 
 ## Prerequisites
 
-- **Go**: `1.25.5` or later (see [`go.mod`](go.mod))
+- **Go**: `1.26.2` or later (see [`go.mod`](go.mod))
 - **Tooling**:
   - `gofmt` (bundled with Go)
   - `goimports` — `go install golang.org/x/tools/cmd/goimports@latest`
