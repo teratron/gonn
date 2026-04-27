@@ -24,7 +24,7 @@ Consistency in communication and code is paramount.
 ## 3. Technology Stack
 
 - **Language**: Go (latest stable version).
-- **Dependencies**: Prefer standard library. Third-party packages require explicit justification.
+- **Dependencies**: Prefer standard library. After the local standard library, the next in priority is the remote standard library <https://cs.opensource.google/go>. Third-party packages require explicit justification.
 
 ## 4. Go Development Rules
 
