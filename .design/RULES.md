@@ -1,6 +1,6 @@
 # Project Specification Rules
 
-**Version:** 1.1.0
+**Version:** 1.2.0
 **Status:** Active
 
 ## Overview
@@ -226,9 +226,42 @@ Type hierarchies use Go struct embedding for composition (not interface embeddin
 
 The GoNN library MUST NOT introduce external dependencies. Only the Go standard library is permitted. Any proposal to add a third-party dependency requires explicit justification and approval.
 
+The canonical source for permitted packages is the Go standard library tree at <https://cs.opensource.google/go>. When stdlib provides a primitive, no third-party alternative is permissible regardless of perceived ergonomic benefits. Test-only dependencies (e.g., `testify`) are not exempt — they leak into examples and onboarding cost.
+
+### C30 — Test Coverage and Benchmarks
+
+Every new Go package and exported function MUST be covered by tests:
+
+1. **Coverage floor**: 80% line coverage per package, measured by `go test -cover`. New code below this floor blocks the merge.
+2. **Table-driven tests**: required for any function with ≥3 distinct input scenarios. One subtest per case via `t.Run`.
+3. **Race detection**: `go test -race ./...` must pass. Non-deterministic failures are bugs, not flakes.
+4. **Benchmarks**: every hot path identified in `l1-performance-contract.md` (PERF-1) MUST have at least one `Benchmark*` function. Regressions > 10% vs. baseline block the merge.
+5. **Fuzz tests**: input-validation boundaries (parsers, numeric guards) SHOULD have native Go fuzz tests (`Fuzz*`).
+
+### C31 — Doc-comment Verbosity
+
+Every exported identifier (type, function, method, variable, constant) MUST carry a Go doc comment. Per project rule §1.1, comments are English. The level of detail required scales with audience exposure:
+
+1. **Public API** (`pkg/nn/`, `cmd/`): full doc comment — purpose, parameters, return semantics, error contract, ≥1 usage example for non-trivial functions.
+2. **Internal exported** (other `pkg/`): purpose + parameter contract. Examples optional.
+3. **Unexported**: short comment if the name is not self-evident; skip if the signature explains itself.
+
+The first sentence of every doc comment MUST start with the identifier name (Go convention: `// Foo does ...`). Doc comments MUST explain **why** the function exists, not only **what** it does — readers understand mechanics from the code; they need intent from the comment.
+
+### C32 — Error Informativeness
+
+Per `l1-error-taxonomy.md` ERR-4, error messages MUST be specific and actionable:
+
+1. **Forbidden phrases**: "something went wrong", "internal error", "unknown error", "invalid input" without specifying which input.
+2. **Required content**: identify the offending value (or its name), the constraint violated, and where possible the remediation. Example: `Input(): size must be positive, got 0` (not `invalid size`).
+3. **Wrapping**: use `fmt.Errorf("...: %w", err)` to preserve the chain. Never lose the root cause via `err.Error()` re-wrapping.
+4. **Category sentinel**: every returned error wraps a category sentinel from `pkg/utils/errors.go` (`ErrUserConfig`, `ErrIntegrity`, etc.) so callers can route via `errors.Is`.
+5. **Location hint**: at Error log level, include a short caller hint (`function or file:line`) when it improves diagnosability.
+
 ## Document History
 
 | Version | Date | Description |
 | :--- | :--- | :--- |
 | 1.0.0 | 2026-04-21 | Initial constitution |
 | 1.1.0 | 2026-04-21 | Added C25-C29 project conventions from codebase analysis |
+| 1.2.0 | 2026-04-27 | Added C30 (Test Coverage), C31 (Doc-comment Verbosity), C32 (Error Informativeness) from TODO.md ideation. Enhanced C29 with stdlib canonical reference. |
