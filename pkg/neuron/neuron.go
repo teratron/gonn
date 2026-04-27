@@ -16,7 +16,7 @@ const (
 // Interface for neural network cells with method GetValue()
 // For types: Input, Hidden, Output, Bias.
 type Nucleus[T utils.Float] interface {
-	// GetValue возвращает текущее значение клетки
+	// GetValue returns the current value of the cell
 	GetValue() *T
 	//SetValue(T)
 }

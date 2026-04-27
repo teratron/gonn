@@ -36,15 +36,15 @@ func New[T utils.Float]() Network[T] {
 }
 
 func (n *Network[T]) Build() error {
-	// Создаем связи между Input -> первый Hidden
+	// Create connections between Input -> first Hidden
 	for _, i := range n.Input.cells {
 		for _, h := range n.Hidden.cells {
 			h.IncomingAxons = append(h.IncomingAxons, axon.New(i, h))
 		}
 	}
 
-	// Создаем связи между Hidden слоями и Output
-	// ... аналогично
+	// Create connections between Hidden layers and Output
+	// ... similarly
 
 	return nil
 }
