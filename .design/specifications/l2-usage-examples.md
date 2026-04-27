@@ -202,7 +202,7 @@ Each example entry MUST specify the following fields:
 | Hyperparams | Same as E01. |
 | API Style | `Builder` for train phase; reload via persistence API (TBD). |
 | Expected Output | Pre-save query == post-reload query (bit-identical for `float64`, ε-close for `float32`). |
-| Status | MAY (gated on `l1-network-persistence.md` — planned, not yet drafted) |
+| Status | SHOULD (gated on [l1-network-persistence.md](l1-network-persistence.md) reaching Stable) |
 
 #### Continuation
 

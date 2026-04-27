@@ -15,7 +15,8 @@ datasets, without requiring users to compile their own Go binary.
 
 - [l1-neural-network-architecture.md](l1-neural-network-architecture.md) — Parent
 - [l2-nn-facade.md](l2-nn-facade.md) — Library API the CLI delegates to
-- [l1-checkpointing.md](l1-checkpointing.md) — Snapshot/resume integration <!-- TBD: when checkpointing lands -->
+- [l1-network-persistence.md](l1-network-persistence.md) — JSON schema the CLI reads/writes
+- [l1-checkpointing.md](l1-checkpointing.md) — Snapshot/resume integration for `gonn train --resume`
 
 ## 1. Motivation
 
@@ -56,8 +57,9 @@ front-end for cross-language tooling (Python notebooks invoking via subprocess).
 
 ## 6. Implementation Notes
 
-1. Gated on `l1-network-persistence.md` (planned) — config/weights JSON schema.
-2. Build with `cobra` or stdlib `flag` only; per `C29 — Zero External Dependencies`, default to stdlib `flag`.
+1. Reads / writes via [l1-network-persistence.md](l1-network-persistence.md) library — no separate format.
+2. Build with stdlib `flag` only — per `C29 — Zero External Dependencies`. Subcommand routing via switch on `os.Args[1]`.
+3. Exit codes map 1:1 to `l1-error-taxonomy.md` categories — `0` success, `2` `ErrUserConfig`, `3` `ErrInputData`, `4` `ErrTrainingFailure`, `5` `ErrIntegrity`, `6` `ErrIO`, `7` `ErrUnsupported`.
 
 ## Canonical References
 

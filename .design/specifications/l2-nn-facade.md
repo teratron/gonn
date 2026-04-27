@@ -24,6 +24,9 @@ step. Users may pick either style based on context; mixing styles inside a singl
 ## Related Specifications
 
 - [l1-neural-network-architecture.md](l1-neural-network-architecture.md) — Parent concept spec
+- [l1-training-semantics.md](l1-training-semantics.md) — Defines what `Train()` does (convergence, rollback)
+- [l1-weight-initialization.md](l1-weight-initialization.md) — Realizes the symbols reserved in §5.6
+- [l1-error-taxonomy.md](l1-error-taxonomy.md) — Categorizes validation errors emitted by `Compile()` §5.7
 - [l2-network-graph.md](l2-network-graph.md) — Underlying computational graph wired by `Compile()`
 - [l2-layer-types.md](l2-layer-types.md) — Layer types created by builder/option methods
 - [l2-activation-functions.md](l2-activation-functions.md) — Activation symbols accepted by builder
@@ -237,9 +240,9 @@ type HiddenLayerSpec[T utils.Float] struct {
 }
 ```
 
-**Future extension hook (out of scope for v2.0)**: a serializable variant of `Config[T]` is reserved
-for `l1-network-persistence.md` (planned). When that spec lands, this struct may be promoted to public
-API to support `WriteConfig` / `ReadConfig` round-trips.
+**Future extension hook (out of scope for v2.0)**: a serializable variant of `Config[T]` is specified in
+[l1-network-persistence.md](l1-network-persistence.md) §5.2. When that spec promotes from Draft, this
+struct will be promoted to public API to support `WriteConfig` / `ReadConfig` round-trips.
 
 ### 5.6 Weight Initialization Methods
 
@@ -254,9 +257,9 @@ const (
 )
 ```
 
-The full algorithm contract for each method belongs to a future `l1-weight-initialization.md` spec.
-For v2.0 the symbols are reserved and `Compile()` accepts them; defaulting and the actual numeric
-formulas are TBD pending that spec.
+The full algorithm contract for each method is defined in [l1-weight-initialization.md](l1-weight-initialization.md)
+(formulas, RNG seeding, determinism contract). This facade reserves the symbols and accepts them at
+`Compile()`; numeric details live in the parent concept spec.
 
 ### 5.7 Validation Rules at `Compile()`
 

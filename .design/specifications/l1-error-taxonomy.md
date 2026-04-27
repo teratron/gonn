@@ -1,7 +1,7 @@
 # Error Taxonomy
 
 **Version:** 0.1.0
-**Status:** Draft
+**Status:** RFC
 **Layer:** concept
 
 ## Overview
@@ -25,12 +25,16 @@ and machine-routable**.
 
 ## 2. Constraints & Assumptions
 
-- Errors implement standard `error` interface; categories use `errors.Is` via sentinel values or
-  category-specific types.
+> **Concept-Layer Notation**: References to `errors.Is` / `errors.As` / `fmt.Errorf` are **illustrative
+> bindings** of universal concepts (category routing, error chain, error wrapping) to Go. The taxonomy
+> itself — categories, mutual exclusion, actionability rule — is language-independent.
+
+- Errors implement the language's standard error interface; categories are routable by **identity**
+  (Go: `errors.Is` against sentinel values).
 - Error messages are **human-actionable** — they say what went wrong, where, and (when possible) how
   to fix it.
-- Wrapping uses `fmt.Errorf("...: %w", err)` per project rule.
-- No panic in library code except `MustXxx` constructors. All other errors are returned values.
+- Error wrapping preserves the chain so the root cause is recoverable (Go: `fmt.Errorf("...: %w", err)`).
+- No process-level abort in library code except `MustXxx` constructors. All other errors are returned values.
 
 ## 3. Core Invariants
 
@@ -85,3 +89,4 @@ if size == 0:
 | Version | Date | Description |
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-04-27 | Initial Draft from TODO #8 (concept side; complementary rule is C32). |
+| 0.1.0 | 2026-04-27 | Concept-Layer Notation added (purity touch). Status promoted Draft → RFC. 6 categories + 4 invariants ready for review. |

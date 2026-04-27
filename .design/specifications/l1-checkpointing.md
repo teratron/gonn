@@ -12,8 +12,10 @@ Old snapshots are compressed and rotated under a retention policy to bound disk 
 
 ## Related Specifications
 
-- [l1-training-control.md](l1-training-control.md) — Pause triggers snapshot; resume reads latest
 - [l1-neural-network-architecture.md](l1-neural-network-architecture.md) — Parent invariants
+- [l1-network-persistence.md](l1-network-persistence.md) — Snapshot reuses the config + weights schema
+- [l1-training-semantics.md](l1-training-semantics.md) — Min-loss snapshot interacts with weight rollback (TRN-3)
+- [l1-training-control.md](l1-training-control.md) — Pause triggers snapshot; resume reads latest
 
 ## 1. Motivation
 
@@ -73,7 +75,7 @@ instances).
 
 ## 6. Implementation Notes
 
-1. Block on `l1-network-persistence.md` (planned) for the JSON schema definition.
+1. Reuse the JSON schema from [l1-network-persistence.md](l1-network-persistence.md) §5.2/§5.3; snapshot adds RNG state and iteration counter as additional top-level fields.
 2. Atomic write: use `os.Rename` after `Sync()` — POSIX guarantee.
 3. Compression via stdlib `compress/gzip` (per `C29 — Zero External Dependencies`).
 

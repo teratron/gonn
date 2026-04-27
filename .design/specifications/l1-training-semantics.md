@@ -1,7 +1,7 @@
 # Training Semantics
 
 **Version:** 0.1.0
-**Status:** Draft
+**Status:** RFC
 **Layer:** concept
 
 ## Overview
@@ -138,3 +138,4 @@ graph LR
 | Version | Date | Description |
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-04-27 | Initial Draft — closes implicit references from `l2-nn-facade.md` `WithLossLimit`/`WithMaxIterations`. |
+| 0.1.0 | 2026-04-27 | Status promoted Draft → RFC. All required sections filled; convergence loop, state diagram, soft-failures, and 6 invariants ready for review. |

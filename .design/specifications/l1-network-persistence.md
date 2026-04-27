@@ -1,15 +1,15 @@
 # Network Persistence
 
 **Version:** 0.1.0
-**Status:** Draft
+**Status:** RFC
 **Layer:** concept
 
 ## Overview
 
-Defines the on-disk representation of a GoNN network — split into a **config** document (architecture
-+ hyperparameters, human-editable) and a **weights** document (trained values, machine-only). Establishes
-the JSON schema, version field semantics, and round-trip integrity guarantees that downstream specs
-(`l1-checkpointing.md`, `l2-cli-client.md`, the E09 example) depend on.
+Defines the on-disk representation of a GoNN network — split into a **config** document
+(architecture and hyperparameters, human-editable) and a **weights** document (trained values,
+machine-only). Establishes the JSON schema, version field semantics, and round-trip integrity
+guarantees that downstream specs (`l1-checkpointing.md`, `l2-cli-client.md`, the E09 example) depend on.
 
 ## Related Specifications
 
@@ -134,3 +134,4 @@ Weight matrices serialize as JSON arrays of arrays; for very large networks a `w
 | Version | Date | Description |
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-04-27 | Initial Draft — closes references from l1-checkpointing, l2-cli-client, l2-usage-examples E09. |
+| 0.1.0 | 2026-04-27 | Status promoted Draft → RFC. Config and weights schemas defined, integrity invariants (PERS-1..PERS-4) ready for review. |

@@ -1,6 +1,6 @@
 # Workspace Specifications Registry
 
-**Version:** 1.3.0
+**Version:** 1.5.0
 **Status:** Active
 
 ## Overview
@@ -13,11 +13,14 @@ Local registry of specifications for this workspace.
 | :--- | :--- | :--- | :--- | :--- |
 | [l1-neural-network-architecture.md](specifications/l1-neural-network-architecture.md) | Conceptual architecture of the neural network library | Stable | L1 | 1.0.0 |
 | [l1-math-functions.md](specifications/l1-math-functions.md) | Mathematical functions framework (activation and loss) | Stable | L1 | 1.0.0 |
+| [l1-training-semantics.md](specifications/l1-training-semantics.md) | `Train()` convergence loop contract — max-iter, loss-limit, min-loss rollback | RFC | L1 | 0.1.0 |
+| [l1-weight-initialization.md](specifications/l1-weight-initialization.md) | Xavier / He / Random formulas + RNG seed contract | RFC | L1 | 0.1.0 |
+| [l1-network-persistence.md](specifications/l1-network-persistence.md) | JSON schema for config and weights, round-trip integrity | RFC | L1 | 0.1.0 |
 | [l1-training-control.md](specifications/l1-training-control.md) | Training lifecycle state machine (Pause/Resume/Stop) | Draft | L1 | 0.1.0 |
 | [l1-checkpointing.md](specifications/l1-checkpointing.md) | Snapshot/recovery system with retention and compression | Draft | L1 | 0.1.0 |
 | [l1-dynamic-topology.md](specifications/l1-dynamic-topology.md) | Dynamic mode for runtime layer/neuron mutation (amends INV-2) | Draft | L1 | 0.1.0 |
 | [l1-observability-protocol.md](specifications/l1-observability-protocol.md) | Read-only state-exposure contract for external observers | Draft | L1 | 0.1.0 |
-| [l1-error-taxonomy.md](specifications/l1-error-taxonomy.md) | Canonical error categories and wrapping contract | Draft | L1 | 0.1.0 |
+| [l1-error-taxonomy.md](specifications/l1-error-taxonomy.md) | Canonical error categories and wrapping contract | RFC | L1 | 0.1.0 |
 | [l1-performance-contract.md](specifications/l1-performance-contract.md) | Performance guarantees, benchmarks, optimization layers | Draft | L1 | 0.1.0 |
 | [l1-data-streaming.md](specifications/l1-data-streaming.md) | Streaming dataset abstraction and bounded memory contract | Draft | L1 | 0.1.0 |
 | [l1-compute-backend.md](specifications/l1-compute-backend.md) | Pluggable compute backend (CPU baseline + GPU future) | Draft | L1 | 0.1.0 |

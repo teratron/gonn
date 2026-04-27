@@ -1,7 +1,7 @@
 # Weight Initialization
 
 **Version:** 0.1.0
-**Status:** Draft
+**Status:** RFC
 **Layer:** concept
 
 ## Overview
@@ -109,3 +109,4 @@ At Compile():
 | Version | Date | Description |
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-04-27 | Initial Draft — closes l2-nn-facade §5.6 reservation. |
+| 0.1.0 | 2026-04-27 | Status promoted Draft → RFC. Xavier/He/Random formulas pinned, RNG seed contract specified, ready for review. |

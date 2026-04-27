@@ -28,11 +28,16 @@ backend methods; user picks the backend at `Compile()` time.
 
 ## 2. Constraints & Assumptions
 
+> **Concept-Layer Notation**: References to `cgo`, build tags, and Go sub-package paths are
+> **illustrative bindings** of universal concepts (foreign-function interface, conditional compilation,
+> module isolation) to the project's Go implementation. The backend contract — interface, fallback
+> rule, numerical tolerance — is language-independent.
+
 - The interface must be **small** — adding a backend requires implementing ~5 methods, not 50.
 - The default CPU backend is **always present** — zero external dependencies (per `C29`).
-- GPU backends use **cgo** and live in **separate sub-packages** (e.g., `pkg/compute/opencl/`)
-  so users without the GPU runtime can ignore them entirely.
-- Build tags isolate cgo: `//go:build cgo && opencl`. Default builds are pure Go.
+- GPU backends use the language's **foreign-function interface** (Go: cgo) and live in **isolated
+  sub-modules** so users without the GPU runtime can ignore them entirely.
+- **Conditional compilation** (Go: build tags `//go:build cgo && opencl`) keeps the default build pure-Go.
 
 ## 3. Core Invariants
 

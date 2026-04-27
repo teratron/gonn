@@ -29,7 +29,12 @@ Real workflows (overnight training, hyperparameter sweeps, GUI-driven experiment
 
 ## 2. Constraints & Assumptions
 
-- Cooperative cancellation only — no goroutine kills. Library checks control state at safe points.
+> **Concept-Layer Notation**: Where this spec references Go primitives (`context.Context`, atomic
+> integer, buffered channel), these are **illustrative bindings** of universal concepts (cancellation
+> token, lock-free state cell, message queue) to the project's implementation language. The conceptual
+> state machine is language-agnostic.
+
+- Cooperative cancellation only — no concurrent-task kills. Library checks control state at safe points.
 - Pause must be **idempotent** and **reentrant**: calling Pause on a paused session is a no-op.
 - Resume must be **deterministic**: bit-identical continuation if no inputs changed (RNG seed pinned).
 
@@ -37,12 +42,11 @@ Real workflows (overnight training, hyperparameter sweeps, GUI-driven experiment
 
 - **CTRL-1**: Training state ∈ {Idle, Running, Pausing, Paused, Stopping, Stopped}. Transitions are
   one-way except Paused → Running (resume) and Running → Pausing → Paused.
-- **CTRL-2**: A pause request observed mid-iteration completes the current iteration (forward + backward
-  + weight update) before transitioning to Paused. No partial weight states are exposed.
+- **CTRL-2**: A pause request observed mid-iteration completes the current iteration (forward, backward, weight update) before transitioning to Paused. No partial weight states are exposed.
 - **CTRL-3**: `Stop()` is destructive: it transitions Running/Paused → Stopping → Stopped. Stopped
   sessions cannot be resumed; the network remains queryable with whatever weights existed at stop.
-- **CTRL-4**: `context.Context` cancellation is honored at the same safe points as Pause/Stop. Library
-  treats `ctx.Err() != nil` equivalently to `Stop()`.
+- **CTRL-4**: External cancellation tokens (in Go: `context.Context`) are honored at the same safe
+  points as Pause/Stop. A cancelled token is treated equivalently to an explicit `Stop()` call.
 - **CTRL-5**: External observers (see `l1-observability-protocol.md`) read state via lock-free atomic
   load. State transitions never block readers.
 

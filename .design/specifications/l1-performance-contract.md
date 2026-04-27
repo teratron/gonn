@@ -24,10 +24,16 @@ benchmarks gate merges, profiling targets are documented, and the optimization r
 
 ## 2. Constraints & Assumptions
 
-- Pure Go optimizations first; assembly / SIMD intrinsics deferred and behind build tags.
-- Parallelism via goroutines + channels (per project rule §4.2). No external worker libraries.
-- GPU offload is a **separate backend** (`l1-compute-backend.md`) — not retrofit into the CPU path.
-- Benchmarks live under `pkg/.../bench_*_test.go` and run via `go test -bench=.`.
+> **Concept-Layer Notation**: References to `pprof`, `sync.Pool`, `runtime.NumCPU`, build tags, and
+> `go test -bench` are **illustrative bindings** of universal performance concepts (sampling profiler,
+> object pooling, hardware-parallelism query, conditional compilation, regression benchmarking) to
+> the project's Go implementation. The performance contract — invariants, optimization layering,
+> benchmark gating — is language-independent.
+
+- Pure-language optimizations first; assembly / SIMD intrinsics deferred and behind conditional compilation.
+- Parallelism via the language's lightweight concurrency primitives (Go: goroutines + channels).
+- GPU offload is a **separate backend** ([l1-compute-backend.md](l1-compute-backend.md)) — not retrofit into the CPU path.
+- Benchmarks live colocated with the code they measure and run via the language's standard test runner.
 
 ## 3. Core Invariants
 
