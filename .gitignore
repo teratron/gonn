@@ -103,3 +103,9 @@ copilot-instructions.md
 # Magic Spec
 .magic/
 .agents/workflows/magic.*.md
+
+# Generated graph artifacts
+.design/spec-graph.html
+.design/spec-graph.json
+.design/.graph-cache/
+.design/wiki/

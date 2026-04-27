@@ -3,7 +3,7 @@
   "workspaces": {
     "main": {
       "description": "GoNN — Go Neural Network library",
-      "scope": ["pkg/", "examples/"]
+      "scope": ["pkg", "examples"]
     }
   }
 }

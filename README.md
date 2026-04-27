@@ -5,8 +5,6 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/teratron/gonn)](https://goreportcard.com/report/github.com/teratron/gonn)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
----
-
 ## Description
 
 GoNN (Go Neural Network) is a Go library for creating and using neural networks. The project is at an initial development stage and provides basic components for building neural network architectures.
@@ -22,8 +20,7 @@ go get -u github.com/teratron/gonn
 ## Usage
 
 ```go
-import "github.com/teratron/gonn/pkg/gonn"
-
+import "github.com/teratron/gonn/pkg/nn"
 ```
 
 ## Documentation
@@ -44,7 +41,7 @@ You can find examples of using the library in the [examples directory](examples)
 
 ## Contributing
 
-Contributions to the project are welcome. Please review the [CONTRIBUTING.md](.kilocode/rules/development-principles.md) file before getting started.
+Contributions to the project are welcome. Please review the [CONTRIBUTING.md](CONTRIBUTING.md) file before getting started.
 
 ## Authors and acknowledgment
 
