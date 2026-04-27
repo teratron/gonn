@@ -46,8 +46,8 @@ duplicated. Specifying the catalog keeps the surface intentional and reviewable.
   on first run.
 - Each example must complete in **< 30 seconds** on a modern laptop CPU. Heavier benchmarks live under
   `bench/` (out of scope for this spec).
-- Russian commentary is permitted in `README.md`; in-code comments and identifiers stay English per
-  project rules.
+- All example artifacts (Go source, in-code comments, identifiers, and `README.md`) are English per
+  project rule §1.1 (Technical Content English-only).
 
 ## 4. Invariant Compliance
 
@@ -81,7 +81,7 @@ Each example entry MUST specify the following fields:
 
 #### Foundational
 
-**E01 — XOR (canonical hello-world)**
+##### E01 — XOR (canonical hello-world)
 
 | Field | Value |
 | :--- | :--- |
@@ -94,7 +94,7 @@ Each example entry MUST specify the following fields:
 | Expected Output | Final loss < 0.01; Query for each input prints predicted class. |
 | Status | MUST |
 
-**E02 — Logical gates suite (AND / OR / NAND)**
+##### E02 — Logical gates suite (AND / OR / NAND)
 
 | Field | Value |
 | :--- | :--- |
@@ -107,7 +107,7 @@ Each example entry MUST specify the following fields:
 | Expected Output | Per-gate trained network + accuracy table over the 4 inputs. |
 | Status | SHOULD |
 
-**E03 — Perceptron (legacy continuity)**
+##### E03 — Perceptron (legacy continuity)
 
 | Field | Value |
 | :--- | :--- |
@@ -122,7 +122,7 @@ Each example entry MUST specify the following fields:
 
 #### Classification
 
-**E04 — Binary classification (toy)**
+##### E04 — Binary classification (toy)
 
 | Field | Value |
 | :--- | :--- |
@@ -135,7 +135,7 @@ Each example entry MUST specify the following fields:
 | Expected Output | Train accuracy > 95%; held-out test accuracy. |
 | Status | SHOULD |
 
-**E05 — Multi-class classification (Iris-like)**
+##### E05 — Multi-class classification (Iris-like)
 
 | Field | Value |
 | :--- | :--- |
@@ -148,7 +148,7 @@ Each example entry MUST specify the following fields:
 | Expected Output | Per-100-epoch loss prints; final test-set accuracy ≥ 90%. |
 | Status | SHOULD |
 
-**E06 — MNIST-style preset (image classification)**
+##### E06 — MNIST-style preset (image classification)
 
 | Field | Value |
 | :--- | :--- |
@@ -163,7 +163,7 @@ Each example entry MUST specify the following fields:
 
 #### Regression
 
-**E07 — 1D function approximation (sin)**
+##### E07 — 1D function approximation (sin)
 
 | Field | Value |
 | :--- | :--- |
@@ -176,7 +176,7 @@ Each example entry MUST specify the following fields:
 | Expected Output | RMSE on a held-out grid; ASCII plot or CSV dump for plotting. |
 | Status | SHOULD |
 
-**E08 — Multi-output regression (preset)**
+##### E08 — Multi-output regression (preset)
 
 | Field | Value |
 | :--- | :--- |
@@ -191,7 +191,7 @@ Each example entry MUST specify the following fields:
 
 #### Persistence
 
-**E09 — Save / reload (placeholder until persistence spec)**
+##### E09 — Save / reload (placeholder until persistence spec)
 
 | Field | Value |
 | :--- | :--- |
@@ -206,7 +206,7 @@ Each example entry MUST specify the following fields:
 
 #### Continuation
 
-**E10 — `AndTrain`: resume training after a Query**
+##### E10 — `AndTrain`: resume training after a Query
 
 | Field | Value |
 | :--- | :--- |
@@ -221,7 +221,7 @@ Each example entry MUST specify the following fields:
 
 #### Observability
 
-**E11 — Progress callbacks**
+##### E11 — Progress callbacks
 
 | Field | Value |
 | :--- | :--- |
@@ -236,7 +236,7 @@ Each example entry MUST specify the following fields:
 
 #### API Style Showcase
 
-**E12 — Three styles, identical network**
+##### E12 — Three styles, identical network
 
 | Field | Value |
 | :--- | :--- |
@@ -249,7 +249,7 @@ Each example entry MUST specify the following fields:
 | Expected Output | Three networks; final losses converge to within 1e-3 of each other. |
 | Status | MUST |
 
-**E13 — Higher-order options (`Sequential`, `DeepNetwork`)**
+##### E13 — Higher-order options (`Sequential`, `DeepNetwork`)
 
 | Field | Value |
 | :--- | :--- |
@@ -263,7 +263,7 @@ Each example entry MUST specify the following fields:
 | Expected Output | Both reach ≥ 85% accuracy; runtime contrast logged. |
 | Status | SHOULD |
 
-**E14 — Shared options across multiple networks**
+##### E14 — Shared options across multiple networks
 
 | Field | Value |
 | :--- | :--- |
@@ -279,7 +279,7 @@ Each example entry MUST specify the following fields:
 
 #### Type Variants
 
-**E15 — `float32` vs `float64` parity**
+##### E15 — `float32` vs `float64` parity
 
 | Field | Value |
 | :--- | :--- |
