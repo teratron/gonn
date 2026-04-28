@@ -64,7 +64,7 @@ Consistency in communication and code is paramount.
 - **Microservices**: Decouple by domain. Use lightweight communication and implement observability (tracing, metrics, logs).
 - **Web**: Use `net/http` for simple services; use frameworks like Gin or Echo for complex routing/middleware while maintaining clean architecture.
 
-## 5. Completion Protocol (Mandatory Checklist)
+## Completion Protocol (Mandatory Checklist)
 
 Before finishing any task, the agent MUST verify the following:
 
