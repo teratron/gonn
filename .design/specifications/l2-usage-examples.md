@@ -1,7 +1,7 @@
 # Usage Examples Catalog
 
 **Version:** 1.0.0
-**Status:** Draft
+**Status:** RFC
 **Layer:** implementation
 **Implements:** l1-neural-network-architecture.md
 
@@ -396,3 +396,4 @@ or equivalent) and use looser thresholds to avoid flakiness.
 | Version | Date | Description |
 | :--- | :--- | :--- |
 | 1.0.0 | 2026-04-27 | Initial Draft — 15-entry catalog with coverage matrix and implementation order. |
+| 1.0.0 | 2026-04-28 | E09 promoted from `MAY (gated)` to `SHOULD (gated on Stable)` after l1-network-persistence reached RFC. Status promoted Draft → RFC. |

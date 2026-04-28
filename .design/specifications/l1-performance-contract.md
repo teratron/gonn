@@ -1,7 +1,7 @@
 # Performance Contract
 
 **Version:** 0.1.0
-**Status:** Draft
+**Status:** RFC
 **Layer:** concept
 
 ## Overview
@@ -95,3 +95,4 @@ next layer's win.
 | Version | Date | Description |
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-04-27 | Initial Draft from TODO #11. |
+| 0.1.0 | 2026-04-28 | Concept-Layer Notation added. Status promoted Draft → RFC. Optimization layers and 5 invariants ready for review. |

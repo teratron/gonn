@@ -1,7 +1,7 @@
 # Weight Initialization
 
-**Version:** 0.1.0
-**Status:** RFC
+**Version:** 1.0.0
+**Status:** Stable
 **Layer:** concept
 
 ## Overview
@@ -110,3 +110,4 @@ At Compile():
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-04-27 | Initial Draft — closes l2-nn-facade §5.6 reservation. |
 | 0.1.0 | 2026-04-27 | Status promoted Draft → RFC. Xavier/He/Random formulas pinned, RNG seed contract specified, ready for review. |
+| 1.0.0 | 2026-04-28 | Promoted RFC → Stable. Xavier/He/Random formulas locked as canonical; WI-1..WI-4 invariants frozen. Unblocks l2-init-impl RFC promotion. |

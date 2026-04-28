@@ -1,6 +1,6 @@
 # Layer Types
 
-**Version:** 1.0.0
+**Version:** 1.1.0
 **Status:** Stable
 **Layer:** implementation
 **Implements:** l1-neural-network-architecture.md
@@ -32,7 +32,7 @@ Layers provide a logical grouping of neurons with shared properties (activation 
 | :--- | :--- |
 | INV-1 (Generic Float) | All layer types parameterized by `T utils.Float` |
 | INV-7 (Composition hierarchy) | `core → base → Dense/Output` embedding chain |
-| INV-2 (Immutable topology) | Layers created during build phase, not modifiable at runtime |
+| INV-2 (TopologyMode) | Default Immutable mode — layers created during build phase, frozen after `Compile()`. Dynamic-mode mutations (`AddHiddenLayer`/`RemoveHiddenLayer`) deferred to l1-dynamic-topology DYN-1..DYN-4 |
 
 ## 5. Detailed Design
 
@@ -113,3 +113,4 @@ graph TD
 | Version | Date | Description |
 | :--- | :--- | :--- |
 | 1.0.0 | 2026-04-21 | Initial Stable — reverse-engineered from existing codebase |
+| 1.1.0 | 2026-04-28 | Re-confirmed Stable under parent INV-2 v2.0 (TopologyMode). Updated INV-2 row in Invariant Compliance to reference Immutable default + Dynamic-mode dispatch to l1-dynamic-topology. |

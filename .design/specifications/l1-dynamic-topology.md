@@ -13,8 +13,9 @@ is immutable after construction"). This spec proposes amending INV-2 to introduc
 - **Immutable** (current default) — INV-2 holds as written.
 - **Dynamic** — topology mutations are permitted at well-defined synchronization barriers.
 
-> ⚠ **Conflict flag**: This spec contradicts `l1-neural-network-architecture.md` INV-2 (Stable). Resolution:
-> amend the parent spec to introduce mode parameter when this spec promotes from Draft → RFC.
+> ✓ **Conflict resolved (2026-04-28)**: Parent `l1-neural-network-architecture.md` v2.0.0 (RFC) amended INV-2
+> to introduce a TopologyMode parameter (Immutable default, Dynamic opt-in). This spec is now the
+> authoritative definition of the Dynamic mode and is referenced from the parent's Related Specifications.
 
 ## Related Specifications
 
@@ -86,3 +87,4 @@ nn.RemoveNeuron(layerIdx uint, count uint) error
 | Version | Date | Description |
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-04-27 | Initial Draft from TODO #6 — flagged conflict with INV-2. |
+| 0.1.0 | 2026-04-28 | Conflict resolved by parent v2.0.0 amendment introducing TopologyMode. Spec remains Draft pending design review of Dynamic-mode mutation API. |

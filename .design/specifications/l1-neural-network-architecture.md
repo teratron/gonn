@@ -1,7 +1,7 @@
 # Neural Network Architecture
 
-**Version:** 1.0.0
-**Status:** Stable
+**Version:** 2.0.0
+**Status:** RFC
 **Layer:** concept
 
 ## Overview
@@ -11,6 +11,7 @@ Defines the conceptual architecture of the GoNN neural network library. GoNN pro
 ## Related Specifications
 
 - [l1-math-functions.md](l1-math-functions.md) — Mathematical functions used by neurons and loss computation
+- [l1-dynamic-topology.md](l1-dynamic-topology.md) — Defines the `Dynamic` topology mode introduced by INV-2 in v2.0
 - [l2-nn-facade.md](l2-nn-facade.md) — Public API facade (implements this spec)
 - [l2-network-graph.md](l2-network-graph.md) — Computational graph (implements this spec)
 - [l2-layer-types.md](l2-layer-types.md) — Layer type hierarchy (implements this spec)
@@ -35,7 +36,10 @@ Go lacks a native, zero-dependency neural network library that leverages Go gene
 ## 3. Core Invariants
 
 - **INV-1**: All numeric computation must be generic over `utils.Float` constraint. No hardcoded float types.
-- **INV-2**: Network topology is immutable after construction (Build phase). Runtime modification is not permitted.
+- **INV-2 (v2.0 amended)**: Network topology mutability is governed by a **TopologyMode** parameter fixed at `Compile()`-time:
+  - **Immutable** (default) — topology is frozen after construction; runtime modification is forbidden. This preserves v1.0 semantics for all existing users and L2 implementations that did not opt in.
+  - **Dynamic** — topology may be mutated at synchronization barriers as defined in [l1-dynamic-topology.md](l1-dynamic-topology.md) (DYN-1..DYN-4). Mutations outside the documented barriers are forbidden.
+  Switching mode after `Compile()` is forbidden in either direction. Implementations are not required to support `Dynamic` — those that don't MUST reject `WithTopologyMode(Dynamic)` at compile time with `ErrUnsupported`.
 - **INV-3**: Forward propagation computes values layer-by-layer from Input to Output. Each cell computes the weighted sum of its incoming axon values plus activation.
 - **INV-4**: Backward propagation computes loss gradients from Output to Input. Each cell propagates its miss (error) backward through outgoing axons.
 - **INV-5**: Weight updates use gradient descent with a configurable learning rate.
@@ -119,3 +123,4 @@ The builder returns `*NN[T]` at each step, enabling method chaining.
 | Version | Date | Description |
 | :--- | :--- | :--- |
 | 1.0.0 | 2026-04-21 | Initial Stable — reverse-engineered from existing codebase |
+| 2.0.0 | 2026-04-28 | INV-2 amended to introduce TopologyMode (Immutable default, Dynamic opt-in). Added related-spec link to l1-dynamic-topology. Status reverted to RFC per amendment rule; C12 cascade demoted dependent L2 specs to RFC for re-review. |

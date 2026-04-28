@@ -1,6 +1,6 @@
 # Network Computational Graph
 
-**Version:** 1.0.0
+**Version:** 1.1.0
 **Status:** Stable
 **Layer:** implementation
 **Implements:** l1-neural-network-architecture.md
@@ -117,3 +117,4 @@ bundle[T utils.Float, S neuron.Nucleus[T]]
 | Version | Date | Description |
 | :--- | :--- | :--- |
 | 1.0.0 | 2026-04-21 | Initial Stable — reverse-engineered from existing codebase |
+| 1.1.0 | 2026-04-28 | Re-confirmed Stable under parent INV-2 v2.0 (TopologyMode). Bundles and propagation pipeline are mode-agnostic; Dynamic-mode mutations are deferred to l1-dynamic-topology rebalance step. No change to public Network[T] surface. |

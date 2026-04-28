@@ -1,7 +1,7 @@
 # CLI Client for GoNN
 
 **Version:** 0.1.0
-**Status:** Draft
+**Status:** RFC
 **Layer:** implementation
 **Implements:** l1-neural-network-architecture.md
 
@@ -73,3 +73,4 @@ front-end for cross-language tooling (Python notebooks invoking via subprocess).
 | Version | Date | Description |
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-04-27 | Initial Draft from TODO #1. |
+| 0.1.0 | 2026-04-28 | Cross-refs to network-persistence and error-taxonomy added; exit-code mapping defined. Status promoted Draft → RFC. |

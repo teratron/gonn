@@ -1,6 +1,6 @@
 # Neuron Model
 
-**Version:** 1.0.0
+**Version:** 1.1.0
 **Status:** Stable
 **Layer:** implementation
 **Implements:** l1-neural-network-architecture.md
@@ -138,3 +138,4 @@ Bundle[T] = []*Axon[T]
 | Version | Date | Description |
 | :--- | :--- | :--- |
 | 1.0.0 | 2026-04-21 | Initial Stable — reverse-engineered from existing codebase |
+| 1.1.0 | 2026-04-28 | Re-confirmed Stable under parent INV-2 v2.0 (TopologyMode). Neuron/Cell/Axon model is mode-agnostic — Dynamic-mode mutations operate on bundles, not on cells. No material change to interfaces. |

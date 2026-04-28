@@ -1,7 +1,7 @@
 # Observability Protocol
 
 **Version:** 0.1.0
-**Status:** Draft
+**Status:** RFC
 **Layer:** concept
 
 ## Overview
@@ -84,3 +84,4 @@ A separate visualizer repository (planned per TODO #7) consumes this protocol.
 | Version | Date | Description |
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-04-27 | Initial Draft from TODO #7 (visualization) + TODO #9 (logging) shared concept. |
+| 0.1.0 | 2026-04-28 | Status promoted Draft → RFC. Read-only contract and 4 invariants ready for review. |

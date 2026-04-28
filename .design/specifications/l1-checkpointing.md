@@ -1,7 +1,7 @@
 # Checkpointing & Snapshot Lifecycle
 
 **Version:** 0.1.0
-**Status:** Draft
+**Status:** RFC
 **Layer:** concept
 
 ## Overview
@@ -90,3 +90,4 @@ instances).
 | Version | Date | Description |
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-04-27 | Initial Draft from TODO #3. |
+| 0.1.0 | 2026-04-28 | Cross-refs to network-persistence and training-semantics added. Status promoted Draft → RFC. |

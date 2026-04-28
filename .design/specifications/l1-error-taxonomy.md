@@ -1,7 +1,7 @@
 # Error Taxonomy
 
-**Version:** 0.1.0
-**Status:** RFC
+**Version:** 1.0.0
+**Status:** Stable
 **Layer:** concept
 
 ## Overview
@@ -90,3 +90,4 @@ if size == 0:
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-04-27 | Initial Draft from TODO #8 (concept side; complementary rule is C32). |
 | 0.1.0 | 2026-04-27 | Concept-Layer Notation added (purity touch). Status promoted Draft → RFC. 6 categories + 4 invariants ready for review. |
+| 1.0.0 | 2026-04-28 | Promoted RFC → Stable. 6 sentinel categories frozen as canonical taxonomy; ERR-1..ERR-4 invariants locked. Unblocks l2-errors-impl RFC promotion and authorizes implementation pass. |

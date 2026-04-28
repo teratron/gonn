@@ -1,7 +1,7 @@
 # Compute Backend Abstraction
 
 **Version:** 0.1.0
-**Status:** Draft
+**Status:** RFC
 **Layer:** concept
 
 ## Overview
@@ -96,3 +96,4 @@ type Backend[T utils.Float] interface {
 | Version | Date | Description |
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-04-27 | Initial Draft from TODO #13. |
+| 0.1.0 | 2026-04-28 | Concept-Layer Notation added. Status promoted Draft → RFC. Backend interface and 4 invariants ready for review. |
