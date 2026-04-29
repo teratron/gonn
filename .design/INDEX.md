@@ -37,7 +37,7 @@ Local registry of specifications for this workspace.
 | [l2-logging-strategy.md](specifications/l2-logging-strategy.md) | Structured logging via `log/slog` (Trace/Debug/Info/Warn/Error) | Draft | L2 | 0.1.0 |
 | [l2-training-loop.md](specifications/l2-training-loop.md) | Go realization of training-semantics — `Train()` body and snapshot mechanics | Draft | L2 | 0.1.0 |
 | [l2-persistence-impl.md](specifications/l2-persistence-impl.md) | Go realization of persistence — `pkg/persistence` package | Draft | L2 | 0.1.0 |
-| [l2-errors-impl.md](specifications/l2-errors-impl.md) | Go realization of error taxonomy — sentinels and helper constructors | RFC | L2 | 0.2.0 |
+| [l2-errors-impl.md](specifications/l2-errors-impl.md) | Go realization of error taxonomy — sentinels and helper constructors | RFC | L2 | 0.3.0 |
 | [l2-init-impl.md](specifications/l2-init-impl.md) | Go realization of weight init — sampling helpers + RNG plumbing | RFC | L2 | 0.2.0 |
 | [l2-control-impl.md](specifications/l2-control-impl.md) | Go realization of training control — atomic state cell + safe-point check | Draft | L2 | 0.1.0 |
 | [l2-checkpointing-impl.md](specifications/l2-checkpointing-impl.md) | Go realization of checkpointing — `pkg/checkpoint` package, atomic write, retention | Draft | L2 | 0.1.0 |

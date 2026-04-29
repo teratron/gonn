@@ -30,7 +30,7 @@ GoNN library implementation plan derived from `ROADMAP.md` Hybrid Path. Phase or
 **Build order:** errors+init (parallel) → cell+axon → layer → network
 **Tasks file:** [tasks/phase-1.md](tasks/phase-1.md)
 
-- [ ] **Error Taxonomy Implementation** ([l2-errors-impl.md](specifications/l2-errors-impl.md)) [L2, RFC v0.2.0]
+- [ ] **Error Taxonomy Implementation** ([l2-errors-impl.md](specifications/l2-errors-impl.md)) [L2, RFC v0.3.0]
 - [ ] **Weight-Init Implementation** ([l2-init-impl.md](specifications/l2-init-impl.md)) [L2, RFC v0.2.0]
 - [ ] **Neuron Model Rewrite** ([l2-neuron-model.md](specifications/l2-neuron-model.md)) [L2, Stable v1.1.0]
 - [ ] **Layer Types Rewrite** ([l2-layer-types.md](specifications/l2-layer-types.md)) [L2, Stable v1.1.0]

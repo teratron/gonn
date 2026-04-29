@@ -1,6 +1,6 @@
 # Error Implementation
 
-**Version:** 0.2.0
+**Version:** 0.3.0
 **Status:** RFC
 **Layer:** implementation
 **Implements:** l1-error-taxonomy.md
@@ -42,6 +42,20 @@ plan for existing codebase usage.
 
 ### 5.1 Sentinel Definitions
 
+The taxonomy is **orthogonal**: every domain owned by a Phase-1/2/3 spec maps to exactly one
+category. `ErrTrainingFailure` from v0.2.0 is dissolved (NaN/divergence → `ErrCompute`,
+state-machine misuse → `ErrControl`); `ErrUnsupported` from v0.2.0 is dissolved into
+`ErrUserConfig` (typo of method name) or `ErrCompute` (missing hardware feature).
+
+| Sentinel | Domain | Owning specs |
+| :--- | :--- | :--- |
+| `ErrUserConfig` | API misuse before runtime — bad size, unknown method symbol | `l2-nn-facade`, layer constructors |
+| `ErrInputData` | Runtime validation of caller-supplied data — bad batch shape, NaN sample | `l2-streaming-impl`, layer Forward |
+| `ErrCompute` | Numeric / hardware faults inside the engine — NaN gradient, dim mismatch, no AVX2 | `l2-network-graph`, `l2-backend-cpu` |
+| `ErrControl` | Training-lifecycle state-machine violations — Pause on Stopped, double-Resume | `l2-control-impl`, `l2-training-loop` |
+| `ErrIntegrity` | Persisted-artifact integrity — bad checksum, schema-version mismatch | `l2-persistence-impl`, `l2-checkpointing-impl` |
+| `ErrIO` | Filesystem / network — permission, EOF, disk full | `l2-persistence-impl`, `l2-checkpointing-impl` |
+
 ```go
 // [REFERENCE] Public sentinels — comparable via errors.Is.
 package utils
@@ -49,12 +63,12 @@ package utils
 import "errors"
 
 var (
-    ErrUserConfig      = errors.New("user-config")
-    ErrInputData       = errors.New("input-data")
-    ErrTrainingFailure = errors.New("training-failure")
-    ErrIntegrity       = errors.New("integrity")
-    ErrIO              = errors.New("io")
-    ErrUnsupported     = errors.New("unsupported")
+    ErrUserConfig = errors.New("user-config")
+    ErrInputData  = errors.New("input-data")
+    ErrCompute    = errors.New("compute")
+    ErrControl    = errors.New("control")
+    ErrIntegrity  = errors.New("integrity")
+    ErrIO         = errors.New("io")
 )
 ```
 
@@ -113,3 +127,4 @@ sites. Migration:
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-04-28 | Initial Draft — concrete Go realization of l1-error-taxonomy RFC. |
 | 0.2.0 | 2026-04-28 | Status promoted Draft → RFC after parent l1-error-taxonomy reached Stable. Sentinel set + helper signatures ready for review. |
+| 0.3.0 | 2026-04-29 | Sentinel set finalized to 6 orthogonal categories: ErrUserConfig, ErrInputData, ErrCompute, ErrControl, ErrIntegrity, ErrIO. ErrTrainingFailure and ErrUnsupported dissolved into existing categories to avoid catch-all routing. |

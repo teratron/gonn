@@ -1,14 +1,27 @@
 ---
 phase: 1
 name: "Foundation Rewrite (Track A)"
-status: Todo
+status: In Progress
 subsystem: "pkg/utils, pkg/neuron, pkg/layer, pkg/network"
 requires: []
-provides: []
+provides:
+  - "pkg/utils — 6-sentinel error taxonomy + Newf/Wrap helpers"
+  - "pkg/utils — math/rand/v2.PCG RNG factory + Xavier/He/Uniform samplers"
 key_files:
-  created: []
-  modified: []
-patterns_established: []
+  created:
+    - pkg/utils/errors.go
+    - pkg/utils/errors_test.go
+    - pkg/utils/init.go
+    - pkg/utils/init_test.go
+  modified:
+    - .design/specifications/l2-errors-impl.md
+    - .design/INDEX.md
+    - .design/PLAN.md
+patterns_established:
+  - "Hybrid 6-category error taxonomy (orthogonal): ErrUserConfig / ErrInputData / ErrCompute / ErrControl / ErrIntegrity / ErrIO"
+  - "Multi-%w fmt.Errorf wrapping in Wrap() preserves both category and cause for errors.Is routing"
+  - "Generic samplers [T utils.Float] computing in float64 then converting — zero-alloc hot path"
+  - "Bootstrap-tagged tasks: RFC L2 specs are working contract; promotion to Stable deferred to phase gate"
 duration_minutes: ~
 ---
 
@@ -31,12 +44,12 @@ duration_minutes: ~
 
 ### Track A — Foundations (parallel leaves)
 
-- [ ] [T-1A01] Define error sentinels and category constants in `pkg/utils/errors.go`
-- [ ] [T-1A02] Implement error helper constructors (`Newf`, `Wrap`, location-hint formatter)
-- [ ] [T-1A03] [Validation] Unit tests for `errors.Is` routing + forbidden-phrase guard (per C32)
-- [ ] [T-1A04] Implement RNG plumbing in `pkg/utils/init.go` (`math/rand/v2.PCG`, seed contract)
-- [ ] [T-1A05] Implement Xavier / He / Uniform sampling helpers
-- [ ] [T-1A06] [Validation] Distribution + reproducibility tests; benchmark Sample hot path
+- [x] [T-1A01] [Bootstrap] Define error sentinels and category constants in `pkg/utils/errors.go`
+- [x] [T-1A02] [Bootstrap] Implement error helper constructors (`Newf`, `Wrap`, location-hint formatter)
+- [x] [T-1A03] [Bootstrap] [Validation] Unit tests for `errors.Is` routing + forbidden-phrase guard (per C32)
+- [x] [T-1A04] [Bootstrap] Implement RNG plumbing in `pkg/utils/init.go` (`math/rand/v2.PCG`, seed contract)
+- [x] [T-1A05] [Bootstrap] Implement Xavier / He / Uniform sampling helpers
+- [x] [T-1A06] [Bootstrap] [Validation] Distribution + reproducibility tests; benchmark Sample hot path
 
 ### Track B — Neuron (after Track A)
 
@@ -71,45 +84,51 @@ duration_minutes: ~
 ### [T-1A01] Define error sentinels and category constants
 
 - **Spec:** [l2-errors-impl.md](../specifications/l2-errors-impl.md) §Sentinels
-- **Status:** Todo
+- **Status:** Done
 - **Assignment:** Agent
 - **Handoff:** T-1A02 consumes the sentinels via `Newf`/`Wrap`.
-- **Notes:** Per C32, every returned error must wrap one of `ErrUserConfig`, `ErrIntegrity`, `ErrCompute`, `ErrControl`, `ErrIO`. Stdlib only (C29).
+- **Notes:** Per C32, every returned error must wrap one of the 6 orthogonal sentinels from `l2-errors-impl` v0.3.0 §5.1: `ErrUserConfig`, `ErrInputData`, `ErrCompute`, `ErrControl`, `ErrIntegrity`, `ErrIO`. Stdlib only (C29).
+- **Changes:** [Bootstrap] Created `pkg/utils/errors.go` with 6 orthogonal sentinels and full C31 doc-comments.
 
 ### [T-1A02] Implement error helper constructors
 
 - **Spec:** [l2-errors-impl.md](../specifications/l2-errors-impl.md) §Constructors
-- **Status:** Todo
+- **Status:** Done
 - **Assignment:** Agent
 - **Handoff:** Used by all subsequent packages for error wrapping.
 - **Notes:** First sentence of every doc-comment starts with the identifier (C31). Forbidden phrases per C32 must be unit-tested (T-1A03).
+- **Changes:** [Bootstrap] Added `Newf`, `Wrap` (multi-`%w`), `NewSizeError`, `NewActivationError`, `NewIntegrityError`, `LocationHint`. Wrap returns nil on nil cause; nil category panics.
 
 ### [T-1A03] [Validation] Errors-impl tests
 
 - **Goal:** Verify `errors.Is` routing through every sentinel and reject forbidden phrases.
 - **Method:** `go test -race ./pkg/utils/...` with table-driven cases.
-- **Status:** Todo
+- **Status:** Done
+- **Changes:** [Bootstrap] `pkg/utils/errors_test.go` — orthogonality matrix, Newf routing, Wrap nil-cause + cause-preservation, panic-on-nil-cat, all helpers, C32 forbidden-phrase sweep, LocationHint, internal helpers. 100% line coverage. `-race` deferred to T-1Z02 (no gcc in dev env).
 
 ### [T-1A04] RNG plumbing in `pkg/utils/init.go`
 
 - **Spec:** [l2-init-impl.md](../specifications/l2-init-impl.md) §RNG
-- **Status:** Todo
+- **Status:** Done
 - **Assignment:** Agent
 - **Handoff:** Consumed by T-1A05 (sampling) and T-1B04 (axon).
 - **Notes:** Use `math/rand/v2.PCG`; honor seed contract from `l1-weight-initialization`. No `math/rand` (legacy).
+- **Changes:** [Bootstrap] `NewRNG(seed) (*rand.Rand, uint64)` — zero seed → wall-clock fallback returning effective seed; PCG streams differentiated by golden-ratio xor.
 
 ### [T-1A05] Xavier / He / Uniform sampling helpers
 
 - **Spec:** [l2-init-impl.md](../specifications/l2-init-impl.md) §Sampling
-- **Status:** Todo
+- **Status:** Done
 - **Assignment:** Agent
 - **Handoff:** Consumed by layer constructors (T-1C02).
+- **Changes:** [Bootstrap] `XavierUniform[T Float]`, `HeNormal[T Float]`, `Uniform[T Float]` — 0 alloc/op, ~15-42 ns/op on 11th-gen i5; degenerate-fan fallback to Uniform.
 
 ### [T-1A06] [Validation] Init-impl tests
 
 - **Goal:** Reproducibility (same seed → same sequence); distribution mean/variance within tolerance; benchmark `Sample` hot path.
 - **Method:** `go test -race -bench=. ./pkg/utils/...`
-- **Status:** Todo
+- **Status:** Done
+- **Changes:** [Bootstrap] `pkg/utils/init_test.go` — reproducibility 256 steps, Xavier/He/Uniform mean+variance within 5% over n=20000, float32 + float64 paths, nil-rng panic, degenerate-fan fallback, 4 zero-alloc benchmarks via `b.Loop()`.
 
 ### [T-1B01] Cell core/input/bias/dense/output rewrite
 

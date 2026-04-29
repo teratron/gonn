@@ -1,0 +1,158 @@
+// Package utils — error sentinels and helper constructors.
+//
+// This file implements [l2-errors-impl] §5.1 (sentinels) and §5.2 (helpers)
+// on top of the L1 error taxonomy. Every package in the GoNN library MUST
+// route its errors through one of the six orthogonal categories defined here
+// so that callers can dispatch via [errors.Is] (per C32 §4).
+//
+// Sentinel choice rule (one category per error site):
+//
+//   - ErrUserConfig — API misuse before runtime: bad size, unknown method symbol.
+//   - ErrInputData  — runtime validation of caller-supplied data: bad batch shape, NaN sample.
+//   - ErrCompute    — numeric / hardware faults inside the engine: NaN gradient, dim mismatch.
+//   - ErrControl    — training-lifecycle state-machine violations.
+//   - ErrIntegrity  — persisted-artifact integrity: bad checksum, schema-version mismatch.
+//   - ErrIO         — filesystem / network: permission, EOF, disk full.
+package utils
+
+import (
+	"errors"
+	"fmt"
+	"runtime"
+)
+
+// ErrUserConfig signals a configuration mistake made by the caller before
+// runtime — typically a bad argument to a Builder method or an unknown enum
+// symbol. Recovery is the caller's responsibility (fix the call).
+var ErrUserConfig = errors.New("user-config")
+
+// ErrInputData signals invalid data supplied to a runtime entry point —
+// a batch with the wrong shape, a sample containing NaN, an empty stream.
+// Distinct from ErrUserConfig in that the data is valid Go but violates
+// the runtime contract.
+var ErrInputData = errors.New("input-data")
+
+// ErrCompute signals a numeric or hardware-level fault inside the engine —
+// NaN gradient, infinite loss, dimension mismatch between layers, missing
+// CPU feature required by a backend. Indicates the engine cannot proceed
+// without operator intervention (lower learning rate, switch backend).
+var ErrCompute = errors.New("compute")
+
+// ErrControl signals a training-lifecycle state-machine violation —
+// Pause issued on a Stopped network, double-Resume, mutating a frozen
+// snapshot. Indicates a programming error in the orchestration layer.
+var ErrControl = errors.New("control")
+
+// ErrIntegrity signals a persisted-artifact integrity failure — checksum
+// mismatch on a checkpoint, schema-version drift, weight-count mismatch
+// after deserialization. Recovery requires re-creating or migrating the
+// artifact.
+var ErrIntegrity = errors.New("integrity")
+
+// ErrIO signals a filesystem or network failure — permission denied, EOF
+// before expected boundary, disk full, broken pipe. Distinct from
+// ErrIntegrity in that the storage medium itself failed, not the contents.
+var ErrIO = errors.New("io")
+
+// Newf builds a new error that wraps the given category sentinel and
+// carries the caller-supplied identifying fields. The format string MUST
+// be specific per C32 §1: it MUST identify the offending value (or its
+// name) and the constraint violated.
+//
+// Example:
+//
+//	return utils.Newf(utils.ErrUserConfig, "Input(): size must be positive, got %d", size)
+//
+// Newf panics if cat is nil — a nil category is always a programming bug.
+func Newf(cat error, format string, args ...any) error {
+	if cat == nil {
+		panic("utils.Newf: nil category sentinel")
+	}
+	return fmt.Errorf(format+": %w", append(args, cat)...)
+}
+
+// Wrap attaches an additional message to an existing error while preserving
+// the original chain. The returned error satisfies errors.Is for both the
+// supplied category and any sentinel already present in cause. Use Wrap
+// when re-routing an stdlib or third-party error into the project taxonomy.
+//
+// If cause is nil, Wrap returns nil — convenient for one-line propagation.
+func Wrap(cat error, cause error, format string, args ...any) error {
+	if cause == nil {
+		return nil
+	}
+	if cat == nil {
+		panic("utils.Wrap: nil category sentinel")
+	}
+	msg := fmt.Sprintf(format, args...)
+	return fmt.Errorf("%s: %w (%w)", msg, cause, cat)
+}
+
+// NewSizeError builds an ErrUserConfig describing a positional-size
+// constraint violation in API arguments. field names the parameter,
+// got is the offending value, constraint is a short phrase (e.g.
+// "positive", ">= 1", "in [1, 1024]").
+func NewSizeError(field string, got int, constraint string) error {
+	return fmt.Errorf("%s: size must be %s, got %d: %w", field, constraint, got, ErrUserConfig)
+}
+
+// NewActivationError builds an ErrUserConfig describing a request for an
+// unregistered activation symbol. symbol is the unknown identifier.
+func NewActivationError(symbol string) error {
+	return fmt.Errorf("activation %q is not registered: %w", symbol, ErrUserConfig)
+}
+
+// NewIntegrityError builds an ErrIntegrity describing a mismatch between
+// expected and observed values in a persisted artifact. what names the
+// artifact slot ("checkpoint.weights[0].len"), expected and got are the
+// rendered values being compared.
+func NewIntegrityError(what string, expected, got string) error {
+	return fmt.Errorf("integrity violation in %s: expected %s, got %s: %w", what, expected, got, ErrIntegrity)
+}
+
+// LocationHint returns a "file:line" string for the caller skip frames
+// above the LocationHint call site. skip=0 reports the caller of
+// LocationHint itself. Returns the empty string when runtime info is
+// unavailable. Intended for C32 §5 caller hints in Error-level logs.
+func LocationHint(skip int) string {
+	_, file, line, ok := runtime.Caller(skip + 1)
+	if !ok {
+		return ""
+	}
+	return fmt.Sprintf("%s:%d", trimToPackagePath(file), line)
+}
+
+// trimToPackagePath shortens an absolute file path to the segment beginning
+// at the project root marker so log lines remain readable across machines.
+// Falls back to the basename when no marker is found.
+func trimToPackagePath(file string) string {
+	const marker = "/gonn/"
+	if i := indexLast(file, marker); i >= 0 {
+		return file[i+len(marker):]
+	}
+	if i := indexLast(file, "\\gonn\\"); i >= 0 {
+		return file[i+len("\\gonn\\"):]
+	}
+	if i := indexLast(file, "/"); i >= 0 {
+		return file[i+1:]
+	}
+	if i := indexLast(file, "\\"); i >= 0 {
+		return file[i+1:]
+	}
+	return file
+}
+
+// indexLast returns the byte index of the last occurrence of sep in s, or
+// -1 when sep is absent. Avoids the strings package to keep this file's
+// import set minimal (errors, fmt, runtime).
+func indexLast(s, sep string) int {
+	if len(sep) == 0 || len(s) < len(sep) {
+		return -1
+	}
+	for i := len(s) - len(sep); i >= 0; i-- {
+		if s[i:i+len(sep)] == sep {
+			return i
+		}
+	}
+	return -1
+}
