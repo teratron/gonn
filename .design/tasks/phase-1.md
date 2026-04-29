@@ -1,7 +1,7 @@
 ---
 phase: 1
-name: "Foundation Rewrite (Track A)"
-status: In Progress
+name: "Foundation Rewrite (complete)"
+status: Done
 subsystem: "pkg/utils, pkg/neuron, pkg/layer, pkg/network"
 requires: []
 provides:
@@ -16,6 +16,8 @@ key_files:
     - pkg/neuron/cell/hidden.go
     - pkg/neuron/cell/cell_test.go
     - pkg/neuron/axon/axon_test.go
+    - pkg/layer/layer_test.go
+    - pkg/network/network_test.go
   modified:
     - pkg/neuron/cell/core.go
     - pkg/neuron/cell/input.go
@@ -23,6 +25,14 @@ key_files:
     - pkg/neuron/cell/dense.go
     - pkg/neuron/cell/output.go
     - pkg/neuron/axon/axon.go
+    - pkg/layer/core.go
+    - pkg/layer/base.go
+    - pkg/layer/input.go
+    - pkg/layer/dense.go
+    - pkg/layer/output.go
+    - pkg/network/network.go
+    - pkg/network/bundle.go
+    - pkg/network/propagation.go
     - .design/specifications/l2-errors-impl.md
     - .design/INDEX.md
     - .design/PLAN.md
@@ -34,6 +44,9 @@ patterns_established:
   - "Generic type alias for type identity: type Hidden[T utils.Float] = Dense[T] (Go 1.24+) — full method inheritance without duplication"
   - "Dual axon constructors: New (default U[-0.5, 0.5] via package PCG + mutex) for legacy callers; NewWithWeight (caller-supplied) for layer-driven Xavier/He"
   - "Recursion-safe method shadowing: o.Dense.CalculateValue() in Output bypasses promotion-based recursion"
+  - "Layer-level activation owned by Network: pre-activation values cached in preactHidden/preactOutput so backprop derivatives feed pre-activation input to the dispatcher"
+  - "Element-wise type assertion replaces non-existent slice covariance: any(cell).(neuron.Neuron[T]) per element instead of any(slice).([]Neuron[T])"
+  - "Pointer-anchored output targets: cell.Output stores a pointer into layer.targets[i]; SetTarget writes the slot in place, keeping the cell's reference valid"
 duration_minutes: ~
 ---
 
@@ -73,23 +86,23 @@ duration_minutes: ~
 
 ### Track C — Layer (after Track B)
 
-- [ ] [T-1C01] Rewrite `pkg/layer/{core,base}.go` — fix nil-deref constructors, dedupe `Init`
-- [ ] [T-1C02] Implement `pkg/layer/{input,dense,output}.go` aligned to `l2-layer-types` v1.1.0
-- [ ] [T-1C03] [Validation] Layer contract + nil-safety tests
+- [x] [T-1C01] Rewrite `pkg/layer/{core,base}.go` — fix nil-deref constructors, dedupe `Init`
+- [x] [T-1C02] Implement `pkg/layer/{input,dense,output}.go` aligned to `l2-layer-types` v1.1.0
+- [x] [T-1C03] [Validation] Layer contract + nil-safety tests
 
 ### Track D — Network (after Track C)
 
-- [ ] [T-1D01] Rewrite `pkg/network/network.go` — element-wise iteration over `Network[T]`
-- [ ] [T-1D02] Rewrite `pkg/network/bundle.go` and complete `Build()` per `l2-network-graph` v1.1.0
-- [ ] [T-1D03] Rewrite `pkg/network/propagation.go` — forward + backward passes
-- [ ] [T-1D04] Fix `Output.CalculateValue` infinite recursion (cycle break per spec §5.4)
-- [ ] [T-1D05] [Validation] Network smoke test (XOR convergence) + race-detector pass
+- [x] [T-1D01] Rewrite `pkg/network/network.go` — element-wise iteration over `Network[T]`
+- [x] [T-1D02] Rewrite `pkg/network/bundle.go` and complete `Build()` per `l2-network-graph` v1.1.0
+- [x] [T-1D03] Rewrite `pkg/network/propagation.go` — forward + backward passes
+- [x] [T-1D04] Fix `Output.CalculateValue` infinite recursion (cycle break per spec §5.4)
+- [x] [T-1D05] [Validation] Network smoke test (XOR convergence) + race-detector pass
 
 ### Phase Gate
 
-- [ ] [T-1Z01] [Validation] `go build ./...` passes — C-001 resolved
-- [ ] [T-1Z02] [Validation] `go test -race ./...` passes; `go test -cover` ≥ 80% on new packages
-- [ ] [T-1Z03] Update STATE.md: clear blocker C-001, record patterns_established in phase frontmatter
+- [x] [T-1Z01] [Validation] `go build ./...` passes — C-001 resolved
+- [x] [T-1Z02] [Validation] `go test -cover` ≥ 80% on new packages (utils 100, neuron/cell 100, neuron/axon 100, layer 93.7, network 96.5). `go test -race ./...` PASS on all 7 packages (PowerShell-launched; bash PATH issue logged in STATE.md Recent Decisions).
+- [x] [T-1Z03] Update STATE.md: clear blocker C-001, record patterns_established in phase frontmatter
 
 ## Detailed Tracking
 

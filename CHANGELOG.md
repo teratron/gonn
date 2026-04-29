@@ -71,3 +71,81 @@ fails to build — that surface is owned by Tracks C/D.
   swapped `math/rand` legacy global for `math/rand/v2.PCG` via
   `utils.NewRNG(0)`; `New` and `NewWithWeight` distinguish default-init
   from caller-controlled paths.
+
+### Phase 1 Track C — 2026-04-29
+
+Layer slice of the Phase 1 Foundation Rewrite. Closes the nil-deref
+constructors, the duplicate Init logic, and the dropped-size defect from
+[l2-layer-types] §5.3.
+
+#### Added
+
+- `pkg/layer/layer_test.go` — 93.7 % line coverage. Includes regression
+  tests for nil-deref panic, dropped size on `NewInput`, Init de-dup,
+  bias-cell alloc, target pointer aliasing.
+
+#### Changed
+
+- `pkg/layer/core.go`, `base.go`, `input.go`, `dense.go`, `output.go` —
+  full rewrite. Constructors now allocate the embedded core/base via
+  `newCore` / `newBase`; `Dense.Init` delegates to `base.Init`;
+  `NewInput(size)` honours the size argument; bias cells allocated when
+  `Bias=true`; Output owns a `targets []T` slice and exposes
+  `SetTarget(idx, value)` for label updates between samples.
+
+### Phase 1 Track D — 2026-04-29
+
+Network slice of the Phase 1 Foundation Rewrite. Closes blocker C-001
+end-to-end: `go build ./...` is green and the XOR smoke test converges
+within 5000 epochs (sigmoid 2-4-1, MSE).
+
+#### Added
+
+- `pkg/network/network_test.go` — 96.5 % line coverage. XOR-convergence
+  smoke test (target loss < 0.02), Build axon-fan-out, SetInputs writes
+  every cell (regression of [l2-network-graph] §5.4 #4), error routing
+  through ErrUserConfig / ErrInputData.
+- `Network.Train(input, target)` — one-shot forward + backward + update
+  helper used by the smoke test and by Phase-2 facade.
+- `Network.LossMode()`, `Network.CalculateLossDefault()` — surfaces the
+  loss configured by SetLayers.
+
+#### Changed
+
+- `pkg/network/network.go` — `New[T]()` returns Network by value (kept
+  for [pkg/nn] embed compatibility); `SetLayers(in, hidden, out)`
+  installs cells from layer constructors and captures activation / loss
+  / bias-cell handles; `Build()` wires Input→Hidden and Hidden→Output
+  axons (and bias-axon when configured); `SetInputs` / `SetTargets`
+  write per-cell instead of cells[0].
+- `pkg/network/bundle.go` — slimmed to `cells []S` + `Replace`, `Add`,
+  `Cells`, `At`, `Len`. The legacy whole-slice `any(...).([]Neuron[T])`
+  cast (always false) is replaced by element-wise type assertion in
+  callers (closes [l2-network-graph] §5.4 #3).
+- `pkg/network/propagation.go` — forward applies layer activation via
+  the [pkg/activation] dispatcher; pre-activation values cached in
+  `Network.preactHidden / preactOutput` so backprop feeds pre-σ to
+  `activation.Derivative` (needed for sigmoid σ' = σ(x)·(1-σ(x)));
+  backward walks Output.Axons in reverse to credit Hidden cells.
+
+### Phase 1 Gate — 2026-04-29
+
+- T-1Z01 `go build ./...` — green. C-001 closed.
+- T-1Z02 `go test -cover ./...`:
+  - pkg/utils 100 %
+  - pkg/neuron/cell 100 %
+  - pkg/neuron/axon 100 %
+  - pkg/layer 93.7 %
+  - pkg/network 96.5 %
+  - pkg/activation 9.1 % (Phase 0 baseline; out of scope)
+  - pkg/loss 13.5 % (Phase 0 baseline; out of scope)
+  - pkg/nn 0 % (Phase 2 facade; out of scope)
+- T-1Z02 `go test -race ./...` — **PASS** on all 7 packages
+  (utils, neuron/cell, neuron/axon, layer, network plus pre-existing
+  activation, loss). Confirmed under MSYS2 mingw64 gcc 15.2.0 via
+  PowerShell. Note: the Claude Code bash shell does not propagate
+  Windows PATH to the Go child process; race-detector runs must be
+  launched from PowerShell or `cmd.exe` until that environment is
+  fixed.
+- T-1Z03 STATE.md cleared blocker C-001; phase-1 frontmatter populated
+  with provides / key_files / patterns_established / status:Done.

@@ -32,6 +32,15 @@ type Network[T utils.Float] struct {
 	hiddenAct  activation.Type
 	outputAct  activation.Type
 	lossMode   loss.Type
+
+	// preactHidden / preactOutput store the pre-activation linear sum so
+	// backprop can feed it to activation.Derivative. The dispatcher
+	// expects pre-activation input (it re-applies the activation inside
+	// to compute σ' = σ(x)·(1-σ(x)) for sigmoid and similar). Reusing the
+	// post-activation value would yield σ(σ(x))·(1-σ(σ(x))) — a vanishing
+	// gradient that prevents convergence.
+	preactHidden []T
+	preactOutput []T
 }
 
 // New returns a freshly constructed Network with empty bundles and the
@@ -77,6 +86,8 @@ func (n *Network[T]) SetLayers(in *layer.Input[T], hidden *layer.Dense[T], out *
 	n.hiddenAct = hidden.Activation
 	n.outputAct = out.Activation
 	n.lossMode = out.Loss
+	n.preactHidden = make([]T, hidden.Size)
+	n.preactOutput = make([]T, out.Size)
 	return nil
 }
 

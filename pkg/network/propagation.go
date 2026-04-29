@@ -9,16 +9,20 @@ import (
 // CalculateValues runs the forward pass: Hidden first (consumes Input),
 // then Output (consumes Hidden). Each cell's CalculateValue reads its
 // own incoming Axons — no slice covariance needed. After the linear
-// sum is computed, the layer-wide activation function is applied via
-// the [pkg/activation] dispatcher.
+// sum is computed, it is captured in preactHidden / preactOutput (the
+// backprop pass needs pre-activation values for the derivative call),
+// then the layer-wide activation function is applied via the
+// [pkg/activation] dispatcher.
 func (n *Network[T]) CalculateValues() {
-	for _, h := range n.Hidden.cells {
+	for i, h := range n.Hidden.cells {
 		h.CalculateValue()
-		*h.GetValue() = activation.Activation[T](*h.GetValue(), n.hiddenAct)
+		n.preactHidden[i] = *h.GetValue()
+		*h.GetValue() = activation.Activation[T](n.preactHidden[i], n.hiddenAct)
 	}
-	for _, o := range n.Output.cells {
+	for i, o := range n.Output.cells {
 		o.Dense.CalculateValue()
-		*o.GetValue() = activation.Activation[T](*o.GetValue(), n.outputAct)
+		n.preactOutput[i] = *o.GetValue()
+		*o.GetValue() = activation.Activation[T](n.preactOutput[i], n.outputAct)
 		if t := o.GetTarget(); t != nil {
 			o.SetMiss(*t - *o.GetValue())
 		}
@@ -62,14 +66,15 @@ func (n *Network[T]) CalculateMisses() {
 // cell — Hidden and Output. rate is the supplied learning rate; the
 // activation derivative for the cell's layer is folded into the
 // effective rate so that downstream cell.CalculateWeight uses
-// `rate * derivative * miss`.
+// `rate * derivative * miss`. Pre-activation values captured during the
+// forward pass are fed to the derivative dispatcher.
 func (n *Network[T]) CalculateWeights(rate *T) {
-	for _, h := range n.Hidden.cells {
-		eff := *rate * activation.Derivative[T](*h.GetValue(), n.hiddenAct)
+	for i, h := range n.Hidden.cells {
+		eff := *rate * activation.Derivative[T](n.preactHidden[i], n.hiddenAct)
 		h.CalculateWeight(&eff)
 	}
-	for _, o := range n.Output.cells {
-		eff := *rate * activation.Derivative[T](*o.GetValue(), n.outputAct)
+	for i, o := range n.Output.cells {
+		eff := *rate * activation.Derivative[T](n.preactOutput[i], n.outputAct)
 		o.CalculateWeight(&eff)
 	}
 }

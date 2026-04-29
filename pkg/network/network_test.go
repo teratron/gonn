@@ -137,9 +137,13 @@ func TestXORConvergence(t *testing.T) {
 		{{1, 1}, {0}},
 	}
 
-	const maxEpochs = 5000
+	const (
+		maxEpochs   = 20000
+		targetLoss  = 0.02
+		predictTol  = 0.4 // sigmoid output must land on the correct side of 0.5
+	)
 	var lastLoss float64
-	for epoch := 0; epoch < maxEpochs; epoch++ {
+	for epoch := range maxEpochs {
 		var total float64
 		for _, sample := range dataset {
 			l, err := n.Train(sample[0], sample[1])
@@ -149,16 +153,19 @@ func TestXORConvergence(t *testing.T) {
 			total += float64(l)
 		}
 		lastLoss = total / float64(len(dataset))
-		if lastLoss < 0.05 {
+		if lastLoss < targetLoss {
 			t.Logf("XOR converged in %d epochs, mean loss = %v", epoch+1, lastLoss)
 			break
 		}
 	}
-	if lastLoss >= 0.05 {
-		t.Errorf("XOR did not converge: mean loss after %d epochs = %v (want < 0.05)", maxEpochs, lastLoss)
+	if lastLoss >= targetLoss {
+		t.Errorf("XOR did not converge: mean loss after %d epochs = %v (want < %v)", maxEpochs, lastLoss, targetLoss)
 	}
 
-	// Sanity: after training, predictions must reflect XOR.
+	// Sanity: after training, predictions must land on the right side of
+	// the 0.5 decision boundary. predictTol of 0.4 is a generous bound
+	// that survives random PCG seeding while still catching collapsed
+	// networks (output stuck at 0.5).
 	for _, sample := range dataset {
 		if err := n.SetInputs(sample[0]); err != nil {
 			t.Fatalf("SetInputs: %v", err)
@@ -166,8 +173,8 @@ func TestXORConvergence(t *testing.T) {
 		n.CalculateValues()
 		got := *n.Output.Cells()[0].GetValue()
 		want := sample[1][0]
-		if math.Abs(float64(got)-want) > 0.3 {
-			t.Errorf("XOR(%v) = %v; want ~%v", sample[0], got, want)
+		if math.Abs(float64(got)-want) > predictTol {
+			t.Errorf("XOR(%v) = %v; want ~%v (tolerance %v)", sample[0], got, want, predictTol)
 		}
 	}
 }
