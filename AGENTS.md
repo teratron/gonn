@@ -7,7 +7,7 @@
 
 ## 2. Go Development Rules
 
-### 21 Fundamentals & Best Practices
+### 2.1 Fundamentals & Best Practices
 
 - **Idiomatic Go**: Follow *Effective Go* and community standards.
 - **Simplicity**: Prioritize readability over cleverness.
