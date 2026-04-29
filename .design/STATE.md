@@ -4,15 +4,16 @@
 <!-- Maximum 100 lines. Agent updates AFTER each completed action. -->
 
 **Workspace:** main
-**Updated:** 2026-04-21 15:34
-**Phase:** 0 — Not Started
+**Project Version:** 0.1.0
+**Updated:** 2026-04-29 08:31
+**Phase:** 1 — Foundation Rewrite (Track A)
 **Status:** Active
 
 ## Current Position
 
 - **Task:** None
 - **Spec:** None
-- **Next Action:** Run /magic.task
+- **Next Action:** Run /magic-run to begin Phase 1 — T-1A01 + T-1A04 in parallel
 
 ## Progress
 
