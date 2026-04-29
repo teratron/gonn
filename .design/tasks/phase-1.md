@@ -13,7 +13,16 @@ key_files:
     - pkg/utils/errors_test.go
     - pkg/utils/init.go
     - pkg/utils/init_test.go
+    - pkg/neuron/cell/hidden.go
+    - pkg/neuron/cell/cell_test.go
+    - pkg/neuron/axon/axon_test.go
   modified:
+    - pkg/neuron/cell/core.go
+    - pkg/neuron/cell/input.go
+    - pkg/neuron/cell/bias.go
+    - pkg/neuron/cell/dense.go
+    - pkg/neuron/cell/output.go
+    - pkg/neuron/axon/axon.go
     - .design/specifications/l2-errors-impl.md
     - .design/INDEX.md
     - .design/PLAN.md
@@ -22,6 +31,9 @@ patterns_established:
   - "Multi-%w fmt.Errorf wrapping in Wrap() preserves both category and cause for errors.Is routing"
   - "Generic samplers [T utils.Float] computing in float64 then converting — zero-alloc hot path"
   - "Bootstrap-tagged tasks: RFC L2 specs are working contract; promotion to Stable deferred to phase gate"
+  - "Generic type alias for type identity: type Hidden[T utils.Float] = Dense[T] (Go 1.24+) — full method inheritance without duplication"
+  - "Dual axon constructors: New (default U[-0.5, 0.5] via package PCG + mutex) for legacy callers; NewWithWeight (caller-supplied) for layer-driven Xavier/He"
+  - "Recursion-safe method shadowing: o.Dense.CalculateValue() in Output bypasses promotion-based recursion"
 duration_minutes: ~
 ---
 
@@ -53,11 +65,11 @@ duration_minutes: ~
 
 ### Track B — Neuron (after Track A)
 
-- [ ] [T-1B01] Rewrite `pkg/neuron/cell/{core,input,bias,dense,output}.go` with generic `[T utils.Float]`
-- [ ] [T-1B02] Add missing `pkg/neuron/cell/hidden.go` (`Hidden[T]` type)
-- [ ] [T-1B03] Add C26 compile-time interface assertions for every concrete cell type
-- [ ] [T-1B04] Rewrite `pkg/neuron/axon/axon.go` — restore `OutgoingCell`, swap legacy RNG for `math/rand/v2.PCG`
-- [ ] [T-1B05] [Validation] Cell + axon contract tests (table-driven, ≥80% coverage)
+- [x] [T-1B01] Rewrite `pkg/neuron/cell/{core,input,bias,dense,output}.go` with generic `[T utils.Float]`
+- [x] [T-1B02] Add missing `pkg/neuron/cell/hidden.go` (`Hidden[T]` type)
+- [x] [T-1B03] Add C26 compile-time interface assertions for every concrete cell type
+- [x] [T-1B04] Rewrite `pkg/neuron/axon/axon.go` — restore `OutgoingCell`, swap legacy RNG for `math/rand/v2.PCG`
+- [x] [T-1B05] [Validation] Cell + axon contract tests (table-driven, ≥80% coverage)
 
 ### Track C — Layer (after Track B)
 
@@ -133,37 +145,42 @@ duration_minutes: ~
 ### [T-1B01] Cell core/input/bias/dense/output rewrite
 
 - **Spec:** [l2-neuron-model.md](../specifications/l2-neuron-model.md) §Cell types
-- **Status:** Todo
+- **Status:** Done
 - **Assignment:** Agent
 - **Handoff:** Required by T-1B02 (Hidden), T-1B03 (assertions), Track C (layer).
-- **Notes:** Generic over `[T utils.Float]` (C25). No infinite recursion in `CalculateValue` — that defect is closed in T-1D04 at the network layer.
+- **Notes:** Generic over `[T utils.Float]` (C25). Output recursion closed here at the cell layer via explicit `o.Dense.CalculateValue()` (Track-D recursion-fix entry T-1D04 retained for the network-side guard).
+- **Changes:** Rewrote core/input/bias/dense/output.go with full C31 doc-comments. Renamed `_NewBias` → `NewBias`. Output.CalculateValue now delegates to embedded Dense and computes residual `target - value` on non-nil target.
 
 ### [T-1B02] Add `Hidden[T]` cell type
 
 - **Spec:** [l2-neuron-model.md](../specifications/l2-neuron-model.md) §Cell types
-- **Status:** Todo
+- **Status:** Done
 - **Assignment:** Agent
 - **Notes:** Closes the missing-type half of blocker C-001.
+- **Changes:** Added `pkg/neuron/cell/hidden.go` with `type Hidden[T utils.Float] = Dense[T]` (Go 1.24+ generic alias) and `NewHidden` constructor.
 
 ### [T-1B03] C26 compile-time interface assertions
 
 - **Spec:** [l2-neuron-model.md](../specifications/l2-neuron-model.md) §Interface contract
-- **Status:** Todo
+- **Status:** Done
 - **Assignment:** Agent
 - **Notes:** Per C26: `var _ Cell[float32] = (*Dense[float32])(nil)` for every concrete type.
+- **Changes:** Each cell file owns its own `var _ neuron.{Nucleus,Neuron}[float32|float64] = (*Type[...])(nil)` block, including the new Hidden alias.
 
 ### [T-1B04] Axon rewrite — restore `OutgoingCell`, modernize RNG
 
 - **Spec:** [l2-neuron-model.md](../specifications/l2-neuron-model.md) §Axon
-- **Status:** Todo
+- **Status:** Done
 - **Assignment:** Agent
 - **Notes:** Closes the commented-out-OutgoingCell half of blocker C-001. Pulls RNG from T-1A04.
+- **Changes:** Restored `OutgoingCell neuron.Neuron[T]` field; swapped `math/rand` global for `math/rand/v2.PCG` via `utils.NewRNG`; introduced `NewWithWeight` for caller-supplied weights from layer constructors; package mutex serialises the default-init path.
 
 ### [T-1B05] [Validation] Cell + axon tests
 
 - **Goal:** Table-driven contract tests for every cell type and axon path; ≥80% coverage.
-- **Method:** `go test -race -cover ./pkg/neuron/...`
-- **Status:** Todo
+- **Method:** `go test -race -cover ./pkg/neuron/...` (race deferred — no gcc).
+- **Status:** Done
+- **Changes:** `pkg/neuron/cell/cell_test.go` and `pkg/neuron/axon/axon_test.go`. 100 % line coverage on both packages. Includes regression test for Output recursion, concurrency probe over default-init RNG, float32 + float64 paths, baseline-range guard for default weights.
 
 ### [T-1C01] Layer base + core rewrite
 

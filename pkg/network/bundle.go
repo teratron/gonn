@@ -1,190 +1,51 @@
 package network
 
 import (
-	"github.com/teratron/gonn/pkg/activation"
 	"github.com/teratron/gonn/pkg/neuron"
-	"github.com/teratron/gonn/pkg/neuron/cell"
 	"github.com/teratron/gonn/pkg/utils"
 )
 
+// bundle is the typed cell container owned by Network. Each Network field
+// (Input, Hidden, Output) holds a bundle parameterised by the matching
+// concrete cell type. The container intentionally exposes very little
+// surface — Network methods do the type-assertion per element when they
+// need to reach the [neuron.Neuron] interface (slice covariance is not
+// available in Go, so any whole-slice cast was unsound and silently
+// no-op'd in the legacy code; closes [l2-network-graph] §5.4 #3).
 type bundle[T utils.Float, S neuron.Nucleus[T]] struct {
-	cells     []S
-	cache     []*T
-	size      int
-	sizeFloat T
-	isInit    bool
+	cells []S
 }
 
 func newBundle[T utils.Float, S neuron.Nucleus[T]]() bundle[T, S] {
-	return bundle[T, S]{
-		cells:     make([]S, 0),
-		cache:     make([]*T, 0),
-		size:      0,
-		sizeFloat: T(0),
-	}
+	return bundle[T, S]{cells: make([]S, 0)}
 }
 
-//func newBundleWithData[T utils.Float, S neuron.Nucleus[T]](data []T) bundle[T, S] {
-//	size := len(data)
-//	return bundle[T, S]{
-//		cells:       make([]S, 0),
-//		size:      size,
-//		sizeFloat: T(float64(size)),
-//	}
-//}
-
-func (b *bundle[T, S]) Add(cell S) {
-	b.cells = append(b.cells, cell)
-	b.cache = append(b.cache, nil)
-	b.size++
-	b.sizeFloat = T(b.size)
+// Replace swaps the cell slice for the supplied one — used by SetLayers
+// to install the cells produced by a layer constructor.
+func (b *bundle[T, S]) Replace(cells []S) {
+	b.cells = cells
 }
 
-func (b *bundle[T, S]) GetValues() *[]*T {
-	for i, c := range b.cells {
-		b.cache[i] = c.GetValue()
-	}
-	return &b.cache
+// Add appends a single cell to the bundle.
+func (b *bundle[T, S]) Add(c S) {
+	b.cells = append(b.cells, c)
 }
 
-func (b *bundle[T, S]) Init(size int, activationMode activation.Type, bias bool) {
-	b.size = b.size + size
-	b.sizeFloat = T(b.size)
-
-	for i := 0; i < size; i++ {
-		if n, ok := any(cell.NewHidden[T](activationMode, bias)).(S); ok {
-			b.cells = append(b.cells, n)
-			b.cache = append(b.cache, nil)
-		}
-	}
-	if len(b.cells) != b.size {
-		utils.Logger.Error("bundle size mismatch")
-		return
-	}
+// Len returns the number of cells in the bundle.
+func (b *bundle[T, S]) Len() int {
+	return len(b.cells)
 }
 
-// Input bundle specific methods
-
-//	func NewInputBundle[T utils.Float](data []T) InputBundle[T] {
-//		size := uint(len(data))
-//		bundle := InputBundle[T]{
-//			bundle: bundle[T, *cell.Input[T]]{
-//				cells:        make([]*cell.Input[T], 0),
-//				size:      size,
-//				sizeFloat: T(float64(size)),
-//			},
-//		}
-//
-//		if len(data) > 0 {
-//			for _, v := range data {
-//				value := v
-//				bundle.cells = append(bundle.cells, cell.NewInput(&value))
-//			}
-//		}
-//
-//		return bundle
-//	}
-
-func (b *bundle[T, _]) SetInputs(data *[]T) {
-	if len(*data) > b.size {
-		utils.Logger.Error("data length is greater than bundle length")
-		return
-	}
-	if i, ok := any(b.cells[0]).(*cell.Input[T]); ok {
-		for _, v := range *data {
-			i.SetValue(&v)
-		}
-	}
+// Cells exposes the slice for read-only iteration. Callers must not
+// append, reslice, or mutate elements via the returned reference — the
+// Network owns the storage.
+func (b *bundle[T, S]) Cells() []S {
+	return b.cells
 }
 
-// Output bundle specific methods
-
-//func NewOutputBundle[T utils.Float](data []T) *cell.Output[T] {
-//	size := uint(len(data))
-//	bundle := OutputBundle[T]{
-//		bundle: bundle[T, *cell.Output[T]]{
-//			cells:        make([]*cell.Output[T], 0),
-//			size:      size,
-//			sizeFloat: T(float64(size)),
-//		},
-//	}
-//
-//	if len(data) > 0 {
-//		for _, v := range data {
-//			target := v
-//			bundle.cells = append(bundle.cells, cell.NewOutput(&target))
-//		}
-//	}
-//
-//	return bundle
-//}
-
-func (b *bundle[T, _]) SetTargets(data *[]T) {
-	if len(*data) > b.size {
-		utils.Logger.Error("data length is greater than bundle length")
-		return
-	}
-	if o, ok := any(b).(*cell.Output[T]); ok {
-		for _, v := range *data {
-			o.SetTarget(&v)
-		}
-	}
+// At returns the cell at index idx. Panics on out-of-range — programming
+// error in the caller, never a runtime condition.
+func (b *bundle[T, S]) At(idx int) S {
+	return b.cells[idx]
 }
 
-// Hidden bundle specific methods
-
-//func NewHiddenBundle[T utils.Float](data []T) HiddenBundle[T] {
-//	size := uint(len(data))
-//	bundle := HiddenBundle[T]{
-//		bundle: bundle[T, *cell.Hidden[T]]{
-//			cells:        make([]*cell.Hidden[T], 0),
-//			size:      size,
-//			sizeFloat: T(float64(size)),
-//		},
-//	}
-//
-//	if len(data) > 0 {
-//		for range data {
-//			bundle.cells = append(bundle.cells, cell.NewHidden[T]())
-//		}
-//	}
-//
-//	return bundle
-//}
-
-// ----------------------------------------------------------------------------
-// FORWARD PROPAGATION
-// ----------------------------------------------------------------------------
-
-// bundle for Output or Hidden
-
-func (b *bundle[T, _]) GetMisses() *[]*T {
-	if c, ok := any(b.cells).([]neuron.Neuron[T]); ok {
-		for i, n := range c {
-			b.cache[i] = n.GetMiss()
-		}
-	}
-	return &b.cache
-}
-
-func (b *bundle[T, _]) calculateValues() {
-	if c, ok := any(b.cells).([]neuron.Neuron[T]); ok {
-		for _, n := range c {
-			n.CalculateValue()
-		}
-	}
-}
-
-// ----------------------------------------------------------------------------
-// BACKWARD PROPAGATION
-// ----------------------------------------------------------------------------
-
-// bundle for Output or Hidden
-
-func (b *bundle[T, _]) calculateWeights(rate *T) {
-	if c, ok := any(b.cells).([]neuron.Neuron[T]); ok {
-		for _, n := range c {
-			n.CalculateWeight(rate)
-		}
-	}
-}
