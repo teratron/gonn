@@ -1,7 +1,7 @@
 # Weight Initialization Implementation
 
-**Version:** 0.2.0
-**Status:** RFC
+**Version:** 1.0.0
+**Status:** Stable
 **Layer:** implementation
 **Implements:** l1-weight-initialization.md
 
@@ -122,3 +122,4 @@ sample(method, rng, fanIn, fanOut):
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-04-28 | Initial Draft — concrete Go realization of l1-weight-initialization RFC. |
 | 0.2.0 | 2026-04-28 | Status promoted Draft → RFC after parent l1-weight-initialization reached Stable. Sampling helpers + Compile() wiring ready for review. |
+| 1.0.0 | 2026-04-30 | Promoted RFC → Stable. Validated by Phase-1 implementation: pkg/utils/init.go ships zero-allocation hot path (15-42 ns/op), reproducibility test, distribution mean/variance within 5% over n=20000, 100% test coverage, race-detector clean. |

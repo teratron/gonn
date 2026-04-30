@@ -1,9 +1,10 @@
 # Implementation Plan
 
-**Version:** 1.0.0
+**Version:** 1.1.0
 **Project Version:** 0.1.0 (initial release target — semver baseline)
 **Generated:** 2026-04-29
-**Based on:** .design/INDEX.md v1.7.0
+**Last Updated:** 2026-04-30
+**Based on:** .design/INDEX.md v1.8.0
 **Based on RULES:** .design/RULES.md v1.2.0
 **Based on ROADMAP:** .design/ROADMAP.md v1.0.0
 **Status:** Active
@@ -22,31 +23,32 @@ GoNN library implementation plan derived from `ROADMAP.md` Hybrid Path. Phase or
 - [x] **Activation Functions** ([l2-activation-functions.md](specifications/l2-activation-functions.md)) [L2, Stable v1.0.0] — `pkg/activation/` retained
 - [x] **Loss Functions** ([l2-loss-functions.md](specifications/l2-loss-functions.md)) [L2, Stable v1.0.0] — `pkg/loss/` retained
 
-## Phase 1 — Foundation Rewrite (Track A)
+## Phase 1 — Foundation Rewrite (Track A) ✓ Done
 
-*Rewrites the broken core under the fresh L2 contracts. Blocking constraint C-001 is resolved here.*
+*Rewrites the broken core under the fresh L2 contracts. Blocking constraint C-001 resolved 2026-04-29.*
 
 **Subsystem:** `pkg/utils`, `pkg/neuron`, `pkg/layer`, `pkg/network`
 **Build order:** errors+init (parallel) → cell+axon → layer → network
 **Tasks file:** [tasks/phase-1.md](tasks/phase-1.md)
 
-- [ ] **Error Taxonomy Implementation** ([l2-errors-impl.md](specifications/l2-errors-impl.md)) [L2, RFC v0.3.0]
-- [ ] **Weight-Init Implementation** ([l2-init-impl.md](specifications/l2-init-impl.md)) [L2, RFC v0.2.0]
-- [ ] **Neuron Model Rewrite** ([l2-neuron-model.md](specifications/l2-neuron-model.md)) [L2, Stable v1.1.0]
-- [ ] **Layer Types Rewrite** ([l2-layer-types.md](specifications/l2-layer-types.md)) [L2, Stable v1.1.0]
-- [ ] **Network Graph Rewrite** ([l2-network-graph.md](specifications/l2-network-graph.md)) [L2, Stable v1.1.0]
+- [x] **Error Taxonomy Implementation** ([l2-errors-impl.md](specifications/l2-errors-impl.md)) [L2, Stable v1.0.0]
+- [x] **Weight-Init Implementation** ([l2-init-impl.md](specifications/l2-init-impl.md)) [L2, Stable v1.0.0]
+- [x] **Neuron Model Rewrite** ([l2-neuron-model.md](specifications/l2-neuron-model.md)) [L2, Stable v1.1.0]
+- [x] **Layer Types Rewrite** ([l2-layer-types.md](specifications/l2-layer-types.md)) [L2, Stable v1.1.0]
+- [x] **Network Graph Rewrite** ([l2-network-graph.md](specifications/l2-network-graph.md)) [L2, Stable v1.1.0]
 
-## Phase 2 — Public Facade Restoration (Track B)
+## Phase 2 — Public Facade Restoration (Track B) — Active [Bootstrap]
 
 *Restores the public `pkg/nn` API on top of the Phase-1 foundation.*
 
 **Subsystem:** `pkg/nn`
-**Requires:** Phase 1 complete
+**Requires:** Phase 1 ✓
 **Tasks file:** [tasks/phase-2.md](tasks/phase-2.md)
+**Bootstrap notice:** All three source specs are RFC/Draft. Tasks tagged `[Bootstrap]`; spec promotion to Stable deferred to Phase Gate after implementation validates the contracts.
 
-- [ ] **NN Public Facade** ([l2-nn-facade.md](specifications/l2-nn-facade.md)) [L2, RFC v2.0.0]
-- [ ] **Training Loop Implementation** ([l2-training-loop.md](specifications/l2-training-loop.md)) [L2, Draft v0.1.0]
-- [ ] **Training Control Implementation** ([l2-control-impl.md](specifications/l2-control-impl.md)) [L2, Draft v0.1.0]
+- [ ] **NN Public Facade** ([l2-nn-facade.md](specifications/l2-nn-facade.md)) [L2, RFC v2.0.0] [Bootstrap]
+- [ ] **Training Loop Implementation** ([l2-training-loop.md](specifications/l2-training-loop.md)) [L2, Draft v0.1.0] [Bootstrap]
+- [ ] **Training Control Implementation** ([l2-control-impl.md](specifications/l2-control-impl.md)) [L2, Draft v0.1.0] [Bootstrap]
 
 ## Phase 3 — New Capability Packages (Track C)
 
@@ -111,3 +113,4 @@ graph LR
 | Version | Date | Description |
 | :--- | :--- | :--- |
 | 1.0.0 | 2026-04-29 | Initial plan derived from ROADMAP.md v1.0.0; Tracks A–D mapped to Phases 1–4. |
+| 1.1.0 | 2026-04-30 | Phase 1 marked Done (C-001 resolved). l2-errors-impl + l2-init-impl promoted to Stable v1.0.0. Phase 2 activated with [Bootstrap] markers (RFC source specs). Phases 3 + 4 remain Blocked. |

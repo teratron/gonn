@@ -1,7 +1,7 @@
 # Error Implementation
 
-**Version:** 0.3.0
-**Status:** RFC
+**Version:** 1.0.0
+**Status:** Stable
 **Layer:** implementation
 **Implements:** l1-error-taxonomy.md
 
@@ -128,3 +128,4 @@ sites. Migration:
 | 0.1.0 | 2026-04-28 | Initial Draft — concrete Go realization of l1-error-taxonomy RFC. |
 | 0.2.0 | 2026-04-28 | Status promoted Draft → RFC after parent l1-error-taxonomy reached Stable. Sentinel set + helper signatures ready for review. |
 | 0.3.0 | 2026-04-29 | Sentinel set finalized to 6 orthogonal categories: ErrUserConfig, ErrInputData, ErrCompute, ErrControl, ErrIntegrity, ErrIO. ErrTrainingFailure and ErrUnsupported dissolved into existing categories to avoid catch-all routing. |
+| 1.0.0 | 2026-04-30 | Promoted RFC → Stable. Validated by Phase-1 implementation: pkg/utils/errors.go ships with 100% test coverage, race-detector clean, C32 forbidden-phrase guard active. Spec text and code in lock-step. |

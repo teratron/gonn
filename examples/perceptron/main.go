@@ -15,13 +15,17 @@ func main() {
 	lenOutput := 2                                                                 // Number of output data.
 	lenData := len(dataSet) - lenOutput
 
-	n := nn.New[float32]().
+	n, err := nn.NewBuilder[float32]().
 		Input(uint(lenInput)).
 		Dense(5, activation.SIGMOID, true).
-		Dense(10, activation.ReLU, true).
-		Dense(5, activation.SIGMOID, false).
-		Output(uint(lenOutput), activation.SOFTMAX, loss.ARCTAN, true) //.
-	//Compile(0.3) // learning rate
+		Output(uint(lenOutput), activation.SOFTMAX, true).
+		WithLoss(loss.ARCTAN).
+		WithLearningRate(0.3).
+		Compile()
+	if err != nil {
+		fmt.Printf("Compile error: %v\n", err)
+		return
+	}
 
 	// Set properties.
 	//n.SetHiddenLayers(
