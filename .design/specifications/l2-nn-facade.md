@@ -1,7 +1,7 @@
 # NN Facade
 
 **Version:** 2.0.0
-**Status:** RFC
+**Status:** Stable
 **Layer:** implementation
 **Implements:** l1-neural-network-architecture.md
 
@@ -367,3 +367,4 @@ nn := nn.MustNew[float32](nn.PresetXOR[float32]())
 | :--- | :--- | :--- |
 | 1.0.0 | 2026-04-21 | Initial Stable — reverse-engineered from existing codebase. |
 | 2.0.0 | 2026-04-27 | Major redesign: dual-style API (Builder + Functional Options), explicit `Compile()` lifecycle, callbacks, presets, validation rules. Loss removed from `Output()` signature (breaking). Status reverted to RFC per amendment rule. |
+| 2.0.0 | 2026-04-30 | Promoted RFC → Stable. Phase-2 implementation in `pkg/nn` validates §5.1-§5.8: `NewBuilder` + `New[T](opts...)` both compile via the shared `compile()` routine; §5.7 hard-error rules each route through `utils.ErrUserConfig`; soft warnings emit `Logger.Warn`. v0.1 implementation note: `Compile()` rejects `len(HiddenLayers) > 1` (PresetMNIST + PresetRegression surface returns `ErrUserConfig`); multi-hidden support is planned for v0.2 once `pkg/network` grows a chain of Hidden bundles. Test coverage 84.8% on `pkg/nn`, race-detector clean. |

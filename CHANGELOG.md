@@ -149,3 +149,89 @@ within 5000 epochs (sigmoid 2-4-1, MSE).
   fixed.
 - T-1Z03 STATE.md cleared blocker C-001; phase-1 frontmatter populated
   with provides / key_files / patterns_established / status:Done.
+
+### Phase 2 — 2026-04-30
+
+Public-facade slice. Restores the `pkg/nn.NN[T]` surface on top of the
+Phase-1 foundation per the [l2-nn-facade] v2.0.0 dual-style API.
+Promotes three specs to Stable.
+
+#### Added
+
+- `pkg/nn/config.go` — `Config[T]`, `HiddenLayerSpec[T]`,
+  `WeightInitMethod` constants, lifecycle `state` enum, project
+  defaults (LearningRate=0.3, MaxIterations=10000, LossLimit=1e-4,
+  WeightInit=xavier, LossMode=MSE).
+- `pkg/nn/nn.go` — `NN[T]` type embedding `network.Network[T]`,
+  `NewBuilder[T]()` entry point, `State()` and `Config()` accessors,
+  `guardConfiguring(method)` helper that turns post-Compile mutations
+  into Logger.Warn no-ops (preserves L1 INV-2).
+- `pkg/nn/builder.go` — Builder API: `Input` / `Dense` / `Hidden`
+  (alias) / `Output` / `WithLearningRate` / `WithLoss` / `WithBias` /
+  `WithWeightInit` / `WithLossLimit` / `WithMaxIterations` /
+  `WithEpochCallback` / `WithBatchCallback` / `Compile()` /
+  `MustCompile()`. Output drops `loss.Type` (breaking vs v1).
+- `pkg/nn/compile.go` — shared finalisation routine consumed by both
+  styles. Validates §5.7 hard-error rules with C32-compliant messages
+  wrapping `utils.ErrUserConfig`; emits §5.7 soft warnings via
+  `Logger.Warn`. v0.1 rejects `len(HiddenLayers) > 1` with explicit
+  "v0.2 feature" note.
+- `pkg/nn/options.go` — Functional Options API: `Option[T]`, `New[T]`,
+  `MustNew[T]`, topology + configuration mirrors of every Builder
+  method.
+- `pkg/nn/presets.go` — higher-order options `Sequential`,
+  `DeepNetwork`, `StandardSetup`; presets `PresetXOR`, `PresetMNIST`,
+  `PresetRegression`. PresetXOR converges via the Phase-1 baseline;
+  multi-hidden presets surface their config but error at Compile() in
+  v0.1.
+- `pkg/nn/query.go`, `verify.go` — forward-only inference and
+  forward+loss-without-update.
+- `pkg/nn/train.go` — `Train(input, target)` (single-step) and
+  `Fit(dataset)` (multi-epoch with `MaxIterations` / `LossLimit`
+  early-stopping, min-loss snapshot/rollback, callbacks).
+  `snapshotWeights` / `restoreWeights` use a flat `[]T` buffer reused
+  across epochs (zero per-epoch GC churn).
+- `pkg/nn/control.go` — atomic 4-state lifecycle (`Idle/Running/
+  Paused/Stopped`) with `Pause()` / `Resume()` / `Stop()` on `*NN[T]`,
+  `awaitSafePoint` worker-side helper, `transitionToRunning` /
+  `transitionToIdle` lifecycle transitions. Invalid transitions wrap
+  `utils.ErrControl`.
+- `pkg/nn/nn_test.go` — 84.8% line coverage. Builder API state-machine
+  tests, all §5.7 validation rules reachable, post-Compile mutation
+  no-op assertions, idempotent Compile, MustCompile/MustNew panic
+  tests, Builder vs Options Config-state parity, presets surface,
+  Query/Verify/Fit happy and error paths, EpochCallback invocation
+  count, Pause/Resume/Stop race scenarios under `-race`.
+
+#### Changed
+
+- `pkg/nn/nn.go` / `builder.go` / `query.go` / `verify.go` /
+  `train.go` — full rewrite from v1 stubs/comments.
+- `examples/perceptron/main.go` — migrated from legacy `nn.New()` (v1)
+  to `nn.NewBuilder()` + `WithLoss()` (v2). Output() no longer
+  receives `loss.Type` (breaking change documented in §5.2).
+- `.design/specifications/l2-nn-facade.md` — RFC → Stable v2.0.0.
+  Document History row records the v0.1 single-hidden limitation and
+  the v0.2 multi-hidden plan.
+- `.design/specifications/l2-training-loop.md` — Draft → Stable
+  v1.0.0. Records the Train + Fit dual-method shape, flat snapshot
+  buffer (vs §5.2 nested `WeightsBuffer`), and the `context.Context` /
+  NaN-loss detection deferred to v0.2.
+- `.design/specifications/l2-control-impl.md` — Draft → Stable v1.0.0.
+  Records the 4-state collapse of §5.1's 6-state design, the TOCTOU
+  CAS guard in `transitionToRunning`, and the deferred ctx /
+  buffered-channel control bus.
+- `.design/INDEX.md` 1.8.0 → 1.9.0; `.design/PLAN.md` 1.1.0 → 1.2.0;
+  `.design/TASKS.md` 1.1.0 → 1.2.0 — Phase 2 marked Done; spec status
+  table refreshed.
+
+#### Notes
+
+- `go test -race -cover ./...` — all packages green, `pkg/nn` 84.8%.
+  Run via PowerShell on this host (Claude Code bash shell does not
+  propagate Windows PATH to the Go child process; `gcc.exe` lives at
+  `C:\msys64\mingw64\bin`).
+- Multi-hidden support, `context.Context` integration, NaN-loss
+  detection, and the buffered-channel control bus are all explicitly
+  deferred to v0.2 with spec annotations and `Compile()`-time errors
+  pointing the user at the limitation.

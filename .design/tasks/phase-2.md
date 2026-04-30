@@ -1,18 +1,46 @@
 ---
 phase: 2
 name: "Public Facade Restoration (Track B)"
-status: Active
+status: Done
 subsystem: "pkg/nn"
 requires:
   - "phase-1: pkg/utils, pkg/neuron, pkg/layer, pkg/network"
-provides: []
+provides:
+  - "pkg/nn — public NN[T] facade with dual-style fluent API (Builder + Functional Options)"
+  - "pkg/nn — Compile()/MustCompile() validation per l2-nn-facade §5.7"
+  - "pkg/nn — Train/Fit/Query/Verify surface with min-loss snapshot/rollback"
+  - "pkg/nn — Pause/Resume/Stop atomic lifecycle control with race-clean concurrency"
+  - "pkg/nn — PresetXOR working preset; PresetMNIST/Regression surface (multi-hidden v0.2)"
 key_files:
-  created: []
-  modified: []
-patterns_established: []
+  created:
+    - pkg/nn/compile.go
+    - pkg/nn/options.go
+    - pkg/nn/presets.go
+    - pkg/nn/control.go
+    - pkg/nn/nn_test.go
+  modified:
+    - pkg/nn/config.go
+    - pkg/nn/nn.go
+    - pkg/nn/builder.go
+    - pkg/nn/query.go
+    - pkg/nn/verify.go
+    - pkg/nn/train.go
+    - examples/perceptron/main.go
+    - .design/specifications/l2-nn-facade.md
+    - .design/specifications/l2-training-loop.md
+    - .design/specifications/l2-control-impl.md
+    - .design/INDEX.md
+    - .design/PLAN.md
+patterns_established:
+  - "Dual fluent API converging on internal Config[T] via shared compile() — no duplicated logic between Builder and Options styles"
+  - "State-machine guard via guardConfiguring(method): post-Compile mutations are Logger.Warn no-ops, never panics (preserves INV-2 immutable topology)"
+  - "Validation as a single switch ladder per §5.7 with C32-compliant specific messages and ErrUserConfig wrapping"
+  - "WeightInitMethod as string constants for self-describing JSON persistence (l1-network-persistence forward-extension hook)"
+  - "Min-loss snapshot via flat []T buffer reused across epochs — zero per-epoch GC churn over long training runs"
+  - "4-state atomic control machine (Idle/Running/Paused/Stopped) collapsing l2-control-impl 6-state design — intermediate Pausing/Stopping observable only inside CAS, never to external observers"
+  - "TOCTOU-safe transitionToRunning via CompareAndSwap(Idle, Running) — preserves a Stop issued before Fit reaches its loop"
+  - "Field-shadowing convention: NN[T] embeds Network[T] but adds Builder methods Input/Dense/Output that shadow the field accessors; internal code uses n.Network.X qualified path"
 duration_minutes: ~
-bootstrap: true
----
 
 # Phase 2 Tasks — Public Facade Restoration (Track B)
 
@@ -37,50 +65,50 @@ All three source specifications are RFC/Draft. Tasks below are tagged `[Bootstra
 
 ### Track A — Builder API + Internal Config
 
-- [ ] [T-2A01] [Bootstrap] Define `Config[T]` and `HiddenLayerSpec[T]` in `pkg/nn/config.go` (per `l2-nn-facade` §5.5)
-- [ ] [T-2A02] [Bootstrap] Define `WeightInitMethod` constants (Xavier / He / Random) in `pkg/nn/config.go` (§5.6)
-- [ ] [T-2A03] [Bootstrap] Implement `NewBuilder[T]()` entry point and the Uninitialized → Configuring state guard in `pkg/nn/builder.go`
-- [ ] [T-2A04] [Bootstrap] Implement topology methods `Input` / `Dense` / `Hidden` (alias) / `Output` (`Output` no longer accepts `loss.Type` — breaking change vs v1)
-- [ ] [T-2A05] [Bootstrap] Implement configuration methods `WithLearningRate` / `WithLoss` / `WithBias` / `WithWeightInit` / `WithLossLimit` / `WithMaxIterations`
-- [ ] [T-2A06] [Bootstrap] Implement callback methods `WithEpochCallback` / `WithBatchCallback`
-- [ ] [T-2A07] [Bootstrap] Implement `Compile()` validation rules (§5.7 hard errors + soft warnings); wrap each error via `utils.Newf(utils.ErrUserConfig, ...)`
-- [ ] [T-2A08] [Bootstrap] Implement `MustCompile()` panic-wrapper
-- [ ] [T-2A09] [Bootstrap] Implement post-Compile no-op + Logger.Warn behaviour for any builder/option mutation (preserves L1 INV-2)
-- [ ] [T-2A10] [Bootstrap] [Validation] Builder API table-driven tests — state machine, validation rules, compile-error routing through ErrUserConfig
+- [x] [T-2A01] [Bootstrap] Define `Config[T]` and `HiddenLayerSpec[T]` in `pkg/nn/config.go` (per `l2-nn-facade` §5.5)
+- [x] [T-2A02] [Bootstrap] Define `WeightInitMethod` constants (Xavier / He / Random) in `pkg/nn/config.go` (§5.6)
+- [x] [T-2A03] [Bootstrap] Implement `NewBuilder[T]()` entry point and the Uninitialized → Configuring state guard in `pkg/nn/builder.go`
+- [x] [T-2A04] [Bootstrap] Implement topology methods `Input` / `Dense` / `Hidden` (alias) / `Output` (`Output` no longer accepts `loss.Type` — breaking change vs v1)
+- [x] [T-2A05] [Bootstrap] Implement configuration methods `WithLearningRate` / `WithLoss` / `WithBias` / `WithWeightInit` / `WithLossLimit` / `WithMaxIterations`
+- [x] [T-2A06] [Bootstrap] Implement callback methods `WithEpochCallback` / `WithBatchCallback`
+- [x] [T-2A07] [Bootstrap] Implement `Compile()` validation rules (§5.7 hard errors + soft warnings); wrap each error via `utils.Newf(utils.ErrUserConfig, ...)`
+- [x] [T-2A08] [Bootstrap] Implement `MustCompile()` panic-wrapper
+- [x] [T-2A09] [Bootstrap] Implement post-Compile no-op + Logger.Warn behaviour for any builder/option mutation (preserves L1 INV-2)
+- [x] [T-2A10] [Bootstrap] [Validation] Builder API table-driven tests — state machine, validation rules, compile-error routing through ErrUserConfig
 
 ### Track B — Functional Options API + Presets
 
-- [ ] [T-2B01] [Bootstrap] Define `Option[T]` type and `New[T](opts...) (*NN[T], error)` constructor in `pkg/nn/options.go`
-- [ ] [T-2B02] [Bootstrap] Implement topology options `WithInput` / `WithHiddenLayer` / `WithOutput`
-- [ ] [T-2B03] [Bootstrap] Implement configuration options mirroring Builder methods (`WithLearningRate`, `WithLoss`, `WithBias`, `WithWeightInit`, `WithLossLimit`, `WithMaxIterations`, callbacks)
-- [ ] [T-2B04] [Bootstrap] Implement higher-order options `Sequential` / `DeepNetwork` / `StandardSetup`
-- [ ] [T-2B05] [Bootstrap] Implement presets `PresetXOR` / `PresetMNIST` / `PresetRegression` in `pkg/nn/presets.go`
-- [ ] [T-2B06] [Bootstrap] Implement `MustNew[T](opts...)` panic-wrapper
-- [ ] [T-2B07] [Bootstrap] [Validation] Options API tests — parity with Builder (same Config[T] state, same Compile path), preset round-trip
+- [x] [T-2B01] [Bootstrap] Define `Option[T]` type and `New[T](opts...) (*NN[T], error)` constructor in `pkg/nn/options.go`
+- [x] [T-2B02] [Bootstrap] Implement topology options `WithInput` / `WithHiddenLayer` / `WithOutput`
+- [x] [T-2B03] [Bootstrap] Implement configuration options mirroring Builder methods (`WithLearningRate`, `WithLoss`, `WithBias`, `WithWeightInit`, `WithLossLimit`, `WithMaxIterations`, callbacks)
+- [x] [T-2B04] [Bootstrap] Implement higher-order options `Sequential` / `DeepNetwork` / `StandardSetup`
+- [x] [T-2B05] [Bootstrap] Implement presets `PresetXOR` / `PresetMNIST` / `PresetRegression` in `pkg/nn/presets.go`
+- [x] [T-2B06] [Bootstrap] Implement `MustNew[T](opts...)` panic-wrapper
+- [x] [T-2B07] [Bootstrap] [Validation] Options API tests — parity with Builder (same Config[T] state, same Compile path), preset round-trip
 
 ### Track C — Train / Query / Verify
 
-- [ ] [T-2C01] [Bootstrap] Implement `Query(input []T) ([]T, error)` forward-only inference in `pkg/nn/query.go`
-- [ ] [T-2C02] [Bootstrap] Implement `Verify(input, target []T) (T, error)` (forward + loss, no weight update) in `pkg/nn/verify.go`
-- [ ] [T-2C03] [Bootstrap] Implement training loop core in `pkg/nn/train.go` — single-step forward + backward + weight update via `network.Network[T].Train`
-- [ ] [T-2C04] [Bootstrap] Implement multi-epoch loop with `MaxIterations` and `LossLimit` early-stopping criteria (per `l1-training-semantics`)
-- [ ] [T-2C05] [Bootstrap] Implement min-loss snapshot + rollback (per `l2-training-loop` §snapshot mechanics)
-- [ ] [T-2C06] [Bootstrap] Implement `EpochCallback` / `BatchCallback` invocation points (synchronous; long callbacks block training — documented)
-- [ ] [T-2C07] [Bootstrap] [Validation] Train/Query/Verify tests — XOR convergence via the public facade, verify-without-update preserves weights, query is read-only
+- [x] [T-2C01] [Bootstrap] Implement `Query(input []T) ([]T, error)` forward-only inference in `pkg/nn/query.go`
+- [x] [T-2C02] [Bootstrap] Implement `Verify(input, target []T) (T, error)` (forward + loss, no weight update) in `pkg/nn/verify.go`
+- [x] [T-2C03] [Bootstrap] Implement training loop core in `pkg/nn/train.go` — single-step forward + backward + weight update via `network.Network[T].Train`
+- [x] [T-2C04] [Bootstrap] Implement multi-epoch loop with `MaxIterations` and `LossLimit` early-stopping criteria (per `l1-training-semantics`)
+- [x] [T-2C05] [Bootstrap] Implement min-loss snapshot + rollback (per `l2-training-loop` §snapshot mechanics)
+- [x] [T-2C06] [Bootstrap] Implement `EpochCallback` / `BatchCallback` invocation points (synchronous; long callbacks block training — documented)
+- [x] [T-2C07] [Bootstrap] [Validation] Train/Query/Verify tests — XOR convergence via the public facade, verify-without-update preserves weights, query is read-only
 
 ### Track D — Lifecycle Control
 
-- [ ] [T-2D01] [Bootstrap] Define lifecycle state cell (atomic) in `pkg/nn/control.go` per `l2-control-impl`
-- [ ] [T-2D02] [Bootstrap] Implement `Pause()` / `Resume()` / `Stop()` API on `*NN[T]`; route invalid transitions through `utils.Newf(utils.ErrControl, ...)`
-- [ ] [T-2D03] [Bootstrap] Implement safe-point check inside Train() loop (between epochs); honour Pause / Stop atomically
-- [ ] [T-2D04] [Bootstrap] [Validation] Concurrency tests — pause from one goroutine while another is training; race-detector clean
+- [x] [T-2D01] [Bootstrap] Define lifecycle state cell (atomic) in `pkg/nn/control.go` per `l2-control-impl`
+- [x] [T-2D02] [Bootstrap] Implement `Pause()` / `Resume()` / `Stop()` API on `*NN[T]`; route invalid transitions through `utils.Newf(utils.ErrControl, ...)`
+- [x] [T-2D03] [Bootstrap] Implement safe-point check inside Train() loop (between epochs); honour Pause / Stop atomically
+- [x] [T-2D04] [Bootstrap] [Validation] Concurrency tests — pause from one goroutine while another is training; race-detector clean
 
 ### Phase Gate
 
-- [ ] [T-2Z01] [Validation] `go build ./...` passes — public facade compiles end-to-end
-- [ ] [T-2Z02] [Validation] `go test -race -cover ./pkg/nn/...` passes; coverage ≥ 80% on `pkg/nn`
-- [ ] [T-2Z03] Promote `l2-nn-facade` RFC v2.0.0 → Stable; promote `l2-training-loop` and `l2-control-impl` Draft → Stable v1.0.0 once their implementations validate the contracts
-- [ ] [T-2Z04] Update STATE.md, write CHANGELOG Phase 2 entries, populate phase-2 frontmatter (provides / key_files / patterns_established)
+- [x] [T-2Z01] [Validation] `go build ./...` passes — public facade compiles end-to-end
+- [x] [T-2Z02] [Validation] `go test -race -cover ./pkg/nn/...` passes; coverage ≥ 80% on `pkg/nn`
+- [x] [T-2Z03] Promote `l2-nn-facade` RFC v2.0.0 → Stable; promote `l2-training-loop` and `l2-control-impl` Draft → Stable v1.0.0 once their implementations validate the contracts
+- [x] [T-2Z04] Update STATE.md, write CHANGELOG Phase 2 entries, populate phase-2 frontmatter (provides / key_files / patterns_established)
 
 ## Detailed Tracking
 

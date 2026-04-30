@@ -63,10 +63,12 @@ func (n *NN[T]) Stop() error {
 }
 
 // transitionToRunning is the worker-side counterpart to Pause/Resume —
-// called by Fit at start. Resets a stale Stopped flag from a prior run
-// and moves Idle → Running.
+// called by Fit at start. Moves Idle → Running via CAS so that a Stop
+// request issued *before* Fit reaches this line is preserved (otherwise
+// a slow goroutine startup would silently clobber the user's intent
+// and the loop would run to MaxIterations).
 func (n *NN[T]) transitionToRunning() {
-	n.control.Store(controlRunning)
+	n.control.CompareAndSwap(controlIdle, controlRunning)
 }
 
 // transitionToIdle is invoked by Fit's deferred cleanup. Mirrors the

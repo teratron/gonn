@@ -1,7 +1,7 @@
 # Training Loop Implementation
 
-**Version:** 0.1.0
-**Status:** Draft
+**Version:** 1.0.0
+**Status:** Stable
 **Layer:** implementation
 **Implements:** l1-training-semantics.md
 
@@ -133,3 +133,4 @@ Owned by the loop, not by the network. Discarded when `Train()` returns.
 | Version | Date | Description |
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-04-28 | Initial Draft — concrete Go realization of l1-training-semantics RFC. |
+| 1.0.0 | 2026-04-30 | Promoted Draft → Stable. Phase-2 implementation lives in `pkg/nn/train.go` as the dual `Train(input, target)` (single-step) + `Fit(dataset)` (multi-epoch) surface. TRN-1..TRN-6 satisfied: termination via `LossLimit`/`MaxIterations`/`Stop()`; min-loss tracking with `snapshotWeights`/`restoreWeights`; flat `[]T` snapshot buffer (instead of nested `WeightsBuffer` from §5.2 — flat is allocation-friendly and survives Phase-1 single-hidden topology). v0.1 implementation note: `context.Context` multiplexing (TRN-1 c) deferred to v0.2; current `awaitSafePoint` honours the package-local atomic Stop signal but not external ctx. NaN-loss detection deferred to v0.2 (TRN-3 partial). |

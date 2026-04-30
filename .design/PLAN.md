@@ -1,10 +1,10 @@
 # Implementation Plan
 
-**Version:** 1.1.0
+**Version:** 1.2.0
 **Project Version:** 0.1.0 (initial release target — semver baseline)
 **Generated:** 2026-04-29
 **Last Updated:** 2026-04-30
-**Based on:** .design/INDEX.md v1.8.0
+**Based on:** .design/INDEX.md v1.9.0
 **Based on RULES:** .design/RULES.md v1.2.0
 **Based on ROADMAP:** .design/ROADMAP.md v1.0.0
 **Status:** Active
@@ -37,18 +37,18 @@ GoNN library implementation plan derived from `ROADMAP.md` Hybrid Path. Phase or
 - [x] **Layer Types Rewrite** ([l2-layer-types.md](specifications/l2-layer-types.md)) [L2, Stable v1.1.0]
 - [x] **Network Graph Rewrite** ([l2-network-graph.md](specifications/l2-network-graph.md)) [L2, Stable v1.1.0]
 
-## Phase 2 — Public Facade Restoration (Track B) — Active [Bootstrap]
+## Phase 2 — Public Facade Restoration (Track B) ✓ Done
 
-*Restores the public `pkg/nn` API on top of the Phase-1 foundation.*
+*Restores the public `pkg/nn` API on top of the Phase-1 foundation. Closed 2026-04-30.*
 
 **Subsystem:** `pkg/nn`
 **Requires:** Phase 1 ✓
 **Tasks file:** [tasks/phase-2.md](tasks/phase-2.md)
-**Bootstrap notice:** All three source specs are RFC/Draft. Tasks tagged `[Bootstrap]`; spec promotion to Stable deferred to Phase Gate after implementation validates the contracts.
+**Outcome:** Builder + Functional Options dual-style fluent API converging on `compile()`. XOR converges via the public facade. Pause/Resume/Stop race-clean under `-race`. Single-hidden v0.1 limitation logged for v0.2 multi-hidden patch.
 
-- [ ] **NN Public Facade** ([l2-nn-facade.md](specifications/l2-nn-facade.md)) [L2, RFC v2.0.0] [Bootstrap]
-- [ ] **Training Loop Implementation** ([l2-training-loop.md](specifications/l2-training-loop.md)) [L2, Draft v0.1.0] [Bootstrap]
-- [ ] **Training Control Implementation** ([l2-control-impl.md](specifications/l2-control-impl.md)) [L2, Draft v0.1.0] [Bootstrap]
+- [x] **NN Public Facade** ([l2-nn-facade.md](specifications/l2-nn-facade.md)) [L2, Stable v2.0.0]
+- [x] **Training Loop Implementation** ([l2-training-loop.md](specifications/l2-training-loop.md)) [L2, Stable v1.0.0]
+- [x] **Training Control Implementation** ([l2-control-impl.md](specifications/l2-control-impl.md)) [L2, Stable v1.0.0]
 
 ## Phase 3 — New Capability Packages (Track C)
 
@@ -114,3 +114,4 @@ graph LR
 | :--- | :--- | :--- |
 | 1.0.0 | 2026-04-29 | Initial plan derived from ROADMAP.md v1.0.0; Tracks A–D mapped to Phases 1–4. |
 | 1.1.0 | 2026-04-30 | Phase 1 marked Done (C-001 resolved). l2-errors-impl + l2-init-impl promoted to Stable v1.0.0. Phase 2 activated with [Bootstrap] markers (RFC source specs). Phases 3 + 4 remain Blocked. |
+| 1.2.0 | 2026-04-30 | Phase 2 marked Done. l2-nn-facade promoted RFC → Stable v2.0.0; l2-training-loop + l2-control-impl promoted Draft → Stable v1.0.0. Phase 3 unblock pending L1 parent promotion via magic.spec; Phase 4 still waits Phase 3. |
