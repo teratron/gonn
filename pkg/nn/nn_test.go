@@ -481,10 +481,25 @@ func TestFitRejectsEmptyDataset(t *testing.T) {
 
 func TestStopRequestsEarlyExit(t *testing.T) {
 	t.Parallel()
+	// Deterministic synchronisation barrier: the first epoch callback
+	// signals "I have entered the loop" via started, then blocks on
+	// stopReady until the test has issued Stop. This avoids the race
+	// where Fit completes 100k tiny epochs in the time it takes the
+	// test goroutine to be scheduled and observe controlRunning.
+	started := make(chan struct{})
+	stopReady := make(chan struct{})
+	var firstEpoch sync.Once
+
 	n := MustNew[float64](
 		PresetXOR[float64](),
 		WithMaxIterations[float64](100_000),
-		WithLossLimit[float64](-1), // unreachable — prevent natural convergence racing the Stop signal
+		WithLossLimit[float64](-1),
+		WithEpochCallback[float64](func(epoch uint, _ float64) {
+			firstEpoch.Do(func() {
+				close(started)
+				<-stopReady
+			})
+		}),
 	)
 	dataset := []Sample[float64]{
 		{Input: []float64{0, 0}, Target: []float64{0}},
@@ -500,17 +515,12 @@ func TestStopRequestsEarlyExit(t *testing.T) {
 		epochs, _, fitErr = n.Fit(dataset)
 	}()
 
-	// Spin until the worker has transitioned to Running, then signal Stop.
-	deadline := time.Now().Add(2 * time.Second)
-	for time.Now().Before(deadline) {
-		if n.control.Load() == controlRunning {
-			break
-		}
-		time.Sleep(time.Millisecond)
-	}
+	<-started // worker is parked inside the first EpochCallback
 	if err := n.Stop(); err != nil {
 		t.Errorf("Stop: %v", err)
 	}
+	close(stopReady) // release the worker — next safe-point will see Stopped
+
 	wg.Wait()
 	if fitErr != nil {
 		t.Errorf("Fit returned error after Stop: %v", fitErr)

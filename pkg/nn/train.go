@@ -65,12 +65,13 @@ func (n *NN[T]) Fit(dataset []Sample[T]) (uint, T, error) {
 	minLossSet := false
 	var snapshot []T
 	var lastLoss T
+	var completedEpochs uint
 
 	for epoch := uint(1); epoch <= n.cfg.MaxIterations; epoch++ {
 		// Safe-point check before each epoch — honours Pause / Stop
 		// transitions issued from another goroutine.
 		if stopped, err := n.awaitSafePoint(); err != nil {
-			return epoch - 1, lastLoss, err
+			return completedEpochs, lastLoss, err
 		} else if stopped {
 			break
 		}
@@ -79,7 +80,7 @@ func (n *NN[T]) Fit(dataset []Sample[T]) (uint, T, error) {
 		for batchIdx, sample := range dataset {
 			loss, err := n.Network.Train(sample.Input, sample.Target)
 			if err != nil {
-				return epoch - 1, lastLoss, err
+				return completedEpochs, lastLoss, err
 			}
 			total += loss
 			if cb := n.cfg.BatchCallback; cb != nil {
@@ -88,6 +89,7 @@ func (n *NN[T]) Fit(dataset []Sample[T]) (uint, T, error) {
 		}
 		mean := total / T(len(dataset))
 		lastLoss = mean
+		completedEpochs = epoch
 		if cb := n.cfg.EpochCallback; cb != nil {
 			cb(epoch, mean)
 		}
@@ -97,7 +99,7 @@ func (n *NN[T]) Fit(dataset []Sample[T]) (uint, T, error) {
 			minLossSet = true
 			snapshot = n.snapshotWeights(snapshot)
 			if mean < n.cfg.LossLimit {
-				return epoch, mean, nil
+				return completedEpochs, mean, nil
 			}
 		}
 	}
@@ -109,7 +111,7 @@ func (n *NN[T]) Fit(dataset []Sample[T]) (uint, T, error) {
 		n.restoreWeights(snapshot)
 		lastLoss = minLoss
 	}
-	return n.cfg.MaxIterations, lastLoss, nil
+	return completedEpochs, lastLoss, nil
 }
 
 // snapshotWeights writes every axon weight into dst (re-using the slice

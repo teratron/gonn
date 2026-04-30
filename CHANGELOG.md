@@ -235,3 +235,13 @@ Promotes three specs to Stable.
   detection, and the buffered-channel control bus are all explicitly
   deferred to v0.2 with spec annotations and `Compile()`-time errors
   pointing the user at the limitation.
+
+#### Fixes
+
+- `Fit()` return semantics: previously returned `cfg.MaxIterations`
+  unconditionally regardless of early-exit via `Stop()` or `LossLimit`.
+  Replaced with a tracked `completedEpochs` counter — now satisfies
+  TRN-4 from [l1-training-semantics] (return the meaningful epoch
+  count, never wall-clock max). Surfaced by the deterministic
+  `TestStopRequestsEarlyExit` synchronisation barrier, which was
+  reporting `epochs=100000` even after a successful Stop.
