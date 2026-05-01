@@ -82,7 +82,7 @@ GoNN library implementation plan derived from `ROADMAP.md` Hybrid Path. Phase or
 ### L1 Concept (deferred — future phases)
 
 - [l1-dynamic-topology.md](specifications/l1-dynamic-topology.md) — Draft v0.2.0 (layer lifecycle + neuron mutation design; 5 open TBDs in §5.5; parent Stable)
-- [l1-meta-learning-hooks.md](specifications/l1-meta-learning-hooks.md) — Draft v0.1.0 (advanced feature, no L2 spec yet)
+- [l1-meta-learning-hooks.md](specifications/l1-meta-learning-hooks.md) — Draft v0.2.0 (universal ParamAccessor + MetaConfig; 9 param categories; 8 open TBDs in §5.6; no L2 spec yet)
 
 ### L1 Concept (tracked — promoted to Stable 2026-05-01, parents of active Phase 3 specs)
 

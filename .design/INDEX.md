@@ -24,7 +24,7 @@ Local registry of specifications for this workspace.
 | [l1-data-streaming.md](specifications/l1-data-streaming.md) | Streaming dataset abstraction and bounded memory contract | Stable | L1 | 1.0.0 |
 | [l1-compute-backend.md](specifications/l1-compute-backend.md) | Pluggable compute backend (CPU baseline + GPU future) | Stable | L1 | 1.0.0 |
 | [l1-dynamic-topology.md](specifications/l1-dynamic-topology.md) | Dynamic mode — layer/neuron mutation lifecycle with transaction protocol | Draft | L1 | 0.2.0 |
-| [l1-meta-learning-hooks.md](specifications/l1-meta-learning-hooks.md) | Adaptive parameter tuning via inner-network recursion | Draft | L1 | 0.1.0 |
+| [l1-meta-learning-hooks.md](specifications/l1-meta-learning-hooks.md) | Universal parameter access for recursive self-optimization via inner-network | Draft | L1 | 0.2.0 |
 | [l2-nn-facade.md](specifications/l2-nn-facade.md) | Public API facade — dual-style fluent API (Builder + Functional Options) | Stable | L2 | 2.0.0 |
 | [l2-network-graph.md](specifications/l2-network-graph.md) | Internal computational graph — Network[T] and bundles | Stable | L2 | 1.1.0 |
 | [l2-layer-types.md](specifications/l2-layer-types.md) | Layer type hierarchy — Input, Dense, Output | Stable | L2 | 1.1.0 |
@@ -48,4 +48,4 @@ Local registry of specifications for this workspace.
 ## Meta Information
 
 - **Maintainer**: Core Team
-- **Last Updated**: 2026-05-01 (l1-dynamic-topology v0.2.0 — expanded layer lifecycle, DYN-5/DYN-6, transaction protocol)
+- **Last Updated**: 2026-05-01 (l1-meta-learning-hooks v0.2.0 — universal ParamAccessor, 9 param categories, META-5..7, MetaConfig wiring)
