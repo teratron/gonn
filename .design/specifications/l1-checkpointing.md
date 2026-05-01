@@ -1,7 +1,7 @@
 # Checkpointing & Snapshot Lifecycle
 
-**Version:** 0.1.0
-**Status:** RFC
+**Version:** 1.0.0
+**Status:** Stable
 **Layer:** concept
 
 ## Overview
@@ -91,3 +91,4 @@ instances).
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-04-27 | Initial Draft from TODO #3. |
 | 0.1.0 | 2026-04-28 | Cross-refs to network-persistence and training-semantics added. Status promoted Draft → RFC. |
+| 1.0.0 | 2026-05-01 | [Batch-Stabilize] RFC → Stable. MVC satisfied: Overview + Core Invariants CHK-1..4 + storage layout. C9 Trust Mode. |

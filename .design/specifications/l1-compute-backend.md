@@ -1,7 +1,7 @@
 # Compute Backend Abstraction
 
-**Version:** 0.1.0
-**Status:** RFC
+**Version:** 1.0.0
+**Status:** Stable
 **Layer:** concept
 
 ## Overview
@@ -97,3 +97,4 @@ type Backend[T utils.Float] interface {
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-04-27 | Initial Draft from TODO #13. |
 | 0.1.0 | 2026-04-28 | Concept-Layer Notation added. Status promoted Draft → RFC. Backend interface and 4 invariants ready for review. |
+| 1.0.0 | 2026-05-01 | [Batch-Stabilize] RFC → Stable. MVC satisfied: Overview + Core Invariants COMP-1..4 + backend interface sketch. C9 Trust Mode. |

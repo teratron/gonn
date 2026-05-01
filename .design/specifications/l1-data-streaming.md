@@ -1,7 +1,7 @@
 # Data Streaming & Bounded Memory
 
-**Version:** 0.1.0
-**Status:** RFC
+**Version:** 1.0.0
+**Status:** Stable
 **Layer:** concept
 
 ## Overview
@@ -89,3 +89,4 @@ type Batch[T utils.Float] struct {
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-04-27 | Initial Draft from TODO #12. |
 | 0.1.0 | 2026-04-28 | Status promoted Draft → RFC. Dataset/Batch interface and 4 invariants ready for review. |
+| 1.0.0 | 2026-05-01 | [Batch-Stabilize] RFC → Stable. MVC satisfied: Overview + Core Invariants DAT-1..4 + interface sketch. C9 Trust Mode. |

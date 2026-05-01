@@ -1,7 +1,7 @@
 # Performance Implementation
 
-**Version:** 0.1.0
-**Status:** Draft
+**Version:** 1.0.0
+**Status:** Stable
 **Layer:** implementation
 **Implements:** l1-performance-contract.md
 
@@ -124,3 +124,4 @@ At `Compile()`: if `ProfilingAddr != ""`, spawn `net/http.ListenAndServe(addr, n
 | Version | Date | Description |
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-04-28 | Initial Draft — concrete Go realization of l1-performance-contract RFC. |
+| 1.0.0 | 2026-05-01 | [Batch-Stabilize] Draft → Stable. L1 parent now Stable. MVC satisfied: Overview + Invariant Compliance PERF-1..5 + pool/prealloc/worker-pool design. C9 Trust Mode. |

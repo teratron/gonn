@@ -1,6 +1,6 @@
 # Workspace Specifications Registry
 
-**Version:** 1.9.0
+**Version:** 2.0.0
 **Status:** Active
 
 ## Overview
@@ -11,18 +11,18 @@ Local registry of specifications for this workspace.
 
 | File | Description | Status | Layer | Version |
 | :--- | :--- | :--- | :--- | :--- |
-| [l1-neural-network-architecture.md](specifications/l1-neural-network-architecture.md) | Conceptual architecture — INV-2 amended with TopologyMode (v2.0) | RFC | L1 | 2.0.0 |
+| [l1-neural-network-architecture.md](specifications/l1-neural-network-architecture.md) | Conceptual architecture — INV-2 amended with TopologyMode (v2.0) | Stable | L1 | 2.0.0 |
 | [l1-math-functions.md](specifications/l1-math-functions.md) | Mathematical functions framework (activation and loss) | Stable | L1 | 1.0.0 |
-| [l1-training-semantics.md](specifications/l1-training-semantics.md) | `Train()` convergence loop contract — max-iter, loss-limit, min-loss rollback | RFC | L1 | 0.1.0 |
+| [l1-training-semantics.md](specifications/l1-training-semantics.md) | `Train()` convergence loop contract — max-iter, loss-limit, min-loss rollback | Stable | L1 | 1.0.0 |
 | [l1-weight-initialization.md](specifications/l1-weight-initialization.md) | Xavier / He / Random formulas + RNG seed contract | Stable | L1 | 1.0.0 |
-| [l1-network-persistence.md](specifications/l1-network-persistence.md) | JSON schema for config and weights, round-trip integrity | RFC | L1 | 0.1.0 |
-| [l1-training-control.md](specifications/l1-training-control.md) | Training lifecycle state machine (Pause/Resume/Stop) | RFC | L1 | 0.1.0 |
-| [l1-checkpointing.md](specifications/l1-checkpointing.md) | Snapshot/recovery system with retention and compression | RFC | L1 | 0.1.0 |
+| [l1-network-persistence.md](specifications/l1-network-persistence.md) | JSON schema for config and weights, round-trip integrity | Stable | L1 | 1.0.0 |
+| [l1-training-control.md](specifications/l1-training-control.md) | Training lifecycle state machine (Pause/Resume/Stop) | Stable | L1 | 1.0.0 |
+| [l1-checkpointing.md](specifications/l1-checkpointing.md) | Snapshot/recovery system with retention and compression | Stable | L1 | 1.0.0 |
 | [l1-error-taxonomy.md](specifications/l1-error-taxonomy.md) | Canonical error categories and wrapping contract | Stable | L1 | 1.0.0 |
-| [l1-observability-protocol.md](specifications/l1-observability-protocol.md) | Read-only state-exposure contract for external observers | RFC | L1 | 0.1.0 |
-| [l1-performance-contract.md](specifications/l1-performance-contract.md) | Performance guarantees, benchmarks, optimization layers | RFC | L1 | 0.1.0 |
-| [l1-data-streaming.md](specifications/l1-data-streaming.md) | Streaming dataset abstraction and bounded memory contract | RFC | L1 | 0.1.0 |
-| [l1-compute-backend.md](specifications/l1-compute-backend.md) | Pluggable compute backend (CPU baseline + GPU future) | RFC | L1 | 0.1.0 |
+| [l1-observability-protocol.md](specifications/l1-observability-protocol.md) | Read-only state-exposure contract for external observers | Stable | L1 | 1.0.0 |
+| [l1-performance-contract.md](specifications/l1-performance-contract.md) | Performance guarantees, benchmarks, optimization layers | Stable | L1 | 1.0.0 |
+| [l1-data-streaming.md](specifications/l1-data-streaming.md) | Streaming dataset abstraction and bounded memory contract | Stable | L1 | 1.0.0 |
+| [l1-compute-backend.md](specifications/l1-compute-backend.md) | Pluggable compute backend (CPU baseline + GPU future) | Stable | L1 | 1.0.0 |
 | [l1-dynamic-topology.md](specifications/l1-dynamic-topology.md) | Dynamic mode — mutation at safe points (conflict resolved by parent v2.0) | Draft | L1 | 0.1.0 |
 | [l1-meta-learning-hooks.md](specifications/l1-meta-learning-hooks.md) | Adaptive parameter tuning via inner-network recursion | Draft | L1 | 0.1.0 |
 | [l2-nn-facade.md](specifications/l2-nn-facade.md) | Public API facade — dual-style fluent API (Builder + Functional Options) | Stable | L2 | 2.0.0 |
@@ -36,16 +36,16 @@ Local registry of specifications for this workspace.
 | [l2-visualization-api.md](specifications/l2-visualization-api.md) | HTTP/JSON adapter exposing observability for external GUIs | Draft | L2 | 0.1.0 |
 | [l2-logging-strategy.md](specifications/l2-logging-strategy.md) | Structured logging via `log/slog` (Trace/Debug/Info/Warn/Error) | Draft | L2 | 0.1.0 |
 | [l2-training-loop.md](specifications/l2-training-loop.md) | Go realization of training-semantics — `Train()` body and snapshot mechanics | Stable | L2 | 1.0.0 |
-| [l2-persistence-impl.md](specifications/l2-persistence-impl.md) | Go realization of persistence — `pkg/persistence` package | Draft | L2 | 0.1.0 |
+| [l2-persistence-impl.md](specifications/l2-persistence-impl.md) | Go realization of persistence — `pkg/persistence` package | Stable | L2 | 1.0.0 |
 | [l2-errors-impl.md](specifications/l2-errors-impl.md) | Go realization of error taxonomy — sentinels and helper constructors | Stable | L2 | 1.0.0 |
 | [l2-init-impl.md](specifications/l2-init-impl.md) | Go realization of weight init — sampling helpers + RNG plumbing | Stable | L2 | 1.0.0 |
 | [l2-control-impl.md](specifications/l2-control-impl.md) | Go realization of training control — atomic state cell + safe-point check | Stable | L2 | 1.0.0 |
-| [l2-checkpointing-impl.md](specifications/l2-checkpointing-impl.md) | Go realization of checkpointing — `pkg/checkpoint` package, atomic write, retention | Draft | L2 | 0.1.0 |
-| [l2-perf-impl.md](specifications/l2-perf-impl.md) | Go realization of performance contract — pools, preallocation, pprof hook | Draft | L2 | 0.1.0 |
-| [l2-streaming-impl.md](specifications/l2-streaming-impl.md) | Go realization of data streaming — `pkg/dataset` package, prefetch decorator | Draft | L2 | 0.1.0 |
-| [l2-backend-cpu.md](specifications/l2-backend-cpu.md) | Go realization of compute backend — `pkg/compute/cpu` reference path | Draft | L2 | 0.1.0 |
+| [l2-checkpointing-impl.md](specifications/l2-checkpointing-impl.md) | Go realization of checkpointing — `pkg/checkpoint` package, atomic write, retention | Stable | L2 | 1.0.0 |
+| [l2-perf-impl.md](specifications/l2-perf-impl.md) | Go realization of performance contract — pools, preallocation, pprof hook | Stable | L2 | 1.0.0 |
+| [l2-streaming-impl.md](specifications/l2-streaming-impl.md) | Go realization of data streaming — `pkg/dataset` package, prefetch decorator | Stable | L2 | 1.0.0 |
+| [l2-backend-cpu.md](specifications/l2-backend-cpu.md) | Go realization of compute backend — `pkg/compute/cpu` reference path | Stable | L2 | 1.0.0 |
 
 ## Meta Information
 
 - **Maintainer**: Core Team
-- **Last Updated**: 2026-04-30 (Phase 2 wrap-up)
+- **Last Updated**: 2026-05-01 (Batch Stabilization — 9 L1 RFC + 5 L2 Draft → Stable; Phase 3 unblocked)

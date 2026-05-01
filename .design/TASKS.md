@@ -1,10 +1,10 @@
 # Master Task Index (Registry)
 
-**Version:** 1.2.0
+**Version:** 1.3.0
 **Project Version:** 0.1.0 (initial release target — semver baseline)
 **Generated:** 2026-04-29
-**Last Updated:** 2026-04-30
-**Based on:** .design/PLAN.md v1.2.0
+**Last Updated:** 2026-05-01
+**Based on:** .design/PLAN.md v1.3.0
 **Based on RULES:** .design/RULES.md v1.2.0
 **Execution Mode:** Parallel (C3)
 **Status:** Active
@@ -19,7 +19,7 @@ Tactical registry of all phases and their statuses. Atomic checklists (`T-XXXX`)
 | :--- | :--- | :--- |
 | [Phase 1](tasks/phase-1.md) | Foundation Rewrite (Track A) — `pkg/utils/{errors,init}`, `pkg/neuron`, `pkg/layer`, `pkg/network` | `Done` (2026-04-29) |
 | [Phase 2](tasks/phase-2.md) | Public Facade Restoration (Track B) — `pkg/nn` | `Done` (2026-04-30) |
-| [Phase 3](tasks/phase-3.md) | New Capability Packages (Track C) — persistence, checkpoint, dataset, compute, perf | `Blocked` (L1 parents must reach Stable; tracked in backlog) |
+| [Phase 3](tasks/phase-3.md) | New Capability Packages (Track C) — persistence, checkpoint, dataset, compute, perf | `Active` (L1 parents Stable 2026-05-01; 15 tasks + 4 gate checks) |
 | [Phase 4](tasks/phase-4.md) | Examples Catalog (Track D) — `examples/E01..E15` | `Blocked` (requires Phase 2 + Phase 3) |
 
 ## Phase 0 — Already Complete
@@ -50,6 +50,16 @@ Tactical registry of all phases and their statuses. Atomic checklists (`T-XXXX`)
 | `pkg/nn/{train,query,verify}.go` | l2-training-loop v1.0.0 | `Stable` |
 | `pkg/nn/control.go` | l2-control-impl v1.0.0 | `Stable` |
 
+## Phase 3 Deliverables (Pending)
+
+| Asset | Spec | Status |
+| :--- | :--- | :--- |
+| `pkg/persistence/{config,weights}.go` | l2-persistence-impl v1.0.0 | `Pending` |
+| `pkg/checkpoint/{snapshot,writer,reader,retention}.go` | l2-checkpointing-impl v1.0.0 | `Pending` |
+| `pkg/dataset/{dataset,slice,csv,prefetch}.go` | l2-streaming-impl v1.0.0 | `Pending` |
+| `pkg/compute/{backend,registry}.go` + `cpu/*` | l2-backend-cpu v1.0.0 | `Pending` |
+| `pkg/network/pool.go` + bench files + `WithProfiling` | l2-perf-impl v1.0.0 | `Pending` |
+
 ## Cross-Cutting Constraints
 
 - **C29 Stdlib-only**: every new file uses Go standard library exclusively.
@@ -60,5 +70,5 @@ Tactical registry of all phases and their statuses. Atomic checklists (`T-XXXX`)
 
 ## Meta Information
 
-- **Last Updated**: 2026-04-30
+- **Last Updated**: 2026-05-01
 - **Maintainer**: Core Team

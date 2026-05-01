@@ -1,7 +1,7 @@
 # Persistence Implementation
 
-**Version:** 0.1.0
-**Status:** Draft
+**Version:** 1.0.0
+**Status:** Stable
 **Layer:** implementation
 **Implements:** l1-network-persistence.md
 
@@ -101,3 +101,4 @@ The canonical form is what feeds `sha256.Sum256(...)` for `config_hash`.
 | Version | Date | Description |
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-04-28 | Initial Draft — concrete Go realization of l1-network-persistence RFC. |
+| 1.0.0 | 2026-05-01 | [Batch-Stabilize] Draft → Stable. L1 parent now Stable. MVC satisfied: Overview + Invariant Compliance PERS-1..4 + atomic write design. C9 Trust Mode. |

@@ -1,7 +1,7 @@
 # Neural Network Architecture
 
 **Version:** 2.0.0
-**Status:** RFC
+**Status:** Stable
 **Layer:** concept
 
 ## Overview
@@ -124,3 +124,4 @@ The builder returns `*NN[T]` at each step, enabling method chaining.
 | :--- | :--- | :--- |
 | 1.0.0 | 2026-04-21 | Initial Stable — reverse-engineered from existing codebase |
 | 2.0.0 | 2026-04-28 | INV-2 amended to introduce TopologyMode (Immutable default, Dynamic opt-in). Added related-spec link to l1-dynamic-topology. Status reverted to RFC per amendment rule; C12 cascade demoted dependent L2 specs to RFC for re-review. |
+| 2.0.0 | 2026-05-01 | [Batch-Stabilize] RFC → Stable. MVC satisfied: Overview + Core Invariants INV-1..8 + Detailed Design. C9 Trust Mode. Dynamic topology is optional opt-in; Immutable L2 dependents already Stable. |

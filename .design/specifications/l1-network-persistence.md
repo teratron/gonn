@@ -1,7 +1,7 @@
 # Network Persistence
 
-**Version:** 0.1.0
-**Status:** RFC
+**Version:** 1.0.0
+**Status:** Stable
 **Layer:** concept
 
 ## Overview
@@ -135,3 +135,4 @@ Weight matrices serialize as JSON arrays of arrays; for very large networks a `w
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-04-27 | Initial Draft — closes references from l1-checkpointing, l2-cli-client, l2-usage-examples E09. |
 | 0.1.0 | 2026-04-27 | Status promoted Draft → RFC. Config and weights schemas defined, integrity invariants (PERS-1..PERS-4) ready for review. |
+| 1.0.0 | 2026-05-01 | [Batch-Stabilize] RFC → Stable. MVC satisfied: Overview + Core Invariants PERS-1..4. C9 Trust Mode auto-promotion. |

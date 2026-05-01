@@ -1,7 +1,7 @@
 # CPU Compute Backend
 
-**Version:** 0.1.0
-**Status:** Draft
+**Version:** 1.0.0
+**Status:** Stable
 **Layer:** implementation
 **Implements:** l1-compute-backend.md
 
@@ -125,3 +125,4 @@ Used by alternative-backend test suites for reference comparison (COMP-1).
 | Version | Date | Description |
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-04-28 | Initial Draft — concrete Go realization of l1-compute-backend RFC, CPU reference path. |
+| 1.0.0 | 2026-05-01 | [Batch-Stabilize] Draft → Stable. L1 parent now Stable. MVC satisfied: Overview + Invariant Compliance COMP-1..4 + Backend implementation skeleton. C9 Trust Mode. |

@@ -1,7 +1,7 @@
 # Data Streaming Implementation
 
-**Version:** 0.1.0
-**Status:** Draft
+**Version:** 1.0.0
+**Status:** Stable
 **Layer:** implementation
 **Implements:** l1-data-streaming.md
 
@@ -119,3 +119,4 @@ Existing call sites that pass `(input, target)` slices migrate to `NewSliceDatas
 | Version | Date | Description |
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-04-28 | Initial Draft — concrete Go realization of l1-data-streaming RFC. |
+| 1.0.0 | 2026-05-01 | [Batch-Stabilize] Draft → Stable. L1 parent now Stable. MVC satisfied: Overview + Invariant Compliance DAT-1..4 + Dataset interface and prefetch decorator. C9 Trust Mode. |

@@ -1,6 +1,6 @@
 # Project Context
 
-**Generated:** 2026-04-29
+**Generated:** 2026-05-01
 
 ## Active Technologies
 
@@ -12,6 +12,7 @@
 .
 ├── .design/
 │   ├── .graph-cache/
+│   ├── CONTEXT.md
 │   ├── INDEX.md
 │   ├── PLAN.md
 │   ├── ROADMAP.md
@@ -38,3 +39,4 @@
 ## Recent Changes
 
 No recent changelog found.
+

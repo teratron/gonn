@@ -1,7 +1,7 @@
 # Training Control & Lifecycle
 
-**Version:** 0.1.0
-**Status:** RFC
+**Version:** 1.0.0
+**Status:** Stable
 **Layer:** concept
 
 ## Overview
@@ -90,3 +90,4 @@ graph LR
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-04-27 | Initial Draft from TODO #2. |
 | 0.1.0 | 2026-04-28 | Concept-Layer Notation added. Status promoted Draft → RFC. State machine and 5 invariants ready for review. |
+| 1.0.0 | 2026-05-01 | [Batch-Stabilize] RFC → Stable. MVC satisfied: Overview + Core Invariants CTRL-1..5 + state machine. C9 Trust Mode. |

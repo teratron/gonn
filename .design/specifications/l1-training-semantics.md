@@ -1,7 +1,7 @@
 # Training Semantics
 
-**Version:** 0.1.0
-**Status:** RFC
+**Version:** 1.0.0
+**Status:** Stable
 **Layer:** concept
 
 ## Overview
@@ -139,3 +139,4 @@ graph LR
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-04-27 | Initial Draft — closes implicit references from `l2-nn-facade.md` `WithLossLimit`/`WithMaxIterations`. |
 | 0.1.0 | 2026-04-27 | Status promoted Draft → RFC. All required sections filled; convergence loop, state diagram, soft-failures, and 6 invariants ready for review. |
+| 1.0.0 | 2026-05-01 | [Batch-Stabilize] RFC → Stable. MVC satisfied: Overview + Core Invariants TRN-1..6 + loop pseudo-code. C9 Trust Mode. |

@@ -1,7 +1,7 @@
 # Checkpointing Implementation
 
-**Version:** 0.1.0
-**Status:** Draft
+**Version:** 1.0.0
+**Status:** Stable
 **Layer:** implementation
 **Implements:** l1-checkpointing.md
 
@@ -118,3 +118,4 @@ sweep(dir, hotN=3, coldM=10):
 | Version | Date | Description |
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-04-28 | Initial Draft — concrete Go realization of l1-checkpointing RFC. |
+| 1.0.0 | 2026-05-01 | [Batch-Stabilize] Draft → Stable. L1 parent now Stable. MVC satisfied: Overview + Invariant Compliance CHK-1..4 + snapshot struct and retention sweep. C9 Trust Mode. |

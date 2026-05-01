@@ -1,7 +1,7 @@
 # Performance Contract
 
-**Version:** 0.1.0
-**Status:** RFC
+**Version:** 1.0.0
+**Status:** Stable
 **Layer:** concept
 
 ## Overview
@@ -96,3 +96,4 @@ next layer's win.
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-04-27 | Initial Draft from TODO #11. |
 | 0.1.0 | 2026-04-28 | Concept-Layer Notation added. Status promoted Draft → RFC. Optimization layers and 5 invariants ready for review. |
+| 1.0.0 | 2026-05-01 | [Batch-Stabilize] RFC → Stable. MVC satisfied: Overview + Core Invariants PERF-1..5 + optimization layer diagram. C9 Trust Mode. |

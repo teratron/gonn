@@ -1,10 +1,10 @@
 # Implementation Plan
 
-**Version:** 1.2.0
+**Version:** 1.3.0
 **Project Version:** 0.1.0 (initial release target — semver baseline)
 **Generated:** 2026-04-29
-**Last Updated:** 2026-04-30
-**Based on:** .design/INDEX.md v1.9.0
+**Last Updated:** 2026-05-01
+**Based on:** .design/INDEX.md v2.0.0
 **Based on RULES:** .design/RULES.md v1.2.0
 **Based on ROADMAP:** .design/ROADMAP.md v1.0.0
 **Status:** Active
@@ -52,17 +52,18 @@ GoNN library implementation plan derived from `ROADMAP.md` Hybrid Path. Phase or
 
 ## Phase 3 — New Capability Packages (Track C)
 
-*Adds capabilities not present in the legacy code. Independent of Phase 2 — runs in parallel once Phase 1 is green.*
+*Adds capabilities not present in the legacy code. All 5 L2 specs now Stable (2026-05-01). Decomposed into Tracks A–E.*
 
-**Subsystem:** `pkg/persistence`, `pkg/checkpoint`, `pkg/dataset`, `pkg/compute`
-**Requires:** Phase 1 complete (parallel with Phase 2)
+**Subsystem:** `pkg/persistence`, `pkg/checkpoint`, `pkg/dataset`, `pkg/compute`, `pkg/network` (perf)
+**Requires:** Phase 1 complete (Track E also needs Phase 2)
 **Tasks file:** [tasks/phase-3.md](tasks/phase-3.md)
+**Track order:** A → B (serial); C, D parallel with A; E last.
 
-- [ ] **Persistence Implementation** ([l2-persistence-impl.md](specifications/l2-persistence-impl.md)) [L2, Draft v0.1.0]
-- [ ] **Checkpointing Implementation** ([l2-checkpointing-impl.md](specifications/l2-checkpointing-impl.md)) [L2, Draft v0.1.0]
-- [ ] **Data Streaming Implementation** ([l2-streaming-impl.md](specifications/l2-streaming-impl.md)) [L2, Draft v0.1.0]
-- [ ] **Compute Backend (CPU)** ([l2-backend-cpu.md](specifications/l2-backend-cpu.md)) [L2, Draft v0.1.0]
-- [ ] **Performance Implementation** ([l2-perf-impl.md](specifications/l2-perf-impl.md)) [L2, Draft v0.1.0]
+- [ ] **[A] Persistence** ([l2-persistence-impl.md](specifications/l2-persistence-impl.md)) [L2, Stable v1.0.0] — `pkg/persistence/` JSON round-trip, PERS-1..4
+- [ ] **[B] Checkpointing** ([l2-checkpointing-impl.md](specifications/l2-checkpointing-impl.md)) [L2, Stable v1.0.0] — `pkg/checkpoint/` atomic write, retention, CHK-1..4
+- [ ] **[C] Data Streaming** ([l2-streaming-impl.md](specifications/l2-streaming-impl.md)) [L2, Stable v1.0.0] — `pkg/dataset/` iterator + prefetch, DAT-1..4
+- [ ] **[D] CPU Compute Backend** ([l2-backend-cpu.md](specifications/l2-backend-cpu.md)) [L2, Stable v1.0.0] — `pkg/compute/cpu/` reference path, COMP-1..4
+- [ ] **[E] Performance Harness** ([l2-perf-impl.md](specifications/l2-perf-impl.md)) [L2, Stable v1.0.0] — sync.Pool + benchmarks, PERF-1..5
 
 ## Phase 4 — Examples Catalog (Track D)
 
@@ -78,25 +79,28 @@ GoNN library implementation plan derived from `ROADMAP.md` Hybrid Path. Phase or
 
 *Specs registered but not in the active plan. Pulled into a phase when their parent L1 is Stable, an explicit user request promotes them, or a downstream consumer requires them.*
 
-### L1 Concept (deferred)
+### L1 Concept (deferred — future phases)
 
-- [l1-neural-network-architecture.md](specifications/l1-neural-network-architecture.md) — RFC v2.0.0 (TopologyMode amendment under review)
-- [l1-training-semantics.md](specifications/l1-training-semantics.md) — RFC v0.1.0 (parent of l2-training-loop)
-- [l1-network-persistence.md](specifications/l1-network-persistence.md) — RFC v0.1.0 (parent of l2-persistence-impl)
-- [l1-training-control.md](specifications/l1-training-control.md) — RFC v0.1.0 (parent of l2-control-impl)
-- [l1-checkpointing.md](specifications/l1-checkpointing.md) — RFC v0.1.0 (parent of l2-checkpointing-impl)
-- [l1-observability-protocol.md](specifications/l1-observability-protocol.md) — RFC v0.1.0
-- [l1-performance-contract.md](specifications/l1-performance-contract.md) — RFC v0.1.0 (parent of l2-perf-impl)
-- [l1-data-streaming.md](specifications/l1-data-streaming.md) — RFC v0.1.0 (parent of l2-streaming-impl)
-- [l1-compute-backend.md](specifications/l1-compute-backend.md) — RFC v0.1.0 (parent of l2-backend-cpu)
-- [l1-dynamic-topology.md](specifications/l1-dynamic-topology.md) — Draft v0.1.0
-- [l1-meta-learning-hooks.md](specifications/l1-meta-learning-hooks.md) — Draft v0.1.0
+- [l1-dynamic-topology.md](specifications/l1-dynamic-topology.md) — Draft v0.1.0 (open design questions; parent Stable)
+- [l1-meta-learning-hooks.md](specifications/l1-meta-learning-hooks.md) — Draft v0.1.0 (advanced feature, no L2 spec yet)
 
-### L2 Implementation (deferred)
+### L1 Concept (tracked — promoted to Stable 2026-05-01, parents of active Phase 3 specs)
+
+- [l1-neural-network-architecture.md](specifications/l1-neural-network-architecture.md) — Stable v2.0.0
+- [l1-training-semantics.md](specifications/l1-training-semantics.md) — Stable v1.0.0
+- [l1-training-control.md](specifications/l1-training-control.md) — Stable v1.0.0
+- [l1-network-persistence.md](specifications/l1-network-persistence.md) — Stable v1.0.0
+- [l1-checkpointing.md](specifications/l1-checkpointing.md) — Stable v1.0.0
+- [l1-observability-protocol.md](specifications/l1-observability-protocol.md) — Stable v1.0.0
+- [l1-performance-contract.md](specifications/l1-performance-contract.md) — Stable v1.0.0
+- [l1-data-streaming.md](specifications/l1-data-streaming.md) — Stable v1.0.0
+- [l1-compute-backend.md](specifications/l1-compute-backend.md) — Stable v1.0.0
+
+### L2 Implementation (deferred — post-MVP)
 
 - [l2-cli-client.md](specifications/l2-cli-client.md) — RFC v0.1.0 (CLI binary, post-MVP)
 - [l2-visualization-api.md](specifications/l2-visualization-api.md) — Draft v0.1.0
-- [l2-logging-strategy.md](specifications/l2-logging-strategy.md) — Draft v0.1.0 (`pkg/utils/logger.go` already provides baseline `slog` wrapper)
+- [l2-logging-strategy.md](specifications/l2-logging-strategy.md) — Draft v0.1.0 (`pkg/utils/logger.go` baseline sufficient for Phase 3)
 
 ## Build Order Diagram
 
@@ -115,3 +119,4 @@ graph LR
 | 1.0.0 | 2026-04-29 | Initial plan derived from ROADMAP.md v1.0.0; Tracks A–D mapped to Phases 1–4. |
 | 1.1.0 | 2026-04-30 | Phase 1 marked Done (C-001 resolved). l2-errors-impl + l2-init-impl promoted to Stable v1.0.0. Phase 2 activated with [Bootstrap] markers (RFC source specs). Phases 3 + 4 remain Blocked. |
 | 1.2.0 | 2026-04-30 | Phase 2 marked Done. l2-nn-facade promoted RFC → Stable v2.0.0; l2-training-loop + l2-control-impl promoted Draft → Stable v1.0.0. Phase 3 unblock pending L1 parent promotion via magic.spec; Phase 4 still waits Phase 3. |
+| 1.3.0 | 2026-05-01 | Phase 3 unblocked and decomposed. Batch Stabilization (magic.spec) promoted 9 L1 RFC + 5 L2 Draft → Stable. Phase 3 split into Tracks A–E with 15 atomic tasks + 4 gate checks. Backlog cleaned. Based on INDEX.md v2.0.0. |
