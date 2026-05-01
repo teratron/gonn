@@ -260,4 +260,3 @@ graph TD
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-04-27 | Initial Draft from TODO #14 — most experimental of the batch. |
 | 0.2.0 | 2026-05-01 | [MODIFIED] Universal parameter access: ParamDescriptor catalog, ParamAccessor interface, TuningContext v2, MetaConfig wiring, 9 parameter categories (scalar through raw weights), safety model diagram, META-5..META-7 invariants. v0.1.0 Tunable preserved as compatibility wrapper. From TODO #26. |
-
