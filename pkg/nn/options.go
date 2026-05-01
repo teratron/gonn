@@ -146,3 +146,18 @@ func WithBatchCallback[T utils.Float](fn func(batch uint, lossValue T)) Option[T
 		cfg.BatchCallback = fn
 	}
 }
+
+// WithProfiling enables the optional net/http/pprof endpoint per
+// [l2-perf-impl] §5.4 (PERF-5). The argument is the listen address
+// passed to http.ListenAndServe (e.g. ":6060"). Empty addr keeps
+// profiling disabled — the same as not calling the option at all.
+//
+// The pprof handlers are registered on http.DefaultServeMux via the
+// blank-imported net/http/pprof package (see profiling.go); the goroutine
+// that runs ListenAndServe is fire-and-forget — listener errors are
+// logged at Warn level and never block compile.
+func WithProfiling[T utils.Float](addr string) Option[T] {
+	return func(cfg *Config[T]) {
+		cfg.ProfilingAddr = addr
+	}
+}

@@ -102,6 +102,10 @@ type Config[T utils.Float] struct {
 
 	EpochCallback func(epoch uint, lossValue T)
 	BatchCallback func(batch uint, lossValue T)
+
+	// ProfilingAddr enables the optional pprof HTTP listener
+	// (PERF-5). Empty (zero value) keeps the listener disabled.
+	ProfilingAddr string
 }
 
 // applyDefaults fills any zero-valued fields with the Defaults constants.

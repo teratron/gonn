@@ -42,6 +42,7 @@ func compile[T utils.Float](n *NN[T], cfg *Config[T]) error {
 		return utils.Wrap(utils.ErrUserConfig, err, "compile: Build failed")
 	}
 	n.LearningRate = cfg.LearningRate
+	startProfilingServer(cfg.ProfilingAddr)
 	return nil
 }
 

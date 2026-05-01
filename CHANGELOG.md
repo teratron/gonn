@@ -6,6 +6,67 @@ release artifacts dictated by [.magic/run.md](.magic/run.md) Phase Completion / 
 
 ## [Unreleased]
 
+### Phase 3 — 2026-05-01
+
+New capability packages from Tracks A–E. All five new packages ship with
+≥80% line coverage, race-clean test suites, and benchmarks for the inner
+loop hot paths. Phase Gate T-3Z01..T-3Z04 closed; Phase 4 (Examples)
+unblocked.
+
+#### Added
+
+- `pkg/persistence/` — `ConfigDoc[T]` + `WeightsDoc[T]` JSON schema with
+  atomic write (tmp + Sync + Rename), SHA-256 `config_hash` anchor
+  (PERS-3), deterministic re-serialisation (PERS-2), and
+  `strconv.FormatFloat`-driven float round-trip (PERS-4). 81.4 % cover.
+- `pkg/checkpoint/` — `Snapshot[T]` resumable training state (CHK-2),
+  `WriteSnapshot` / `LoadLatest` atomic write (CHK-1) with auto-detected
+  gzip cold tier (CHK-3), and `Sweep` / `StartSweeper` retention
+  goroutine on `time.Ticker`. 83.2 % cover.
+- `pkg/dataset/` — `Dataset[T]` pull-source interface (DAT-1) with
+  `NewSliceDataset` (in-memory), `NewCSVDataset` (`encoding/csv` +
+  `bufio`), and `Prefetch` channel-based decorator that bounds residency
+  to `(prefetch+1) × batchSize` (DAT-3). 87.6 % cover.
+- `pkg/compute/` — pluggable `Backend[T]` interface (`Forward`,
+  `Backward`, `UpdateWeights`, `Allocate`, `Free`) with name-keyed
+  registry (COMP-2). 97.3 % cover.
+- `pkg/compute/cpu/` — reference CPU backend (`init()` registration,
+  pure Go kernels, `ToleranceF32 = 1e-5`, `ToleranceF64 = 1e-12`,
+  always-present default per COMP-1). 100 % cover.
+- `pkg/network/pool.go` — `sync.Pool`-backed `AcquireActivations` /
+  `ReleaseActivations` with per-precision pools and zero-on-release
+  semantics (PERF-4); `PreallocStorage[T]` flat-slice owner for
+  `Compile()`-time preallocation (PERF-2).
+- `pkg/network/worker.go` — `WorkerPool` sized to
+  `runtime.GOMAXPROCS(0)` (PERF-3) with idempotent `Stop`.
+- `pkg/network/bench_network_test.go`, `pkg/nn/bench_nn_test.go` — PERF-1
+  benchmarks: `BenchmarkAcquireRelease_F32/F64`,
+  `BenchmarkPreallocStorage_DeepNetwork_F32`,
+  `BenchmarkWorkerPool_Submit`, `BenchmarkForward_XOR_f32`,
+  `BenchmarkBackward_XOR_f32`, `BenchmarkCompile_DeepNetwork_f32`,
+  `BenchmarkFit_XOR_f32`. Backward pass measured at 0 allocs/op.
+- `pkg/nn/profiling.go` + `WithProfiling[T](addr)` option — opt-in
+  `net/http/pprof` listener (PERF-5); blank-import side effect registers
+  `/debug/pprof/*` handlers; mutex-guarded once-per-address dispatch so
+  repeated `New` calls cannot duplicate listeners.
+
+#### Changed
+
+- `pkg/nn/config.go` — added `ProfilingAddr string` field to `Config[T]`.
+- `pkg/nn/compile.go` — terminal `startProfilingServer(cfg.ProfilingAddr)`
+  call so successful compile arms the optional pprof listener.
+
+#### Phase Gate
+
+- T-3Z01 `go build ./...` — green across all 14 packages.
+- T-3Z02 coverage — every new package ≥ 80 % line coverage; existing
+  packages unchanged.
+- T-3Z03 `go test -race ./...` — race-clean (run via PowerShell for gcc
+  PATH resolution per existing 2026-04-29 note in STATE.md). The
+  pre-existing `TestPauseResumeCycle` flake on `pkg/nn` is unrelated to
+  Phase 3 work and reproduces on `develop` without these changes.
+- T-3Z04 STATE.md updated; PLAN.md Phase 3 → ✓ Done; Phase 4 unblocked.
+
 ### Phase 1 Track A — 2026-04-29 [Bootstrap]
 
 Foundations slice of the Phase 1 Foundation Rewrite. Closes the `pkg/utils`

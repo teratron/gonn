@@ -69,10 +69,6 @@ build/
 *.bak
 *.tmp
 
-# Rust
-rust/
-*.rs
-
 .gemini/
 gha-creds-*.json
 
@@ -105,3 +101,5 @@ copilot-instructions.md
 .design/spec-graph.json
 .design/.graph-cache/
 .design/wiki/
+
+cover*
