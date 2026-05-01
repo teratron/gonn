@@ -23,7 +23,7 @@ Local registry of specifications for this workspace.
 | [l1-performance-contract.md](specifications/l1-performance-contract.md) | Performance guarantees, benchmarks, optimization layers | Stable | L1 | 1.0.0 |
 | [l1-data-streaming.md](specifications/l1-data-streaming.md) | Streaming dataset abstraction and bounded memory contract | Stable | L1 | 1.0.0 |
 | [l1-compute-backend.md](specifications/l1-compute-backend.md) | Pluggable compute backend (CPU baseline + GPU future) | Stable | L1 | 1.0.0 |
-| [l1-dynamic-topology.md](specifications/l1-dynamic-topology.md) | Dynamic mode — mutation at safe points (conflict resolved by parent v2.0) | Draft | L1 | 0.1.0 |
+| [l1-dynamic-topology.md](specifications/l1-dynamic-topology.md) | Dynamic mode — layer/neuron mutation lifecycle with transaction protocol | Draft | L1 | 0.2.0 |
 | [l1-meta-learning-hooks.md](specifications/l1-meta-learning-hooks.md) | Adaptive parameter tuning via inner-network recursion | Draft | L1 | 0.1.0 |
 | [l2-nn-facade.md](specifications/l2-nn-facade.md) | Public API facade — dual-style fluent API (Builder + Functional Options) | Stable | L2 | 2.0.0 |
 | [l2-network-graph.md](specifications/l2-network-graph.md) | Internal computational graph — Network[T] and bundles | Stable | L2 | 1.1.0 |
@@ -48,4 +48,4 @@ Local registry of specifications for this workspace.
 ## Meta Information
 
 - **Maintainer**: Core Team
-- **Last Updated**: 2026-05-01 (Batch Stabilization — 9 L1 RFC + 5 L2 Draft → Stable; Phase 3 unblocked)
+- **Last Updated**: 2026-05-01 (l1-dynamic-topology v0.2.0 — expanded layer lifecycle, DYN-5/DYN-6, transaction protocol)
