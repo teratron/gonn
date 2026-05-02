@@ -1,6 +1,6 @@
 # Project Context
 
-**Generated:** 2026-05-01
+**Generated:** 2026-05-02
 
 ## Active Technologies
 
@@ -27,12 +27,16 @@
 │   └── perceptron/
 └── pkg/
     ├── activation/
+    ├── checkpoint/
+    ├── compute/
+    ├── dataset/
     ├── layer/
     ├── loss/
     ├── network/
     ├── neuron/
     ├── nn/
     ├── nn.json
+    ├── persistence/
     └── utils/
 ```
 

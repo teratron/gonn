@@ -1,7 +1,7 @@
 # Usage Examples Catalog
 
 **Version:** 1.0.0
-**Status:** RFC
+**Status:** Stable
 **Layer:** implementation
 **Implements:** l1-neural-network-architecture.md
 
@@ -202,7 +202,7 @@ Each example entry MUST specify the following fields:
 | Hyperparams | Same as E01. |
 | API Style | `Builder` for train phase; reload via persistence API (TBD). |
 | Expected Output | Pre-save query == post-reload query (bit-identical for `float64`, ε-close for `float32`). |
-| Status | SHOULD (gated on [l1-network-persistence.md](l1-network-persistence.md) reaching Stable) |
+| Status | SHOULD (ungated 2026-05-01 — l1-network-persistence reached Stable) |
 
 #### Continuation
 
@@ -397,3 +397,4 @@ or equivalent) and use looser thresholds to avoid flakiness.
 | :--- | :--- | :--- |
 | 1.0.0 | 2026-04-27 | Initial Draft — 15-entry catalog with coverage matrix and implementation order. |
 | 1.0.0 | 2026-04-28 | E09 promoted from `MAY (gated)` to `SHOULD (gated on Stable)` after l1-network-persistence reached RFC. Status promoted Draft → RFC. |
+| 1.0.0 | 2026-05-01 | [Trust-Mode] RFC → Stable. MVC satisfied: Overview + Invariant Compliance + Detailed Design + Drawbacks + Coverage Matrix. E09 ungated (parent persistence Stable since 2026-05-01). C9 Trust Mode auto-promotion. |

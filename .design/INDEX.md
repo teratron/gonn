@@ -1,6 +1,6 @@
 # Workspace Specifications Registry
 
-**Version:** 2.0.0
+**Version:** 2.1.0
 **Status:** Active
 
 ## Overview
@@ -31,7 +31,7 @@ Local registry of specifications for this workspace.
 | [l2-neuron-model.md](specifications/l2-neuron-model.md) | Neuron/Cell/Axon model and interfaces | Stable | L2 | 1.1.0 |
 | [l2-activation-functions.md](specifications/l2-activation-functions.md) | 10 activation functions with dispatcher pattern | Stable | L2 | 1.0.0 |
 | [l2-loss-functions.md](specifications/l2-loss-functions.md) | 18 loss functions with dispatcher pattern | Stable | L2 | 1.0.0 |
-| [l2-usage-examples.md](specifications/l2-usage-examples.md) | Canonical example catalog — 15 entries with coverage matrix | RFC | L2 | 1.0.0 |
+| [l2-usage-examples.md](specifications/l2-usage-examples.md) | Canonical example catalog — 15 entries with coverage matrix | Stable | L2 | 1.0.0 |
 | [l2-cli-client.md](specifications/l2-cli-client.md) | CLI binary `gonn` — train/query/verify subcommands | RFC | L2 | 0.1.0 |
 | [l2-visualization-api.md](specifications/l2-visualization-api.md) | HTTP/JSON adapter exposing observability for external GUIs | Draft | L2 | 0.1.0 |
 | [l2-logging-strategy.md](specifications/l2-logging-strategy.md) | Structured logging via `log/slog` (Trace/Debug/Info/Warn/Error) | Draft | L2 | 0.1.0 |
@@ -48,4 +48,4 @@ Local registry of specifications for this workspace.
 ## Meta Information
 
 - **Maintainer**: Core Team
-- **Last Updated**: 2026-05-01 (l1-meta-learning-hooks v0.2.0 — universal ParamAccessor, 9 param categories, META-5..7, MetaConfig wiring)
+- **Last Updated**: 2026-05-02 (l2-usage-examples promoted RFC → Stable for Phase 4 decomposition; E09 ungated by Phase 3 persistence)

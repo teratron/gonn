@@ -1,10 +1,10 @@
 # Implementation Plan
 
-**Version:** 1.4.0
+**Version:** 1.5.0
 **Project Version:** 0.1.0 (initial release target — semver baseline)
 **Generated:** 2026-04-29
-**Last Updated:** 2026-05-01
-**Based on:** .design/INDEX.md v2.0.0
+**Last Updated:** 2026-05-02
+**Based on:** .design/INDEX.md v2.1.0
 **Based on RULES:** .design/RULES.md v1.2.0
 **Based on ROADMAP:** .design/ROADMAP.md v1.0.0
 **Status:** Active
@@ -67,13 +67,14 @@ GoNN library implementation plan derived from `ROADMAP.md` Hybrid Path. Phase or
 
 ## Phase 4 — Examples Catalog (Track D)
 
-*Smoke-test catalog validating every track end-to-end. Unblocked 2026-05-01.*
+*Smoke-test catalog validating every track end-to-end. Active since 2026-05-02. Spec promoted RFC → Stable; v0.1 scope is 7 single-hidden examples + smoke-test pattern + coverage audit. The 8 multi-hidden / AndTrain / MNIST entries stay in the spec but defer to v0.2.*
 
 **Subsystem:** `examples/`
 **Requires:** Phase 2 + Phase 3 complete ✓
 **Tasks file:** [tasks/phase-4.md](tasks/phase-4.md)
+**Track order:** A → (B, C, D in parallel) → E → Gate T-4Z. 14 atomic tasks (10 feature + 4 gate).
 
-- [ ] **Usage Examples Catalog (15 entries)** ([l2-usage-examples.md](specifications/l2-usage-examples.md)) [L2, RFC v1.0.0]
+- [ ] **Usage Examples Catalog (v0.1 scope: 7 entries)** ([l2-usage-examples.md](specifications/l2-usage-examples.md)) [L2, Stable v1.0.0] — E01, E02, E09, E11, E12, E14 (adapted), E15
 
 ## Backlog
 
@@ -102,6 +103,10 @@ GoNN library implementation plan derived from `ROADMAP.md` Hybrid Path. Phase or
 - [l2-visualization-api.md](specifications/l2-visualization-api.md) — Draft v0.1.0
 - [l2-logging-strategy.md](specifications/l2-logging-strategy.md) — Draft v0.1.0 (`pkg/utils/logger.go` baseline sufficient for Phase 3)
 
+### Phase 4 v0.2 Backlog (gated on multi-hidden / AndTrain / MNIST loader)
+
+These eight entries from `l2-usage-examples` Stable v1.0.0 wait on Phase v0.2 features (`compile()` accepting `len(HiddenLayers) > 1`, `AndTrain`, MNIST dataset-loader spec): E03 perceptron refactor, E04 binary classification, E05 Iris multi-class, E06 MNIST preset, E07 regression-sin, E08 regression multi, E10 continuation (`AndTrain`), E13 higher-order options. They remain in the spec catalog but are not Phase 4 tasks.
+
 ## Build Order Diagram
 
 ```mermaid
@@ -121,3 +126,4 @@ graph LR
 | 1.2.0 | 2026-04-30 | Phase 2 marked Done. l2-nn-facade promoted RFC → Stable v2.0.0; l2-training-loop + l2-control-impl promoted Draft → Stable v1.0.0. Phase 3 unblock pending L1 parent promotion via magic.spec; Phase 4 still waits Phase 3. |
 | 1.3.0 | 2026-05-01 | Phase 3 unblocked and decomposed. Batch Stabilization (magic.spec) promoted 9 L1 RFC + 5 L2 Draft → Stable. Phase 3 split into Tracks A–E with 15 atomic tasks + 4 gate checks. Backlog cleaned. Based on INDEX.md v2.0.0. |
 | 1.4.0 | 2026-05-01 | Phase 3 marked Done. Tracks A–E closed; Phase Gate T-3Z01..T-3Z04 green. New packages: `pkg/persistence`, `pkg/checkpoint`, `pkg/dataset`, `pkg/compute` (+`cpu`), perf hooks in `pkg/network`/`pkg/nn`. All ≥80 % coverage, race-clean. Phase 4 unblocked. |
+| 1.5.0 | 2026-05-02 | Phase 4 activated and decomposed. l2-usage-examples promoted RFC → Stable v1.0.0 (E09 ungated). 14 atomic tasks across Tracks A–E + 4 gate checks scoped to v0.1's single-hidden constraint. 8 multi-hidden / AndTrain / MNIST entries split out as v0.2 backlog. Based on INDEX.md v2.1.0. |
