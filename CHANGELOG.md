@@ -6,6 +6,59 @@ release artifacts dictated by [.magic/run.md](.magic/run.md) Phase Completion / 
 
 ## [Unreleased]
 
+### Phase 4 — 2026-05-02
+
+v0.1 examples catalog. Seven new example modules covering the
+v0.1-implementable subset of `l2-usage-examples` Stable v1.0.0; the
+remaining eight entries (multi-hidden / `AndTrain` / MNIST loader)
+defer to v0.2. Phase Gate T-4Z01..T-4Z04 closed; v0.1 release-ready
+bar reached.
+
+#### Added
+
+- `examples/xor/` (E01) — dual-style XOR (Builder + Functional Options).
+  Establishes the Phase 4 v0.1 smoke-test pattern: `runX()` helpers
+  callable from both `main()` and `main_test.go` with loose loss
+  thresholds to absorb seed-driven init drift.
+- `examples/style_showcase/` (E12) — same XOR network built three ways
+  (Builder, Options, `PresetXOR`); inter-style spread asserted ≤ 0.1.
+- `examples/logic_gates/` (E02) — single 2-2-1 topology trained over
+  AND / OR / NAND truth tables in a loop.
+- `examples/callbacks/` (E11) — `WithEpochCallback` + `WithBatchCallback`
+  wired to XOR; smoke test asserts both fire at least once during Fit.
+- `examples/persistence/` (E09) — train, extract weights via bundle
+  accessors, write `pkg/persistence` config + weights, reload into a
+  freshly compiled network, assert post-reload Query matches original
+  within `cpu.ToleranceF32` (PERS-4). Documents the v0.1 conversion
+  seam future `nn.Save` / `nn.Load` hooks will close.
+- `examples/shared_options/` (E14, v0.1 adapted) — shared `[]Option[T]`
+  across two single-hidden topologies (ReLU(8) vs ReLU(16)). Spec
+  Topology B's two-hidden variant is gated until v0.2.
+- `examples/precision/` (E15) — XOR at `float32` and `float64` with
+  identical hyperparameters; reports per-precision loss + elapsed time.
+- `examples/README.md` — catalog index and coverage matrix audit
+  flagging six v0.2-gated API surfaces (`Sequential`, `DeepNetwork`,
+  `PresetMNIST`, `PresetRegression`, `Verify`, `AndTrain`).
+
+#### Changed
+
+- `go.work` — registered seven new example modules.
+- `examples/perceptron/main.go` — added `// removed once v0.2 lands`
+  doc-comment documenting the temporary single-hidden stub state. The
+  legacy four-hidden topology returns when E03 is unblocked by v0.2.
+
+#### Phase Gate
+
+- T-4Z01 `go build` — green for every example module and the library
+  itself.
+- T-4Z02 `go test` — every smoke test passes deterministically (loose
+  loss thresholds; no public RNG seed yet).
+- T-4Z03 `go test -race` — race-clean across all seven examples (run
+  via PowerShell per existing 2026-04-29 / 2026-05-01 STATE.md note).
+- T-4Z04 STATE.md updated; PLAN.md Phase 4 → ✓ Done; v0.1 release-ready
+  bar reached; v0.2 backlog (multi-hidden + `AndTrain` + MNIST loader)
+  ready for next planning cycle.
+
 ### Phase 3 — 2026-05-01
 
 New capability packages from Tracks A–E. All five new packages ship with

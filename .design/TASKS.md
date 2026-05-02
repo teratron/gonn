@@ -1,10 +1,10 @@
 # Master Task Index (Registry)
 
-**Version:** 1.5.0
+**Version:** 1.6.0
 **Project Version:** 0.1.0 (initial release target — semver baseline)
 **Generated:** 2026-04-29
 **Last Updated:** 2026-05-02
-**Based on:** .design/PLAN.md v1.5.0
+**Based on:** .design/PLAN.md v1.6.0
 **Based on RULES:** .design/RULES.md v1.2.0
 **Execution Mode:** Parallel (C3)
 **Status:** Active
@@ -20,7 +20,7 @@ Tactical registry of all phases and their statuses. Atomic checklists (`T-XXXX`)
 | [Phase 1](tasks/phase-1.md) | Foundation Rewrite (Track A) — `pkg/utils/{errors,init}`, `pkg/neuron`, `pkg/layer`, `pkg/network` | `Done` (2026-04-29) |
 | [Phase 2](tasks/phase-2.md) | Public Facade Restoration (Track B) — `pkg/nn` | `Done` (2026-04-30) |
 | [Phase 3](tasks/phase-3.md) | New Capability Packages (Track C) — persistence, checkpoint, dataset, compute, perf | `Done` (2026-05-01) |
-| [Phase 4](tasks/phase-4.md) | Examples Catalog (Track D) — `examples/E01..E15` (v0.1 scope: 7 entries) | `Active` (decomposed 2026-05-02; 14 tasks + 4 gate checks) |
+| [Phase 4](tasks/phase-4.md) | Examples Catalog (Track D) — `examples/E01..E15` (v0.1 scope: 7 entries) | `Done` (2026-05-02) |
 
 ## Phase 0 — Already Complete
 
@@ -60,18 +60,18 @@ Tactical registry of all phases and their statuses. Atomic checklists (`T-XXXX`)
 | `pkg/compute/{backend,registry}.go` + `cpu/*` | l2-backend-cpu v1.0.0 | `Stable` |
 | `pkg/network/{pool,worker}.go` + `pkg/nn/profiling.go` + bench files | l2-perf-impl v1.0.0 | `Stable` |
 
-## Phase 4 Deliverables (Pending — v0.1 scope)
+## Phase 4 Deliverables (Done — v0.1 scope)
 
 | Asset | Spec | Status |
 | :--- | :--- | :--- |
-| `examples/xor/` (E01) | l2-usage-examples v1.0.0 | `Pending` |
-| `examples/style_showcase/` (E12) | l2-usage-examples v1.0.0 | `Pending` |
-| `examples/logic_gates/` (E02) | l2-usage-examples v1.0.0 | `Pending` |
-| `examples/callbacks/` (E11) | l2-usage-examples v1.0.0 | `Pending` |
-| `examples/persistence/` (E09) | l2-usage-examples v1.0.0 + l2-persistence-impl v1.0.0 | `Pending` |
-| `examples/shared_options/` (E14, adapted) | l2-usage-examples v1.0.0 | `Pending` |
-| `examples/precision/` (E15) | l2-usage-examples v1.0.0 | `Pending` |
-| `examples/README.md` + coverage audit | l2-usage-examples v1.0.0 §5.3 | `Pending` |
+| `examples/xor/` (E01) | l2-usage-examples v1.0.0 | `Stable` |
+| `examples/style_showcase/` (E12) | l2-usage-examples v1.0.0 | `Stable` |
+| `examples/logic_gates/` (E02) | l2-usage-examples v1.0.0 | `Stable` |
+| `examples/callbacks/` (E11) | l2-usage-examples v1.0.0 | `Stable` |
+| `examples/persistence/` (E09) | l2-usage-examples v1.0.0 + l2-persistence-impl v1.0.0 | `Stable` |
+| `examples/shared_options/` (E14, adapted) | l2-usage-examples v1.0.0 | `Stable` |
+| `examples/precision/` (E15) | l2-usage-examples v1.0.0 | `Stable` |
+| `examples/README.md` + coverage audit | l2-usage-examples v1.0.0 §5.3 | `Stable` |
 
 ### Phase 4 v0.2 Backlog (8 entries — multi-hidden / AndTrain / MNIST)
 

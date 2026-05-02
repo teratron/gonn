@@ -24,7 +24,15 @@
 │   ├── tasks/
 │   └── workspace.json
 ├── examples/
-│   └── perceptron/
+│   ├── README.md
+│   ├── callbacks/
+│   ├── logic_gates/
+│   ├── perceptron/
+│   ├── persistence/
+│   ├── precision/
+│   ├── shared_options/
+│   ├── style_showcase/
+│   └── xor/
 └── pkg/
     ├── activation/
     ├── checkpoint/

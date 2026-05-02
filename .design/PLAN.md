@@ -1,6 +1,6 @@
 # Implementation Plan
 
-**Version:** 1.5.0
+**Version:** 1.6.0
 **Project Version:** 0.1.0 (initial release target — semver baseline)
 **Generated:** 2026-04-29
 **Last Updated:** 2026-05-02
@@ -65,16 +65,16 @@ GoNN library implementation plan derived from `ROADMAP.md` Hybrid Path. Phase or
 - [x] **[D] CPU Compute Backend** ([l2-backend-cpu.md](specifications/l2-backend-cpu.md)) [L2, Stable v1.0.0] — `pkg/compute/cpu/` reference path, COMP-1..4
 - [x] **[E] Performance Harness** ([l2-perf-impl.md](specifications/l2-perf-impl.md)) [L2, Stable v1.0.0] — sync.Pool + benchmarks, PERF-1..5
 
-## Phase 4 — Examples Catalog (Track D)
+## Phase 4 — Examples Catalog (Track D) ✓ Done
 
-*Smoke-test catalog validating every track end-to-end. Active since 2026-05-02. Spec promoted RFC → Stable; v0.1 scope is 7 single-hidden examples + smoke-test pattern + coverage audit. The 8 multi-hidden / AndTrain / MNIST entries stay in the spec but defer to v0.2.*
+*Smoke-test catalog validating every track end-to-end. Closed 2026-05-02. v0.1 scope is 7 single-hidden examples + smoke-test pattern + coverage audit. The 8 multi-hidden / AndTrain / MNIST entries stay in the spec but defer to v0.2.*
 
 **Subsystem:** `examples/`
 **Requires:** Phase 2 + Phase 3 complete ✓
 **Tasks file:** [tasks/phase-4.md](tasks/phase-4.md)
-**Track order:** A → (B, C, D in parallel) → E → Gate T-4Z. 14 atomic tasks (10 feature + 4 gate).
+**Outcome:** 10 feature tasks + 4 gate checks executed. All seven new example modules build, test, and race-clean. Coverage matrix audit at the bottom of `examples/README.md` flags 6 v0.2-gated API surfaces (`Sequential`, `DeepNetwork`, `PresetMNIST`, `PresetRegression`, `Verify`, `AndTrain`).
 
-- [ ] **Usage Examples Catalog (v0.1 scope: 7 entries)** ([l2-usage-examples.md](specifications/l2-usage-examples.md)) [L2, Stable v1.0.0] — E01, E02, E09, E11, E12, E14 (adapted), E15
+- [x] **Usage Examples Catalog (v0.1 scope: 7 entries)** ([l2-usage-examples.md](specifications/l2-usage-examples.md)) [L2, Stable v1.0.0] — E01, E02, E09, E11, E12, E14 (adapted), E15
 
 ## Backlog
 
@@ -127,3 +127,4 @@ graph LR
 | 1.3.0 | 2026-05-01 | Phase 3 unblocked and decomposed. Batch Stabilization (magic.spec) promoted 9 L1 RFC + 5 L2 Draft → Stable. Phase 3 split into Tracks A–E with 15 atomic tasks + 4 gate checks. Backlog cleaned. Based on INDEX.md v2.0.0. |
 | 1.4.0 | 2026-05-01 | Phase 3 marked Done. Tracks A–E closed; Phase Gate T-3Z01..T-3Z04 green. New packages: `pkg/persistence`, `pkg/checkpoint`, `pkg/dataset`, `pkg/compute` (+`cpu`), perf hooks in `pkg/network`/`pkg/nn`. All ≥80 % coverage, race-clean. Phase 4 unblocked. |
 | 1.5.0 | 2026-05-02 | Phase 4 activated and decomposed. l2-usage-examples promoted RFC → Stable v1.0.0 (E09 ungated). 14 atomic tasks across Tracks A–E + 4 gate checks scoped to v0.1's single-hidden constraint. 8 multi-hidden / AndTrain / MNIST entries split out as v0.2 backlog. Based on INDEX.md v2.1.0. |
+| 1.6.0 | 2026-05-02 | Phase 4 marked Done. All 7 example modules (xor, style_showcase, logic_gates, callbacks, persistence, shared_options, precision) build, test, and race-clean. Phase Gate T-4Z01..T-4Z04 green. v0.1 release-ready bar reached; v0.2 backlog (multi-hidden + AndTrain + MNIST loader) ready for next planning cycle. |

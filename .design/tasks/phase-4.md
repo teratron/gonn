@@ -1,24 +1,45 @@
 ---
 phase: 4
 name: "Examples Catalog (Track D)"
-status: Active
+status: Done
 subsystem: "examples/"
 requires:
   - "phase-2: pkg/nn public facade"
   - "phase-3: pkg/persistence, pkg/checkpoint, pkg/dataset, pkg/compute, pkg/perf"
-provides: []
+provides:
+  - "examples/xor: dual-style XOR + smoke-test pattern (E01)"
+  - "examples/style_showcase: Builder + Options + Preset parity (E12)"
+  - "examples/logic_gates: AND/OR/NAND truth-table fits (E02)"
+  - "examples/callbacks: WithEpochCallback + WithBatchCallback wiring (E11)"
+  - "examples/persistence: pkg/persistence round-trip with PERS-4 tolerance (E09)"
+  - "examples/shared_options: shared []Option[T] across two single-hidden topologies (E14, adapted)"
+  - "examples/precision: float32 vs float64 parity at identical hyperparameters (E15)"
+  - "examples/README.md: catalog index + coverage matrix audit"
 key_files:
-  created: []
-  modified: []
-patterns_established: []
+  created:
+    - "examples/xor/{go.mod,main.go,main_builder.go,main_options.go,main_test.go}"
+    - "examples/style_showcase/{go.mod,main.go,main_test.go}"
+    - "examples/logic_gates/{go.mod,main.go,main_test.go}"
+    - "examples/callbacks/{go.mod,main.go,main_test.go}"
+    - "examples/persistence/{go.mod,main.go,main_test.go}"
+    - "examples/shared_options/{go.mod,main.go,main_test.go}"
+    - "examples/precision/{go.mod,main.go,main_test.go}"
+    - "examples/README.md"
+  modified:
+    - "go.work (registered 7 new example modules)"
+    - "examples/perceptron/main.go (v0.2 stub note)"
+patterns_established:
+  - "smoke-test: extract runX() helpers from main(); main_test.go calls them with loose loss thresholds"
+  - "per-example go.mod with replace directive — modules isolated from library go.mod"
+  - "manual pkg/nn ↔ pkg/persistence seam via bundle accessors (extract/install weights)"
 duration_minutes: ~
 ---
 
 # Phase 4 Tasks — Examples Catalog (Track D)
 
 **Phase:** 4
-**Status:** `Active`
-**Strategic Goal:** Land the v0.1 example catalog defined in [l2-usage-examples.md](../specifications/l2-usage-examples.md) Stable v1.0.0 — every example smoke-tests a meaningful API surface and CI catches regressions via `go test ./examples/...`. The canonical 15-entry catalog is partitioned by the v0.1 multi-hidden constraint: 7 entries are implementable now, 8 are deferred to v0.2 (multi-hidden topology / `AndTrain` / dataset loader).
+**Status:** `Done` (2026-05-02)
+**Strategic Goal:** Land the v0.1 example catalog defined in [l2-usage-examples.md](../specifications/l2-usage-examples.md) Stable v1.0.0 — every example smoke-tests a meaningful API surface and CI catches regressions via `go test ./examples/...`. The canonical 15-entry catalog is partitioned by the v0.1 multi-hidden constraint: 7 entries implemented in this phase; 8 deferred to v0.2 (multi-hidden topology / `AndTrain` / dataset loader). Closed 2026-05-02 via /magic.run with all 10 atomic tasks + 4 gate checks green.
 
 ## Constraint — Multi-Hidden Topology Deferred
 
