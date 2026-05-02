@@ -1,7 +1,7 @@
 # Master Task Index (Registry)
 
 **Version:** 1.6.0
-**Project Version:** 0.1.0 (initial release target — semver baseline)
+**Project Version:** 0.1.1 (initial release target — semver baseline)
 **Generated:** 2026-04-29
 **Last Updated:** 2026-05-02
 **Based on:** .design/PLAN.md v1.6.0

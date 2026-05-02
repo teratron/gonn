@@ -4,7 +4,7 @@
 <!-- Maximum 100 lines. Agent updates AFTER each completed action. -->
 
 **Workspace:** main
-**Project Version:** 0.1.0
+**Project Version:** 0.1.1
 **Updated:** 2026-05-02
 **Phase:** v0.1 release-ready — all four phases Done; v0.2 backlog awaiting kickoff
 **Status:** Active
@@ -27,6 +27,7 @@ Overall:          [81/81]  ████████ 100%   v0.1 MVP scope reache
 
 ## Recent Decisions
 
+- 2026-05-02 **Decision:** Incremented project patch version to `0.1.1` across all `examples/*/go.mod` and design metadata (`STATE.md`, `PLAN.md`, `TASKS.md`). This change reflects the extensive work completed during Phase 4 and establishes a mechanism for patch tracking even within the v0.1 release cycle, resolving the stale `v0.4.0` references in example modules.
 - 2026-05-02 **Decision:** Phase 4 closed via /magic.run. 7 example modules (xor, style_showcase, logic_gates, callbacks, persistence, shared_options, precision) build, test, and race-clean. Coverage matrix audit at `examples/README.md` flags 6 v0.2-gated API surfaces. Phase Gate T-4Z01..T-4Z04 green. CHANGELOG Phase 4 entry added; PLAN 1.5.0 → 1.6.0; TASKS 1.5.0 → 1.6.0. v0.1 release-ready bar reached. Established conventions: per-example go.mod with replace directive; `runX()` helpers extracted from `main()` for smoke tests; pkg/nn ↔ pkg/persistence seam documented in E09 (manual bundle walk pending future `nn.Save`/`nn.Load`).
 - 2026-05-02 **Decision:** Phase 4 activated and decomposed via /magic.task update. l2-usage-examples promoted RFC → Stable v1.0.0 (E09 ungated; persistence Stable since 2026-05-01). 14 atomic tasks across Tracks A–E + 4 gate checks. v0.1 scope is 7 single-hidden examples (E01, E02, E09, E11, E12, E14-adapted, E15); 8 multi-hidden / AndTrain / MNIST entries deferred to v0.2 backlog. INDEX.md 2.0.0 → 2.1.0; PLAN.md 1.4.0 → 1.5.0; TASKS.md 1.4.0 → 1.5.0.
 - 2026-05-01 **Decision:** Phase 3 closed via /magic.run. All 5 tracks green: persistence (81.4 % cover), checkpoint (83.2 %), dataset (87.6 %), compute (97.3 %), compute/cpu (100 %), network (96.1 %), nn (83.7 %). PERF-4 backward-pass benches at 0 allocs/op. pprof opt-in via `WithProfiling[T](addr)`. Phase Gate T-3Z01..T-3Z04 all green; CHANGELOG entry added; PLAN 1.3.0 → 1.4.0; TASKS 1.3.0 → 1.4.0. Phase 4 unblocked.

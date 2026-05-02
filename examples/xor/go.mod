@@ -1,7 +1,7 @@
 module github.com/teratron/gonn/examples/xor
 
-go 1.25.3
+go 1.26.2
 
 replace github.com/teratron/gonn => ../..
 
-require github.com/teratron/gonn v0.4.0
+require github.com/teratron/gonn v0.1.1
