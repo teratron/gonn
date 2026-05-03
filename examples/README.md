@@ -6,13 +6,13 @@ Implements the v0.1 subset of [`l2-usage-examples.md`](../.design/specifications
 
 | ID | Path | Style | Demonstrates |
 | :--- | :--- | :--- | :--- |
-| E01 | [xor/](xor/) | Builder + Options | Canonical XOR — dual-style parity baseline |
-| E02 | [logic_gates/](logic_gates/) | Builder | AND / OR / NAND truth-table fits |
-| E09 | [persistence/](persistence/) | Builder + `pkg/persistence` | Save → reload → query, ULP-1 round-trip (PERS-4) |
-| E11 | [callbacks/](callbacks/) | Options | `WithEpochCallback` + `WithBatchCallback` |
-| E12 | [style_showcase/](style_showcase/) | Builder + Options + Preset | Three-style equivalence on the same network |
-| E14 | [shared_options/](shared_options/) | Options | Shared `[]Option[T]` across two single-hidden topologies (adapted from spec Topology B) |
-| E15 | [precision/](precision/) | Builder | `float32` vs `float64` parity at identical hyperparameters |
+| E01 | [xor](xor/) | Builder + Options | Canonical XOR — dual-style parity baseline |
+| E02 | [logic_gates](logic_gates/) | Builder | AND / OR / NAND truth-table fits |
+| E09 | [persistence](persistence/) | Builder + `pkg/persistence` | Save → reload → query, ULP-1 round-trip (PERS-4) |
+| E11 | [callbacks](callbacks/) | Options | `WithEpochCallback` + `WithBatchCallback` |
+| E12 | [style_showcase](style_showcase/) | Builder + Options + Preset | Three-style equivalence on the same network |
+| E14 | [shared_options](shared_options/) | Options | Shared `[]Option[T]` across two single-hidden topologies (adapted from spec Topology B) |
+| E15 | [precision](precision/) | Builder | `float32` vs `float64` parity at identical hyperparameters |
 
 Run any one example: `go run ./examples/{name}/`. Run the whole smoke suite: `go test ./examples/...`.
 
@@ -22,7 +22,7 @@ These catalog entries stay in the spec but require features not yet in v0.1. Eac
 
 | ID | Path | Gate |
 | :--- | :--- | :--- |
-| E03 | [perceptron/](perceptron/) | v0.2 multi-hidden (file currently runs a single-hidden stub; `// removed once v0.2 lands`) |
+| E03 | [perceptron](perceptron/) | v0.2 multi-hidden (file currently runs a single-hidden stub; `// removed once v0.2 lands`) |
 | E04 | `examples/binary_classification/` | v0.2 multi-hidden |
 | E05 | `examples/iris/` | v0.2 multi-hidden |
 | E06 | `examples/mnist/` | v0.2 multi-hidden + dataset-loader spec |

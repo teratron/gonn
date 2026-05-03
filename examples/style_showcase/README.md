@@ -11,5 +11,5 @@ This example provides a side-by-side comparison of the three different ways to c
 ## Running the example
 
 ```bash
-go run main.go
+go run ./examples/style_showcase
 ```

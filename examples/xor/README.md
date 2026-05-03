@@ -10,5 +10,5 @@ The classic XOR problem — the smallest non-linear classification task. This ex
 ## Running the example
 
 ```bash
-go run main.go
+go run ./examples/xor
 ```

@@ -9,5 +9,5 @@ The architecture will be expanded to a 4-hidden-layer topology in v0.2.
 ## Running the example
 
 ```bash
-go run main.go
+go run ./examples/perceptron
 ```

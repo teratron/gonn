@@ -11,5 +11,5 @@ This example demonstrates how to share a common set of `nn.Option[T]` across mul
 ## Running the example
 
 ```bash
-go run main.go
+go run ./examples/shared_options
 ```

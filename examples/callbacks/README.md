@@ -10,5 +10,5 @@ This example demonstrates how to use progress callbacks in `gonn`. It trains a c
 ## Running the example
 
 ```bash
-go run main.go
+go run ./examples/callbacks
 ```

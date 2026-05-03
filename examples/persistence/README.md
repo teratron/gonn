@@ -11,5 +11,5 @@ This example demonstrates the round-trip integrity of saving and reloading a neu
 ## Running the example
 
 ```bash
-go run main.go
+go run ./examples/persistence
 ```

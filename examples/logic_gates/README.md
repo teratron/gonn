@@ -11,5 +11,5 @@ This example shows how a small neural network can specialize to learn different 
 ## Running the example
 
 ```bash
-go run main.go
+go run ./examples/logic_gates
 ```
