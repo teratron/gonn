@@ -1,10 +1,10 @@
 # Implementation Plan
 
-**Version:** 1.6.0
-**Project Version:** 0.1.1 (initial release target — semver baseline)
+**Version:** 1.7.0
+**Project Version:** 0.1.1 (v0.1 released; v0.2 active under Phase 5)
 **Generated:** 2026-04-29
-**Last Updated:** 2026-05-02
-**Based on:** .design/INDEX.md v2.1.0
+**Last Updated:** 2026-05-03
+**Based on:** .design/INDEX.md v2.3.0
 **Based on RULES:** .design/RULES.md v1.2.0
 **Based on ROADMAP:** .design/ROADMAP.md v1.0.0
 **Status:** Active
@@ -65,6 +65,17 @@ GoNN library implementation plan derived from `ROADMAP.md` Hybrid Path. Phase or
 - [x] **[D] CPU Compute Backend** ([l2-backend-cpu.md](specifications/l2-backend-cpu.md)) [L2, Stable v1.0.0] — `pkg/compute/cpu/` reference path, COMP-1..4
 - [x] **[E] Performance Harness** ([l2-perf-impl.md](specifications/l2-perf-impl.md)) [L2, Stable v1.0.0] — sync.Pool + benchmarks, PERF-1..5
 
+## Phase 5 — Multi-Hidden Topology (v0.2)
+
+*Lifts the v0.1 single-hidden constraint baked into `pkg/nn.compile()`. Active since 2026-05-03. Unblocks 6 of 8 deferred Phase 4 entries; E06 (MNIST loader) and E10 (AndTrain) remain backlog.*
+
+**Subsystem:** `pkg/network`, `pkg/nn`, `pkg/persistence`, `examples/`
+**Requires:** Phase 1 + 2 + 3 + 4 ✓
+**Tasks file:** [tasks/phase-5.md](tasks/phase-5.md)
+**Track order:** A → B (serial); C, D parallel after B; Gate T-5Z. 23 atomic tasks (19 feature + 4 gate).
+
+- [ ] **Multi-Hidden Topology** ([l2-multihidden-impl.md](specifications/l2-multihidden-impl.md)) [L2, Stable v1.0.0] — `pkg/network` slice generalisation, `pkg/nn` compile() gate lift, weights schema 1.0.0 → 1.1.0, six v0.2 catalog examples (E03, E04, E05, E07, E08, E13).
+
 ## Phase 4 — Examples Catalog (Track D) ✓ Done
 
 *Smoke-test catalog validating every track end-to-end. Closed 2026-05-02. v0.1 scope is 7 single-hidden examples + smoke-test pattern + coverage audit. The 8 multi-hidden / AndTrain / MNIST entries stay in the spec but defer to v0.2.*
@@ -103,9 +114,9 @@ GoNN library implementation plan derived from `ROADMAP.md` Hybrid Path. Phase or
 - [l2-visualization-api.md](specifications/l2-visualization-api.md) — Draft v0.1.0
 - [l2-logging-strategy.md](specifications/l2-logging-strategy.md) — Draft v0.1.0 (`pkg/utils/logger.go` baseline sufficient for Phase 3)
 
-### Phase 4 v0.2 Backlog (gated on multi-hidden / AndTrain / MNIST loader)
+### Phase 4 → Phase 5 promotion (multi-hidden)
 
-These eight entries from `l2-usage-examples` Stable v1.0.0 wait on Phase v0.2 features (`compile()` accepting `len(HiddenLayers) > 1`, `AndTrain`, MNIST dataset-loader spec): E03 perceptron refactor, E04 binary classification, E05 Iris multi-class, E06 MNIST preset, E07 regression-sin, E08 regression multi, E10 continuation (`AndTrain`), E13 higher-order options. They remain in the spec catalog but are not Phase 4 tasks.
+Six of the eight original v0.2-gated catalog entries (E03, E04, E05, E07, E08, E13) move from backlog into active Phase 5 work. E06 (MNIST preset — needs dataset-loader spec) and E10 (continuation — needs `AndTrain` API surface) stay deferred until their respective spec authoring lands.
 
 ## Build Order Diagram
 
@@ -128,3 +139,4 @@ graph LR
 | 1.4.0 | 2026-05-01 | Phase 3 marked Done. Tracks A–E closed; Phase Gate T-3Z01..T-3Z04 green. New packages: `pkg/persistence`, `pkg/checkpoint`, `pkg/dataset`, `pkg/compute` (+`cpu`), perf hooks in `pkg/network`/`pkg/nn`. All ≥80 % coverage, race-clean. Phase 4 unblocked. |
 | 1.5.0 | 2026-05-02 | Phase 4 activated and decomposed. l2-usage-examples promoted RFC → Stable v1.0.0 (E09 ungated). 14 atomic tasks across Tracks A–E + 4 gate checks scoped to v0.1's single-hidden constraint. 8 multi-hidden / AndTrain / MNIST entries split out as v0.2 backlog. Based on INDEX.md v2.1.0. |
 | 1.6.0 | 2026-05-02 | Phase 4 marked Done. All 7 example modules (xor, style_showcase, logic_gates, callbacks, persistence, shared_options, precision) build, test, and race-clean. Phase Gate T-4Z01..T-4Z04 green. v0.1 release-ready bar reached; v0.2 backlog (multi-hidden + AndTrain + MNIST loader) ready for next planning cycle. |
+| 1.7.0 | 2026-05-03 | Phase 5 activated and decomposed. l2-multihidden-impl promoted Draft → Stable v1.0.0. 19 atomic tasks across Tracks A–D + 4 gate checks. Track A → B serial; C, D parallel after B. v0.2 catalog promotion: E03/E04/E05/E07/E08/E13 (six of eight backlog entries) move into Phase 5; E06 + E10 stay deferred. Based on INDEX.md v2.3.0. |

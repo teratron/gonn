@@ -1,10 +1,10 @@
 # Master Task Index (Registry)
 
-**Version:** 1.6.0
-**Project Version:** 0.1.1 (initial release target — semver baseline)
+**Version:** 1.7.0
+**Project Version:** 0.1.1 (v0.1 released; v0.2 active under Phase 5)
 **Generated:** 2026-04-29
-**Last Updated:** 2026-05-02
-**Based on:** .design/PLAN.md v1.6.0
+**Last Updated:** 2026-05-03
+**Based on:** .design/PLAN.md v1.7.0
 **Based on RULES:** .design/RULES.md v1.2.0
 **Execution Mode:** Parallel (C3)
 **Status:** Active
@@ -21,6 +21,7 @@ Tactical registry of all phases and their statuses. Atomic checklists (`T-XXXX`)
 | [Phase 2](tasks/phase-2.md) | Public Facade Restoration (Track B) — `pkg/nn` | `Done` (2026-04-30) |
 | [Phase 3](tasks/phase-3.md) | New Capability Packages (Track C) — persistence, checkpoint, dataset, compute, perf | `Done` (2026-05-01) |
 | [Phase 4](tasks/phase-4.md) | Examples Catalog (Track D) — `examples/E01..E15` (v0.1 scope: 7 entries) | `Done` (2026-05-02) |
+| [Phase 5](tasks/phase-5.md) | Multi-Hidden Topology (v0.2) — `pkg/network` chain + compile() lift + weights 1.1.0 + 6 catalog examples | `Active` (decomposed 2026-05-03; 19 tasks + 4 gate checks) |
 
 ## Phase 0 — Already Complete
 
@@ -73,9 +74,29 @@ Tactical registry of all phases and their statuses. Atomic checklists (`T-XXXX`)
 | `examples/precision/` (E15) | l2-usage-examples v1.0.0 | `Stable` |
 | `examples/README.md` + coverage audit | l2-usage-examples v1.0.0 §5.3 | `Stable` |
 
-### Phase 4 v0.2 Backlog (8 entries — multi-hidden / AndTrain / MNIST)
+### Phase 4 v0.2 Promotion → Phase 5
 
-E03, E04, E05, E06, E07, E08, E10, E13 — wait on v0.2 multi-hidden (`pkg/nn.compile()` accepts `len(HiddenLayers) > 1`), `AndTrain` API surface, or MNIST dataset-loader spec.
+Six of the eight v0.2-gated entries (E03, E04, E05, E07, E08, E13) are now active under Phase 5 — see deliverables table below.
+
+## Phase 5 Deliverables (Pending)
+
+| Asset | Spec | Status |
+| :--- | :--- | :--- |
+| `pkg/network/{network,propagation}.go` (multi-hidden chain) | l2-multihidden-impl v1.0.0 | `Pending` |
+| `pkg/nn/compile.go` (gate lift + variadic SetLayers) | l2-multihidden-impl v1.0.0 | `Pending` |
+| `pkg/persistence/config.go` (SchemaVersion 1.1.0) | l2-multihidden-impl v1.0.0 §5.4 | `Pending` |
+| `examples/perceptron/` restored (E03) | l2-usage-examples v1.0.0 | `Pending` |
+| `examples/binary_classification/` (E04) | l2-usage-examples v1.0.0 | `Pending` |
+| `examples/iris/` (E05) | l2-usage-examples v1.0.0 | `Pending` |
+| `examples/regression_sin/` (E07) | l2-usage-examples v1.0.0 | `Pending` |
+| `examples/regression_multi/` (E08) | l2-usage-examples v1.0.0 | `Pending` |
+| `examples/higher_order_options/` (E13) | l2-usage-examples v1.0.0 | `Pending` |
+
+### Remaining v0.2 Backlog (gated on follow-up specs)
+
+- **E06 MNIST preset** — awaits MNIST dataset-loader spec (planned post-Phase 5).
+- **E10 Continuation** — awaits `AndTrain` API surface (planned post-Phase 5).
+- **`PresetRegression` parameter extension** — v0.3 follow-up minor.
 
 ## Cross-Cutting Constraints
 
@@ -87,5 +108,5 @@ E03, E04, E05, E06, E07, E08, E10, E13 — wait on v0.2 multi-hidden (`pkg/nn.co
 
 ## Meta Information
 
-- **Last Updated**: 2026-05-02
+- **Last Updated**: 2026-05-03
 - **Maintainer**: Core Team

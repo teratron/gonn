@@ -1,7 +1,7 @@
 # Multi-Hidden Topology Implementation
 
-**Version:** 0.1.0
-**Status:** Draft
+**Version:** 1.0.0
+**Status:** Stable
 **Layer:** implementation
 **Implements:** l1-neural-network-architecture.md
 
@@ -272,3 +272,4 @@ the O(N²) cost stays within PERF-2 budgets.
 | Version | Date | Description |
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-05-03 | Initial Draft — concrete v0.2 plan for lifting the `len(HiddenLayers) > 1` rejection in `pkg/nn.compile()`. Documents the storage shape change in `Network[T]`, the propagation chain across the new hidden slice, and the matching weights schema bump (1.0.0 → 1.1.0). Drives Phase 5 (v0.2) decomposition. |
+| 1.0.0 | 2026-05-03 | [Trust-Mode] Draft → Stable. MVC satisfied (Overview + Invariant Compliance INV-1..7 + Detailed Design + Drawbacks). Parent `l1-neural-network-architecture` Stable v2.0.0. Two §5.7 TBDs are scoped deferrals (per-layer WeightInit, optional chain-length soft cap) — not design gaps. C9 Trust Mode auto-promotion. |
