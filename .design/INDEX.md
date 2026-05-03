@@ -1,6 +1,6 @@
 # Workspace Specifications Registry
 
-**Version:** 2.1.0
+**Version:** 2.2.0
 **Status:** Active
 
 ## Overview
@@ -44,8 +44,9 @@ Local registry of specifications for this workspace.
 | [l2-perf-impl.md](specifications/l2-perf-impl.md) | Go realization of performance contract — pools, preallocation, pprof hook | Stable | L2 | 1.0.0 |
 | [l2-streaming-impl.md](specifications/l2-streaming-impl.md) | Go realization of data streaming — `pkg/dataset` package, prefetch decorator | Stable | L2 | 1.0.0 |
 | [l2-backend-cpu.md](specifications/l2-backend-cpu.md) | Go realization of compute backend — `pkg/compute/cpu` reference path | Stable | L2 | 1.0.0 |
+| [l2-multihidden-impl.md](specifications/l2-multihidden-impl.md) | v0.2 multi-hidden topology lift — Network[T] chain + compile() gate removal | Draft | L2 | 0.1.0 |
 
 ## Meta Information
 
 - **Maintainer**: Core Team
-- **Last Updated**: 2026-05-02 (l2-usage-examples promoted RFC → Stable for Phase 4 decomposition; E09 ungated by Phase 3 persistence)
+- **Last Updated**: 2026-05-03 (added l2-multihidden-impl Draft v0.1.0 — v0.2 anchor spec for Phase 4 v0.2 backlog unlock)
