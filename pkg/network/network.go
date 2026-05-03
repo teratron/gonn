@@ -1,10 +1,10 @@
 // Package network — the internal computational graph.
 //
-// Network[T] is the value-typed engine that owns three cell bundles
-// (Input, Hidden, Output), wires axons between them, and runs the
-// forward / backward / weight-update pipeline. Public entry points
-// (Builder, NN[T]) are out of scope for Phase 1 — the facade layer
-// is restored in Phase 2.
+// Network[T] is the value-typed engine that owns three cell groups
+// (Input, a chain of Hiddens, Output), wires axons between them, and
+// runs the forward / backward / weight-update pipeline. Public entry
+// points (Builder, NN[T]) are out of scope for Phase 1 — the facade
+// layer is restored in Phase 2 and the multi-hidden chain in Phase 5.
 package network
 
 import (
@@ -20,27 +20,37 @@ import (
 const defaultLearningRate = 0.3
 
 // Network is the typed graph. Embedded by [pkg/nn].NN in Phase 2.
+//
+// Per [l2-multihidden-impl] §5.1 the Hidden field generalises to a slice
+// of bundles in compile-time order. Single-hidden topologies (v0.1)
+// continue to work unchanged: callers wrap their one Dense layer in a
+// one-element slice when calling SetLayers.
 type Network[T utils.Float] struct {
 	LearningRate T `json:"learningRate" xml:"learningRate"`
 
-	Input  bundle[T, *cell.Input[T]]  `json:"input" xml:"input"`
-	Hidden bundle[T, *cell.Hidden[T]] `json:"hidden" xml:"hidden"`
-	Output bundle[T, *cell.Output[T]] `json:"output" xml:"output"`
+	Input   bundle[T, *cell.Input[T]]    `json:"input" xml:"input"`
+	Hiddens []bundle[T, *cell.Hidden[T]] `json:"hiddens" xml:"hiddens"`
+	Output  bundle[T, *cell.Output[T]]   `json:"output" xml:"output"`
 
-	hiddenBias *cell.Bias[T]
-	outputBias *cell.Bias[T]
-	hiddenAct  activation.Type
-	outputAct  activation.Type
-	lossMode   loss.Type
+	// hiddenBiases / hiddenActs are positional with Hiddens[i]: a layer
+	// with Bias == false contributes a nil entry so the lookup stays
+	// indexable without auxiliary maps.
+	hiddenBiases []*cell.Bias[T]
+	outputBias   *cell.Bias[T]
+	hiddenActs   []activation.Type
+	outputAct    activation.Type
+	lossMode     loss.Type
 
-	// preactHidden / preactOutput store the pre-activation linear sum so
-	// backprop can feed it to activation.Derivative. The dispatcher
-	// expects pre-activation input (it re-applies the activation inside
-	// to compute σ' = σ(x)·(1-σ(x)) for sigmoid and similar). Reusing the
-	// post-activation value would yield σ(σ(x))·(1-σ(σ(x))) — a vanishing
-	// gradient that prevents convergence.
-	preactHidden []T
-	preactOutput []T
+	// preactHiddens[i] / preactOutput store the pre-activation linear
+	// sums so backprop can feed them to activation.Derivative. The
+	// dispatcher expects pre-activation input (it re-applies the
+	// activation inside to compute σ' = σ(x)·(1-σ(x)) for sigmoid and
+	// similar). Reusing the post-activation value would yield
+	// σ(σ(x))·(1-σ(σ(x))) — a vanishing gradient that prevents
+	// convergence. preactHiddens[i] is sized to Hiddens[i].Len() once at
+	// SetLayers time and never reslicing afterwards.
+	preactHiddens [][]T
+	preactOutput  []T
 }
 
 // New returns a freshly constructed Network with empty bundles and the
@@ -52,7 +62,7 @@ func New[T utils.Float]() Network[T] {
 	return Network[T]{
 		LearningRate: T(defaultLearningRate),
 		Input:        newBundle[T, *cell.Input[T]](),
-		Hidden:       newBundle[T, *cell.Hidden[T]](),
+		Hiddens:      nil,
 		Output:       newBundle[T, *cell.Output[T]](),
 	}
 }
@@ -60,33 +70,67 @@ func New[T utils.Float]() Network[T] {
 // SetLayers installs cells from constructed layer values into the network
 // bundles. The layer types own the cells; the network mirrors their
 // slices so propagation methods can reach them. Bias cells declared by
-// layers are stored separately and used as axon sources by Build.
+// layers are stored separately (positionally aligned with Hiddens[i])
+// and used as axon sources by Build.
 //
-// Returns an error wrapping ErrUserConfig when any required layer is nil.
-func (n *Network[T]) SetLayers(in *layer.Input[T], hidden *layer.Dense[T], out *layer.Output[T]) error {
-	if in == nil || hidden == nil || out == nil {
+// hiddens is the multi-hidden chain in left-to-right order. v0.1 callers
+// pass a one-element slice; v0.2 supports any positive length.
+//
+// Returns an error wrapping ErrUserConfig when any required layer is
+// nil, when the hiddens slice is empty, or when any layer reports zero
+// size.
+func (n *Network[T]) SetLayers(in *layer.Input[T], hiddens []*layer.Dense[T], out *layer.Output[T]) error {
+	if in == nil || out == nil {
 		return utils.Newf(utils.ErrUserConfig,
-			"SetLayers: all three layers must be non-nil (in=%v hidden=%v out=%v)",
-			in != nil, hidden != nil, out != nil,
+			"SetLayers: input and output layers must be non-nil (in=%v out=%v)",
+			in != nil, out != nil,
 		)
 	}
-	if in.Size == 0 || hidden.Size == 0 || out.Size == 0 {
+	if len(hiddens) == 0 {
 		return utils.Newf(utils.ErrUserConfig,
-			"SetLayers: every layer must have positive size (in=%d hidden=%d out=%d)",
-			in.Size, hidden.Size, out.Size,
+			"SetLayers: hiddens slice must contain at least one layer (got 0)")
+	}
+	for i, h := range hiddens {
+		if h == nil {
+			return utils.Newf(utils.ErrUserConfig,
+				"SetLayers: hiddens[%d] is nil — every chain entry must be a constructed Dense layer", i)
+		}
+		if h.Size == 0 {
+			return utils.Newf(utils.ErrUserConfig,
+				"SetLayers: hiddens[%d] has zero size — every Dense layer must declare Size > 0", i)
+		}
+	}
+	if in.Size == 0 || out.Size == 0 {
+		return utils.Newf(utils.ErrUserConfig,
+			"SetLayers: input and output layers must have positive size (in=%d out=%d)",
+			in.Size, out.Size,
 		)
 	}
+
 	n.Input.Replace(in.Cells())
-	// Hidden[T] is a generic alias of Dense[T]; the slice element types
-	// are identical so the slice rebind is type-safe.
-	n.Hidden.Replace(hidden.Cells())
 	n.Output.Replace(out.Cells())
-	n.hiddenBias = hidden.BiasCell()
+
+	// Resize positional metadata to match the new chain. Allocating
+	// fresh slices (rather than mutating in place) keeps SetLayers
+	// idempotent under retries — a previous call's longer chain does
+	// not leak into the new one.
+	n.Hiddens = make([]bundle[T, *cell.Hidden[T]], len(hiddens))
+	n.hiddenBiases = make([]*cell.Bias[T], len(hiddens))
+	n.hiddenActs = make([]activation.Type, len(hiddens))
+	n.preactHiddens = make([][]T, len(hiddens))
+	for i, h := range hiddens {
+		// Hidden[T] is a generic alias of Dense[T]; the slice element
+		// types are identical so the slice rebind is type-safe.
+		n.Hiddens[i] = newBundle[T, *cell.Hidden[T]]()
+		n.Hiddens[i].Replace(h.Cells())
+		n.hiddenBiases[i] = h.BiasCell()
+		n.hiddenActs[i] = h.Activation
+		n.preactHiddens[i] = make([]T, h.Size)
+	}
+
 	n.outputBias = out.BiasCell()
-	n.hiddenAct = hidden.Activation
 	n.outputAct = out.Activation
 	n.lossMode = out.Loss
-	n.preactHidden = make([]T, hidden.Size)
 	n.preactOutput = make([]T, out.Size)
 	return nil
 }
@@ -98,30 +142,53 @@ func (n *Network[T]) LossMode() loss.Type {
 	return n.lossMode
 }
 
-// Build wires axons between layers. Each Hidden cell receives one axon
-// per Input cell (and one from hiddenBias if present); each Output cell
-// receives one axon per Hidden cell (and one from outputBias if present).
+// Build wires axons across the Input → Hiddens → Output chain.
+//
+// Per [l2-multihidden-impl] §5.3:
+//   - Hiddens[0] cells receive one axon per Input cell (and one from
+//     hiddenBiases[0] if present).
+//   - Hiddens[i] cells (i ≥ 1) receive one axon per Hiddens[i-1] cell
+//     (and one from hiddenBiases[i] if present).
+//   - Output cells receive one axon per Hiddens[len-1] cell (and one
+//     from outputBias if present).
+//
 // Subsequent calls overwrite the existing axon bundles — Build is
 // idempotent and safe under dynamic-topology adjustments.
 func (n *Network[T]) Build() error {
-	if n.Input.Len() == 0 || n.Hidden.Len() == 0 || n.Output.Len() == 0 {
+	if n.Input.Len() == 0 || len(n.Hiddens) == 0 || n.Output.Len() == 0 {
 		return utils.Newf(utils.ErrUserConfig,
-			"Build: empty bundle (in=%d hidden=%d out=%d) — call SetLayers first",
-			n.Input.Len(), n.Hidden.Len(), n.Output.Len(),
+			"Build: empty bundle (in=%d hiddenChain=%d out=%d) — call SetLayers first",
+			n.Input.Len(), len(n.Hiddens), n.Output.Len(),
 		)
 	}
-	for _, h := range n.Hidden.cells {
-		h.Axons = h.Axons[:0]
-		for _, src := range n.Input.cells {
-			h.Axons = append(h.Axons, axon.New[T](src, h))
-		}
-		if n.hiddenBias != nil {
-			h.Axons = append(h.Axons, axon.New[T](n.hiddenBias, h))
+	for i := range n.Hiddens {
+		if n.Hiddens[i].Len() == 0 {
+			return utils.Newf(utils.ErrUserConfig,
+				"Build: Hiddens[%d] has zero cells — call SetLayers with non-empty layers", i)
 		}
 	}
+	for i, hb := range n.Hiddens {
+		bias := n.hiddenBiases[i]
+		for _, h := range hb.cells {
+			h.Axons = h.Axons[:0]
+			if i == 0 {
+				for _, src := range n.Input.cells {
+					h.Axons = append(h.Axons, axon.New[T](src, h))
+				}
+			} else {
+				for _, src := range n.Hiddens[i-1].cells {
+					h.Axons = append(h.Axons, axon.New[T](src, h))
+				}
+			}
+			if bias != nil {
+				h.Axons = append(h.Axons, axon.New[T](bias, h))
+			}
+		}
+	}
+	lastHidden := n.Hiddens[len(n.Hiddens)-1].cells
 	for _, o := range n.Output.cells {
 		o.Axons = o.Axons[:0]
-		for _, src := range n.Hidden.cells {
+		for _, src := range lastHidden {
 			o.Axons = append(o.Axons, axon.New[T](src, o))
 		}
 		if n.outputBias != nil {

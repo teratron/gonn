@@ -183,8 +183,12 @@ func buildConfigDoc() persistence.ConfigDoc[float32] {
 // layer's axon weights + bias contributions into the on-disk schema.
 // Hidden cells have len(Input)+1 axons (last one is bias); output cells
 // have len(Hidden)+1 axons (last one is bias).
+//
+// Track C (Phase 5 v0.2) generalises this helper to walk every entry in
+// n.Network.Hiddens; for v0.1 single-hidden examples we still emit one
+// "hidden_0" layer plus output.
 func extractWeights(n *nn.NN[float32]) persistence.WeightsDoc[float32] {
-	hiddenCells := n.Network.Hidden.Cells()
+	hiddenCells := n.Network.Hiddens[0].Cells()
 	hiddenLayer := persistence.LayerWeights[float32]{
 		Name:    "hidden_0",
 		Weights: make([][]float32, len(hiddenCells)),
@@ -226,7 +230,7 @@ func installWeights(n *nn.NN[float32], doc persistence.WeightsDoc[float32]) erro
 	if len(doc.Layers) != 2 {
 		return fmt.Errorf("expected 2 layers, got %d", len(doc.Layers))
 	}
-	hiddenCells := n.Network.Hidden.Cells()
+	hiddenCells := n.Network.Hiddens[0].Cells()
 	for i, h := range hiddenCells {
 		row := doc.Layers[0].Weights[i]
 		if len(row) != len(h.Axons)-1 {

@@ -125,10 +125,12 @@ func (n *NN[T]) snapshotWeights(dst []T) []T {
 		dst = dst[:count]
 	}
 	idx := 0
-	for _, h := range n.Network.Hidden.Cells() {
-		for _, a := range h.Axons {
-			dst[idx] = a.Weight
-			idx++
+	for _, hb := range n.Network.Hiddens {
+		for _, h := range hb.Cells() {
+			for _, a := range h.Axons {
+				dst[idx] = a.Weight
+				idx++
+			}
 		}
 	}
 	for _, o := range n.Network.Output.Cells() {
@@ -145,10 +147,12 @@ func (n *NN[T]) snapshotWeights(dst []T) []T {
 // the same topology — Fit owns this invariant.
 func (n *NN[T]) restoreWeights(src []T) {
 	idx := 0
-	for _, h := range n.Network.Hidden.Cells() {
-		for i := range h.Axons {
-			h.Axons[i].Weight = src[idx]
-			idx++
+	for _, hb := range n.Network.Hiddens {
+		for _, h := range hb.Cells() {
+			for i := range h.Axons {
+				h.Axons[i].Weight = src[idx]
+				idx++
+			}
 		}
 	}
 	for _, o := range n.Network.Output.Cells() {
@@ -163,8 +167,10 @@ func (n *NN[T]) restoreWeights(src []T) {
 // output axons. Used to size the snapshot buffer.
 func (n *NN[T]) weightCount() int {
 	count := 0
-	for _, h := range n.Network.Hidden.Cells() {
-		count += len(h.Axons)
+	for _, hb := range n.Network.Hiddens {
+		for _, h := range hb.Cells() {
+			count += len(h.Axons)
+		}
 	}
 	for _, o := range n.Network.Output.Cells() {
 		count += len(o.Axons)

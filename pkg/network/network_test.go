@@ -16,7 +16,27 @@ func newTrainable[T utils.Float](inSize, hiddenSize, outSize int, withBias bool)
 	hidden := layer.NewDense[T](hiddenSize, activation.SIGMOID, withBias)
 	out := layer.NewOutput[T](outSize, activation.SIGMOID, loss.MSE, withBias)
 	n := New[T]()
-	if err := n.SetLayers(in, hidden, out); err != nil {
+	if err := n.SetLayers(in, []*layer.Dense[T]{hidden}, out); err != nil {
+		return nil, err
+	}
+	if err := n.Build(); err != nil {
+		return nil, err
+	}
+	return &n, nil
+}
+
+// newTrainableChain wires a multi-hidden chain with uniform sigmoid
+// activations and the same bias setting on every layer. Used by Phase 5
+// Track A regression tests for two- and three-hidden topologies.
+func newTrainableChain[T utils.Float](inSize int, hiddenSizes []int, outSize int, withBias bool) (*Network[T], error) {
+	in := layer.NewInput[T](inSize)
+	hiddens := make([]*layer.Dense[T], len(hiddenSizes))
+	for i, sz := range hiddenSizes {
+		hiddens[i] = layer.NewDense[T](sz, activation.SIGMOID, withBias)
+	}
+	out := layer.NewOutput[T](outSize, activation.SIGMOID, loss.MSE, withBias)
+	n := New[T]()
+	if err := n.SetLayers(in, hiddens, out); err != nil {
 		return nil, err
 	}
 	if err := n.Build(); err != nil {
@@ -48,9 +68,31 @@ func TestSetLayersRejectsZeroSize(t *testing.T) {
 	hidden := layer.NewDense[float64](2, activation.SIGMOID, false)
 	out := layer.NewOutput[float64](1, activation.SIGMOID, loss.MSE, false)
 	n := New[float64]()
-	err := n.SetLayers(in, hidden, out)
+	err := n.SetLayers(in, []*layer.Dense[float64]{hidden}, out)
 	if !errors.Is(err, utils.ErrUserConfig) {
 		t.Errorf("expected ErrUserConfig, got %v", err)
+	}
+}
+
+func TestSetLayersRejectsEmptyHiddens(t *testing.T) {
+	t.Parallel()
+	in := layer.NewInput[float64](2)
+	out := layer.NewOutput[float64](1, activation.SIGMOID, loss.MSE, false)
+	n := New[float64]()
+	err := n.SetLayers(in, nil, out)
+	if !errors.Is(err, utils.ErrUserConfig) {
+		t.Errorf("expected ErrUserConfig for empty hiddens, got %v", err)
+	}
+}
+
+func TestSetLayersRejectsNilHiddenEntry(t *testing.T) {
+	t.Parallel()
+	in := layer.NewInput[float64](2)
+	out := layer.NewOutput[float64](1, activation.SIGMOID, loss.MSE, false)
+	n := New[float64]()
+	err := n.SetLayers(in, []*layer.Dense[float64]{nil}, out)
+	if !errors.Is(err, utils.ErrUserConfig) {
+		t.Errorf("expected ErrUserConfig for nil hiddens entry, got %v", err)
 	}
 }
 
@@ -69,7 +111,7 @@ func TestBuildWiresAxons(t *testing.T) {
 	if err != nil {
 		t.Fatalf("setup: %v", err)
 	}
-	for i, h := range n.Hidden.Cells() {
+	for i, h := range n.Hiddens[0].Cells() {
 		// 2 inputs + 1 bias = 3 axons per hidden cell
 		if got := len(h.Axons); got != 3 {
 			t.Errorf("hidden[%d] axons = %d; want 3", i, got)
@@ -202,10 +244,10 @@ func TestCalculateLossDefaultUsesConfiguredMode(t *testing.T) {
 func TestBundleAddAt(t *testing.T) {
 	t.Parallel()
 	n, _ := newTrainable[float64](2, 2, 1, false)
-	if got := n.Hidden.Len(); got != 2 {
-		t.Errorf("Hidden.Len = %d; want 2", got)
+	if got := n.Hiddens[0].Len(); got != 2 {
+		t.Errorf("Hiddens[0].Len = %d; want 2", got)
 	}
-	if n.Hidden.At(0) == nil {
-		t.Errorf("Hidden.At(0) returned nil")
+	if n.Hiddens[0].At(0) == nil {
+		t.Errorf("Hiddens[0].At(0) returned nil")
 	}
 }

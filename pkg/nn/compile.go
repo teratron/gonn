@@ -28,14 +28,14 @@ func compile[T utils.Float](n *NN[T], cfg *Config[T]) error {
 	emitSoftWarnings(cfg)
 
 	in := layer.NewInput[T](int(cfg.InputSize))
-	// MVP: exactly one hidden layer required (validation enforces this).
-	// Multi-hidden support is planned for v0.2 once pkg/network grows a
-	// chain of Hidden bundles.
+	// Track A wraps the v0.1 single-hidden path into the new variadic
+	// SetLayers slice. Track B (T-5B01) lifts the validate() guard so
+	// callers can supply more than one hidden layer.
 	hSpec := cfg.HiddenLayers[0]
-	hidden := layer.NewDense[T](int(hSpec.Size), hSpec.Activation, hSpec.Bias)
+	hiddens := []*layer.Dense[T]{layer.NewDense[T](int(hSpec.Size), hSpec.Activation, hSpec.Bias)}
 	out := layer.NewOutput[T](int(cfg.OutputSize), cfg.OutputActivation, cfg.LossType, cfg.OutputBias)
 
-	if err := n.SetLayers(in, hidden, out); err != nil {
+	if err := n.SetLayers(in, hiddens, out); err != nil {
 		return utils.Wrap(utils.ErrUserConfig, err, "compile: SetLayers failed")
 	}
 	if err := n.Build(); err != nil {

@@ -5,15 +5,15 @@
 
 **Workspace:** main
 **Project Version:** 0.1.1
-**Updated:** 2026-05-03
-**Phase:** 5 — Multi-Hidden Topology (v0.2) (Active — decomposed, ready for /magic.run)
+**Updated:** 2026-05-03 17:48
+**Phase:** 5 — Multi-Hidden Topology (v0.2) (Active — Track A green; Track B next)
 **Status:** Active
 
 ## Current Position
 
-- **Task:** T-5A01 (Pending) — Phase 5 Track A first task (Network[T] storage generalisation).
-- **Spec:** l2-multihidden-impl promoted Draft → Stable v1.0.0; INDEX.md 2.2.0 → 2.3.0; PLAN.md 1.6.0 → 1.7.0; TASKS.md 1.6.0 → 1.7.0; phase-5.md decomposed (19 tasks + 4 gate checks).
-- **Next Action:** Run `/magic.run` to execute Phase 5. Track ordering: A serial first (storage + propagation chain in pkg/network), then B serial (pkg/nn compile() lift), then C and D parallel (persistence schema bump + 6 catalog examples), Gate T-5Z01..T-5Z04 closes phase.
+- **Task:** T-5A07 Done — Track A complete (T-5A01..A07).
+- **Spec:** l2-multihidden-impl Stable v1.0.0; INDEX.md 2.3.0; PLAN.md 1.7.0; TASKS.md 1.7.0; phase-5.md Track A all `[x]`.
+- **Next Action:** Track B — `pkg/nn.compile()` gate lift (T-5B01..T-5B03). Then Tracks C + D parallel; Gate T-5Z closes the phase.
 
 ## Progress
 
@@ -22,12 +22,13 @@ Phase 1 (Done):   [22/22]  ████████ 100%
 Phase 2 (Done):   [26/26]  ████████ 100%
 Phase 3 (Done):   [19/19]  ████████ 100%
 Phase 4 (Done):   [14/14]  ████████ 100%
-Phase 5 (Active): [0/23]   ░░░░░░░░  ~0%   (19 feature + 4 gate)
-Overall:          [81/104] ████████░ ~78%   v0.1 closed; v0.2 in flight
+Phase 5 (Active): [7/23]   ██░░░░░░  ~30%   (Track A complete; B/C/D pending)
+Overall:          [88/104] █████████ ~85%   v0.1 closed; v0.2 in flight
 ```
 
 ## Recent Decisions
 
+- 2026-05-03 **Decision:** Track A landed. `pkg/network.Network[T]` storage now slice-shaped (`Hiddens []bundle`, `hiddenBiases`, `hiddenActs`, `preactHiddens` parallel to it); `SetLayers` accepts `[]*layer.Dense[T]`; Build/CalculateValues/CalculateMisses/CalculateWeights walk the chain per [l2-multihidden-impl] §5.3 / §5.6. Spec §5.6 derivative folding (δ stored on miss inside CalculateMisses, plain rate in CalculateWeights) supersedes the v0.1 raw-residual + derivative-in-update arrangement; XOR single-hidden regression still converges. New `propagation_test.go` covers chain wiring (table test), forward + backward goldens (Linear 2-hidden, 3-hidden), and Sigmoid 2-hidden XOR convergence. Coverage 95.8 %, race-clean. Downstream callers (`pkg/nn.compile`, `pkg/nn/train.go` snapshot/restore/weightCount, `pkg/nn/nn_test.go`, `examples/persistence`) migrated to slice-form access. All `pkg/...` tests + 7 v0.1 example modules green under `-race`.
 - 2026-05-03 **Decision:** Phase 5 activated and decomposed via /magic.task update. l2-multihidden-impl promoted Draft → Stable v1.0.0 (Trust Mode — MVC + Implements Stable + only scoped TBDs). 19 atomic tasks across Tracks A–D + 4 gate checks. Track A → B serial (storage generalisation must precede compile() lift); C and D parallel after B. Six v0.2 catalog entries (E03/E04/E05/E07/E08/E13) promoted from Phase 4 backlog into Phase 5. E06 (MNIST loader) and E10 (AndTrain) stay deferred. INDEX.md 2.2.0 → 2.3.0; PLAN.md 1.6.0 → 1.7.0; TASKS.md 1.6.0 → 1.7.0.
 - 2026-05-03 **Decision:** New v0.2 anchor spec `l2-multihidden-impl` Draft v0.1.0 authored via /magic.spec Proactive Architect mode. Captures three coordinated deltas — `pkg/network.Network[T]` storage chain, `pkg/nn.compile()` gate lift, `pkg/persistence` weights schema 1.0.0 → 1.1.0. INDEX.md 2.1.0 → 2.2.0.
 - 2026-05-02 **Decision:** Phase 4 closed via /magic.run. 7 example modules build, test, race-clean. Coverage matrix audit at examples/README.md flags 6 v0.2-gated API surfaces. Phase Gate T-4Z01..T-4Z04 green. v0.1 release-ready bar reached. Established conventions: per-example go.mod with replace directive; `runX()` helpers extracted from `main()` for smoke tests; pkg/nn ↔ pkg/persistence seam documented in E09.
@@ -38,11 +39,11 @@ Overall:          [81/104] ████████░ ~78%   v0.1 closed; v0.2 
 
 ## Blockers
 
-- (none — Phase 5 ready for /magic.run)
+- (none — Track A complete; Track B unblocked)
 
 ## Blocking Constraints
 
-- **Track A is the cascade gate**: T-5A01..A07 must land cleanly before B/C/D can proceed. Risk surfaced in phase-5.md `@role:planning-skeptic` audit; mitigated by writing the multi-hidden propagation tests (T-5A07) alongside the storage change.
+- **Track A cascade gate cleared**: T-5A01..A07 all landed; multi-hidden chain proven by table-driven golden math + Sigmoid XOR convergence. B/C/D unblocked.
 - **Persistence forward-compat**: SchemaVersion 1.0.0 → 1.1.0 is minor — v0.1 readers loading v0.2 files emit a warning per PERS-1, not a hard error. T-5C02 covers the regression load.
 - (race detector via PowerShell only — pre-existing TestPauseResumeCycle flake on `pkg/nn` reproduces on `develop` and is unrelated; non-blocking)
 
