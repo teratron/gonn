@@ -7,7 +7,7 @@
 // into it, and asserts the post-reload Query output matches the original
 // within float-32 tolerance (PERS-4).
 //
-// The example also documents the v0.1 conversion seam — pkg/nn does not
+// The example also documents the v0.5 conversion seam — pkg/nn does not
 // yet expose dump / load hooks, so the bundle accessors on
 // network.Network[T] are walked manually. Future versions of the facade
 // are expected to fold this glue into nn.Save / nn.Load.
@@ -184,8 +184,8 @@ func buildConfigDoc() persistence.ConfigDoc[float32] {
 // Hidden cells have len(Input)+1 axons (last one is bias); output cells
 // have len(Hidden)+1 axons (last one is bias).
 //
-// Track C (Phase 5 v0.2) generalises this helper to walk every entry in
-// n.Network.Hiddens; for v0.1 single-hidden examples we still emit one
+// Track C (Phase 5 v0.6) generalises this helper to walk every entry in
+// n.Network.Hiddens; for v0.5 single-hidden examples we still emit one
 // "hidden_0" layer plus output.
 func extractWeights(n *nn.NN[float32]) persistence.WeightsDoc[float32] {
 	hiddenCells := n.Network.Hiddens[0].Cells()

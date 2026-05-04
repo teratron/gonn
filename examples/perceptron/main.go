@@ -1,12 +1,12 @@
-// Example E03 — Perceptron (legacy continuity, v0.1 stub).
+// Example E03 — Perceptron (legacy continuity, v0.5 stub).
 //
 // The original spec calls for a 4-hidden-layer topology
-// (3 → Sigmoid(5) → ReLU(10) → Sigmoid(5) → SoftMax(2)). v0.1 compile()
+// (3 → Sigmoid(5) → ReLU(10) → Sigmoid(5) → SoftMax(2)). v0.5 compile()
 // rejects len(HiddenLayers) > 1, so this file currently runs a single
 // hidden layer to keep `go build ./examples/...` green; the original
-// architecture lands once the v0.2 multi-hidden patch lifts the gate.
+// architecture lands once the v0.6 multi-hidden patch lifts the gate.
 //
-// // removed once v0.2 lands
+// // removed once v0.6 lands
 package main
 
 import (

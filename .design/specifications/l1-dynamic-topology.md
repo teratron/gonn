@@ -167,7 +167,7 @@ graph TD
 - <!-- TBD: gradient continuity across mutation — should optimizer state for unchanged weights persist? Likely yes for neuron add; reset recommended after layer add/remove -->
 - <!-- TBD: what happens to in-flight epoch counter / loss history after mutation? Propose: epoch counter resets to 0, loss history is preserved with a mutation marker -->
 - <!-- TBD: serialization format extension for `Dynamic` snapshots — include mutation log for replay -->
-- <!-- TBD: should RemoveNeuron support index-based removal instead of LIFO? Deferred to v0.3.0 -->
+- <!-- TBD: should RemoveNeuron support index-based removal instead of LIFO? Deferred to v0.7.0 -->
 - <!-- TBD: maximum depth / maximum neurons-per-layer guard to prevent runaway growth -->
 
 ## 6. Implementation Notes

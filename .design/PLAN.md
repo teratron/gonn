@@ -1,7 +1,7 @@
 # Implementation Plan
 
 **Version:** 1.7.0
-**Project Version:** 0.1.1 (v0.1 released; v0.2 active under Phase 5)
+**Project Version:** 0.1.1 (v0.5 released; v0.6 active under Phase 5)
 **Generated:** 2026-04-29
 **Last Updated:** 2026-05-03
 **Based on:** .design/INDEX.md v2.3.0
@@ -44,7 +44,7 @@ GoNN library implementation plan derived from `ROADMAP.md` Hybrid Path. Phase or
 **Subsystem:** `pkg/nn`
 **Requires:** Phase 1 ✓
 **Tasks file:** [tasks/phase-2.md](tasks/phase-2.md)
-**Outcome:** Builder + Functional Options dual-style fluent API converging on `compile()`. XOR converges via the public facade. Pause/Resume/Stop race-clean under `-race`. Single-hidden v0.1 limitation logged for v0.2 multi-hidden patch.
+**Outcome:** Builder + Functional Options dual-style fluent API converging on `compile()`. XOR converges via the public facade. Pause/Resume/Stop race-clean under `-race`. Single-hidden v0.5 limitation logged for v0.6 multi-hidden patch.
 
 - [x] **NN Public Facade** ([l2-nn-facade.md](specifications/l2-nn-facade.md)) [L2, Stable v2.0.0]
 - [x] **Training Loop Implementation** ([l2-training-loop.md](specifications/l2-training-loop.md)) [L2, Stable v1.0.0]
@@ -65,27 +65,27 @@ GoNN library implementation plan derived from `ROADMAP.md` Hybrid Path. Phase or
 - [x] **[D] CPU Compute Backend** ([l2-backend-cpu.md](specifications/l2-backend-cpu.md)) [L2, Stable v1.0.0] — `pkg/compute/cpu/` reference path, COMP-1..4
 - [x] **[E] Performance Harness** ([l2-perf-impl.md](specifications/l2-perf-impl.md)) [L2, Stable v1.0.0] — sync.Pool + benchmarks, PERF-1..5
 
-## Phase 5 — Multi-Hidden Topology (v0.2)
+## Phase 5 — Multi-Hidden Topology (v0.6)
 
-*Lifts the v0.1 single-hidden constraint baked into `pkg/nn.compile()`. Active since 2026-05-03. Unblocks 6 of 8 deferred Phase 4 entries; E06 (MNIST loader) and E10 (AndTrain) remain backlog.*
+*Lifts the v0.5 single-hidden constraint baked into `pkg/nn.compile()`. Active since 2026-05-03. Unblocks 6 of 8 deferred Phase 4 entries; E06 (MNIST loader) and E10 (AndTrain) remain backlog.*
 
 **Subsystem:** `pkg/network`, `pkg/nn`, `pkg/persistence`, `examples/`
 **Requires:** Phase 1 + 2 + 3 + 4 ✓
 **Tasks file:** [tasks/phase-5.md](tasks/phase-5.md)
 **Track order:** A → B (serial); C, D parallel after B; Gate T-5Z. 23 atomic tasks (19 feature + 4 gate).
 
-- [ ] **Multi-Hidden Topology** ([l2-multihidden-impl.md](specifications/l2-multihidden-impl.md)) [L2, Stable v1.0.0] — `pkg/network` slice generalisation, `pkg/nn` compile() gate lift, weights schema 1.0.0 → 1.1.0, six v0.2 catalog examples (E03, E04, E05, E07, E08, E13).
+- [ ] **Multi-Hidden Topology** ([l2-multihidden-impl.md](specifications/l2-multihidden-impl.md)) [L2, Stable v1.0.0] — `pkg/network` slice generalisation, `pkg/nn` compile() gate lift, weights schema 1.0.0 → 1.1.0, six v0.6 catalog examples (E03, E04, E05, E07, E08, E13).
 
 ## Phase 4 — Examples Catalog (Track D) ✓ Done
 
-*Smoke-test catalog validating every track end-to-end. Closed 2026-05-02. v0.1 scope is 7 single-hidden examples + smoke-test pattern + coverage audit. The 8 multi-hidden / AndTrain / MNIST entries stay in the spec but defer to v0.2.*
+*Smoke-test catalog validating every track end-to-end. Closed 2026-05-02. v0.5 scope is 7 single-hidden examples + smoke-test pattern + coverage audit. The 8 multi-hidden / AndTrain / MNIST entries stay in the spec but defer to v0.6.*
 
 **Subsystem:** `examples/`
 **Requires:** Phase 2 + Phase 3 complete ✓
 **Tasks file:** [tasks/phase-4.md](tasks/phase-4.md)
-**Outcome:** 10 feature tasks + 4 gate checks executed. All seven new example modules build, test, and race-clean. Coverage matrix audit at the bottom of `examples/README.md` flags 6 v0.2-gated API surfaces (`Sequential`, `DeepNetwork`, `PresetMNIST`, `PresetRegression`, `Verify`, `AndTrain`).
+**Outcome:** 10 feature tasks + 4 gate checks executed. All seven new example modules build, test, and race-clean. Coverage matrix audit at the bottom of `examples/README.md` flags 6 v0.6-gated API surfaces (`Sequential`, `DeepNetwork`, `PresetMNIST`, `PresetRegression`, `Verify`, `AndTrain`).
 
-- [x] **Usage Examples Catalog (v0.1 scope: 7 entries)** ([l2-usage-examples.md](specifications/l2-usage-examples.md)) [L2, Stable v1.0.0] — E01, E02, E09, E11, E12, E14 (adapted), E15
+- [x] **Usage Examples Catalog (v0.5 scope: 7 entries)** ([l2-usage-examples.md](specifications/l2-usage-examples.md)) [L2, Stable v1.0.0] — E01, E02, E09, E11, E12, E14 (adapted), E15
 
 ## Backlog
 
@@ -93,8 +93,8 @@ GoNN library implementation plan derived from `ROADMAP.md` Hybrid Path. Phase or
 
 ### L1 Concept (deferred — future phases)
 
-- [l1-dynamic-topology.md](specifications/l1-dynamic-topology.md) — Draft v0.2.0 (layer lifecycle + neuron mutation design; 5 open TBDs in §5.5; parent Stable)
-- [l1-meta-learning-hooks.md](specifications/l1-meta-learning-hooks.md) — Draft v0.2.0 (universal ParamAccessor + MetaConfig; 9 param categories; 8 open TBDs in §5.6; no L2 spec yet)
+- [l1-dynamic-topology.md](specifications/l1-dynamic-topology.md) — Draft v0.6.0 (layer lifecycle + neuron mutation design; 5 open TBDs in §5.5; parent Stable)
+- [l1-meta-learning-hooks.md](specifications/l1-meta-learning-hooks.md) — Draft v0.6.0 (universal ParamAccessor + MetaConfig; 9 param categories; 8 open TBDs in §5.6; no L2 spec yet)
 
 ### L1 Concept (tracked — promoted to Stable 2026-05-01, parents of active Phase 3 specs)
 
@@ -110,13 +110,13 @@ GoNN library implementation plan derived from `ROADMAP.md` Hybrid Path. Phase or
 
 ### L2 Implementation (deferred — post-MVP)
 
-- [l2-cli-client.md](specifications/l2-cli-client.md) — RFC v0.1.0 (CLI binary, post-MVP)
-- [l2-visualization-api.md](specifications/l2-visualization-api.md) — Draft v0.1.0
-- [l2-logging-strategy.md](specifications/l2-logging-strategy.md) — Draft v0.1.0 (`pkg/utils/logger.go` baseline sufficient for Phase 3)
+- [l2-cli-client.md](specifications/l2-cli-client.md) — RFC v0.5.0 (CLI binary, post-MVP)
+- [l2-visualization-api.md](specifications/l2-visualization-api.md) — Draft v0.5.0
+- [l2-logging-strategy.md](specifications/l2-logging-strategy.md) — Draft v0.5.0 (`pkg/utils/logger.go` baseline sufficient for Phase 3)
 
 ### Phase 4 → Phase 5 promotion (multi-hidden)
 
-Six of the eight original v0.2-gated catalog entries (E03, E04, E05, E07, E08, E13) move from backlog into active Phase 5 work. E06 (MNIST preset — needs dataset-loader spec) and E10 (continuation — needs `AndTrain` API surface) stay deferred until their respective spec authoring lands.
+Six of the eight original v0.6-gated catalog entries (E03, E04, E05, E07, E08, E13) move from backlog into active Phase 5 work. E06 (MNIST preset — needs dataset-loader spec) and E10 (continuation — needs `AndTrain` API surface) stay deferred until their respective spec authoring lands.
 
 ## Build Order Diagram
 
@@ -137,6 +137,6 @@ graph LR
 | 1.2.0 | 2026-04-30 | Phase 2 marked Done. l2-nn-facade promoted RFC → Stable v2.0.0; l2-training-loop + l2-control-impl promoted Draft → Stable v1.0.0. Phase 3 unblock pending L1 parent promotion via magic.spec; Phase 4 still waits Phase 3. |
 | 1.3.0 | 2026-05-01 | Phase 3 unblocked and decomposed. Batch Stabilization (magic.spec) promoted 9 L1 RFC + 5 L2 Draft → Stable. Phase 3 split into Tracks A–E with 15 atomic tasks + 4 gate checks. Backlog cleaned. Based on INDEX.md v2.0.0. |
 | 1.4.0 | 2026-05-01 | Phase 3 marked Done. Tracks A–E closed; Phase Gate T-3Z01..T-3Z04 green. New packages: `pkg/persistence`, `pkg/checkpoint`, `pkg/dataset`, `pkg/compute` (+`cpu`), perf hooks in `pkg/network`/`pkg/nn`. All ≥80 % coverage, race-clean. Phase 4 unblocked. |
-| 1.5.0 | 2026-05-02 | Phase 4 activated and decomposed. l2-usage-examples promoted RFC → Stable v1.0.0 (E09 ungated). 14 atomic tasks across Tracks A–E + 4 gate checks scoped to v0.1's single-hidden constraint. 8 multi-hidden / AndTrain / MNIST entries split out as v0.2 backlog. Based on INDEX.md v2.1.0. |
-| 1.6.0 | 2026-05-02 | Phase 4 marked Done. All 7 example modules (xor, style_showcase, logic_gates, callbacks, persistence, shared_options, precision) build, test, and race-clean. Phase Gate T-4Z01..T-4Z04 green. v0.1 release-ready bar reached; v0.2 backlog (multi-hidden + AndTrain + MNIST loader) ready for next planning cycle. |
-| 1.7.0 | 2026-05-03 | Phase 5 activated and decomposed. l2-multihidden-impl promoted Draft → Stable v1.0.0. 19 atomic tasks across Tracks A–D + 4 gate checks. Track A → B serial; C, D parallel after B. v0.2 catalog promotion: E03/E04/E05/E07/E08/E13 (six of eight backlog entries) move into Phase 5; E06 + E10 stay deferred. Based on INDEX.md v2.3.0. |
+| 1.5.0 | 2026-05-02 | Phase 4 activated and decomposed. l2-usage-examples promoted RFC → Stable v1.0.0 (E09 ungated). 14 atomic tasks across Tracks A–E + 4 gate checks scoped to v0.5's single-hidden constraint. 8 multi-hidden / AndTrain / MNIST entries split out as v0.6 backlog. Based on INDEX.md v2.1.0. |
+| 1.6.0 | 2026-05-02 | Phase 4 marked Done. All 7 example modules (xor, style_showcase, logic_gates, callbacks, persistence, shared_options, precision) build, test, and race-clean. Phase Gate T-4Z01..T-4Z04 green. v0.5 release-ready bar reached; v0.6 backlog (multi-hidden + AndTrain + MNIST loader) ready for next planning cycle. |
+| 1.7.0 | 2026-05-03 | Phase 5 activated and decomposed. l2-multihidden-impl promoted Draft → Stable v1.0.0. 19 atomic tasks across Tracks A–D + 4 gate checks. Track A → B serial; C, D parallel after B. v0.6 catalog promotion: E03/E04/E05/E07/E08/E13 (six of eight backlog entries) move into Phase 5; E06 + E10 stay deferred. Based on INDEX.md v2.3.0. |

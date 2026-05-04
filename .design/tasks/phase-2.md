@@ -4,42 +4,43 @@ name: "Public Facade Restoration (Track B)"
 status: Done
 subsystem: "pkg/nn"
 requires:
-  - "phase-1: pkg/utils, pkg/neuron, pkg/layer, pkg/network"
+
+- "phase-1: pkg/utils, pkg/neuron, pkg/layer, pkg/network"
 provides:
-  - "pkg/nn — public NN[T] facade with dual-style fluent API (Builder + Functional Options)"
-  - "pkg/nn — Compile()/MustCompile() validation per l2-nn-facade §5.7"
-  - "pkg/nn — Train/Fit/Query/Verify surface with min-loss snapshot/rollback"
-  - "pkg/nn — Pause/Resume/Stop atomic lifecycle control with race-clean concurrency"
-  - "pkg/nn — PresetXOR working preset; PresetMNIST/Regression surface (multi-hidden v0.2)"
+- "pkg/nn — public NN[T] facade with dual-style fluent API (Builder + Functional Options)"
+- "pkg/nn — Compile()/MustCompile() validation per l2-nn-facade §5.7"
+- "pkg/nn — Train/Fit/Query/Verify surface with min-loss snapshot/rollback"
+- "pkg/nn — Pause/Resume/Stop atomic lifecycle control with race-clean concurrency"
+- "pkg/nn — PresetXOR working preset; PresetMNIST/Regression surface (multi-hidden v0.6)"
 key_files:
   created:
-    - pkg/nn/compile.go
-    - pkg/nn/options.go
-    - pkg/nn/presets.go
-    - pkg/nn/control.go
-    - pkg/nn/nn_test.go
+  - pkg/nn/compile.go
+  - pkg/nn/options.go
+  - pkg/nn/presets.go
+  - pkg/nn/control.go
+  - pkg/nn/nn_test.go
   modified:
-    - pkg/nn/config.go
-    - pkg/nn/nn.go
-    - pkg/nn/builder.go
-    - pkg/nn/query.go
-    - pkg/nn/verify.go
-    - pkg/nn/train.go
-    - examples/perceptron/main.go
-    - .design/specifications/l2-nn-facade.md
-    - .design/specifications/l2-training-loop.md
-    - .design/specifications/l2-control-impl.md
-    - .design/INDEX.md
-    - .design/PLAN.md
+  - pkg/nn/config.go
+  - pkg/nn/nn.go
+  - pkg/nn/builder.go
+  - pkg/nn/query.go
+  - pkg/nn/verify.go
+  - pkg/nn/train.go
+  - examples/perceptron/main.go
+  - .design/specifications/l2-nn-facade.md
+  - .design/specifications/l2-training-loop.md
+  - .design/specifications/l2-control-impl.md
+  - .design/INDEX.md
+  - .design/PLAN.md
 patterns_established:
-  - "Dual fluent API converging on internal Config[T] via shared compile() — no duplicated logic between Builder and Options styles"
-  - "State-machine guard via guardConfiguring(method): post-Compile mutations are Logger.Warn no-ops, never panics (preserves INV-2 immutable topology)"
-  - "Validation as a single switch ladder per §5.7 with C32-compliant specific messages and ErrUserConfig wrapping"
-  - "WeightInitMethod as string constants for self-describing JSON persistence (l1-network-persistence forward-extension hook)"
-  - "Min-loss snapshot via flat []T buffer reused across epochs — zero per-epoch GC churn over long training runs"
-  - "4-state atomic control machine (Idle/Running/Paused/Stopped) collapsing l2-control-impl 6-state design — intermediate Pausing/Stopping observable only inside CAS, never to external observers"
-  - "TOCTOU-safe transitionToRunning via CompareAndSwap(Idle, Running) — preserves a Stop issued before Fit reaches its loop"
-  - "Field-shadowing convention: NN[T] embeds Network[T] but adds Builder methods Input/Dense/Output that shadow the field accessors; internal code uses n.Network.X qualified path"
+- "Dual fluent API converging on internal Config[T] via shared compile() — no duplicated logic between Builder and Options styles"
+- "State-machine guard via guardConfiguring(method): post-Compile mutations are Logger.Warn no-ops, never panics (preserves INV-2 immutable topology)"
+- "Validation as a single switch ladder per §5.7 with C32-compliant specific messages and ErrUserConfig wrapping"
+- "WeightInitMethod as string constants for self-describing JSON persistence (l1-network-persistence forward-extension hook)"
+- "Min-loss snapshot via flat []T buffer reused across epochs — zero per-epoch GC churn over long training runs"
+- "4-state atomic control machine (Idle/Running/Paused/Stopped) collapsing l2-control-impl 6-state design — intermediate Pausing/Stopping observable only inside CAS, never to external observers"
+- "TOCTOU-safe transitionToRunning via CompareAndSwap(Idle, Running) — preserves a Stop issued before Fit reaches its loop"
+- "Field-shadowing convention: NN[T] embeds Network[T] but adds Builder methods Input/Dense/Output that shadow the field accessors; internal code uses n.Network.X qualified path"
 duration_minutes: ~
 
 # Phase 2 Tasks — Public Facade Restoration (Track B)

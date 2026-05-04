@@ -43,8 +43,8 @@ plan for existing codebase usage.
 ### 5.1 Sentinel Definitions
 
 The taxonomy is **orthogonal**: every domain owned by a Phase-1/2/3 spec maps to exactly one
-category. `ErrTrainingFailure` from v0.2.0 is dissolved (NaN/divergence → `ErrCompute`,
-state-machine misuse → `ErrControl`); `ErrUnsupported` from v0.2.0 is dissolved into
+category. `ErrTrainingFailure` from v0.6.0 is dissolved (NaN/divergence → `ErrCompute`,
+state-machine misuse → `ErrControl`); `ErrUnsupported` from v0.6.0 is dissolved into
 `ErrUserConfig` (typo of method name) or `ErrCompute` (missing hardware feature).
 
 | Sentinel | Domain | Owning specs |

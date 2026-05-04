@@ -24,8 +24,8 @@ Locked after the 2026-04-28 code-state analysis of `pkg/` and `examples/`.
 
 | # | Path | Spec source | Status of source |
 | :--- | :--- | :--- | :--- |
-| A.1 | `pkg/utils/errors.go` (new) | `l2-errors-impl` | RFC v0.2.0 |
-| A.2 | `pkg/utils/init.go` (new) | `l2-init-impl` | RFC v0.2.0 |
+| A.1 | `pkg/utils/errors.go` (new) | `l2-errors-impl` | RFC v0.6.0 |
+| A.2 | `pkg/utils/init.go` (new) | `l2-init-impl` | RFC v0.6.0 |
 | A.3 | `pkg/neuron/cell/{core,input,bias,dense,output,hidden}.go` (rewrite + add `hidden.go`) | `l2-neuron-model` | Stable v1.1.0 |
 | A.4 | `pkg/neuron/axon/axon.go` (rewrite — restore `OutgoingCell`, modernize RNG to `math/rand/v2.PCG`) | `l2-neuron-model` | Stable v1.1.0 |
 | A.5 | `pkg/layer/{core,base,input,dense,output}.go` (rewrite — fix nil-deref constructors, dedupe `Init`) | `l2-layer-types` | Stable v1.1.0 |

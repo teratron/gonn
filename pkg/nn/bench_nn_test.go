@@ -62,7 +62,7 @@ func BenchmarkBackward_XOR_f32(b *testing.B) {
 }
 
 // BenchmarkCompile_DeepNetwork_f32 measures compile-time on the
-// 2 → 4 → 1 XOR topology. Multi-hidden topologies are deferred to v0.2;
+// 2 → 4 → 1 XOR topology. Multi-hidden topologies are deferred to v0.6;
 // when they land this benchmark grows accordingly.
 func BenchmarkCompile_DeepNetwork_f32(b *testing.B) {
 	b.ReportAllocs()

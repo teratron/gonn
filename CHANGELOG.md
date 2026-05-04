@@ -8,16 +8,16 @@ release artifacts dictated by [.magic/run.md](.magic/run.md) Phase Completion / 
 
 ### Phase 4 — 2026-05-02
 
-v0.1 examples catalog. Seven new example modules covering the
-v0.1-implementable subset of `l2-usage-examples` Stable v1.0.0; the
+v0.5 examples catalog. Seven new example modules covering the
+v0.5-implementable subset of `l2-usage-examples` Stable v1.0.0; the
 remaining eight entries (multi-hidden / `AndTrain` / MNIST loader)
-defer to v0.2. Phase Gate T-4Z01..T-4Z04 closed; v0.1 release-ready
+defer to v0.6. Phase Gate T-4Z01..T-4Z04 closed; v0.5 release-ready
 bar reached.
 
 #### Added
 
 - `examples/xor/` (E01) — dual-style XOR (Builder + Functional Options).
-  Establishes the Phase 4 v0.1 smoke-test pattern: `runX()` helpers
+  Establishes the Phase 4 v0.5 smoke-test pattern: `runX()` helpers
   callable from both `main()` and `main_test.go` with loose loss
   thresholds to absorb seed-driven init drift.
 - `examples/style_showcase/` (E12) — same XOR network built three ways
@@ -29,23 +29,23 @@ bar reached.
 - `examples/persistence/` (E09) — train, extract weights via bundle
   accessors, write `pkg/persistence` config + weights, reload into a
   freshly compiled network, assert post-reload Query matches original
-  within `cpu.ToleranceF32` (PERS-4). Documents the v0.1 conversion
+  within `cpu.ToleranceF32` (PERS-4). Documents the v0.5 conversion
   seam future `nn.Save` / `nn.Load` hooks will close.
-- `examples/shared_options/` (E14, v0.1 adapted) — shared `[]Option[T]`
+- `examples/shared_options/` (E14, v0.5 adapted) — shared `[]Option[T]`
   across two single-hidden topologies (ReLU(8) vs ReLU(16)). Spec
-  Topology B's two-hidden variant is gated until v0.2.
+  Topology B's two-hidden variant is gated until v0.6.
 - `examples/precision/` (E15) — XOR at `float32` and `float64` with
   identical hyperparameters; reports per-precision loss + elapsed time.
 - `examples/README.md` — catalog index and coverage matrix audit
-  flagging six v0.2-gated API surfaces (`Sequential`, `DeepNetwork`,
+  flagging six v0.6-gated API surfaces (`Sequential`, `DeepNetwork`,
   `PresetMNIST`, `PresetRegression`, `Verify`, `AndTrain`).
 
 #### Changed
 
 - `go.work` — registered seven new example modules.
-- `examples/perceptron/main.go` — added `// removed once v0.2 lands`
+- `examples/perceptron/main.go` — added `// removed once v0.6 lands`
   doc-comment documenting the temporary single-hidden stub state. The
-  legacy four-hidden topology returns when E03 is unblocked by v0.2.
+  legacy four-hidden topology returns when E03 is unblocked by v0.6.
 
 #### Phase Gate
 
@@ -55,8 +55,8 @@ bar reached.
   loss thresholds; no public RNG seed yet).
 - T-4Z03 `go test -race` — race-clean across all seven examples (run
   via PowerShell per existing 2026-04-29 / 2026-05-01 STATE.md note).
-- T-4Z04 STATE.md updated; PLAN.md Phase 4 → ✓ Done; v0.1 release-ready
-  bar reached; v0.2 backlog (multi-hidden + `AndTrain` + MNIST loader)
+- T-4Z04 STATE.md updated; PLAN.md Phase 4 → ✓ Done; v0.5 release-ready
+  bar reached; v0.6 backlog (multi-hidden + `AndTrain` + MNIST loader)
   ready for next planning cycle.
 
 ### Phase 3 — 2026-05-01
@@ -144,7 +144,7 @@ half of blocker C-001 (Tracks B/D still pending). Specs `l2-errors-impl` and
 
 - `.design/specifications/l2-errors-impl.md` — bumped 0.2.0 → 0.3.0;
   sentinel set finalized to 6 orthogonal categories. `ErrTrainingFailure`
-  and `ErrUnsupported` from v0.2.0 dissolved into `ErrCompute` /
+  and `ErrUnsupported` from v0.6.0 dissolved into `ErrCompute` /
   `ErrUserConfig` to avoid catch-all routing.
 - `.design/INDEX.md`, `.design/PLAN.md` — registry version aligned.
 - `.design/tasks/phase-1.md` — `[Bootstrap]` markers added to T-1A0x;
@@ -288,8 +288,8 @@ Promotes three specs to Stable.
 - `pkg/nn/compile.go` — shared finalisation routine consumed by both
   styles. Validates §5.7 hard-error rules with C32-compliant messages
   wrapping `utils.ErrUserConfig`; emits §5.7 soft warnings via
-  `Logger.Warn`. v0.1 rejects `len(HiddenLayers) > 1` with explicit
-  "v0.2 feature" note.
+  `Logger.Warn`. v0.5 rejects `len(HiddenLayers) > 1` with explicit
+  "v0.6 feature" note.
 - `pkg/nn/options.go` — Functional Options API: `Option[T]`, `New[T]`,
   `MustNew[T]`, topology + configuration mirrors of every Builder
   method.
@@ -297,7 +297,7 @@ Promotes three specs to Stable.
   `DeepNetwork`, `StandardSetup`; presets `PresetXOR`, `PresetMNIST`,
   `PresetRegression`. PresetXOR converges via the Phase-1 baseline;
   multi-hidden presets surface their config but error at Compile() in
-  v0.1.
+  v0.5.
 - `pkg/nn/query.go`, `verify.go` — forward-only inference and
   forward+loss-without-update.
 - `pkg/nn/train.go` — `Train(input, target)` (single-step) and
@@ -325,12 +325,12 @@ Promotes three specs to Stable.
   to `nn.NewBuilder()` + `WithLoss()` (v2). Output() no longer
   receives `loss.Type` (breaking change documented in §5.2).
 - `.design/specifications/l2-nn-facade.md` — RFC → Stable v2.0.0.
-  Document History row records the v0.1 single-hidden limitation and
-  the v0.2 multi-hidden plan.
+  Document History row records the v0.5 single-hidden limitation and
+  the v0.6 multi-hidden plan.
 - `.design/specifications/l2-training-loop.md` — Draft → Stable
   v1.0.0. Records the Train + Fit dual-method shape, flat snapshot
   buffer (vs §5.2 nested `WeightsBuffer`), and the `context.Context` /
-  NaN-loss detection deferred to v0.2.
+  NaN-loss detection deferred to v0.6.
 - `.design/specifications/l2-control-impl.md` — Draft → Stable v1.0.0.
   Records the 4-state collapse of §5.1's 6-state design, the TOCTOU
   CAS guard in `transitionToRunning`, and the deferred ctx /
@@ -347,7 +347,7 @@ Promotes three specs to Stable.
   `C:\msys64\mingw64\bin`).
 - Multi-hidden support, `context.Context` integration, NaN-loss
   detection, and the buffered-channel control bus are all explicitly
-  deferred to v0.2 with spec annotations and `Compile()`-time errors
+  deferred to v0.6 with spec annotations and `Compile()`-time errors
   pointing the user at the limitation.
 
 #### Fixes

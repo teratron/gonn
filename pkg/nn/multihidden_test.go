@@ -45,7 +45,7 @@ func TestDeepStackRandomInitWarn(t *testing.T) {
 		opts = append(opts, WithHiddenLayer[float64](4, activation.SIGMOID))
 	}
 	if _, err := New[float64](opts...); err != nil {
-		t.Fatalf("deep-stack Compile must succeed in v0.2, got %v", err)
+		t.Fatalf("deep-stack Compile must succeed in v0.6, got %v", err)
 	}
 
 	out := buf.String()

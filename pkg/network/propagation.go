@@ -57,7 +57,7 @@ func (n *Network[T]) CalculateLoss(mode loss.Type) T {
 // where axon.Cell points at the source cell in Hiddens[i]. The
 // activation derivative is NOT folded here — CalculateWeights composes
 // it into the per-layer effective rate (`rate × σ'(z_i)`) so the
-// single-hidden path stays bit-identical to v0.1: same residuals on
+// single-hidden path stays bit-identical to v0.5: same residuals on
 // Output, same per-cell raw misses on Hidden, same ΔW arithmetic.
 // Bias cells (also reachable through Axons) are filtered out by the
 // type assertion to *cell.Hidden[T] — biases never accumulate gradient.
@@ -97,7 +97,7 @@ func (n *Network[T]) CalculateMisses() {
 // cell — every Hidden layer plus Output. Per cell the activation
 // derivative is folded into the effective rate so that downstream
 // cell.CalculateWeight uses `rate × σ'(z) × miss × axon.cell.value()`
-// — the v0.1 single-hidden formula extended positionally to every
+// — the v0.5 single-hidden formula extended positionally to every
 // chain entry. Pre-activation values captured during the forward pass
 // are fed to the derivative dispatcher.
 func (n *Network[T]) CalculateWeights(rate *T) {

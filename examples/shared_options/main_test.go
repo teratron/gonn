@@ -9,7 +9,7 @@ import (
 
 // TestSharedOptsTrainBothTopologies asserts the same []Option[T] slice
 // drives convergence in two distinct topologies. Loose threshold matches
-// the broader Phase 4 v0.1 stance: random init is the dominant variable
+// the broader Phase 4 v0.5 stance: random init is the dominant variable
 // because the public API does not yet expose an RNG seed.
 func TestSharedOptsTrainBothTopologies(t *testing.T) {
 	common := commonOpts()

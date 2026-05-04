@@ -1,7 +1,7 @@
 # Master Task Index (Registry)
 
 **Version:** 1.7.0
-**Project Version:** 0.1.1 (v0.1 released; v0.2 active under Phase 5)
+**Project Version:** 0.1.1 (v0.5 released; v0.6 active under Phase 5)
 **Generated:** 2026-04-29
 **Last Updated:** 2026-05-03
 **Based on:** .design/PLAN.md v1.7.0
@@ -20,8 +20,8 @@ Tactical registry of all phases and their statuses. Atomic checklists (`T-XXXX`)
 | [Phase 1](tasks/phase-1.md) | Foundation Rewrite (Track A) — `pkg/utils/{errors,init}`, `pkg/neuron`, `pkg/layer`, `pkg/network` | `Done` (2026-04-29) |
 | [Phase 2](tasks/phase-2.md) | Public Facade Restoration (Track B) — `pkg/nn` | `Done` (2026-04-30) |
 | [Phase 3](tasks/phase-3.md) | New Capability Packages (Track C) — persistence, checkpoint, dataset, compute, perf | `Done` (2026-05-01) |
-| [Phase 4](tasks/phase-4.md) | Examples Catalog (Track D) — `examples/E01..E15` (v0.1 scope: 7 entries) | `Done` (2026-05-02) |
-| [Phase 5](tasks/phase-5.md) | Multi-Hidden Topology (v0.2) — `pkg/network` chain + compile() lift + weights 1.1.0 + 6 catalog examples | `Active` (decomposed 2026-05-03; 19 tasks + 4 gate checks) |
+| [Phase 4](tasks/phase-4.md) | Examples Catalog (Track D) — `examples/E01..E15` (v0.5 scope: 7 entries) | `Done` (2026-05-02) |
+| [Phase 5](tasks/phase-5.md) | Multi-Hidden Topology (v0.6) — `pkg/network` chain + compile() lift + weights 1.1.0 + 6 catalog examples | `Active` (decomposed 2026-05-03; 19 tasks + 4 gate checks) |
 
 ## Phase 0 — Already Complete
 
@@ -61,7 +61,7 @@ Tactical registry of all phases and their statuses. Atomic checklists (`T-XXXX`)
 | `pkg/compute/{backend,registry}.go` + `cpu/*` | l2-backend-cpu v1.0.0 | `Stable` |
 | `pkg/network/{pool,worker}.go` + `pkg/nn/profiling.go` + bench files | l2-perf-impl v1.0.0 | `Stable` |
 
-## Phase 4 Deliverables (Done — v0.1 scope)
+## Phase 4 Deliverables (Done — v0.5 scope)
 
 | Asset | Spec | Status |
 | :--- | :--- | :--- |
@@ -74,9 +74,9 @@ Tactical registry of all phases and their statuses. Atomic checklists (`T-XXXX`)
 | `examples/precision/` (E15) | l2-usage-examples v1.0.0 | `Stable` |
 | `examples/README.md` + coverage audit | l2-usage-examples v1.0.0 §5.3 | `Stable` |
 
-### Phase 4 v0.2 Promotion → Phase 5
+### Phase 4 v0.6 Promotion → Phase 5
 
-Six of the eight v0.2-gated entries (E03, E04, E05, E07, E08, E13) are now active under Phase 5 — see deliverables table below.
+Six of the eight v0.6-gated entries (E03, E04, E05, E07, E08, E13) are now active under Phase 5 — see deliverables table below.
 
 ## Phase 5 Deliverables (Pending)
 
@@ -92,11 +92,11 @@ Six of the eight v0.2-gated entries (E03, E04, E05, E07, E08, E13) are now activ
 | `examples/regression_multi/` (E08) | l2-usage-examples v1.0.0 | `Pending` |
 | `examples/higher_order_options/` (E13) | l2-usage-examples v1.0.0 | `Pending` |
 
-### Remaining v0.2 Backlog (gated on follow-up specs)
+### Remaining v0.6 Backlog (gated on follow-up specs)
 
 - **E06 MNIST preset** — awaits MNIST dataset-loader spec (planned post-Phase 5).
 - **E10 Continuation** — awaits `AndTrain` API surface (planned post-Phase 5).
-- **`PresetRegression` parameter extension** — v0.3 follow-up minor.
+- **`PresetRegression` parameter extension** — v0.7 follow-up minor.
 
 ## Cross-Cutting Constraints
 

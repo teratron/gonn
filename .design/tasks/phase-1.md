@@ -112,7 +112,7 @@ duration_minutes: ~
 - **Status:** Done
 - **Assignment:** Agent
 - **Handoff:** T-1A02 consumes the sentinels via `Newf`/`Wrap`.
-- **Notes:** Per C32, every returned error must wrap one of the 6 orthogonal sentinels from `l2-errors-impl` v0.3.0 §5.1: `ErrUserConfig`, `ErrInputData`, `ErrCompute`, `ErrControl`, `ErrIntegrity`, `ErrIO`. Stdlib only (C29).
+- **Notes:** Per C32, every returned error must wrap one of the 6 orthogonal sentinels from `l2-errors-impl` v0.7.0 §5.1: `ErrUserConfig`, `ErrInputData`, `ErrCompute`, `ErrControl`, `ErrIntegrity`, `ErrIO`. Stdlib only (C29).
 - **Changes:** [Bootstrap] Created `pkg/utils/errors.go` with 6 orthogonal sentinels and full C31 doc-comments.
 
 ### [T-1A02] Implement error helper constructors

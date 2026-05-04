@@ -97,7 +97,7 @@ func (n *NN[T]) Train(ctx Context, input, target []T) (uint, T) {
 ### 5.2 Snapshot Buffer Type
 
 ```go
-// [REFERENCE] Internal type — not exported in v0.1.
+// [REFERENCE] Internal type — not exported in v0.5.
 type WeightsBuffer[T utils.Float] struct {
     layers [][][]T  // [layerIdx][neuronIdx][axonIdx] = weight
     biases [][]T    // [layerIdx][neuronIdx] = bias
@@ -133,4 +133,4 @@ Owned by the loop, not by the network. Discarded when `Train()` returns.
 | Version | Date | Description |
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-04-28 | Initial Draft — concrete Go realization of l1-training-semantics RFC. |
-| 1.0.0 | 2026-04-30 | Promoted Draft → Stable. Phase-2 implementation lives in `pkg/nn/train.go` as the dual `Train(input, target)` (single-step) + `Fit(dataset)` (multi-epoch) surface. TRN-1..TRN-6 satisfied: termination via `LossLimit`/`MaxIterations`/`Stop()`; min-loss tracking with `snapshotWeights`/`restoreWeights`; flat `[]T` snapshot buffer (instead of nested `WeightsBuffer` from §5.2 — flat is allocation-friendly and survives Phase-1 single-hidden topology). v0.1 implementation note: `context.Context` multiplexing (TRN-1 c) deferred to v0.2; current `awaitSafePoint` honours the package-local atomic Stop signal but not external ctx. NaN-loss detection deferred to v0.2 (TRN-3 partial). |
+| 1.0.0 | 2026-04-30 | Promoted Draft → Stable. Phase-2 implementation lives in `pkg/nn/train.go` as the dual `Train(input, target)` (single-step) + `Fit(dataset)` (multi-epoch) surface. TRN-1..TRN-6 satisfied: termination via `LossLimit`/`MaxIterations`/`Stop()`; min-loss tracking with `snapshotWeights`/`restoreWeights`; flat `[]T` snapshot buffer (instead of nested `WeightsBuffer` from §5.2 — flat is allocation-friendly and survives Phase-1 single-hidden topology). v0.5 implementation note: `context.Context` multiplexing (TRN-1 c) deferred to v0.6; current `awaitSafePoint` honours the package-local atomic Stop signal but not external ctx. NaN-loss detection deferred to v0.6 (TRN-3 partial). |

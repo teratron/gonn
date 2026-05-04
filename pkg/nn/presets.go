@@ -13,7 +13,7 @@ import (
 // Sequential adds count hidden layers with identical size and activation.
 // Useful as a one-liner replacement for repeated WithHiddenLayer calls.
 //
-// Note: in v0.1 the network only supports a single hidden layer. Calling
+// Note: in v0.5 the network only supports a single hidden layer. Calling
 // Sequential with count > 1 is accepted by the staging buffer and rejected
 // by Compile() — this is intentional so the full configuration surfaces
 // in error messages.
@@ -31,7 +31,7 @@ func Sequential[T utils.Float](count, size uint, act activation.Type) Option[T] 
 
 // DeepNetwork adds layers hidden levels of progressively halving size,
 // floored at 2. Replicates the convenience helper from the v3 reference
-// design. Same v0.1 multi-hidden caveat as [Sequential].
+// design. Same v0.5 multi-hidden caveat as [Sequential].
 func DeepNetwork[T utils.Float](startSize, layers uint, act activation.Type) Option[T] {
 	return func(cfg *Config[T]) {
 		size := startSize
@@ -89,8 +89,8 @@ func PresetXOR[T utils.Float]() Option[T] {
 // PresetMNIST returns the canonical MNIST classifier:
 // 784 → ReLU(128) → ReLU(64) → SoftMax(10), CrossEntropy, He init.
 //
-// Multi-hidden — runs into the v0.1 single-hidden Compile() check.
-// Provided so the preset surface matches the spec; v0.2 will lift the
+// Multi-hidden — runs into the v0.5 single-hidden Compile() check.
+// Provided so the preset surface matches the spec; v0.6 will lift the
 // restriction and this preset will work without modification.
 func PresetMNIST[T utils.Float]() Option[T] {
 	return func(cfg *Config[T]) {
@@ -112,7 +112,7 @@ func PresetMNIST[T utils.Float]() Option[T] {
 // supplied input and hidden size:
 // inputSize → ReLU(hiddenSize) → ReLU(hiddenSize/2) → Linear(1), MSE.
 //
-// Multi-hidden — same v0.1 limitation as [PresetMNIST]; ships against
+// Multi-hidden — same v0.5 limitation as [PresetMNIST]; ships against
 // the spec for forward compatibility.
 func PresetRegression[T utils.Float](inputSize, hiddenSize uint) Option[T] {
 	half := max(hiddenSize/2, 2)

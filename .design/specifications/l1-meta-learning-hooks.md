@@ -13,7 +13,7 @@ accesses parameters through a uniform `ParamAccessor[T]` interface; any paramete
 **input** (features) or **output** (tunable target) for an inner `*NN[T]` instance trained on
 the outer loop's dynamics.
 
-The v0.1.0 design covered only scalar hyperparameters via `Tunable[T]`. This v0.2.0 expansion
+The v0.5.0 design covered only scalar hyperparameters via `Tunable[T]`. This v0.6.0 expansion
 generalizes to **all parameter categories** so that any aspect of the network can be used for
 recursive self-optimization.
 
@@ -38,7 +38,7 @@ loss tracking, observability) to **let the network tune itself recursively**:
 - Inner network learns from outer training trajectories.
 - Same machinery works for any scalar — gradient-skip thresholds, batch-size schedules, etc.
 
-**v0.2.0 extension — universal parameter access:**
+**v0.6.0 extension — universal parameter access:**
 
 Beyond scalar hyperparameters, research workflows need to:
 
@@ -133,7 +133,7 @@ type ParamAccessor[T utils.Float] interface {
     Write(values []T) error       // only for ReadWrite; returns ErrReadOnly for ReadOnly params
 }
 
-// Tunable[T] — v0.1.0 backward-compatible interface for scalar parameters
+// Tunable[T] — v0.5.0 backward-compatible interface for scalar parameters
 type Tunable[T utils.Float] interface {
     Value(ctx TuningContext[T]) T
 }
@@ -153,9 +153,9 @@ type TuningContext[T utils.Float] struct {
 ```text
 nn := gonn.New[float64]().
     Input(10).Dense(20, SIGMOID, true).Output(1, LINEAR, MSE, true).
-    // Scalar tunable (v0.1.0 style)
+    // Scalar tunable (v0.5.0 style)
     WithLearningRateTunable(gonn.AdaptiveByNetwork(innerLR)).
-    // Universal parameter wiring (v0.2.0)
+    // Universal parameter wiring (v0.6.0)
     WithMetaLearning(gonn.MetaConfig[float64]{
         InputParams: []string{
             "training.loss_history",        // last N losses
@@ -196,7 +196,7 @@ for each outer epoch:
 
 ### 5.4 Backward Compatibility
 
-The v0.1.0 `Tunable[T]` interface is preserved as a **convenience wrapper** over the v0.2.0
+The v0.5.0 `Tunable[T]` interface is preserved as a **convenience wrapper** over the v0.6.0
 `ParamAccessor[T]` system:
 
 - `Const[T](v)` → accessor with `Category: Scalar`, `Access: ReadWrite`, returns `[v]`.
@@ -259,4 +259,4 @@ graph TD
 | Version | Date | Description |
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-04-27 | Initial Draft from TODO #14 — most experimental of the batch. |
-| 0.2.0 | 2026-05-01 | [MODIFIED] Universal parameter access: ParamDescriptor catalog, ParamAccessor interface, TuningContext v2, MetaConfig wiring, 9 parameter categories (scalar through raw weights), safety model diagram, META-5..META-7 invariants. v0.1.0 Tunable preserved as compatibility wrapper. From TODO #26. |
+| 0.2.0 | 2026-05-01 | [MODIFIED] Universal parameter access: ParamDescriptor catalog, ParamAccessor interface, TuningContext v2, MetaConfig wiring, 9 parameter categories (scalar through raw weights), safety model diagram, META-5..META-7 invariants. v0.5.0 Tunable preserved as compatibility wrapper. From TODO #26. |

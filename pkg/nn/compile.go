@@ -63,7 +63,7 @@ func validate[T utils.Float](cfg *Config[T]) error {
 	}
 	if len(cfg.HiddenLayers) == 0 {
 		return utils.Newf(utils.ErrUserConfig,
-			"compile: at least one Dense / WithHiddenLayer call is required (linear-only networks planned for v0.2)")
+			"compile: at least one Dense / WithHiddenLayer call is required (linear-only networks planned for v0.6)")
 	}
 	for i, h := range cfg.HiddenLayers {
 		if h.Size == 0 {

@@ -87,7 +87,7 @@ func (n *NN[T]) transitionToIdle() {
 // Returns (stopped bool, err error):
 //   - (false, nil) — keep training.
 //   - (true, nil)  — Stop was requested; caller breaks out of the loop.
-//   - (_, err)     — never returned in v0.1; reserved for future
+//   - (_, err)     — never returned in v0.5; reserved for future
 //     timeout-based safe-points.
 //
 // While the state is Paused the goroutine yields via runtime.Gosched

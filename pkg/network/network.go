@@ -22,7 +22,7 @@ const defaultLearningRate = 0.3
 // Network is the typed graph. Embedded by [pkg/nn].NN in Phase 2.
 //
 // Per [l2-multihidden-impl] §5.1 the Hidden field generalises to a slice
-// of bundles in compile-time order. Single-hidden topologies (v0.1)
+// of bundles in compile-time order. Single-hidden topologies (v0.5)
 // continue to work unchanged: callers wrap their one Dense layer in a
 // one-element slice when calling SetLayers.
 type Network[T utils.Float] struct {
@@ -73,8 +73,8 @@ func New[T utils.Float]() Network[T] {
 // layers are stored separately (positionally aligned with Hiddens[i])
 // and used as axon sources by Build.
 //
-// hiddens is the multi-hidden chain in left-to-right order. v0.1 callers
-// pass a one-element slice; v0.2 supports any positive length.
+// hiddens is the multi-hidden chain in left-to-right order. v0.5 callers
+// pass a one-element slice; v0.6 supports any positive length.
 //
 // Returns an error wrapping ErrUserConfig when any required layer is
 // nil, when the hiddens slice is empty, or when any layer reports zero

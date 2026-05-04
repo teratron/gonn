@@ -129,16 +129,16 @@ func TestBuilderRejectsZeroSize(t *testing.T) {
 
 func TestBuilderAcceptsMultiHidden(t *testing.T) {
 	t.Parallel()
-	// Phase 5 / Track B (T-5B01) lifts the v0.1 single-hidden gate.
+	// Phase 5 / Track B (T-5B01) lifts the v0.5 single-hidden gate.
 	// The Builder must now accept any positive HiddenLayers count and
-	// produce an Operational network — multi-hidden is the v0.2 default.
+	// produce an Operational network — multi-hidden is the v0.6 default.
 	n, err := NewBuilder[float64]().
 		Input(2).
 		Dense(4, activation.SIGMOID, true).
 		Dense(4, activation.SIGMOID, true).
 		Output(1, activation.SIGMOID, true).Compile()
 	if err != nil {
-		t.Fatalf("multi-hidden Builder Compile must succeed in v0.2, got %v", err)
+		t.Fatalf("multi-hidden Builder Compile must succeed in v0.6, got %v", err)
 	}
 	if n.State() != stateOperational {
 		t.Errorf("post-Compile state = %v; want Operational", n.State())
@@ -191,7 +191,7 @@ func TestPostCompileMutationsAreNoOps(t *testing.T) {
 	}
 	// Capture pre-mutation config; the post-Compile call must not change it.
 	before := n.Config()
-	n.Input(99)         // should be a no-op + Logger.Warn
+	n.Input(99) // should be a no-op + Logger.Warn
 	n.Dense(99, activation.ReLU, false)
 	n.WithLearningRate(99)
 	after := n.Config()
@@ -278,11 +278,11 @@ func TestPresetXORCompiles(t *testing.T) {
 func TestPresetMNISTCompiles(t *testing.T) {
 	t.Parallel()
 	// PresetMNIST is a 2-hidden classifier; Phase 5 / Track B (T-5B01)
-	// lifts the gate that previously rejected it in v0.1. Smoke-only —
+	// lifts the gate that previously rejected it in v0.5. Smoke-only —
 	// MNIST training is gated on the dataset-loader spec (E06).
 	n, err := New[float64](PresetMNIST[float64]())
 	if err != nil {
-		t.Fatalf("PresetMNIST Compile must succeed in v0.2, got %v", err)
+		t.Fatalf("PresetMNIST Compile must succeed in v0.6, got %v", err)
 	}
 	if n.State() != stateOperational {
 		t.Errorf("PresetMNIST post-Compile state = %v; want Operational", n.State())
@@ -299,7 +299,7 @@ func TestPresetRegressionCompiles(t *testing.T) {
 		PresetRegression[float64](4, 16),
 	)
 	if err != nil {
-		t.Fatalf("PresetRegression Compile must succeed in v0.2, got %v", err)
+		t.Fatalf("PresetRegression Compile must succeed in v0.6, got %v", err)
 	}
 	if n.State() != stateOperational {
 		t.Errorf("PresetRegression post-Compile state = %v; want Operational", n.State())
@@ -709,7 +709,7 @@ func TestFitDivergenceRollback(t *testing.T) {
 	// restore the best-observed weights and report the minimum loss.
 	n := MustNew[float64](
 		PresetXOR[float64](),
-		WithLearningRate[float64](50),         // intentionally divergent
+		WithLearningRate[float64](50), // intentionally divergent
 		WithMaxIterations[float64](10),
 		WithLossLimit[float64](-1),
 	)

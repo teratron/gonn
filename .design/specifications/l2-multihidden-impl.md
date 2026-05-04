@@ -9,7 +9,7 @@
 
 Concrete realization of the multi-hidden-layer topology already permitted by
 [l1-neural-network-architecture.md](l1-neural-network-architecture.md) v2.0.0
-but rejected by the v0.1 `pkg/nn.compile()` validation gate. This spec lifts
+but rejected by the v0.5 `pkg/nn.compile()` validation gate. This spec lifts
 the gate, generalizes `pkg/network.Network[T]`'s single-bundle Hidden field
 to a chain of bundles, and re-routes forward / backward / weight-update so
 gradients propagate through every intermediate layer rather than only one.
@@ -17,7 +17,7 @@ gradients propagate through every intermediate layer rather than only one.
 The unlock matters because eight catalog examples
 ([l2-usage-examples.md](l2-usage-examples.md) §5.2 — E03, E04, E05, E06,
 E07, E08, E10, E13) describe topologies with two or more hidden layers and
-are explicitly deferred to v0.2 in [tasks/phase-4.md](../tasks/phase-4.md).
+are explicitly deferred to v0.6 in [tasks/phase-4.md](../tasks/phase-4.md).
 Lifting the constraint here unblocks seven of those entries directly
 (E10 still waits on `AndTrain`, E06 on a dataset-loader spec).
 
@@ -27,7 +27,7 @@ Lifting the constraint here unblocks seven of those entries directly
 - [l2-nn-facade.md](l2-nn-facade.md) — Public facade whose `compile()` currently rejects `len(HiddenLayers) > 1`. v2.1.0 minor bump consumes this spec.
 - [l2-network-graph.md](l2-network-graph.md) — Owns `Network[T]`. v1.2.0 minor bump generalizes the Hidden bundle to a slice.
 - [l2-neuron-model.md](l2-neuron-model.md) — Cell / axon types reused unchanged.
-- [l2-usage-examples.md](l2-usage-examples.md) — Eight v0.2 catalog entries unblocked by this spec.
+- [l2-usage-examples.md](l2-usage-examples.md) — Eight v0.6 catalog entries unblocked by this spec.
 
 ## 1. Motivation
 
@@ -35,13 +35,13 @@ Lifting the constraint here unblocks seven of those entries directly
 
 ```text
 if len(cfg.HiddenLayers) > 1 → ErrUserConfig "multi-hidden networks not
-supported in v0.1 (got N hidden layers; planned for v0.2)"
+supported in v0.5 (got N hidden layers; planned for v0.6)"
 ```
 
 The guard was deliberate — Phase 2 stopped at the smallest topology that
 exercises every public API element so the facade could stabilize without
 also debugging the propagation chain. Phase 4 then partitioned the example
-catalog into v0.1 (single-hidden) and v0.2 (multi-hidden) groups; eight
+catalog into v0.5 (single-hidden) and v0.6 (multi-hidden) groups; eight
 entries plus several catalog API surfaces (`Sequential`, `DeepNetwork`,
 `PresetMNIST`, `PresetRegression`, `Verify`) wait for this spec.
 
@@ -58,7 +58,7 @@ Removing the guard requires three coordinated changes:
 ## 2. Constraints & Assumptions
 
 - Stdlib only per C29; no new dependencies.
-- v0.1 single-hidden behaviour is preserved exactly when `len(HiddenLayers) == 1`
+- v0.5 single-hidden behaviour is preserved exactly when `len(HiddenLayers) == 1`
   — the new chain reduces to the existing path; no public API breakage.
 - Activation per hidden layer is read from `cfg.HiddenLayers[i].Activation`
   (already present in `Config[T]`); a single uniform activation across the
@@ -165,19 +165,19 @@ generalises the existing two-layer convention to N+1 entries:
 }
 ```
 
-Schema version bumps `1.0.0 → 1.1.0` (minor, forward-compatible). v0.1 readers
-loading a v0.2 file see the new entries and apply the existing forward-compat
+Schema version bumps `1.0.0 → 1.1.0` (minor, forward-compatible). v0.5 readers
+loading a v0.6 file see the new entries and apply the existing forward-compat
 rule from [l1-network-persistence.md](l1-network-persistence.md) §3 PERS-1
 (minor mismatch → warning + best-effort load — load fails because cell counts
 will not match, but the failure is `ErrIntegrity` rather than a parse crash).
-v0.2 readers loading a v0.1 file see one hidden layer and rebuild correctly.
+v0.6 readers loading a v0.5 file see one hidden layer and rebuild correctly.
 
 ### 5.5 compile() validation delta
 
 ```go
-// [REFERENCE] Replacement for the v0.1 multi-hidden guard in pkg/nn/compile.go.
+// [REFERENCE] Replacement for the v0.5 multi-hidden guard in pkg/nn/compile.go.
 //   Removed:
-//     if len(cfg.HiddenLayers) > 1 { return ErrUserConfig "...not supported in v0.1..." }
+//     if len(cfg.HiddenLayers) > 1 { return ErrUserConfig "...not supported in v0.5..." }
 //   Added (validation pass):
 //     for i, h := range cfg.HiddenLayers {
 //         if h.Size == 0 → ErrUserConfig "hidden layer %d has size 0"
@@ -242,14 +242,14 @@ the O(N²) cost stays within PERF-2 budgets.
 
 ### 5.7 Open Questions
 
-- <!-- TBD: should `Sequential(count, size, activation)` and `DeepNetwork(start, depth, activation)` validate that the resulting chain length stays under a soft cap (e.g. 64)? Spec says no, but l1-performance-contract.md PERF-3 worker pool budgets benefit from a bound. Default to no cap for v0.2; reconsider after benchmarks. -->
-- <!-- TBD: how does WeightInit propagate per-layer? Phase 2 used a single `cfg.WeightInit` applied uniformly. Multi-hidden may want per-layer init (Xavier for tanh hidden, He for ReLU hidden). Out of scope for the v0.2 lift — defer to a follow-up minor when call sites surface the need. -->
+- <!-- TBD: should `Sequential(count, size, activation)` and `DeepNetwork(start, depth, activation)` validate that the resulting chain length stays under a soft cap (e.g. 64)? Spec says no, but l1-performance-contract.md PERF-3 worker pool budgets benefit from a bound. Default to no cap for v0.6; reconsider after benchmarks. -->
+- <!-- TBD: how does WeightInit propagate per-layer? Phase 2 used a single `cfg.WeightInit` applied uniformly. Multi-hidden may want per-layer init (Xavier for tanh hidden, He for ReLU hidden). Out of scope for the v0.6 lift — defer to a follow-up minor when call sites surface the need. -->
 
 ## 6. Implementation Notes
 
 1. **Order of land**: pkg/network first (storage + Build wiring + Forward/Backward/UpdateWeights), then pkg/nn (compile() validation + SetLayers call), then examples (E03/E04/E05/E07/E08/E13 in `examples/`).
-2. **Backwards compatibility test**: `pkg/nn.PresetXOR` keeps the single-hidden topology — every v0.1 example must continue to converge after the lift. Phase 4 v0.1 smoke tests ARE the regression suite for this guarantee.
-3. **Persistence migration**: bump `persistence.SchemaVersion` to `"1.1.0"` and add a regression test loading the v0.1 fixtures generated by `examples/persistence/`.
+2. **Backwards compatibility test**: `pkg/nn.PresetXOR` keeps the single-hidden topology — every v0.5 example must continue to converge after the lift. Phase 4 v0.5 smoke tests ARE the regression suite for this guarantee.
+3. **Persistence migration**: bump `persistence.SchemaVersion` to `"1.1.0"` and add a regression test loading the v0.5 fixtures generated by `examples/persistence/`.
 4. **Coverage**: `pkg/network` regression is required at the propagation level — table-driven tests with `[][]T` weights for two-hidden and three-hidden chains, comparing against hand-computed reference vectors (analogous to E01 cpu kernel tests in `pkg/compute/cpu/cpu_test.go`).
 
 ## 7. Drawbacks & Alternatives
@@ -271,5 +271,5 @@ the O(N²) cost stays within PERF-2 budgets.
 
 | Version | Date | Description |
 | :--- | :--- | :--- |
-| 0.1.0 | 2026-05-03 | Initial Draft — concrete v0.2 plan for lifting the `len(HiddenLayers) > 1` rejection in `pkg/nn.compile()`. Documents the storage shape change in `Network[T]`, the propagation chain across the new hidden slice, and the matching weights schema bump (1.0.0 → 1.1.0). Drives Phase 5 (v0.2) decomposition. |
+| 0.1.0 | 2026-05-03 | Initial Draft — concrete v0.6 plan for lifting the `len(HiddenLayers) > 1` rejection in `pkg/nn.compile()`. Documents the storage shape change in `Network[T]`, the propagation chain across the new hidden slice, and the matching weights schema bump (1.0.0 → 1.1.0). Drives Phase 5 (v0.6) decomposition. |
 | 1.0.0 | 2026-05-03 | [Trust-Mode] Draft → Stable. MVC satisfied (Overview + Invariant Compliance INV-1..7 + Detailed Design + Drawbacks). Parent `l1-neural-network-architecture` Stable v2.0.0. Two §5.7 TBDs are scoped deferrals (per-layer WeightInit, optional chain-length soft cap) — not design gaps. C9 Trust Mode auto-promotion. |

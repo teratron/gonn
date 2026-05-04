@@ -44,7 +44,7 @@ Local registry of specifications for this workspace.
 | [l2-perf-impl.md](specifications/l2-perf-impl.md) | Go realization of performance contract — pools, preallocation, pprof hook | Stable | L2 | 1.0.0 |
 | [l2-streaming-impl.md](specifications/l2-streaming-impl.md) | Go realization of data streaming — `pkg/dataset` package, prefetch decorator | Stable | L2 | 1.0.0 |
 | [l2-backend-cpu.md](specifications/l2-backend-cpu.md) | Go realization of compute backend — `pkg/compute/cpu` reference path | Stable | L2 | 1.0.0 |
-| [l2-multihidden-impl.md](specifications/l2-multihidden-impl.md) | v0.2 multi-hidden topology lift — Network[T] chain + compile() gate removal | Stable | L2 | 1.0.0 |
+| [l2-multihidden-impl.md](specifications/l2-multihidden-impl.md) | v0.6 multi-hidden topology lift — Network[T] chain + compile() gate removal | Stable | L2 | 1.0.0 |
 
 ## Meta Information
 
