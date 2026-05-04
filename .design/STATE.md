@@ -4,7 +4,7 @@
 <!-- Maximum 100 lines. Agent updates AFTER each completed action. -->
 
 **Workspace:** main
-**Project Version:** 0.1.1
+**Project Version:** 0.5.1
 **Updated:** 2026-05-04 13:52
 **Phase:** 5 — Multi-Hidden Topology (v0.6) (Active — Tracks A+B green; Tracks C+D next)
 **Status:** Active
@@ -22,8 +22,8 @@ Phase 1 (Done):   [22/22]  ████████ 100%
 Phase 2 (Done):   [26/26]  ████████ 100%
 Phase 3 (Done):   [19/19]  ████████ 100%
 Phase 4 (Done):   [14/14]  ████████ 100%
-Phase 5 (Active): [10/23]  ███░░░░░  ~43%   (Tracks A+B complete; C+D pending)
-Overall:          [91/104] █████████ ~88%   v0.5 closed; v0.6 in flight
+Phase 5 (Active): [10/23]  ███░░░░░ ~43%   (Tracks A+B complete; C+D pending)
+Overall:          [91/104] ███████░ ~88%   v0.5 closed; v0.6 in flight
 ```
 
 ## Recent Decisions

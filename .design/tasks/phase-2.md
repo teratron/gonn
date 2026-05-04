@@ -42,6 +42,7 @@ patterns_established:
 - "TOCTOU-safe transitionToRunning via CompareAndSwap(Idle, Running) — preserves a Stop issued before Fit reaches its loop"
 - "Field-shadowing convention: NN[T] embeds Network[T] but adds Builder methods Input/Dense/Output that shadow the field accessors; internal code uses n.Network.X qualified path"
 duration_minutes: ~
+---
 
 # Phase 2 Tasks — Public Facade Restoration (Track B)
 

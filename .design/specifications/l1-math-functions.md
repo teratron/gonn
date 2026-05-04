@@ -17,6 +17,7 @@ Defines the conceptual framework for mathematical functions used in the neural n
 ## 1. Motivation
 
 Neural networks require two categories of mathematical functions:
+
 1. **Activation functions**: Apply non-linear transformations to neuron values, enabling the network to learn complex patterns
 2. **Loss functions**: Measure the difference between predicted and target values, providing the gradient signal for learning
 

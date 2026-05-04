@@ -88,6 +88,7 @@ All numeric types are parameterized by `T utils.Float` where `Float` is defined 
 ### 5.4 Builder Pattern
 
 Network construction uses a fluent builder:
+
 - `New[T]()` creates an empty network
 - `.Input(size)` adds the input layer
 - `.Dense(size, activation, bias)` adds hidden layers

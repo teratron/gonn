@@ -38,7 +38,7 @@ buffer, ownership of weights during rollback, control-state polling cadence, and
 
 | L1 Invariant | Implementation |
 | :--- | :--- |
-| TRN-1 (Termination) | Loop checks `(loss < lossLimit) || (iter >= max) || ctx.Done() || stopFlag.Load()` at iteration boundary. |
+| TRN-1 (Termination) | Loop checks `(loss < lossLimit) \|\| (iter >= max) \|\| ctx.Done() \|\| stopFlag.Load()` at iteration boundary. |
 | TRN-2 (min-loss tracking) | Local vars `minLoss`, `minIter` updated per iteration; `bestSnapshot` deep-copied on improvement. |
 | TRN-3 (Rollback) | On termination via TRN-1 (a)/(b), `network.LoadWeights(bestSnapshot)` restores best state. |
 | TRN-4 (Diagnostic return) | Returns `(uint(minIter), T(minLoss))`, never the wall-clock final iter/loss. |

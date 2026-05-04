@@ -1,7 +1,7 @@
 # Implementation Plan
 
 **Version:** 1.7.0
-**Project Version:** 0.1.1 (v0.5 released; v0.6 active under Phase 5)
+**Project Version:** 0.5.1 (v0.5 released; v0.6 active under Phase 5)
 **Generated:** 2026-04-29
 **Last Updated:** 2026-05-03
 **Based on:** .design/INDEX.md v2.3.0
