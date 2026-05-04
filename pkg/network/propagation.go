@@ -47,25 +47,21 @@ func (n *Network[T]) CalculateLoss(mode loss.Type) T {
 	return loss.CalculateTotalLoss(&misses, mode)
 }
 
-// CalculateMisses runs the backward pass per [l2-multihidden-impl] §5.6.
-// Output cells already hold the residual computed during forward
-// (CalculateValues does `target - value`); we promote it to δ_o by
-// multiplying by σ'(z_o), then walk Hiddens right-to-left, accumulating
+// CalculateMisses runs the backward pass across the chain. Per
+// [l2-multihidden-impl] §5.6 the residual on each Output cell is set
+// during forward (`target - value`); we walk Hiddens right-to-left,
+// accumulating each cell's raw miss as
 //
-//	δ_i = (Σ over next-layer cells c: c.miss × axon.Weight) × σ'(z_i)
+//	miss_i = Σ over next-layer cells c: c.miss × axon.Weight
 //
-// where axon.Cell points at the source cell in Hiddens[i]. Bias cells
-// (also reachable through Axons) are filtered out by the type assertion
-// to *cell.Hidden[T] — biases never accumulate gradient.
-//
-// For len(Hiddens) == 1 this reduces to the v0.1 single-hidden formula
-// composed with the output derivative; XOR convergence is preserved.
+// where axon.Cell points at the source cell in Hiddens[i]. The
+// activation derivative is NOT folded here — CalculateWeights composes
+// it into the per-layer effective rate (`rate × σ'(z_i)`) so the
+// single-hidden path stays bit-identical to v0.1: same residuals on
+// Output, same per-cell raw misses on Hidden, same ΔW arithmetic.
+// Bias cells (also reachable through Axons) are filtered out by the
+// type assertion to *cell.Hidden[T] — biases never accumulate gradient.
 func (n *Network[T]) CalculateMisses() {
-	for i, o := range n.Output.cells {
-		dz := activation.Derivative[T](n.preactOutput[i], n.outputAct)
-		o.SetMiss(*o.GetMiss() * dz)
-	}
-
 	for i := len(n.Hiddens) - 1; i >= 0; i-- {
 		hb := n.Hiddens[i]
 		for _, h := range hb.cells {
@@ -94,33 +90,28 @@ func (n *Network[T]) CalculateMisses() {
 				}
 			}
 		}
-		// Fold in this layer's activation derivative — δ_i = raw × σ'(z_i).
-		act := n.hiddenActs[i]
-		preact := n.preactHiddens[i]
-		for cellIdx, h := range hb.cells {
-			dz := activation.Derivative[T](preact[cellIdx], act)
-			h.SetMiss(*h.GetMiss() * dz)
-		}
 	}
 }
 
 // CalculateWeights applies the gradient-descent step to every learnable
-// cell — every Hidden layer plus Output. Per [l2-multihidden-impl] §5.6
-// each cell's miss already carries σ'(z) (folded in by
-// CalculateMisses), so the per-cell effective rate is simply `rate`:
-// the axon update reduces to `weight += rate × cell.miss × cell.value()`.
-//
-// Single-hidden (len(Hiddens) == 1) reduces to one outer iteration over
-// Hiddens[0] and Output — bit-for-bit equivalent to the v0.1 path
-// modulo the moved-derivative bookkeeping.
+// cell — every Hidden layer plus Output. Per cell the activation
+// derivative is folded into the effective rate so that downstream
+// cell.CalculateWeight uses `rate × σ'(z) × miss × axon.cell.value()`
+// — the v0.1 single-hidden formula extended positionally to every
+// chain entry. Pre-activation values captured during the forward pass
+// are fed to the derivative dispatcher.
 func (n *Network[T]) CalculateWeights(rate *T) {
-	for _, hb := range n.Hiddens {
-		for _, h := range hb.cells {
-			h.CalculateWeight(rate)
+	for layerIdx, hb := range n.Hiddens {
+		act := n.hiddenActs[layerIdx]
+		preact := n.preactHiddens[layerIdx]
+		for cellIdx, h := range hb.cells {
+			eff := *rate * activation.Derivative[T](preact[cellIdx], act)
+			h.CalculateWeight(&eff)
 		}
 	}
-	for _, o := range n.Output.cells {
-		o.CalculateWeight(rate)
+	for cellIdx, o := range n.Output.cells {
+		eff := *rate * activation.Derivative[T](n.preactOutput[cellIdx], n.outputAct)
+		o.CalculateWeight(&eff)
 	}
 }
 

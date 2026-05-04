@@ -28,11 +28,14 @@ func compile[T utils.Float](n *NN[T], cfg *Config[T]) error {
 	emitSoftWarnings(cfg)
 
 	in := layer.NewInput[T](int(cfg.InputSize))
-	// Track A wraps the v0.1 single-hidden path into the new variadic
-	// SetLayers slice. Track B (T-5B01) lifts the validate() guard so
-	// callers can supply more than one hidden layer.
-	hSpec := cfg.HiddenLayers[0]
-	hiddens := []*layer.Dense[T]{layer.NewDense[T](int(hSpec.Size), hSpec.Activation, hSpec.Bias)}
+	// Build the multi-hidden chain per [l2-multihidden-impl] §5.5. Each
+	// HiddenLayerSpec carries its own Size / Activation / Bias, so the
+	// chain composes mixed-activation, mixed-bias topologies in one pass.
+	// validate() above enforces Size > 0 and known Activation per entry.
+	hiddens := make([]*layer.Dense[T], len(cfg.HiddenLayers))
+	for i, hSpec := range cfg.HiddenLayers {
+		hiddens[i] = layer.NewDense[T](int(hSpec.Size), hSpec.Activation, hSpec.Bias)
+	}
 	out := layer.NewOutput[T](int(cfg.OutputSize), cfg.OutputActivation, cfg.LossType, cfg.OutputBias)
 
 	if err := n.SetLayers(in, hiddens, out); err != nil {
@@ -61,11 +64,6 @@ func validate[T utils.Float](cfg *Config[T]) error {
 	if len(cfg.HiddenLayers) == 0 {
 		return utils.Newf(utils.ErrUserConfig,
 			"compile: at least one Dense / WithHiddenLayer call is required (linear-only networks planned for v0.2)")
-	}
-	if len(cfg.HiddenLayers) > 1 {
-		return utils.Newf(utils.ErrUserConfig,
-			"compile: multi-hidden networks not supported in v0.1 (got %d hidden layers; planned for v0.2)",
-			len(cfg.HiddenLayers))
 	}
 	for i, h := range cfg.HiddenLayers {
 		if h.Size == 0 {

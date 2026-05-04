@@ -127,15 +127,21 @@ func TestBuilderRejectsZeroSize(t *testing.T) {
 	}
 }
 
-func TestBuilderRejectsMultiHiddenAsV01Limitation(t *testing.T) {
+func TestBuilderAcceptsMultiHidden(t *testing.T) {
 	t.Parallel()
-	_, err := NewBuilder[float64]().
+	// Phase 5 / Track B (T-5B01) lifts the v0.1 single-hidden gate.
+	// The Builder must now accept any positive HiddenLayers count and
+	// produce an Operational network — multi-hidden is the v0.2 default.
+	n, err := NewBuilder[float64]().
 		Input(2).
 		Dense(4, activation.SIGMOID, true).
 		Dense(4, activation.SIGMOID, true).
 		Output(1, activation.SIGMOID, true).Compile()
-	if !errors.Is(err, utils.ErrUserConfig) {
-		t.Errorf("expected ErrUserConfig (multi-hidden limitation), got %v", err)
+	if err != nil {
+		t.Fatalf("multi-hidden Builder Compile must succeed in v0.2, got %v", err)
+	}
+	if n.State() != stateOperational {
+		t.Errorf("post-Compile state = %v; want Operational", n.State())
 	}
 }
 
@@ -269,13 +275,34 @@ func TestPresetXORCompiles(t *testing.T) {
 	}
 }
 
-func TestPresetMNISTBlockedByMultiHidden(t *testing.T) {
+func TestPresetMNISTCompiles(t *testing.T) {
 	t.Parallel()
-	// PresetMNIST has 2 hidden layers; v0.1 supports only 1. Verifies
-	// the preset surface matches the spec while still erroring cleanly.
-	_, err := New[float64](PresetMNIST[float64]())
-	if !errors.Is(err, utils.ErrUserConfig) {
-		t.Errorf("PresetMNIST in v0.1 must error with ErrUserConfig, got %v", err)
+	// PresetMNIST is a 2-hidden classifier; Phase 5 / Track B (T-5B01)
+	// lifts the gate that previously rejected it in v0.1. Smoke-only —
+	// MNIST training is gated on the dataset-loader spec (E06).
+	n, err := New[float64](PresetMNIST[float64]())
+	if err != nil {
+		t.Fatalf("PresetMNIST Compile must succeed in v0.2, got %v", err)
+	}
+	if n.State() != stateOperational {
+		t.Errorf("PresetMNIST post-Compile state = %v; want Operational", n.State())
+	}
+}
+
+func TestPresetRegressionCompiles(t *testing.T) {
+	t.Parallel()
+	// PresetRegression also uses 2 hidden layers (size, size/2). Same
+	// gate lift as MNIST — assert the surface compiles cleanly.
+	n, err := New[float64](
+		WithInput[float64](4),
+		WithOutput[float64](1, activation.Linear),
+		PresetRegression[float64](4, 16),
+	)
+	if err != nil {
+		t.Fatalf("PresetRegression Compile must succeed in v0.2, got %v", err)
+	}
+	if n.State() != stateOperational {
+		t.Errorf("PresetRegression post-Compile state = %v; want Operational", n.State())
 	}
 }
 
