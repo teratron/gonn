@@ -56,5 +56,15 @@
         "rules": "rules",
         "files": [],
         "description": "Kilo Code"
+    },
+    "lingma": {
+        "dir": ".lingma",
+        "workflows": "commands",
+        "skills": "skills",
+        "rules": "rules",
+        "files": [
+            "LINGMA.md"
+        ],
+        "description": "Lingma Code (Alibaba)"
     }
 }
