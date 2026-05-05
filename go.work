@@ -10,4 +10,5 @@ use (
 	./examples/persistence
 	./examples/shared_options
 	./examples/precision
+	./examples/binary_classification
 )

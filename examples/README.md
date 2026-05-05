@@ -8,6 +8,7 @@ Implements the v0.5 subset of [`l2-usage-examples.md`](../.design/specifications
 | :--- | :--- | :--- | :--- |
 | E01 | [xor](xor/) | Builder + Options | Canonical XOR — dual-style parity baseline |
 | E02 | [logic_gates](logic_gates/) | Builder | AND / OR / NAND truth-table fits |
+| E04 | [binary_classification](binary_classification/) | Options | Multi-hidden + BCE + He init + custom metric |
 | E09 | [persistence](persistence/) | Builder + `pkg/persistence` | Save → reload → query, ULP-1 round-trip (PERS-4) |
 | E11 | [callbacks](callbacks/) | Options | `WithEpochCallback` + `WithBatchCallback` |
 | E12 | [style_showcase](style_showcase/) | Builder + Options + Preset | Three-style equivalence on the same network |
@@ -23,7 +24,6 @@ These catalog entries stay in the spec but require features not yet in v0.5. Eac
 | ID | Path | Gate |
 | :--- | :--- | :--- |
 | E03 | [perceptron](perceptron/) | v0.6 multi-hidden (file currently runs a single-hidden stub; `// removed once v0.6 lands`) |
-| E04 | `examples/binary_classification/` | v0.6 multi-hidden |
 | E05 | `examples/iris/` | v0.6 multi-hidden |
 | E06 | `examples/mnist/` | v0.6 multi-hidden + dataset-loader spec |
 | E07 | `examples/regression_sin/` | v0.6 multi-hidden |
@@ -44,8 +44,8 @@ Cross-reference of `l2-usage-examples` §5.3 against the v0.5 active examples. *
 | `Output` / `WithOutput` | covered | all v0.5 actives | — |
 | `WithLearningRate` | covered | all v0.5 actives | — |
 | `WithLoss` | covered | all v0.5 actives | — |
-| `WithBias` | covered | E11 (preset → bias on), E14 | E03 deferred |
-| `WithWeightInit` (xavier/he) | covered | E01 (xavier) | E04 he, E06 he, E07 xavier deferred |
+| `WithBias` | covered | E11 (preset → bias on), E14, E04 | E03 deferred |
+| `WithWeightInit` (xavier/he) | covered | E01 (xavier), E04 (he) | E06 he, E07 xavier deferred |
 | `WithMaxIterations` | covered | all v0.5 actives | — |
 | `WithLossLimit` | covered | E01, E12, E14 | — |
 | `WithEpochCallback` | covered | E11 | E05 deferred |
@@ -57,7 +57,7 @@ Cross-reference of `l2-usage-examples` §5.3 against the v0.5 active examples. *
 | `PresetRegression` | **gap → v0.6** | (none) | E08 deferred (multi-hidden) |
 | `Train` | covered | all v0.5 actives via `Fit` | — |
 | `Query` | covered | E01, E09, E11, E12, E14, E15 | — |
-| `Verify` | **gap → v0.6** | (none) | E04 / E05 / E07 deferred |
+| `Verify` | **gap → v0.6** | (none) | E05 / E07 deferred |
 | `AndTrain` | **gap → v0.6** | (none) | API surface not yet defined |
 | `Persistence` (Save / Reload) | covered (manual seam) | E09 | future `nn.Save` / `nn.Load` will close the seam |
 
