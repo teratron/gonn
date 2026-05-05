@@ -129,11 +129,16 @@ func TestSchemaVersionMajorMismatch(t *testing.T) {
 		t.Fatalf("WriteConfig: %v", err)
 	}
 	raw, _ := os.ReadFile(path)
+	// SchemaVersion uses the live constant so this test keeps working
+	// across minor bumps (1.0.0 → 1.1.0 in Phase 5 / Track C).
 	corrupted := strings.Replace(string(raw),
-		`"schema_version": "1.0.0"`,
+		`"schema_version": "`+SchemaVersion+`"`,
 		`"schema_version": "2.7.0"`, 1)
 	if err := os.WriteFile(path, []byte(corrupted), 0o644); err != nil {
 		t.Fatalf("rewrite: %v", err)
+	}
+	if !strings.Contains(string(corrupted), `"2.7.0"`) {
+		t.Fatalf("test setup: SchemaVersion replace failed — corruption did not take effect")
 	}
 
 	_, err := ReadConfig[float32](path)

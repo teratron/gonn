@@ -11,6 +11,12 @@
 // yet expose dump / load hooks, so the bundle accessors on
 // network.Network[T] are walked manually. Future versions of the facade
 // are expected to fold this glue into nn.Save / nn.Load.
+//
+// Phase 5 / Track C generalises the extract / install helpers across the
+// Hiddens slice. The default run still uses XOR (single hidden, the v0.1
+// regression baseline); the smoke test in main_test.go exercises a
+// 2-hidden round-trip via the same code path so the multi-hidden seam
+// is covered.
 package main
 
 import (
@@ -21,22 +27,59 @@ import (
 
 	"github.com/teratron/gonn/pkg/activation"
 	"github.com/teratron/gonn/pkg/loss"
+	"github.com/teratron/gonn/pkg/neuron/axon"
 	"github.com/teratron/gonn/pkg/nn"
 	"github.com/teratron/gonn/pkg/persistence"
 )
 
-const (
-	hiddenSize = 4
-	hiddenAct  = activation.SIGMOID
-	outputAct  = activation.SIGMOID
-	lossMode   = loss.MSE
-	rate       = 0.3
-	maxIters   = 10_000
-	lossLimit  = 1e-4
-)
+// hiddenSpec mirrors one HiddenLayerDoc entry locally. The example
+// keeps a single source of topology truth so the network builder, the
+// config-doc emitter, and the extract / install helpers cannot drift.
+type hiddenSpec struct {
+	size uint
+	act  activation.Type
+	bias bool
+}
+
+// outputSpec is the matching record for the Output layer.
+type outputSpec struct {
+	size uint
+	act  activation.Type
+	bias bool
+}
+
+// trainConfig groups every hyperparameter the example needs to wire a
+// network. The fields are exposed so tests can override individual
+// parts without rebuilding the whole literal.
+type trainConfig struct {
+	inputSize uint
+	hidden    []hiddenSpec
+	output    outputSpec
+	loss      loss.Type
+	rate      float32
+	maxIters  uint
+	lossLimit float32
+}
+
+// xorTopology returns the canonical single-hidden XOR setup used by
+// main(). Single-hidden remains the regression baseline for the
+// example; multi-hidden coverage lives in main_test.go.
+func xorTopology() trainConfig {
+	return trainConfig{
+		inputSize: 2,
+		hidden: []hiddenSpec{
+			{size: 4, act: activation.SIGMOID, bias: true},
+		},
+		output:    outputSpec{size: 1, act: activation.SIGMOID, bias: true},
+		loss:      loss.MSE,
+		rate:      0.3,
+		maxIters:  10_000,
+		lossLimit: 1e-4,
+	}
+}
 
 func main() {
-	if err := run("nn-roundtrip"); err != nil {
+	if err := run("nn-roundtrip", xorTopology()); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
@@ -57,8 +100,8 @@ func xorDataset() []nn.Sample[float32] {
 // difference between original and reloaded Query outputs. Tests call it
 // directly so the assertion can read the numeric drift instead of
 // scraping stdout.
-func run(label string) error {
-	original, err := train()
+func run(label string, tc trainConfig) error {
+	original, err := train(tc)
 	if err != nil {
 		return fmt.Errorf("train: %w", err)
 	}
@@ -79,8 +122,8 @@ func run(label string) error {
 	cfgPath := filepath.Join(dir, "config.json")
 	weightsPath := filepath.Join(dir, "weights.json")
 
-	cfg := buildConfigDoc()
-	weights := extractWeights(original)
+	cfg := buildConfigDoc(tc)
+	weights := extractWeights(original, tc)
 	if err := persistence.WriteConfig(cfgPath, cfg); err != nil {
 		return fmt.Errorf("write config: %w", err)
 	}
@@ -97,11 +140,11 @@ func run(label string) error {
 		return fmt.Errorf("InputSize drift: want %d got %d", cfg.InputSize, loadedCfg.InputSize)
 	}
 
-	rebuilt, err := buildBlank()
+	rebuilt, err := buildBlank(tc)
 	if err != nil {
 		return fmt.Errorf("blank net: %w", err)
 	}
-	if err := installWeights(rebuilt, loadedWeights); err != nil {
+	if err := installWeights(rebuilt, tc, loadedWeights); err != nil {
 		return fmt.Errorf("install weights: %w", err)
 	}
 
@@ -125,15 +168,19 @@ func run(label string) error {
 	return nil
 }
 
-func train() (*nn.NN[float32], error) {
-	n, err := nn.NewBuilder[float32]().
-		Input(2).
-		Dense(hiddenSize, hiddenAct, true).
-		Output(1, outputAct, true).
-		WithLearningRate(rate).
-		WithLoss(lossMode).
-		WithMaxIterations(maxIters).
-		WithLossLimit(lossLimit).
+// train builds the network described by tc and runs Fit on the XOR
+// dataset. Returns the trained NN; callers extract weights from it.
+func train(tc trainConfig) (*nn.NN[float32], error) {
+	b := nn.NewBuilder[float32]().Input(tc.inputSize)
+	for _, h := range tc.hidden {
+		b = b.Dense(h.size, h.act, h.bias)
+	}
+	n, err := b.
+		Output(tc.output.size, tc.output.act, tc.output.bias).
+		WithLearningRate(tc.rate).
+		WithLoss(tc.loss).
+		WithMaxIterations(tc.maxIters).
+		WithLossLimit(tc.lossLimit).
 		Compile()
 	if err != nil {
 		return nil, err
@@ -147,114 +194,181 @@ func train() (*nn.NN[float32], error) {
 // buildBlank constructs a network with the same topology as train() but
 // without running Fit. Random init guarantees its outputs differ from
 // the trained network — installWeights then overwrites those weights.
-func buildBlank() (*nn.NN[float32], error) {
-	return nn.NewBuilder[float32]().
-		Input(2).
-		Dense(hiddenSize, hiddenAct, true).
-		Output(1, outputAct, true).
-		WithLearningRate(rate).
-		WithLoss(lossMode).
+func buildBlank(tc trainConfig) (*nn.NN[float32], error) {
+	b := nn.NewBuilder[float32]().Input(tc.inputSize)
+	for _, h := range tc.hidden {
+		b = b.Dense(h.size, h.act, h.bias)
+	}
+	return b.
+		Output(tc.output.size, tc.output.act, tc.output.bias).
+		WithLearningRate(tc.rate).
+		WithLoss(tc.loss).
 		WithMaxIterations(1).
 		Compile()
 }
 
-// buildConfigDoc returns the on-disk projection of the topology used in
-// train(). Kept alongside train() so the two cannot drift — any change
-// to the architecture must update both call sites.
-func buildConfigDoc() persistence.ConfigDoc[float32] {
+// buildConfigDoc returns the on-disk projection of tc. Kept alongside
+// train() so the two cannot drift — any change to the architecture
+// must update both call sites.
+func buildConfigDoc(tc trainConfig) persistence.ConfigDoc[float32] {
+	hiddens := make([]persistence.HiddenLayerDoc, len(tc.hidden))
+	for i, h := range tc.hidden {
+		hiddens[i] = persistence.HiddenLayerDoc{
+			Size:       h.size,
+			Activation: h.act.String(),
+			Bias:       h.bias,
+		}
+	}
 	return persistence.ConfigDoc[float32]{
-		LibVersion: "0.1.0",
-		InputSize:  2,
-		HiddenLayers: []persistence.HiddenLayerDoc{
-			{Size: hiddenSize, Activation: hiddenAct.String(), Bias: true},
+		LibVersion:   "0.2.0",
+		InputSize:    tc.inputSize,
+		HiddenLayers: hiddens,
+		Output: persistence.OutputDoc{
+			Size:       tc.output.size,
+			Activation: tc.output.act.String(),
+			Bias:       tc.output.bias,
 		},
-		Output: persistence.OutputDoc{Size: 1, Activation: outputAct.String(), Bias: true},
 		Training: persistence.TrainingDoc[float32]{
-			LearningRate:  rate,
-			Loss:          lossMode.String(),
-			LossLimit:     lossLimit,
-			MaxIterations: maxIters,
+			LearningRate:  tc.rate,
+			Loss:          tc.loss.String(),
+			LossLimit:     tc.lossLimit,
+			MaxIterations: tc.maxIters,
 			WeightInit:    "xavier",
 		},
 	}
 }
 
-// extractWeights walks a trained network's bundles and packages each
-// layer's axon weights + bias contributions into the on-disk schema.
-// Hidden cells have len(Input)+1 axons (last one is bias); output cells
-// have len(Hidden)+1 axons (last one is bias).
+// extractWeights walks every Hiddens[i] bundle plus the Output bundle
+// and packages their axon weights into the on-disk schema. Per-layer
+// Bias state is read from tc — when bias is false the cell carries no
+// bias axon, so the row width and Biases slice shape change accordingly.
 //
-// Track C (Phase 5 v0.6) generalises this helper to walk every entry in
-// n.Network.Hiddens; for v0.5 single-hidden examples we still emit one
-// "hidden_0" layer plus output.
-func extractWeights(n *nn.NN[float32]) persistence.WeightsDoc[float32] {
-	hiddenCells := n.Network.Hiddens[0].Cells()
-	hiddenLayer := persistence.LayerWeights[float32]{
-		Name:    "hidden_0",
-		Weights: make([][]float32, len(hiddenCells)),
-		Biases:  make([]float32, len(hiddenCells)),
+// Layer naming convention (matches l2-multihidden-impl §5.4): hidden_0,
+// hidden_1, …, output.
+func extractWeights(n *nn.NN[float32], tc trainConfig) persistence.WeightsDoc[float32] {
+	layers := make([]persistence.LayerWeights[float32], 0, len(tc.hidden)+1)
+	for i, h := range tc.hidden {
+		cells := n.Network.Hiddens[i].Cells()
+		layers = append(layers, extractLayer(
+			fmt.Sprintf("hidden_%d", i),
+			h.bias,
+			len(cells),
+			func(cellIdx int) []float32 { return axonWeights(n.Network.Hiddens[i].Cells()[cellIdx].Axons) },
+		))
 	}
-	for i, h := range hiddenCells {
-		row := make([]float32, len(h.Axons)-1) // last axon is bias
-		for j := 0; j < len(h.Axons)-1; j++ {
-			row[j] = h.Axons[j].Weight
-		}
-		hiddenLayer.Weights[i] = row
-		hiddenLayer.Biases[i] = h.Axons[len(h.Axons)-1].Weight
-	}
+	outCells := n.Network.Output.Cells()
+	layers = append(layers, extractLayer(
+		"output",
+		tc.output.bias,
+		len(outCells),
+		func(cellIdx int) []float32 { return axonWeights(outCells[cellIdx].Axons) },
+	))
+	return persistence.WeightsDoc[float32]{Layers: layers}
+}
 
-	outputCells := n.Network.Output.Cells()
-	outputLayer := persistence.LayerWeights[float32]{
-		Name:    "output",
-		Weights: make([][]float32, len(outputCells)),
-		Biases:  make([]float32, len(outputCells)),
+// extractLayer is the shared shape-aware packager. Bias axons live at
+// the tail of the cell's Axons slice when hasBias is true; otherwise
+// every axon contributes to the Weights matrix.
+func extractLayer(name string, hasBias bool, numCells int, axonsForCell func(int) []float32) persistence.LayerWeights[float32] {
+	out := persistence.LayerWeights[float32]{
+		Name:    name,
+		Weights: make([][]float32, numCells),
 	}
-	for i, o := range outputCells {
-		row := make([]float32, len(o.Axons)-1)
-		for j := 0; j < len(o.Axons)-1; j++ {
-			row[j] = o.Axons[j].Weight
+	if hasBias {
+		out.Biases = make([]float32, numCells)
+	}
+	for i := range numCells {
+		ws := axonsForCell(i)
+		split := len(ws)
+		if hasBias {
+			split--
 		}
-		outputLayer.Weights[i] = row
-		outputLayer.Biases[i] = o.Axons[len(o.Axons)-1].Weight
+		row := make([]float32, split)
+		copy(row, ws[:split])
+		out.Weights[i] = row
+		if hasBias {
+			out.Biases[i] = ws[split]
+		}
 	}
-
-	return persistence.WeightsDoc[float32]{
-		Layers: []persistence.LayerWeights[float32]{hiddenLayer, outputLayer},
-	}
+	return out
 }
 
 // installWeights performs the inverse of extractWeights: copy the
 // loaded weight values back into a freshly compiled network's axons.
-// Bias axons are always the last entry in each cell's Axons slice.
-func installWeights(n *nn.NN[float32], doc persistence.WeightsDoc[float32]) error {
-	if len(doc.Layers) != 2 {
-		return fmt.Errorf("expected 2 layers, got %d", len(doc.Layers))
+// Bias axons are at the tail of each cell's Axons slice when the layer
+// declares bias == true.
+func installWeights(n *nn.NN[float32], tc trainConfig, doc persistence.WeightsDoc[float32]) error {
+	wantLayers := len(tc.hidden) + 1
+	if len(doc.Layers) != wantLayers {
+		return fmt.Errorf("expected %d layers (hidden chain + output), got %d", wantLayers, len(doc.Layers))
 	}
-	hiddenCells := n.Network.Hiddens[0].Cells()
-	for i, h := range hiddenCells {
-		row := doc.Layers[0].Weights[i]
-		if len(row) != len(h.Axons)-1 {
-			return fmt.Errorf("hidden[%d] axon count mismatch: doc %d, net %d",
-				i, len(row), len(h.Axons)-1)
+	for i, h := range tc.hidden {
+		cells := n.Network.Hiddens[i].Cells()
+		layer := doc.Layers[i]
+		if err := installLayer(fmt.Sprintf("hidden_%d", i), h.bias, len(cells), layer,
+			func(cellIdx int, axonIdx int, w float32) {
+				cells[cellIdx].Axons[axonIdx].Weight = w
+			},
+			func(cellIdx int) int { return len(cells[cellIdx].Axons) },
+		); err != nil {
+			return err
+		}
+	}
+	outCells := n.Network.Output.Cells()
+	outLayer := doc.Layers[len(doc.Layers)-1]
+	return installLayer("output", tc.output.bias, len(outCells), outLayer,
+		func(cellIdx int, axonIdx int, w float32) {
+			outCells[cellIdx].Axons[axonIdx].Weight = w
+		},
+		func(cellIdx int) int { return len(outCells[cellIdx].Axons) },
+	)
+}
+
+// installLayer mirrors extractLayer for the install side. setAxon /
+// axonCount close over the live cell slice so this helper stays free
+// of the generic *cell.Hidden / *cell.Output type split.
+func installLayer(
+	name string,
+	hasBias bool,
+	numCells int,
+	layer persistence.LayerWeights[float32],
+	setAxon func(cellIdx, axonIdx int, w float32),
+	axonCount func(cellIdx int) int,
+) error {
+	if len(layer.Weights) != numCells {
+		return fmt.Errorf("%s: doc has %d cells, net has %d", name, len(layer.Weights), numCells)
+	}
+	if hasBias && len(layer.Biases) != numCells {
+		return fmt.Errorf("%s: bias count mismatch — doc %d, net %d", name, len(layer.Biases), numCells)
+	}
+	for i := range numCells {
+		row := layer.Weights[i]
+		expectedSplit := axonCount(i)
+		if hasBias {
+			expectedSplit--
+		}
+		if len(row) != expectedSplit {
+			return fmt.Errorf("%s[%d]: weight row width %d != expected %d", name, i, len(row), expectedSplit)
 		}
 		for j, w := range row {
-			h.Axons[j].Weight = w
+			setAxon(i, j, w)
 		}
-		h.Axons[len(h.Axons)-1].Weight = doc.Layers[0].Biases[i]
-	}
-	outputCells := n.Network.Output.Cells()
-	for i, o := range outputCells {
-		row := doc.Layers[1].Weights[i]
-		if len(row) != len(o.Axons)-1 {
-			return fmt.Errorf("output[%d] axon count mismatch: doc %d, net %d",
-				i, len(row), len(o.Axons)-1)
+		if hasBias {
+			setAxon(i, expectedSplit, layer.Biases[i])
 		}
-		for j, w := range row {
-			o.Axons[j].Weight = w
-		}
-		o.Axons[len(o.Axons)-1].Weight = doc.Layers[1].Biases[i]
 	}
 	return nil
+}
+
+// axonWeights collects the live Weight scalars from an axon bundle.
+// Defined as a free helper so the extract path keeps a flat structure
+// and the slice-of-cells iteration stays readable.
+func axonWeights(axons axon.Bundle[float32]) []float32 {
+	w := make([]float32, len(axons))
+	for i, a := range axons {
+		w[i] = a.Weight
+	}
+	return w
 }
 
 func queryAll(n *nn.NN[float32]) ([][]float32, error) {

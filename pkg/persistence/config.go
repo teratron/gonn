@@ -26,7 +26,18 @@ import (
 // SchemaVersion is the wire-format version embedded in every ConfigDoc /
 // WeightsDoc. Bump rules per [l1-network-persistence] PERS-1: major change
 // is breaking; minor / patch are forward-compatible (warning, not fatal).
-const SchemaVersion = "1.0.0"
+//
+// Version history:
+//
+//   - 1.0.0 (Phase 3) — single-hidden topology baseline.
+//   - 1.1.0 (Phase 5 / Track C) — multi-hidden chain.  WeightsDoc.Layers
+//     now carries N+1 entries (one per HiddenLayers entry plus output).
+//     Forward-compatible minor bump per PERS-1: v0.1 readers loading a
+//     v0.2 file pass schema validation but fail later on cell-count
+//     reconciliation with ErrIntegrity rather than a parse crash; v0.2
+//     readers loading a v0.1 file see a single hidden entry and rebuild
+//     correctly.
+const SchemaVersion = "1.1.0"
 
 // HiddenLayerDoc mirrors one [pkg/nn].HiddenLayerSpec entry on disk.
 // Activation is serialised as the canonical String() form (e.g. "ReLU")
