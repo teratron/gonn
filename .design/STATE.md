@@ -18,11 +18,11 @@
 ## Progress
 
 ```
-Phase 1 (Done):   [22/22]  ████████ 100%
-Phase 2 (Done):   [26/26]  ████████ 100%
-Phase 3 (Done):   [19/19]  ████████ 100%
-Phase 4 (Done):   [14/14]  ████████ 100%
-Phase 5 (Done):   [23/23]  ████████ 100%   (all tracks + gate complete)
+Phase 1 (Done):   [22/22]   ████████ 100%
+Phase 2 (Done):   [26/26]   ████████ 100%
+Phase 3 (Done):   [19/19]   ████████ 100%
+Phase 4 (Done):   [14/14]   ████████ 100%
+Phase 5 (Done):   [23/23]   ████████ 100%   (all tracks + gate complete)
 Overall:          [104/104] ████████ 100%
 ```
 
