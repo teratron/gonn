@@ -16,9 +16,9 @@ import (
 // runtime type assertions, so we keep one registry per supported width.
 // Both maps share registryMu.
 var (
-	registryMu  sync.RWMutex
-	factoryF32  = make(map[string]func() any)
-	factoryF64  = make(map[string]func() any)
+	registryMu sync.RWMutex
+	factoryF32 = make(map[string]func() any)
+	factoryF64 = make(map[string]func() any)
 )
 
 // Register installs factory under name for both float32 and float64

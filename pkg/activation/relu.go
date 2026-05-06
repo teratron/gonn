@@ -1,7 +1,9 @@
 package activation
 
+import "github.com/teratron/gonn/pkg/utils"
+
 // ReLU activation function: f(x) = x < 0 ? leak * x : x
-func reluActivation[T float32 | float64](value T, leak float64) T {
+func reluActivation[T utils.Float](value T, leak float64) T {
 	if value < T(0) {
 		return value * T(leak)
 	} else {
@@ -10,7 +12,7 @@ func reluActivation[T float32 | float64](value T, leak float64) T {
 }
 
 // ReLU derivative function
-func reluDerivative[T float32 | float64](value T, leak float64) T {
+func reluDerivative[T utils.Float](value T, leak float64) T {
 	if value < T(0) {
 		return T(leak)
 	} else {

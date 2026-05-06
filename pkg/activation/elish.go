@@ -1,9 +1,12 @@
 package activation
 
-import "math"
+import (
+	"github.com/teratron/gonn/pkg/utils"
+	"math"
+)
 
 // ELISH activation function: f(x) = x >= 0 ? x * sigmoid(x) : (exp(x) - 1) * sigmoid(x)
-func elishActivation[T float32 | float64](value T) T {
+func elishActivation[T utils.Float](value T) T {
 	sigmoidVal := T(1.0) / (T(1.0) + T(math.Exp(float64(-value))))
 	if value >= T(0) {
 		return value * sigmoidVal
@@ -13,7 +16,7 @@ func elishActivation[T float32 | float64](value T) T {
 }
 
 // ELISH derivative function
-func elishDerivative[T float32 | float64](value T) T {
+func elishDerivative[T utils.Float](value T) T {
 	sigmoidVal := T(1.0) / (T(1.0) + T(math.Exp(float64(-value))))
 	sigmoidDeriv := sigmoidVal * (T(1.0) - sigmoidVal)
 	if value >= T(0) {

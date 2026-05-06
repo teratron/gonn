@@ -260,4 +260,3 @@ func resolveLoss(name string) (loss.Type, error) {
 	}
 	return 0, utils.Newf(utils.ErrUserConfig, "loss %q is not registered", name)
 }
-

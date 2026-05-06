@@ -11,25 +11,25 @@ type Type uint8
 
 // Loss function mode.
 const (
-	MSE       Type = iota // MSE - Mean Squared Error
-	MAE                   // MAE - Mean Absolute Error (equivalent to Avg)
-	CCE                   // CCE - Categorical Cross-Entropy
-	BCE                   // BCE - Binary Cross-Entropy
-	CROSS_ENTROPY         // CROSS_ENTROPY - Cross-Entropy (alias for CCE)
-	MAPE                  // MAPE - Mean Absolute Percentage Error
-	MSLE                  // MSLE - Mean Squared Logarithmic Error
-	KLD                   // KLD - Kullback-Leibler Divergence
-	COSINE                // COSINE - Cosine Similarity/Distance
-	POISSON               // POISSON - Poisson Loss Function
-	HINGE                 // HINGE - Hinge Loss
-	SQ_HINGE              // SQ_HINGE - Squared Hinge Loss
-	CAT_HINGE             // CAT_HINGE - Categorical Hinge Loss
-	LOG_COSH              // LOG_COSH - Log-Cosh Loss
-	HUBER                 // HUBER - Huber Loss
-	AVG                   // AVG - Average Error (Mean Absolute Error)
-	RMSE                  // RMSE - Root Mean Squared Error
-	ARCTAN                // ARCTAN - Arctan Error
-	DEFAULT   = MSE
+	MSE           Type = iota // MSE - Mean Squared Error
+	MAE                       // MAE - Mean Absolute Error (equivalent to Avg)
+	CCE                       // CCE - Categorical Cross-Entropy
+	BCE                       // BCE - Binary Cross-Entropy
+	CROSS_ENTROPY             // CROSS_ENTROPY - Cross-Entropy (alias for CCE)
+	MAPE                      // MAPE - Mean Absolute Percentage Error
+	MSLE                      // MSLE - Mean Squared Logarithmic Error
+	KLD                       // KLD - Kullback-Leibler Divergence
+	COSINE                    // COSINE - Cosine Similarity/Distance
+	POISSON                   // POISSON - Poisson Loss Function
+	HINGE                     // HINGE - Hinge Loss
+	SQ_HINGE                  // SQ_HINGE - Squared Hinge Loss
+	CAT_HINGE                 // CAT_HINGE - Categorical Hinge Loss
+	LOG_COSH                  // LOG_COSH - Log-Cosh Loss
+	HUBER                     // HUBER - Huber Loss
+	AVG                       // AVG - Average Error (Mean Absolute Error)
+	RMSE                      // RMSE - Root Mean Squared Error
+	ARCTAN                    // ARCTAN - Arctan Error
+	DEFAULT       = MSE
 )
 
 func CalculateTotalLoss[T utils.Float](misses *[]*T, mode Type) (loss T) {

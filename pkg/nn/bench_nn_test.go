@@ -7,6 +7,7 @@
 package nn
 
 import (
+	"github.com/teratron/gonn/pkg/utils"
 	"testing"
 
 	"github.com/teratron/gonn/pkg/activation"
@@ -15,7 +16,7 @@ import (
 
 // xorDataset returns the canonical 4-sample XOR training set used by
 // the public-facade benchmarks below.
-func xorDataset[T float32 | float64]() []Sample[T] {
+func xorDataset[T utils.Float]() []Sample[T] {
 	return []Sample[T]{
 		{Input: []T{0, 0}, Target: []T{0}},
 		{Input: []T{0, 1}, Target: []T{1}},
@@ -27,7 +28,7 @@ func xorDataset[T float32 | float64]() []Sample[T] {
 // newXORNetwork constructs the canonical XOR topology: 2 → 4 (Sigmoid)
 // → 1 (Sigmoid). MustNew is fine because compile errors here would be
 // programming bugs, not runtime conditions.
-func newXORNetwork[T float32 | float64]() *NN[T] {
+func newXORNetwork[T utils.Float]() *NN[T] {
 	return MustNew[T](
 		WithInput[T](2),
 		WithHiddenLayer[T](4, activation.SIGMOID),

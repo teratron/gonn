@@ -1,9 +1,12 @@
 package loss
 
-import "math"
+import (
+	"github.com/teratron/gonn/pkg/utils"
+	"math"
+)
 
 // Poisson Loss Function: Poisson = predicted - target * log(predicted)
-func poissonLoss[T float32 | float64](predicted, target T) T {
+func poissonLoss[T utils.Float](predicted, target T) T {
 	epsilon := T(1e-7)
 	clampedPred := predicted
 	if clampedPred < epsilon {

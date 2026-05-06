@@ -1,10 +1,13 @@
 package loss
 
-import "math"
+import (
+	"github.com/teratron/gonn/pkg/utils"
+	"math"
+)
 
 // Categorical Cross-Entropy loss function: CCE = -sum(target * log(predicted))
 // This implementation works with vector inputs (slices)
-func cceLoss[T float32 | float64](predicted, target []T) T {
+func cceLoss[T utils.Float](predicted, target []T) T {
 	if len(predicted) != len(target) {
 		return 0 // Return 0 if slices have different lengths
 	}
@@ -29,6 +32,6 @@ func cceLoss[T float32 | float64](predicted, target []T) T {
 }
 
 // For single value, return 0 as CCE requires vectors
-func cceLossSingle[T float32 | float64](predicted, target T) T {
+func cceLossSingle[T utils.Float](predicted, target T) T {
 	return 0
 }

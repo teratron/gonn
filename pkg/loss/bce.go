@@ -1,9 +1,12 @@
 package loss
 
-import "math"
+import (
+	"github.com/teratron/gonn/pkg/utils"
+	"math"
+)
 
 // Binary Cross-Entropy loss function: BCE = -(target * log(predicted) + (1 - target) * log(1 - predicted))
-func bceLoss[T float32 | float64](predicted, target T) T {
+func bceLoss[T utils.Float](predicted, target T) T {
 	// Clamp predicted to avoid log(0) which would result in -inf
 	epsilon := T(1e-7)
 	clampedPred := predicted

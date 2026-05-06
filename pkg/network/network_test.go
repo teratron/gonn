@@ -180,9 +180,9 @@ func TestXORConvergence(t *testing.T) {
 	}
 
 	const (
-		maxEpochs   = 20000
-		targetLoss  = 0.02
-		predictTol  = 0.4 // sigmoid output must land on the correct side of 0.5
+		maxEpochs  = 20000
+		targetLoss = 0.02
+		predictTol = 0.4 // sigmoid output must land on the correct side of 0.5
 	)
 	var lastLoss float64
 	for epoch := range maxEpochs {

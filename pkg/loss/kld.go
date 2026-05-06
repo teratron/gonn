@@ -1,9 +1,12 @@
 package loss
 
-import "math"
+import (
+	"github.com/teratron/gonn/pkg/utils"
+	"math"
+)
 
 // Kullback-Leibler Divergence loss function: KLD = sum(target * log(target / predicted))
-func kldLoss[T float32 | float64](predicted, target T) T {
+func kldLoss[T utils.Float](predicted, target T) T {
 	epsilon := T(1e-7)
 	clampedPred := predicted
 	if clampedPred < epsilon {

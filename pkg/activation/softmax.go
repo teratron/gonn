@@ -1,9 +1,12 @@
 package activation
 
-import "math"
+import (
+	"github.com/teratron/gonn/pkg/utils"
+	"math"
+)
 
 // Softmax activation function (simplified for single value)
-func softmaxActivation[T float32 | float64](value T) T {
+func softmaxActivation[T utils.Float](value T) T {
 	// This is a placeholder. The actual implementation would require a vector of values.
 	expVal := T(math.Exp(float64(value)))
 	// In a real scenario, we would need the sum of exps for all values in the layer.
@@ -13,7 +16,7 @@ func softmaxActivation[T float32 | float64](value T) T {
 }
 
 // Softmax derivative function (simplified for single value)
-func softmaxDerivative[T float32 | float64](value T) T {
+func softmaxDerivative[T utils.Float](value T) T {
 	// The derivative of softmax is more complex and depends on the output vector.
 	// For a single value, we can approximate with the derivative of the simplified activation.
 	activationVal := softmaxActivation(value)

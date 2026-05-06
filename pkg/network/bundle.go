@@ -48,4 +48,3 @@ func (b *bundle[T, S]) Cells() []S {
 func (b *bundle[T, S]) At(idx int) S {
 	return b.cells[idx]
 }
-

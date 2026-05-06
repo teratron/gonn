@@ -1,16 +1,18 @@
 package loss
 
+import "github.com/teratron/gonn/pkg/utils"
+
 // Huber Loss: HUBER = { 0.5 * (predicted - target)²                    if |predicted - target| <= delta
 //
 //	{ delta * |predicted - target| - 0.5 * delta²    otherwise
 //
 // Using delta = 1.0 as default
-func huberLoss[T float32 | float64](predicted, target T) T {
+func huberLoss[T utils.Float](predicted, target T) T {
 	return huberLossWithDelta(predicted, target, 1.0)
 }
 
 // Huber Loss with custom delta parameter
-func huberLossWithDelta[T float32 | float64](predicted, target T, delta float64) T {
+func huberLossWithDelta[T utils.Float](predicted, target T, delta float64) T {
 	diff := predicted - target
 	absDiff := diff
 	if diff < 0 {

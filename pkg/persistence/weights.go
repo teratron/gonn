@@ -35,9 +35,9 @@ type LayerWeights[T utils.Float] struct {
 // loading mismatched pairs surfaces an ErrIntegrity (PERS-3) instead of
 // silently producing a network with the wrong topology.
 type WeightsDoc[T utils.Float] struct {
-	SchemaVersion string             `json:"schema_version"`
-	ConfigHash    string             `json:"config_hash"`
-	Layers        []LayerWeights[T]  `json:"layers"`
+	SchemaVersion string            `json:"schema_version"`
+	ConfigHash    string            `json:"config_hash"`
+	Layers        []LayerWeights[T] `json:"layers"`
 }
 
 // WriteWeights serialises w to path atomically, embedding a SHA-256 of

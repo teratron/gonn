@@ -26,11 +26,11 @@ func sampleSnapshot() Snapshot[float32] {
 		},
 	}
 	return Snapshot[float32]{
-		Iter:    42,
-		Loss:    0.123,
+		Iter:         42,
+		Loss:         0.123,
 		MinLossState: MinLossState[float32]{Iter: 40, Loss: 0.1},
-		RNGState: []byte{1, 2, 3, 4},
-		Config:  cfg,
+		RNGState:     []byte{1, 2, 3, 4},
+		Config:       cfg,
 		Weights: persistence.WeightsDoc[float32]{
 			SchemaVersion: persistence.SchemaVersion,
 			Layers: []persistence.LayerWeights[float32]{

@@ -52,10 +52,10 @@ func TestForwardXORReferenceMath(t *testing.T) {
 		input []float32
 		want  []float32
 	}{
-		{[]float32{0, 0}, []float32{0, 0}},  // sum=0, sum=−1 → relu = 0,0
-		{[]float32{1, 0}, []float32{1, 0}},  // sum=1, sum=0  → relu = 1,0
+		{[]float32{0, 0}, []float32{0, 0}}, // sum=0, sum=−1 → relu = 0,0
+		{[]float32{1, 0}, []float32{1, 0}}, // sum=1, sum=0  → relu = 1,0
 		{[]float32{0, 1}, []float32{1, 0}},
-		{[]float32{1, 1}, []float32{2, 1}},  // sum=2, sum=1
+		{[]float32{1, 1}, []float32{2, 1}}, // sum=2, sum=1
 	}
 	for _, tc := range cases {
 		got, err := b.Forward(layer, tc.input)

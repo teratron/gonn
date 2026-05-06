@@ -1,6 +1,7 @@
 package axon
 
 import (
+	"github.com/teratron/gonn/pkg/utils"
 	"math"
 	"sync"
 	"testing"
@@ -19,17 +20,17 @@ type stubNeuron[T neuronFloat] struct {
 	v, miss T
 }
 
-func (s *stubNeuron[T]) GetValue() *T            { return &s.v }
-func (s *stubNeuron[T]) GetMiss() *T             { return &s.miss }
-func (s *stubNeuron[T]) SetMiss(value T)         { s.miss = value }
-func (s *stubNeuron[T]) CalculateValue()         {}
-func (s *stubNeuron[T]) CalculateWeight(_ *T)    {}
+func (s *stubNeuron[T]) GetValue() *T         { return &s.v }
+func (s *stubNeuron[T]) GetMiss() *T          { return &s.miss }
+func (s *stubNeuron[T]) SetMiss(value T)      { s.miss = value }
+func (s *stubNeuron[T]) CalculateValue()      {}
+func (s *stubNeuron[T]) CalculateWeight(_ *T) {}
 
 // neuronFloat is a private alias of utils.Float to keep stub signatures
 // concise — the public utils.Float constraint is what production code
 // uses, this is only for stub plumbing inside the test file.
 type neuronFloat interface {
-	float32 | float64
+	utils.Float
 }
 
 func approx(a, b float64) bool { return math.Abs(a-b) <= 1e-9 }

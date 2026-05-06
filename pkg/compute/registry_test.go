@@ -16,12 +16,12 @@ import (
 
 type stubBackend[T utils.Float] struct{ name string }
 
-func (s stubBackend[T]) Name() string                                            { return s.name }
-func (s stubBackend[T]) Forward(LayerHandle[T], []T) ([]T, error)                { return nil, nil }
-func (s stubBackend[T]) Backward(LayerHandle[T], []T) ([]T, error)               { return nil, nil }
-func (s stubBackend[T]) UpdateWeights(LayerHandle[T], []T, []T, T) error         { return nil }
-func (s stubBackend[T]) Allocate(int) (Buffer[T], error)                         { return Buffer[T]{}, nil }
-func (s stubBackend[T]) Free(Buffer[T]) error                                    { return nil }
+func (s stubBackend[T]) Name() string                                    { return s.name }
+func (s stubBackend[T]) Forward(LayerHandle[T], []T) ([]T, error)        { return nil, nil }
+func (s stubBackend[T]) Backward(LayerHandle[T], []T) ([]T, error)       { return nil, nil }
+func (s stubBackend[T]) UpdateWeights(LayerHandle[T], []T, []T, T) error { return nil }
+func (s stubBackend[T]) Allocate(int) (Buffer[T], error)                 { return Buffer[T]{}, nil }
+func (s stubBackend[T]) Free(Buffer[T]) error                            { return nil }
 
 func TestRegisterAndGetF32(t *testing.T) {
 	Register("stub32", func() Backend[float32] {

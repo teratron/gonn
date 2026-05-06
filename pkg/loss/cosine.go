@@ -1,9 +1,12 @@
 package loss
 
-import "math"
+import (
+	"github.com/teratron/gonn/pkg/utils"
+	"math"
+)
 
 // Cosine similarity/distance calculation for vectors
-func cosineLossVector[T float32 | float64](predicted, target []T) T {
+func cosineLossVector[T utils.Float](predicted, target []T) T {
 	if len(predicted) != len(target) || len(predicted) == 0 {
 		return 0
 	}
