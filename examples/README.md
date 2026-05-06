@@ -1,64 +1,62 @@
 # GoNN Examples Catalog
 
-Implements the v0.5 subset of [`l2-usage-examples.md`](../.design/specifications/l2-usage-examples.md). Every active example is its own Go module with a smoke test gated on `go test ./examples/...`.
+Implements the v0.2 multi-hidden subset of [`l2-usage-examples.md`](../.design/specifications/l2-usage-examples.md). Every active example is its own Go module with a smoke test.
 
-## v0.5 Active
+## Active
 
 | ID | Path | Style | Demonstrates |
 | :--- | :--- | :--- | :--- |
 | E01 | [xor](xor/) | Builder + Options | Canonical XOR — dual-style parity baseline |
 | E02 | [logic_gates](logic_gates/) | Builder | AND / OR / NAND truth-table fits |
-| E04 | [binary_classification](binary_classification/) | Options | Multi-hidden + BCE + He init + custom metric |
+| E03 | [perceptron](perceptron/) | Builder | 4-hidden mixed-activation topology (3→Sigmoid(5)→ReLU(10)→Sigmoid(5)→SoftMax(2)) |
+| E04 | [binary_classification](binary_classification/) | Options | Multi-hidden BCE + He init; Gaussian-blob 2-class dataset |
+| E05 | [iris](iris/) | Options | Multi-hidden MSE + EpochCallback; Fisher iris 3-class, `go:embed` CSV |
+| E07 | [regression_sin](regression_sin/) | Options | 2-hidden TanH sine regression; RMSE target ≤ 0.10 |
+| E08 | [regression_multi](regression_multi/) | Options | 2-hidden ReLU+He; 5-input → 3-output regression, per-dim RMSE ≤ 0.20 |
 | E09 | [persistence](persistence/) | Builder + `pkg/persistence` | Save → reload → query, ULP-1 round-trip (PERS-4) |
 | E11 | [callbacks](callbacks/) | Options | `WithEpochCallback` + `WithBatchCallback` |
 | E12 | [style_showcase](style_showcase/) | Builder + Options + Preset | Three-style equivalence on the same network |
-| E14 | [shared_options](shared_options/) | Options | Shared `[]Option[T]` across two single-hidden topologies (adapted from spec Topology B) |
+| E13 | [higher_order_options](higher_order_options/) | Options | `Sequential` + `DeepNetwork` higher-order options; iris CSV reuse |
+| E14 | [shared_options](shared_options/) | Options | Shared `[]Option[T]` across two topologies |
 | E15 | [precision](precision/) | Builder | `float32` vs `float64` parity at identical hyperparameters |
 
-Run any one example: `go run ./examples/{name}/`. Run the whole smoke suite: `go test ./examples/...`.
+Run any one example: `go run ./examples/{name}/`. Run the whole smoke suite from the workspace root: `go test ./...`.
 
-## Deferred to v0.6
-
-These catalog entries stay in the spec but require features not yet in v0.5. Each unblocks once its gate clears.
+## Deferred
 
 | ID | Path | Gate |
 | :--- | :--- | :--- |
-| E03 | [perceptron](perceptron/) | v0.6 multi-hidden (file currently runs a single-hidden stub; `// removed once v0.6 lands`) |
-| E05 | `examples/iris/` | v0.6 multi-hidden |
-| E06 | `examples/mnist/` | v0.6 multi-hidden + dataset-loader spec |
-| E07 | `examples/regression_sin/` | v0.6 multi-hidden |
-| E08 | `examples/regression_multi/` | v0.6 multi-hidden + `PresetRegression` extension |
+| E06 | `examples/mnist/` | dataset-loader spec + MNIST download |
 | E10 | `examples/continuation/` | `AndTrain` API surface |
-| E13 | `examples/higher_order_options/` | v0.6 multi-hidden |
 
-## Coverage Matrix Audit
+## Coverage Matrix
 
-Cross-reference of `l2-usage-examples` §5.3 against the v0.5 active examples. **`covered`** means at least one active example exercises the API element; **`v0.6`** means the remaining covering examples are deferred.
+Cross-reference of `l2-usage-examples` §5.3 against active examples. **`covered`** means at least one active example exercises the element.
 
-| API Element | v0.5 status | Active examples | Notes |
+| API Element | Status | Active examples | Notes |
 | :--- | :--- | :--- | :--- |
-| `NewBuilder[T]()` + `Compile()` | covered | E01, E02, E12, E15 | E03/E07/E10 deferred |
-| `New[T](opts...)` / `MustNew[T]` | covered | E01, E11, E12, E14 | E04/E05/E08/E13 deferred |
-| `Input` / `WithInput` | covered | all v0.5 actives | — |
-| `Dense` / `WithHiddenLayer` | covered | all v0.5 actives | — |
-| `Output` / `WithOutput` | covered | all v0.5 actives | — |
-| `WithLearningRate` | covered | all v0.5 actives | — |
-| `WithLoss` | covered | all v0.5 actives | — |
-| `WithBias` | covered | E11 (preset → bias on), E14, E04 | E03 deferred |
-| `WithWeightInit` (xavier/he) | covered | E01 (xavier), E04 (he) | E06 he, E07 xavier deferred |
-| `WithMaxIterations` | covered | all v0.5 actives | — |
-| `WithLossLimit` | covered | E01, E12, E14 | — |
-| `WithEpochCallback` | covered | E11 | E05 deferred |
+| `NewBuilder[T]()` + `Compile()` | covered | E01, E02, E03, E12, E15 | — |
+| `New[T](opts...)` / `MustNew[T]` | covered | E01, E04, E05, E07, E08, E11, E12, E13, E14 | — |
+| `Input` / `WithInput` | covered | all actives | — |
+| `Dense` / `WithHiddenLayer` (multi) | covered | E03, E04, E05, E07, E08 | — |
+| `Output` / `WithOutput` | covered | all actives | — |
+| `WithLearningRate` | covered | all actives | — |
+| `WithLoss` (MSE/BCE/ARCTAN) | covered | E04 (BCE), E05 (MSE), E03 (ARCTAN) | — |
+| `WithBias` | covered | E04, E05, E07, E08, E11, E13, E14 | — |
+| `WithWeightInit` (xavier/he) | covered | E01 (xavier), E04 (he), E07 (xavier), E08 (he) | — |
+| `WithMaxIterations` | covered | all actives | — |
+| `WithLossLimit` | covered | E01, E03, E12, E14 | — |
+| `WithEpochCallback` | covered | E05, E11 | — |
 | `WithBatchCallback` | covered | E11 | — |
-| `Sequential` | **gap → v0.6** | (none) | E13 deferred |
-| `DeepNetwork` | **gap → v0.6** | (none) | E13 deferred |
-| `PresetXOR` | covered | E11 (preset), E12 | — |
-| `PresetMNIST` | **gap → v0.6** | (none) | E06 deferred (multi-hidden + loader) |
-| `PresetRegression` | **gap → v0.6** | (none) | E08 deferred (multi-hidden) |
-| `Train` | covered | all v0.5 actives via `Fit` | — |
-| `Query` | covered | E01, E09, E11, E12, E14, E15 | — |
-| `Verify` | **gap → v0.6** | (none) | E05 / E07 deferred |
-| `AndTrain` | **gap → v0.6** | (none) | API surface not yet defined |
-| `Persistence` (Save / Reload) | covered (manual seam) | E09 | future `nn.Save` / `nn.Load` will close the seam |
+| `Sequential` | covered | E13 | — |
+| `DeepNetwork` | covered | E13 | — |
+| `PresetXOR` | covered | E11, E12 | — |
+| `PresetMNIST` | gap | (none) | E06 deferred (loader) |
+| `PresetRegression` | gap | (none) | requires E08 extension |
+| `Train` | covered | all actives via `Fit` | — |
+| `Query` | covered | E01, E04, E05, E07, E08, E09, E11, E12, E13, E14, E15 | — |
+| `Verify` | gap | (none) | planned E05/E07 extension |
+| `AndTrain` | gap | (none) | E10 deferred |
+| `Persistence` (Save / Reload) | covered | E09 | — |
 
-**v0.5 gap summary**: 6 elements (`Sequential`, `DeepNetwork`, `PresetMNIST`, `PresetRegression`, `Verify`, `AndTrain`) are uncovered until the multi-hidden / `AndTrain` / dataset-loader work lands. None are blocking the v0.5 release bar.
+**Gap summary**: 4 elements (`PresetMNIST`, `PresetRegression`, `Verify`, `AndTrain`) remain uncovered pending E06/E10/loader work.

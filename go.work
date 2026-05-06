@@ -11,4 +11,8 @@ use (
 	./examples/shared_options
 	./examples/precision
 	./examples/binary_classification
+	./examples/iris
+	./examples/regression_sin
+	./examples/regression_multi
+	./examples/higher_order_options
 )
