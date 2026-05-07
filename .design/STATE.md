@@ -5,15 +5,15 @@
 
 **Workspace:** main
 **Project Version:** 0.5.1
-**Updated:** 2026-05-06 18:15
-**Phase:** 5 — Multi-Hidden Topology (v0.2) (**COMPLETE** — all tracks green, phase gate passed)
+**Updated:** 2026-05-07 05:29
+**Phase:** 6 — Feature Expansion + v0.2 Release
 **Status:** Active
 
 ## Current Position
 
-- **Task:** Phase 5 complete — T-5Z01..T-5Z04 gate passed.
-- **Spec:** l2-multihidden-impl Stable v1.0.0; INDEX.md 2.3.0; PLAN.md 1.7.0; TASKS.md 1.7.0; phase-5.md Tracks A + B + C + D all `[x]`.
-- **Next Action:** Phase 6 (if scoped) or v0.2 release prep.
+- **Task:** Phase 6 active — 19 tasks (T-6A01..T-6C03 + T-6T01/T-6T02 + T-6Z01/T-6Z02). Start with T-6A01 (optimizer interface) and T-6B01 (regularizer interface) in parallel.
+- **Spec:** 5 new Phase 6 specs Stable v1.0.0 (l1-optimizer-strategies, l2-optimizer-impl, l1-regularization, l2-regularization-impl, l1-release-policy); INDEX.md 2.4.0; PLAN.md 1.8.0; TASKS.md 1.8.0; phase-6.md created.
+- **Next Action:** Run /magic.run to execute Phase 6 Track A (optimizer), Track B (regularizer), Track C (release prep) in parallel
 
 ## Progress
 

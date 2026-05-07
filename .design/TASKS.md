@@ -1,10 +1,10 @@
 # Master Task Index (Registry)
 
-**Version:** 1.7.0
-**Project Version:** 0.5.1 (v0.5 released; v0.6 active under Phase 5)
+**Version:** 1.8.0
+**Project Version:** 0.5.1 (v0.5 released; v0.6/v0.2 complete; Phase 6 active)
 **Generated:** 2026-04-29
-**Last Updated:** 2026-05-03
-**Based on:** .design/PLAN.md v1.7.0
+**Last Updated:** 2026-05-07
+**Based on:** .design/PLAN.md v1.8.0
 **Based on RULES:** .design/RULES.md v1.2.0
 **Execution Mode:** Parallel (C3)
 **Status:** Active
@@ -21,7 +21,8 @@ Tactical registry of all phases and their statuses. Atomic checklists (`T-XXXX`)
 | [Phase 2](tasks/phase-2.md) | Public Facade Restoration (Track B) — `pkg/nn` | `Done` (2026-04-30) |
 | [Phase 3](tasks/phase-3.md) | New Capability Packages (Track C) — persistence, checkpoint, dataset, compute, perf | `Done` (2026-05-01) |
 | [Phase 4](tasks/phase-4.md) | Examples Catalog (Track D) — `examples/E01..E15` (v0.5 scope: 7 entries) | `Done` (2026-05-02) |
-| [Phase 5](tasks/phase-5.md) | Multi-Hidden Topology (v0.6) — `pkg/network` chain + compile() lift + weights 1.1.0 + 6 catalog examples | `Active` (decomposed 2026-05-03; 19 tasks + 4 gate checks) |
+| [Phase 5](tasks/phase-5.md) | Multi-Hidden Topology (v0.6) — `pkg/network` chain + compile() lift + weights 1.1.0 + 6 catalog examples | `Done` (2026-05-06) |
+| [Phase 6](tasks/phase-6.md) | Feature Expansion + v0.2 Release — `pkg/optimizer/`, `pkg/regularizer/`, axon WeightInit fix, CHANGELOG, v0.2.0 tag | `Active` (decomposed 2026-05-07; 15 tasks + 2 validation + 2 gate) |
 
 ## Phase 0 — Already Complete
 
@@ -78,19 +79,32 @@ Tactical registry of all phases and their statuses. Atomic checklists (`T-XXXX`)
 
 Six of the eight v0.6-gated entries (E03, E04, E05, E07, E08, E13) are now active under Phase 5 — see deliverables table below.
 
-## Phase 5 Deliverables (Pending)
+## Phase 5 Deliverables (Done — 2026-05-06)
 
 | Asset | Spec | Status |
 | :--- | :--- | :--- |
-| `pkg/network/{network,propagation}.go` (multi-hidden chain) | l2-multihidden-impl v1.0.0 | `Pending` |
-| `pkg/nn/compile.go` (gate lift + variadic SetLayers) | l2-multihidden-impl v1.0.0 | `Pending` |
-| `pkg/persistence/config.go` (SchemaVersion 1.1.0) | l2-multihidden-impl v1.0.0 §5.4 | `Pending` |
-| `examples/perceptron/` restored (E03) | l2-usage-examples v1.0.0 | `Pending` |
-| `examples/binary_classification/` (E04) | l2-usage-examples v1.0.0 | `Pending` |
-| `examples/iris/` (E05) | l2-usage-examples v1.0.0 | `Pending` |
-| `examples/regression_sin/` (E07) | l2-usage-examples v1.0.0 | `Pending` |
-| `examples/regression_multi/` (E08) | l2-usage-examples v1.0.0 | `Pending` |
-| `examples/higher_order_options/` (E13) | l2-usage-examples v1.0.0 | `Pending` |
+| `pkg/network/{network,propagation}.go` (multi-hidden chain) | l2-multihidden-impl v1.0.0 | `Done` |
+| `pkg/nn/compile.go` (gate lift + variadic SetLayers) | l2-multihidden-impl v1.0.0 | `Done` |
+| `pkg/persistence/config.go` (SchemaVersion 1.1.0) | l2-multihidden-impl v1.0.0 §5.4 | `Done` |
+| `examples/perceptron/` restored (E03) | l2-usage-examples v1.0.0 | `Done` |
+| `examples/binary_classification/` (E04) | l2-usage-examples v1.0.0 | `Done` |
+| `examples/iris/` (E05) | l2-usage-examples v1.0.0 | `Done` |
+| `examples/regression_sin/` (E07) | l2-usage-examples v1.0.0 | `Done` |
+| `examples/regression_multi/` (E08) | l2-usage-examples v1.0.0 | `Done` |
+| `examples/higher_order_options/` (E13) | l2-usage-examples v1.0.0 | `Done` |
+
+## Phase 6 Deliverables (Pending)
+
+| Asset | Spec | Status |
+| :--- | :--- | :--- |
+| `pkg/optimizer/` (new package) | l2-optimizer-impl v1.0.0 | `Pending` |
+| `pkg/regularizer/` (new package) | l2-regularization-impl v1.0.0 | `Pending` |
+| `pkg/neuron/axon/axon.go` (WeightInit debt fix) | l2-regularization-impl v1.0.0 T-6B06 | `Pending` |
+| `pkg/nn/options.go` + `compile.go` (WithOptimizer, WithRegularizer) | l2-optimizer-impl + l2-regularization-impl | `Pending` |
+| `pkg/nn/train.go` (opt.Step + reg.Penalty + reg.ApplyMask) | l2-training-loop v1.0.0 | `Pending` |
+| `CHANGELOG.md` (v0.2.0 entry) | l1-release-policy v1.0.0 | `Pending` |
+| `README.md` (v0.2 multi-hidden API docs) | l1-release-policy v1.0.0 | `Pending` |
+| `v0.2.0` git tag | l1-release-policy v1.0.0 §5.4 | `Pending` |
 
 ### Remaining v0.6 Backlog (gated on follow-up specs)
 
@@ -108,5 +122,5 @@ Six of the eight v0.6-gated entries (E03, E04, E05, E07, E08, E13) are now activ
 
 ## Meta Information
 
-- **Last Updated**: 2026-05-03
+- **Last Updated**: 2026-05-07
 - **Maintainer**: Core Team

@@ -1,6 +1,6 @@
 # Workspace Specifications Registry
 
-**Version:** 2.3.0
+**Version:** 2.4.0
 **Status:** Active
 
 ## Overview
@@ -23,7 +23,7 @@ Local registry of specifications for this workspace.
 | [l1-performance-contract.md](specifications/l1-performance-contract.md) | Performance guarantees, benchmarks, optimization layers | Stable | L1 | 1.0.0 |
 | [l1-data-streaming.md](specifications/l1-data-streaming.md) | Streaming dataset abstraction and bounded memory contract | Stable | L1 | 1.0.0 |
 | [l1-compute-backend.md](specifications/l1-compute-backend.md) | Pluggable compute backend (CPU baseline + GPU future) | Stable | L1 | 1.0.0 |
-| [l1-dynamic-topology.md](specifications/l1-dynamic-topology.md) | Dynamic mode — layer/neuron mutation lifecycle with transaction protocol | Draft | L1 | 0.2.0 |
+| [l1-dynamic-topology.md](specifications/l1-dynamic-topology.md) | Dynamic mode — layer/neuron mutation lifecycle with transaction protocol | Stable | L1 | 0.2.0 |
 | [l1-meta-learning-hooks.md](specifications/l1-meta-learning-hooks.md) | Universal parameter access for recursive self-optimization via inner-network | Draft | L1 | 0.2.0 |
 | [l2-nn-facade.md](specifications/l2-nn-facade.md) | Public API facade — dual-style fluent API (Builder + Functional Options) | Stable | L2 | 2.0.0 |
 | [l2-network-graph.md](specifications/l2-network-graph.md) | Internal computational graph — Network[T] and bundles | Stable | L2 | 1.1.0 |
@@ -33,8 +33,8 @@ Local registry of specifications for this workspace.
 | [l2-loss-functions.md](specifications/l2-loss-functions.md) | 18 loss functions with dispatcher pattern | Stable | L2 | 1.0.0 |
 | [l2-usage-examples.md](specifications/l2-usage-examples.md) | Canonical example catalog — 15 entries with coverage matrix | Stable | L2 | 1.0.0 |
 | [l2-cli-client.md](specifications/l2-cli-client.md) | CLI binary `gonn` — train/query/verify subcommands | RFC | L2 | 0.1.0 |
-| [l2-visualization-api.md](specifications/l2-visualization-api.md) | HTTP/JSON adapter exposing observability for external GUIs | Draft | L2 | 0.1.0 |
-| [l2-logging-strategy.md](specifications/l2-logging-strategy.md) | Structured logging via `log/slog` (Trace/Debug/Info/Warn/Error) | Draft | L2 | 0.1.0 |
+| [l2-visualization-api.md](specifications/l2-visualization-api.md) | HTTP/JSON adapter exposing observability for external GUIs | Stable | L2 | 0.1.0 |
+| [l2-logging-strategy.md](specifications/l2-logging-strategy.md) | Structured logging via `log/slog` (Trace/Debug/Info/Warn/Error) | Stable | L2 | 0.1.0 |
 | [l2-training-loop.md](specifications/l2-training-loop.md) | Go realization of training-semantics — `Train()` body and snapshot mechanics | Stable | L2 | 1.0.0 |
 | [l2-persistence-impl.md](specifications/l2-persistence-impl.md) | Go realization of persistence — `pkg/persistence` package | Stable | L2 | 1.0.0 |
 | [l2-errors-impl.md](specifications/l2-errors-impl.md) | Go realization of error taxonomy — sentinels and helper constructors | Stable | L2 | 1.0.0 |
@@ -45,8 +45,13 @@ Local registry of specifications for this workspace.
 | [l2-streaming-impl.md](specifications/l2-streaming-impl.md) | Go realization of data streaming — `pkg/dataset` package, prefetch decorator | Stable | L2 | 1.0.0 |
 | [l2-backend-cpu.md](specifications/l2-backend-cpu.md) | Go realization of compute backend — `pkg/compute/cpu` reference path | Stable | L2 | 1.0.0 |
 | [l2-multihidden-impl.md](specifications/l2-multihidden-impl.md) | v0.6 multi-hidden topology lift — Network[T] chain + compile() gate removal | Stable | L2 | 1.0.0 |
+| [l1-optimizer-strategies.md](specifications/l1-optimizer-strategies.md) | Optimizer strategies contract — SGD / Adam / RMSProp / Momentum | Stable | L1 | 1.0.0 |
+| [l2-optimizer-impl.md](specifications/l2-optimizer-impl.md) | Go realization of optimizer strategies — pkg/optimizer package | Stable | L2 | 1.0.0 |
+| [l1-regularization.md](specifications/l1-regularization.md) | Regularization contract — L1 / L2 / Dropout / Compose | Stable | L1 | 1.0.0 |
+| [l2-regularization-impl.md](specifications/l2-regularization-impl.md) | Go realization of regularization — pkg/regularizer package | Stable | L2 | 1.0.0 |
+| [l1-release-policy.md](specifications/l1-release-policy.md) | Semantic versioning and release gate contract for GoNN | Stable | L1 | 1.0.0 |
 
 ## Meta Information
 
 - **Maintainer**: Core Team
-- **Last Updated**: 2026-05-03 (l2-multihidden-impl promoted Draft → Stable v1.0.0 for Phase 5 decomposition)
+- **Last Updated**: 2026-05-07 (Pre-Plan: l1-dynamic-topology / l2-visualization-api / l2-logging-strategy promoted Draft → Stable; 5 new Phase 6 specs added: l1-optimizer-strategies, l2-optimizer-impl, l1-regularization, l2-regularization-impl, l1-release-policy)

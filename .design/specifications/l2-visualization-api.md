@@ -1,7 +1,7 @@
 # Visualization API
 
 **Version:** 0.1.0
-**Status:** Draft
+**Status:** Stable
 **Layer:** implementation
 **Implements:** l1-observability-protocol.md
 
@@ -96,3 +96,4 @@ To make that boundary concrete, the library publishes a documented, versioned wi
 | Version | Date | Description |
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-04-27 | Initial Draft from TODO #7. |
+| 0.1.0 | 2026-05-07 | [Pre-Plan] Trust Mode promoted Draft → Stable. MVC satisfied (Overview + Invariant Compliance + Canonical References). |

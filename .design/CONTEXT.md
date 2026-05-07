@@ -1,6 +1,6 @@
 # Project Context
 
-**Generated:** 2026-05-03
+**Generated:** 2026-05-07
 
 ## Active Technologies
 
@@ -25,11 +25,16 @@
 │   └── workspace.json
 ├── examples/
 │   ├── README.md
+│   ├── binary_classification/
 │   ├── callbacks/
+│   ├── higher_order_options/
+│   ├── iris/
 │   ├── logic_gates/
 │   ├── perceptron/
 │   ├── persistence/
 │   ├── precision/
+│   ├── regression_multi/
+│   ├── regression_sin/
 │   ├── shared_options/
 │   ├── style_showcase/
 │   └── xor/
@@ -51,3 +56,4 @@
 ## Recent Changes
 
 No recent changelog found.
+

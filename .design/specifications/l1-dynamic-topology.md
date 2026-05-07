@@ -1,7 +1,7 @@
 # Dynamic Topology Mode
 
 **Version:** 0.2.0
-**Status:** Draft
+**Status:** Stable
 **Layer:** concept
 
 ## Overview
@@ -194,3 +194,4 @@ graph TD
 | 0.1.0 | 2026-04-27 | Initial Draft from TODO #6 — flagged conflict with INV-2. |
 | 0.1.0 | 2026-04-28 | Conflict resolved by parent v2.0.0 amendment introducing TopologyMode. Spec remains Draft pending design review of Dynamic-mode mutation API. |
 | 0.2.0 | 2026-05-01 | [MODIFIED] Expanded layer management: §5.2 Layer Lifecycle (add/remove semantics), §5.3 Neuron Mutation Details, §5.4 Transaction Protocol diagram, DYN-5/DYN-6 invariants, extended motivation and related specs. Minor version bump per extensibility. |
+| 0.2.0 | 2026-05-07 | [Pre-Plan] Trust Mode promoted Draft → Stable. No content change; MVC satisfied (Overview + Core Invariants DYN-1..DYN-6 + Canonical References). |

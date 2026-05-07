@@ -115,3 +115,28 @@ To add a new agent — edit only that file; the scripts read it automatically
 - [agents.json](agents.json)                             — agent registry
 - [scripts/setup_windows.ps1](scripts/setup_windows.ps1) — PowerShell (Windows)
 - [scripts/setup_unix.sh](scripts/setup_unix.sh)         — Bash (Unix/macOS)
+
+## Windows Junction Safety
+
+When managing Windows junctions (`mklink /J`) and git index, follow this strict order to prevent data loss:
+
+### The Problem
+
+`git rm -r --cached <path>` on Windows **follows junctions** and physically deletes files in the junction target, even with `--cached`. Example: `git rm -r --cached .claude/commands` where `.claude/commands` is a junction to `workflows/` will **delete all files in `workflows/` from disk**.
+
+### Safe Procedure
+
+Always run `git rm --cached` **before** creating junctions, while the paths are empty or nonexistent:
+
+1. `git rm --cached`   ← first, while no junctions exist yet
+2. `mklink /J ...`     ← then create junctions
+
+When removing from git index, list **specific file paths** rather than directories:
+
+```bash
+# Safe — specific files only
+git rm --cached --ignore-unmatch workflows/magic.analyze.md
+
+# Dangerous — git will traverse the junction into parent/source directories
+git rm -r --cached .claude/commands
+```

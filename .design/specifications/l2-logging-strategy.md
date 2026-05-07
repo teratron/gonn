@@ -1,7 +1,7 @@
 # Logging Strategy
 
 **Version:** 0.1.0
-**Status:** Draft
+**Status:** Stable
 **Layer:** implementation
 **Implements:** l1-observability-protocol.md
 
@@ -85,3 +85,4 @@ Plus event-specific fields documented per call-site.
 | Version | Date | Description |
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-04-27 | Initial Draft from TODO #9. |
+| 0.1.0 | 2026-05-07 | [Pre-Plan] Trust Mode promoted Draft → Stable. MVC satisfied (Overview + Invariant Compliance + Canonical References). |
