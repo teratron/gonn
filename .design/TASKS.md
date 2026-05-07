@@ -104,7 +104,7 @@ Six of the eight v0.6-gated entries (E03, E04, E05, E07, E08, E13) are now activ
 | `pkg/nn/train.go` (opt.Step + reg.Penalty + reg.ApplyMask) | l2-training-loop v1.0.0 | `Pending` |
 | `CHANGELOG.md` (v0.2.0 entry) | l1-release-policy v1.0.0 | `Pending` |
 | `README.md` (v0.2 multi-hidden API docs) | l1-release-policy v1.0.0 | `Pending` |
-| `v0.2.0` git tag | l1-release-policy v1.0.0 §5.4 | `Pending` |
+| `v0.6.0` git tag | l1-release-policy v1.0.0 §5.4 | `Pending` |
 
 ### Remaining v0.6 Backlog (gated on follow-up specs)
 

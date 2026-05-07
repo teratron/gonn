@@ -78,7 +78,7 @@ duration_minutes:
 
 ## Track C — v0.2 Release Preparation
 
-*Goal: public API audit, CHANGELOG, README, v0.2.0 tag.*
+*Goal: public API audit, CHANGELOG, README, v0.6.0 tag.*
 *Source: [l1-release-policy.md](../specifications/l1-release-policy.md)*
 
 - [ ] **T-6C01** — Audit public API surface against REL-2: enumerate all exported symbols in
@@ -110,8 +110,8 @@ duration_minutes:
 
 - [ ] **T-6Z01** — Release gate (REL-5): `go build ./...` clean; `go test -race ./...` all green;
   every non-example package ≥ 80% line coverage; all example modules build and smoke-test pass
-  (`go test ./...` in each example dir); `CHANGELOG.md` v0.2.0 entry present.
+  (`go test ./...` in each example dir); `CHANGELOG.md` v0.6.0 entry present.
 
-- [ ] **T-6Z02** — Tag `v0.2.0`: create annotated git tag
-  `git tag -a v0.2.0 -m "Release v0.2.0 — multi-hidden topology + optimizer + regularizer"`.
+- [ ] **T-6Z02** — Tag `v0.6.0`: create annotated git tag
+  `git tag -a v0.6.0 -m "Release v0.6.0 — multi-hidden topology + optimizer + regularizer"`.
   Do NOT push until T-6Z01 is green. Push tag and create GitHub Release from CHANGELOG.md entry.

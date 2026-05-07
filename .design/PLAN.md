@@ -1,7 +1,7 @@
 # Implementation Plan
 
 **Version:** 1.8.0
-**Project Version:** 0.5.1 (v0.5 released; v0.6/v0.2 active; Phase 6 scoped)
+**Project Version:** 0.5.1 (v0.5 released; v0.6 active; Phase 6 scoped)
 **Generated:** 2026-04-29
 **Last Updated:** 2026-05-07
 **Based on:** .design/INDEX.md v2.4.0
@@ -98,7 +98,7 @@ GoNN library implementation plan derived from `ROADMAP.md` Hybrid Path. Phase or
 
 - [ ] **[A] Optimizer Strategies** ([l1-optimizer-strategies.md](specifications/l1-optimizer-strategies.md) + [l2-optimizer-impl.md](specifications/l2-optimizer-impl.md)) [L1+L2, Stable v1.0.0] — `pkg/optimizer/` package; SGD/Adam/RMSProp/Momentum; `WithOptimizer` option; train.go integration.
 - [ ] **[B] Regularization** ([l1-regularization.md](specifications/l1-regularization.md) + [l2-regularization-impl.md](specifications/l2-regularization-impl.md)) [L1+L2, Stable v1.0.0] — `pkg/regularizer/` package; L1/L2/Dropout/Compose; `WithRegularizer` option; axon WeightInit debt fixed.
-- [ ] **[C] v0.2 Release Preparation** ([l1-release-policy.md](specifications/l1-release-policy.md)) [L1, Stable v1.0.0] — public API audit; CHANGELOG.md; README.md update; v0.2.0 tag.
+- [ ] **[C] v0.6 Release Preparation** ([l1-release-policy.md](specifications/l1-release-policy.md)) [L1, Stable v1.0.0] — public API audit; CHANGELOG.md; README.md update; v0.6.0 tag.
 
 ## Backlog
 

@@ -9,7 +9,7 @@
 Defines the semantic versioning policy for GoNN, the public API surface contract, and the release
 gate criteria that must pass before tagging any version. This spec is the authoritative source
 for what constitutes a breaking vs. non-breaking change, which packages are public, and what
-the v0.2.0 milestone delivers.
+the v0.6.0 milestone delivers.
 
 ## Related Specifications
 
@@ -21,7 +21,7 @@ the v0.2.0 milestone delivers.
 ## 1. Motivation
 
 Phase 5 is complete. The multi-hidden catalog (E03/E04/E05/E07/E08/E13) is green. Before
-tagging `v0.2.0`, the project needs a shared definition of:
+tagging `v0.6.0`, the project needs a shared definition of:
 
 - Which packages are part of the public contract (import-stable surface).
 - What version bump is required for each class of change.
@@ -61,9 +61,9 @@ Without this policy, version numbers carry no semantic meaning for downstream us
 
 ## 5. Detailed Design
 
-### 5.1 v0.2.0 Deliverables
+### 5.1 v0.6.0 Deliverables
 
-The `v0.2.0` tag marks the completion of multi-hidden topology support:
+The `v0.6.0` tag marks the completion of multi-hidden topology support:
 
 - Multi-hidden `Network[T]` — unlimited hidden layers via `HiddenLayers []uint`.
 - `pkg/persistence` schema v1.1.0 — multi-hidden weight serialization.
@@ -78,7 +78,7 @@ The `v0.2.0` tag marks the completion of multi-hidden topology support:
 - `pkg/regularizer/` — L1/L2/Dropout regularization (Phase 6, Track B).
 - WeightInit fix: `axon.New[T]` applies configured Xavier/He (Phase 6, Track B, T-6B06).
 
-### 5.3 Known Debt to Document Before v0.2.0
+### 5.3 Known Debt to Document Before v0.6.0
 
 - `axon.New[T]` always uses `U[-0.5, 0.5]` regardless of configured `WeightInit`.
 - `E06` (MNIST loader) and `E10` (AndTrain continuation) remain deferred.
@@ -96,10 +96,10 @@ graph LR
 ## 6. Implementation Notes
 
 1. Audit `pkg/nn` exported symbols against the public surface defined in REL-2.
-2. Author `CHANGELOG.md` with v0.2.0 section (multi-hidden, new examples, known debt).
+2. Author `CHANGELOG.md` with v0.6.0 section (multi-hidden, new examples, known debt).
 3. Update root `README.md` — document multi-hidden API (`HiddenLayers` option, v0.2 feature list).
 4. Run the full gate check (REL-5) — resolve all failures before tagging.
-5. Create annotated tag `v0.2.0` with message summarizing deliverables from §5.1.
+5. Create annotated tag `v0.6.0` with message summarizing deliverables from §5.1.
 
 ## 7. Drawbacks & Alternatives
 
@@ -113,10 +113,10 @@ graph LR
 | :--- | :--- | :--- |
 | `[ARCH-L1]` | `.design/specifications/l1-neural-network-architecture.md` | Public API entry point definition |
 | `[PERS-L1]` | `.design/specifications/l1-network-persistence.md` | Serialization contract for breaking-change classification |
-| `[CHANGELOG]` | `CHANGELOG.md` | Release notes (to be created for v0.2.0, updated for v0.3.0) |
+| `[CHANGELOG]` | `CHANGELOG.md` | Release notes (to be created for v0.6.0, updated for v0.3.0) |
 
 ## Document History
 
 | Version | Date | Description |
 | :--- | :--- | :--- |
-| 1.0.0 | 2026-05-07 | Initial — release policy for v0.2.0 and beyond (Spark 3). Trust Mode Stable. |
+| 1.0.0 | 2026-05-07 | Initial — release policy for v0.6.0 and beyond (Spark 3). Trust Mode Stable. |
