@@ -14,6 +14,11 @@ var (
 // pointer used to compute the residual `target - value` after each forward
 // pass. The target is owned by the loss layer; Output stores the pointer
 // so callers can swap in a new label without re-walking the graph.
+//
+// AI-Meta:
+//   - Purpose: Terminal cell that computes loss residual and drives the backward pass.
+//   - Concurrency: NotSafe; CalculateValue writes miss in-place.
+//   - Related: [NewOutput], [Dense], [neuron.Neuron].
 type Output[T utils.Float] struct {
 	*Dense[T]
 	target *T
@@ -22,6 +27,11 @@ type Output[T utils.Float] struct {
 // NewOutput allocates an Output cell pointing at the supplied target slot.
 // The Dense backing is created with kind tag neuron.OUTPUT so introspection
 // distinguishes terminal cells from interior ones.
+//
+// AI-Meta:
+//   - Purpose: Construct an Output cell wired to an external target slot; used by layer.NewOutput.
+//   - Usage: c := cell.NewOutput[float32](&targetSlot).
+//   - Related: [Output].
 func NewOutput[T utils.Float](target *T) *Output[T] {
 	return &Output[T]{
 		Dense:  NewDense[T](uint(neuron.OUTPUT)),
@@ -41,14 +51,14 @@ func (o *Output[T]) SetTarget(value *T) {
 	o.target = value
 }
 
-// CalculateValue (FORWARD) delegates to the embedded Dense's forward pass
-// and then writes the residual `target - value` into miss so the backward
-// pass starts with a populated error term.
+// CalculateValue (FORWARD) delegates to Dense's forward pass then computes
+// miss = target - value. The explicit Dense.CalculateValue() call is
+// mandatory to avoid infinite recursion via method promotion.
 //
-// The explicit `o.Dense.CalculateValue()` call is mandatory: a bare
-// `o.CalculateValue()` resolves back to this very method via promotion
-// and produces unbounded recursion. This was the third half of blocker
-// C-001 in the legacy code.
+// AI-Meta:
+//   - Purpose: Forward pass for output cell: compute dot product then write residual into miss.
+//   - Concurrency: NotSafe; mutates miss and value.
+//   - Related: [Dense.CalculateValue], [Dense.CalculateWeight].
 func (o *Output[T]) CalculateValue() {
 	o.Dense.CalculateValue()
 	if o.target != nil {

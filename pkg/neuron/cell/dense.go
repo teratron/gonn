@@ -16,6 +16,11 @@ var (
 // embedding), and a backprop error term. Dense satisfies [neuron.Neuron]:
 // it can compute its own value from the axon sum and update axon weights
 // from a propagated gradient.
+//
+// AI-Meta:
+//   - Purpose: Hidden-layer cell that performs forward (dot product) and backward (weight update) steps.
+//   - Concurrency: NotSafe; CalculateValue and CalculateWeight mutate internal state.
+//   - Related: [NewDense], [neuron.Neuron], [axon.Bundle].
 type Dense[T utils.Float] struct {
 	*core[T]
 	miss  T
@@ -25,6 +30,11 @@ type Dense[T utils.Float] struct {
 // NewDense allocates a Dense cell at position number within its layer.
 // The axon bundle starts empty — connections are wired in by the layer
 // constructor once both endpoints exist.
+//
+// AI-Meta:
+//   - Purpose: Construct a Dense cell with an empty axon bundle; used by layer.NewDense.
+//   - Usage: c := cell.NewDense[float32](0).
+//   - Related: [Dense].
 func NewDense[T utils.Float](number uint) *Dense[T] {
 	return &Dense[T]{
 		core:  newCore[T]([2]uint{uint(neuron.DENSE), number}),
@@ -55,8 +65,12 @@ func (d *Dense[T]) AddMiss(value T) {
 
 // CalculateValue (FORWARD) refreshes the scalar value from the dot product
 // of incoming-axon weights and source-cell values. Activation application
-// is intentionally absent here — it lands on the layer level so that the
-// activation function can be swapped without touching individual cells.
+// is intentionally absent here — it lands on the layer level.
+//
+// AI-Meta:
+//   - Purpose: Run the forward pass for this cell: value = Σ(axon.Weight * input.Value).
+//   - Concurrency: NotSafe; mutates d.value.
+//   - Related: [CalculateWeight], [axon.Axon.CalculateValue].
 func (d *Dense[T]) CalculateValue() {
 	d.value = 0
 	for _, a := range d.Axons {
@@ -66,8 +80,12 @@ func (d *Dense[T]) CalculateValue() {
 
 // CalculateWeight (BACKWARD) updates every incoming axon weight using the
 // supplied learning rate and the cell's accumulated miss. The gradient
-// passed to each axon is `rate * miss` — the activation derivative is
-// folded in by the layer before this call (placeholder until layer rewrite).
+// passed to each axon is rate * miss.
+//
+// AI-Meta:
+//   - Purpose: Run the backward pass: update all incoming axon weights from the accumulated gradient.
+//   - Concurrency: NotSafe; mutates axon weights.
+//   - Related: [CalculateValue], [axon.Axon.CalculateWeight].
 func (d *Dense[T]) CalculateWeight(rate *T) {
 	gradient := *rate * d.miss
 	for i := range d.Axons {

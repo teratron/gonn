@@ -5,6 +5,11 @@ import (
 )
 
 // ActivationType represents different activation functions.
+//
+// AI-Meta:
+//   - Purpose: Enum selecting which activation function to apply in Activation and Derivative dispatchers.
+//   - Usage: Pass as mode argument — activation.Activation[float32](x, activation.SIGMOID).
+//   - Related: [Activation], [Derivative], [Function].
 type Type uint8
 
 // Activation function mode.
@@ -22,12 +27,26 @@ const (
 	Default   = Linear
 )
 
+// Function is the contract for stateful, in-place activation functions that carry their own hyperparameters.
+// Unlike the Activation/Derivative dispatchers, implementations hold state (e.g. slope, alpha).
+//
+// AI-Meta:
+//   - Purpose: Contract for stateful activation functions with configurable hyperparameters.
+//   - Usage: s := activation.NewSigmoid[float32](1.0); s.Activation(&v); s.Derivative(&v).
+//   - Implementations: [Sigmoid].
+//   - Related: [Activation], [Derivative].
 type Function[T utils.Float] interface {
 	Activation(value *T)
 	Derivative(value *T)
 }
 
-// Activation function with parameters.
+// Activation applies the named activation function to a single value, dispatching by mode.
+// Optional params configure mode-specific hyperparameters (slope, alpha, scale, leak, beta).
+//
+// AI-Meta:
+//   - Purpose: Stateless dispatcher — apply one activation function by mode to a scalar value.
+//   - Usage: y := activation.Activation[float32](x, activation.SIGMOID) — params optional per mode.
+//   - Related: [Derivative], [Type], [Function].
 func Activation[T utils.Float](value T, mode Type, params ...float64) T {
 	switch mode {
 	case ELISH:
@@ -87,7 +106,13 @@ func Activation[T utils.Float](value T, mode Type, params ...float64) T {
 	}
 }
 
-// Derivative activation function with parameters.
+// Derivative applies the derivative of the named activation function, dispatching by mode.
+// For most modes the input value is expected to be the post-activation output, not the raw input.
+//
+// AI-Meta:
+//   - Purpose: Stateless dispatcher — compute one activation derivative by mode for a scalar value.
+//   - Usage: d := activation.Derivative[float32](y, activation.SIGMOID) — y is post-activation.
+//   - Related: [Activation], [Type], [Function].
 func Derivative[T utils.Float](value T, mode Type, params ...float64) T {
 	switch mode {
 	case ELISH:
@@ -143,7 +168,12 @@ func Derivative[T utils.Float](value T, mode Type, params ...float64) T {
 	}
 }
 
-// String returns the string representation of the activation type
+// String returns the string representation of the activation type.
+//
+// AI-Meta:
+//   - Purpose: Human-readable name for the activation type, used in logs and diagnostics.
+//   - Usage: fmt.Println(activation.SIGMOID.String()) // → "SIGMOID".
+//   - Related: [Type].
 func (a Type) String() string {
 	switch a {
 	case ELISH:

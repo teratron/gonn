@@ -22,8 +22,12 @@ import (
 const configHashPrefix = "sha256:"
 
 // LayerWeights is the on-disk image of one layer's trainable parameters.
-// Weights is the dense matrix shaped [outputs][inputs]; Biases is the
-// per-output bias vector (empty when the layer has Bias == false).
+// Weights is shaped [outputs][inputs]; Biases is per-output (empty when
+// the layer has no bias).
+//
+// AI-Meta:
+//   - Purpose: Serialisable weight matrix and bias vector for one layer inside WeightsDoc.Layers.
+//   - Related: [WeightsDoc].
 type LayerWeights[T utils.Float] struct {
 	Name    string `json:"name"`
 	Weights [][]T  `json:"weights"`
@@ -31,20 +35,26 @@ type LayerWeights[T utils.Float] struct {
 }
 
 // WeightsDoc is the on-disk projection of a trained network's weights.
-// The ConfigHash field anchors the document to a specific config.json so
-// loading mismatched pairs surfaces an ErrIntegrity (PERS-3) instead of
-// silently producing a network with the wrong topology.
+// ConfigHash anchors it to a specific config.json so loading mismatched
+// pairs surfaces ErrIntegrity instead of producing a silent topology mismatch.
+//
+// AI-Meta:
+//   - Purpose: Serialisable trained weights document; must be paired with a matching ConfigDoc.
+//   - Related: [WriteWeights], [ReadWeights], [LayerWeights], [ConfigDoc].
 type WeightsDoc[T utils.Float] struct {
 	SchemaVersion string            `json:"schema_version"`
 	ConfigHash    string            `json:"config_hash"`
 	Layers        []LayerWeights[T] `json:"layers"`
 }
 
-// WriteWeights serialises w to path atomically, embedding a SHA-256 of
-// cfg as ConfigHash so subsequent ReadWeights calls can verify the
-// pairing. The same canonical-config hashing rules from PERS-2 / PERS-3
-// apply — re-writing an unchanged (cfg, w) pair yields a byte-identical
-// file.
+// WriteWeights serialises w to path atomically, embedding a SHA-256 of cfg
+// as ConfigHash. Re-writing an unchanged (cfg, w) pair yields a byte-identical
+// file (deterministic canonical format).
+//
+// AI-Meta:
+//   - Purpose: Persist trained weights alongside a config digest for integrity checking on load.
+//   - Errors: ErrIO (filesystem failures).
+//   - Related: [ReadWeights], [WeightsDoc], [WriteConfig].
 func WriteWeights[T utils.Float](path string, cfg ConfigDoc[T], w WeightsDoc[T]) error {
 	hash, err := configHashHex(cfg)
 	if err != nil {
@@ -59,10 +69,14 @@ func WriteWeights[T utils.Float](path string, cfg ConfigDoc[T], w WeightsDoc[T])
 	return atomicWrite(path, data)
 }
 
-// ReadWeights loads both config and weights documents, verifying the
-// SHA-256 anchor between them per PERS-3. A mismatch is reported as an
-// ErrIntegrity-wrapped error so callers can route via errors.Is. Schema
-// drift is enforced separately by ReadConfig (PERS-1).
+// ReadWeights loads both config and weights documents and verifies the
+// SHA-256 anchor between them. A hash mismatch returns ErrIntegrity;
+// schema drift is enforced by ReadConfig separately.
+//
+// AI-Meta:
+//   - Purpose: Load a matched (config, weights) pair with integrity verification; primary entry point for inference.
+//   - Errors: ErrIO (file failure), ErrUserConfig (schema mismatch), ErrIntegrity (config hash mismatch).
+//   - Related: [WriteWeights], [ReadConfig], [ConfigDoc], [WeightsDoc].
 func ReadWeights[T utils.Float](configPath, weightsPath string) (ConfigDoc[T], WeightsDoc[T], error) {
 	cfg, err := ReadConfig[T](configPath)
 	if err != nil {

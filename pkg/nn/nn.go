@@ -7,18 +7,24 @@ import (
 	"github.com/teratron/gonn/pkg/utils"
 )
 
-// NN is the public facade type. It embeds network.Network[T] (composition,
-// not inheritance — INV-7) and adds the construction lifecycle plus the
-// training-control state cell.
+// NN is the public facade type. It embeds network.Network[T] by composition
+// and adds the construction lifecycle and the training-control state machine.
 //
-// Both fluent styles return *NN[T]:
-//   - Builder: [NewBuilder] starts the chain in Configuring state.
-//   - Options: [New] / [MustNew] run compile() implicitly and return an
-//     Operational network.
+// Two fluent construction styles are available:
+//   - Builder API: [NewBuilder] → chain methods → [Compile].
+//   - Options API: [New] / [MustNew] run compile implicitly and return Operational.
 //
-// Concurrent reads of a compiled network are safe (e.g. parallel Query).
-// Train must be invoked from a single goroutine — it owns the internal
-// PCG and the weights.
+// Concurrent reads of an Operational network are safe (parallel Query).
+// Train/Fit must run from a single goroutine — they own the weights.
+//
+// AI-Meta:
+//   - Purpose: Public network handle for topology configuration, training, and inference.
+//   - Usage: Configure via NewBuilder or New, call Train/Fit for learning, Query for inference.
+//   - Lifecycle: Configuring (after NewBuilder) → Operational (after Compile / New / MustNew).
+//   - Concurrency: ReadSafe for Query after Compile; Train and Fit require SingleGoroutine.
+//   - Related: [NewBuilder], [New], [MustNew], [network.Network].
+//   - Constraints: Topology is immutable after Compile; weights must not be mutated concurrently.
+//   - Stability: Stable.
 type NN[T utils.Float] struct {
 	network.Network[T] `json:"network" xml:"network"`
 
@@ -36,17 +42,24 @@ type NN[T utils.Float] struct {
 	control atomic.Int32
 }
 
-// NewBuilder is the entry point for the Builder API (Style A). Returns
-// an *NN[T] in Configuring state with default-initialised configuration —
-// callers chain Input/Dense/Output/WithX calls then finalise via Compile.
+// NewBuilder is the entry point for the Builder API. Returns an *NN[T] in
+// Configuring state; callers chain topology and hyperparameter methods then
+// call Compile to transition to Operational.
 //
 //	nn, err := nn.NewBuilder[float32]().
 //	    Input(2).
 //	    Dense(4, activation.SIGMOID, true).
 //	    Output(1, activation.SIGMOID, true).
-//	    WithLearningRate(0.3).
 //	    WithLoss(loss.MSE).
 //	    Compile()
+//
+// AI-Meta:
+//   - Purpose: Start a fluent Builder chain for configuring a new network.
+//   - Usage: nn.NewBuilder[float32]().Input(N).Dense(M, ...).Output(K, ...).Compile().
+//   - Lifecycle: Returns NN in Configuring state; must call Compile before Train/Query.
+//   - Concurrency: SingleGoroutine; must complete Compile before sharing across goroutines.
+//   - Related: [NN], [Compile], [New], [MustNew].
+//   - Stability: Stable.
 func NewBuilder[T utils.Float]() *NN[T] {
 	n := &NN[T]{
 		Network:    network.New[T](),
@@ -56,9 +69,15 @@ func NewBuilder[T utils.Float]() *NN[T] {
 	return n
 }
 
-// State reports the current lifecycle position. Exposed for advanced
-// callers and for the post-compile guard helpers; ordinary code rarely
-// needs to inspect it.
+// State reports the current lifecycle position (Uninitialized, Configuring,
+// or Operational). Ordinary code rarely needs to inspect this — it is
+// primarily for advanced callers and test assertions.
+//
+// AI-Meta:
+//   - Purpose: Expose the construction-lifecycle state for introspection and assertions.
+//   - Concurrency: ReadSafe; field is written only during construction.
+//   - Related: [NN], [NewBuilder], [Compile].
+//   - Stability: Stable.
 func (n *NN[T]) State() state {
 	return n.stateField
 }
@@ -91,9 +110,15 @@ func (n *NN[T]) guardConfiguring(method string) bool {
 	}
 }
 
-// Config returns a copy of the staged configuration. Useful for tests
-// that want to assert the chain populated the right fields, and for
-// future persistence-spec round-trips.
+// Config returns a shallow copy of the staged configuration. Useful for
+// tests that want to assert the chain populated the right fields. Callers
+// must not mutate the returned HiddenLayers slice.
+//
+// AI-Meta:
+//   - Purpose: Read-only introspection of the staged or compiled configuration.
+//   - Concurrency: ReadSafe; returns a shallow copy of the internal Config.
+//   - Related: [Config], [Compile].
+//   - Stability: Stable.
 func (n *NN[T]) Config() Config[T] {
 	// Shallow copy — HiddenLayers slice header is duplicated but the
 	// backing array is shared. Callers must not mutate the returned

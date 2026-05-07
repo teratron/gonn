@@ -4,26 +4,33 @@ import (
 	"github.com/teratron/gonn/pkg/utils"
 )
 
-// Sample is a convenience alias for one (input, target) pair fed into
-// Fit. Two parallel slices keep the type signature simple and avoid a
-// dedicated struct that would need to carry the generic parameter.
+// Sample is one (input, target) pair for use with Fit. Two parallel slices
+// keep the type signature simple while preserving the generic parameter T.
+//
+// AI-Meta:
+//   - Purpose: Typed container for one training sample passed to Fit.
+//   - Usage: Fit([]nn.Sample[float32]{{Input: x, Target: y}, ...}).
+//   - Related: [Fit].
+//   - Stability: Stable.
 type Sample[T utils.Float] struct {
 	Input  []T
 	Target []T
 }
 
 // Train runs one forward + backward + weight-update step for the supplied
-// (input, target) pair using the network's configured learning rate and
-// loss function. Returns the loss measured on this single sample.
+// (input, target) pair using the network's configured learning rate. Returns
+// the loss measured on this single sample.
 //
-// Single-step semantics — the multi-epoch loop with early stopping and
-// min-loss snapshot lives in [Fit]. Train is the lower-level primitive
-// for callers that own their own outer loop (the legacy perceptron
-// example follows this style).
+// The primitive for callers that own their own outer loop. For the managed
+// multi-epoch loop with early stopping and best-weight rollback, use Fit.
 //
-// Returns ErrUserConfig when the network is not Operational, or
-// whatever Network.Train returns (typically ErrInputData on shape
-// mismatch).
+// AI-Meta:
+//   - Purpose: Single-step training primitive; caller drives the epoch loop.
+//   - Usage: for _, s := range samples { loss, err := n.Train(s.Input, s.Target) }.
+//   - Concurrency: SingleGoroutine; must not run concurrently with other Train/Fit calls.
+//   - Errors: ErrUserConfig (not Operational), ErrInputData (shape mismatch).
+//   - Related: [Fit], [Query], [network.Network.Train].
+//   - Stability: Stable.
 func (n *NN[T]) Train(input, target []T) (T, error) {
 	if n.stateField != stateOperational {
 		return 0, utils.Newf(utils.ErrUserConfig,
@@ -32,22 +39,22 @@ func (n *NN[T]) Train(input, target []T) (T, error) {
 	return n.Network.Train(input, target)
 }
 
-// Fit runs the multi-epoch training loop driven by the cfg.MaxIterations
-// and cfg.LossLimit early-stopping criteria from [l1-training-semantics].
-// One epoch processes every sample in dataset once, in order; the per-
-// epoch loss is the arithmetic mean of per-sample losses.
+// Fit runs the managed multi-epoch training loop. Each epoch processes every
+// Sample once in order; the epoch loss is the arithmetic mean of per-sample
+// losses. Early stops when mean loss drops below LossLimit or MaxIterations
+// is reached, or when a Stop signal is received.
 //
-// Snapshot / rollback ([l2-training-loop] §snapshot mechanics): every
-// time the running loss reaches a new minimum, Fit records a deep copy
-// of the network weights. If the final epoch ends with a loss higher
-// than the recorded minimum, Fit restores the snapshot before returning.
-// This guards against late-epoch divergence wiping out a good model.
+// Best-weight rollback: whenever a new minimum is reached Fit snapshots the
+// weights. If the final epoch's loss is higher than the minimum, the snapshot
+// is restored before returning.
 //
-// Returns the number of epochs executed and the lowest mean-epoch loss
-// observed. EpochCallback is invoked synchronously at the end of every
-// epoch with (epoch, lossValue); a nil callback is skipped.
-//
-// Honours pause / stop signals between epochs (see [control.go]).
+// AI-Meta:
+//   - Purpose: Run the full training loop with early stopping, callbacks, and best-weight rollback.
+//   - Usage: epochs, loss, err := n.Fit(samples).
+//   - Concurrency: SingleGoroutine; Pause/Resume/Stop may be called from another goroutine.
+//   - Errors: ErrUserConfig (not Operational), ErrInputData (sample shape mismatch).
+//   - Related: [Train], [Pause], [Resume], [Stop], [Sample].
+//   - Stability: Stable.
 func (n *NN[T]) Fit(dataset []Sample[T]) (uint, T, error) {
 	if n.stateField != stateOperational {
 		return 0, 0, utils.Newf(utils.ErrUserConfig,

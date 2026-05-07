@@ -24,6 +24,12 @@ import (
 //
 // The returned *rand.Rand is NOT safe for concurrent use. The training
 // loop is single-goroutine; concurrent callers must wrap their own mutex.
+//
+// AI-Meta:
+//   - Purpose: Create a seeded *rand.Rand for weight initialization; returns the effective seed.
+//   - Usage: rng, seed := utils.NewRNG(0) — seed=0 uses wall clock for non-reproducible training.
+//   - Concurrency: NotSafe; the returned *rand.Rand must not be shared across goroutines.
+//   - Related: [XavierUniform], [HeNormal], [Uniform].
 func NewRNG(seed uint64) (*rand.Rand, uint64) {
 	if seed == 0 {
 		seed = uint64(time.Now().UnixNano())
@@ -42,6 +48,12 @@ func NewRNG(seed uint64) (*rand.Rand, uint64) {
 //
 // XavierUniform panics when rng is nil — a nil source is always a
 // programming bug; recoverable misconfiguration belongs in Compile().
+//
+// AI-Meta:
+//   - Purpose: Sample one weight from the Glorot uniform distribution, suited for sigmoid/tanh layers.
+//   - Usage: w := utils.XavierUniform[float32](rng, fanIn, fanOut).
+//   - Concurrency: NotSafe; rng must not be shared across goroutines.
+//   - Related: [NewRNG], [HeNormal], [Uniform].
 func XavierUniform[T Float](rng *rand.Rand, fanIn, fanOut int) T {
 	if rng == nil {
 		panic("utils.XavierUniform: nil *rand.Rand")
@@ -62,6 +74,12 @@ func XavierUniform[T Float](rng *rand.Rand, fanIn, fanOut int) T {
 // Reference: He, K. et al. (2015). Delving deep into rectifiers.
 //
 // HeNormal panics when rng is nil.
+//
+// AI-Meta:
+//   - Purpose: Sample one weight from the He normal distribution, suited for ReLU-family layers.
+//   - Usage: w := utils.HeNormal[float32](rng, fanIn).
+//   - Concurrency: NotSafe; rng must not be shared across goroutines.
+//   - Related: [NewRNG], [XavierUniform], [Uniform].
 func HeNormal[T Float](rng *rand.Rand, fanIn int) T {
 	if rng == nil {
 		panic("utils.HeNormal: nil *rand.Rand")
@@ -76,6 +94,12 @@ func HeNormal[T Float](rng *rand.Rand, fanIn int) T {
 // Uniform samples one weight from U[-1, 1).
 //
 // Uniform panics when rng is nil.
+//
+// AI-Meta:
+//   - Purpose: Sample one weight from U[-1, 1) — fallback initializer when fan counts are unavailable.
+//   - Usage: w := utils.Uniform[float32](rng).
+//   - Concurrency: NotSafe; rng must not be shared across goroutines.
+//   - Related: [NewRNG], [XavierUniform], [HeNormal].
 func Uniform[T Float](rng *rand.Rand) T {
 	if rng == nil {
 		panic("utils.Uniform: nil *rand.Rand")

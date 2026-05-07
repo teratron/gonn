@@ -12,14 +12,17 @@ import (
 	"github.com/teratron/gonn/pkg/utils"
 )
 
-// NewSliceDataset returns a Dataset[T] backed by the provided in-memory
-// slices. inputs[i] pairs with targets[i]; both slices must have equal
-// outer length. batchSize must be positive — zero or negative values
-// are rejected with ErrUserConfig.
+// NewSliceDataset wraps in-memory slices into a Dataset[T]. inputs[i] pairs
+// with targets[i]; both slices must have equal outer length. batchSize must
+// be positive. The returned dataset supports Reset and reports a known Len.
 //
-// The returned dataset supports Reset() and reports Len() == len(inputs).
-// It is intended both for unit tests and as a migration bridge from the
-// legacy single-sample Train(input, target) call sites.
+// Intended for unit tests and for migrating single-sample Train call sites.
+//
+// AI-Meta:
+//   - Purpose: Wrap resident [][]T arrays into the Dataset interface for batch-streaming without I/O.
+//   - Usage: ds, err := dataset.NewSliceDataset[float32](inputs, targets, 16).
+//   - Errors: ErrUserConfig (mismatched slice lengths, non-positive batchSize).
+//   - Related: [Dataset], [NewCSVDataset], [Prefetch].
 func NewSliceDataset[T utils.Float](inputs, targets [][]T, batchSize int) (Dataset[T], error) {
 	if len(inputs) != len(targets) {
 		return nil, utils.Newf(utils.ErrUserConfig,

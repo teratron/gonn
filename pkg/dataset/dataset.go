@@ -13,24 +13,37 @@ import (
 	"github.com/teratron/gonn/pkg/utils"
 )
 
-// Batch is a homogeneous group of (input, target) pairs all sharing the
-// same input and output shapes (DAT-2). Inputs[i] is paired with
-// Targets[i]; len(Inputs) == len(Targets) is enforced by the producer.
+// Batch is a homogeneous group of (input, target) pairs sharing the same
+// input and output shapes. Inputs[i] pairs with Targets[i]; equality of
+// outer lengths is enforced by the producer.
+//
+// AI-Meta:
+//   - Purpose: Value type carrying one mini-batch; passed from Dataset.Next to the training loop.
+//   - Related: [Dataset], [Batch.Len].
 type Batch[T utils.Float] struct {
 	Inputs  [][]T
 	Targets [][]T
 }
 
-// Len returns the batch size — number of (input, target) pairs.
+// Len returns the number of (input, target) pairs in the batch.
+//
+// AI-Meta:
+//   - Purpose: Report the batch size for loop bounds in the training step.
+//   - Related: [Batch].
 func (b Batch[T]) Len() int { return len(b.Inputs) }
 
-// Dataset is the pull-source contract over training samples (DAT-1). The
-// library never calls Reset implicitly and never seeks; the caller drives
-// the iteration. Implementations that cannot rewind should return
-// ErrUnsupported from Reset.
+// Dataset is the pull-source contract for training samples. The library
+// never calls Reset implicitly; the caller drives iteration. Implementations
+// that cannot rewind return ErrUnsupported from Reset.
 //
-// Next returns io.EOF at end-of-epoch — distinct from a fatal data error
-// which is wrapped with utils.ErrInputData per DAT-4.
+// Next returns io.EOF at end-of-epoch; fatal data errors are wrapped with
+// utils.ErrInputData.
+//
+// AI-Meta:
+//   - Purpose: Pull-source abstraction over any batch-addressable sample store.
+//   - Implementations: [NewCSVDataset], [NewSliceDataset], [Prefetch].
+//   - Concurrency: NotSafe; Next and Reset must not be called concurrently.
+//   - Related: [Batch], [ErrUnsupported], [Prefetch].
 type Dataset[T utils.Float] interface {
 	// Next produces the next batch or returns io.EOF when the source is
 	// exhausted. ctx cancellation is honoured by all stock implementations.
@@ -46,7 +59,10 @@ type Dataset[T utils.Float] interface {
 }
 
 // ErrUnsupported is the sentinel returned by Reset on sources that cannot
-// rewind (true streams). Callers route via errors.Is — the value wraps
-// ErrInputData so downstream code that only checks the taxonomy still
-// works correctly.
+// rewind (true streams). Wraps ErrInputData so downstream code that only
+// checks the taxonomy still routes correctly.
+//
+// AI-Meta:
+//   - Purpose: Signal that a Dataset does not support Reset; callers check via errors.Is(err, ErrUnsupported).
+//   - Related: [Dataset].
 var ErrUnsupported = utils.Newf(utils.ErrInputData, "dataset: Reset not supported")

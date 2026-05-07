@@ -20,21 +20,33 @@ import (
 )
 
 // SchemaVersion is the wire-format version embedded in every Snapshot.
-// CHK-4: a top-level schema_version makes future migrations possible
-// via the migrate() registry in reader.go.
+// A top-level schema_version field enables forward migration via the
+// migrate() dispatcher in reader.go.
+//
+// AI-Meta:
+//   - Purpose: Mark the on-disk snapshot format version for migration and compatibility checks.
+//   - Related: [Snapshot], [LoadLatest].
 const SchemaVersion = "1.0"
 
-// MinLossState records the best loss observed so far together with the
-// iteration where it was reached. Used by the training loop to roll
-// back to the best-known state per [l1-training-semantics] TRN-3.
+// MinLossState records the best loss observed so far and the iteration
+// where it was reached; used by the training loop to roll back to the
+// best-known state.
+//
+// AI-Meta:
+//   - Purpose: Track the best-loss checkpoint for potential rollback during training.
+//   - Related: [Snapshot].
 type MinLossState[T utils.Float] struct {
 	Iter uint64 `json:"iter"`
 	Loss T      `json:"loss"`
 }
 
-// Snapshot is the resumable training state per CHK-2. It carries the
-// full config + weights documents (so the snapshot is self-contained)
-// plus iteration, RNG state, and the rolling min-loss tracker.
+// Snapshot is the complete resumable training state: config + weights
+// documents (self-contained), iteration counter, RNG state, and rolling
+// min-loss tracker.
+//
+// AI-Meta:
+//   - Purpose: Self-contained training checkpoint; load via LoadLatest to resume a run.
+//   - Related: [WriteSnapshot], [LoadLatest], [MinLossState], [persistence.ConfigDoc], [persistence.WeightsDoc].
 type Snapshot[T utils.Float] struct {
 	SchemaVersion string                    `json:"schema_version"`
 	Iter          uint64                    `json:"iter"`
@@ -53,9 +65,14 @@ func snapshotName(iter uint64, ts int64) string {
 	return fmt.Sprintf("snap-%020d-%d.json", iter, ts)
 }
 
-// WriteSnapshot serialises snap to a fresh file inside dir using the
-// atomic write protocol. SchemaVersion and Timestamp are populated
-// automatically when callers leave them at the zero value.
+// WriteSnapshot serialises snap to a new file inside dir using the atomic
+// write protocol (tmp + Sync + Rename). SchemaVersion and Timestamp are
+// auto-populated when callers leave them at their zero values.
+//
+// AI-Meta:
+//   - Purpose: Persist a training snapshot atomically; returns the path of the written file.
+//   - Errors: ErrIO (mkdir, create, write, sync, or rename failure).
+//   - Related: [Snapshot], [LoadLatest], [Sweep].
 func WriteSnapshot[T utils.Float](dir string, snap Snapshot[T]) (string, error) {
 	if snap.SchemaVersion == "" {
 		snap.SchemaVersion = SchemaVersion

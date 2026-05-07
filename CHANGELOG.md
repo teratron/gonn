@@ -6,6 +6,23 @@ release artifacts dictated by [.magic/run.md](.magic/run.md) Phase Completion / 
 
 ## [Unreleased]
 
+### AI-Meta annotation rollout — 2026-05-07
+
+Added structured `AI-Meta:` trailing blocks to all exported Go doc comments
+across the entire public surface (`pkg/`). Governed by new rule **C33** and
+spec **l2-ai-doc-metadata.md** (promoted from RFC to Stable). Closes TODO #27.
+
+#### Added
+
+- `.design/specifications/l2-ai-doc-metadata.md` — spec defining the closed
+  vocabulary (`Purpose`, `Usage`, `Lifecycle`, `Concurrency`, `Errors`,
+  `Related`, `Constraints`, `Implementations`, `Stability`), tier matrix,
+  BNF grammar, and process-artifact firewall.
+- C33 rule in `.design/RULES.md` (version 1.3.0).
+- `AI-Meta:` blocks on ~200 exported symbols across `pkg/utils`,
+  `pkg/activation`, `pkg/loss`, `pkg/neuron`, `pkg/layer`, `pkg/network`,
+  `pkg/dataset`, `pkg/compute`, `pkg/checkpoint`, `pkg/persistence`, `pkg/nn`.
+
 ### Phase 4 — 2026-05-02
 
 v0.5 examples catalog. Seven new example modules covering the

@@ -7,6 +7,11 @@ import (
 )
 
 // LossType represents different loss functions.
+//
+// AI-Meta:
+//   - Purpose: Enum selecting which loss function to apply in Loss and CalculateTotalLoss.
+//   - Usage: Pass as mode argument — loss.Loss[float32](predicted, target, loss.MSE).
+//   - Related: [Loss], [CalculateTotalLoss].
 type Type uint8
 
 // Loss function mode.
@@ -32,6 +37,14 @@ const (
 	DEFAULT       = MSE
 )
 
+// CalculateTotalLoss computes the aggregate loss over a slice of per-sample errors,
+// returning the mean. For RMSE, MSLE, LOG_COSH, and HUBER an additional square-root
+// step is applied to the average before returning.
+//
+// AI-Meta:
+//   - Purpose: Aggregate per-sample losses from a training batch into a single scalar.
+//   - Usage: totalLoss := loss.CalculateTotalLoss[float32](&misses, loss.MSE).
+//   - Related: [Loss], [Type].
 func CalculateTotalLoss[T utils.Float](misses *[]*T, mode Type) (loss T) {
 	var count T = 0.0
 	for _, miss := range *misses {
@@ -47,7 +60,12 @@ func CalculateTotalLoss[T utils.Float](misses *[]*T, mode Type) (loss T) {
 	return
 }
 
-// Loss function for single values.
+// Loss computes the loss between a predicted and a target scalar value, dispatching by mode.
+//
+// AI-Meta:
+//   - Purpose: Stateless dispatcher — compute one loss value for a (predicted, target) scalar pair.
+//   - Usage: l := loss.Loss[float32](predicted, target, loss.MSE).
+//   - Related: [CalculateTotalLoss], [Type].
 func Loss[T utils.Float](predicted, target T, mode Type) T {
 	switch mode {
 	case MSE:
@@ -129,7 +147,12 @@ func Loss[T utils.Float](predicted, target T, mode Type) T {
 // 		}
 // }
 
-// String returns the string representation of the loss type
+// String returns the string representation of the loss type.
+//
+// AI-Meta:
+//   - Purpose: Human-readable name for the loss type, used in logs and diagnostics.
+//   - Usage: fmt.Println(loss.MSE.String()) // → "MSE".
+//   - Related: [Type].
 func (l Type) String() string {
 	switch l {
 	case MSE:

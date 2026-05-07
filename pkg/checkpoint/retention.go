@@ -18,25 +18,34 @@ import (
 	"github.com/teratron/gonn/pkg/utils"
 )
 
-// SweepConfig captures the retention policy. HotN snapshots remain
-// uncompressed for fast resume; the next ColdM are gzipped; older
-// snapshots are deleted. Zero or negative values disable the
-// corresponding tier.
+// SweepConfig captures the retention policy. HotN most-recent snapshots
+// stay uncompressed for fast resume; the next ColdM are gzipped; older
+// ones are deleted. Zero or negative values disable the corresponding tier.
+//
+// AI-Meta:
+//   - Purpose: Parameterise the three-tier snapshot retention sweep (hot / cold / delete).
+//   - Related: [Sweep], [StartSweeper], [DefaultSweepConfig].
 type SweepConfig struct {
 	HotN  int
 	ColdM int
 }
 
-// DefaultSweepConfig matches [l2-checkpointing-impl] §5.4 defaults
-// (hotN=3, coldM=10) and is used when callers pass a zero-value
-// SweepConfig to Sweep / StartSweeper.
+// DefaultSweepConfig is the baseline retention policy (hotN=3, coldM=10).
+// Applied automatically when callers pass a zero-value SweepConfig.
+//
+// AI-Meta:
+//   - Purpose: Provide sensible out-of-the-box retention settings for most training runs.
+//   - Related: [SweepConfig], [Sweep], [StartSweeper].
 var DefaultSweepConfig = SweepConfig{HotN: 3, ColdM: 10}
 
-// Sweep applies the retention policy to dir once, returning the
-// numbers of files kept hot, gzipped, and deleted. Errors from
-// individual file operations are joined into err but do not abort the
-// sweep — disk-full or permission failures should not poison the
-// queue.
+// Sweep applies the retention policy to dir once. Returns the counts of
+// files kept hot, gzipped, and deleted. Per-file errors are joined but do
+// not abort the sweep — a disk-full on one file should not block the rest.
+//
+// AI-Meta:
+//   - Purpose: Apply one-shot retention sweep to a snapshot directory; safe to call from tests or cron.
+//   - Errors: ErrIO (readdir failure or file-operation errors joined into err).
+//   - Related: [SweepConfig], [DefaultSweepConfig], [StartSweeper].
 func Sweep(dir string, cfg SweepConfig) (hot, cold, deleted int, err error) {
 	if cfg.HotN <= 0 && cfg.ColdM <= 0 {
 		cfg = DefaultSweepConfig
@@ -99,10 +108,14 @@ func Sweep(dir string, cfg SweepConfig) (hot, cold, deleted int, err error) {
 	return hot, cold, deleted, joinErrors(errs)
 }
 
-// StartSweeper launches a goroutine that calls Sweep on dir every
-// interval until ctx is cancelled. The returned Sweeper exposes Stop()
-// for synchronous shutdown — Stop blocks until the running tick (if
-// any) finishes, ensuring no half-applied sweep races test teardown.
+// StartSweeper launches a goroutine that calls Sweep on dir every interval
+// until ctx is cancelled. The returned Sweeper's Stop blocks until the
+// current tick completes, ensuring no half-applied sweep races test teardown.
+//
+// AI-Meta:
+//   - Purpose: Run periodic retention sweeps in the background alongside training.
+//   - Concurrency: Safe; the sweep goroutine is managed by the returned Sweeper.
+//   - Related: [Sweeper], [Sweep], [SweepConfig].
 func StartSweeper(ctx context.Context, dir string, cfg SweepConfig, interval time.Duration) *Sweeper {
 	if interval <= 0 {
 		interval = time.Minute
@@ -127,9 +140,15 @@ func StartSweeper(ctx context.Context, dir string, cfg SweepConfig, interval tim
 	return s
 }
 
-// Sweeper is the handle returned by StartSweeper. Multiple Stop calls
-// are safe; the goroutine is joined on the first call and subsequent
-// calls return immediately.
+// Sweeper is the handle returned by StartSweeper. Multiple Stop calls are
+// safe; the goroutine is joined on the first call and subsequent calls
+// return immediately.
+//
+// AI-Meta:
+//   - Purpose: Handle to the background retention sweep goroutine; call Stop to shut it down cleanly.
+//   - Lifecycle: Operational after StartSweeper; terminated after Stop.
+//   - Concurrency: Safe; Stop uses sync.Once and WaitGroup internally.
+//   - Related: [StartSweeper], [Stop].
 type Sweeper struct {
 	once sync.Once
 	stop chan struct{}
@@ -138,6 +157,11 @@ type Sweeper struct {
 
 // Stop signals the goroutine to exit and blocks until it has returned.
 // Idempotent — second and later calls are no-ops.
+//
+// AI-Meta:
+//   - Purpose: Gracefully shut down the sweeper; call as defer s.Stop() after StartSweeper.
+//   - Concurrency: Safe; idempotent via sync.Once.
+//   - Related: [Sweeper], [StartSweeper].
 func (s *Sweeper) Stop() {
 	s.once.Do(func() {
 		close(s.stop)

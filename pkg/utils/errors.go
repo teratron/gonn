@@ -24,34 +24,59 @@ import (
 // ErrUserConfig signals a configuration mistake made by the caller before
 // runtime — typically a bad argument to a Builder method or an unknown enum
 // symbol. Recovery is the caller's responsibility (fix the call).
+//
+// AI-Meta:
+//   - Purpose: Sentinel for caller-side configuration faults (bad Builder args, unknown enum).
+//   - Usage: Wrap: fmt.Errorf("...: %w", ErrUserConfig); detect: errors.Is(err, ErrUserConfig).
+//   - Related: [ErrInputData], [ErrCompute], [ErrControl], [ErrIntegrity], [ErrIO], [Newf].
 var ErrUserConfig = errors.New("user-config")
 
 // ErrInputData signals invalid data supplied to a runtime entry point —
 // a batch with the wrong shape, a sample containing NaN, an empty stream.
 // Distinct from ErrUserConfig in that the data is valid Go but violates
 // the runtime contract.
+//
+// AI-Meta:
+//   - Purpose: Sentinel for runtime data-contract violations (wrong batch shape, NaN sample).
+//   - Usage: Wrap: fmt.Errorf("...: %w", ErrInputData); detect: errors.Is(err, ErrInputData).
 var ErrInputData = errors.New("input-data")
 
 // ErrCompute signals a numeric or hardware-level fault inside the engine —
 // NaN gradient, infinite loss, dimension mismatch between layers, missing
 // CPU feature required by a backend. Indicates the engine cannot proceed
 // without operator intervention (lower learning rate, switch backend).
+//
+// AI-Meta:
+//   - Purpose: Sentinel for numeric or hardware faults inside the engine (NaN gradient, dim mismatch).
+//   - Usage: Wrap: fmt.Errorf("...: %w", ErrCompute); detect: errors.Is(err, ErrCompute).
 var ErrCompute = errors.New("compute")
 
 // ErrControl signals a training-lifecycle state-machine violation —
 // Pause issued on a Stopped network, double-Resume, mutating a frozen
 // snapshot. Indicates a programming error in the orchestration layer.
+//
+// AI-Meta:
+//   - Purpose: Sentinel for training lifecycle state-machine violations (Pause on stopped network).
+//   - Usage: Wrap: fmt.Errorf("...: %w", ErrControl); detect: errors.Is(err, ErrControl).
 var ErrControl = errors.New("control")
 
 // ErrIntegrity signals a persisted-artifact integrity failure — checksum
 // mismatch on a checkpoint, schema-version drift, weight-count mismatch
 // after deserialization. Recovery requires re-creating or migrating the
 // artifact.
+//
+// AI-Meta:
+//   - Purpose: Sentinel for persisted-artifact integrity failures (checksum mismatch, schema drift).
+//   - Usage: Wrap: fmt.Errorf("...: %w", ErrIntegrity); detect: errors.Is(err, ErrIntegrity).
 var ErrIntegrity = errors.New("integrity")
 
 // ErrIO signals a filesystem or network failure — permission denied, EOF
 // before expected boundary, disk full, broken pipe. Distinct from
 // ErrIntegrity in that the storage medium itself failed, not the contents.
+//
+// AI-Meta:
+//   - Purpose: Sentinel for filesystem or network failures (permission denied, disk full, EOF).
+//   - Usage: Wrap: fmt.Errorf("...: %w", ErrIO); detect: errors.Is(err, ErrIO).
 var ErrIO = errors.New("io")
 
 // Newf builds a new error that wraps the given category sentinel and
@@ -64,6 +89,12 @@ var ErrIO = errors.New("io")
 //	return utils.Newf(utils.ErrUserConfig, "Input(): size must be positive, got %d", size)
 //
 // Newf panics if cat is nil — a nil category is always a programming bug.
+//
+// AI-Meta:
+//   - Purpose: Build an error wrapping a category sentinel with a caller-formatted message.
+//   - Usage: utils.Newf(utils.ErrUserConfig, "Input(): size must be positive, got %d", n).
+//   - Concurrency: Safe.
+//   - Related: [Wrap], [NewSizeError], [NewActivationError], [NewIntegrityError].
 func Newf(cat error, format string, args ...any) error {
 	if cat == nil {
 		panic("utils.Newf: nil category sentinel")
@@ -77,6 +108,12 @@ func Newf(cat error, format string, args ...any) error {
 // when re-routing an stdlib or third-party error into the project taxonomy.
 //
 // If cause is nil, Wrap returns nil — convenient for one-line propagation.
+//
+// AI-Meta:
+//   - Purpose: Re-route a foreign error into the project taxonomy while preserving the original chain.
+//   - Usage: utils.Wrap(utils.ErrIO, err, "checkpoint.Write(): failed to flush").
+//   - Concurrency: Safe.
+//   - Related: [Newf], [ErrIO], [ErrUserConfig].
 func Wrap(cat error, cause error, format string, args ...any) error {
 	if cause == nil {
 		return nil
@@ -92,12 +129,22 @@ func Wrap(cat error, cause error, format string, args ...any) error {
 // constraint violation in API arguments. field names the parameter,
 // got is the offending value, constraint is a short phrase (e.g.
 // "positive", ">= 1", "in [1, 1024]").
+//
+// AI-Meta:
+//   - Purpose: Convenience constructor for ErrUserConfig about an API size constraint violation.
+//   - Usage: utils.NewSizeError("Input()", size, "positive").
+//   - Related: [Newf], [ErrUserConfig].
 func NewSizeError(field string, got int, constraint string) error {
 	return fmt.Errorf("%s: size must be %s, got %d: %w", field, constraint, got, ErrUserConfig)
 }
 
 // NewActivationError builds an ErrUserConfig describing a request for an
 // unregistered activation symbol. symbol is the unknown identifier.
+//
+// AI-Meta:
+//   - Purpose: Convenience constructor for ErrUserConfig about an unregistered activation symbol.
+//   - Usage: utils.NewActivationError("SWISH").
+//   - Related: [Newf], [ErrUserConfig].
 func NewActivationError(symbol string) error {
 	return fmt.Errorf("activation %q is not registered: %w", symbol, ErrUserConfig)
 }
@@ -106,6 +153,11 @@ func NewActivationError(symbol string) error {
 // expected and observed values in a persisted artifact. what names the
 // artifact slot ("checkpoint.weights[0].len"), expected and got are the
 // rendered values being compared.
+//
+// AI-Meta:
+//   - Purpose: Convenience constructor for ErrIntegrity about a persisted-artifact value mismatch.
+//   - Usage: utils.NewIntegrityError("checkpoint.weights[0].len", "512", "256").
+//   - Related: [Newf], [ErrIntegrity].
 func NewIntegrityError(what string, expected, got string) error {
 	return fmt.Errorf("integrity violation in %s: expected %s, got %s: %w", what, expected, got, ErrIntegrity)
 }
@@ -113,7 +165,12 @@ func NewIntegrityError(what string, expected, got string) error {
 // LocationHint returns a "file:line" string for the caller skip frames
 // above the LocationHint call site. skip=0 reports the caller of
 // LocationHint itself. Returns the empty string when runtime info is
-// unavailable. Intended for C32 §5 caller hints in Error-level logs.
+// unavailable. Intended for caller hints in Error-level logs.
+//
+// AI-Meta:
+//   - Purpose: Return a file:line string to include in Error-level log messages for diagnostics.
+//   - Usage: utils.Logger.Error("failed", "at", utils.LocationHint(0)).
+//   - Concurrency: Safe.
 func LocationHint(skip int) string {
 	_, file, line, ok := runtime.Caller(skip + 1)
 	if !ok {

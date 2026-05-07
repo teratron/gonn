@@ -10,12 +10,20 @@ import (
 // container parameterised by *cell.Input[T] — Input cells only carry a
 // scalar value, no axons or activation, so the lighter core (no base
 // embedding) is sufficient.
+//
+// AI-Meta:
+//   - Purpose: First layer in the network graph; holds one Input cell per feature.
+//   - Concurrency: NotSafe; cells are mutated via SetValue before each forward pass.
+//   - Related: [NewInput], [cell.Input], [Dense], [Output].
 type Input[T utils.Float] core[T, *cell.Input[T]]
 
 // NewInput allocates an Input layer of the requested size and populates
-// it with zero-valued cell.Input units. Closes [l2-layer-types] §5.3 #3:
-// the previous implementation passed a hard-coded 0 to Init and silently
-// produced a layer of size zero regardless of the caller's request.
+// it with zero-valued cell.Input units.
+//
+// AI-Meta:
+//   - Purpose: Construct an Input layer pre-filled with zero-valued cells; used by the network builder.
+//   - Usage: l := layer.NewInput[float32](4) for a four-feature input layer.
+//   - Related: [Input], [Init].
 func NewInput[T utils.Float](size int) *Input[T] {
 	in := (*Input[T])(newCore[T, *cell.Input[T]](neuron.INPUT, size))
 	in.populate()
@@ -23,8 +31,12 @@ func NewInput[T utils.Float](size int) *Input[T] {
 	return in
 }
 
-// Init resets the Input layer to the requested size and re-populates
-// cells. Honours the call-supplied size — no implicit zeroing.
+// Init resets the Input layer to the requested size and re-populates cells.
+//
+// AI-Meta:
+//   - Purpose: Resize and re-initialise the Input layer, discarding previous cells.
+//   - Concurrency: NotSafe; must not be called concurrently with forward passes.
+//   - Related: [NewInput].
 func (i *Input[T]) Init(size int) {
 	((*core[T, *cell.Input[T]])(i)).Init(neuron.INPUT, size)
 	i.populate()
@@ -40,8 +52,12 @@ func (i *Input[T]) populate() {
 	}
 }
 
-// Cells exposes the input cell slice for read access. See core.Cells for
-// the ownership contract.
+// Cells exposes the input cell slice for read access.
+//
+// AI-Meta:
+//   - Purpose: Return the cell slice so callers can feed feature values via cell.SetValue.
+//   - Concurrency: ReadSafe; slice elements must be written only before the forward pass.
+//   - Related: [cell.Input].
 func (i *Input[T]) Cells() []*cell.Input[T] {
 	return ((*core[T, *cell.Input[T]])(i)).Cells()
 }

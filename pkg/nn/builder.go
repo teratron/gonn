@@ -10,10 +10,16 @@ import (
 // Topology methods
 // ============================================================================
 
-// Input declares the input layer size. Order convention: call Input
-// before any Dense / Hidden / Output. Calling Input twice overwrites
-// the previous value with a Logger.Debug trace — useful for repl-like
+// Input declares the input layer size. Calling Input twice overwrites the
+// previous size with a Logger.Debug trace — useful for REPL-style
 // reconfiguration before Compile.
+//
+// AI-Meta:
+//   - Purpose: Set the number of input features in the Builder API.
+//   - Usage: nn.NewBuilder[float32]().Input(4)....
+//   - Concurrency: NotSafe; must be called before Compile.
+//   - Related: [NN], [Compile], [WithInput].
+//   - Stability: Stable.
 func (n *NN[T]) Input(size uint) *NN[T] {
 	if !n.guardConfiguring("Input") {
 		return n
@@ -26,10 +32,15 @@ func (n *NN[T]) Input(size uint) *NN[T] {
 	return n
 }
 
-// Dense appends a hidden layer with the given size, activation, and
-// bias setting. The activation symbol must be registered in the
-// activation dispatcher — invalid symbols surface at Compile() as
-// ErrUserConfig (UnknownActivation).
+// Dense appends a hidden layer with the given size, activation, and bias
+// setting. Invalid activation symbols surface at Compile as ErrUserConfig.
+//
+// AI-Meta:
+//   - Purpose: Add one hidden layer in the Builder API; supports per-layer bias control.
+//   - Usage: .Dense(8, activation.ReLU, true).
+//   - Concurrency: NotSafe; must be called before Compile.
+//   - Related: [Hidden], [WithHiddenLayer], [Compile].
+//   - Stability: Stable.
 func (n *NN[T]) Dense(size uint, act activation.Type, bias bool) *NN[T] {
 	if !n.guardConfiguring("Dense") {
 		return n
@@ -42,16 +53,27 @@ func (n *NN[T]) Dense(size uint, act activation.Type, bias bool) *NN[T] {
 	return n
 }
 
-// Hidden is a documented alias for Dense — kept for naming-convention
-// users who think in terms of "input/hidden/output".
+// Hidden is a documented alias for Dense, kept for callers who prefer
+// input/hidden/output naming over the layer-type name.
+//
+// AI-Meta:
+//   - Purpose: Alias for Dense; use whichever name fits the code's vocabulary.
+//   - Related: [Dense], [WithHiddenLayer].
+//   - Stability: Stable.
 func (n *NN[T]) Hidden(size uint, act activation.Type, bias bool) *NN[T] {
 	return n.Dense(size, act, bias)
 }
 
-// Output declares the output layer. Note the breaking change from v1.0:
-// loss is no longer a parameter here — set it via [WithLoss]. Rationale
-// per [l2-nn-facade] §5.2: structural concerns (size, activation, bias)
-// and training concerns (loss) live on separate axes.
+// Output declares the output layer size, activation, and bias. Loss is set
+// separately via WithLoss — structural and training concerns are on separate
+// axes.
+//
+// AI-Meta:
+//   - Purpose: Declare the output layer in the Builder API.
+//   - Usage: .Output(1, activation.SIGMOID, true).WithLoss(loss.MSE).
+//   - Concurrency: NotSafe; must be called before Compile.
+//   - Related: [WithLoss], [WithOutput], [Compile].
+//   - Stability: Stable.
 func (n *NN[T]) Output(size uint, act activation.Type, bias bool) *NN[T] {
 	if !n.guardConfiguring("Output") {
 		return n
@@ -70,9 +92,13 @@ func (n *NN[T]) Output(size uint, act activation.Type, bias bool) *NN[T] {
 // Configuration methods
 // ============================================================================
 
-// WithLearningRate sets the SGD learning rate applied during Train.
-// Non-positive values are accepted at the chain level but rejected by
-// Compile() with ErrUserConfig (RateNonPositive).
+// WithLearningRate sets the SGD learning rate. Non-positive values are
+// accepted here but rejected by Compile with ErrUserConfig.
+//
+// AI-Meta:
+//   - Purpose: Configure the learning rate in the Builder API.
+//   - Related: [WithLearningRate], [DefaultLearningRate], [Compile].
+//   - Stability: Stable.
 func (n *NN[T]) WithLearningRate(rate T) *NN[T] {
 	if !n.guardConfiguring("WithLearningRate") {
 		return n
@@ -82,7 +108,12 @@ func (n *NN[T]) WithLearningRate(rate T) *NN[T] {
 }
 
 // WithLoss sets the loss function symbol consumed by the training loop.
-// Default at Compile() is loss.MSE.
+// Default at Compile is loss.MSE.
+//
+// AI-Meta:
+//   - Purpose: Select the loss function in the Builder API.
+//   - Related: [WithLoss], [loss.Type], [Compile].
+//   - Stability: Stable.
 func (n *NN[T]) WithLoss(lossType loss.Type) *NN[T] {
 	if !n.guardConfiguring("WithLoss") {
 		return n
@@ -91,9 +122,13 @@ func (n *NN[T]) WithLoss(lossType loss.Type) *NN[T] {
 	return n
 }
 
-// WithBias sets the global default for any Dense / Output layer added
-// AFTER this call. Layers added before WithBias keep their per-call
-// bias setting — this method does not retroactively rewrite history.
+// WithBias sets the global default bias flag for Dense/Output layers added
+// after this call. Layers added before this call keep their per-call setting.
+//
+// AI-Meta:
+//   - Purpose: Set the default bias flag for subsequently added layers in the Builder API.
+//   - Related: [WithBias], [Dense], [Output].
+//   - Stability: Stable.
 func (n *NN[T]) WithBias(use bool) *NN[T] {
 	if !n.guardConfiguring("WithBias") {
 		return n
@@ -102,9 +137,13 @@ func (n *NN[T]) WithBias(use bool) *NN[T] {
 	return n
 }
 
-// WithWeightInit selects the weight-initialisation strategy. Unknown
-// methods are accepted at the chain level but rejected by Compile()
-// with ErrUserConfig (UnknownInit).
+// WithWeightInit selects the weight-initialisation strategy. Unknown methods
+// are accepted here but rejected by Compile with ErrUserConfig.
+//
+// AI-Meta:
+//   - Purpose: Select the weight-init strategy in the Builder API.
+//   - Related: [WithWeightInit], [WeightInitMethod], [Compile].
+//   - Stability: Stable.
 func (n *NN[T]) WithWeightInit(method WeightInitMethod) *NN[T] {
 	if !n.guardConfiguring("WithWeightInit") {
 		return n
@@ -113,9 +152,13 @@ func (n *NN[T]) WithWeightInit(method WeightInitMethod) *NN[T] {
 	return n
 }
 
-// WithLossLimit sets the early-stopping threshold (per [l1-training-semantics]).
-// Train returns once the running loss drops below this value. Default
-// at Compile() is DefaultLossLimit.
+// WithLossLimit sets the early-stopping threshold; Fit returns once the mean
+// epoch loss drops below this value. Default at Compile is DefaultLossLimit.
+//
+// AI-Meta:
+//   - Purpose: Set the early-stopping loss threshold in the Builder API.
+//   - Related: [WithLossLimit], [DefaultLossLimit], [Fit].
+//   - Stability: Stable.
 func (n *NN[T]) WithLossLimit(threshold T) *NN[T] {
 	if !n.guardConfiguring("WithLossLimit") {
 		return n
@@ -124,8 +167,13 @@ func (n *NN[T]) WithLossLimit(threshold T) *NN[T] {
 	return n
 }
 
-// WithMaxIterations bounds the training loop. Default at Compile() is
-// DefaultMaxIterations.
+// WithMaxIterations bounds the training loop to at most count epochs.
+// Default at Compile is DefaultMaxIterations.
+//
+// AI-Meta:
+//   - Purpose: Cap the number of training epochs in the Builder API.
+//   - Related: [WithMaxIterations], [DefaultMaxIterations], [Fit].
+//   - Stability: Stable.
 func (n *NN[T]) WithMaxIterations(count uint) *NN[T] {
 	if !n.guardConfiguring("WithMaxIterations") {
 		return n
@@ -138,9 +186,15 @@ func (n *NN[T]) WithMaxIterations(count uint) *NN[T] {
 // Callback methods
 // ============================================================================
 
-// WithEpochCallback registers a callback invoked at the end of every
-// training epoch. Synchronous — a long-running callback blocks training.
+// WithEpochCallback registers a callback invoked at the end of every epoch.
+// The callback is synchronous — a slow callback blocks the training loop.
 // Pass nil to disable a previously-set callback.
+//
+// AI-Meta:
+//   - Purpose: Register an epoch-level progress hook for logging or early-stopping logic.
+//   - Concurrency: Callback runs on the Fit goroutine; must be goroutine-safe if sharing state.
+//   - Related: [WithEpochCallback], [WithBatchCallback], [Fit].
+//   - Stability: Stable.
 func (n *NN[T]) WithEpochCallback(fn func(epoch uint, lossValue T)) *NN[T] {
 	if !n.guardConfiguring("WithEpochCallback") {
 		return n
@@ -149,8 +203,14 @@ func (n *NN[T]) WithEpochCallback(fn func(epoch uint, lossValue T)) *NN[T] {
 	return n
 }
 
-// WithBatchCallback registers a callback invoked at the end of every
-// training batch. Synchronous; same caveats as [WithEpochCallback].
+// WithBatchCallback registers a callback invoked at the end of every batch.
+// Synchronous; same caveats as WithEpochCallback.
+//
+// AI-Meta:
+//   - Purpose: Register a batch-level progress hook for fine-grained loss monitoring.
+//   - Concurrency: Callback runs on the Fit goroutine; must be goroutine-safe if sharing state.
+//   - Related: [WithBatchCallback], [WithEpochCallback], [Fit].
+//   - Stability: Stable.
 func (n *NN[T]) WithBatchCallback(fn func(batch uint, lossValue T)) *NN[T] {
 	if !n.guardConfiguring("WithBatchCallback") {
 		return n
@@ -163,16 +223,21 @@ func (n *NN[T]) WithBatchCallback(fn func(batch uint, lossValue T)) *NN[T] {
 // Finalisation
 // ============================================================================
 
-// Compile validates the staged configuration, applies defaults, builds
-// the underlying network, and transitions the *NN[T] to Operational
-// state. Returns the same *NN[T] (for chain-style examples) plus an
-// error if validation fails — every error wraps utils.ErrUserConfig
-// per the project taxonomy (C32).
+// Compile validates the staged configuration, applies defaults, builds the
+// underlying network graph, and transitions the NN to Operational state.
+// Returns the same *NN[T] for chain-style assignments.
 //
-// Compile is idempotent for the post-compile case: a second call on an
-// already-Operational network returns (n, ErrAlreadyCompiled) without
-// re-running validation. Mutating builder methods after Compile emit
-// Logger.Warn and become no-ops.
+// Idempotent on Operational networks: a second call returns (n, ErrUserConfig).
+// Builder methods called after Compile emit Logger.Warn and become no-ops.
+//
+// AI-Meta:
+//   - Purpose: Finalise topology, validate config, and wire all axons; required before Train/Query.
+//   - Lifecycle: Configuring → Operational on success.
+//   - Concurrency: SingleGoroutine; must complete before sharing NN across goroutines.
+//   - Errors: ErrUserConfig (missing layers, zero sizes, bad rate, unknown activation/loss/init).
+//   - Related: [NewBuilder], [New], [MustCompile], [network.Network.Build].
+//   - Constraints: Idempotent; topology cannot be mutated after success.
+//   - Stability: Stable.
 func (n *NN[T]) Compile() (*NN[T], error) {
 	switch n.stateField {
 	case stateOperational:
@@ -187,8 +252,13 @@ func (n *NN[T]) Compile() (*NN[T], error) {
 	return n, nil
 }
 
-// MustCompile is the panic-on-error variant of Compile, reserved for
-// examples and tests where any compile error is a programming bug.
+// MustCompile is the panicking variant of Compile, intended for examples
+// and tests where a compile failure is a programming bug.
+//
+// AI-Meta:
+//   - Purpose: Panicking wrapper around Compile; eliminates error handling in non-production contexts.
+//   - Related: [Compile], [MustNew].
+//   - Stability: Stable.
 func (n *NN[T]) MustCompile() *NN[T] {
 	out, err := n.Compile()
 	if err != nil {

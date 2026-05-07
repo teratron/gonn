@@ -12,8 +12,14 @@ import (
 )
 
 // WorkerPool dispatches independent jobs to up to Workers goroutines.
-// Construction is cheap; jobs is unbuffered so closing it acts as the
-// shutdown signal.
+// The jobs channel is unbuffered — closing it during Stop acts as the
+// shutdown signal and drains all in-flight work.
+//
+// AI-Meta:
+//   - Purpose: Bounded goroutine pool for batch-level parallelism; sized to GOMAXPROCS.
+//   - Lifecycle: Operational after NewWorkerPool; drains and terminates on Stop.
+//   - Concurrency: Safe; Submit blocks on backpressure rather than dropping jobs.
+//   - Related: [NewWorkerPool], [Submit], [Stop].
 type WorkerPool struct {
 	Workers int
 	jobs    chan func()
@@ -21,9 +27,13 @@ type WorkerPool struct {
 	once    sync.Once
 }
 
-// NewWorkerPool creates a pool sized to GOMAXPROCS — the Go runtime
-// already obeys the OS thread cap, so using GOMAXPROCS keeps NN
-// parallelism bounded by the same dial users already turn (PERF-3).
+// NewWorkerPool creates a pool sized to GOMAXPROCS so NN parallelism stays
+// bounded by the same dial users already tune at the OS level.
+//
+// AI-Meta:
+//   - Purpose: Construct and start a worker pool; goroutines run until Stop is called.
+//   - Usage: p := network.NewWorkerPool(); defer p.Stop(); p.Submit(fn).
+//   - Related: [WorkerPool], [Submit], [Stop].
 func NewWorkerPool() *WorkerPool {
 	workers := max(runtime.GOMAXPROCS(0), 1)
 	p := &WorkerPool{
@@ -45,14 +55,24 @@ func (p *WorkerPool) run() {
 	}
 }
 
-// Submit enqueues fn for execution by the next available worker. The
-// call blocks if all workers are busy — natural backpressure.
+// Submit enqueues fn for the next available worker. Blocks when all
+// workers are busy — provides natural back-pressure to the caller.
+//
+// AI-Meta:
+//   - Purpose: Dispatch a job to the pool; must not be called after Stop.
+//   - Concurrency: Safe to call from multiple goroutines.
+//   - Related: [Stop], [WorkerPool].
 func (p *WorkerPool) Submit(fn func()) {
 	p.jobs <- fn
 }
 
-// Stop closes the jobs channel and waits for the workers to drain.
-// Idempotent — multiple Stop calls are safe.
+// Stop closes the jobs channel and waits for all workers to drain and exit.
+// Idempotent — multiple Stop calls are safe via sync.Once.
+//
+// AI-Meta:
+//   - Purpose: Gracefully shut down the pool; call as defer p.Stop() after NewWorkerPool.
+//   - Concurrency: Safe; blocks until the last in-flight job completes.
+//   - Related: [NewWorkerPool], [Submit].
 func (p *WorkerPool) Stop() {
 	p.once.Do(func() {
 		close(p.jobs)

@@ -6,16 +6,16 @@ import (
 	"github.com/teratron/gonn/pkg/neuron/cell"
 )
 
-// CalculateValues runs the forward pass left-to-right across the chain:
-// every hidden layer (in order) consumes the previous layer's outputs,
-// then Output consumes the last hidden layer. Each cell's CalculateValue
-// reads its own incoming Axons, so layer-i cells see exactly the values
-// produced by layer i-1 cells in the same forward pass.
+// CalculateValues runs the forward pass left-to-right: each hidden layer
+// consumes the previous layer's post-activation outputs; Output consumes
+// the last hidden layer. Pre-activation linear sums are captured before
+// the activation dispatcher is applied so CalculateMisses/CalculateWeights
+// can feed the correct value to the derivative.
 //
-// After the linear sum is computed, it is captured in preactHiddens[i]
-// / preactOutput (backprop needs pre-activation values for the
-// derivative call), then the layer-wide activation function is applied
-// via the [pkg/activation] dispatcher. Per [l2-multihidden-impl] §5.6.
+// AI-Meta:
+//   - Purpose: Execute the full forward pass, writing post-activation values and miss residuals into cells.
+//   - Concurrency: NotSafe; mutates cell values and preact scratch buffers.
+//   - Related: [CalculateMisses], [CalculateWeights], [Train].
 func (n *Network[T]) CalculateValues() {
 	for i, hb := range n.Hiddens {
 		act := n.hiddenActs[i]
@@ -36,9 +36,13 @@ func (n *Network[T]) CalculateValues() {
 	}
 }
 
-// CalculateLoss computes the aggregate loss across Output cells using
-// the supplied dispatcher mode. Reads the residual already set by
-// Output.CalculateValue.
+// CalculateLoss computes the aggregate loss across Output cells using the
+// supplied loss mode. Reads residuals written by CalculateValues.
+//
+// AI-Meta:
+//   - Purpose: Compute scalar training loss after a forward pass; useful for logging or early stopping.
+//   - Concurrency: ReadSafe after CalculateValues; does not mutate cell state.
+//   - Related: [CalculateLossDefault], [CalculateValues], [loss.CalculateTotalLoss].
 func (n *Network[T]) CalculateLoss(mode loss.Type) T {
 	misses := make([]*T, n.Output.Len())
 	for i, o := range n.Output.cells {
@@ -47,20 +51,17 @@ func (n *Network[T]) CalculateLoss(mode loss.Type) T {
 	return loss.CalculateTotalLoss(&misses, mode)
 }
 
-// CalculateMisses runs the backward pass across the chain. Per
-// [l2-multihidden-impl] §5.6 the residual on each Output cell is set
-// during forward (`target - value`); we walk Hiddens right-to-left,
-// accumulating each cell's raw miss as
+// CalculateMisses runs the backward pass right-to-left across the hidden
+// chain. Output cell residuals are already set during CalculateValues.
+// Each hidden cell accumulates raw miss = Σ(next.miss × axon.Weight);
+// the activation derivative is NOT folded here — CalculateWeights folds
+// it into the effective rate per layer. Bias cells are filtered by type
+// assertion and never receive gradient.
 //
-//	miss_i = Σ over next-layer cells c: c.miss × axon.Weight
-//
-// where axon.Cell points at the source cell in Hiddens[i]. The
-// activation derivative is NOT folded here — CalculateWeights composes
-// it into the per-layer effective rate (`rate × σ'(z_i)`) so the
-// single-hidden path stays bit-identical to v0.5: same residuals on
-// Output, same per-cell raw misses on Hidden, same ΔW arithmetic.
-// Bias cells (also reachable through Axons) are filtered out by the
-// type assertion to *cell.Hidden[T] — biases never accumulate gradient.
+// AI-Meta:
+//   - Purpose: Propagate error signals backward through all hidden layers.
+//   - Concurrency: NotSafe; mutates cell miss fields.
+//   - Related: [CalculateValues], [CalculateWeights], [Train].
 func (n *Network[T]) CalculateMisses() {
 	for i := len(n.Hiddens) - 1; i >= 0; i-- {
 		hb := n.Hiddens[i]
@@ -93,13 +94,15 @@ func (n *Network[T]) CalculateMisses() {
 	}
 }
 
-// CalculateWeights applies the gradient-descent step to every learnable
-// cell — every Hidden layer plus Output. Per cell the activation
-// derivative is folded into the effective rate so that downstream
-// cell.CalculateWeight uses `rate × σ'(z) × miss × axon.cell.value()`
-// — the v0.5 single-hidden formula extended positionally to every
-// chain entry. Pre-activation values captured during the forward pass
-// are fed to the derivative dispatcher.
+// CalculateWeights applies one gradient-descent step to all learnable cells
+// (Hidden layers + Output). The activation derivative is folded into the
+// effective rate per cell: eff = rate × σ'(preact), so cell.CalculateWeight
+// computes ΔW = eff × miss × axon.value without knowing the activation type.
+//
+// AI-Meta:
+//   - Purpose: Update all axon weights from the current miss and pre-activation values.
+//   - Concurrency: NotSafe; mutates axon weights in place.
+//   - Related: [CalculateMisses], [CalculateValues], [Train].
 func (n *Network[T]) CalculateWeights(rate *T) {
 	for layerIdx, hb := range n.Hiddens {
 		act := n.hiddenActs[layerIdx]
@@ -115,14 +118,25 @@ func (n *Network[T]) CalculateWeights(rate *T) {
 	}
 }
 
-// CalculateLossDefault is a convenience wrapper that uses the loss mode
-// captured by SetLayers — saves callers from re-deriving it each step.
+// CalculateLossDefault calls CalculateLoss with the mode captured during
+// SetLayers, avoiding the need to re-supply the loss type each step.
+//
+// AI-Meta:
+//   - Purpose: Compute loss using the layer-configured mode; convenience wrapper around CalculateLoss.
+//   - Concurrency: ReadSafe after CalculateValues.
+//   - Related: [CalculateLoss], [LossMode].
 func (n *Network[T]) CalculateLossDefault() T {
 	return n.CalculateLoss(n.lossMode)
 }
 
 // Train runs one full forward + backward + weight-update step on the
-// supplied (input, target) pair using the network's configured rate.
+// supplied (input, target) pair using the network's LearningRate.
+//
+// AI-Meta:
+//   - Purpose: Execute one training step; returns the aggregate loss for the sample.
+//   - Errors: ErrInputData (length mismatch in SetInputs or SetTargets).
+//   - Concurrency: NotSafe; the single-step contract requires exclusive access.
+//   - Related: [CalculateValues], [CalculateMisses], [CalculateWeights], [SetInputs], [SetTargets].
 func (n *Network[T]) Train(input, target []T) (T, error) {
 	if err := n.SetInputs(input); err != nil {
 		return 0, err

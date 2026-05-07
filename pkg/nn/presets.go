@@ -11,12 +11,13 @@ import (
 // ============================================================================
 
 // Sequential adds count hidden layers with identical size and activation.
-// Useful as a one-liner replacement for repeated WithHiddenLayer calls.
+// A one-liner replacement for repeated WithHiddenLayer calls.
 //
-// Note: in v0.5 the network only supports a single hidden layer. Calling
-// Sequential with count > 1 is accepted by the staging buffer and rejected
-// by Compile() — this is intentional so the full configuration surfaces
-// in error messages.
+// AI-Meta:
+//   - Purpose: Add N identical hidden layers in one Options API call.
+//   - Usage: nn.New[float32](Sequential[float32](3, 64, activation.ReLU), ...).
+//   - Related: [Option], [WithHiddenLayer], [DeepNetwork].
+//   - Stability: Stable.
 func Sequential[T utils.Float](count, size uint, act activation.Type) Option[T] {
 	return func(cfg *Config[T]) {
 		for range count {
@@ -29,9 +30,14 @@ func Sequential[T utils.Float](count, size uint, act activation.Type) Option[T] 
 	}
 }
 
-// DeepNetwork adds layers hidden levels of progressively halving size,
-// floored at 2. Replicates the convenience helper from the v3 reference
-// design. Same v0.5 multi-hidden caveat as [Sequential].
+// DeepNetwork adds layers hidden layers whose size halves at each level,
+// floored at 2. Produces a funnel topology for progressive feature compression.
+//
+// AI-Meta:
+//   - Purpose: Add a pyramid of hidden layers with halving size in the Options API.
+//   - Usage: nn.New[float32](DeepNetwork[float32](128, 4, activation.ReLU), ...).
+//   - Related: [Option], [Sequential], [WithHiddenLayer].
+//   - Stability: Stable.
 func DeepNetwork[T utils.Float](startSize, layers uint, act activation.Type) Option[T] {
 	return func(cfg *Config[T]) {
 		size := startSize
@@ -49,9 +55,14 @@ func DeepNetwork[T utils.Float](startSize, layers uint, act activation.Type) Opt
 	}
 }
 
-// StandardSetup is an opinionated defaults bundle: learning rate,
-// MSE loss, bias on, Xavier init. Application order means callers who
-// supply WithLearningRate later override the rate set here.
+// StandardSetup is an opinionated defaults bundle: given learning rate,
+// MSE loss, bias on, Xavier init. Options applied later can override these.
+//
+// AI-Meta:
+//   - Purpose: Apply a sensible baseline configuration in one Options API call.
+//   - Usage: nn.New[float32](StandardSetup[float32](0.1), WithInput[float32](4), ...).
+//   - Related: [Option], [WithLearningRate], [PresetXOR].
+//   - Stability: Stable.
 func StandardSetup[T utils.Float](rate T) Option[T] {
 	return func(cfg *Config[T]) {
 		cfg.LearningRate = rate
@@ -65,11 +76,14 @@ func StandardSetup[T utils.Float](rate T) Option[T] {
 // Presets — named option bundles for canonical tasks
 // ============================================================================
 
-// PresetXOR returns the canonical XOR-network configuration:
+// PresetXOR returns the canonical XOR network configuration:
 // 2 → Sigmoid(4) → Sigmoid(1), MSE, rate 0.3, Xavier init, bias on.
 //
-// Validates against the Phase-1 XOR smoke test so a regression in this
-// preset shows up as a Phase-2 test failure.
+// AI-Meta:
+//   - Purpose: One-option XOR baseline for smoke tests and tutorials.
+//   - Usage: n := nn.MustNew[float32](nn.PresetXOR[float32]()).
+//   - Related: [Option], [MustNew], [StandardSetup].
+//   - Stability: Stable.
 func PresetXOR[T utils.Float]() Option[T] {
 	return func(cfg *Config[T]) {
 		cfg.InputSize = 2
@@ -87,11 +101,13 @@ func PresetXOR[T utils.Float]() Option[T] {
 }
 
 // PresetMNIST returns the canonical MNIST classifier:
-// 784 → ReLU(128) → ReLU(64) → SoftMax(10), CrossEntropy, He init.
+// 784 → ReLU(128) → ReLU(64) → Softmax(10), CrossEntropy, He init.
 //
-// Multi-hidden — runs into the v0.5 single-hidden Compile() check.
-// Provided so the preset surface matches the spec; v0.6 will lift the
-// restriction and this preset will work without modification.
+// AI-Meta:
+//   - Purpose: Standard multi-layer MNIST digit classifier preset.
+//   - Usage: n, err := nn.New[float32](nn.PresetMNIST[float32]()).
+//   - Related: [Option], [New], [PresetRegression].
+//   - Stability: Stable.
 func PresetMNIST[T utils.Float]() Option[T] {
 	return func(cfg *Config[T]) {
 		cfg.InputSize = 784
@@ -108,12 +124,14 @@ func PresetMNIST[T utils.Float]() Option[T] {
 	}
 }
 
-// PresetRegression returns a generic regression configuration with the
-// supplied input and hidden size:
+// PresetRegression returns a generic regression configuration:
 // inputSize → ReLU(hiddenSize) → ReLU(hiddenSize/2) → Linear(1), MSE.
 //
-// Multi-hidden — same v0.5 limitation as [PresetMNIST]; ships against
-// the spec for forward compatibility.
+// AI-Meta:
+//   - Purpose: Generic continuous-output regression preset parameterised by input and hidden sizes.
+//   - Usage: n, err := nn.New[float32](nn.PresetRegression[float32](10, 64)).
+//   - Related: [Option], [New], [PresetMNIST].
+//   - Stability: Stable.
 func PresetRegression[T utils.Float](inputSize, hiddenSize uint) Option[T] {
 	half := max(hiddenSize/2, 2)
 	return func(cfg *Config[T]) {

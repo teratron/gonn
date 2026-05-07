@@ -4,16 +4,18 @@ import (
 	"github.com/teratron/gonn/pkg/utils"
 )
 
-// Verify runs forward propagation and returns the configured-loss value
-// without performing the backward pass or updating weights. Equivalent
-// to "what would Train compute if it stopped after the forward step".
+// Verify runs a forward pass and returns the configured loss without
+// performing backprop or updating weights. Cell values are mutated but
+// weights and biases are untouched — safe to call between training epochs
+// to monitor validation-set loss without contaminating learning.
 //
-// Mutates the cell values (forward writes through them) but leaves
-// weights and biases untouched — safe to invoke between training
-// epochs to monitor validation-set loss without contaminating learning.
-//
-// Returns ErrInputData on shape mismatch; ErrUserConfig when called on
-// a non-Operational network.
+// AI-Meta:
+//   - Purpose: Compute validation loss for one sample without touching weights.
+//   - Usage: loss, err := n.Verify(validInput, validTarget).
+//   - Concurrency: NotSafe; mutates cell values (forward pass).
+//   - Errors: ErrUserConfig (not Operational), ErrInputData (shape mismatch).
+//   - Related: [Query], [Train], [network.Network.CalculateValues].
+//   - Stability: Stable.
 func (n *NN[T]) Verify(input, target []T) (T, error) {
 	if n.stateField != stateOperational {
 		return 0, utils.Newf(utils.ErrUserConfig,

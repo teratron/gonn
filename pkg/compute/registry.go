@@ -21,11 +21,14 @@ var (
 	factoryF64 = make(map[string]func() any)
 )
 
-// Register installs factory under name for both float32 and float64
-// specialisations. Backends that legitimately support only one width
-// can use RegisterFloat32 / RegisterFloat64 directly. Re-registering
-// the same name overwrites the prior factory — this lets tests inject
-// stubs without poisoning later runs.
+// Register installs factory under name for the T specialisation. Re-registering
+// the same name overwrites the prior factory, letting tests inject stubs.
+//
+// AI-Meta:
+//   - Purpose: Add a named Backend factory to the global registry; called from init() of backend packages.
+//   - Usage: compute.Register[float32]("cpu", func() compute.Backend[float32] { return &cpuBackend{} }).
+//   - Concurrency: Safe; guards registry with a write lock.
+//   - Related: [Get], [Names], [Backend].
 func Register[T utils.Float](name string, factory func() Backend[T]) {
 	registryMu.Lock()
 	defer registryMu.Unlock()
@@ -38,10 +41,14 @@ func Register[T utils.Float](name string, factory func() Backend[T]) {
 	}
 }
 
-// Get resolves name into a fresh Backend[T] instance. Unknown names
-// yield ErrUserConfig so callers can route via errors.Is. Each Get call
-// returns a new backend value; backends are cheap to construct (no
-// goroutines, no preallocated state) so caching is the caller's choice.
+// Get resolves name into a fresh Backend[T] instance. Unknown names yield
+// ErrUserConfig. Each call returns a new value; caching is the caller's choice.
+//
+// AI-Meta:
+//   - Purpose: Retrieve a registered backend by name at compile/init time.
+//   - Errors: ErrUserConfig (unknown name), ErrCompute (incompatible type registration).
+//   - Concurrency: Safe; guards registry with a read lock.
+//   - Related: [Register], [Names], [Backend].
 func Get[T utils.Float](name string) (Backend[T], error) {
 	registryMu.RLock()
 	defer registryMu.RUnlock()
@@ -66,9 +73,13 @@ func Get[T utils.Float](name string) (Backend[T], error) {
 	return b, nil
 }
 
-// Names returns the sorted list of registered backend names for the
-// generic specialisation T. Useful for logging the available targets at
-// startup or when reporting an unknown-backend error to the user.
+// Names returns the sorted list of registered backend names for the T
+// specialisation. Useful for startup logging and error messages.
+//
+// AI-Meta:
+//   - Purpose: Enumerate available backends for diagnostics or user-facing selection UI.
+//   - Concurrency: Safe; guards registry with a read lock.
+//   - Related: [Register], [Get].
 func Names[T utils.Float]() []string {
 	registryMu.RLock()
 	defer registryMu.RUnlock()

@@ -11,14 +11,15 @@ import (
 	"github.com/teratron/gonn/pkg/utils"
 )
 
-// LayerHandle is the per-layer view a backend needs to evaluate the
-// forward / backward kernels. Weights is shaped [outputSize][inputSize];
-// Bias is per-output (empty when the layer has no bias). Activation is
-// applied element-wise to the pre-activation sum.
+// LayerHandle is the per-layer view a compute backend needs to run the
+// forward/backward kernels. Weights is shaped [outputSize][inputSize];
+// Bias is per-output (empty when the layer has no bias). Only UpdateWeights
+// is allowed to write through the weight/bias slices.
 //
-// The handle is a value type — backends should not mutate Weights or
-// Bias outside of UpdateWeights, which is the only kernel allowed to
-// write through the slices.
+// AI-Meta:
+//   - Purpose: Pass layer topology and activation functions to a backend kernel without exposing graph internals.
+//   - Concurrency: NotSafe; only UpdateWeights may mutate Weights/Bias.
+//   - Related: [Backend], [Buffer].
 type LayerHandle[T utils.Float] struct {
 	Size       int
 	Weights    [][]T
@@ -27,18 +28,27 @@ type LayerHandle[T utils.Float] struct {
 	Derivative func(T) T
 }
 
-// Buffer is the explicit handle returned by Backend.Allocate. CPU
-// backends use the embedded slice directly; future GPU backends store
-// a device pointer here. Per COMP-4 callers must release buffers via
-// Backend.Free.
+// Buffer is the explicit device-memory handle returned by Backend.Allocate.
+// CPU backends embed the slice directly; future GPU backends would store a
+// device pointer. Callers must release via Backend.Free.
+//
+// AI-Meta:
+//   - Purpose: Opaque buffer handle for device memory; abstracts CPU slice vs. GPU pointer.
+//   - Concurrency: NotSafe; caller owns the buffer exclusively between Allocate and Free.
+//   - Related: [Backend], [LayerHandle].
 type Buffer[T utils.Float] struct {
 	Data []T
 }
 
-// Backend is the small surface every compute target implements. The CPU
-// reference path is the always-available default (COMP-1). Returning
-// Name() lets the registry route by string and lets logs identify the
-// active backend.
+// Backend is the minimal surface every compute target must implement. The
+// CPU reference path is always available as the default. Name() lets the
+// registry route by string and identifies the active backend in logs.
+//
+// AI-Meta:
+//   - Purpose: Pluggable compute boundary between math kernels and the rest of the library.
+//   - Implementations: CPU reference backend (internal); future: OpenCL, CUDA.
+//   - Concurrency: Depends on implementation; CPU backend is NotSafe by default.
+//   - Related: [LayerHandle], [Buffer], [Register], [Get].
 type Backend[T utils.Float] interface {
 	Name() string
 	Forward(layer LayerHandle[T], input []T) ([]T, error)

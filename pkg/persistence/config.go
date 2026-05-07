@@ -23,34 +23,38 @@ import (
 	"github.com/teratron/gonn/pkg/utils"
 )
 
-// SchemaVersion is the wire-format version embedded in every ConfigDoc /
-// WeightsDoc. Bump rules per [l1-network-persistence] PERS-1: major change
-// is breaking; minor / patch are forward-compatible (warning, not fatal).
+// SchemaVersion is the wire-format version embedded in every ConfigDoc and
+// WeightsDoc. Major changes are breaking; minor/patch are forward-compatible.
 //
 // Version history:
 //
-//   - 1.0.0 (Phase 3) — single-hidden topology baseline.
-//   - 1.1.0 (Phase 5 / Track C) — multi-hidden chain.  WeightsDoc.Layers
-//     now carries N+1 entries (one per HiddenLayers entry plus output).
-//     Forward-compatible minor bump per PERS-1: v0.1 readers loading a
-//     v0.2 file pass schema validation but fail later on cell-count
-//     reconciliation with ErrIntegrity rather than a parse crash; v0.2
-//     readers loading a v0.1 file see a single hidden entry and rebuild
-//     correctly.
+//   - 1.0.0 — single-hidden topology baseline.
+//   - 1.1.0 — multi-hidden chain; WeightsDoc.Layers carries N+1 entries.
+//
+// AI-Meta:
+//   - Purpose: Version sentinel for on-disk documents; compared by ReadConfig/ReadWeights for compatibility.
+//   - Related: [ConfigDoc], [WeightsDoc], [WriteConfig], [ReadConfig].
 const SchemaVersion = "1.1.0"
 
-// HiddenLayerDoc mirrors one [pkg/nn].HiddenLayerSpec entry on disk.
-// Activation is serialised as the canonical String() form (e.g. "ReLU")
-// so JSON files remain self-describing across language bindings.
+// HiddenLayerDoc is the on-disk representation of one hidden layer spec.
+// Activation is stored as the canonical string form (e.g. "ReLU") so
+// config files remain self-describing across language bindings.
+//
+// AI-Meta:
+//   - Purpose: Serialisable descriptor for one hidden layer inside ConfigDoc.HiddenLayers.
+//   - Related: [ConfigDoc], [OutputDoc].
 type HiddenLayerDoc struct {
 	Size       uint   `json:"size"`
 	Activation string `json:"activation"`
 	Bias       bool   `json:"bias"`
 }
 
-// OutputDoc captures the output-layer shape on disk. Split from
-// HiddenLayerDoc to mirror the JSON schema in
-// [l1-network-persistence] §5.2.
+// OutputDoc captures the output-layer shape on disk. A separate type from
+// HiddenLayerDoc mirrors the JSON schema's distinction between the two.
+//
+// AI-Meta:
+//   - Purpose: Serialisable descriptor for the output layer inside ConfigDoc.Output.
+//   - Related: [ConfigDoc], [HiddenLayerDoc].
 type OutputDoc struct {
 	Size       uint   `json:"size"`
 	Activation string `json:"activation"`
@@ -58,8 +62,12 @@ type OutputDoc struct {
 }
 
 // TrainingDoc holds the hyperparameters that feed Compile(). LearningRate
-// and LossLimit are stored as JSON numbers; their Go type T is recovered
-// on read via generic specialisation.
+// and LossLimit are JSON numbers whose Go type T is recovered on read via
+// generic specialisation.
+//
+// AI-Meta:
+//   - Purpose: On-disk training hyperparameter block nested inside ConfigDoc.Training.
+//   - Related: [ConfigDoc].
 type TrainingDoc[T utils.Float] struct {
 	LearningRate  T      `json:"learning_rate"`
 	Loss          string `json:"loss"`
@@ -69,10 +77,13 @@ type TrainingDoc[T utils.Float] struct {
 	RNGSeed       int64  `json:"rng_seed,omitempty"`
 }
 
-// ConfigDoc is the on-disk projection of the in-memory [pkg/nn].Config[T].
-// It is intentionally a separate type: the persistence package depends on
-// pkg/utils only — pulling pkg/nn would create an import cycle. Conversion
-// happens at the pkg/nn boundary.
+// ConfigDoc is the on-disk projection of the network's architecture and
+// hyperparameters. A separate type from nn.Config[T] to avoid an import
+// cycle; conversion happens at the nn package boundary.
+//
+// AI-Meta:
+//   - Purpose: Complete serialisable description of network topology and training settings.
+//   - Related: [WriteConfig], [ReadConfig], [WeightsDoc], [HiddenLayerDoc], [OutputDoc], [TrainingDoc].
 type ConfigDoc[T utils.Float] struct {
 	SchemaVersion string           `json:"schema_version"`
 	LibVersion    string           `json:"lib_version,omitempty"`
@@ -83,13 +94,14 @@ type ConfigDoc[T utils.Float] struct {
 	Training      TrainingDoc[T]   `json:"training"`
 }
 
-// WriteConfig serialises cfg to path atomically (§5.2). The format is
-// deterministic per PERS-2: re-serialising a freshly read file yields a
-// byte-identical artefact, which makes configs diffable in git.
+// WriteConfig serialises cfg to path atomically (tmp + Sync + Rename).
+// The canonical format is deterministic — re-serialising a freshly read
+// file yields a byte-identical artefact, making configs diffable in git.
 //
-// The on-disk file is written via tmp + Sync + Rename so a crash mid-write
-// leaves either the prior file untouched or no file — never a half-written
-// document. Errors wrap project sentinels: ErrIO for filesystem failures.
+// AI-Meta:
+//   - Purpose: Persist network topology and hyperparameters; safe to call after each training run.
+//   - Errors: ErrIO (filesystem failures).
+//   - Related: [ReadConfig], [ConfigDoc], [WriteWeights].
 func WriteConfig[T utils.Float](path string, cfg ConfigDoc[T]) error {
 	cfg = withDefaults(cfg)
 	data, err := canonicalConfigBytes(cfg)
@@ -99,10 +111,14 @@ func WriteConfig[T utils.Float](path string, cfg ConfigDoc[T]) error {
 	return atomicWrite(path, data)
 }
 
-// ReadConfig parses a config document from path and validates schema_version
-// per PERS-1. Major-version mismatch returns an ErrUserConfig-wrapped error;
-// minor / patch drift is silently tolerated to preserve forward compat as
-// stated in [l1-network-persistence] §2.
+// ReadConfig parses a config document from path and validates the schema
+// version. Major-version mismatches return ErrUserConfig; minor/patch drift
+// is silently tolerated for forward compatibility.
+//
+// AI-Meta:
+//   - Purpose: Load and validate a config.json file; prerequisite for ReadWeights.
+//   - Errors: ErrIO (file or decode failure), ErrUserConfig (schema major mismatch).
+//   - Related: [WriteConfig], [ReadWeights], [ConfigDoc].
 func ReadConfig[T utils.Float](path string) (ConfigDoc[T], error) {
 	var doc ConfigDoc[T]
 	raw, err := os.ReadFile(path)

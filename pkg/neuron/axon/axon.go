@@ -18,9 +18,15 @@ import (
 // Bundle is the standard collection used by every neuron-side cell to
 // hold its incoming axons. Slice rather than map — order is meaningful
 // for forward-pass determinism and matches the layer's cell order.
+//
+// AI-Meta:
+//   - Purpose: Ordered slice of incoming axons owned by a Dense or Output cell.
+//   - Usage: Iterate for forward pass: for _, a := range cell.Axons { sum += a.CalculateValue() }.
+//   - Related: [Axon].
 type Bundle[T utils.Float] []*Axon[T]
 
-// Axon is the connection record. Weight participates in both passes:
+// Axon is the directed weighted connection between an incoming Nucleus and an outgoing Neuron.
+// Weight participates in both passes:
 //
 //   - Forward: contributes Weight * Cell.Value to the outgoing cell sum.
 //   - Backward: receives a gradient and updates Weight in place.
@@ -29,6 +35,11 @@ type Bundle[T utils.Float] []*Axon[T]
 // from the cell on the receiving side of the connection. Storing both
 // endpoints costs one pointer per axon — the alternative (re-deriving
 // the outgoing cell from a reverse adjacency map) is hot-path expensive.
+//
+// AI-Meta:
+//   - Purpose: Weighted synapse connecting an incoming cell (forward) and an outgoing cell (backward).
+//   - Concurrency: NotSafe; CalculateWeight mutates Weight in-place.
+//   - Related: [Bundle], [New], [NewWithWeight].
 type Axon[T utils.Float] struct {
 	Weight       T                 `json:"weight" xml:"weight"`
 	Cell         neuron.Nucleus[T] `json:"-" xml:"-"`
@@ -63,10 +74,13 @@ func sampleDefaultWeight[T utils.Float]() T {
 }
 
 // New constructs an Axon connecting incoming → outgoing with a default
-// weight drawn from U[-0.5, 0.5] (legacy baseline preserved per
-// l2-neuron-model §2). Callers that need reproducible weights — layer
-// constructors driving Xavier / He sampling — should call NewWithWeight
-// with a pre-computed value instead.
+// weight drawn from U[-0.5, 0.5]. Callers that need reproducible weights
+// (Xavier/He sampling) should call NewWithWeight with a pre-computed value.
+//
+// AI-Meta:
+//   - Purpose: Construct an axon with a random default weight; use for quick wiring.
+//   - Usage: a := axon.New[float32](inCell, outCell).
+//   - Related: [NewWithWeight], [Axon].
 func New[T utils.Float](incoming neuron.Nucleus[T], outgoing neuron.Neuron[T]) *Axon[T] {
 	return &Axon[T]{
 		Weight:       sampleDefaultWeight[T](),
@@ -75,9 +89,13 @@ func New[T utils.Float](incoming neuron.Nucleus[T], outgoing neuron.Neuron[T]) *
 	}
 }
 
-// NewWithWeight constructs an Axon with the supplied weight — the path
-// taken when a layer constructor has already sampled from a strategy
-// (Xavier/He/Uniform) using its own seeded RNG.
+// NewWithWeight constructs an Axon with a caller-supplied weight — used when
+// a layer constructor has sampled from Xavier/He/Uniform with its own RNG.
+//
+// AI-Meta:
+//   - Purpose: Construct an axon with a pre-computed deterministic weight.
+//   - Usage: a := axon.NewWithWeight[float32](w, inCell, outCell).
+//   - Related: [New], [Axon].
 func NewWithWeight[T utils.Float](weight T, incoming neuron.Nucleus[T], outgoing neuron.Neuron[T]) *Axon[T] {
 	return &Axon[T]{
 		Weight:       weight,
@@ -86,24 +104,33 @@ func NewWithWeight[T utils.Float](weight T, incoming neuron.Nucleus[T], outgoing
 	}
 }
 
-// CalculateValue (FORWARD) returns the weighted contribution this axon
-// pushes into the outgoing cell's value sum. Reads only Cell — the
-// outgoing endpoint is updated by the cell, not by the axon.
+// CalculateValue (FORWARD) returns Weight * Cell.Value — the axon's contribution to the forward sum.
+//
+// AI-Meta:
+//   - Purpose: Compute this axon's weighted contribution during the forward pass.
+//   - Concurrency: Safe for concurrent reads; does not mutate any field.
+//   - Related: [CalculateMiss], [CalculateWeight].
 func (a *Axon[T]) CalculateValue() T {
 	return *a.Cell.GetValue() * a.Weight
 }
 
-// CalculateMiss (BACKWARD) returns the weighted error contribution this
-// axon delivers back to the incoming cell. Reads only OutgoingCell —
-// symmetric counterpart of CalculateValue.
+// CalculateMiss (BACKWARD) returns OutgoingCell.Miss * Weight — the error signal propagated back.
+//
+// AI-Meta:
+//   - Purpose: Compute this axon's error contribution during the backward pass.
+//   - Concurrency: Safe for concurrent reads; does not mutate any field.
+//   - Related: [CalculateValue], [CalculateWeight].
 func (a *Axon[T]) CalculateMiss() T {
 	return *a.OutgoingCell.GetMiss() * a.Weight
 }
 
-// CalculateWeight (BACKWARD) updates Weight in place: classic gradient
-// descent step `w += gradient * cell.value`. The gradient is supplied by
-// the cell that owns this axon; the axon never computes the activation
-// derivative on its own.
+// CalculateWeight (BACKWARD) updates Weight in-place: w += *gradient * Cell.Value.
+// The gradient (rate * miss) is computed and supplied by the owning cell.
+//
+// AI-Meta:
+//   - Purpose: Apply one gradient-descent weight update for this axon.
+//   - Concurrency: NotSafe; mutates Weight in-place.
+//   - Related: [CalculateValue], [CalculateMiss].
 func (a *Axon[T]) CalculateWeight(gradient *T) {
 	a.Weight += *gradient * *a.Cell.GetValue()
 }

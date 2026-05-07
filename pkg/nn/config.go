@@ -40,30 +40,56 @@ func (s state) String() string {
 }
 
 // WeightInitMethod identifies a recognised weight-initialisation strategy.
-// String-typed (not numeric) so that JSON-serialised Config[T] payloads
-// remain self-describing — this matches the planned persistence contract
-// in [l1-network-persistence] §5.2 without locking in numeric IDs.
+// String-typed so JSON-serialised Config payloads stay self-describing
+// across library versions without locking in numeric IDs.
+//
+// AI-Meta:
+//   - Purpose: Closed string enum for selecting the weight-init strategy applied at Compile.
+//   - Usage: Pass WeightInitXavier / WeightInitHe / WeightInitRandom to WithWeightInit.
+//   - Related: [WeightInitXavier], [WeightInitHe], [WeightInitRandom], [WithWeightInit].
+//   - Stability: Stable.
 type WeightInitMethod string
 
 const (
 	// WeightInitXavier draws weights from Glorot uniform U[-a, a],
-	// a = sqrt(6 / (fanIn + fanOut)). Recommended for tanh / sigmoid
-	// layers. The default applied by Compile() when WeightInit is unset.
+	// a = sqrt(6 / (fanIn + fanOut)). Recommended for tanh / sigmoid layers.
+	// The default applied by Compile when WeightInit is unset.
+	//
+	// AI-Meta:
+	//   - Purpose: Glorot uniform weight initialiser; optimal for tanh/sigmoid activations.
+	//   - Related: [WeightInitMethod], [WeightInitHe], [WeightInitRandom], [WithWeightInit].
+	//   - Stability: Stable.
 	WeightInitXavier WeightInitMethod = "xavier"
 
 	// WeightInitHe draws weights from He normal N(0, sigma^2),
 	// sigma = sqrt(2 / fanIn). Recommended for ReLU / LeakyReLU layers.
+	//
+	// AI-Meta:
+	//   - Purpose: He normal weight initialiser; optimal for ReLU/LeakyReLU activations.
+	//   - Related: [WeightInitMethod], [WeightInitXavier], [WeightInitRandom], [WithWeightInit].
+	//   - Stability: Stable.
 	WeightInitHe WeightInitMethod = "he"
 
 	// WeightInitRandom draws weights from uniform U[-1, 1). Soft-warns
-	// at Compile() when paired with deep stacks (>5 hidden layers) due
+	// at Compile when paired with deep stacks (>5 hidden layers) due
 	// to gradient-explosion risk.
+	//
+	// AI-Meta:
+	//   - Purpose: Uniform random weight initialiser; use only for shallow or experimental networks.
+	//   - Related: [WeightInitMethod], [WeightInitXavier], [WeightInitHe], [WithWeightInit].
+	//   - Stability: Stable.
 	WeightInitRandom WeightInitMethod = "random"
 )
 
-// Defaults applied by Compile() when the corresponding Config field is
-// left at its zero value. Public so tests / examples can reference them
-// without re-deriving the numbers from the spec text.
+// Defaults applied by Compile when the corresponding Config field is left at
+// its zero value. Public so tests and examples can reference the canonical
+// values without hard-coding them.
+//
+// AI-Meta:
+//   - Purpose: Canonical baseline values for hyperparameters; applied by applyDefaults before compile.
+//   - Usage: Reference in assertions or option chains that need to override then restore defaults.
+//   - Related: [Config], [Compile].
+//   - Stability: Stable.
 const (
 	DefaultLearningRate     = 0.3
 	DefaultMaxIterations    = uint(10_000)
@@ -72,20 +98,31 @@ const (
 	DefaultLossMode         = loss.MSE
 )
 
-// HiddenLayerSpec captures the shape of one hidden layer. A slice of
-// these inside Config[T] allows higher-order options like Sequential and
-// DeepNetwork to compose multiple hidden layers from a single call.
+// HiddenLayerSpec captures the shape of one hidden layer. A slice of these
+// inside Config[T] lets higher-order options like Sequential and DeepNetwork
+// compose multiple hidden layers from a single call.
+//
+// AI-Meta:
+//   - Purpose: Per-layer shape descriptor for one element of the multi-hidden chain.
+//   - Usage: Populated by Dense / Hidden builder methods or WithHiddenLayer; stored in Config.HiddenLayers.
+//   - Related: [Config], [Dense], [WithHiddenLayer], [Sequential], [DeepNetwork].
+//   - Stability: Stable.
 type HiddenLayerSpec[T utils.Float] struct {
 	Size       uint
 	Activation activation.Type
 	Bias       bool
 }
 
-// Config is the internal staging buffer populated by builder methods and
-// functional options. It is intentionally unexported in v2.0 — promotion
-// to a public, serialisable type is reserved for the persistence spec
-// (see [l2-nn-facade] §5.5 forward-extension hook). The generic parameter
-// T flows through every public surface in this package.
+// Config is the staging buffer that both the Builder API and Functional
+// Options API write into before Compile reads it. The generic parameter T
+// flows through every public surface in this package.
+//
+// AI-Meta:
+//   - Purpose: Unified configuration struct shared by both construction styles; frozen by Compile.
+//   - Lifecycle: Populated in Configuring state; read-only after Compile transitions NN to Operational.
+//   - Concurrency: NotSafe; mutated by builder/option methods, read by compile().
+//   - Related: [HiddenLayerSpec], [Compile], [Option], [NN.Config].
+//   - Stability: Stable.
 type Config[T utils.Float] struct {
 	InputSize        uint
 	HiddenLayers     []HiddenLayerSpec[T]

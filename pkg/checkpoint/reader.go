@@ -24,10 +24,15 @@ import (
 // auto-detect compressed snapshots without relying on the .gz suffix.
 var gzipMagic = []byte{0x1f, 0x8b}
 
-// LoadLatest returns the most recent snapshot in dir along with the path
-// it was loaded from. "Most recent" is defined by the Iter encoded in
-// the filename — ties are broken by Timestamp. Both .json and .json.gz
-// snapshots are considered.
+// LoadLatest returns the most-recent snapshot in dir. "Most recent" is
+// determined by the Iter encoded in the filename; ties are broken by
+// Timestamp. Both .json and .json.gz files are considered; gzip is detected
+// by magic bytes, not suffix.
+//
+// AI-Meta:
+//   - Purpose: Resume a training run by loading the newest snapshot from a checkpoint directory.
+//   - Errors: ErrIO (readdir or file-read failure), ErrIntegrity (corrupt JSON or gzip).
+//   - Related: [Snapshot], [WriteSnapshot], [Sweep].
 func LoadLatest[T utils.Float](dir string) (Snapshot[T], string, error) {
 	entries, err := os.ReadDir(dir)
 	if err != nil {

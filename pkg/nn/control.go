@@ -17,12 +17,16 @@ const (
 	controlStopped int32 = 3 // stop requested; worker exits at next safe-point
 )
 
-// Pause requests a transition Running → Paused. The worker observes
-// this at the next safe-point (between epochs) and blocks there until
-// Resume or Stop is invoked.
+// Pause requests a Running → Paused transition. The Fit goroutine observes
+// this signal at the next safe-point (between epochs) and blocks until
+// Resume or Stop is called.
 //
-// Returns ErrControl when called on a network that is not currently
-// running — pause-while-idle is a state-machine misuse.
+// AI-Meta:
+//   - Purpose: Temporarily suspend an in-progress Fit loop from another goroutine.
+//   - Concurrency: Safe; uses atomic CAS and is designed for cross-goroutine calls.
+//   - Errors: ErrControl (network is not currently Running).
+//   - Related: [Resume], [Stop], [Fit].
+//   - Stability: Stable.
 func (n *NN[T]) Pause() error {
 	if !n.control.CompareAndSwap(controlRunning, controlPaused) {
 		return utils.Newf(utils.ErrControl,
@@ -32,8 +36,15 @@ func (n *NN[T]) Pause() error {
 	return nil
 }
 
-// Resume requests a transition Paused → Running. Idempotent on already-
-// Running networks (returns nil); errors via ErrControl on Idle / Stopped.
+// Resume requests a Paused → Running transition. Idempotent on already-Running
+// networks (returns nil); errors via ErrControl on Idle or Stopped.
+//
+// AI-Meta:
+//   - Purpose: Resume a Fit loop that was suspended by Pause.
+//   - Concurrency: Safe; designed for cross-goroutine calls.
+//   - Errors: ErrControl (network is not paused or running).
+//   - Related: [Pause], [Stop], [Fit].
+//   - Stability: Stable.
 func (n *NN[T]) Resume() error {
 	if n.control.CompareAndSwap(controlPaused, controlRunning) {
 		utils.Logger.Debug("Resume signalled")
@@ -46,9 +57,16 @@ func (n *NN[T]) Resume() error {
 		"Resume: network is not paused (state=%d)", n.control.Load())
 }
 
-// Stop requests an early exit from the training loop. The worker
-// observes this at the next safe-point and returns from Fit. Idempotent
-// on already-Stopped networks; allowed from Idle / Running / Paused.
+// Stop requests an early exit from the training loop. The Fit goroutine
+// observes the signal at the next safe-point and returns. Idempotent on
+// already-Stopped networks; valid from Idle, Running, or Paused.
+//
+// AI-Meta:
+//   - Purpose: Signal Fit to terminate at the next epoch boundary; best-weight rollback still applies.
+//   - Concurrency: Safe; designed for cross-goroutine calls.
+//   - Errors: Never returns an error (idempotent CAS loop).
+//   - Related: [Pause], [Resume], [Fit].
+//   - Stability: Stable.
 func (n *NN[T]) Stop() error {
 	for {
 		cur := n.control.Load()

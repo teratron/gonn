@@ -15,15 +15,17 @@ import (
 	"github.com/teratron/gonn/pkg/utils"
 )
 
-// Prefetch wraps inner with a goroutine that fetches the next batch in
-// the background. The channel buffer holds at most prefetch+1 batches at
-// any time, so total residency is bounded by (prefetch+1) × batchSize
-// samples (DAT-3).
+// Prefetch wraps inner with a background producer goroutine. The channel
+// buffer holds at most prefetch+1 batches, bounding residency to
+// (prefetch+1) × batchSize samples. A value of 0 still buffers one batch
+// ahead. Reset rewinds inner and restarts the producer.
 //
-// prefetch must be ≥ 0; values of 0 still buffer one batch ahead (the
-// "+1" in the channel capacity) so even single-thread consumers benefit
-// from one-step look-ahead. The returned dataset's Reset rewinds the
-// inner source and restarts the producer.
+// AI-Meta:
+//   - Purpose: Overlap I/O with training by pulling batches ahead of the consumer.
+//   - Usage: ds, err := dataset.Prefetch[float32](inner, 2).
+//   - Errors: ErrUserConfig (nil inner, negative prefetch).
+//   - Concurrency: Safe; consumer calls Next/Reset, producer runs in a separate goroutine.
+//   - Related: [Dataset], [NewCSVDataset], [NewSliceDataset].
 func Prefetch[T utils.Float](inner Dataset[T], prefetch int) (Dataset[T], error) {
 	if inner == nil {
 		return nil, utils.Newf(utils.ErrUserConfig, "Prefetch: inner dataset is nil")

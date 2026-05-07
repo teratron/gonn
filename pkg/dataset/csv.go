@@ -17,15 +17,18 @@ import (
 	"github.com/teratron/gonn/pkg/utils"
 )
 
-// NewCSVDataset opens a CSV file at path and returns a Dataset[T] that
-// produces batches of the requested size. The CSV layout is
-// `input_size` numeric columns followed by `output_size` numeric columns
-// per row; the caller passes both widths so the reader knows where to
-// split.
+// NewCSVDataset opens a CSV file at path and returns a streaming Dataset[T].
+// Each row contains inputSize numeric columns followed by outputSize numeric
+// columns; the reader splits them lazily on each Next call.
 //
-// Errors during open are returned immediately; per-row decode failures
-// surface from Next() wrapped with utils.ErrInputData (DAT-4) so they are
-// routable via errors.Is.
+// Open errors are returned immediately; per-row decode failures surface from
+// Next() wrapped with utils.ErrInputData so callers can route via errors.Is.
+//
+// AI-Meta:
+//   - Purpose: Construct a lazy CSV-backed Dataset for large files that do not fit in memory.
+//   - Usage: ds, err := dataset.NewCSVDataset[float32]("data.csv", 4, 1, 32).
+//   - Errors: ErrIO (file not found or unreadable), ErrInputData (bad size args or row decode).
+//   - Related: [Dataset], [NewSliceDataset], [Prefetch].
 func NewCSVDataset[T utils.Float](path string, inputSize, outputSize, batchSize int) (Dataset[T], error) {
 	if inputSize <= 0 {
 		return nil, utils.NewSizeError("NewCSVDataset.inputSize", inputSize, "positive")

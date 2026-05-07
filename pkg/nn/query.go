@@ -4,14 +4,17 @@ import (
 	"github.com/teratron/gonn/pkg/utils"
 )
 
-// Query runs forward propagation only and returns a freshly allocated
-// slice of output values. Read-only with respect to weights — safe to
-// invoke concurrently from multiple goroutines once the network is
-// Operational.
+// Query runs forward propagation only and returns a freshly allocated slice
+// of output values. Weights are never modified — safe to call concurrently
+// from multiple goroutines once the network is Operational.
 //
-// Returns ErrInputData wrapped with the size mismatch when the supplied
-// input length does not match the configured input layer; ErrUserConfig
-// wrapped when the network has not been compiled yet.
+// AI-Meta:
+//   - Purpose: Run inference on one input vector; does not update weights.
+//   - Usage: out, err := n.Query([]float32{0.1, 0.2, 0.3}).
+//   - Concurrency: ReadSafe; multiple goroutines may call Query simultaneously.
+//   - Errors: ErrUserConfig (not Operational), ErrInputData (length mismatch).
+//   - Related: [Train], [Verify], [NN].
+//   - Stability: Stable.
 func (n *NN[T]) Query(input []T) ([]T, error) {
 	if n.stateField != stateOperational {
 		return nil, utils.Newf(utils.ErrUserConfig,
