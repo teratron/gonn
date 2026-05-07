@@ -53,4 +53,4 @@ Overall:          [104/104] ████████ 100%
 
 **Last Session Ended:** 2026-05-06
 **Handoff File:** none
-**Bootstrap Mode:** false (Phase 5 complete; v0.2 multi-hidden catalog active)
+**Bootstrap Mode:** false (Phase 5 complete; v0.6 multi-hidden catalog active)

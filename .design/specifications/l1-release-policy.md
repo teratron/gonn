@@ -72,7 +72,7 @@ The `v0.6.0` tag marks the completion of multi-hidden topology support:
 - Known debt documented in CHANGELOG: `axon.New[T]` ignores `WeightInit` for deep ReLU
   (mitigated by SIGMOID + input normalization).
 
-### 5.2 v0.3.0 Planned Deliverables (post-Phase 6)
+### 5.2 v0.7.0 Planned Deliverables (post-Phase 6)
 
 - `pkg/optimizer/` — pluggable SGD/Adam/RMSProp optimizer (Phase 6, Track A).
 - `pkg/regularizer/` — L1/L2/Dropout regularization (Phase 6, Track B).
@@ -97,7 +97,7 @@ graph LR
 
 1. Audit `pkg/nn` exported symbols against the public surface defined in REL-2.
 2. Author `CHANGELOG.md` with v0.6.0 section (multi-hidden, new examples, known debt).
-3. Update root `README.md` — document multi-hidden API (`HiddenLayers` option, v0.2 feature list).
+3. Update root `README.md` — document multi-hidden API (`HiddenLayers` option, v0.6 feature list).
 4. Run the full gate check (REL-5) — resolve all failures before tagging.
 5. Create annotated tag `v0.6.0` with message summarizing deliverables from §5.1.
 
@@ -113,7 +113,7 @@ graph LR
 | :--- | :--- | :--- |
 | `[ARCH-L1]` | `.design/specifications/l1-neural-network-architecture.md` | Public API entry point definition |
 | `[PERS-L1]` | `.design/specifications/l1-network-persistence.md` | Serialization contract for breaking-change classification |
-| `[CHANGELOG]` | `CHANGELOG.md` | Release notes (to be created for v0.6.0, updated for v0.3.0) |
+| `[CHANGELOG]` | `CHANGELOG.md` | Release notes (to be created for v0.6.0, updated for v0.7.0) |
 
 ## Document History
 

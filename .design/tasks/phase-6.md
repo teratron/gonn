@@ -1,6 +1,6 @@
 ---
 phase: 6
-name: Feature Expansion + v0.2 Release
+name: Feature Expansion + v0.6 Release
 status: Todo
 subsystem: pkg/optimizer, pkg/regularizer, pkg/nn, pkg/neuron/axon, root docs
 requires:
@@ -11,7 +11,7 @@ patterns_established: []
 duration_minutes:
 ---
 
-# Phase 6 — Feature Expansion + v0.2 Release
+# Phase 6 — Feature Expansion + v0.6 Release
 
 **Status:** Todo
 **Decomposed:** 2026-05-07
@@ -76,7 +76,7 @@ duration_minutes:
   `Build()`. Current behaviour: always uses `U[-0.5, 0.5]`. Fix must be backward-compatible
   (existing tests with no explicit WeightInit must still pass; Xavier for SIGMOID is the default).
 
-## Track C — v0.2 Release Preparation
+## Track C — v0.6 Release Preparation
 
 *Goal: public API audit, CHANGELOG, README, v0.6.0 tag.*
 *Source: [l1-release-policy.md](../specifications/l1-release-policy.md)*
@@ -89,7 +89,7 @@ duration_minutes:
   Include: multi-hidden topology (v0.6), persistence schema 1.1.0, six new examples (E03/E04/E05/E07/E08/E13),
   known debt (axon WeightInit), deferred items (E06, E10).
 
-- [ ] **T-6C03** — Update root `README.md`: add v0.2 section documenting the `HiddenLayers []uint`
+- [ ] **T-6C03** — Update root `README.md`: add v0.6 section documenting the `HiddenLayers []uint`
   option, multi-hidden example snippets, and the new example catalog table (15 entries, 7 v0.5 + 6 v0.6 + 2 deferred).
 
 ## Validation Tasks

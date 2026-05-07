@@ -22,7 +22,7 @@ Tactical registry of all phases and their statuses. Atomic checklists (`T-XXXX`)
 | [Phase 3](tasks/phase-3.md) | New Capability Packages (Track C) — persistence, checkpoint, dataset, compute, perf | `Done` (2026-05-01) |
 | [Phase 4](tasks/phase-4.md) | Examples Catalog (Track D) — `examples/E01..E15` (v0.5 scope: 7 entries) | `Done` (2026-05-02) |
 | [Phase 5](tasks/phase-5.md) | Multi-Hidden Topology (v0.6) — `pkg/network` chain + compile() lift + weights 1.1.0 + 6 catalog examples | `Done` (2026-05-06) |
-| [Phase 6](tasks/phase-6.md) | Feature Expansion + v0.2 Release — `pkg/optimizer/`, `pkg/regularizer/`, axon WeightInit fix, CHANGELOG, v0.2.0 tag | `Active` (decomposed 2026-05-07; 15 tasks + 2 validation + 2 gate) |
+| [Phase 6](tasks/phase-6.md) | Feature Expansion + v0.6 Release — `pkg/optimizer/`, `pkg/regularizer/`, axon WeightInit fix, CHANGELOG, v0.6.0 tag | `Active` (decomposed 2026-05-07; 15 tasks + 2 validation + 2 gate) |
 
 ## Phase 0 — Already Complete
 
@@ -102,8 +102,8 @@ Six of the eight v0.6-gated entries (E03, E04, E05, E07, E08, E13) are now activ
 | `pkg/neuron/axon/axon.go` (WeightInit debt fix) | l2-regularization-impl v1.0.0 T-6B06 | `Pending` |
 | `pkg/nn/options.go` + `compile.go` (WithOptimizer, WithRegularizer) | l2-optimizer-impl + l2-regularization-impl | `Pending` |
 | `pkg/nn/train.go` (opt.Step + reg.Penalty + reg.ApplyMask) | l2-training-loop v1.0.0 | `Pending` |
-| `CHANGELOG.md` (v0.2.0 entry) | l1-release-policy v1.0.0 | `Pending` |
-| `README.md` (v0.2 multi-hidden API docs) | l1-release-policy v1.0.0 | `Pending` |
+| `CHANGELOG.md` (v0.6.0 entry) | l1-release-policy v1.0.0 | `Pending` |
+| `README.md` (v0.6 multi-hidden API docs) | l1-release-policy v1.0.0 | `Pending` |
 | `v0.6.0` git tag | l1-release-policy v1.0.0 §5.4 | `Pending` |
 
 ### Remaining v0.6 Backlog (gated on follow-up specs)
