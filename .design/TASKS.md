@@ -1,7 +1,7 @@
 # Master Task Index (Registry)
 
 **Version:** 1.8.0
-**Project Version:** 0.5.1 (v0.5 released; v0.6/v0.2 complete; Phase 6 active)
+**Project Version:** 0.5.1 (v0.5 released; v0.6 complete; Phase 6 active)
 **Generated:** 2026-04-29
 **Last Updated:** 2026-05-07
 **Based on:** .design/PLAN.md v1.8.0

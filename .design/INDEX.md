@@ -1,6 +1,6 @@
 # Workspace Specifications Registry
 
-**Version:** 2.4.0
+**Version:** 2.5.0
 **Status:** Active
 
 ## Overview
@@ -50,8 +50,9 @@ Local registry of specifications for this workspace.
 | [l1-regularization.md](specifications/l1-regularization.md) | Regularization contract — L1 / L2 / Dropout / Compose | Stable | L1 | 1.0.0 |
 | [l2-regularization-impl.md](specifications/l2-regularization-impl.md) | Go realization of regularization — pkg/regularizer package | Stable | L2 | 1.0.0 |
 | [l1-release-policy.md](specifications/l1-release-policy.md) | Semantic versioning and release gate contract for GoNN | Stable | L1 | 1.0.0 |
+| [l2-ai-doc-metadata.md](specifications/l2-ai-doc-metadata.md) | AI-Meta trailing block for doc comments — closed vocabulary, tier-gated, process-artifact firewall | RFC | L2 | 0.1.0 |
 
 ## Meta Information
 
 - **Maintainer**: Core Team
-- **Last Updated**: 2026-05-07 (Pre-Plan: l1-dynamic-topology / l2-visualization-api / l2-logging-strategy promoted Draft → Stable; 5 new Phase 6 specs added: l1-optimizer-strategies, l2-optimizer-impl, l1-regularization, l2-regularization-impl, l1-release-policy)
+- **Last Updated**: 2026-05-07 (l2-ai-doc-metadata RFC added from TODO #27 — AI-friendly doc-comment trailing block; RULES.md bumped to 1.3.0 with new C33 rule)

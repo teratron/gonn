@@ -1,6 +1,6 @@
 # Project Specification Rules
 
-**Version:** 1.2.0
+**Version:** 1.3.0
 **Status:** Active
 
 ## Overview
@@ -258,6 +258,18 @@ Per `l1-error-taxonomy.md` ERR-4, error messages MUST be specific and actionable
 4. **Category sentinel**: every returned error wraps a category sentinel from `pkg/utils/errors.go` (`ErrUserConfig`, `ErrIntegrity`, etc.) so callers can route via `errors.Is`.
 5. **Location hint**: at Error log level, include a short caller hint (`function or file:line`) when it improves diagnosability.
 
+### C33 — AI-Meta Annotation
+
+Exported identifiers (types, functions, methods, interfaces, error sentinels) MUST carry a trailing `AI-Meta:` block in their doc comment, on top of the verbosity required by C31. The block uses a closed vocabulary and gives AI assistants and human readers constant-time orientation per symbol. Full grammar and field semantics live in `l2-ai-doc-metadata.md`.
+
+1. **Format**: trailing labeled list, separated from preceding prose by one blank doc-comment line. Each entry is `  - <Field>: <single-line value>`. Block ends the doc comment.
+2. **Closed vocabulary** (no other field names): `Purpose`, `Usage`, `Lifecycle`, `Concurrency`, `Errors`, `Related`, `Constraints`, `Implementations`, `Stability`.
+3. **Closed enums**: `Stability` ∈ `Stable | Experimental | Deprecated | Internal`. `Concurrency` ∈ `Safe | ReadSafe | SingleGoroutine | NotSafe` (optional `; <clarifier>` suffix).
+4. **Tier-gated obligations** (mirrors C31 audience tiers): public API (`pkg/nn/`, `cmd/`) — full block; other exported (`pkg/*`) — `Purpose` and condition-driven fields; unexported — block omitted.
+5. **Process-artifact firewall**: block content MUST NOT cite SDD artifacts. No `.design/...` paths, no spec filenames, no `INV-N` invariant numbers, no `C-rule` numbers. Each line is self-contained natural language. Sentinel error names, state names, and other identifiers exported by the library are permitted — they are part of the public surface.
+6. **Hard cap**: ≤ 12 lines including the `AI-Meta:` label. Going over signals over-documentation; trim or split the symbol.
+7. **Verification**: until the dedicated linter (`cmd/lint-aimeta`) lands, compliance is verified via `go doc -all` rendering check and reviewer checklist. The linter, when delivered, is invoked from per-package `TestAIMetaCompliance` so the convention is enforced by `go test ./...`.
+
 ## Document History
 
 | Version | Date | Description |
@@ -265,3 +277,4 @@ Per `l1-error-taxonomy.md` ERR-4, error messages MUST be specific and actionable
 | 1.0.0 | 2026-04-21 | Initial constitution |
 | 1.1.0 | 2026-04-21 | Added C25-C29 project conventions from codebase analysis |
 | 1.2.0 | 2026-04-27 | Added C30 (Test Coverage), C31 (Doc-comment Verbosity), C32 (Error Informativeness) from TODO.md ideation. Enhanced C29 with stdlib canonical reference. |
+| 1.3.0 | 2026-05-07 | Added C33 (AI-Meta Annotation) from TODO #27. Closed vocabulary, tier-gated obligations, process-artifact firewall. Full grammar in `l2-ai-doc-metadata.md`. |
