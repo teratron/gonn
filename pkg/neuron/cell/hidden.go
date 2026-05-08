@@ -12,7 +12,7 @@ import (
 // on Hidden values without duplication, while the dedicated constructor
 // gives callers a stable name to reach for.
 //
-// Generic type aliases require Go 1.24+ (this module is on 1.26.2).
+// Generic type aliases require Go 1.24+ (this module is on 1.26.3).
 //
 // AI-Meta:
 //   - Purpose: Interior cell type; type alias for Dense providing a stable named constructor.
