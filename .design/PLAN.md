@@ -1,11 +1,11 @@
 # Implementation Plan
 
-**Version:** 1.8.0
+**Version:** 1.9.0
 **Project Version:** 0.5.1 (v0.5 released; v0.6 active; Phase 6 scoped)
 **Generated:** 2026-04-29
-**Last Updated:** 2026-05-07
-**Based on:** .design/INDEX.md v2.4.0
-**Based on RULES:** .design/RULES.md v1.2.0
+**Last Updated:** 2026-05-08
+**Based on:** .design/INDEX.md v2.5.0
+**Based on RULES:** .design/RULES.md v1.3.0
 **Based on ROADMAP:** .design/ROADMAP.md v1.0.0
 **Status:** Active
 
@@ -114,6 +114,7 @@ GoNN library implementation plan derived from `ROADMAP.md` Hybrid Path. Phase or
 - [l2-visualization-api.md](specifications/l2-visualization-api.md) — Stable v0.1.0 (promoted 2026-05-07; HTTP/JSON observability API; gated on a separate visualizer repo)
 - [l2-logging-strategy.md](specifications/l2-logging-strategy.md) — Stable v0.1.0 (promoted 2026-05-07; slog-based structured logging; baseline pkg/utils/logger.go sufficient for now)
 - [l2-cli-client.md](specifications/l2-cli-client.md) — RFC v0.1.0 (CLI binary, post-MVP)
+- [l2-ai-doc-metadata.md](specifications/l2-ai-doc-metadata.md) — RFC v0.1.0 (AI-Meta trailing block convention; gated on cmd/lint-aimeta delivery; rollout phased per §8)
 
 ### L1 Concept (tracked — promoted to Stable 2026-05-01, parents of active Phase 3 specs)
 
@@ -156,3 +157,4 @@ graph LR
 | 1.6.0 | 2026-05-02 | Phase 4 marked Done. All 7 example modules (xor, style_showcase, logic_gates, callbacks, persistence, shared_options, precision) build, test, and race-clean. Phase Gate T-4Z01..T-4Z04 green. v0.5 release-ready bar reached; v0.6 backlog (multi-hidden + AndTrain + MNIST loader) ready for next planning cycle. |
 | 1.7.0 | 2026-05-03 | Phase 5 activated and decomposed. l2-multihidden-impl promoted Draft → Stable v1.0.0. 19 atomic tasks across Tracks A–D + 4 gate checks. Track A → B serial; C, D parallel after B. v0.6 catalog promotion: E03/E04/E05/E07/E08/E13 (six of eight backlog entries) move into Phase 5; E06 + E10 stay deferred. Based on INDEX.md v2.3.0. |
 | 1.8.0 | 2026-05-07 | Phase 5 marked Done. Phase 6 scoped: Track A (Optimizer), Track B (Regularization), Track C (v0.6 Release). Pre-Plan: 3 Draft specs promoted Stable; 5 new Phase 6 specs authored directly as Stable v1.0.0 (Trust Mode). Backlog reorganised. Based on INDEX.md v2.4.0. |
+| 1.9.0 | 2026-05-08 | Sync update: l2-ai-doc-metadata (RFC v0.1.0) added to Backlog (orphan resolved). RULES.md parity updated v1.2.0 → v1.3.0 (C33 AI-Meta Annotation). INDEX.md sync v2.4.0 → v2.5.0. Phase 6 plan unchanged. |

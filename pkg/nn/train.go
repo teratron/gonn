@@ -1,6 +1,7 @@
 package nn
 
 import (
+	"github.com/teratron/gonn/pkg/regularizer"
 	"github.com/teratron/gonn/pkg/utils"
 )
 
@@ -18,8 +19,8 @@ type Sample[T utils.Float] struct {
 }
 
 // Train runs one forward + backward + weight-update step for the supplied
-// (input, target) pair using the network's configured learning rate. Returns
-// the loss measured on this single sample.
+// (input, target) pair using the configured optimizer. Returns the loss
+// measured on this single sample.
 //
 // The primitive for callers that own their own outer loop. For the managed
 // multi-epoch loop with early stopping and best-weight rollback, use Fit.
@@ -29,14 +30,53 @@ type Sample[T utils.Float] struct {
 //   - Usage: for _, s := range samples { loss, err := n.Train(s.Input, s.Target) }.
 //   - Concurrency: SingleGoroutine; must not run concurrently with other Train/Fit calls.
 //   - Errors: ErrUserConfig (not Operational), ErrInputData (shape mismatch).
-//   - Related: [Fit], [Query], [network.Network.Train].
+//   - Related: [Fit], [Query].
 //   - Stability: Stable.
 func (n *NN[T]) Train(input, target []T) (T, error) {
 	if n.stateField != stateOperational {
 		return 0, utils.Newf(utils.ErrUserConfig,
 			"Train: network is %s, must be Operational", n.stateField.String())
 	}
-	return n.Network.Train(input, target)
+	return n.trainStep(input, target)
+}
+
+// trainStep executes one forward + backward + optimizer step.
+// Shared by Train and the inner loop of Fit.
+func (n *NN[T]) trainStep(input, target []T) (T, error) {
+	if err := n.Network.SetInputs(input); err != nil {
+		return 0, err
+	}
+	if err := n.Network.SetTargets(target); err != nil {
+		return 0, err
+	}
+	n.Network.CalculateValues()
+
+	// Apply dropout / mask after forward pass (training=true).
+	if n.reg != nil {
+		acts := n.Network.HiddenActivations()
+		acts = n.reg.ApplyMask(acts, true)
+		n.Network.SetHiddenActivations(acts)
+	}
+
+	lossVal := n.Network.CalculateLossDefault()
+
+	// Add regularization penalty to the reported loss.
+	if n.reg != nil {
+		n.weightBuf = n.Network.AppendFlatWeights(n.weightBuf)
+		lossVal += regularizer.Penalty(n.reg, n.weightBuf)
+	}
+
+	n.Network.CalculateMisses()
+
+	// Collect weights and gradients, delegate update to the optimizer.
+	n.weightBuf = n.Network.AppendFlatWeights(n.weightBuf)
+	n.gradBuf = n.Network.AppendFlatGradients(n.gradBuf)
+	if err := n.opt.Step(n.weightBuf, n.gradBuf); err != nil {
+		return lossVal, err
+	}
+	n.Network.ApplyFlatWeights(n.weightBuf)
+
+	return lossVal, nil
 }
 
 // Fit runs the managed multi-epoch training loop. Each epoch processes every
@@ -85,7 +125,7 @@ func (n *NN[T]) Fit(dataset []Sample[T]) (uint, T, error) {
 
 		var total T
 		for batchIdx, sample := range dataset {
-			loss, err := n.Network.Train(sample.Input, sample.Target)
+			loss, err := n.trainStep(sample.Input, sample.Target)
 			if err != nil {
 				return completedEpochs, lastLoss, err
 			}

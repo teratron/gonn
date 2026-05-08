@@ -10,6 +10,8 @@ package nn
 import (
 	"github.com/teratron/gonn/pkg/activation"
 	"github.com/teratron/gonn/pkg/loss"
+	"github.com/teratron/gonn/pkg/optimizer"
+	"github.com/teratron/gonn/pkg/regularizer"
 	"github.com/teratron/gonn/pkg/utils"
 )
 
@@ -139,6 +141,14 @@ type Config[T utils.Float] struct {
 
 	EpochCallback func(epoch uint, lossValue T)
 	BatchCallback func(batch uint, lossValue T)
+
+	// Optimizer overrides the default SGD weight-update rule. nil resolves
+	// to DefaultOptimizer(LearningRate) in compile().
+	Optimizer optimizer.Optimizer[T]
+
+	// Regularizer adds a generalization penalty and optional activation mask.
+	// nil disables regularization (no penalty, no dropout).
+	Regularizer regularizer.Regularizer[T]
 
 	// ProfilingAddr enables the optional pprof HTTP listener
 	// (PERF-5). Empty (zero value) keeps the listener disabled.

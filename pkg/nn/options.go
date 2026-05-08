@@ -4,6 +4,8 @@ import (
 	"github.com/teratron/gonn/pkg/activation"
 	"github.com/teratron/gonn/pkg/loss"
 	"github.com/teratron/gonn/pkg/network"
+	"github.com/teratron/gonn/pkg/optimizer"
+	"github.com/teratron/gonn/pkg/regularizer"
 	"github.com/teratron/gonn/pkg/utils"
 )
 
@@ -241,3 +243,32 @@ func WithProfiling[T utils.Float](addr string) Option[T] {
 		cfg.ProfilingAddr = addr
 	}
 }
+
+// WithOptimizer replaces the default SGD weight-update rule with opt.
+// When not set, compile() falls back to optimizer.DefaultOptimizer(LearningRate).
+//
+// AI-Meta:
+//   - Purpose: Plug in an alternative optimizer (Adam, RMSProp, SGD+Momentum) in the Options API.
+//   - Usage: nn.New[float32](WithOptimizer[float32](optimizer.NewAdam[float32](0.001)), ...).
+//   - Related: [Option], [New], [optimizer.Optimizer].
+//   - Stability: Stable.
+func WithOptimizer[T utils.Float](opt optimizer.Optimizer[T]) Option[T] {
+	return func(cfg *Config[T]) {
+		cfg.Optimizer = opt
+	}
+}
+
+// WithRegularizer attaches a regularization strategy to the training loop.
+// nil disables regularization (the default when option is omitted).
+//
+// AI-Meta:
+//   - Purpose: Attach L1/L2/Dropout or a Compose regularizer in the Options API.
+//   - Usage: nn.New[float32](WithRegularizer[float32](regularizer.NewL2[float32](0.01)), ...).
+//   - Related: [Option], [New], [regularizer.Regularizer].
+//   - Stability: Stable.
+func WithRegularizer[T utils.Float](reg regularizer.Regularizer[T]) Option[T] {
+	return func(cfg *Config[T]) {
+		cfg.Regularizer = reg
+	}
+}
+

@@ -1,11 +1,16 @@
 package nn
 
 import (
+	"math/rand/v2"
+
 	"github.com/teratron/gonn/pkg/activation"
 	"github.com/teratron/gonn/pkg/layer"
 	"github.com/teratron/gonn/pkg/loss"
+	"github.com/teratron/gonn/pkg/network"
+	"github.com/teratron/gonn/pkg/optimizer"
 	"github.com/teratron/gonn/pkg/utils"
 )
+
 
 // compile is the shared finalisation routine consumed by both the
 // Builder API ([Compile]) and the Functional Options API ([New]).
@@ -41,12 +46,41 @@ func compile[T utils.Float](n *NN[T], cfg *Config[T]) error {
 	if err := n.SetLayers(in, hiddens, out); err != nil {
 		return utils.Wrap(utils.ErrUserConfig, err, "compile: SetLayers failed")
 	}
+
+	// Wire the weight-init sampler before Build so axons receive the correct
+	// initial values (fixes the known axon.New U[-0.5,0.5] debt — T-6B06).
+	rng, _ := utils.NewRNG(0)
+	n.Network.SetWeightSampler(weightSamplerFor[T](cfg.WeightInit, rng))
+
 	if err := n.Build(); err != nil {
 		return utils.Wrap(utils.ErrUserConfig, err, "compile: Build failed")
 	}
 	n.LearningRate = cfg.LearningRate
+
+	// Resolve optimizer: use the user-supplied instance or fall back to SGD.
+	if cfg.Optimizer != nil {
+		n.opt = cfg.Optimizer
+	} else {
+		n.opt = optimizer.DefaultOptimizer[T](cfg.LearningRate)
+	}
+	n.reg = cfg.Regularizer
+
 	startProfilingServer(cfg.ProfilingAddr)
 	return nil
+}
+
+// weightSamplerFor converts a WeightInitMethod into the sampler function
+// consumed by network.Network.SetWeightSampler. Xavier is the default when
+// method is unrecognised (should not happen after validate()).
+func weightSamplerFor[T utils.Float](method WeightInitMethod, rng *rand.Rand) network.WeightSampler[T] {
+	switch method {
+	case WeightInitHe:
+		return func(fanIn, _ int) T { return utils.HeNormal[T](rng, fanIn) }
+	case WeightInitRandom:
+		return func(_, _ int) T { return utils.Uniform[T](rng) }
+	default: // WeightInitXavier
+		return func(fanIn, fanOut int) T { return utils.XavierUniform[T](rng, fanIn, fanOut) }
+	}
 }
 
 // validate enforces the [l2-nn-facade] §5.7 hard-error rules. The check

@@ -129,6 +129,45 @@ func (n *Network[T]) CalculateLossDefault() T {
 	return n.CalculateLoss(n.lossMode)
 }
 
+// AppendFlatGradients computes the raw gradient ∂L/∂w for every learnable
+// weight and appends it to dst (reusing the backing array when capacity
+// allows). Gradients are emitted in the same canonical order as
+// AppendFlatWeights: Hiddens[0] → Hiddens[n-1] → Output.
+//
+// Definition: grad[i] = −σ'(preact) × miss × axon.Cell.Value
+// The sign convention ensures that SGD.Step (w -= lr × grad) reproduces
+// the original inline update (w += lr × σ'(preact) × miss × cell.value).
+//
+// Must be called after CalculateMisses — it reads the miss fields set there.
+//
+// AI-Meta:
+//   - Purpose: Compute flat raw gradients for the optimizer Step call.
+//   - Concurrency: NotSafe; reads cell miss and pre-activation buffers.
+//   - Related: [AppendFlatWeights], [ApplyFlatWeights], [CalculateMisses].
+//   - Stability: Stable.
+func (n *Network[T]) AppendFlatGradients(dst []T) []T {
+	dst = dst[:0]
+	for layerIdx, hb := range n.Hiddens {
+		act := n.hiddenActs[layerIdx]
+		preact := n.preactHiddens[layerIdx]
+		for cellIdx, h := range hb.cells {
+			deriv := activation.Derivative[T](preact[cellIdx], act)
+			miss := *h.GetMiss()
+			for _, a := range h.Axons {
+				dst = append(dst, -deriv*miss**a.Cell.GetValue())
+			}
+		}
+	}
+	for cellIdx, o := range n.Output.cells {
+		deriv := activation.Derivative[T](n.preactOutput[cellIdx], n.outputAct)
+		miss := *o.GetMiss()
+		for _, a := range o.Axons {
+			dst = append(dst, -deriv*miss**a.Cell.GetValue())
+		}
+	}
+	return dst
+}
+
 // Train runs one full forward + backward + weight-update step on the
 // supplied (input, target) pair using the network's LearningRate.
 //

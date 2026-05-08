@@ -4,6 +4,60 @@ All notable changes to the GoNN library will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the
 release artifacts dictated by [.magic/run.md](.magic/run.md) Phase Completion / Plan Completion.
 
+## [0.6.0] — 2026-05-08
+
+### Multi-hidden topology, optimizer pluggability, and regularization
+
+This release completes the Phase 5 + Phase 6 milestones and represents the
+first feature-complete minor release of the GoNN v0.6 line.
+
+#### Added
+
+- **`pkg/optimizer/`** — new package with four weight-update strategies:
+  - `SGD[T]` — vanilla stochastic gradient descent; stateless, 0 allocs/op. `DefaultOptimizer` fallback.
+  - `Adam[T]` — adaptive moment estimation (Kingma & Ba 2014); β₁=0.9, β₂=0.999, ε=1e-8 defaults; lazy moment allocation, 0 allocs/op in hot path.
+  - `SGDMomentum[T]` — SGD with velocity term γ=0.9; lazy velocity allocation.
+  - `RMSProp[T]` — squared-gradient EMA; α=0.99, ε=1e-8; lazy allocation.
+  - All four implement `Optimizer[T]` with `Step`, `Reset`, `LearningRate`, `SaveState`, `LoadState`.
+  - `DefaultOptimizer[T](lr)` returns SGD; preserves pre-v0.6 training arithmetic when no optimizer is configured.
+- **`pkg/regularizer/`** — new package:
+  - `L2[T]` — weight-decay penalty λ×Σwᵢ²; identity `ApplyMask`.
+  - `L1[T]` — lasso penalty λ×Σ|wᵢ|; identity `ApplyMask`.
+  - `Dropout[T]` — inverted Bernoulli mask; retained activations scaled ×(1/p); `ApplyMask(_, false)` is a strict no-op (inference unchanged).
+  - `Compose[T]` — additive penalty + left-to-right sequential `ApplyMask` over a variadic slice.
+  - `Apply` and `Penalty` nil-safe package-level helpers eliminate per-call-site nil guards in training code.
+- **`pkg/nn`** — integration points:
+  - `WithOptimizer[T](opt optimizer.Optimizer[T])` option and `cfg.Optimizer` Config field.
+  - `WithRegularizer[T](reg regularizer.Regularizer[T])` option and `cfg.Regularizer` Config field.
+  - New `trainStep()` helper replaces the inline `rate × delta` weight update; routes through `opt.Step(weights, deltas)` so all four optimizers are usable transparently.
+  - Regularizer penalty is added to effective loss; `ApplyMask(acts, true)` applied after forward pass during training; `ApplyMask(acts, false)` is a no-op during Query.
+  - `weightBuf` / `gradBuf` on `NN[T]` reused across training steps — zero per-step allocations.
+- **Multi-hidden topology** (Phase 5 — previously shipped on branch):
+  - `pkg/network.Network[T]` now holds `Hiddens []bundle` supporting arbitrary chain depth.
+  - `compile()` gate lifted — topologies with two or more hidden layers are fully supported.
+  - `pkg/persistence` schema bumped 1.0.0 → 1.1.0 with forward-compat loading of v0.1 fixtures.
+  - Six new examples: `examples/perceptron/` (E03), `examples/binary_classification/` (E04), `examples/iris/` (E05), `examples/regression_sin/` (E07), `examples/regression_multi/` (E08), `examples/higher_order_options/` (E13).
+- **WeightInit debt resolved** — `pkg/nn/compile.go` now calls `Network.SetWeightSampler` before `Build()`, wiring Xavier / He / Uniform initialisation through to axon construction. The prior `U[-0.5, 0.5]` default remains as the `WeightInitRandom` variant; Xavier is the default for SIGMOID layers.
+- **C33 AI-Meta annotation** — structured `AI-Meta:` trailing blocks on all exported doc-comments (Purpose, Usage, Concurrency, Errors, Stability).
+
+#### Changed
+
+- `pkg/nn/config.go` — added `Optimizer optimizer.Optimizer[T]` and `Regularizer regularizer.Regularizer[T]` fields.
+- `pkg/nn/train.go` — per-sample weight update now delegates to `opt.Step`; regularizer penalty applied before backprop.
+- `pkg/network/network.go` — added `WeightSampler[T]`, `SetWeightSampler`, `AppendFlatWeights`, `ApplyFlatWeights`, `HiddenActivations`, `SetHiddenActivations`.
+- `pkg/network/propagation.go` — added `AppendFlatGradients` (returns ∂L/∂w sign convention: `-σ'(z) × miss × cellValue`).
+
+#### Deferred to v0.7
+
+- **E06 MNIST example** — awaits MNIST dataset-loader spec.
+- **E10 Continuation** — awaits `AndTrain` API surface.
+- `context.Context` integration for training cancellation.
+- NaN-loss detection and recovery hooks.
+
+#### Known Issues
+
+- `TestPauseResumeCycle` in `pkg/nn` exhibits a timing-dependent flake on Windows (pre-existing; not introduced in v0.6). The goroutine-state-machine logic is correct; the test races against OS scheduler jitter in CI. Tracked for fix in v0.6.1.
+
 ## [Unreleased]
 
 ### AI-Meta annotation rollout — 2026-05-07

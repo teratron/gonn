@@ -1,6 +1,7 @@
 package nn
 
 import (
+	"github.com/teratron/gonn/pkg/regularizer"
 	"github.com/teratron/gonn/pkg/utils"
 )
 
@@ -24,6 +25,13 @@ func (n *NN[T]) Query(input []T) ([]T, error) {
 		return nil, err
 	}
 	n.CalculateValues()
+
+	// Inference mask (training=false): L1/L2 are no-ops; Dropout passes through.
+	if n.reg != nil {
+		acts := n.Network.HiddenActivations()
+		acts = regularizer.Apply(n.reg, acts, false)
+		n.Network.SetHiddenActivations(acts)
+	}
 
 	out := make([]T, n.Network.Output.Len())
 	for i, c := range n.Network.Output.Cells() {

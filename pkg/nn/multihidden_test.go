@@ -154,7 +154,7 @@ func TestCompileMultiHiddenTwoHiddenConverges(t *testing.T) {
 		WithLearningRate[float64](0.5),
 		WithLoss[float64](loss.MSE),
 		WithWeightInit[float64](WeightInitXavier),
-		WithMaxIterations[float64](20000),
+		WithMaxIterations[float64](50000),
 		WithLossLimit[float64](0.05),
 	)
 	if err != nil {
@@ -164,9 +164,12 @@ func TestCompileMultiHiddenTwoHiddenConverges(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Fit: %v", err)
 	}
+	// Xavier uniform on a 2-4-4-1 network uses larger initial weights than
+	// the old U[-0.5,0.5] fallback (T-6B06 debt fix), so more epochs are
+	// needed to confirm convergence.
 	const target = 0.10
 	if float64(finalLoss) > target {
-		t.Errorf("2-hidden XOR loss %v above tolerance %v after 20000 epochs", finalLoss, target)
+		t.Errorf("2-hidden XOR loss %v above tolerance %v after 50000 epochs", finalLoss, target)
 	}
 }
 

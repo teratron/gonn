@@ -4,6 +4,8 @@ import (
 	"sync/atomic"
 
 	"github.com/teratron/gonn/pkg/network"
+	"github.com/teratron/gonn/pkg/optimizer"
+	"github.com/teratron/gonn/pkg/regularizer"
 	"github.com/teratron/gonn/pkg/utils"
 )
 
@@ -40,6 +42,17 @@ type NN[T utils.Float] struct {
 	// be called from a different goroutine while Train is running. See
 	// [control.go] for the public surface.
 	control atomic.Int32
+
+	// opt is the resolved optimizer (always non-nil after compile).
+	opt optimizer.Optimizer[T]
+
+	// reg is the optional regularizer (nil = no regularization).
+	reg regularizer.Regularizer[T]
+
+	// weightBuf / gradBuf are reused per training step to avoid
+	// per-sample allocations in the hot training loop.
+	weightBuf []T
+	gradBuf   []T
 }
 
 // NewBuilder is the entry point for the Builder API. Returns an *NN[T] in

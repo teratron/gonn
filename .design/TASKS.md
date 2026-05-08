@@ -1,11 +1,11 @@
 # Master Task Index (Registry)
 
-**Version:** 1.8.0
+**Version:** 1.9.0
 **Project Version:** 0.5.1 (v0.5 released; v0.6 complete; Phase 6 active)
 **Generated:** 2026-04-29
-**Last Updated:** 2026-05-07
-**Based on:** .design/PLAN.md v1.8.0
-**Based on RULES:** .design/RULES.md v1.2.0
+**Last Updated:** 2026-05-08
+**Based on:** .design/PLAN.md v1.9.0
+**Based on RULES:** .design/RULES.md v1.3.0
 **Execution Mode:** Parallel (C3)
 **Status:** Active
 
@@ -122,5 +122,5 @@ Six of the eight v0.6-gated entries (E03, E04, E05, E07, E08, E13) are now activ
 
 ## Meta Information
 
-- **Last Updated**: 2026-05-07
+- **Last Updated**: 2026-05-08
 - **Maintainer**: Core Team
