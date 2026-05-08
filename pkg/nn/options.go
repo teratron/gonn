@@ -271,4 +271,3 @@ func WithRegularizer[T utils.Float](reg regularizer.Regularizer[T]) Option[T] {
 		cfg.Regularizer = reg
 	}
 }
-

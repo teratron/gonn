@@ -126,33 +126,28 @@ type HiddenLayerSpec[T utils.Float] struct {
 //   - Related: [HiddenLayerSpec], [Compile], [Option], [NN.Config].
 //   - Stability: Stable.
 type Config[T utils.Float] struct {
-	InputSize        uint
-	HiddenLayers     []HiddenLayerSpec[T]
-	OutputSize       uint
-	OutputActivation activation.Type
-	OutputBias       bool
-
-	LearningRate  T
-	LossType      loss.Type
-	LossLimit     T
-	MaxIterations uint
-	WeightInit    WeightInitMethod
-	DefaultBias   bool
-
-	EpochCallback func(epoch uint, lossValue T)
-	BatchCallback func(batch uint, lossValue T)
-
-	// Optimizer overrides the default SGD weight-update rule. nil resolves
-	// to DefaultOptimizer(LearningRate) in compile().
-	Optimizer optimizer.Optimizer[T]
-
-	// Regularizer adds a generalization penalty and optional activation mask.
-	// nil disables regularization (no penalty, no dropout).
-	Regularizer regularizer.Regularizer[T]
-
+	HiddenLayers []HiddenLayerSpec[T]
 	// ProfilingAddr enables the optional pprof HTTP listener
 	// (PERF-5). Empty (zero value) keeps the listener disabled.
 	ProfilingAddr string
+	BatchCallback func(batch uint, lossValue T)
+	EpochCallback func(epoch uint, lossValue T)
+	InputSize     uint
+	LearningRate  T
+	LossLimit     T
+	LossType      loss.Type
+	MaxIterations uint
+	// Optimizer overrides the default SGD weight-update rule. nil resolves
+	// to DefaultOptimizer(LearningRate) in compile().
+	Optimizer        optimizer.Optimizer[T]
+	OutputActivation activation.Type
+	OutputSize       uint
+	// Regularizer adds a generalization penalty and optional activation mask.
+	// nil disables regularization (no penalty, no dropout).
+	Regularizer regularizer.Regularizer[T]
+	WeightInit  WeightInitMethod
+	DefaultBias bool
+	OutputBias  bool
 }
 
 // applyDefaults fills any zero-valued fields with the Defaults constants.

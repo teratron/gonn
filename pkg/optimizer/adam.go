@@ -20,11 +20,11 @@ import (
 //   - Related: [Optimizer], [NewSGD], [NewRMSProp].
 //   - Stability: Stable.
 type Adam[T utils.Float] struct {
-	lr   T
+	lr                T
 	beta1, beta2, eps float64
-	t    int
-	m    []float64 // first moment
-	v    []float64 // second moment
+	t                 int
+	m                 []float64 // first moment
+	v                 []float64 // second moment
 }
 
 // compile-time interface verification (C26).

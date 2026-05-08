@@ -20,10 +20,10 @@ import (
 //   - Related: [Optimizer], [NewAdam], [NewSGD].
 //   - Stability: Stable.
 type RMSProp[T utils.Float] struct {
-	lr      T
-	alpha   float64
-	eps     float64
-	sqGrad  []float64
+	lr     T
+	alpha  float64
+	eps    float64
+	sqGrad []float64
 }
 
 // compile-time interface verification (C26).

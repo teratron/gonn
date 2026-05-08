@@ -11,6 +11,8 @@
 coverage.out
 *.out
 *_cov
+cov
+cov.*
 vendor/
 
 # Dotenv files (local secrets — never commit)
