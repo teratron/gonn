@@ -9,6 +9,8 @@
 *.prof
 .coverprofile
 coverage.out
+*.out
+*_cov
 vendor/
 
 # Dotenv files (local secrets — never commit)

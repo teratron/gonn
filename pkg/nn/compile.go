@@ -11,7 +11,6 @@ import (
 	"github.com/teratron/gonn/pkg/utils"
 )
 
-
 // compile is the shared finalisation routine consumed by both the
 // Builder API ([Compile]) and the Functional Options API ([New]).
 // Per [l2-nn-facade] §5.4 there is exactly one compile path — both
