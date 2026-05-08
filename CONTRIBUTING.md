@@ -34,7 +34,7 @@ The `.design/`, `.agents/`, and `.magic/` directories are part of the **Specific
 - **Tooling**:
   - `gofmt` (bundled with Go)
   - `goimports` — `go install golang.org/x/tools/cmd/goimports@latest`
-  - `golangci-lint` — see [installation guide](https://golangci-lint.run/usage/install/)
+  - `golangci-lint` — see [installation guide](https://golangci-lint.run/docs/welcome/install/)
 - **Optional** (for contributors using SDD workflows):
   - Node.js ≥ 18 (used by the Magic Spec engine in `.magic/scripts/`)
   - An AI agent that supports slash commands (Claude Code, Cursor, Windsurf, etc.)
