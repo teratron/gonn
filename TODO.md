@@ -26,6 +26,7 @@
 - [x] возвращаясь к теме рекурсивного использования нашей НН, надо продумать так чтоб все параметры, если нужно можно было бы использовать в качестве входных/выходных данных для обучения, а не только ошибки, градиента, количество нейронных слоёв, нейронов, эпох, скорости обучения и т.д. и т.п. в общем чтоб можно было любые параметры сети использовать для обучения. → [l1-meta-learning-hooks.md](.design/specifications/l1-meta-learning-hooks.md) (v0.6.0 — §4 Parameter Categories, §5.2 MetaConfig wiring)
 - [x] в докстрингах добавить в конце метаданные для лучшего понимания ИИ (кратко) для чего этот код, что он делает, как использовать и т.д. и т.п. → [l2-ai-doc-metadata.md](.design/specifications/l2-ai-doc-metadata.md) (Phases 2–5 complete; spec promoted to Stable)
 - [x] не везде используется utils.Float, где-то по прежнему используются float32 | float64
-- [ ] как добавлять количество скрытых слоёв, если их много?
+- [x] как добавлять количество скрытых слоёв, если их много? → [l2-deep-builder.md](.design/specifications/l2-deep-builder.md) (Repeat/Pattern/HiddenLayers bulk constructors)
+- [x] сделать GoNN skills для разработчиков: Use our GoNN skills with your AI tools to generate high-performance GoNN code that follows best practices. → [l2-gonn-skills.md](.design/specifications/l2-gonn-skills.md) (skills/ directory at project root)
 - [ ] нужен этот файл pkg\nn.json?
 - [ ] нужен этот файл pkg\network\phase6_test.go?

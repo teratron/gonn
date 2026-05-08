@@ -51,8 +51,11 @@ Local registry of specifications for this workspace.
 | [l2-regularization-impl.md](specifications/l2-regularization-impl.md) | Go realization of regularization — pkg/regularizer package | Stable | L2 | 1.0.0 |
 | [l1-release-policy.md](specifications/l1-release-policy.md) | Semantic versioning and release gate contract for GoNN | Stable | L1 | 1.0.0 |
 | [l2-ai-doc-metadata.md](specifications/l2-ai-doc-metadata.md) | AI-Meta trailing block for doc comments — closed vocabulary, tier-gated, process-artifact firewall | RFC | L2 | 0.1.0 |
+| [l1-lr-scheduling.md](specifications/l1-lr-scheduling.md) | Learning rate scheduler contract — StepLR / CosineAnnealing / WarmUp / ChainScheduler | Stable | L1 | 1.0.0 |
+| [l2-deep-builder.md](specifications/l2-deep-builder.md) | Deep network builder ergonomics — Repeat / Pattern / HiddenLayers bulk constructors | Stable | L2 | 1.0.0 |
+| [l2-gonn-skills.md](specifications/l2-gonn-skills.md) | GoNN developer AI skills — SKILL.md for AI-assisted code generation | Stable | L2 | 1.0.0 |
 
 ## Meta Information
 
 - **Maintainer**: Core Team
-- **Last Updated**: 2026-05-07 (l2-ai-doc-metadata RFC added from TODO #27 — AI-friendly doc-comment trailing block; RULES.md bumped to 1.3.0 with new C33 rule)
+- **Last Updated**: 2026-05-08 (3 new specs: l1-lr-scheduling (LR schedulers), l2-deep-builder (bulk constructors for 100+ layers), l2-gonn-skills (AI developer skills). TODO #29, #32 dispatched.)
