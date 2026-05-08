@@ -1,7 +1,7 @@
 # Implementation Plan
 
-**Version:** 1.9.0
-**Project Version:** 0.5.1 (v0.5 released; v0.6 active; Phase 6 scoped)
+**Version:** 2.0.0
+**Project Version:** 0.6.0 (v0.6 released; Phase 7 scoped)
 **Generated:** 2026-04-29
 **Last Updated:** 2026-05-08
 **Based on:** .design/INDEX.md v2.5.0
@@ -87,18 +87,31 @@ GoNN library implementation plan derived from `ROADMAP.md` Hybrid Path. Phase or
 
 - [x] **Usage Examples Catalog (v0.5 scope: 7 entries)** ([l2-usage-examples.md](specifications/l2-usage-examples.md)) [L2, Stable v1.0.0] — E01, E02, E09, E11, E12, E14 (adapted), E15
 
-## Phase 6 — Feature Expansion + v0.6 Release
+## Phase 6 — Feature Expansion + v0.6 Release ✓ Done
 
-*Adds optimizer pluggability, regularization, and closes the v0.6.0 release gate. Scoped 2026-05-07.*
+*Adds optimizer pluggability, regularization, and closes the v0.6.0 release gate. Closed 2026-05-08. All 19 tasks green; gate T-6Z01..T-6Z02 passed.*
 
 **Subsystem:** `pkg/optimizer/` (new), `pkg/regularizer/` (new), `pkg/nn`, `pkg/neuron/axon`, root docs
 **Requires:** Phase 5 ✓
 **Tasks file:** [tasks/phase-6.md](tasks/phase-6.md)
-**Track order:** A and B parallel (both after Phase 5); C parallel; T-6T01/T-6T02 validation; Gate T-6Z.
+**Outcome:** `pkg/optimizer/` (SGD/Adam/RMSProp/Momentum); `pkg/regularizer/` (L1/L2/Dropout/Compose); WeightInit debt fix; CHANGELOG.md v0.6.0; v0.6.0 tag. Coverage: optimizer 98.9%, regularizer 80.0%.
 
-- [ ] **[A] Optimizer Strategies** ([l1-optimizer-strategies.md](specifications/l1-optimizer-strategies.md) + [l2-optimizer-impl.md](specifications/l2-optimizer-impl.md)) [L1+L2, Stable v1.0.0] — `pkg/optimizer/` package; SGD/Adam/RMSProp/Momentum; `WithOptimizer` option; train.go integration.
-- [ ] **[B] Regularization** ([l1-regularization.md](specifications/l1-regularization.md) + [l2-regularization-impl.md](specifications/l2-regularization-impl.md)) [L1+L2, Stable v1.0.0] — `pkg/regularizer/` package; L1/L2/Dropout/Compose; `WithRegularizer` option; axon WeightInit debt fixed.
-- [ ] **[C] v0.6.0 Release Preparation** ([l1-release-policy.md](specifications/l1-release-policy.md)) [L1, Stable v1.0.0] — public API audit; CHANGELOG.md; README.md update; v0.6.0 tag.
+- [x] **[A] Optimizer Strategies** ([l1-optimizer-strategies.md](specifications/l1-optimizer-strategies.md) + [l2-optimizer-impl.md](specifications/l2-optimizer-impl.md)) [L1+L2, Stable v1.0.0]
+- [x] **[B] Regularization** ([l1-regularization.md](specifications/l1-regularization.md) + [l2-regularization-impl.md](specifications/l2-regularization-impl.md)) [L1+L2, Stable v1.0.0]
+- [x] **[C] v0.6.0 Release Preparation** ([l1-release-policy.md](specifications/l1-release-policy.md)) [L1, Stable v1.0.0]
+
+## Phase 7 — Deep Builder + LR Scheduling + Developer Skills
+
+*Adds LR scheduler contract, bulk topology constructors for deep networks, and AI developer skills. Scoped 2026-05-08.*
+
+**Subsystem:** `pkg/optimizer/` (scheduler extension), `pkg/nn` (builder ergonomics), `skills/gonn/`
+**Requires:** Phase 6 ✓
+**Tasks file:** [tasks/phase-7.md](tasks/phase-7.md)
+**Track order:** A (L1-first LR scheduling) → B (L2, deep builder after A); C (L2, skills, parallel); T-7T01/T-7T02 validation; Gate T-7Z.
+
+- [ ] **[A] LR Scheduling** ([l1-lr-scheduling.md](specifications/l1-lr-scheduling.md)) [L1, Stable v1.0.0] — `pkg/optimizer/` scheduler extension; StepLR/WarmUpLR/CosineAnnealingLR/ChainScheduler; `WithScheduler` option; train.go integration.
+- [ ] **[B] Deep Builder Ergonomics** ([l2-deep-builder.md](specifications/l2-deep-builder.md)) [L2, Stable v1.0.0] — `Repeat`/`Pattern`/`HiddenLayers` bulk constructors on both Builder and Options APIs.
+- [ ] **[C] GoNN Developer Skills** ([l2-gonn-skills.md](specifications/l2-gonn-skills.md)) [L2, Stable v1.0.0] — `skills/gonn/SKILL.md` + examples + API reference for AI-assisted code generation.
 
 ## Backlog
 
@@ -142,6 +155,7 @@ graph LR
   C1 --> D1
   D1 --> E1[Phase 5 — Multi-Hidden]
   E1 --> F1[Phase 6 — Optimizer + Regularizer + Release]
+  F1 --> G1[Phase 7 — LR Scheduling + Deep Builder + Skills]
 ```
 
 ## Document History
@@ -158,3 +172,4 @@ graph LR
 | 1.7.0 | 2026-05-03 | Phase 5 activated and decomposed. l2-multihidden-impl promoted Draft → Stable v1.0.0. 19 atomic tasks across Tracks A–D + 4 gate checks. Track A → B serial; C, D parallel after B. v0.6 catalog promotion: E03/E04/E05/E07/E08/E13 (six of eight backlog entries) move into Phase 5; E06 + E10 stay deferred. Based on INDEX.md v2.3.0. |
 | 1.8.0 | 2026-05-07 | Phase 5 marked Done. Phase 6 scoped: Track A (Optimizer), Track B (Regularization), Track C (v0.6 Release). Pre-Plan: 3 Draft specs promoted Stable; 5 new Phase 6 specs authored directly as Stable v1.0.0 (Trust Mode). Backlog reorganised. Based on INDEX.md v2.4.0. |
 | 1.9.0 | 2026-05-08 | Sync update: l2-ai-doc-metadata (RFC v0.1.0) added to Backlog (orphan resolved). RULES.md parity updated v1.2.0 → v1.3.0 (C33 AI-Meta Annotation). INDEX.md sync v2.4.0 → v2.5.0. Phase 6 plan unchanged. |
+| 2.0.0 | 2026-05-08 | Phase 6 marked Done. Phase 7 scoped: Track A (LR Scheduling), Track B (Deep Builder), Track C (GoNN Skills). 3 orphaned specs resolved. Based on INDEX.md v2.5.0. |

@@ -262,7 +262,7 @@ Per `l1-error-taxonomy.md` ERR-4, error messages MUST be specific and actionable
 
 Exported identifiers (types, functions, methods, interfaces, error sentinels) MUST carry a trailing `AI-Meta:` block in their doc comment, on top of the verbosity required by C31. The block uses a closed vocabulary and gives AI assistants and human readers constant-time orientation per symbol. Full grammar and field semantics live in `l2-ai-doc-metadata.md`.
 
-1. **Format**: trailing labeled list, separated from preceding prose by one blank doc-comment line. Each entry is `  - <Field>: <single-line value>`. Block ends the doc comment.
+1. **Format**: trailing labeled list, separated from preceding prose by one blank doc-comment line. Each entry is `- <Field>: <single-line value>`. Block ends the doc comment.
 2. **Closed vocabulary** (no other field names): `Purpose`, `Usage`, `Lifecycle`, `Concurrency`, `Errors`, `Related`, `Constraints`, `Implementations`, `Stability`.
 3. **Closed enums**: `Stability` ∈ `Stable | Experimental | Deprecated | Internal`. `Concurrency` ∈ `Safe | ReadSafe | SingleGoroutine | NotSafe` (optional `; <clarifier>` suffix).
 4. **Tier-gated obligations** (mirrors C31 audience tiers): public API (`pkg/nn/`, `cmd/`) — full block; other exported (`pkg/*`) — `Purpose` and condition-driven fields; unexported — block omitted.

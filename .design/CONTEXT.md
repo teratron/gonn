@@ -20,8 +20,10 @@
 │   ├── STATE.md
 │   ├── TASKS.md
 │   ├── archives/
+│   ├── spec-graph.html
 │   ├── specifications/
 │   ├── tasks/
+│   ├── wiki/
 │   └── workspace.json
 ├── examples/
 │   ├── README.md
@@ -49,7 +51,9 @@
     ├── neuron/
     ├── nn/
     ├── nn.json
+    ├── optimizer/
     ├── persistence/
+    ├── regularizer/
     └── utils/
 ```
 

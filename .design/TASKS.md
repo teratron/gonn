@@ -1,10 +1,10 @@
 # Master Task Index (Registry)
 
-**Version:** 1.9.0
-**Project Version:** 0.5.1 (v0.5 released; v0.6 complete; Phase 6 active)
+**Version:** 2.0.0
+**Project Version:** 0.6.0 (v0.6 released; Phase 7 active)
 **Generated:** 2026-04-29
 **Last Updated:** 2026-05-08
-**Based on:** .design/PLAN.md v1.9.0
+**Based on:** .design/PLAN.md v2.0.0
 **Based on RULES:** .design/RULES.md v1.3.0
 **Execution Mode:** Parallel (C3)
 **Status:** Active
@@ -22,7 +22,8 @@ Tactical registry of all phases and their statuses. Atomic checklists (`T-XXXX`)
 | [Phase 3](tasks/phase-3.md) | New Capability Packages (Track C) — persistence, checkpoint, dataset, compute, perf | `Done` (2026-05-01) |
 | [Phase 4](tasks/phase-4.md) | Examples Catalog (Track D) — `examples/E01..E15` (v0.5 scope: 7 entries) | `Done` (2026-05-02) |
 | [Phase 5](tasks/phase-5.md) | Multi-Hidden Topology (v0.6) — `pkg/network` chain + compile() lift + weights 1.1.0 + 6 catalog examples | `Done` (2026-05-06) |
-| [Phase 6](tasks/phase-6.md) | Feature Expansion + v0.6 Release — `pkg/optimizer/`, `pkg/regularizer/`, axon WeightInit fix, CHANGELOG, v0.6.0 tag | `Active` (decomposed 2026-05-07; 15 tasks + 2 validation + 2 gate) |
+| [Phase 6](tasks/phase-6.md) | Feature Expansion + v0.6 Release — `pkg/optimizer/`, `pkg/regularizer/`, axon WeightInit fix, CHANGELOG, v0.6.0 tag | `Done` (2026-05-08) |
+| [Phase 7](tasks/phase-7.md) | Deep Builder + LR Scheduling + Developer Skills — `pkg/optimizer/` scheduler extension, `pkg/nn` bulk constructors, `skills/gonn/` | `Active` (decomposed 2026-05-08; 13 tasks + 2 validation + 1 gate) |
 
 ## Phase 0 — Already Complete
 
@@ -93,18 +94,34 @@ Six of the eight v0.6-gated entries (E03, E04, E05, E07, E08, E13) are now activ
 | `examples/regression_multi/` (E08) | l2-usage-examples v1.0.0 | `Done` |
 | `examples/higher_order_options/` (E13) | l2-usage-examples v1.0.0 | `Done` |
 
-## Phase 6 Deliverables (Pending)
+## Phase 6 Deliverables (Done — 2026-05-08)
 
 | Asset | Spec | Status |
 | :--- | :--- | :--- |
-| `pkg/optimizer/` (new package) | l2-optimizer-impl v1.0.0 | `Pending` |
-| `pkg/regularizer/` (new package) | l2-regularization-impl v1.0.0 | `Pending` |
-| `pkg/neuron/axon/axon.go` (WeightInit debt fix) | l2-regularization-impl v1.0.0 T-6B06 | `Pending` |
-| `pkg/nn/options.go` + `compile.go` (WithOptimizer, WithRegularizer) | l2-optimizer-impl + l2-regularization-impl | `Pending` |
-| `pkg/nn/train.go` (opt.Step + reg.Penalty + reg.ApplyMask) | l2-training-loop v1.0.0 | `Pending` |
-| `CHANGELOG.md` (v0.6.0 entry) | l1-release-policy v1.0.0 | `Pending` |
-| `README.md` (v0.6 multi-hidden API docs) | l1-release-policy v1.0.0 | `Pending` |
-| `v0.6.0` git tag | l1-release-policy v1.0.0 §5.4 | `Pending` |
+| `pkg/optimizer/` (SGD/Adam/RMSProp/Momentum) | l2-optimizer-impl v1.0.0 | `Done` |
+| `pkg/regularizer/` (L1/L2/Dropout/Compose) | l2-regularization-impl v1.0.0 | `Done` |
+| `pkg/neuron/axon/axon.go` (WeightInit debt fix) | l2-regularization-impl v1.0.0 T-6B06 | `Done` |
+| `pkg/nn/options.go` + `compile.go` (WithOptimizer, WithRegularizer) | l2-optimizer-impl + l2-regularization-impl | `Done` |
+| `pkg/nn/train.go` (opt.Step + reg.Penalty + reg.ApplyMask) | l2-training-loop v1.0.0 | `Done` |
+| `CHANGELOG.md` (v0.6.0 entry) | l1-release-policy v1.0.0 | `Done` |
+| `README.md` (v0.6 multi-hidden API docs) | l1-release-policy v1.0.0 | `Done` |
+| `v0.6.0` git tag | l1-release-policy v1.0.0 §5.4 | `Done` |
+
+## Phase 7 Deliverables (Pending)
+
+| Asset | Spec | Status |
+| :--- | :--- | :--- |
+| `pkg/optimizer/scheduler.go` (Scheduler[T] interface) | l1-lr-scheduling v1.0.0 | `Pending` |
+| `pkg/optimizer/step_lr.go` | l1-lr-scheduling v1.0.0 | `Pending` |
+| `pkg/optimizer/warmup_lr.go` | l1-lr-scheduling v1.0.0 | `Pending` |
+| `pkg/optimizer/cosine_lr.go` | l1-lr-scheduling v1.0.0 | `Pending` |
+| `pkg/optimizer/chain_scheduler.go` | l1-lr-scheduling v1.0.0 | `Pending` |
+| `pkg/nn/options.go` (WithScheduler) | l1-lr-scheduling v1.0.0 | `Pending` |
+| `pkg/nn/builder.go` (Repeat/Pattern/HiddenLayers) | l2-deep-builder v1.0.0 | `Pending` |
+| `pkg/nn/options.go` (Repeat/Pattern/WithHiddenLayers) | l2-deep-builder v1.0.0 | `Pending` |
+| `skills/gonn/SKILL.md` | l2-gonn-skills v1.0.0 | `Pending` |
+| `skills/gonn/examples/*.md` | l2-gonn-skills v1.0.0 | `Pending` |
+| `skills/gonn/resources/*.md` | l2-gonn-skills v1.0.0 | `Pending` |
 
 ### Remaining v0.6 Backlog (gated on follow-up specs)
 
