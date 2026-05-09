@@ -61,7 +61,7 @@ func build() (*nn.NN[float32], error) {
 func trainPerceptron(n *nn.NN[float32]) ([]float32, error) {
 	data := dataSet()
 	lenData := len(data) - lenOutput
-	for epoch := 1; epoch <= 5_000; epoch++ {
+	for epoch := 1; epoch <= 100_000; epoch++ {
 		for i := lenInput; i <= lenData; i++ {
 			if _, err := n.Train(data[i-lenInput:i], data[i:i+lenOutput]); err != nil {
 				return nil, err

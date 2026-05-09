@@ -11,3 +11,9 @@ The architecture will be expanded to a 4-hidden-layer topology in v0.6.
 ```bash
 go run ./examples/perceptron
 ```
+
+## Running the tests
+
+```bash
+go test ./examples/perceptron
+```

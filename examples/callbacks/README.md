@@ -12,3 +12,9 @@ This example demonstrates how to use progress callbacks in `gonn`. It trains a c
 ```bash
 go run ./examples/callbacks
 ```
+
+## Running the tests
+
+```bash
+go test ./examples/callbacks
+```

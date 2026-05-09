@@ -13,3 +13,9 @@ This example demonstrates how to share a common set of `nn.Option[T]` across mul
 ```bash
 go run ./examples/shared_options
 ```
+
+## Running the tests
+
+```bash
+go test ./examples/shared_options
+```

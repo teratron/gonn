@@ -13,3 +13,9 @@ This example provides a side-by-side comparison of the three different ways to c
 ```bash
 go run ./examples/style_showcase
 ```
+
+## Running the tests
+
+```bash
+go test ./examples/style_showcase
+```

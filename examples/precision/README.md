@@ -12,3 +12,9 @@ This example compares the performance and accuracy of `float32` vs `float64` imp
 ```bash
 go run ./examples/precision
 ```
+
+## Running the tests
+
+```bash
+go test ./examples/precision
+```

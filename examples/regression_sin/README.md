@@ -34,3 +34,9 @@ The example aims for a test Root Mean Squared Error (RMSE) of $\leq 0.10$.
 ```bash
 go run ./examples/regression_sin
 ```
+
+## Running the tests
+
+```bash
+go test ./examples/regression_sin
+```

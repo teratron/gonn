@@ -13,3 +13,9 @@ This example demonstrates the round-trip integrity of saving and reloading a neu
 ```bash
 go run ./examples/persistence
 ```
+
+## Running the tests
+
+```bash
+go test ./examples/persistence
+```

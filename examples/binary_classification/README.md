@@ -15,3 +15,9 @@ This example demonstrates how to build and train a multi-hidden layer neural net
 ```bash
 go run ./examples/binary_classification
 ```
+
+## Running the tests
+
+```bash
+go test ./examples/binary_classification
+```

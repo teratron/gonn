@@ -41,3 +41,9 @@ Where:
 ```bash
 go run ./examples/iris
 ```
+
+## Running the tests
+
+```bash
+go test ./examples/iris
+```

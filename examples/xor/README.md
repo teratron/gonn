@@ -12,3 +12,9 @@ The classic XOR problem — the smallest non-linear classification task. This ex
 ```bash
 go run ./examples/xor
 ```
+
+## Running the tests
+
+```bash
+go test ./examples/xor
+```

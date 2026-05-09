@@ -44,3 +44,9 @@ This ensures that all input features have the same scale, preventing features wi
 ```bash
 go run ./examples/higher_order_options
 ```
+
+## Running the tests
+
+```bash
+go test ./examples/higher_order_options
+```

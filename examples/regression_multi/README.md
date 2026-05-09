@@ -39,3 +39,9 @@ Target performance is a test RMSE of $\leq 0.20$ across all dimensions.
 ```bash
 go run ./examples/regression_multi
 ```
+
+## Running the tests
+
+```bash
+go test ./examples/regression_multi
+```

@@ -13,3 +13,9 @@ This example shows how a small neural network can specialize to learn different 
 ```bash
 go run ./examples/logic_gates
 ```
+
+## Running the tests
+
+```bash
+go test ./examples/logic_gates
+```
