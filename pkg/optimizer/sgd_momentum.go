@@ -74,6 +74,10 @@ func (s *SGDMomentum[T]) Reset() {
 // LearningRate returns the configured step size.
 func (s *SGDMomentum[T]) LearningRate() T { return s.lr }
 
+// SetLearningRate replaces the effective learning rate. Implements LearningRateSetter
+// so that BindScheduler can push updated rates from a Scheduler.
+func (s *SGDMomentum[T]) SetLearningRate(rate T) { s.lr = rate }
+
 // SaveState serialises lr, momentum, and velocity to JSON.
 func (s *SGDMomentum[T]) SaveState() ([]byte, error) {
 	return json.Marshal(struct {

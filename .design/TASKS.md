@@ -23,7 +23,7 @@ Tactical registry of all phases and their statuses. Atomic checklists (`T-XXXX`)
 | [Phase 4](tasks/phase-4.md) | Examples Catalog (Track D) — `examples/E01..E15` (v0.5 scope: 7 entries) | `Done` (2026-05-02) |
 | [Phase 5](tasks/phase-5.md) | Multi-Hidden Topology (v0.6) — `pkg/network` chain + compile() lift + weights 1.1.0 + 6 catalog examples | `Done` (2026-05-06) |
 | [Phase 6](tasks/phase-6.md) | Feature Expansion + v0.6 Release — `pkg/optimizer/`, `pkg/regularizer/`, axon WeightInit fix, CHANGELOG, v0.6.0 tag | `Done` (2026-05-08) |
-| [Phase 7](tasks/phase-7.md) | Deep Builder + LR Scheduling + Developer Skills — `pkg/optimizer/` scheduler extension, `pkg/nn` bulk constructors, `skills/gonn/` | `Active` (decomposed 2026-05-08; 13 tasks + 2 validation + 1 gate) |
+| [Phase 7](tasks/phase-7.md) | Deep Builder + LR Scheduling + Developer Skills — `pkg/optimizer/` scheduler extension, `pkg/nn` bulk constructors, `skills/gonn/` | `Done` (2026-05-10) |
 
 ## Phase 0 — Already Complete
 
@@ -107,21 +107,27 @@ Six of the eight v0.6-gated entries (E03, E04, E05, E07, E08, E13) are now activ
 | `README.md` (v0.6 multi-hidden API docs) | l1-release-policy v1.0.0 | `Done` |
 | `v0.6.0` git tag | l1-release-policy v1.0.0 §5.4 | `Done` |
 
-## Phase 7 Deliverables (Pending)
+## Phase 7 Deliverables (Done — 2026-05-10)
 
 | Asset | Spec | Status |
 | :--- | :--- | :--- |
-| `pkg/optimizer/scheduler.go` (Scheduler[T] interface) | l1-lr-scheduling v1.0.0 | `Pending` |
-| `pkg/optimizer/step_lr.go` | l1-lr-scheduling v1.0.0 | `Pending` |
-| `pkg/optimizer/warmup_lr.go` | l1-lr-scheduling v1.0.0 | `Pending` |
-| `pkg/optimizer/cosine_lr.go` | l1-lr-scheduling v1.0.0 | `Pending` |
-| `pkg/optimizer/chain_scheduler.go` | l1-lr-scheduling v1.0.0 | `Pending` |
-| `pkg/nn/options.go` (WithScheduler) | l1-lr-scheduling v1.0.0 | `Pending` |
-| `pkg/nn/builder.go` (Repeat/Pattern/HiddenLayers) | l2-deep-builder v1.0.0 | `Pending` |
-| `pkg/nn/options.go` (Repeat/Pattern/WithHiddenLayers) | l2-deep-builder v1.0.0 | `Pending` |
-| `skills/gonn/SKILL.md` | l2-gonn-skills v1.0.0 | `Pending` |
-| `skills/gonn/examples/*.md` | l2-gonn-skills v1.0.0 | `Pending` |
-| `skills/gonn/resources/*.md` | l2-gonn-skills v1.0.0 | `Pending` |
+| `pkg/optimizer/scheduler.go` (Scheduler[T] interface, BindScheduler, LearningRateSetter[T]) | l1-lr-scheduling v1.0.0 | `Done` |
+| `pkg/optimizer/step_lr.go` | l1-lr-scheduling v1.0.0 | `Done` |
+| `pkg/optimizer/warmup_lr.go` | l1-lr-scheduling v1.0.0 | `Done` |
+| `pkg/optimizer/cosine_lr.go` | l1-lr-scheduling v1.0.0 | `Done` |
+| `pkg/optimizer/chain_scheduler.go` | l1-lr-scheduling v1.0.0 | `Done` |
+| `pkg/optimizer/scheduler_test.go` | l1-lr-scheduling v1.0.0 | `Done` |
+| `pkg/nn/options.go` (WithScheduler, Repeat, Pattern, WithHiddenLayers) | l1-lr-scheduling + l2-deep-builder v1.0.0 | `Done` |
+| `pkg/nn/builder.go` (Repeat, Pattern, HiddenLayers, WithScheduler) | l2-deep-builder v1.0.0 | `Done` |
+| `pkg/nn/train.go` (scheduler dispatch per Granularity) | l1-lr-scheduling v1.0.0 | `Done` |
+| `pkg/nn/config.go` (Scheduler field) | l1-lr-scheduling v1.0.0 | `Done` |
+| `pkg/nn/phase7_test.go` | l2-deep-builder v1.0.0 | `Done` |
+| `skills/gonn/SKILL.md` | l2-gonn-skills v1.0.0 | `Done` |
+| `skills/gonn/examples/builder-xor.md` | l2-gonn-skills v1.0.0 | `Done` |
+| `skills/gonn/examples/options-mnist.md` | l2-gonn-skills v1.0.0 | `Done` |
+| `skills/gonn/examples/deep-network.md` | l2-gonn-skills v1.0.0 | `Done` |
+| `skills/gonn/resources/api-reference.md` | l2-gonn-skills v1.0.0 | `Done` |
+| `skills/gonn/resources/conventions.md` | l2-gonn-skills v1.0.0 | `Done` |
 
 ### Remaining v0.6 Backlog (gated on follow-up specs)
 
@@ -139,5 +145,5 @@ Six of the eight v0.6-gated entries (E03, E04, E05, E07, E08, E13) are now activ
 
 ## Meta Information
 
-- **Last Updated**: 2026-05-08
+- **Last Updated**: 2026-05-10
 - **Maintainer**: Core Team

@@ -4,6 +4,48 @@ All notable changes to the GoNN library will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the
 release artifacts dictated by [.magic/run.md](.magic/run.md) Phase Completion / Plan Completion.
 
+## [Unreleased] — Phase 7 — 2026-05-10
+
+### LR scheduling, deep network builder, and AI developer skills
+
+Phase 7 extends the optimizer ecosystem with a full LR scheduler framework,
+adds bulk topology constructors for deep network construction, and ships a
+structured AI developer skills directory for assisted code generation.
+
+#### Added
+
+- **`pkg/optimizer/` — scheduler extension:**
+  - `Scheduler[T]` interface: `Step() T`, `Reset()`, `Granularity() Granularity`, `SaveState(io.Writer) error`, `LoadState(io.Reader) error`.
+  - `Granularity` enum: `PerEpoch` (default for step-decay schedulers) / `PerStep` (default for warm-up schedulers).
+  - `LearningRateSetter[T]` optional interface: `SetLearningRate(T)` — implemented by all four existing optimizers (SGD, Adam, RMSProp, SGDMomentum).
+  - `BindScheduler[T](opt, sched) Scheduler[T]` — wraps scheduler; each `Step()` call also calls `opt.SetLearningRate(newRate)` if the optimizer implements `LearningRateSetter[T]`.
+  - `NewStepLR[T](lr0, stepSize, gamma)` / `NewStepLRWithGranularity[T](...)` — step decay: lr₀ × γ^(⌊t/stepSize⌋).
+  - `NewWarmUpLR[T](lr0, warmupSteps)` — linear warm-up from 0 to lr₀ over N steps; holds lr₀ after; `PerStep` default.
+  - `NewCosineAnnealingLR[T](lr0, lrMin, tMax)` — cosine annealing: lrMin + 0.5(lr₀−lrMin)(1+cos(πt/tMax)); holds lrMin after tMax.
+  - `NewChainScheduler[T](segments []SchedulerSegment[T])` — sequential composition; `SchedulerSegment[T]{Scheduler, Duration}`. Resets each sub-scheduler on transition. Holds last rate when all segments are exhausted.
+  - All scheduler types implement full JSON `SaveState`/`LoadState` for training checkpoints.
+- **`pkg/nn/` — bulk topology constructors and scheduler wiring:**
+  - Builder API: `Repeat(count, size uint, act, bias)` — appends N identical hidden layers; `Pattern(block, repeats)` — appends block×repeats layers; `HiddenLayers(layers)` — **replaces** all hidden layers (setter semantics); `WithScheduler(sched)`.
+  - Options API: `Repeat[T](count, size, act)`, `Pattern[T](block, repeats)`, `WithHiddenLayers[T](layers)` — append semantics (consistent with `WithHiddenLayer`); `WithScheduler[T](sched)`.
+  - `Config[T].Scheduler` field added.
+  - Training loop (`Fit`) dispatches `sched.Step()` per `Granularity()`: after each batch for `PerStep`, after each epoch for `PerEpoch`. Nil-guarded — no overhead when no scheduler is configured.
+- **`skills/gonn/`** — AI developer skills directory:
+  - `SKILL.md` — 10-section skill file with YAML frontmatter: API styles, lifecycle, types, bulk constructors, activation↔loss matching, optimizer selection, AI-Meta annotation, error handling, testing patterns, common mistakes.
+  - `examples/builder-xor.md` — XOR classifier with Builder API (Style A), anti-patterns.
+  - `examples/options-mnist.md` — MNIST classifier with Options API + `PresetMNIST`, anti-patterns.
+  - `examples/deep-network.md` — 100-layer network with `Repeat`, `Pattern`, and `BindScheduler` + `ChainScheduler` (warm-up → cosine), anti-patterns.
+  - `resources/api-reference.md` — condensed public API surface for all exported symbols in `pkg/nn`, `pkg/optimizer`, `pkg/regularizer`.
+  - `resources/conventions.md` — GoNN coding conventions for AI agents (C25–C33 translated without referencing internal file names).
+
+#### Changed
+
+- `pkg/optimizer/sgd.go`, `adam.go`, `rmsprop.go`, `sgd_momentum.go` — each gained `SetLearningRate(T)` implementing `LearningRateSetter[T]`.
+
+#### Coverage
+
+- `pkg/optimizer`: 88.9% (up from 98.9% baseline via new scheduler files at ~85%)
+- `pkg/nn`: 86.4% (unchanged — new tests offset new code)
+
 ## [0.6.0] — 2026-05-08
 
 ### Multi-hidden topology, optimizer pluggability, and regularization

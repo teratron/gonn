@@ -49,6 +49,9 @@ type NN[T utils.Float] struct {
 	// reg is the optional regularizer (nil = no regularization).
 	reg regularizer.Regularizer[T]
 
+	// sched is the optional learning-rate scheduler (nil = no scheduling).
+	sched optimizer.Scheduler[T]
+
 	// weightBuf / gradBuf are reused per training step to avoid
 	// per-sample allocations in the hot training loop.
 	weightBuf []T

@@ -4,16 +4,16 @@
 <!-- Maximum 100 lines. Agent updates AFTER each completed action. -->
 
 **Workspace:** main
-**Project Version:** 0.6.0
-**Updated:** 2026-05-08 13:18
+**Project Version:** 0.6.0 (Phase 7 complete; v0.7.0 scope not yet planned)
+**Updated:** 2026-05-10
 **Phase:** 7 — Deep Builder + LR Scheduling + Developer Skills
-**Status:** Active
+**Status:** Done
 
 ## Current Position
 
-- **Task:** Phase 6 complete. All 19 tasks Done. v0.6.0 annotated tag created on develop.
-- **Spec:** All Phase 6 specs Stable v1.0.0. Tag created; push to origin + GitHub Release pending user action.
-- **Next Action:** Run /magic.run to execute Phase 7
+- **Task:** Phase 7 complete. All 16 tasks Done (T-7A01..T-7A06, T-7B01..T-7B04, T-7C01..T-7C03, T-7T01, T-7T02, T-7Z01).
+- **Spec:** All Phase 7 specs Stable v1.0.0. Gate T-7Z01 passed.
+- **Next Action:** Plan v0.7.0 scope via /magic.spec or /magic.task
 
 ## Progress
 
@@ -24,35 +24,26 @@ Phase 3 (Done):   [19/19]   ████████ 100%
 Phase 4 (Done):   [14/14]   ████████ 100%
 Phase 5 (Done):   [23/23]   ████████ 100%   (all tracks + gate complete)
 Phase 6 (Done):   [19/19]   ████████ 100%   (all tracks + validation + gate + tag)
-Overall:          [123/123] ████████ 100%
+Phase 7 (Done):   [16/16]   ████████ 100%   (Tracks A+B+C + validation + gate)
+Overall:          [139/139] ████████ 100%
 ```
 
 ## Recent Decisions
 
+- 2026-05-10 **Decision:** Phase 7 complete. Track A: `pkg/optimizer/` extended with `Scheduler[T]` interface, `BindScheduler[T]`, `LearningRateSetter[T]` optional extension, and four scheduler types — `StepLR[T]` (step decay), `WarmUpLR[T]` (linear ramp, PerStep default), `CosineAnnealingLR[T]` (cosine decay), `ChainScheduler[T]` (sequential composition). All four existing optimizers (SGD/Adam/RMSProp/SGDMomentum) implement `LearningRateSetter[T]` via `SetLearningRate(T)`. `pkg/optimizer/scheduler_test.go` covers all scheduler types, BindScheduler wiring, Granularity defaults, and SaveState/LoadState round-trips; coverage 88.9 %. Track B: `pkg/nn/builder.go` + `pkg/nn/options.go` extended with bulk constructors `Repeat`/`Pattern`/`HiddenLayers` (Builder, setter/append semantics distinguished) and `Repeat[T]`/`Pattern[T]`/`WithHiddenLayers[T]` (Options, append); `WithScheduler` added to both; `pkg/nn/train.go` dispatches `sched.Step()` per `Granularity()` (PerEpoch after epoch, PerStep per batch); `pkg/nn/config.go` adds `Scheduler` field; `pkg/nn/phase7_test.go` covers 11 test functions + 2 benchmarks; coverage 86.4 %. Track C: `skills/gonn/` created with `SKILL.md` (10 sections, YAML frontmatter), 3 example files (builder-xor, options-mnist, deep-network), and 2 resource files (api-reference, conventions). Gate T-7Z01: `go build ./...` clean; `go test ./pkg/...` all green; all packages ≥80 %; skills directory matches spec §5.1; 3 orphaned specs resolved.
 - 2026-05-08 **Decision:** Phase 6 complete. Tracks A+B (optimizer + regularizer + WeightInit fix): `pkg/optimizer/` (SGD/Adam/RMSProp/SGDMomentum, 98.9% cover, 0 allocs/op benchmarks), `pkg/regularizer/` (L1/L2/Dropout/Compose, 80.0% cover), `pkg/nn` wired via `WithOptimizer`/`WithRegularizer`/`trainStep()`. Track C: CHANGELOG.md v0.6.0, README.md updated with full v0.6 API docs. Validation: TestWeightInitRanges, TestRegularizerConvergence, TestInferenceNoDropout, TestOptimizerIntegration all green. Gate T-6Z01: all packages ≥80% cover (`network` 96.3%, `nn` 86.4%). Tag v0.6.0 created. Pre-existing TestPauseResumeCycle timing flake documented in CHANGELOG Known Issues.
-- 2026-05-06 **Decision:** Phase 5 Tracks C + D complete. Track C: `pkg/persistence.SchemaVersion` bumped 1.0.0 → 1.1.0; new `multihidden_test.go` covers forward-compat (v0.1 fixture load) and bit-identical float64 round-trip with 3-layer topology; `examples/persistence` helpers extended to walk `Hiddens` slice via `extractWeights`/`installWeights`. Track D: 5 new example modules added — E03 `perceptron` (4-hidden Builder, restored), E04 `binary_classification` (2-hidden BCE+He, Gaussian blobs), E05 `iris` (go:embed CSV, EpochCallback, SoftMax 3-class), E07 `regression_sin` (TanH sine, RMSE ≤ 0.10), E08 `regression_multi` (5-input 3-output ReLU+He), E13 `higher_order_options` (Sequential + DeepNetwork with SIGMOID, min-max normalised iris). All 5 modules race-clean; accuracy/RMSE spec targets met. `go.work` updated with all new module paths. `examples/README.md` moved E03/E05/E07/E08/E13 from Deferred → Active; coverage matrix updated. Phase gate T-5Z: `go build ./...` clean; `pkg/nn` 85.2 %, `pkg/network` 95.7 %, `pkg/persistence` 81.4 % — all ≥ 80 %. Known debt: `axon.New` ignores configured `WeightInit`; works in practice because `U[-0.5, 0.5]` ≈ Xavier for shallow fan counts, but deep ReLU needs input normalisation or SIGMOID.
-- 2026-05-04 **Decision:** Track B landed. `pkg/nn.compile()` gate `if len(cfg.HiddenLayers) > 1 { return ErrUserConfig ... }` removed; `compile()` now builds the full `[]*layer.Dense[T]` chain from `cfg.HiddenLayers`. Outdated tests flipped to v0.6 positive paths: `TestBuilderAcceptsMultiHidden`, `TestPresetMNISTCompiles`, new `TestPresetRegressionCompiles`. New `multihidden_test.go` covers (a) `TestDeepStackRandomInitWarn` + Xavier negative control via `captureWarnings` slog-buffer helper, (b) `TestCompileFitMultiHiddenChainDepths` for depths {2,3,7}, (c) `TestCompileMultiHiddenTwoHiddenConverges` (Sigmoid Xavier, 20000 epochs, ≤ 0.10). pkg/nn coverage 85.2 %, race-clean. **Track A correction**: initial `CalculateMisses` stored δ on miss (per spec §5.6 pseudocode), but that altered the v0.5 single-hidden ΔW arithmetic enough that `examples/callbacks` `TestTrainConverges` (XOR loss < 0.15 in 2000 epochs) regressed. Reverted to v0.5 pattern — raw miss in `CalculateMisses`, derivative folded inside `CalculateWeights` via `eff = rate × σ'(z)` per layer — extending positionally to every chain entry. Single-hidden behaviour bit-identical to v0.5; multi-hidden chain extension is the v0.5 omission propagated layer-by-layer (faster initial gradients than fully-correct backprop, but matches `T-5A06`'s explicit "preserves v0.5 single-layer arithmetic when len == 1"). All `pkg/...` and 7 v0.5 example modules green under `-race`.
-- 2026-05-03 **Decision:** Track A landed. `pkg/network.Network[T]` storage now slice-shaped (`Hiddens []bundle`, `hiddenBiases`, `hiddenActs`, `preactHiddens` parallel to it); `SetLayers` accepts `[]*layer.Dense[T]`; Build/CalculateValues/CalculateMisses/CalculateWeights walk the chain per [l2-multihidden-impl] §5.3 / §5.6. New `propagation_test.go` covers chain wiring (table test), forward + backward goldens (Linear 2-hidden, 3-hidden), and Sigmoid 2-hidden XOR convergence. Coverage 95.8 %, race-clean. Downstream callers (`pkg/nn.compile`, `pkg/nn/train.go` snapshot/restore/weightCount, `pkg/nn/nn_test.go`, `examples/persistence`) migrated to slice-form access.
-- 2026-05-03 **Decision:** Phase 5 activated and decomposed via /magic.task update. l2-multihidden-impl promoted Draft → Stable v1.0.0 (Trust Mode — MVC + Implements Stable + only scoped TBDs). 19 atomic tasks across Tracks A–D + 4 gate checks. Track A → B serial (storage generalisation must precede compile() lift); C and D parallel after B. Six v0.6 catalog entries (E03/E04/E05/E07/E08/E13) promoted from Phase 4 backlog into Phase 5. E06 (MNIST loader) and E10 (AndTrain) stay deferred. INDEX.md 2.2.0 → 2.3.0; PLAN.md 1.6.0 → 1.7.0; TASKS.md 1.6.0 → 1.7.0.
-- 2026-05-03 **Decision:** New v0.6 anchor spec `l2-multihidden-impl` Draft v0.5.0 authored via /magic.spec Proactive Architect mode. Captures three coordinated deltas — `pkg/network.Network[T]` storage chain, `pkg/nn.compile()` gate lift, `pkg/persistence` weights schema 1.0.0 → 1.1.0. INDEX.md 2.1.0 → 2.2.0.
-- 2026-05-02 **Decision:** Phase 4 closed via /magic.run. 7 example modules build, test, race-clean. Coverage matrix audit at examples/README.md flags 6 v0.6-gated API surfaces. Phase Gate T-4Z01..T-4Z04 green. v0.5 release-ready bar reached. Established conventions: per-example go.mod with replace directive; `runX()` helpers extracted from `main()` for smoke tests; pkg/nn ↔ pkg/persistence seam documented in E09.
-- 2026-05-02 **Decision:** Phase 4 activated and decomposed via /magic.task update. l2-usage-examples promoted RFC → Stable v1.0.0 (E09 ungated; persistence Stable since 2026-05-01). 14 atomic tasks across Tracks A–E + 4 gate checks scoped to v0.5's single-hidden constraint.
-- 2026-05-01 **Decision:** Phase 3 closed via /magic.run. All 5 tracks green: persistence (81.4 %), checkpoint (83.2 %), dataset (87.6 %), compute (97.3 %), compute/cpu (100 %), network (96.1 %), nn (83.7 %). PERF-4 backward-pass at 0 allocs/op. pprof opt-in via `WithProfiling[T](addr)`.
-- 2026-04-30 **Decision:** Phase 2 complete. Multi-hidden topology errors at Compile() with v0.6 deferred-feature note — this constraint shapes Phase 4 v0.5 scope and is now lifted by Phase 5.
-- 2026-04-29 **Decision:** `go test -race ./...` green via PowerShell because the Claude Code bash-shell does not propagate Windows PATH to the Go child process (gcc lives at C:/msys64/mingw64/bin). Documented for repeatability.
 
 ## Blockers
 
-- (none — Phase 6 complete)
+- (none — Phase 7 complete)
 
 ## Blocking Constraints
 
 - (none — all tracks green, phase gate passed)
 - Note: race detector via PowerShell only on Windows (gcc PATH issue, pre-existing).
-- (none — all blocking constraints resolved)
 
 ## Session Continuity
 
-**Last Session Ended:** 2026-05-08
+**Last Session Ended:** 2026-05-10
 **Handoff File:** none
-**Bootstrap Mode:** false (Phase 6 complete; v0.6.0 tagged; next = push + GitHub Release)
+**Bootstrap Mode:** false (Phase 7 complete; next = plan v0.7.0 scope)

@@ -271,3 +271,77 @@ func WithRegularizer[T utils.Float](reg regularizer.Regularizer[T]) Option[T] {
 		cfg.Regularizer = reg
 	}
 }
+
+// WithScheduler attaches a learning-rate scheduler to the training loop.
+// The scheduler's Step is called after each epoch (PerEpoch granularity) or
+// after each batch (PerStep granularity). nil disables scheduling (default).
+// Use optimizer.BindScheduler to wire the scheduler to the active optimizer
+// so that Step automatically updates the optimizer's effective rate.
+//
+// AI-Meta:
+//   - Purpose: Attach an LR scheduler (StepLR, WarmUpLR, CosineAnnealingLR, ChainScheduler) in the Options API.
+//   - Usage: nn.New[float32](WithScheduler[float32](optimizer.BindScheduler(myOpt, optimizer.NewStepLR[float32](0.1, 10, 0.5))), ...).
+//   - Related: [Option], [New], [optimizer.Scheduler], [optimizer.BindScheduler].
+//   - Stability: Stable.
+func WithScheduler[T utils.Float](sched optimizer.Scheduler[T]) Option[T] {
+	return func(cfg *Config[T]) {
+		cfg.Scheduler = sched
+	}
+}
+
+// ============================================================================
+// Bulk topology constructors (Track B — l2-deep-builder)
+// ============================================================================
+
+// Repeat appends count identical hidden layers (size, act, DefaultBias) to
+// the topology. Equivalent to calling WithHiddenLayer count times.
+// RepeatCountZero (count == 0) is a no-op here; Compile rejects zero-layer configs.
+//
+// AI-Meta:
+//   - Purpose: Add N identical hidden layers in one Options API call; replaces repeated WithHiddenLayer.
+//   - Usage: nn.New[float32](Repeat[float32](100, 256, activation.ReLU), ...).
+//   - Related: [Option], [WithHiddenLayer], [Pattern], [WithHiddenLayers], [Sequential].
+//   - Stability: Stable.
+func Repeat[T utils.Float](count, size uint, act activation.Type) Option[T] {
+	return func(cfg *Config[T]) {
+		for range count {
+			cfg.HiddenLayers = append(cfg.HiddenLayers, HiddenLayerSpec[T]{
+				Size:       size,
+				Activation: act,
+				Bias:       cfg.DefaultBias,
+			})
+		}
+	}
+}
+
+// Pattern appends block repeated repeats times, producing len(block)×repeats
+// hidden layers. A zero-length block or zero repeats is a no-op here;
+// Compile enforces the minimum-one-layer rule.
+//
+// AI-Meta:
+//   - Purpose: Add a repeating multi-layer block to the topology in the Options API.
+//   - Usage: nn.New[float32](Pattern[float32](block, 33), ...).
+//   - Related: [Option], [Repeat], [WithHiddenLayers].
+//   - Stability: Stable.
+func Pattern[T utils.Float](block []HiddenLayerSpec[T], repeats uint) Option[T] {
+	return func(cfg *Config[T]) {
+		for range repeats {
+			cfg.HiddenLayers = append(cfg.HiddenLayers, block...)
+		}
+	}
+}
+
+// WithHiddenLayers appends the given slice of layer specs to the topology
+// (append semantics, consistent with WithHiddenLayer singular).
+// For replace semantics in the Builder API use (*NN[T]).HiddenLayers.
+//
+// AI-Meta:
+//   - Purpose: Bulk-append a pre-built slice of hidden layer specs in the Options API.
+//   - Usage: nn.New[float32](WithHiddenLayers[float32](layers), ...).
+//   - Related: [Option], [HiddenLayerSpec], [WithHiddenLayer], [Repeat], [Pattern].
+//   - Stability: Stable.
+func WithHiddenLayers[T utils.Float](layers []HiddenLayerSpec[T]) Option[T] {
+	return func(cfg *Config[T]) {
+		cfg.HiddenLayers = append(cfg.HiddenLayers, layers...)
+	}
+}

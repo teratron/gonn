@@ -1,6 +1,7 @@
 package nn
 
 import (
+	"github.com/teratron/gonn/pkg/optimizer"
 	"github.com/teratron/gonn/pkg/regularizer"
 	"github.com/teratron/gonn/pkg/utils"
 )
@@ -133,12 +134,21 @@ func (n *NN[T]) Fit(dataset []Sample[T]) (uint, T, error) {
 			if cb := n.cfg.BatchCallback; cb != nil {
 				cb(uint(batchIdx), loss)
 			}
+			// Advance the LR scheduler at step granularity (e.g. warm-up).
+			if n.sched != nil && n.sched.Granularity() == optimizer.PerStep {
+				n.sched.Step()
+			}
 		}
 		mean := total / T(len(dataset))
 		lastLoss = mean
 		completedEpochs = epoch
 		if cb := n.cfg.EpochCallback; cb != nil {
 			cb(epoch, mean)
+		}
+
+		// Advance the LR scheduler at epoch granularity (LRS-1).
+		if n.sched != nil && n.sched.Granularity() == optimizer.PerEpoch {
+			n.sched.Step()
 		}
 
 		if !minLossSet || mean < minLoss {

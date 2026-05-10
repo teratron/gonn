@@ -15,6 +15,10 @@ import (
 	"github.com/teratron/gonn/pkg/utils"
 )
 
+// DefaultExcessiveLayersWarning is the hidden-layer count at which compile
+// emits a soft warning for ExcessiveLayers (l2-deep-builder §5.7).
+const DefaultExcessiveLayersWarning = 10_000
+
 // state enumerates the construction-lifecycle positions of an *NN[T].
 // Per [l2-nn-facade] §5.1 the legal call set differs by state — illegal
 // calls are no-ops with a Logger.Warn, never panics.
@@ -145,6 +149,9 @@ type Config[T utils.Float] struct {
 	// Regularizer adds a generalization penalty and optional activation mask.
 	// nil disables regularization (no penalty, no dropout).
 	Regularizer regularizer.Regularizer[T]
+	// Scheduler adjusts the effective learning rate during training.
+	// nil disables scheduling (the default when WithScheduler is not called).
+	Scheduler   optimizer.Scheduler[T]
 	WeightInit  WeightInitMethod
 	DefaultBias bool
 	OutputBias  bool

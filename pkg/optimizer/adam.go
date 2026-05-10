@@ -94,6 +94,10 @@ func (a *Adam[T]) Reset() {
 // LearningRate returns the base step size.
 func (a *Adam[T]) LearningRate() T { return a.lr }
 
+// SetLearningRate replaces the effective learning rate. Implements LearningRateSetter
+// so that BindScheduler can push updated rates from a Scheduler.
+func (a *Adam[T]) SetLearningRate(rate T) { a.lr = rate }
+
 // adamState is the JSON-serialisable snapshot of Adam internal state.
 type adamState struct {
 	LR    float64   `json:"lr"`

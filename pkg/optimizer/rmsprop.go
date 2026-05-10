@@ -80,6 +80,10 @@ func (r *RMSProp[T]) Reset() {
 // LearningRate returns the configured step size.
 func (r *RMSProp[T]) LearningRate() T { return r.lr }
 
+// SetLearningRate replaces the effective learning rate. Implements LearningRateSetter
+// so that BindScheduler can push updated rates from a Scheduler.
+func (r *RMSProp[T]) SetLearningRate(rate T) { r.lr = rate }
+
 // SaveState serialises lr, hyperparameters, and squared-EMA buffer to JSON.
 func (r *RMSProp[T]) SaveState() ([]byte, error) {
 	return json.Marshal(struct {

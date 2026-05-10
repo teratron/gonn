@@ -3,7 +3,7 @@
 **Version:** 2.0.0
 **Project Version:** 0.6.0 (v0.6 released; Phase 7 scoped)
 **Generated:** 2026-04-29
-**Last Updated:** 2026-05-08
+**Last Updated:** 2026-05-10
 **Based on:** .design/INDEX.md v2.5.0
 **Based on RULES:** .design/RULES.md v1.3.0
 **Based on ROADMAP:** .design/ROADMAP.md v1.0.0
@@ -100,18 +100,19 @@ GoNN library implementation plan derived from `ROADMAP.md` Hybrid Path. Phase or
 - [x] **[B] Regularization** ([l1-regularization.md](specifications/l1-regularization.md) + [l2-regularization-impl.md](specifications/l2-regularization-impl.md)) [L1+L2, Stable v1.0.0]
 - [x] **[C] v0.6.0 Release Preparation** ([l1-release-policy.md](specifications/l1-release-policy.md)) [L1, Stable v1.0.0]
 
-## Phase 7 — Deep Builder + LR Scheduling + Developer Skills
+## Phase 7 — Deep Builder + LR Scheduling + Developer Skills ✓ Done
 
-*Adds LR scheduler contract, bulk topology constructors for deep networks, and AI developer skills. Scoped 2026-05-08.*
+*Adds LR scheduler contract, bulk topology constructors for deep networks, and AI developer skills. Closed 2026-05-10. All 16 tasks green; gate T-7Z01 passed.*
 
 **Subsystem:** `pkg/optimizer/` (scheduler extension), `pkg/nn` (builder ergonomics), `skills/gonn/`
 **Requires:** Phase 6 ✓
 **Tasks file:** [tasks/phase-7.md](tasks/phase-7.md)
 **Track order:** A (L1-first LR scheduling) → B (L2, deep builder after A); C (L2, skills, parallel); T-7T01/T-7T02 validation; Gate T-7Z.
+**Outcome:** `pkg/optimizer/` extended with Scheduler[T] interface, BindScheduler, LearningRateSetter[T] optional extension, and four scheduler implementations (StepLR, WarmUpLR, CosineAnnealingLR, ChainScheduler). All four optimizers (SGD/Adam/RMSProp/SGDMomentum) implement LearningRateSetter[T]. `pkg/nn` extended with Repeat/Pattern/HiddenLayers bulk constructors (Builder) and Repeat/Pattern/WithHiddenLayers (Options); WithScheduler on both APIs; train.go dispatches Step() per Granularity(). Coverage: optimizer 88.9%, nn 86.4%. skills/gonn/ ships SKILL.md + 3 examples + 2 resources.
 
-- [ ] **[A] LR Scheduling** ([l1-lr-scheduling.md](specifications/l1-lr-scheduling.md)) [L1, Stable v1.0.0] — `pkg/optimizer/` scheduler extension; StepLR/WarmUpLR/CosineAnnealingLR/ChainScheduler; `WithScheduler` option; train.go integration.
-- [ ] **[B] Deep Builder Ergonomics** ([l2-deep-builder.md](specifications/l2-deep-builder.md)) [L2, Stable v1.0.0] — `Repeat`/`Pattern`/`HiddenLayers` bulk constructors on both Builder and Options APIs.
-- [ ] **[C] GoNN Developer Skills** ([l2-gonn-skills.md](specifications/l2-gonn-skills.md)) [L2, Stable v1.0.0] — `skills/gonn/SKILL.md` + examples + API reference for AI-assisted code generation.
+- [x] **[A] LR Scheduling** ([l1-lr-scheduling.md](specifications/l1-lr-scheduling.md)) [L1, Stable v1.0.0] — `pkg/optimizer/` scheduler extension; StepLR/WarmUpLR/CosineAnnealingLR/ChainScheduler; `WithScheduler` option; train.go integration.
+- [x] **[B] Deep Builder Ergonomics** ([l2-deep-builder.md](specifications/l2-deep-builder.md)) [L2, Stable v1.0.0] — `Repeat`/`Pattern`/`HiddenLayers` bulk constructors on both Builder and Options APIs.
+- [x] **[C] GoNN Developer Skills** ([l2-gonn-skills.md](specifications/l2-gonn-skills.md)) [L2, Stable v1.0.0] — `skills/gonn/SKILL.md` + examples + API reference for AI-assisted code generation.
 
 ## Backlog
 
@@ -173,3 +174,4 @@ graph LR
 | 1.8.0 | 2026-05-07 | Phase 5 marked Done. Phase 6 scoped: Track A (Optimizer), Track B (Regularization), Track C (v0.6 Release). Pre-Plan: 3 Draft specs promoted Stable; 5 new Phase 6 specs authored directly as Stable v1.0.0 (Trust Mode). Backlog reorganised. Based on INDEX.md v2.4.0. |
 | 1.9.0 | 2026-05-08 | Sync update: l2-ai-doc-metadata (RFC v0.1.0) added to Backlog (orphan resolved). RULES.md parity updated v1.2.0 → v1.3.0 (C33 AI-Meta Annotation). INDEX.md sync v2.4.0 → v2.5.0. Phase 6 plan unchanged. |
 | 2.0.0 | 2026-05-08 | Phase 6 marked Done. Phase 7 scoped: Track A (LR Scheduling), Track B (Deep Builder), Track C (GoNN Skills). 3 orphaned specs resolved. Based on INDEX.md v2.5.0. |
+| 2.1.0 | 2026-05-10 | Phase 7 marked Done. All 16 tasks green. pkg/optimizer extended with Scheduler[T]/BindScheduler/LearningRateSetter[T] + 4 scheduler types. pkg/nn: Repeat/Pattern/HiddenLayers/WithScheduler on Builder and Options APIs. skills/gonn/ created. Coverage optimizer 88.9%, nn 86.4%. Gate T-7Z01 passed. |

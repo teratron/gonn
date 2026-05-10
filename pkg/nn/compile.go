@@ -63,6 +63,7 @@ func compile[T utils.Float](n *NN[T], cfg *Config[T]) error {
 		n.opt = optimizer.DefaultOptimizer[T](cfg.LearningRate)
 	}
 	n.reg = cfg.Regularizer
+	n.sched = cfg.Scheduler
 
 	startProfilingServer(cfg.ProfilingAddr)
 	return nil
@@ -149,6 +150,12 @@ func emitSoftWarnings[T utils.Float](cfg *Config[T]) {
 	if len(cfg.HiddenLayers) > 5 && cfg.WeightInit == WeightInitRandom {
 		utils.Logger.Warn(
 			"deep stack (>5 hidden) with WeightInitRandom — gradient explosion risk; prefer Xavier or He",
+			"hiddenCount", len(cfg.HiddenLayers),
+		)
+	}
+	if len(cfg.HiddenLayers) > DefaultExcessiveLayersWarning {
+		utils.Logger.Warn(
+			"layer count exceeds 10,000 — construction is O(N) but training cost scales with topology",
 			"hiddenCount", len(cfg.HiddenLayers),
 		)
 	}

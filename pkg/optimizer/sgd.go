@@ -51,6 +51,10 @@ func (s *SGD[T]) Reset() {}
 // LearningRate returns the configured step size.
 func (s *SGD[T]) LearningRate() T { return s.lr }
 
+// SetLearningRate replaces the effective learning rate. Implements LearningRateSetter
+// so that BindScheduler can push updated rates from a Scheduler.
+func (s *SGD[T]) SetLearningRate(rate T) { s.lr = rate }
+
 // SaveState serialises the learning rate to JSON.
 func (s *SGD[T]) SaveState() ([]byte, error) {
 	return json.Marshal(struct {
