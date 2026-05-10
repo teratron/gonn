@@ -1,6 +1,8 @@
 package nn
 
 import (
+	"log/slog"
+
 	"github.com/teratron/gonn/pkg/activation"
 	"github.com/teratron/gonn/pkg/loss"
 	"github.com/teratron/gonn/pkg/network"
@@ -343,5 +345,84 @@ func Pattern[T utils.Float](block []HiddenLayerSpec[T], repeats uint) Option[T] 
 func WithHiddenLayers[T utils.Float](layers []HiddenLayerSpec[T]) Option[T] {
 	return func(cfg *Config[T]) {
 		cfg.HiddenLayers = append(cfg.HiddenLayers, layers...)
+	}
+}
+
+// ============================================================================
+// Dynamic topology options (Phase 9 — l2-dynamic-topology-impl)
+// ============================================================================
+
+// WithTopologyMode opts the network into dynamic topology mutation after
+// compile. Pass network.Dynamic to enable AddNeuron / AddHiddenLayer etc.
+// The default Immutable keeps the static-topology guarantee of prior phases.
+//
+// AI-Meta:
+//   - Purpose: Opt a compiled network into dynamic topology mutation at construction time.
+//   - Usage: nn.New[float32](WithTopologyMode[float32](network.Dynamic), ...).
+//   - Related: [Option], [network.TopologyMode], [network.Dynamic].
+//   - Stability: Stable.
+func WithTopologyMode[T utils.Float](mode network.TopologyMode) Option[T] {
+	return func(cfg *Config[T]) {
+		cfg.TopologyMode = mode
+	}
+}
+
+// ============================================================================
+// Observability options (Phase 9 — l2-logging-strategy, l2-visualization-api)
+// ============================================================================
+
+// WithLogger routes NN training lifecycle events to the supplied slog.Logger.
+// nil disables per-network structured logging (fallback to utils.Logger).
+//
+// AI-Meta:
+//   - Purpose: Attach a custom slog.Logger for per-network lifecycle events.
+//   - Usage: nn.New[float32](WithLogger[float32](slog.New(...)), ...).
+//   - Related: [Option], [utils.GoLogger], [utils.LevelTrace].
+//   - Stability: Stable.
+func WithLogger[T utils.Float](l *slog.Logger) Option[T] {
+	return func(cfg *Config[T]) {
+		cfg.Logger = l
+	}
+}
+
+// WithVisualizationEndpoint sets the listen address for the optional HTTP
+// observability server. An empty string (default) disables the server.
+// Example: ":8080" or "127.0.0.1:9000".
+//
+// AI-Meta:
+//   - Purpose: Start the HTTP visualization server at the given address after compile.
+//   - Usage: nn.New[float32](WithVisualizationEndpoint[float32](":8080"), ...).
+//   - Related: [Option], [visualization.VisServer].
+//   - Stability: Stable.
+func WithVisualizationEndpoint[T utils.Float](addr string) Option[T] {
+	return func(cfg *Config[T]) {
+		cfg.VisAddr = addr
+	}
+}
+
+// WithVisualizationToken sets a static bearer token for the visualization
+// server. When non-empty, requests must include "Authorization: Bearer <token>".
+// An empty token (default) disables authentication.
+//
+// AI-Meta:
+//   - Purpose: Protect the visualization HTTP endpoint with bearer-token auth.
+//   - Related: [Option], [WithVisualizationEndpoint].
+//   - Stability: Stable.
+func WithVisualizationToken[T utils.Float](token string) Option[T] {
+	return func(cfg *Config[T]) {
+		cfg.VisToken = token
+	}
+}
+
+// WithVisualizationCORS enables CORS headers on the visualization server so
+// browser-based dashboards can connect cross-origin. Default false.
+//
+// AI-Meta:
+//   - Purpose: Enable CORS on the visualization HTTP server for browser dashboards.
+//   - Related: [Option], [WithVisualizationEndpoint].
+//   - Stability: Stable.
+func WithVisualizationCORS[T utils.Float](enable bool) Option[T] {
+	return func(cfg *Config[T]) {
+		cfg.VisCORS = enable
 	}
 }

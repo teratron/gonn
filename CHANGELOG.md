@@ -4,6 +4,91 @@ All notable changes to the GoNN library will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the
 release artifacts dictated by [.magic/run.md](.magic/run.md) Phase Completion / Plan Completion.
 
+## [0.8.0] — 2026-05-10
+
+### Metric Schedulers, Dynamic Topology, and Observability Stack
+
+Phase 9 delivers three independent feature tracks: patience-based and cyclic LR schedulers,
+runtime-safe topology mutation, and an HTTP observability server.
+
+#### Added
+
+- **`pkg/optimizer/metric_scheduler.go`** — `MetricScheduler[T]` interface:
+  - Extends `Scheduler[T]` with `StepWithMetric(metric T) T`.
+  - Compile-time assertions on all implementing types.
+  - `boundScheduler[T]` extended to forward `StepWithMetric` via type assertion on inner scheduler.
+- **`pkg/optimizer/reduce_on_plateau.go`** — `ReduceOnPlateau[T]`:
+  - Patience-based LR reduction: multiplies current rate by `factor` after `patience` consecutive
+    epochs without improvement (mode "min" or "max", threshold-gated).
+  - `NewReduceOnPlateau[T](lr0, opts...)` with `WithROPFactor`, `WithROPPatience`, `WithROPThreshold`,
+    `WithROPMinLR`, `WithROPMode` functional options.
+  - LRS-4 floor at `minLR`; LRS-5 `Reset()`; LRS-6 `SaveState`/`LoadState` JSON round-trip.
+  - `Granularity()` = `PerEpoch`.
+- **`pkg/optimizer/one_cycle_lr.go`** — `OneCycleLR[T]`:
+  - Three-phase schedule: linear warm-up → cosine decay → hold.
+  - `NewOneCycleLR[T](maxLR, totalSteps, opts...)` with `WithOCLPctStart`, `WithOCLDivFactor`,
+    `WithOCLFinalDiv` functional options.
+  - `Granularity()` = `PerStep`; `StepWithMetric` ignores metric (self-contained curve).
+  - LRS-4..LRS-6 compliance; `SaveState`/`LoadState` JSON round-trip.
+- **`pkg/network/topology.go`** — Dynamic topology mutations:
+  - `TopologyMode` enum (`Immutable` default, `Dynamic` opt-in).
+  - `topologyTx[T]` struct: shallow snapshot of topology slices for transactional rollback.
+  - `Network[T].SetTopologyMode`, `TopologyVersion()` (atomic), `requireDynamic()`.
+  - `AddNeuron(layerIdx, count)`, `RemoveNeuron(layerIdx, count)`: grow/shrink a hidden layer
+    and rebalance all incoming axons in the mutated layer and its successor.
+  - `AddHiddenLayer(position, size, act, bias)`, `RemoveHiddenLayer(position)`: insert/remove
+    a layer in the Hiddens chain with full axon rebalancing; enforces ≥1 hidden invariant.
+  - Topology version incremented per `Commit()`; rolled back on any error.
+- **`pkg/utils/errors.go`** — Six DYN error sentinels:
+  `ErrImmutableMode`, `ErrInvalidPosition`, `ErrImmutableLayer`, `ErrMinimumTopology`,
+  `ErrEmptyLayer`, `ErrMutationFailed`.
+- **`pkg/utils/logger.go`** — `GoLogger` slog adapter:
+  - `LevelTrace = slog.Level(-8)`; discard handler fallback for nil loggers.
+  - `NewGoLogger(l, libVersion, networkID)` injects `lib_version` + `network_id` via `slog.With`.
+  - `Trace/Debug/Info/Warn/Error` methods forwarding to slog at correct levels.
+- **`pkg/visualization/`** — HTTP observability server (new package):
+  - `VisServer`: `NewVisServer(addr, token, cors)`, `RegisterNetwork(SnapFn)`, `Start()`, `Stop(ctx)`,
+    `Addr()` (for `:0` test-port discovery).
+  - Six endpoints — all wrapped in `{"protocol_version":"1.0.0","data":...}` envelope:
+    `GET /v1/snapshot`, `/v1/loss`, `/v1/activations/{layerIdx}`, `/v1/control`, `/v1/stats`, `/v1/health`.
+  - `authMiddleware` (bearer-token, no-op when empty), `corsMiddleware` (CORS headers + OPTIONS preflight).
+  - Coverage: 90.0%.
+- **`pkg/nn/topology.go`** — DYN-2 state-gated wrappers on `NN[T]`:
+  - `requireIdleOrPaused()` — rejects mutations when training is actively running.
+  - `AddNeuron`, `RemoveNeuron`, `AddHiddenLayer`, `RemoveHiddenLayer` — gate then delegate to Network[T].
+- **`pkg/nn/nn.go`** — `Close() error` (stops vis server with 5 s timeout), `TopologyVersion() uint64`.
+- **`pkg/checkpoint/snapshot.go`** — `TopologyVersion uint64` field added to `Snapshot[T]` for
+  topology-change detection on checkpoint restore.
+
+#### Changed
+
+- **`pkg/nn/train.go`**:
+  - `libVersion = "0.8.0"` constant.
+  - PerEpoch scheduler dispatch now type-asserts to `MetricScheduler[T]`; if true calls
+    `ms.StepWithMetric(epochLoss)` instead of `sched.Step()`.
+  - Training lifecycle log events via `GoLogger` (`Info` start/stop, `Debug` per-epoch loss).
+- **`pkg/nn/compile.go`**: starts `VisServer` when `cfg.VisAddr != ""`; calls `SetTopologyMode`.
+- **`pkg/nn/options.go`**: `WithTopologyMode[T]`, `WithLogger[T]`, `WithVisualizationEndpoint[T]`,
+  `WithVisualizationToken[T]`, `WithVisualizationCORS[T]` functional options.
+- **`pkg/nn/config.go`**: `TopologyMode network.TopologyMode`, `Logger *slog.Logger`,
+  `VisAddr string`, `VisToken string`, `VisCORS bool` fields.
+- **`pkg/nn/builder.go`**: `WithTopologyMode(network.TopologyMode)` builder method.
+- **`l2-lr-scheduling-impl.md`** — bumped to v1.2.0; `ReduceOnPlateau` and `OneCycleLR`
+  moved from Deferred to Implemented; `MetricScheduler[T]` interface added to §5.2.
+
+#### Coverage
+
+| Package | Coverage |
+| :--- | :--- |
+| `pkg/optimizer` | 90.3% |
+| `pkg/network` | 92.9% |
+| `pkg/visualization` | 90.0% |
+| `pkg/nn` | 85.9% |
+
+#### Known Issues
+
+- Pre-existing: race detector (`-race`) unavailable on Windows via PowerShell (gcc PATH issue).
+
 ## [0.7.0] — 2026-05-10
 
 ### ExponentialLR scheduler and gonn CLI binary

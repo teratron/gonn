@@ -48,14 +48,18 @@ type MinLossState[T utils.Float] struct {
 //   - Purpose: Self-contained training checkpoint; load via LoadLatest to resume a run.
 //   - Related: [WriteSnapshot], [LoadLatest], [MinLossState], [persistence.ConfigDoc], [persistence.WeightsDoc].
 type Snapshot[T utils.Float] struct {
-	SchemaVersion string                    `json:"schema_version"`
-	Iter          uint64                    `json:"iter"`
-	Loss          T                         `json:"loss"`
-	MinLossState  MinLossState[T]           `json:"min_loss_state"`
-	RNGState      []byte                    `json:"rng_state,omitempty"`
-	Config        persistence.ConfigDoc[T]  `json:"config"`
-	Weights       persistence.WeightsDoc[T] `json:"weights"`
-	Timestamp     int64                     `json:"timestamp"`
+	SchemaVersion   string                    `json:"schema_version"`
+	Iter            uint64                    `json:"iter"`
+	Loss            T                         `json:"loss"`
+	MinLossState    MinLossState[T]           `json:"min_loss_state"`
+	RNGState        []byte                    `json:"rng_state,omitempty"`
+	Config          persistence.ConfigDoc[T]  `json:"config"`
+	Weights         persistence.WeightsDoc[T] `json:"weights"`
+	Timestamp       int64                     `json:"timestamp"`
+	// TopologyVersion records the network topology mutation counter at the
+	// time this snapshot was written. A mismatch on restore indicates that
+	// the topology changed between checkpoint and resume.
+	TopologyVersion uint64                    `json:"topology_version,omitempty"`
 }
 
 // snapshotName produces the canonical filename for a snapshot. The Iter

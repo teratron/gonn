@@ -98,13 +98,30 @@ type boundScheduler[T utils.Float] struct {
 	setter LearningRateSetter[T]
 }
 
+// compile-time assertion: boundScheduler forwards MetricScheduler so
+// BindScheduler chains work transparently with ReduceOnPlateau / OneCycleLR.
+var _ MetricScheduler[float32] = (*boundScheduler[float32])(nil)
+
 func (b *boundScheduler[T]) Step() T {
 	rate := b.inner.Step()
 	b.setter.SetLearningRate(rate)
 	return rate
 }
 
-func (b *boundScheduler[T]) Reset()                        { b.inner.Reset() }
-func (b *boundScheduler[T]) Granularity() Granularity      { return b.inner.Granularity() }
-func (b *boundScheduler[T]) SaveState() ([]byte, error)    { return b.inner.SaveState() }
-func (b *boundScheduler[T]) LoadState(data []byte) error   { return b.inner.LoadState(data) }
+// StepWithMetric forwards to the inner MetricScheduler if it implements the
+// interface; otherwise falls back to the plain Step path.
+func (b *boundScheduler[T]) StepWithMetric(metric T) T {
+	var rate T
+	if ms, ok := b.inner.(MetricScheduler[T]); ok {
+		rate = ms.StepWithMetric(metric)
+	} else {
+		rate = b.inner.Step()
+	}
+	b.setter.SetLearningRate(rate)
+	return rate
+}
+
+func (b *boundScheduler[T]) Reset()                      { b.inner.Reset() }
+func (b *boundScheduler[T]) Granularity() Granularity    { return b.inner.Granularity() }
+func (b *boundScheduler[T]) SaveState() ([]byte, error)  { return b.inner.SaveState() }
+func (b *boundScheduler[T]) LoadState(data []byte) error { return b.inner.LoadState(data) }

@@ -1,7 +1,7 @@
 # Dynamic Topology Implementation
 
-**Version:** 0.1.0
-**Status:** Draft
+**Version:** 0.2.0
+**Status:** Stable
 **Layer:** implementation
 **Implements:** l1-dynamic-topology.md
 
@@ -166,8 +166,6 @@ checkpoint JSON schema.
 
 ## Canonical References
 
-<!-- Populated at Stable promotion. Source files do not exist yet. -->
-
 | Alias | Path | Purpose |
 | :--- | :--- | :--- |
 | `[TOPO]` | `pkg/network/topology.go` | Mutation methods and topologyTx — created in v0.7.0 Phase A |
@@ -181,3 +179,4 @@ checkpoint JSON schema.
 | Version | Date | Description |
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-05-10 | Initial Draft — Go blueprint for l1-dynamic-topology.md realization. v0.7.0 Phase A scope. |
+| 0.2.0 | 2026-05-10 | Trust Mode promotion Draft → Stable. MVC satisfied: invariant compliance table complete, detailed design sections 5.1–5.7, canonical references confirmed. |

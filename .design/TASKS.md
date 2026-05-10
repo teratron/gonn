@@ -1,10 +1,10 @@
 # Master Task Index (Registry)
 
-**Version:** 2.1.0
-**Project Version:** 0.7.0 (Phase 8 active — v0.7.0 in progress)
+**Version:** 2.2.0
+**Project Version:** 0.8.0 (Phase 9 active — v0.8.0 in progress)
 **Generated:** 2026-04-29
 **Last Updated:** 2026-05-10
-**Based on:** .design/PLAN.md v2.2.0
+**Based on:** .design/PLAN.md v2.3.0
 **Based on RULES:** .design/RULES.md v1.3.0
 **Execution Mode:** Parallel (C3)
 **Status:** Active
@@ -25,6 +25,7 @@ Tactical registry of all phases and their statuses. Atomic checklists (`T-XXXX`)
 | [Phase 6](tasks/phase-6.md) | Feature Expansion + v0.6 Release — `pkg/optimizer/`, `pkg/regularizer/`, axon WeightInit fix, CHANGELOG, v0.6.0 tag | `Done` (2026-05-08) |
 | [Phase 7](tasks/phase-7.md) | Deep Builder + LR Scheduling + Developer Skills — `pkg/optimizer/` scheduler extension, `pkg/nn` bulk constructors, `skills/gonn/` | `Done` (2026-05-10) |
 | [Phase 8](tasks/phase-8.md) | LR Scheduling Extension + CLI Binary — `ExponentialLR`, `cmd/gonn/` binary, v0.7.0 release | `Done` (2026-05-10) |
+| [Phase 9](tasks/phase-9.md) | Metric Schedulers + Dynamic Topology + Observability Stack — `ReduceOnPlateau`, `OneCycleLR`, topology mutations, slog + viz HTTP server, v0.8.0 release | `Todo` |
 
 ## Phase 0 — Already Complete
 
@@ -146,18 +147,36 @@ Six of the eight v0.6-gated entries (E03, E04, E05, E07, E08, E13) are now activ
 
 ## Meta Information
 
-## Phase 8 Deliverables (Todo)
+## Phase 8 Deliverables (Done — 2026-05-10)
 
 | Asset | Spec | Status |
 | :--- | :--- | :--- |
-| `pkg/optimizer/exponential_lr.go` | l2-lr-scheduling-impl v1.1.0 | `Todo` |
-| `cmd/gonn/main.go` (routing) | l2-cli-client v0.2.0 | `Todo` |
-| `cmd/gonn/train.go` | l2-cli-client v0.2.0 §5.1.1 | `Todo` |
-| `cmd/gonn/query.go` + `verify.go` | l2-cli-client v0.2.0 §5.1.2–5.1.3 | `Todo` |
-| `cmd/gonn/version.go` + `exitcode.go` | l2-cli-client v0.2.0 §5.3 | `Todo` |
-| `cmd/gonn/csv.go` (streaming) | l2-cli-client v0.2.0 §5.2 | `Todo` |
-| `CHANGELOG.md` (v0.7.0 entry) | l1-release-policy v1.0.0 | `Todo` |
-| `v0.7.0` git tag | l1-release-policy v1.0.0 §5.4 | `Todo` |
+| `pkg/optimizer/exponential_lr.go` | l2-lr-scheduling-impl v1.1.0 | `Done` |
+| `cmd/gonn/main.go` (routing) | l2-cli-client v0.2.0 | `Done` |
+| `cmd/gonn/train.go` | l2-cli-client v0.2.0 §5.1.1 | `Done` |
+| `cmd/gonn/query.go` + `verify.go` | l2-cli-client v0.2.0 §5.1.2–5.1.3 | `Done` |
+| `cmd/gonn/version.go` + `exitcode.go` | l2-cli-client v0.2.0 §5.3 | `Done` |
+| `cmd/gonn/csv.go` (streaming) | l2-cli-client v0.2.0 §5.2 | `Done` |
+| `CHANGELOG.md` (v0.7.0 entry) | l1-release-policy v1.0.0 | `Done` |
+| `v0.7.0` git tag | l1-release-policy v1.0.0 §5.4 | `Done` |
+
+## Phase 9 Deliverables (Todo)
+
+| Asset | Spec | Status |
+| :--- | :--- | :--- |
+| `pkg/optimizer/metric_scheduler.go` | l2-metric-scheduler-impl v0.1.0 | `Todo` |
+| `pkg/optimizer/reduce_on_plateau.go` + test | l2-metric-scheduler-impl v0.1.0 §5.3 | `Todo` |
+| `pkg/optimizer/one_cycle_lr.go` + test | l2-metric-scheduler-impl v0.1.0 §5.4 | `Todo` |
+| `pkg/nn/train.go` (metric dispatch patch) | l2-metric-scheduler-impl v0.1.0 §5.5 | `Todo` |
+| `pkg/network/topology.go` | l2-dynamic-topology-impl v0.2.0 §5.1–5.6 | `Todo` |
+| `pkg/network/topology_test.go` | l2-dynamic-topology-impl v0.2.0 | `Todo` |
+| `pkg/utils/errors.go` (new DYN sentinels) | l2-dynamic-topology-impl v0.2.0 §5.6 | `Todo` |
+| `pkg/nn/options.go` + `builder.go` (WithTopologyMode) | l2-dynamic-topology-impl v0.2.0 §5.1 | `Todo` |
+| `pkg/utils/logger.go` (slog upgrade, LevelTrace) | l2-logging-strategy v0.2.0 §5.5 | `Todo` |
+| `pkg/visualization/server.go` + `handlers.go` + `middleware.go` | l2-visualization-api v0.2.0 §5.5–5.6 | `Todo` |
+| `pkg/nn/options.go` (WithLogger, WithVisualizationEndpoint) + `compile.go` | l2-visualization-api + l2-logging-strategy | `Todo` |
+| `CHANGELOG.md` (v0.8.0 entry) | l1-release-policy v1.0.0 | `Todo` |
+| `v0.8.0` git tag | l1-release-policy v1.0.0 §5.4 | `Todo` |
 
 - **Last Updated**: 2026-05-10
 - **Maintainer**: Core Team

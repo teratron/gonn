@@ -1,12 +1,15 @@
 package nn
 
 import (
+	"context"
 	"sync/atomic"
+	"time"
 
 	"github.com/teratron/gonn/pkg/network"
 	"github.com/teratron/gonn/pkg/optimizer"
 	"github.com/teratron/gonn/pkg/regularizer"
 	"github.com/teratron/gonn/pkg/utils"
+	"github.com/teratron/gonn/pkg/visualization"
 )
 
 // NN is the public facade type. It embeds network.Network[T] by composition
@@ -56,6 +59,10 @@ type NN[T utils.Float] struct {
 	// per-sample allocations in the hot training loop.
 	weightBuf []T
 	gradBuf   []T
+
+	// vis is the optional HTTP observability server started by compile when
+	// WithVisualizationEndpoint is set. nil when disabled. Stopped by Close.
+	vis *visualization.VisServer
 }
 
 // NewBuilder is the entry point for the Builder API. Returns an *NN[T] in
@@ -140,4 +147,34 @@ func (n *NN[T]) Config() Config[T] {
 	// backing array is shared. Callers must not mutate the returned
 	// slice; this is the same contract as Network.Cells().
 	return n.cfg
+}
+
+// Close stops the optional visualization HTTP server and releases its port.
+// Safe to call on networks without a visualization server (no-op). Returns
+// the first error encountered during shutdown; the shutdown timeout is 5 s.
+//
+// AI-Meta:
+//   - Purpose: Release resources held by the optional visualization server.
+//   - Concurrency: Safe; can be called from any goroutine after Compile.
+//   - Related: [WithVisualizationEndpoint], [visualization.VisServer].
+//   - Stability: Stable.
+func (n *NN[T]) Close() error {
+	if n.vis == nil {
+		return nil
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	return n.vis.Stop(ctx)
+}
+
+// TopologyVersion returns the monotonic counter incremented by every successful
+// topology mutation on the embedded network. Zero for immutable networks.
+//
+// AI-Meta:
+//   - Purpose: Expose topology change counter for checkpoint invalidation and observability.
+//   - Concurrency: Safe; delegates to atomic load on Network[T].
+//   - Related: [network.Network.TopologyVersion], [WithTopologyMode].
+//   - Stability: Stable.
+func (n *NN[T]) TopologyVersion() uint64 {
+	return n.Network.TopologyVersion()
 }

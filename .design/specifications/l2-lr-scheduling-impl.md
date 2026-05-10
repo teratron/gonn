@@ -1,6 +1,6 @@
 # LR Scheduling Implementation
 
-**Version:** 1.1.0
+**Version:** 1.2.0
 **Status:** Stable
 **Layer:** implementation
 **Implements:** l1-lr-scheduling.md
@@ -9,9 +9,8 @@
 
 Go realization of the learning rate scheduling contract (`l1-lr-scheduling.md`) in `pkg/optimizer/`.
 Phase 7 shipped four scheduler types — StepLR, WarmUpLR, CosineAnnealingLR, ChainScheduler — covering
-all six L1 invariants (LRS-1..LRS-6). Three optional types from the L1 taxonomy (ExponentialLR,
-ReduceOnPlateau, OneCycleLR) are deferred and tracked as TODOs; their absence does not violate any
-L1 invariant.
+all six L1 invariants (LRS-1..LRS-6). Phase 8 added ExponentialLR. Phase 9 added ReduceOnPlateau and
+OneCycleLR via the `MetricScheduler[T]` interface extension.
 
 ## Related Specifications
 
@@ -51,12 +50,15 @@ registry gap: the Go implementation in `pkg/optimizer/` is complete but had no c
 
 ```plaintext
 pkg/optimizer/
-├── scheduler.go          # Scheduler[T], LearningRateSetter[T], BindScheduler[T], Granularity
-├── step_lr.go            # StepLR[T] — periodic step decay (lr₀ × gamma^⌊t/stepSize⌋)
-├── warmup_lr.go          # WarmUpLR[T] — linear ramp-up (lr₀ × t/warmupSteps, then constant)
-├── cosine_lr.go          # CosineAnnealingLR[T] — cosine decay to lr_min
-├── chain_scheduler.go    # ChainScheduler[T] — ordered composition of (scheduler, steps) pairs
-└── exponential_lr.go     # ExponentialLR[T] — per-step gamma decay (lr₀ × gamma^t)
+├── scheduler.go            # Scheduler[T], LearningRateSetter[T], BindScheduler[T], Granularity
+├── metric_scheduler.go     # MetricScheduler[T] interface + boundScheduler forwarding
+├── step_lr.go              # StepLR[T] — periodic step decay (lr₀ × gamma^⌊t/stepSize⌋)
+├── warmup_lr.go            # WarmUpLR[T] — linear ramp-up (lr₀ × t/warmupSteps, then constant)
+├── cosine_lr.go            # CosineAnnealingLR[T] — cosine decay to lr_min
+├── chain_scheduler.go      # ChainScheduler[T] — ordered composition of (scheduler, steps) pairs
+├── exponential_lr.go       # ExponentialLR[T] — per-step gamma decay (lr₀ × gamma^t)
+├── reduce_on_plateau.go    # ReduceOnPlateau[T] — patience-based reduction (PerEpoch)
+└── one_cycle_lr.go         # OneCycleLR[T] — 3-phase warm-up/cosine/hold (PerStep)
 ```
 
 ### 5.2 Core Interfaces
@@ -71,12 +73,23 @@ type Scheduler[T utils.Float] interface {
     LoadState([]byte) error
 }
 
+// MetricScheduler extends Scheduler for metric-driven strategies (Phase 9).
+type MetricScheduler[T utils.Float] interface {
+    Scheduler[T]
+    StepWithMetric(metric T) T
+}
+
 type LearningRateSetter[T utils.Float] interface {
     SetLearningRate(T)
 }
 
 func BindScheduler[T utils.Float](opt Optimizer[T], sched Scheduler[T]) Scheduler[T]
 ```
+
+`BindScheduler` returns a `*boundScheduler[T]` that implements `MetricScheduler[T]`: if the
+wrapped inner scheduler implements `MetricScheduler[T]`, `StepWithMetric` forwards; otherwise
+it delegates to `Step()`. This allows callers to type-assert the result to `MetricScheduler[T]`
+without knowing the inner scheduler type.
 
 ### 5.3 Scheduler Taxonomy
 
@@ -89,11 +102,9 @@ func BindScheduler[T utils.Float](opt Optimizer[T], sched Scheduler[T]) Schedule
 | `CosineAnnealingLR[T]` | `cosine_lr.go` | `lr0, T_max, lr_min` | `lr_min + 0.5(lr0−lr_min)(1+cos(πt/T_max))` |
 | `ChainScheduler[T]` | `chain_scheduler.go` | `[]segment{Scheduler,steps}` | delegates to active sub-scheduler |
 | `ExponentialLR[T]` | `exponential_lr.go` | `lr0, gamma` | `lr0 × gamma^t` |
+| `ReduceOnPlateau[T]` | `reduce_on_plateau.go` | `lr0, patience, factor, threshold, minLR, mode` | `current × factor` after `patience` stale epochs |
+| `OneCycleLR[T]` | `one_cycle_lr.go` | `maxLR, totalSteps, pctStart, divFactor, finalDiv` | warm-up ramp → cosine decay → hold |
 
-#### Deferred (not yet implemented)
-
-- `ReduceOnPlateau` — requires metric injection into `Step()` (signature change); needs `MetricScheduler[T]` interface.
-- `OneCycleLR` — depends on `ReduceOnPlateau` interface design decision.
 
 ### 5.4 Granularity Dispatch in Training Loop
 
@@ -107,12 +118,18 @@ for epoch := range epochs {
         }
     }
     if sched != nil && sched.Granularity() == PerEpoch {
-        sched.Step()
+        if ms, ok := sched.(MetricScheduler[T]); ok {
+            ms.StepWithMetric(epochLoss)
+        } else {
+            sched.Step()
+        }
     }
 }
 ```
 
-`WarmUpLR` defaults to `PerStep`; all others default to `PerEpoch`. Overridable at construction.
+`WarmUpLR` and `OneCycleLR` default to `PerStep`; all others default to `PerEpoch`. Overridable at
+construction. `ReduceOnPlateau` implements `MetricScheduler[T]` so the training loop forwards the
+epoch loss automatically.
 
 ### 5.5 Optimizer Integration
 

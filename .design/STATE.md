@@ -4,16 +4,16 @@
 <!-- Maximum 100 lines. Agent updates AFTER each completed action. -->
 
 **Workspace:** main
-**Project Version:** 0.7.0 (Phase 8 complete)
-**Updated:** 2026-05-10 22:00
-**Phase:** 8 — LR Scheduling Extension + CLI Binary
+**Project Version:** 0.8.0 (Phase 9 complete)
+**Updated:** 2026-05-10 23:00
+**Phase:** 9 — Metric Schedulers + Dynamic Topology + Observability Stack
 **Status:** Done
 
 ## Current Position
 
-- **Task:** Phase 8 complete. All 9 tasks Done (T-8A01, T-8B01..T-8B05, T-8T01, T-8T02, T-8Z01).
-- **Spec:** l2-lr-scheduling-impl.md bumped to v1.1.0 (ExponentialLR in Implemented). Gate T-8Z01 passed.
-- **Next Action:** Create v0.7.0 git tag per l1-release-policy.md §5.4; plan v0.8.0 scope.
+- **Task:** Phase 9 complete. All 15 tasks done. Gate T-9Z01 passed: `go build ./...` clean, `go test ./...` all 17 packages green, all new packages ≥80% coverage.
+- **Spec:** l2-lr-scheduling-impl.md bumped to v1.2.0 (ReduceOnPlateau + OneCycleLR Implemented). CHANGELOG.md v0.8.0 written.
+- **Next Action:** Tag v0.8.0; plan Phase 10
 
 ## Progress
 
@@ -26,7 +26,8 @@ Phase 5 (Done):   [23/23]   ████████ 100%   (all tracks + gate c
 Phase 6 (Done):   [19/19]   ████████ 100%   (all tracks + validation + gate + tag)
 Phase 7 (Done):   [16/16]   ████████ 100%   (Tracks A+B+C + validation + gate)
 Phase 8 (Done):   [9/9]     ████████ 100%   (Track A: ExponentialLR + Track B: CLI binary + gate)
-Overall:          [148/148] ████████ 100%
+Phase 9 (Done):   [15/15]   ████████ 100%   (Tracks A+B+C + validation + gate)
+Overall:          [163/163] ████████ 100%
 ```
 
 ## Recent Decisions
@@ -35,9 +36,13 @@ Overall:          [148/148] ████████ 100%
 - 2026-05-10 **Decision:** Phase 7 complete. Track A: `pkg/optimizer/` extended with `Scheduler[T]` interface, `BindScheduler[T]`, `LearningRateSetter[T]` optional extension, and four scheduler types — `StepLR[T]` (step decay), `WarmUpLR[T]` (linear ramp, PerStep default), `CosineAnnealingLR[T]` (cosine decay), `ChainScheduler[T]` (sequential composition). All four existing optimizers (SGD/Adam/RMSProp/SGDMomentum) implement `LearningRateSetter[T]` via `SetLearningRate(T)`. `pkg/optimizer/scheduler_test.go` covers all scheduler types, BindScheduler wiring, Granularity defaults, and SaveState/LoadState round-trips; coverage 88.9 %. Track B: `pkg/nn/builder.go` + `pkg/nn/options.go` extended with bulk constructors `Repeat`/`Pattern`/`HiddenLayers` (Builder, setter/append semantics distinguished) and `Repeat[T]`/`Pattern[T]`/`WithHiddenLayers[T]` (Options, append); `WithScheduler` added to both; `pkg/nn/train.go` dispatches `sched.Step()` per `Granularity()` (PerEpoch after epoch, PerStep per batch); `pkg/nn/config.go` adds `Scheduler` field; `pkg/nn/phase7_test.go` covers 11 test functions + 2 benchmarks; coverage 86.4 %. Track C: `skills/gonn/` created with `SKILL.md` (10 sections, YAML frontmatter), 3 example files (builder-xor, options-mnist, deep-network), and 2 resource files (api-reference, conventions). Gate T-7Z01: `go build ./...` clean; `go test ./pkg/...` all green; all packages ≥80 %; skills directory matches spec §5.1; 3 orphaned specs resolved.
 - 2026-05-08 **Decision:** Phase 6 complete. Tracks A+B (optimizer + regularizer + WeightInit fix): `pkg/optimizer/` (SGD/Adam/RMSProp/SGDMomentum, 98.9% cover, 0 allocs/op benchmarks), `pkg/regularizer/` (L1/L2/Dropout/Compose, 80.0% cover), `pkg/nn` wired via `WithOptimizer`/`WithRegularizer`/`trainStep()`. Track C: CHANGELOG.md v0.6.0, README.md updated with full v0.6 API docs. Validation: TestWeightInitRanges, TestRegularizerConvergence, TestInferenceNoDropout, TestOptimizerIntegration all green. Gate T-6Z01: all packages ≥80% cover (`network` 96.3%, `nn` 86.4%). Tag v0.6.0 created. Pre-existing TestPauseResumeCycle timing flake documented in CHANGELOG Known Issues.
 
+## Recent Decisions
+
+- 2026-05-10 **Decision:** Phase 9 complete. Track A: `pkg/optimizer/metric_scheduler.go` (MetricScheduler[T] interface + boundScheduler forwarding), `reduce_on_plateau.go` (patience/factor/threshold/minLR/mode, PerEpoch), `one_cycle_lr.go` (3-phase warm-up/cosine/hold, PerStep); optimizer coverage 90.3%. Track B: `pkg/network/topology.go` (TopologyMode, topologyTx rollback, AddNeuron/RemoveNeuron/AddHiddenLayer/RemoveHiddenLayer + successor rebalancing); 6 DYN error sentinels in utils/errors.go; DYN-2 wrappers in pkg/nn/topology.go; network coverage 92.9%. Track C: pkg/utils/logger.go rewritten to GoLogger slog adapter (LevelTrace=-8, nil-safe discard fallback); pkg/visualization/ new package with 6 endpoints + auth/CORS middleware; nn wired via WithLogger/WithVisualizationEndpoint/WithVisualizationToken/WithVisualizationCORS; Close() stops vis server; visualization coverage 90.0%; nn coverage 85.9%. CHANGELOG.md v0.8.0 written. l2-lr-scheduling-impl.md bumped to v1.2.0.
+
 ## Blockers
 
-- (none — Phase 7 complete)
+- (none — Phase 9 complete)
 
 ## Blocking Constraints
 
@@ -48,4 +53,4 @@ Overall:          [148/148] ████████ 100%
 
 **Last Session Ended:** 2026-05-10
 **Handoff File:** none
-**Bootstrap Mode:** false (Phase 7 complete; next = plan v0.7.0 scope)
+**Bootstrap Mode:** false (Phase 9 complete; next = tag v0.8.0 + plan Phase 10)

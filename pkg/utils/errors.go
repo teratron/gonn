@@ -79,6 +79,58 @@ var ErrIntegrity = errors.New("integrity")
 //   - Usage: Wrap: fmt.Errorf("...: %w", ErrIO); detect: errors.Is(err, ErrIO).
 var ErrIO = errors.New("io")
 
+// Dynamic-topology sentinels (DYN-1..DYN-6, per l2-dynamic-topology-impl).
+// These are returned exclusively by mutation methods on Network[T] and the
+// wrapping methods on NN[T].
+
+// ErrImmutableMode is returned when a topology mutation is attempted on a
+// Network whose TopologyMode is Immutable (DYN-1).
+//
+// AI-Meta:
+//   - Purpose: Sentinel for topology mutation on an immutable network (DYN-1).
+//   - Usage: errors.Is(err, utils.ErrImmutableMode).
+var ErrImmutableMode = errors.New("immutable-mode")
+
+// ErrInvalidPosition is returned when a layer position or neuron index is
+// out of the valid range for the current topology.
+//
+// AI-Meta:
+//   - Purpose: Sentinel for out-of-range topology mutation positions.
+//   - Usage: errors.Is(err, utils.ErrInvalidPosition).
+var ErrInvalidPosition = errors.New("invalid-position")
+
+// ErrImmutableLayer is returned when a mutation targets a layer that may not
+// be mutated (e.g., Input or Output layers).
+//
+// AI-Meta:
+//   - Purpose: Sentinel for mutations targeting non-mutable layers (Input/Output).
+//   - Usage: errors.Is(err, utils.ErrImmutableLayer).
+var ErrImmutableLayer = errors.New("immutable-layer")
+
+// ErrMinimumTopology is returned when a removal operation would reduce the
+// topology below the one-hidden-layer minimum contract (DYN-3).
+//
+// AI-Meta:
+//   - Purpose: Sentinel for removal that would violate the minimum topology contract.
+//   - Usage: errors.Is(err, utils.ErrMinimumTopology).
+var ErrMinimumTopology = errors.New("minimum-topology")
+
+// ErrEmptyLayer is returned when a size-zero layer is provided to a topology
+// mutation (count = 0 or resulting layer size = 0 after removal).
+//
+// AI-Meta:
+//   - Purpose: Sentinel for zero-size layer in topology mutations.
+//   - Usage: errors.Is(err, utils.ErrEmptyLayer).
+var ErrEmptyLayer = errors.New("empty-layer")
+
+// ErrMutationFailed is returned when a topology mutation fails during the
+// transactional commit phase and the rollback has been applied.
+//
+// AI-Meta:
+//   - Purpose: Sentinel for unrecoverable topology mutation failure after rollback.
+//   - Usage: errors.Is(err, utils.ErrMutationFailed).
+var ErrMutationFailed = errors.New("mutation-failed")
+
 // Newf builds a new error that wraps the given category sentinel and
 // carries the caller-supplied identifying fields. The format string MUST
 // be specific per C32 §1: it MUST identify the offending value (or its

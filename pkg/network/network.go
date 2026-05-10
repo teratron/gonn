@@ -72,6 +72,15 @@ type Network[T utils.Float] struct {
 	// initWeight is optionally set by SetWeightSampler before Build.
 	// nil reverts to axon.New which uses U[-0.5, 0.5].
 	initWeight WeightSampler[T]
+
+	// topologyMode governs whether runtime mutation methods are allowed.
+	// Defaults to Immutable (zero value). Set to Dynamic via the NN
+	// option / builder to enable AddNeuron / AddHiddenLayer etc.
+	topologyMode TopologyMode
+
+	// topologyVersion is a monotonic counter incremented by every
+	// successful topology mutation commit. Read via TopologyVersion().
+	topologyVersion uint64
 }
 
 // New returns a freshly constructed Network with empty bundles and the

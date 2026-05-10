@@ -3,6 +3,7 @@ package nn
 import (
 	"github.com/teratron/gonn/pkg/activation"
 	"github.com/teratron/gonn/pkg/loss"
+	"github.com/teratron/gonn/pkg/network"
 	"github.com/teratron/gonn/pkg/optimizer"
 	"github.com/teratron/gonn/pkg/utils"
 )
@@ -292,6 +293,21 @@ func (n *NN[T]) WithScheduler(sched optimizer.Scheduler[T]) *NN[T] {
 		return n
 	}
 	n.cfg.Scheduler = sched
+	return n
+}
+
+// WithTopologyMode opts the network into dynamic topology mutation after
+// compile. Pass network.Dynamic to enable AddNeuron / AddHiddenLayer etc.
+//
+// AI-Meta:
+//   - Purpose: Opt in to dynamic topology at compile time via the Builder API.
+//   - Related: [network.TopologyMode], [WithTopologyMode].
+//   - Stability: Stable.
+func (n *NN[T]) WithTopologyMode(mode network.TopologyMode) *NN[T] {
+	if !n.guardConfiguring("WithTopologyMode") {
+		return n
+	}
+	n.cfg.TopologyMode = mode
 	return n
 }
 

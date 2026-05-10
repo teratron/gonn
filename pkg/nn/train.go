@@ -6,6 +6,9 @@ import (
 	"github.com/teratron/gonn/pkg/utils"
 )
 
+// libVersion is the GoNN library version embedded in structured log events.
+const libVersion = "0.8.0"
+
 // Sample is one (input, target) pair for use with Fit. Two parallel slices
 // keep the type signature simple while preserving the generic parameter T.
 //
@@ -106,8 +109,14 @@ func (n *NN[T]) Fit(dataset []Sample[T]) (uint, T, error) {
 			"Fit: dataset must contain at least one sample")
 	}
 
+	log := utils.NewGoLogger(n.cfg.Logger, libVersion, "")
+	log.Info("training started", "max_iterations", n.cfg.MaxIterations)
+
 	n.transitionToRunning()
-	defer n.transitionToIdle()
+	defer func() {
+		n.transitionToIdle()
+		log.Info("training stopped")
+	}()
 
 	minLoss := T(0)
 	minLossSet := false
@@ -142,13 +151,20 @@ func (n *NN[T]) Fit(dataset []Sample[T]) (uint, T, error) {
 		mean := total / T(len(dataset))
 		lastLoss = mean
 		completedEpochs = epoch
+		log.Debug("epoch completed", "epoch", epoch, "loss", float64(mean))
 		if cb := n.cfg.EpochCallback; cb != nil {
 			cb(epoch, mean)
 		}
 
 		// Advance the LR scheduler at epoch granularity (LRS-1).
+		// When the scheduler implements MetricScheduler, supply the epoch
+		// loss so plateau-based strategies can detect stalls (T-9A04).
 		if n.sched != nil && n.sched.Granularity() == optimizer.PerEpoch {
-			n.sched.Step()
+			if ms, ok := n.sched.(optimizer.MetricScheduler[T]); ok {
+				ms.StepWithMetric(mean)
+			} else {
+				n.sched.Step()
+			}
 		}
 
 		if !minLossSet || mean < minLoss {

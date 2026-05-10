@@ -9,6 +9,7 @@ import (
 	"github.com/teratron/gonn/pkg/network"
 	"github.com/teratron/gonn/pkg/optimizer"
 	"github.com/teratron/gonn/pkg/utils"
+	"github.com/teratron/gonn/pkg/visualization"
 )
 
 // compile is the shared finalisation routine consumed by both the
@@ -64,8 +65,32 @@ func compile[T utils.Float](n *NN[T], cfg *Config[T]) error {
 	}
 	n.reg = cfg.Regularizer
 	n.sched = cfg.Scheduler
+	n.Network.SetTopologyMode(cfg.TopologyMode)
 
 	startProfilingServer(cfg.ProfilingAddr)
+	if err := startVisServer(n, cfg); err != nil {
+		return err
+	}
+	return nil
+}
+
+// startVisServer starts the visualization HTTP server when cfg.VisAddr is
+// non-empty and registers a snapshot callback that pulls current state from n.
+func startVisServer[T utils.Float](n *NN[T], cfg *Config[T]) error {
+	if cfg.VisAddr == "" {
+		return nil
+	}
+	vs := visualization.NewVisServer(cfg.VisAddr, cfg.VisToken, cfg.VisCORS)
+	vs.RegisterNetwork(func() visualization.NetworkState {
+		return visualization.NetworkState{
+			TopologyVersion: n.Network.TopologyVersion(),
+			Control:         "idle",
+		}
+	})
+	if err := vs.Start(); err != nil {
+		return utils.Wrap(utils.ErrIO, err, "compile: visualization server start failed on %q", cfg.VisAddr)
+	}
+	n.vis = vs
 	return nil
 }
 

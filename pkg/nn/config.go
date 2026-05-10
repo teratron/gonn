@@ -8,8 +8,11 @@
 package nn
 
 import (
+	"log/slog"
+
 	"github.com/teratron/gonn/pkg/activation"
 	"github.com/teratron/gonn/pkg/loss"
+	"github.com/teratron/gonn/pkg/network"
 	"github.com/teratron/gonn/pkg/optimizer"
 	"github.com/teratron/gonn/pkg/regularizer"
 	"github.com/teratron/gonn/pkg/utils"
@@ -151,8 +154,17 @@ type Config[T utils.Float] struct {
 	Regularizer regularizer.Regularizer[T]
 	// Scheduler adjusts the effective learning rate during training.
 	// nil disables scheduling (the default when WithScheduler is not called).
-	Scheduler   optimizer.Scheduler[T]
-	WeightInit  WeightInitMethod
+	Scheduler optimizer.Scheduler[T]
+	WeightInit WeightInitMethod
+	// TopologyMode opts the network into Dynamic mutations after compile.
+	// Default Immutable — topology cannot change after Compile.
+	TopologyMode network.TopologyMode
+	// Logger routes structured training lifecycle events to a custom sink.
+	// nil falls back to utils.Logger.
+	Logger      *slog.Logger
+	VisAddr     string
+	VisToken    string
+	VisCORS     bool
 	DefaultBias bool
 	OutputBias  bool
 }

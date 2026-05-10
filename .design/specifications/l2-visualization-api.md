@@ -1,6 +1,6 @@
 # Visualization API
 
-**Version:** 0.1.0
+**Version:** 0.2.0
 **Status:** Stable
 **Layer:** implementation
 **Implements:** l1-observability-protocol.md
@@ -78,17 +78,75 @@ To make that boundary concrete, the library publishes a documented, versioned wi
 - WebSocket streaming for high-frequency updates. v1 uses polling; clients pace themselves.
 - Authentication beyond a bearer token; OIDC/mTLS deferred.
 
+## 5.4 Package Structure
+
+```plaintext
+pkg/visualization/
+├── server.go        # VisServer struct, Start()/Stop(), http.ServeMux registration
+├── handlers.go      # handler functions: snapshotHandler, lossHandler, activationsHandler, etc.
+├── middleware.go    # bearer-token auth middleware (no-op when token not set)
+└── server_test.go   # httptest.NewServer-based integration tests
+```
+
+`pkg/nn/` option wiring:
+
+```plaintext
+pkg/nn/
+├── options.go   # WithVisualizationEndpoint[T](addr string), WithVisualizationToken[T](token string), WithVisualizationCORS[T](enabled bool)
+└── compile.go   # starts pkg/visualization.VisServer after compile() if endpoint configured
+```
+
+### 5.5 Server Struct and Lifecycle
+
+```go
+// [REFERENCE]
+type VisServer struct {
+    addr    string
+    token   string
+    cors    bool
+    mux     *http.ServeMux
+    srv     *http.Server
+    cancel  context.CancelFunc
+}
+
+func NewVisServer(addr, token string, cors bool) *VisServer
+func (s *VisServer) RegisterNetwork(snap func() Snapshot) // called by compile()
+func (s *VisServer) Start() error                          // non-blocking; spawns goroutine
+func (s *VisServer) Stop(ctx context.Context) error        // graceful shutdown
+```
+
+`NN[T].Close()` must call `s.Stop(ctx)` if a server was registered — lifecycle bound to NN.
+
+### 5.6 Handler Signatures
+
+```go
+// [REFERENCE]
+func (s *VisServer) snapshotHandler(w http.ResponseWriter, r *http.Request)       // GET /v1/snapshot
+func (s *VisServer) lossHandler(w http.ResponseWriter, r *http.Request)           // GET /v1/loss?n=100
+func (s *VisServer) activationsHandler(w http.ResponseWriter, r *http.Request)    // GET /v1/activations/{layerIdx}
+func (s *VisServer) controlHandler(w http.ResponseWriter, r *http.Request)        // GET /v1/control
+func (s *VisServer) statsHandler(w http.ResponseWriter, r *http.Request)          // GET /v1/stats
+func (s *VisServer) healthHandler(w http.ResponseWriter, r *http.Request)         // GET /v1/health
+```
+
+All handlers write `Content-Type: application/json` and include `"protocol_version": "1.0.0"`.
+Non-existing `layerIdx` returns 404 with `{"error":"layer not found"}`.
+
 ## 6. Implementation Notes
 
-1. New file `pkg/nn/visualization.go` (or `pkg/visualization/server.go`).
-2. Server lifecycle bound to `nn.NN[T]` — stops when network is garbage-collected or `Close()` called.
-3. CORS headers permissive only when explicitly enabled (`WithVisualizationCORS(true)`).
+1. Implement `pkg/visualization/server.go` + `handlers.go` — no `pkg/nn` changes yet.
+2. Write `server_test.go` using `httptest.NewServer` for endpoint coverage.
+3. Wire `WithVisualizationEndpoint` option in `pkg/nn/options.go` and `compile.go`.
+4. Add `Close()` to `pkg/nn/nn.go` if not present; call `VisServer.Stop()` there.
+5. CORS headers permissive only when explicitly enabled (`WithVisualizationCORS(true)`).
 
 ## Canonical References
 
 | Alias | Path | Purpose |
 | :--- | :--- | :--- |
-| `[VIS-DIR]` | `pkg/nn/` (or new `pkg/visualization/`) | Implementation home |
+| `[VIS-SERVER]` | `pkg/visualization/server.go` | VisServer struct and lifecycle |
+| `[VIS-HANDLERS]` | `pkg/visualization/handlers.go` | Endpoint handler implementations |
+| `[NN-OPT]` | `pkg/nn/options.go` | WithVisualizationEndpoint option wiring |
 | `[GUI-REPO]` | (external — TBD URL) | Reference visualizer consuming this API |
 
 ## Document History
@@ -96,4 +154,5 @@ To make that boundary concrete, the library publishes a documented, versioned wi
 | Version | Date | Description |
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-04-27 | Initial Draft from TODO #7. |
-| 0.1.0 | 2026-05-07 | [Pre-Plan] Trust Mode promoted Draft → Stable. MVC satisfied (Overview + Invariant Compliance + Canonical References). |
+| 0.1.0 | 2026-05-07 | [Pre-Plan] Trust Mode promoted Draft → Stable. MVC satisfied. |
+| 0.2.0 | 2026-05-10 | Added §5.4 package structure, §5.5 VisServer lifecycle, §5.6 handler signatures, updated canonical references. |
