@@ -1,10 +1,10 @@
 # Master Task Index (Registry)
 
-**Version:** 2.0.0
-**Project Version:** 0.6.0 (v0.6 released; Phase 7 active)
+**Version:** 2.1.0
+**Project Version:** 0.7.0 (Phase 8 active — v0.7.0 in progress)
 **Generated:** 2026-04-29
-**Last Updated:** 2026-05-08
-**Based on:** .design/PLAN.md v2.0.0
+**Last Updated:** 2026-05-10
+**Based on:** .design/PLAN.md v2.2.0
 **Based on RULES:** .design/RULES.md v1.3.0
 **Execution Mode:** Parallel (C3)
 **Status:** Active
@@ -24,6 +24,7 @@ Tactical registry of all phases and their statuses. Atomic checklists (`T-XXXX`)
 | [Phase 5](tasks/phase-5.md) | Multi-Hidden Topology (v0.6) — `pkg/network` chain + compile() lift + weights 1.1.0 + 6 catalog examples | `Done` (2026-05-06) |
 | [Phase 6](tasks/phase-6.md) | Feature Expansion + v0.6 Release — `pkg/optimizer/`, `pkg/regularizer/`, axon WeightInit fix, CHANGELOG, v0.6.0 tag | `Done` (2026-05-08) |
 | [Phase 7](tasks/phase-7.md) | Deep Builder + LR Scheduling + Developer Skills — `pkg/optimizer/` scheduler extension, `pkg/nn` bulk constructors, `skills/gonn/` | `Done` (2026-05-10) |
+| [Phase 8](tasks/phase-8.md) | LR Scheduling Extension + CLI Binary — `ExponentialLR`, `cmd/gonn/` binary, v0.7.0 release | `Todo` |
 
 ## Phase 0 — Already Complete
 
@@ -144,6 +145,19 @@ Six of the eight v0.6-gated entries (E03, E04, E05, E07, E08, E13) are now activ
 - **C-001 Resolution**: Phase 1 closes the compilation blocker recorded in STATE.md. No integration testing until `go build ./...` is green.
 
 ## Meta Information
+
+## Phase 8 Deliverables (Todo)
+
+| Asset | Spec | Status |
+| :--- | :--- | :--- |
+| `pkg/optimizer/exponential_lr.go` | l2-lr-scheduling-impl v1.1.0 | `Todo` |
+| `cmd/gonn/main.go` (routing) | l2-cli-client v0.2.0 | `Todo` |
+| `cmd/gonn/train.go` | l2-cli-client v0.2.0 §5.1.1 | `Todo` |
+| `cmd/gonn/query.go` + `verify.go` | l2-cli-client v0.2.0 §5.1.2–5.1.3 | `Todo` |
+| `cmd/gonn/version.go` + `exitcode.go` | l2-cli-client v0.2.0 §5.3 | `Todo` |
+| `cmd/gonn/csv.go` (streaming) | l2-cli-client v0.2.0 §5.2 | `Todo` |
+| `CHANGELOG.md` (v0.7.0 entry) | l1-release-policy v1.0.0 | `Todo` |
+| `v0.7.0` git tag | l1-release-policy v1.0.0 §5.4 | `Todo` |
 
 - **Last Updated**: 2026-05-10
 - **Maintainer**: Core Team

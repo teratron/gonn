@@ -1,6 +1,6 @@
 # Project Context
 
-**Generated:** 2026-05-08
+**Generated:** 2026-05-10
 
 ## Active Technologies
 
@@ -20,10 +20,8 @@
 │   ├── STATE.md
 │   ├── TASKS.md
 │   ├── archives/
-│   ├── spec-graph.html
 │   ├── specifications/
 │   ├── tasks/
-│   ├── wiki/
 │   └── workspace.json
 ├── examples/
 │   ├── README.md
@@ -60,3 +58,4 @@
 ## Recent Changes
 
 No recent changelog found.
+

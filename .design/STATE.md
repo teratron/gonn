@@ -5,15 +5,15 @@
 
 **Workspace:** main
 **Project Version:** 0.6.0 (Phase 7 complete; v0.7.0 scope not yet planned)
-**Updated:** 2026-05-10
-**Phase:** 7 — Deep Builder + LR Scheduling + Developer Skills
-**Status:** Done
+**Updated:** 2026-05-10 18:00
+**Phase:** 8 — LR Scheduling Extension + CLI Binary
+**Status:** Active
 
 ## Current Position
 
 - **Task:** Phase 7 complete. All 16 tasks Done (T-7A01..T-7A06, T-7B01..T-7B04, T-7C01..T-7C03, T-7T01, T-7T02, T-7Z01).
 - **Spec:** All Phase 7 specs Stable v1.0.0. Gate T-7Z01 passed.
-- **Next Action:** Plan v0.7.0 scope via /magic.spec or /magic.task
+- **Next Action:** Run /magic.run to execute Phase 8 (Track A: ExponentialLR, Track B: gonn CLI binary)
 
 ## Progress
 

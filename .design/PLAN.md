@@ -1,7 +1,7 @@
 # Implementation Plan
 
-**Version:** 2.0.0
-**Project Version:** 0.6.0 (v0.6 released; Phase 7 scoped)
+**Version:** 2.2.0
+**Project Version:** 0.6.0 (v0.7.0 scoped in Phase 8)
 **Generated:** 2026-04-29
 **Last Updated:** 2026-05-10
 **Based on:** .design/INDEX.md v2.5.0
@@ -114,21 +114,38 @@ GoNN library implementation plan derived from `ROADMAP.md` Hybrid Path. Phase or
 - [x] **[B] Deep Builder Ergonomics** ([l2-deep-builder.md](specifications/l2-deep-builder.md)) [L2, Stable v1.0.0] — `Repeat`/`Pattern`/`HiddenLayers` bulk constructors on both Builder and Options APIs.
 - [x] **[C] GoNN Developer Skills** ([l2-gonn-skills.md](specifications/l2-gonn-skills.md)) [L2, Stable v1.0.0] — `skills/gonn/SKILL.md` + examples + API reference for AI-assisted code generation.
 
+## Phase 8 — LR Scheduling Extension + CLI Binary (v0.7.0)
+
+*Closes LR scheduling registry gap (ExponentialLR) and delivers the standalone `gonn` CLI binary. v0.7.0 release gate included.*
+
+**Subsystem:** `pkg/optimizer/` (LR extension), `cmd/gonn/` (new CLI binary)
+**Requires:** Phase 7 ✓
+**Tasks file:** [tasks/phase-8.md](tasks/phase-8.md)
+**Track order:** A (ExponentialLR) and B (CLI binary) in parallel; T tests after each track; Gate T-8Z01.
+
+- [ ] **[A] LR Scheduling Extension** ([l2-lr-scheduling-impl.md](specifications/l2-lr-scheduling-impl.md)) [L2, Stable v1.0.0 → v1.1.0] — `ExponentialLR[T]`: lr₀ × gamma^t decay, LRS-1..LRS-6 compliant. Closes `pkg/optimizer/` scheduler taxonomy gap.
+- [ ] **[B] CLI Binary** ([l2-cli-client.md](specifications/l2-cli-client.md)) [L2, Stable v0.2.0] — `cmd/gonn/`: `train`/`query`/`verify`/`version` subcommands; CSV streaming (64 MB threshold); exit-code contract; `--json` output.
+
 ## Backlog
 
 *Specs registered but not in the active plan. Pulled into a phase when their parent L1 is Stable, an explicit user request promotes them, or a downstream consumer requires them.*
 
 ### L1 Concept (deferred — no L2 spec yet)
 
-- [l1-dynamic-topology.md](specifications/l1-dynamic-topology.md) — Stable v0.2.0 (promoted 2026-05-07; 5 open TBDs in §5.5; no L2 spec yet — gated on follow-up l2-dynamic-topology-impl)
 - [l1-meta-learning-hooks.md](specifications/l1-meta-learning-hooks.md) — Draft v0.2.0 (universal ParamAccessor; 8 open TBDs in §5.6; explicitly pre-RFC; no L2 spec yet)
+- [l1-dynamic-topology.md](specifications/l1-dynamic-topology.md) — Stable v0.2.0 (5 open TBDs in §5.5; L2 spec drafted as l2-dynamic-topology-impl below; gated on Phase A implementation)
 
-### L2 Implementation (deferred — post-Phase 6)
+### L2 Implementation (deferred — requires design decision or separate repo)
 
-- [l2-visualization-api.md](specifications/l2-visualization-api.md) — Stable v0.1.0 (promoted 2026-05-07; HTTP/JSON observability API; gated on a separate visualizer repo)
-- [l2-logging-strategy.md](specifications/l2-logging-strategy.md) — Stable v0.1.0 (promoted 2026-05-07; slog-based structured logging; baseline pkg/utils/logger.go sufficient for now)
-- [l2-cli-client.md](specifications/l2-cli-client.md) — RFC v0.1.0 (CLI binary, post-MVP)
+- [l2-dynamic-topology-impl.md](specifications/l2-dynamic-topology-impl.md) — Draft v0.1.0 (topology mutation blueprint for v0.7.0+ Phase A; Canonical References reference non-existent files — promote to Stable after `pkg/network/topology.go` is written)
+- [l2-visualization-api.md](specifications/l2-visualization-api.md) — Stable v0.1.0 (HTTP/JSON observability API; gated on a separate visualizer repo)
+- [l2-logging-strategy.md](specifications/l2-logging-strategy.md) — Stable v0.1.0 (slog-based structured logging; baseline pkg/utils/logger.go sufficient for now)
 - [l2-ai-doc-metadata.md](specifications/l2-ai-doc-metadata.md) — RFC v0.1.0 (AI-Meta trailing block convention; gated on cmd/lint-aimeta delivery; rollout phased per §8)
+
+### LR Scheduler Types (deferred — require MetricScheduler interface design)
+
+- `ReduceOnPlateau` — needs `MetricScheduler[T]` interface extension (metric value injection into Step); interface design decision deferred to post-v0.7.0.
+- `OneCycleLR` — can be expressed as 3-segment ChainScheduler; implement after ReduceOnPlateau interface is settled.
 
 ### L1 Concept (tracked — promoted to Stable 2026-05-01, parents of active Phase 3 specs)
 
@@ -157,6 +174,7 @@ graph LR
   D1 --> E1[Phase 5 — Multi-Hidden]
   E1 --> F1[Phase 6 — Optimizer + Regularizer + Release]
   F1 --> G1[Phase 7 — LR Scheduling + Deep Builder + Skills]
+  G1 --> H1[Phase 8 — LR Extension + CLI Binary]
 ```
 
 ## Document History
@@ -175,3 +193,4 @@ graph LR
 | 1.9.0 | 2026-05-08 | Sync update: l2-ai-doc-metadata (RFC v0.1.0) added to Backlog (orphan resolved). RULES.md parity updated v1.2.0 → v1.3.0 (C33 AI-Meta Annotation). INDEX.md sync v2.4.0 → v2.5.0. Phase 6 plan unchanged. |
 | 2.0.0 | 2026-05-08 | Phase 6 marked Done. Phase 7 scoped: Track A (LR Scheduling), Track B (Deep Builder), Track C (GoNN Skills). 3 orphaned specs resolved. Based on INDEX.md v2.5.0. |
 | 2.1.0 | 2026-05-10 | Phase 7 marked Done. All 16 tasks green. pkg/optimizer extended with Scheduler[T]/BindScheduler/LearningRateSetter[T] + 4 scheduler types. pkg/nn: Repeat/Pattern/HiddenLayers/WithScheduler on Builder and Options APIs. skills/gonn/ created. Coverage optimizer 88.9%, nn 86.4%. Gate T-7Z01 passed. |
+| 2.2.0 | 2026-05-10 | Phase 8 scoped: Track A (ExponentialLR, closes scheduler gap), Track B (gonn CLI binary). l2-lr-scheduling-impl + l2-dynamic-topology-impl orphans resolved. l2-cli-client promoted from Backlog (RFC→Stable). Backlog updated: l2-dynamic-topology-impl Draft added; deferred scheduler types (ReduceOnPlateau, OneCycleLR) noted. Based on INDEX.md v2.5.0. |
