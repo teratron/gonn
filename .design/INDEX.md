@@ -32,7 +32,7 @@ Local registry of specifications for this workspace.
 | [l2-activation-functions.md](specifications/l2-activation-functions.md) | 10 activation functions with dispatcher pattern | Stable | L2 | 1.0.0 |
 | [l2-loss-functions.md](specifications/l2-loss-functions.md) | 18 loss functions with dispatcher pattern | Stable | L2 | 1.0.0 |
 | [l2-usage-examples.md](specifications/l2-usage-examples.md) | Canonical example catalog — 15 entries with coverage matrix | Stable | L2 | 1.0.0 |
-| [l2-cli-client.md](specifications/l2-cli-client.md) | CLI binary `gonn` — train/query/verify subcommands | RFC | L2 | 0.1.0 |
+| [l2-cli-client.md](specifications/l2-cli-client.md) | CLI binary `gonn` — train/query/verify subcommands | Stable | L2 | 0.2.0 |
 | [l2-visualization-api.md](specifications/l2-visualization-api.md) | HTTP/JSON adapter exposing observability for external GUIs | Stable | L2 | 0.1.0 |
 | [l2-logging-strategy.md](specifications/l2-logging-strategy.md) | Structured logging via `log/slog` (Trace/Debug/Info/Warn/Error) | Stable | L2 | 0.1.0 |
 | [l2-training-loop.md](specifications/l2-training-loop.md) | Go realization of training-semantics — `Train()` body and snapshot mechanics | Stable | L2 | 1.0.0 |
@@ -54,8 +54,10 @@ Local registry of specifications for this workspace.
 | [l1-lr-scheduling.md](specifications/l1-lr-scheduling.md) | Learning rate scheduler contract — StepLR / CosineAnnealing / WarmUp / ChainScheduler | Stable | L1 | 1.0.0 |
 | [l2-deep-builder.md](specifications/l2-deep-builder.md) | Deep network builder ergonomics — Repeat / Pattern / HiddenLayers bulk constructors | Stable | L2 | 1.0.0 |
 | [l2-gonn-skills.md](specifications/l2-gonn-skills.md) | GoNN developer AI skills — SKILL.md for AI-assisted code generation | Stable | L2 | 1.0.0 |
+| [l2-lr-scheduling-impl.md](specifications/l2-lr-scheduling-impl.md) | Go realization of LR scheduling — pkg/optimizer/ schedulers (Phase 7) | Stable | L2 | 1.0.0 |
+| [l2-dynamic-topology-impl.md](specifications/l2-dynamic-topology-impl.md) | Go realization of dynamic topology — mutation methods on Network[T] | Draft | L2 | 0.1.0 |
 
 ## Meta Information
 
 - **Maintainer**: Core Team
-- **Last Updated**: 2026-05-08 (3 new specs: l1-lr-scheduling (LR schedulers), l2-deep-builder (bulk constructors for 100+ layers), l2-gonn-skills (AI developer skills). TODO #29, #32 dispatched.)
+- **Last Updated**: 2026-05-10 (3 dispatches: l2-lr-scheduling-impl Stable (closes Phase 7 registry gap), l2-dynamic-topology-impl Draft (v0.7.0 blueprint), l2-cli-client RFC→Stable v0.2.0 (all TBDs resolved).)
