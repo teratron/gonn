@@ -4,6 +4,42 @@ All notable changes to the GoNN library will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the
 release artifacts dictated by [.magic/run.md](.magic/run.md) Phase Completion / Plan Completion.
 
+## [0.7.0] — 2026-05-10
+
+### ExponentialLR scheduler and gonn CLI binary
+
+Phase 8 adds one missing scheduler type (`ExponentialLR`) and ships the first
+command-line interface (`gonn`) for training, querying, and verifying networks
+directly from the terminal without writing Go code.
+
+#### Added
+
+- **`pkg/optimizer/exponential_lr.go`** — `ExponentialLR[T]`:
+  - Per-step exponential decay: `lr = lr₀ × gamma^t`.
+  - LRS-1..LRS-6 compliance identical to `StepLR` (no `stepSize` parameter — simpler formula).
+  - `NewExponentialLR[T](lr0, gamma)` / `NewExponentialLRWithGranularity[T](lr0, gamma, gran)`.
+  - Default `Granularity()` = `PerEpoch`; JSON `SaveState`/`LoadState` round-trip.
+  - `pkg/optimizer/` coverage: 88.2%.
+- **`cmd/gonn/`** — standalone CLI binary:
+  - `train` — load config JSON + CSV dataset → train → write weights.json. Flags: `--config`, `--data`, `--out` (default `weights.json`), `--resume`, `--precision` (float32|float64), `--json`.
+  - `query` — load config + weights → single forward pass on `--input` (comma-separated). Flags: `--config`, `--weights`, `--input`, `--precision`, `--json`.
+  - `verify` — load config + weights → mean loss over evaluation CSV (no weight update). Flags: `--config`, `--weights`, `--data`, `--precision`, `--json`.
+  - `version` — print `gonn <version> (go<runtime>)`. Flag: `--json`.
+  - Exit-code contract: 0=OK, 1=generic, 2=ErrUserConfig, 3=ErrInputData, 4=ErrCompute, 5=ErrIntegrity, 6=ErrIO, 7=unsupported precision.
+  - Dataset loading: files ≤ 64 MB use `encoding/csv` full-read; files > 64 MB use `pkg/dataset.NewCSVDataset` streaming path. Threshold overridable via `csvStreamThreshold` package var for testing.
+  - `--json` output for all subcommands per spec §5.4: `{"epochs":N,"final_loss":X}`, `{"output":[...]}`, `{"loss":X}`, `{"version":"...","go_version":"..."}`.
+  - Coverage: 83.7%.
+
+#### Changed
+
+- `l2-lr-scheduling-impl.md` — bumped to v1.1.0; ExponentialLR moved from Deferred to Implemented.
+
+#### Known Issues
+
+- Pre-existing: race detector (`-race`) unavailable on Windows via PowerShell (gcc PATH issue); all tests pass without `-race`.
+
+---
+
 ## [Unreleased] — Phase 7 — 2026-05-10
 
 ### LR scheduling, deep network builder, and AI developer skills

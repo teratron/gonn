@@ -54,7 +54,7 @@ Local registry of specifications for this workspace.
 | [l1-lr-scheduling.md](specifications/l1-lr-scheduling.md) | Learning rate scheduler contract — StepLR / CosineAnnealing / WarmUp / ChainScheduler | Stable | L1 | 1.0.0 |
 | [l2-deep-builder.md](specifications/l2-deep-builder.md) | Deep network builder ergonomics — Repeat / Pattern / HiddenLayers bulk constructors | Stable | L2 | 1.0.0 |
 | [l2-gonn-skills.md](specifications/l2-gonn-skills.md) | GoNN developer AI skills — SKILL.md for AI-assisted code generation | Stable | L2 | 1.0.0 |
-| [l2-lr-scheduling-impl.md](specifications/l2-lr-scheduling-impl.md) | Go realization of LR scheduling — pkg/optimizer/ schedulers (Phase 7) | Stable | L2 | 1.0.0 |
+| [l2-lr-scheduling-impl.md](specifications/l2-lr-scheduling-impl.md) | Go realization of LR scheduling — pkg/optimizer/ schedulers (Phase 7+8) | Stable | L2 | 1.1.0 |
 | [l2-dynamic-topology-impl.md](specifications/l2-dynamic-topology-impl.md) | Go realization of dynamic topology — mutation methods on Network[T] | Draft | L2 | 0.1.0 |
 
 ## Meta Information

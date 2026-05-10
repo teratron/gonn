@@ -24,7 +24,7 @@ Tactical registry of all phases and their statuses. Atomic checklists (`T-XXXX`)
 | [Phase 5](tasks/phase-5.md) | Multi-Hidden Topology (v0.6) — `pkg/network` chain + compile() lift + weights 1.1.0 + 6 catalog examples | `Done` (2026-05-06) |
 | [Phase 6](tasks/phase-6.md) | Feature Expansion + v0.6 Release — `pkg/optimizer/`, `pkg/regularizer/`, axon WeightInit fix, CHANGELOG, v0.6.0 tag | `Done` (2026-05-08) |
 | [Phase 7](tasks/phase-7.md) | Deep Builder + LR Scheduling + Developer Skills — `pkg/optimizer/` scheduler extension, `pkg/nn` bulk constructors, `skills/gonn/` | `Done` (2026-05-10) |
-| [Phase 8](tasks/phase-8.md) | LR Scheduling Extension + CLI Binary — `ExponentialLR`, `cmd/gonn/` binary, v0.7.0 release | `Todo` |
+| [Phase 8](tasks/phase-8.md) | LR Scheduling Extension + CLI Binary — `ExponentialLR`, `cmd/gonn/` binary, v0.7.0 release | `Done` (2026-05-10) |
 
 ## Phase 0 — Already Complete
 

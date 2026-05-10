@@ -1,6 +1,6 @@
 # LR Scheduling Implementation
 
-**Version:** 1.0.0
+**Version:** 1.1.0
 **Status:** Stable
 **Layer:** implementation
 **Implements:** l1-lr-scheduling.md
@@ -55,7 +55,8 @@ pkg/optimizer/
 ├── step_lr.go            # StepLR[T] — periodic step decay (lr₀ × gamma^⌊t/stepSize⌋)
 ├── warmup_lr.go          # WarmUpLR[T] — linear ramp-up (lr₀ × t/warmupSteps, then constant)
 ├── cosine_lr.go          # CosineAnnealingLR[T] — cosine decay to lr_min
-└── chain_scheduler.go    # ChainScheduler[T] — ordered composition of (scheduler, steps) pairs
+├── chain_scheduler.go    # ChainScheduler[T] — ordered composition of (scheduler, steps) pairs
+└── exponential_lr.go     # ExponentialLR[T] — per-step gamma decay (lr₀ × gamma^t)
 ```
 
 ### 5.2 Core Interfaces
@@ -77,7 +78,9 @@ type LearningRateSetter[T utils.Float] interface {
 func BindScheduler[T utils.Float](opt Optimizer[T], sched Scheduler[T]) Scheduler[T]
 ```
 
-### 5.3 Scheduler Taxonomy (Phase 7)
+### 5.3 Scheduler Taxonomy
+
+#### Implemented
 
 | Type | File | Parameters | Rate formula |
 | :--- | :--- | :--- | :--- |
@@ -85,8 +88,12 @@ func BindScheduler[T utils.Float](opt Optimizer[T], sched Scheduler[T]) Schedule
 | `WarmUpLR[T]` | `warmup_lr.go` | `lr0, warmupSteps` | `lr0 × t/warmupSteps` → `lr0` |
 | `CosineAnnealingLR[T]` | `cosine_lr.go` | `lr0, T_max, lr_min` | `lr_min + 0.5(lr0−lr_min)(1+cos(πt/T_max))` |
 | `ChainScheduler[T]` | `chain_scheduler.go` | `[]segment{Scheduler,steps}` | delegates to active sub-scheduler |
+| `ExponentialLR[T]` | `exponential_lr.go` | `lr0, gamma` | `lr0 × gamma^t` |
 
-Deferred (not yet implemented): `ExponentialLR`, `ReduceOnPlateau`, `OneCycleLR`.
+#### Deferred (not yet implemented)
+
+- `ReduceOnPlateau` — requires metric injection into `Step()` (signature change); needs `MetricScheduler[T]` interface.
+- `OneCycleLR` — depends on `ReduceOnPlateau` interface design decision.
 
 ### 5.4 Granularity Dispatch in Training Loop
 
@@ -136,7 +143,8 @@ optimizer does not implement the interface (scheduler advances but optimizer rat
 | `[WARMUP]` | `pkg/optimizer/warmup_lr.go` | WarmUpLR implementation |
 | `[COSINE]` | `pkg/optimizer/cosine_lr.go` | CosineAnnealingLR implementation |
 | `[CHAIN]` | `pkg/optimizer/chain_scheduler.go` | ChainScheduler implementation |
-| `[TESTS]` | `pkg/optimizer/scheduler_test.go` | Coverage 88.9% — all types + BindScheduler + SaveState/LoadState |
+| `[EXP-LR]` | `pkg/optimizer/exponential_lr.go` | ExponentialLR implementation |
+| `[TESTS]` | `pkg/optimizer/scheduler_test.go` | Coverage 88.2% — all types + BindScheduler + SaveState/LoadState |
 | `[TRAIN]` | `pkg/nn/train.go` | Granularity dispatch integration |
 
 ## Document History
@@ -144,3 +152,4 @@ optimizer does not implement the interface (scheduler advances but optimizer rat
 | Version | Date | Description |
 | :--- | :--- | :--- |
 | 1.0.0 | 2026-05-10 | Initial — Go realization of LR scheduling (Phase 7). Closes registry gap for pkg/optimizer/scheduler*.go. Trust Mode Stable (all LRS-1..LRS-6 invariants covered). |
+| 1.1.0 | 2026-05-10 | Phase 8 Track A — ExponentialLR[T] (lr₀ × gamma^t) added; §5.1 package structure updated; §5.3 Deferred list updated. |

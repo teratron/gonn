@@ -310,3 +310,95 @@ func BenchmarkStepLRStep(b *testing.B) {
 		_ = sched.Step()
 	}
 }
+
+// TestExponentialLR verifies single step, accumulation, gamma=1 no-op,
+// gamma near-zero floor, SaveState/LoadState round-trip, and Reset.
+func TestExponentialLR(t *testing.T) {
+	t.Run("single step", func(t *testing.T) {
+		sched := optimizer.NewExponentialLR[float64](1.0, 0.9)
+		// step 1 → lr₀ × 0.9^1 = 0.9
+		if r := sched.Step(); math.Abs(r-0.9) > 1e-12 {
+			t.Errorf("step 1: got %v, want 0.9", r)
+		}
+	})
+
+	t.Run("accumulation", func(t *testing.T) {
+		sched := optimizer.NewExponentialLR[float64](1.0, 0.5)
+		// step 1 → 0.5, step 2 → 0.25, step 3 → 0.125
+		want := []float64{0.5, 0.25, 0.125}
+		for i, w := range want {
+			if r := sched.Step(); math.Abs(r-w) > 1e-12 {
+				t.Errorf("step %d: got %v, want %v", i+1, r, w)
+			}
+		}
+	})
+
+	t.Run("gamma=1 no-op", func(t *testing.T) {
+		sched := optimizer.NewExponentialLR[float64](0.1, 1.0)
+		for i := 0; i < 20; i++ {
+			if r := sched.Step(); math.Abs(r-0.1) > 1e-12 {
+				t.Errorf("step %d: got %v, want 0.1 (gamma=1 no-op)", i+1, r)
+			}
+		}
+	})
+
+	t.Run("gamma near-zero floor", func(t *testing.T) {
+		sched := optimizer.NewExponentialLR[float64](1.0, 1e-10)
+		// After enough steps the value should be effectively zero.
+		for i := 0; i < 50; i++ {
+			sched.Step()
+		}
+		r := sched.Step()
+		if r < 0 {
+			t.Errorf("rate went negative: %v", r)
+		}
+	})
+
+	t.Run("SaveState/LoadState round-trip", func(t *testing.T) {
+		s1 := optimizer.NewExponentialLR[float64](1.0, 0.9)
+		for i := 0; i < 7; i++ {
+			s1.Step()
+		}
+		blob, err := s1.SaveState()
+		if err != nil {
+			t.Fatalf("SaveState: %v", err)
+		}
+		s2 := optimizer.NewExponentialLR[float64](0, 1.0)
+		if err := s2.LoadState(blob); err != nil {
+			t.Fatalf("LoadState: %v", err)
+		}
+		r1, r2 := s1.Step(), s2.Step()
+		if math.Abs(r1-r2) > 1e-12 {
+			t.Errorf("round-trip mismatch: s1=%v s2=%v", r1, r2)
+		}
+	})
+
+	t.Run("Reset restores lr0", func(t *testing.T) {
+		sched := optimizer.NewExponentialLR[float64](0.5, 0.9)
+		for i := 0; i < 10; i++ {
+			sched.Step()
+		}
+		sched.Reset()
+		// After reset, step 1 → lr₀ × gamma^1
+		if r := sched.Step(); math.Abs(r-0.5*0.9) > 1e-12 {
+			t.Errorf("after reset step 1: got %v, want %v", r, 0.5*0.9)
+		}
+	})
+}
+
+// TestGranularityExponential verifies ExponentialLR default granularity.
+func TestGranularityExponential(t *testing.T) {
+	if optimizer.NewExponentialLR[float32](0.1, 0.9).Granularity() != optimizer.PerEpoch {
+		t.Error("ExponentialLR default granularity should be PerEpoch")
+	}
+}
+
+// BenchmarkExponentialLRStep measures allocations on the ExponentialLR hot path.
+func BenchmarkExponentialLRStep(b *testing.B) {
+	sched := optimizer.NewExponentialLR[float64](0.1, 0.95)
+	b.ResetTimer()
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		_ = sched.Step()
+	}
+}
