@@ -57,8 +57,9 @@ Local registry of specifications for this workspace.
 | [l2-lr-scheduling-impl.md](specifications/l2-lr-scheduling-impl.md) | Go realization of LR scheduling — pkg/optimizer/ schedulers (Phase 7+8) | Stable | L2 | 1.1.0 |
 | [l2-dynamic-topology-impl.md](specifications/l2-dynamic-topology-impl.md) | Go realization of dynamic topology — mutation methods on Network[T] | Stable | L2 | 0.2.0 |
 | [l2-metric-scheduler-impl.md](specifications/l2-metric-scheduler-impl.md) | Go realization of metric-driven LR schedulers — MetricScheduler[T], ReduceOnPlateau[T], OneCycleLR[T] | Stable | L2 | 0.1.0 |
+| [l1-normalization-layers.md](specifications/l1-normalization-layers.md) | Normalization layer contract — BatchNorm / LayerNorm / GroupNorm with affine params and train/eval mode | Stable | L1 | 1.0.0 |
 
 ## Meta Information
 
 - **Maintainer**: Core Team
-- **Last Updated**: 2026-05-10 (4 dispatches: l2-metric-scheduler-impl Stable v0.1.0 (new — MetricScheduler[T]/ReduceOnPlateau/OneCycleLR), l2-dynamic-topology-impl Draft→Stable v0.2.0, l2-visualization-api v0.2.0 (pkg/visualization/ blueprint), l2-logging-strategy v0.2.0 (goLogger/LevelTrace blueprint).)
+- **Last Updated**: 2026-05-11 (1 dispatch: l1-normalization-layers Stable v1.0.0 (new — NORM-1..9 invariants: BatchNorm/LayerNorm/GroupNorm, affine params, running stats, train/eval mode).)
