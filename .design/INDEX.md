@@ -24,7 +24,7 @@ Local registry of specifications for this workspace.
 | [l1-data-streaming.md](specifications/l1-data-streaming.md) | Streaming dataset abstraction and bounded memory contract | Stable | L1 | 1.0.0 |
 | [l1-compute-backend.md](specifications/l1-compute-backend.md) | Pluggable compute backend (CPU baseline + GPU future) | Stable | L1 | 1.0.0 |
 | [l1-dynamic-topology.md](specifications/l1-dynamic-topology.md) | Dynamic mode — layer/neuron mutation lifecycle with transaction protocol | Stable | L1 | 0.2.0 |
-| [l1-meta-learning-hooks.md](specifications/l1-meta-learning-hooks.md) | Universal parameter access for recursive self-optimization via inner-network | Draft | L1 | 0.2.0 |
+| [l1-meta-learning-hooks.md](specifications/l1-meta-learning-hooks.md) | Universal parameter access for recursive self-optimization via inner-network | RFC | L1 | 0.3.0 |
 | [l2-nn-facade.md](specifications/l2-nn-facade.md) | Public API facade — dual-style fluent API (Builder + Functional Options) | Stable | L2 | 2.0.0 |
 | [l2-network-graph.md](specifications/l2-network-graph.md) | Internal computational graph — Network[T] and bundles | Stable | L2 | 1.1.0 |
 | [l2-layer-types.md](specifications/l2-layer-types.md) | Layer type hierarchy — Input, Dense, Output | Stable | L2 | 1.1.0 |
@@ -58,8 +58,9 @@ Local registry of specifications for this workspace.
 | [l2-dynamic-topology-impl.md](specifications/l2-dynamic-topology-impl.md) | Go realization of dynamic topology — mutation methods on Network[T] | Stable | L2 | 0.2.0 |
 | [l2-metric-scheduler-impl.md](specifications/l2-metric-scheduler-impl.md) | Go realization of metric-driven LR schedulers — MetricScheduler[T], ReduceOnPlateau[T], OneCycleLR[T] | Stable | L2 | 0.1.0 |
 | [l1-normalization-layers.md](specifications/l1-normalization-layers.md) | Normalization layer contract — BatchNorm / LayerNorm / GroupNorm with affine params and train/eval mode | Stable | L1 | 1.0.0 |
+| [l1-training-callbacks.md](specifications/l1-training-callbacks.md) | Training event callbacks — OnIterationEnd / OnImprovementFound / OnTrainEnd with StopTraining signal | Stable | L1 | 1.0.0 |
 
 ## Meta Information
 
 - **Maintainer**: Core Team
-- **Last Updated**: 2026-05-11 (1 dispatch: l1-normalization-layers Stable v1.0.0 (new — NORM-1..9 invariants: BatchNorm/LayerNorm/GroupNorm, affine params, running stats, train/eval mode).)
+- **Last Updated**: 2026-05-11 (3 dispatches: l1-normalization-layers Stable v1.0.0 (NORM-1..9), l1-training-callbacks Stable v1.0.0 (CB-1..9, 3 events), l1-meta-learning-hooks Draft→RFC v0.3.0 (8 TBDs closed).)

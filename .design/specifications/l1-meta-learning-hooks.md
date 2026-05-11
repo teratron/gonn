@@ -1,7 +1,7 @@
 # Meta-Learning Hooks
 
-**Version:** 0.2.0
-**Status:** Draft
+**Version:** 0.3.0
+**Status:** RFC
 **Layer:** concept
 
 ## Overview
@@ -17,9 +17,6 @@ The v0.5.0 design covered only scalar hyperparameters via `Tunable[T]`. This v0.
 generalizes to **all parameter categories** so that any aspect of the network can be used for
 recursive self-optimization.
 
-> ⚠ This is the most experimental spec in the v0.x series. Marked `Draft`. Expect substantive
-> redesign before RFC.
-
 ## Related Specifications
 
 - [l1-neural-network-architecture.md](l1-neural-network-architecture.md) — Parent
@@ -28,6 +25,7 @@ recursive self-optimization.
 - [l1-dynamic-topology.md](l1-dynamic-topology.md) — Topology mutations can be driven by meta-learning decisions
 - [l1-training-semantics.md](l1-training-semantics.md) — Training metrics (loss, iterations) as meta-learning inputs
 - [l1-weight-initialization.md](l1-weight-initialization.md) — Re-initialization strategy after parameter override
+- [l1-training-callbacks.md](l1-training-callbacks.md) — OnImprovementFound event provides iteration-level meta signal; can trigger meta-learning decisions
 
 ## 1. Motivation
 
@@ -224,16 +222,41 @@ graph TD
     OBS --> LOOP
 ```
 
-### 5.6 Open Questions
+### 5.6 Design Decisions (Closed)
 
-- <!-- TBD: TuningContext schema — what additional fields beyond loss/iteration/params? -->
-- <!-- TBD: training the inner network — when, on what loss? Propose: meta-loss = delta(outer_loss) before vs after decision -->
-- <!-- TBD: serialization of adaptive parameters in snapshots — store the inner network too? Yes — inner NN serialized alongside outer NN -->
-- <!-- TBD: cost model — is per-iteration inner-network query feasible, or only per-epoch? Configurable via ApplyAt: IterationBarrier | EpochBarrier -->
-- <!-- TBD: which statistics to precompute (mean/var/L2/dead-ratio) — eager vs lazy calculation? -->
-- <!-- TBD: multi-objective meta-learning — inner network optimizes for accuracy + speed tradeoff? -->
-- <!-- TBD: should structural decisions (neuron delta, layer add/remove) go through l1-dynamic-topology API directly, or through a separate "advisor" pattern? -->
-- <!-- TBD: inner network architecture auto-sizing — how to determine inner NN input/output dimensions from the param catalog? Propose: auto-infer from sum of flattened input/output shapes -->
+**TuningContext schema**: Frozen at `{Iteration, Epoch, CurrentLoss, LossHistory (ring), Params map}`.
+The `Params` map already carries all declared input params. No additional fields for v1;
+extensions require a minor spec bump.
+
+**Inner network training loss**: `meta_loss = outer_loss_before_decision − outer_loss_after_decision`.
+Positive value = improvement. Applied at the same barrier as the decision itself. Inner network
+learns to predict parameter adjustments that reduce outer loss.
+
+**Serialization**: The inner network is serialized as a nested JSON object within the outer network's
+checkpoint, keyed `"meta_config.inner_network"`. This satisfies `l1-network-persistence` PERS-2
+(round-trip integrity) for the full meta-learning configuration.
+
+**Cost model (`ApplyAt`)**: Configurable via `MetaConfig.ApplyAt`: `IterationBarrier` (query per iteration,
+research mode) or `EpochBarrier` (query per epoch, default). Default = `EpochBarrier` to avoid
+inner-network overhead on every weight update.
+
+**Statistics computation (eager vs lazy)**: Lazy with per-iteration caching. Statistics are computed
+on the first `Read()` call per iteration and cached until the next weight update event. Prevents
+redundant computation when multiple InputParams request the same underlying statistic (e.g.,
+two params using `layer.1.weight.mean`).
+
+**Multi-objective meta-learning**: Out of scope for v1. The inner network produces one scalar output
+per declared OutputParam. Multi-objective optimization (Pareto fronts, scalarized objectives) is
+deferred to a future minor extension.
+
+**Structural decisions routing**: Structural outputs (neuron delta, layer add/remove signals) are
+applied directly through the `l1-dynamic-topology` mutation API at safe points. No separate
+"advisor" pattern is introduced — it adds indirection without benefit at this scale.
+
+**Inner network auto-sizing**: At `Compile()`-time, `inputDim = Σ len(flatten(p)) for p in InputParams`
+and `outputDim = Σ len(flatten(p)) for p in OutputParams`. The inner network's declared input/output
+layer sizes MUST match these computed dimensions; mismatch returns `ErrDimensionMismatch` during
+outer network compilation. This prevents runtime shape errors.
 
 ## 6. Implementation Notes
 
@@ -260,3 +283,4 @@ graph TD
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-04-27 | Initial Draft from TODO #14 — most experimental of the batch. |
 | 0.2.0 | 2026-05-01 | [MODIFIED] Universal parameter access: ParamDescriptor catalog, ParamAccessor interface, TuningContext v2, MetaConfig wiring, 9 parameter categories (scalar through raw weights), safety model diagram, META-5..META-7 invariants. v0.5.0 Tunable preserved as compatibility wrapper. From TODO #26. |
+| 0.3.0 | 2026-05-11 | [MODIFIED] Draft → RFC. Closed all 8 design TBDs: TuningContext schema frozen, meta-loss definition, serialization contract (nested JSON), ApplyAt cost model (EpochBarrier default), lazy stat caching, multi-objective deferred to v2, structural routing via dynamic-topology API, auto-sizing via compile-time dimension check. Added l1-training-callbacks to Related Specifications. |
