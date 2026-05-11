@@ -1,10 +1,10 @@
 # Implementation Plan
 
-**Version:** 2.3.0
-**Project Version:** 0.8.0 (v0.8.0 scoped in Phase 9)
+**Version:** 2.4.0
+**Project Version:** 0.9.0 (v0.9.0 scoped in Phase 10)
 **Generated:** 2026-04-29
-**Last Updated:** 2026-05-10
-**Based on:** .design/INDEX.md v2.6.0
+**Last Updated:** 2026-05-11
+**Based on:** .design/INDEX.md v2.7.0
 **Based on RULES:** .design/RULES.md v1.3.0
 **Based on ROADMAP:** .design/ROADMAP.md v1.0.0
 **Status:** Active
@@ -127,36 +127,47 @@ GoNN library implementation plan derived from `ROADMAP.md` Hybrid Path. Phase or
 - [x] **[A] LR Scheduling Extension** ([l2-lr-scheduling-impl.md](specifications/l2-lr-scheduling-impl.md)) [L2, Stable v1.1.0] — `ExponentialLR[T]`: lr₀ × gamma^t decay, LRS-1..LRS-6 compliant. Closes `pkg/optimizer/` scheduler taxonomy gap.
 - [x] **[B] CLI Binary** ([l2-cli-client.md](specifications/l2-cli-client.md)) [L2, Stable v0.2.0] — `cmd/gonn/`: `train`/`query`/`verify`/`version` subcommands; CSV streaming (64 MB threshold); exit-code contract; `--json` output.
 
-## Phase 9 — Metric Schedulers + Dynamic Topology + Observability Stack (v0.8.0)
+## Phase 9 — Metric Schedulers + Dynamic Topology + Observability Stack (v0.8.0) ✓ Done
 
-*Three parallel tracks closing the Creative Spark backlog from Phase 8. Track A: metric-driven LR
-schedulers (ReduceOnPlateau, OneCycleLR) with the new MetricScheduler[T] interface.
-Track B: dynamic topology mutations (AddHiddenLayer/RemoveHiddenLayer/AddNeuron/RemoveNeuron)
-on Network[T]. Track C: structured slog logging + HTTP visualization server.*
+*Three parallel tracks closing the Creative Spark backlog from Phase 8. Closed 2026-05-10. All 15 tasks green; gate T-9Z01 passed.*
 
 **Subsystem:** `pkg/optimizer/` (metric schedulers), `pkg/network/` (topology), `pkg/utils/` (slog), `pkg/visualization/` (new), `pkg/nn/` (option wiring)
 **Requires:** Phase 8 ✓
 **Tasks file:** [tasks/phase-9.md](tasks/phase-9.md)
 **Track order:** A, B, C fully parallel (no shared write paths); T-9T01/T-9T02/T-9T03 after each; Gate T-9Z01.
+**Outcome:** `MetricScheduler[T]` interface + `ReduceOnPlateau[T]` + `OneCycleLR[T]` in `pkg/optimizer/`; `topologyTx` rollback + 4 mutation methods on `Network[T]`; `pkg/visualization/` HTTP server + 6 handlers; `pkg/utils/logger.go` slog upgrade with `LevelTrace`; `l2-lr-scheduling-impl.md` bumped v1.2.0. v0.8.0 tagged.
 
-- [ ] **[A] Metric Schedulers** ([l2-metric-scheduler-impl.md](specifications/l2-metric-scheduler-impl.md)) [L2, Stable v0.1.0] — `MetricScheduler[T]` interface; `ReduceOnPlateau[T]`; `OneCycleLR[T]`; `pkg/nn/train.go` metric dispatch patch.
-- [ ] **[B] Dynamic Topology** ([l2-dynamic-topology-impl.md](specifications/l2-dynamic-topology-impl.md)) [L2, Stable v0.2.0] — `TopologyMode` enum, mutation methods on `Network[T]`, `topologyTx` rollback, `rebalance`, `TopologyVersion()`, new error sentinels.
-- [ ] **[C] Observability Stack** ([l2-visualization-api.md](specifications/l2-visualization-api.md) + [l2-logging-strategy.md](specifications/l2-logging-strategy.md)) [L2, Stable v0.2.0] — `pkg/visualization/server.go` + handlers; `pkg/utils/logger.go` slog upgrade with `LevelTrace`; `WithLogger`/`WithVisualizationEndpoint` option wiring.
+- [x] **[A] Metric Schedulers** ([l2-metric-scheduler-impl.md](specifications/l2-metric-scheduler-impl.md)) [L2, Stable v0.1.0] — `MetricScheduler[T]` interface; `ReduceOnPlateau[T]`; `OneCycleLR[T]`; `pkg/nn/train.go` metric dispatch patch.
+- [x] **[B] Dynamic Topology** ([l2-dynamic-topology-impl.md](specifications/l2-dynamic-topology-impl.md)) [L2, Stable v0.2.0] — `TopologyMode` enum, mutation methods on `Network[T]`, `topologyTx` rollback, `rebalance`, `TopologyVersion()`, new error sentinels.
+- [x] **[C] Observability Stack** ([l2-visualization-api.md](specifications/l2-visualization-api.md) + [l2-logging-strategy.md](specifications/l2-logging-strategy.md)) [L2, Stable v0.2.0] — `pkg/visualization/server.go` + handlers; `pkg/utils/logger.go` slog upgrade with `LevelTrace`; `WithLogger`/`WithVisualizationEndpoint` option wiring.
+
+## Phase 10 — Normalization Layers + Training Callbacks (v0.9.0)
+
+*Two parallel tracks delivering the normalization layer package and the callback event system.
+Track A: BatchNorm/LayerNorm/GroupNorm in pkg/layer/norm/. Track B: CallbackRegistry[T] wired
+into pkg/nn/train.go. Light coordination on pkg/nn/train.go (Track B owns it; Track A merges after).*
+
+**Subsystem:** `pkg/layer/norm/` (new), `pkg/nn/` (callbacks + options + train), `pkg/utils/` (sentinel)
+**Requires:** Phase 9 ✓
+**Tasks file:** [tasks/phase-10.md](tasks/phase-10.md)
+**Track order:** A and B mostly parallel; Track B completes train.go changes first; T-10T01 after A, T-10T02 after B; Gate T-10Z01.
+
+- [ ] **[A] Normalization Layers** ([l1-normalization-layers.md](specifications/l1-normalization-layers.md) + [l2-normalization-impl.md](specifications/l2-normalization-impl.md)) [L1+L2, Stable v1.0.0 / v0.1.0] — `pkg/layer/norm/`: `Normalizer[T]` interface; `BatchNorm/LayerNorm/GroupNorm[T]`; `WithBatchNorm`/`WithLayerNorm` options; `SetTrain`/`SetEval` propagation; JSON round-trip.
+- [ ] **[B] Training Callbacks** ([l1-training-callbacks.md](specifications/l1-training-callbacks.md) + [l2-callbacks-impl.md](specifications/l2-callbacks-impl.md)) [L1+L2, Stable v1.0.0 / v0.1.0] — `pkg/nn/callbacks.go`: `CallbackRegistry[T]`; `ErrStopTraining`; panic recovery; `defer fireOnTrainEnd`; `WithOnIterationEnd`/`WithOnImprovementFound`/`WithOnTrainEnd` options; 0-alloc benchmark.
 
 ## Backlog
 
 *Specs registered but not in the active plan. Pulled into a phase when their parent L1 is Stable, an explicit user request promotes them, or a downstream consumer requires them.*
 
-### L1 Concept (deferred — no L2 spec yet)
+### L1 Concept (deferred — RFC status)
 
-- [l1-meta-learning-hooks.md](specifications/l1-meta-learning-hooks.md) — Draft v0.2.0 (universal ParamAccessor; 8 open TBDs in §5.6; explicitly pre-RFC; no L2 spec yet)
-- [l1-dynamic-topology.md](specifications/l1-dynamic-topology.md) — Stable v0.2.0 (5 open TBDs in §5.5; L2 spec drafted as l2-dynamic-topology-impl below; gated on Phase A implementation)
+- [l1-meta-learning-hooks.md](specifications/l1-meta-learning-hooks.md) — RFC v0.3.0 (8 TBDs closed 2026-05-11; no L2 spec yet; awaiting RFC review before Stable promotion and Phase 11 scoping)
 
 ### L2 Implementation (deferred)
 
 - [l2-ai-doc-metadata.md](specifications/l2-ai-doc-metadata.md) — RFC v0.1.0 (AI-Meta trailing block convention; gated on cmd/lint-aimeta delivery; rollout phased per §8)
 
-### L1 Concept (tracked — promoted to Stable 2026-05-01, parents of active Phase 3 specs)
+### L1 Concept (tracked — promoted to Stable 2026-05-01, parents of active Phase 3–9 specs)
 
 - [l1-neural-network-architecture.md](specifications/l1-neural-network-architecture.md) — Stable v2.0.0
 - [l1-training-semantics.md](specifications/l1-training-semantics.md) — Stable v1.0.0
@@ -185,6 +196,7 @@ graph LR
   F1 --> G1[Phase 7 — LR Scheduling + Deep Builder + Skills]
   G1 --> H1[Phase 8 — LR Extension + CLI Binary]
   H1 --> I1[Phase 9 — Metric Schedulers + Dynamic Topology + Observability]
+  I1 --> J1[Phase 10 — Normalization Layers + Training Callbacks]
 ```
 
 ## Document History
@@ -205,3 +217,4 @@ graph LR
 | 2.1.0 | 2026-05-10 | Phase 7 marked Done. All 16 tasks green. pkg/optimizer extended with Scheduler[T]/BindScheduler/LearningRateSetter[T] + 4 scheduler types. pkg/nn: Repeat/Pattern/HiddenLayers/WithScheduler on Builder and Options APIs. skills/gonn/ created. Coverage optimizer 88.9%, nn 86.4%. Gate T-7Z01 passed. |
 | 2.2.0 | 2026-05-10 | Phase 8 scoped: Track A (ExponentialLR, closes scheduler gap), Track B (gonn CLI binary). l2-lr-scheduling-impl + l2-dynamic-topology-impl orphans resolved. l2-cli-client promoted from Backlog (RFC→Stable). Backlog updated: l2-dynamic-topology-impl Draft added; deferred scheduler types (ReduceOnPlateau, OneCycleLR) noted. Based on INDEX.md v2.5.0. |
 | 2.3.0 | 2026-05-10 | Phase 8 marked Done (v0.7.0 tagged). Phase 9 scoped: Track A (MetricScheduler/ReduceOnPlateau/OneCycleLR), Track B (Dynamic Topology mutations), Track C (slog logging + viz HTTP server). Backlog: Dynamic Topology + MetricScheduler + Observability items moved to Phase 9. Based on INDEX.md v2.6.0. |
+| 2.4.0 | 2026-05-11 | Phase 9 marked Done (v0.8.0 tagged). Phase 10 scoped: Track A (normalization layers: BatchNorm/LayerNorm/GroupNorm), Track B (training callbacks: CallbackRegistry/ErrStopTraining). l1-meta-learning-hooks promoted Draft→RFC v0.3.0 (moved to Backlog). VERSION_DRIFT l2-lr-scheduling-impl synced v1.1.0→v1.2.0. Based on INDEX.md v2.7.0. |

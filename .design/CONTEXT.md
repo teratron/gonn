@@ -1,6 +1,6 @@
 # Project Context
 
-**Generated:** 2026-05-10
+**Generated:** 2026-05-11
 
 ## Active Technologies
 
@@ -52,7 +52,8 @@
     ├── optimizer/
     ├── persistence/
     ├── regularizer/
-    └── utils/
+    ├── utils/
+    └── visualization/
 ```
 
 ## Recent Changes

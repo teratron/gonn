@@ -1,6 +1,6 @@
 # Workspace Specifications Registry
 
-**Version:** 2.6.0
+**Version:** 2.7.0
 **Status:** Active
 
 ## Overview
@@ -54,13 +54,15 @@ Local registry of specifications for this workspace.
 | [l1-lr-scheduling.md](specifications/l1-lr-scheduling.md) | Learning rate scheduler contract — StepLR / CosineAnnealing / WarmUp / ChainScheduler | Stable | L1 | 1.0.0 |
 | [l2-deep-builder.md](specifications/l2-deep-builder.md) | Deep network builder ergonomics — Repeat / Pattern / HiddenLayers bulk constructors | Stable | L2 | 1.0.0 |
 | [l2-gonn-skills.md](specifications/l2-gonn-skills.md) | GoNN developer AI skills — SKILL.md for AI-assisted code generation | Stable | L2 | 1.0.0 |
-| [l2-lr-scheduling-impl.md](specifications/l2-lr-scheduling-impl.md) | Go realization of LR scheduling — pkg/optimizer/ schedulers (Phase 7+8) | Stable | L2 | 1.1.0 |
+| [l2-lr-scheduling-impl.md](specifications/l2-lr-scheduling-impl.md) | Go realization of LR scheduling — pkg/optimizer/ schedulers (Phase 7+8) | Stable | L2 | 1.2.0 |
 | [l2-dynamic-topology-impl.md](specifications/l2-dynamic-topology-impl.md) | Go realization of dynamic topology — mutation methods on Network[T] | Stable | L2 | 0.2.0 |
 | [l2-metric-scheduler-impl.md](specifications/l2-metric-scheduler-impl.md) | Go realization of metric-driven LR schedulers — MetricScheduler[T], ReduceOnPlateau[T], OneCycleLR[T] | Stable | L2 | 0.1.0 |
 | [l1-normalization-layers.md](specifications/l1-normalization-layers.md) | Normalization layer contract — BatchNorm / LayerNorm / GroupNorm with affine params and train/eval mode | Stable | L1 | 1.0.0 |
 | [l1-training-callbacks.md](specifications/l1-training-callbacks.md) | Training event callbacks — OnIterationEnd / OnImprovementFound / OnTrainEnd with StopTraining signal | Stable | L1 | 1.0.0 |
+| [l2-normalization-impl.md](specifications/l2-normalization-impl.md) | Go realization of normalization layers — pkg/layer/norm/ (BatchNorm/LayerNorm/GroupNorm) | Stable | L2 | 0.1.0 |
+| [l2-callbacks-impl.md](specifications/l2-callbacks-impl.md) | Go realization of training callbacks — pkg/nn/callbacks.go + train.go integration | Stable | L2 | 0.1.0 |
 
 ## Meta Information
 
 - **Maintainer**: Core Team
-- **Last Updated**: 2026-05-11 (3 dispatches: l1-normalization-layers Stable v1.0.0 (NORM-1..9), l1-training-callbacks Stable v1.0.0 (CB-1..9, 3 events), l1-meta-learning-hooks Draft→RFC v0.3.0 (8 TBDs closed).)
+- **Last Updated**: 2026-05-11 (5 dispatches: l1-normalization-layers Stable v1.0.0 (NORM-1..9), l1-training-callbacks Stable v1.0.0 (CB-1..9), l1-meta-learning-hooks Draft→RFC v0.3.0, l2-normalization-impl Stable v0.1.0, l2-callbacks-impl Stable v0.1.0.)
