@@ -4,6 +4,47 @@ All notable changes to the GoNN library will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the
 release artifacts dictated by [.magic/run.md](.magic/run.md) Phase Completion / Plan Completion.
 
+## [0.9.0] — 2026-05-12
+
+### Normalization Layers + Training Callbacks
+
+Phase 10 adds post-activation normalization and structured training event callbacks.
+
+#### Added
+
+- **`pkg/layer/norm/`** — new normalization sub-package:
+  - `Normalizer[T utils.Float]` interface: `Forward`, `SetMode`, `GradSlots`, `InputSize`, `OutputSize`.
+  - `NormMode` enum (`NormTrain=0`, `NormEval=1`); shared helpers `stddev`, `applyAffine`.
+  - `BatchNorm[T]`: EMA running stats (eval frozen), affine γ/β optional, `ErrBatchNormSingleSample`
+    guard, `MarshalJSON`/`UnmarshalJSON` round-trip; functional options `WithBatchNormEps`,
+    `WithBatchNormMomentum`, `WithBatchNormAffine`.
+  - `LayerNorm[T]`: per-sample mean/var, stateless (mode stored but forward is always per-sample),
+    affine optional, JSON round-trip.
+  - `GroupNorm[T]`: G-group partition, `ErrGroupSizeMismatch` when `features%groups != 0`, affine
+    optional, JSON round-trip.
+  - Coverage: 82 %.
+- **`pkg/nn/callbacks.go`** — training event callback infrastructure:
+  - `ErrStopTraining` sentinel; `StopReason` enum (6 values: LossLimit, MaxIterations,
+    ContextCancel, ExternalStop, Callback, LoopError).
+  - `Snapshot[T]` (flat weight copy + epoch), `CallbackContext[T]`, `CallbackFn[T]` type.
+  - `CallbackRegistry[T]`: `OnIterationEnd`, `OnImprovementFound`, `OnTrainEnd` slices.
+  - `invokeOne` — panic recovery (CB-5); `fireEvent` — nil short-circuit (CB-3), stops on
+    first `ErrStopTraining`; `fireOnTrainEnd` — defer-safe CB-8 guarantee.
+- **`pkg/utils/errors.go`** — `ErrCallbackPanic` sentinel added.
+- **`pkg/nn/train.go`** — `Fit` wired with callbacks: deferred `OnTrainEnd` (CB-8), per-epoch
+  `OnImprovementFound` / `OnIterationEnd` dispatch, `ErrStopTraining` → rollback + return.
+- **`pkg/nn/options.go`** — six new functional options: `WithNormAfterLayer`, `WithBatchNorm`,
+  `WithLayerNorm`, `WithOnIterationEnd`, `WithOnImprovementFound`, `WithOnTrainEnd`.
+- **`pkg/nn/config.go`** — `Callbacks *CallbackRegistry[T]` and `NormLayers map[int]Normalizer[T]`
+  fields added to `Config[T]`.
+- **`pkg/nn/compile.go`** — resolves nil norm-layer sentinels at compile time using hidden layer
+  sizes; wires `n.callbacks` and `n.normLayers` from config.
+- **`pkg/nn/nn.go`** — `SetTrain()` / `SetEval()` propagate `NormTrain`/`NormEval` to all
+  registered `Normalizer[T]` instances; `callbacks` and `normLayers` fields added to `NN[T]`.
+- **`pkg/nn/callbacks_test.go`** — 15 unit + integration tests covering CB-3/5/7/8 invariants,
+  registration order, rollback on `ErrStopTraining`, `OnTrainEnd` on all exit paths,
+  and `BenchmarkNoCallbacks`.
+
 ## [0.8.0] — 2026-05-10
 
 ### Metric Schedulers, Dynamic Topology, and Observability Stack

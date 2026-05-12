@@ -5,6 +5,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/teratron/gonn/pkg/layer/norm"
 	"github.com/teratron/gonn/pkg/network"
 	"github.com/teratron/gonn/pkg/optimizer"
 	"github.com/teratron/gonn/pkg/regularizer"
@@ -63,6 +64,14 @@ type NN[T utils.Float] struct {
 	// vis is the optional HTTP observability server started by compile when
 	// WithVisualizationEndpoint is set. nil when disabled. Stopped by Close.
 	vis *visualization.VisServer
+
+	// callbacks holds per-event training callback registrations (Phase 10).
+	// nil when no callbacks are registered (CB-3 zero overhead).
+	callbacks *CallbackRegistry[T]
+
+	// normLayers maps hidden-layer index → Normalizer applied post-activation
+	// in the forward pass (Phase 10). nil when no normalization is configured.
+	normLayers map[int]norm.Normalizer[T]
 }
 
 // NewBuilder is the entry point for the Builder API. Returns an *NN[T] in
@@ -147,6 +156,42 @@ func (n *NN[T]) Config() Config[T] {
 	// backing array is shared. Callers must not mutate the returned
 	// slice; this is the same contract as Network.Cells().
 	return n.cfg
+}
+
+// SetTrain switches all registered normalization layers to NormTrain mode
+// so they use batch statistics and update running averages during Forward.
+// Call before each training epoch to ensure correct BatchNorm behaviour.
+//
+// AI-Meta:
+//   - Purpose: Propagate NormTrain mode to all Normalizer instances before training (NORM-6).
+//   - Usage: n.SetTrain(); for _, s := range dataset { n.Train(s.Input, s.Target) }.
+//   - Concurrency: NotSafe; must not overlap with Forward calls.
+//   - Related: [SetEval], [norm.NormTrain], [norm.Normalizer].
+//   - Stability: Stable.
+func (n *NN[T]) SetTrain() {
+	for _, nl := range n.normLayers {
+		if nl != nil {
+			nl.SetMode(norm.NormTrain)
+		}
+	}
+}
+
+// SetEval switches all registered normalization layers to NormEval mode so
+// they use frozen running statistics during Forward. Call before inference
+// to ensure BatchNorm does not mutate running stats.
+//
+// AI-Meta:
+//   - Purpose: Propagate NormEval mode to all Normalizer instances before inference (NORM-6).
+//   - Usage: n.SetEval(); output, err := n.Query(input).
+//   - Concurrency: NotSafe; must not overlap with Forward calls.
+//   - Related: [SetTrain], [norm.NormEval], [norm.Normalizer].
+//   - Stability: Stable.
+func (n *NN[T]) SetEval() {
+	for _, nl := range n.normLayers {
+		if nl != nil {
+			nl.SetMode(norm.NormEval)
+		}
+	}
 }
 
 // Close stops the optional visualization HTTP server and releases its port.

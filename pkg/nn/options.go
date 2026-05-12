@@ -4,6 +4,7 @@ import (
 	"log/slog"
 
 	"github.com/teratron/gonn/pkg/activation"
+	"github.com/teratron/gonn/pkg/layer/norm"
 	"github.com/teratron/gonn/pkg/loss"
 	"github.com/teratron/gonn/pkg/network"
 	"github.com/teratron/gonn/pkg/optimizer"
@@ -424,5 +425,145 @@ func WithVisualizationToken[T utils.Float](token string) Option[T] {
 func WithVisualizationCORS[T utils.Float](enable bool) Option[T] {
 	return func(cfg *Config[T]) {
 		cfg.VisCORS = enable
+	}
+}
+
+// ============================================================================
+// Normalization options (Phase 10 — l2-normalization-impl)
+// ============================================================================
+
+// WithNormAfterLayer inserts a normalizer after the hidden layer at the given
+// index. The normalizer is applied to the hidden activations of that layer after
+// each forward pass. Multiple calls for the same index overwrite the previous
+// normalizer (last-write-wins).
+//
+// AI-Meta:
+//   - Purpose: Register a custom Normalizer to be applied after hidden layer idx during training.
+//   - Usage: nn.New[float32](WithNormAfterLayer[float32](0, norm.NewBatchNorm[float32](8)), ...).
+//   - Related: [Option], [WithBatchNorm], [WithLayerNorm], [norm.Normalizer].
+//   - Stability: Stable.
+func WithNormAfterLayer[T utils.Float](idx int, n norm.Normalizer[T]) Option[T] {
+	return func(cfg *Config[T]) {
+		if cfg.NormLayers == nil {
+			cfg.NormLayers = make(map[int]norm.Normalizer[T])
+		}
+		cfg.NormLayers[idx] = n
+	}
+}
+
+// WithBatchNorm is a convenience wrapper that attaches a default BatchNorm
+// after the hidden layer at idx. The BatchNorm feature count is derived from
+// the hidden layer size at Compile time if it was already set, or defaults to
+// a placeholder — prefer WithNormAfterLayer for precise control.
+// For correctness, call after the corresponding WithHiddenLayer call so the
+// layer size is known.
+//
+// AI-Meta:
+//   - Purpose: Convenience shortcut to add BatchNorm after hidden layer idx without specifying features.
+//   - Usage: nn.New[float32](WithHiddenLayer[float32](8, activation.ReLU), WithBatchNorm[float32](0), ...).
+//   - Related: [Option], [WithNormAfterLayer], [norm.NewBatchNorm].
+//   - Stability: Stable.
+func WithBatchNorm[T utils.Float](idx int) Option[T] {
+	return func(cfg *Config[T]) {
+		if idx < len(cfg.HiddenLayers) {
+			size := int(cfg.HiddenLayers[idx].Size)
+			if size > 0 {
+				if cfg.NormLayers == nil {
+					cfg.NormLayers = make(map[int]norm.Normalizer[T])
+				}
+				cfg.NormLayers[idx] = norm.NewBatchNorm[T](size)
+				return
+			}
+		}
+		// Layer not defined yet or size=0 — register a sentinel to be resolved at compile.
+		if cfg.NormLayers == nil {
+			cfg.NormLayers = make(map[int]norm.Normalizer[T])
+		}
+		cfg.NormLayers[idx] = nil // resolved in compile
+	}
+}
+
+// WithLayerNorm is a convenience wrapper that attaches a default LayerNorm
+// after the hidden layer at idx.
+//
+// AI-Meta:
+//   - Purpose: Convenience shortcut to add LayerNorm after hidden layer idx.
+//   - Usage: nn.New[float32](WithHiddenLayer[float32](8, activation.ReLU), WithLayerNorm[float32](0), ...).
+//   - Related: [Option], [WithNormAfterLayer], [norm.NewLayerNorm].
+//   - Stability: Stable.
+func WithLayerNorm[T utils.Float](idx int) Option[T] {
+	return func(cfg *Config[T]) {
+		if idx < len(cfg.HiddenLayers) {
+			size := int(cfg.HiddenLayers[idx].Size)
+			if size > 0 {
+				if cfg.NormLayers == nil {
+					cfg.NormLayers = make(map[int]norm.Normalizer[T])
+				}
+				cfg.NormLayers[idx] = norm.NewLayerNorm[T](size)
+				return
+			}
+		}
+		if cfg.NormLayers == nil {
+			cfg.NormLayers = make(map[int]norm.Normalizer[T])
+		}
+		cfg.NormLayers[idx] = nil
+	}
+}
+
+// ============================================================================
+// Callback options (Phase 10 — l2-callbacks-impl)
+// ============================================================================
+
+// WithOnIterationEnd registers fn to be called after each epoch's weight update
+// (CB-9 boundary atomicity). Multiple calls append to the slice in order (CB-7).
+// Returning ErrStopTraining from fn triggers early stopping with best-weight rollback.
+//
+// AI-Meta:
+//   - Purpose: Register a per-epoch callback invoked after weight update completes (CB-9).
+//   - Usage: nn.New[float32](WithOnIterationEnd[float32](func(ctx nn.CallbackContext[float32]) error { return nil }), ...).
+//   - Related: [Option], [CallbackFn], [ErrStopTraining], [WithOnImprovementFound], [WithOnTrainEnd].
+//   - Stability: Stable.
+func WithOnIterationEnd[T utils.Float](fn CallbackFn[T]) Option[T] {
+	return func(cfg *Config[T]) {
+		if cfg.Callbacks == nil {
+			cfg.Callbacks = &CallbackRegistry[T]{}
+		}
+		cfg.Callbacks.OnIterationEnd = append(cfg.Callbacks.OnIterationEnd, fn)
+	}
+}
+
+// WithOnImprovementFound registers fn to be called whenever the epoch loss
+// reaches a new minimum (before the OnIterationEnd dispatch for that epoch).
+// Multiple calls append in order (CB-7).
+//
+// AI-Meta:
+//   - Purpose: Register a callback triggered on each new loss minimum, ideal for checkpoint saves.
+//   - Usage: nn.New[float32](WithOnImprovementFound[float32](saveFn), ...).
+//   - Related: [Option], [CallbackFn], [ErrStopTraining], [WithOnIterationEnd].
+//   - Stability: Stable.
+func WithOnImprovementFound[T utils.Float](fn CallbackFn[T]) Option[T] {
+	return func(cfg *Config[T]) {
+		if cfg.Callbacks == nil {
+			cfg.Callbacks = &CallbackRegistry[T]{}
+		}
+		cfg.Callbacks.OnImprovementFound = append(cfg.Callbacks.OnImprovementFound, fn)
+	}
+}
+
+// WithOnTrainEnd registers fn to be called when Fit returns, regardless of
+// how training ended (normal completion, ErrStopTraining, error, or panic).
+// The CallbackContext.StopReason field is set (CB-8 guarantee).
+//
+// AI-Meta:
+//   - Purpose: Register a finalisation callback that fires on any Fit exit path (CB-8).
+//   - Usage: nn.New[float32](WithOnTrainEnd[float32](logResultFn), ...).
+//   - Related: [Option], [CallbackFn], [StopReason], [WithOnIterationEnd].
+//   - Stability: Stable.
+func WithOnTrainEnd[T utils.Float](fn CallbackFn[T]) Option[T] {
+	return func(cfg *Config[T]) {
+		if cfg.Callbacks == nil {
+			cfg.Callbacks = &CallbackRegistry[T]{}
+		}
+		cfg.Callbacks.OnTrainEnd = append(cfg.Callbacks.OnTrainEnd, fn)
 	}
 }

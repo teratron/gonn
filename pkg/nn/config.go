@@ -11,6 +11,7 @@ import (
 	"log/slog"
 
 	"github.com/teratron/gonn/pkg/activation"
+	"github.com/teratron/gonn/pkg/layer/norm"
 	"github.com/teratron/gonn/pkg/loss"
 	"github.com/teratron/gonn/pkg/network"
 	"github.com/teratron/gonn/pkg/optimizer"
@@ -167,6 +168,13 @@ type Config[T utils.Float] struct {
 	VisCORS     bool
 	DefaultBias bool
 	OutputBias  bool
+	// Callbacks holds the per-event training callback slices.
+	// nil disables all callback dispatching (CB-3 zero overhead).
+	Callbacks *CallbackRegistry[T]
+	// NormLayers maps hidden-layer index to a Normalizer applied
+	// after the activation of that layer during forward and backward passes.
+	// nil map disables normalization (zero overhead when omitted).
+	NormLayers map[int]norm.Normalizer[T]
 }
 
 // applyDefaults fills any zero-valued fields with the Defaults constants.

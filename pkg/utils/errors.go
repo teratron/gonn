@@ -131,6 +131,18 @@ var ErrEmptyLayer = errors.New("empty-layer")
 //   - Usage: errors.Is(err, utils.ErrMutationFailed).
 var ErrMutationFailed = errors.New("mutation-failed")
 
+// ErrCallbackPanic signals that a user-supplied training callback panicked.
+// The panic is recovered internally; training continues. The error wraps
+// ErrControl because a panicking callback is a programming fault in the
+// orchestration layer, not a data or compute fault.
+//
+// AI-Meta:
+//   - Purpose: Sentinel for a recovered panic inside a training callback; training continues.
+//   - Usage: errors.Is(err, utils.ErrCallbackPanic) to detect callback panics in logs.
+//   - Related: [ErrControl], [Newf].
+//   - Stability: Stable.
+var ErrCallbackPanic = errors.New("callback-panic")
+
 // Newf builds a new error that wraps the given category sentinel and
 // carries the caller-supplied identifying fields. The format string MUST
 // be specific per C32 §1: it MUST identify the offending value (or its

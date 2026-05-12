@@ -1,7 +1,7 @@
 ---
 phase: 10
 name: Normalization Layers + Training Callbacks
-status: Todo
+status: Done
 subsystem: pkg/layer/norm (new), pkg/nn (callbacks + options), pkg/utils
 requires:
   - phase-9 (v0.8.0 tagged; pkg/network topology stable; pkg/nn options/compile/train stable)
@@ -29,12 +29,12 @@ duration_minutes: ~
 l2-normalization-impl.md. New sub-package in pkg/layer/norm/.*
 *Source: [l2-normalization-impl.md](../specifications/l2-normalization-impl.md)*
 
-- [ ] **T-10A01** — Create `pkg/layer/norm/norm.go`: `NormMode` enum (`NormTrain=0`, `NormEval=1`);
+- [x] **T-10A01** — Create `pkg/layer/norm/norm.go`: `NormMode` enum (`NormTrain=0`, `NormEval=1`);
   `Normalizer[T utils.Float]` interface (`Forward`, `SetMode`, `GradSlots`, `InputSize`, `OutputSize`);
   shared free functions: `stddev[T](variance, eps T) T`, `applyAffine[T](xHat, gamma, beta []T) []T`.
   No state — interface + pure helpers only. Add compile-time assertions for all three concrete types.
 
-- [ ] **T-10A02** — Create `pkg/layer/norm/batchnorm.go` + begin `norm_test.go`:
+- [x] **T-10A02** — Create `pkg/layer/norm/batchnorm.go` + begin `norm_test.go`:
   `BatchNorm[T]`: fields `features int`, `eps T`, `momentum T`, `affine bool`, `gamma, beta []T`,
   `runningMean, runningVar []T`, `mode atomic.Int32`.
   `NewBatchNorm[T](features int, opts ...BatchNormOption[T]) *BatchNorm[T]` — γ=1, β=0, running stats 0/1.
@@ -43,13 +43,13 @@ l2-normalization-impl.md. New sub-package in pkg/layer/norm/.*
   `ErrBatchNormSingleSample` guard in train mode.
   Tests: shape preservation, γ=1/β=0 identity check, EMA update, eval uses frozen stats, JSON round-trip.
 
-- [ ] **T-10A03** — Create `pkg/layer/norm/layernorm.go` and `pkg/layer/norm/groupnorm.go`.
+- [x] **T-10A03** — Create `pkg/layer/norm/layernorm.go` and `pkg/layer/norm/groupnorm.go`.
   `LayerNorm[T]`: per-sample mean/var; no running stats; affine optional. `MarshalJSON/UnmarshalJSON`.
   `GroupNorm[T]`: G groups; `ErrGroupSizeMismatch` if `features % G != 0`. `MarshalJSON/UnmarshalJSON`.
   Extend `norm_test.go`: LayerNorm shape + affine disabled; GroupNorm group partition + G-divides-F guard;
   SetMode has no effect on LayerNorm/GroupNorm (forward is always per-sample).
 
-- [ ] **T-10A04** — Wire normalization into `pkg/nn/`:
+- [x] **T-10A04** — Wire normalization into `pkg/nn/`:
   `pkg/nn/options.go`: add `WithNormAfterLayer[T](idx int, n layer.Normalizer[T]) Option[T]`,
   `WithBatchNorm[T](idx int) Option[T]`, `WithLayerNorm[T](idx int) Option[T]`.
   `pkg/nn/config.go`: add `NormLayers map[int]layer.Normalizer[T]` field.
@@ -63,7 +63,7 @@ l2-normalization-impl.md. New sub-package in pkg/layer/norm/.*
 *Goal: Implement CallbackRegistry[T] + train.go integration from l2-callbacks-impl.md.*
 *Source: [l2-callbacks-impl.md](../specifications/l2-callbacks-impl.md)*
 
-- [ ] **T-10B01** — Create `pkg/nn/callbacks.go`:
+- [x] **T-10B01** — Create `pkg/nn/callbacks.go`:
   `StopReason` enum (6 values per spec §5.2); `ErrStopTraining` sentinel;
   `CallbackContext[T]` struct (Iteration, Loss, MinLoss, MinIter, StopReason *StopReason, Snapshot);
   `CallbackFn[T]` type alias; `CallbackRegistry[T]` struct (3 slice fields).
@@ -72,7 +72,7 @@ l2-normalization-impl.md. New sub-package in pkg/layer/norm/.*
   iterate in order; first `errors.Is(err, ErrStopTraining)` → return stop signal.
   Add `ErrCallbackPanic` sentinel to `pkg/utils/errors.go`.
 
-- [ ] **T-10B02** — Integrate callbacks into `pkg/nn/train.go`:
+- [x] **T-10B02** — Integrate callbacks into `pkg/nn/train.go`:
   Add `defer fireOnTrainEnd(nn.callbacks, &stopReason, &result)` at top of `Train()`.
   After `opt.Step` + reg hooks: if `loss < minLoss` → `fireEvent(OnImprovementFound, ctx)` first;
   then `fireEvent(OnIterationEnd, ctx)`. On stop signal from either → goto rollback+return path.
@@ -80,7 +80,7 @@ l2-normalization-impl.md. New sub-package in pkg/layer/norm/.*
   **No change to `Train()` signature or return type.**
   After T-10B02: Add `propagateMode()` call from T-10A04 to `pkg/nn/nn.go` (coordinate merge).
 
-- [ ] **T-10B03** — Wire callback options into `pkg/nn/`:
+- [x] **T-10B03** — Wire callback options into `pkg/nn/`:
   `pkg/nn/options.go`: add `WithOnIterationEnd[T]`, `WithOnImprovementFound[T]`, `WithOnTrainEnd[T]`
   functional options (each appends to respective registry slice on the NN config).
   `pkg/nn/config.go`: add `Callbacks *CallbackRegistry[T]` field; lazy-init in `WithOn*` options.
@@ -90,14 +90,14 @@ l2-normalization-impl.md. New sub-package in pkg/layer/norm/.*
 
 ## Validation Tasks
 
-- [ ] **T-10T01** — Normalization layers validation (after Track A):
+- [x] **T-10T01** — Normalization layers validation (after Track A):
   - `go test -count=1 -race ./pkg/layer/norm/...` — all tests green.
   - Coverage `pkg/layer/norm/` ≥80 %.
   - Verify `WithBatchNorm(0)` on a compiled NN does not change output shape.
   - Verify `SetEval()` freezes BatchNorm running stats (2nd forward pass == 1st eval pass).
   - Verify JSON round-trip: save NN with norm layer, reload, forward output bit-identical.
 
-- [ ] **T-10T02** — Training callbacks validation (after Track B):
+- [x] **T-10T02** — Training callbacks validation (after Track B):
   - `go test -count=1 -race ./pkg/nn/...` — all tests green (including new callbacks_test.go).
   - `BenchmarkNoCallbacks` reports 0 allocs/op.
   - Verify `ErrStopTraining` from `OnImprovementFound` triggers min-loss rollback (TRN-3 preserved).
@@ -106,7 +106,7 @@ l2-normalization-impl.md. New sub-package in pkg/layer/norm/.*
 
 ## Gate
 
-- [ ] **T-10Z01** — Phase 10 gate:
+- [x] **T-10Z01** — Phase 10 gate:
   - `go build ./...` clean (zero regressions).
   - `go test -count=1 -race ./...` all green.
   - Every new / modified package ≥80 % line coverage:

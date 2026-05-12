@@ -5,6 +5,7 @@ import (
 
 	"github.com/teratron/gonn/pkg/activation"
 	"github.com/teratron/gonn/pkg/layer"
+	normPkg "github.com/teratron/gonn/pkg/layer/norm"
 	"github.com/teratron/gonn/pkg/loss"
 	"github.com/teratron/gonn/pkg/network"
 	"github.com/teratron/gonn/pkg/optimizer"
@@ -66,6 +67,27 @@ func compile[T utils.Float](n *NN[T], cfg *Config[T]) error {
 	n.reg = cfg.Regularizer
 	n.sched = cfg.Scheduler
 	n.Network.SetTopologyMode(cfg.TopologyMode)
+
+	// Resolve nil norm-layer entries inserted by WithBatchNorm/WithLayerNorm
+	// when the hidden layer sizes were not yet declared at option-apply time.
+	if len(cfg.NormLayers) > 0 {
+		resolved := make(map[int]normPkg.Normalizer[T], len(cfg.NormLayers))
+		for idx, nl := range cfg.NormLayers {
+			if nl != nil {
+				resolved[idx] = nl
+				continue
+			}
+			// nil sentinel: create a default BatchNorm using the hidden layer size.
+			if idx < len(cfg.HiddenLayers) {
+				size := int(cfg.HiddenLayers[idx].Size)
+				if size > 0 {
+					resolved[idx] = normPkg.NewBatchNorm[T](size)
+				}
+			}
+		}
+		n.normLayers = resolved
+	}
+	n.callbacks = cfg.Callbacks
 
 	startProfilingServer(cfg.ProfilingAddr)
 	if err := startVisServer(n, cfg); err != nil {

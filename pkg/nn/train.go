@@ -113,23 +113,39 @@ func (n *NN[T]) Fit(dataset []Sample[T]) (uint, T, error) {
 	log.Info("training started", "max_iterations", n.cfg.MaxIterations)
 
 	n.transitionToRunning()
+
+	var completedEpochs uint
+	var lastLoss T
+	// stopReason and lastLoss are captured by pointer in fireOnTrainEnd so the
+	// deferred call reads the final values at Fit return time (CB-8).
+	var stopReason StopReason
+	stopReasonSet := false
 	defer func() {
 		n.transitionToIdle()
 		log.Info("training stopped")
+		if n.callbacks != nil {
+			sr := stopReason
+			if !stopReasonSet {
+				sr = StopMaxIterations
+			}
+			fireOnTrainEnd(n.callbacks, &sr, &completedEpochs, &lastLoss)
+		}
 	}()
 
 	minLoss := T(0)
 	minLossSet := false
 	var snapshot []T
-	var lastLoss T
-	var completedEpochs uint
 
 	for epoch := uint(1); epoch <= n.cfg.MaxIterations; epoch++ {
 		// Safe-point check before each epoch — honours Pause / Stop
 		// transitions issued from another goroutine.
 		if stopped, err := n.awaitSafePoint(); err != nil {
+			stopReason = StopLoopError
+			stopReasonSet = true
 			return completedEpochs, lastLoss, err
 		} else if stopped {
+			stopReason = StopExternalStop
+			stopReasonSet = true
 			break
 		}
 
@@ -137,6 +153,8 @@ func (n *NN[T]) Fit(dataset []Sample[T]) (uint, T, error) {
 		for batchIdx, sample := range dataset {
 			loss, err := n.trainStep(sample.Input, sample.Target)
 			if err != nil {
+				stopReason = StopLoopError
+				stopReasonSet = true
 				return completedEpochs, lastLoss, err
 			}
 			total += loss
@@ -171,8 +189,39 @@ func (n *NN[T]) Fit(dataset []Sample[T]) (uint, T, error) {
 			minLoss = mean
 			minLossSet = true
 			snapshot = n.snapshotWeights(snapshot)
+
+			// Dispatch OnImprovementFound before OnIterationEnd (CB-9).
+			if n.callbacks != nil {
+				snap := snapshotFromWeights(snapshot, epoch)
+				ctx := callbackContextFrom(int(epoch), mean, minLoss, int(epoch), snap)
+				if err := fireEvent(n.callbacks.OnImprovementFound, ctx); err != nil {
+					stopReason = StopCallback
+					stopReasonSet = true
+					n.restoreWeights(snapshot)
+					lastLoss = minLoss
+					return completedEpochs, lastLoss, nil
+				}
+			}
+
 			if mean < n.cfg.LossLimit {
+				stopReason = StopLossLimit
+				stopReasonSet = true
 				return completedEpochs, mean, nil
+			}
+		}
+
+		// Dispatch OnIterationEnd after the weight update block (CB-9).
+		if n.callbacks != nil {
+			snap := snapshotFromWeights(snapshot, epoch)
+			ctx := callbackContextFrom(int(epoch), mean, minLoss, int(epoch), snap)
+			if err := fireEvent(n.callbacks.OnIterationEnd, ctx); err != nil {
+				stopReason = StopCallback
+				stopReasonSet = true
+				if minLossSet && snapshot != nil {
+					n.restoreWeights(snapshot)
+					lastLoss = minLoss
+				}
+				return completedEpochs, lastLoss, nil
 			}
 		}
 	}
