@@ -38,6 +38,7 @@ n, err := nn.New[float64](
 ```
 
 Rules:
+
 - **Never mix styles** in one construction chain.
 - Builder always ends with `.Compile()` or `.MustCompile()`.
 - Options API compiles implicitly inside `nn.New` / `nn.MustNew`.
@@ -101,7 +102,7 @@ n, _ := nn.NewBuilder[float64]().Input(784).HiddenLayers(layers).Output(10, acti
 ## 5. Activation ↔ Loss Matching
 
 | Output Activation | Recommended Loss | Task |
-|:---|:---|:---|
+| :--- | :--- | :--- |
 | `activation.SIGMOID` | `loss.BCE` | Binary classification (1 output) |
 | `activation.SOFTMAX` | `loss.CCE` or `loss.CROSS_ENTROPY` | Multi-class classification |
 | `activation.Linear` | `loss.MSE` or `loss.MAE` | Regression |
@@ -157,6 +158,7 @@ func MyFunction() {}
 ```
 
 Rules:
+
 - Block appears after a blank doc-comment line.
 - Maximum 12 lines including the `AI-Meta:` label.
 - Never reference internal file paths or spec IDs.
@@ -222,7 +224,7 @@ Always run with `-race`: `go test -race ./...`
 ## 10. Common Mistakes
 
 | Mistake | Fix |
-|:---|:---|
+| :--- | :--- |
 | Calling `Train`/`Query` before `Compile` | Always call `Compile()` first; `New()` handles this automatically |
 | Mixing Builder and Options in one chain | Use one style consistently per network |
 | Passing `float64` literal where `T` is expected | Use `T(value)` or typed constant |

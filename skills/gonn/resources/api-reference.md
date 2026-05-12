@@ -8,7 +8,7 @@ All types parameterized by `T utils.Float` (`float32 | float64`).
 ### Types
 
 | Type | Description |
-|:---|:---|
+| :--- | :--- |
 | `NN[T]` | Public network handle; configure → compile → train/query |
 | `Config[T]` | Staging buffer shared by Builder and Options APIs |
 | `HiddenLayerSpec[T]` | `{Size uint, Activation activation.Type, Bias bool}` |
@@ -19,7 +19,7 @@ All types parameterized by `T utils.Float` (`float32 | float64`).
 ### Construction
 
 | Symbol | Signature | Description |
-|:---|:---|:---|
+| :--- | :--- | :--- |
 | `NewBuilder[T]` | `() *NN[T]` | Start a Builder chain (Configuring state) |
 | `New[T]` | `(opts ...Option[T]) (*NN[T], error)` | Options API — compiles implicitly |
 | `MustNew[T]` | `(opts ...Option[T]) *NN[T]` | Panic variant of New |
@@ -27,7 +27,7 @@ All types parameterized by `T utils.Float` (`float32 | float64`).
 ### Builder Methods (Style A)
 
 | Method | Signature | Description |
-|:---|:---|:---|
+| :--- | :--- | :--- |
 | `Input` | `(size uint) *NN[T]` | Declare input layer size |
 | `Dense` | `(size uint, act activation.Type, bias bool) *NN[T]` | Add one hidden layer |
 | `Hidden` | same as Dense | Alias for Dense |
@@ -52,7 +52,7 @@ All types parameterized by `T utils.Float` (`float32 | float64`).
 ### Option Constructors (Style B)
 
 | Function | Signature | Description |
-|:---|:---|:---|
+| :--- | :--- | :--- |
 | `WithInput[T]` | `(uint) Option[T]` | Set input size |
 | `WithHiddenLayer[T]` | `(uint, activation.Type) Option[T]` | Add one hidden layer (DefaultBias) |
 | `WithHiddenLayers[T]` | `([]HiddenLayerSpec[T]) Option[T]` | Append a slice of layers |
@@ -74,7 +74,7 @@ All types parameterized by `T utils.Float` (`float32 | float64`).
 ### Higher-Order Options and Presets
 
 | Function | Description |
-|:---|:---|
+| :--- | :--- |
 | `Sequential[T](count, size uint, act)` | N identical layers using DefaultBias |
 | `DeepNetwork[T](startSize, layers uint, act)` | Pyramid with halving size |
 | `StandardSetup[T](rate T)` | SGD + MSE + Xavier + DefaultBias |
@@ -85,7 +85,7 @@ All types parameterized by `T utils.Float` (`float32 | float64`).
 ### Training Methods
 
 | Method | Signature | Description |
-|:---|:---|:---|
+| :--- | :--- | :--- |
 | `Fit` | `([]Sample[T]) (epochs uint, loss T, err error)` | Managed multi-epoch loop |
 | `Train` | `(input, target []T) (T, error)` | Single forward+backward+update |
 | `Query` | `([]T) ([]T, error)` | Inference (no weight update) |
@@ -94,7 +94,7 @@ All types parameterized by `T utils.Float` (`float32 | float64`).
 ### Defaults
 
 | Constant | Value |
-|:---|:---|
+| :--- | :--- |
 | `DefaultLearningRate` | `0.3` |
 | `DefaultMaxIterations` | `10_000` |
 | `DefaultLossLimit` | `1e-4` |
@@ -104,7 +104,7 @@ All types parameterized by `T utils.Float` (`float32 | float64`).
 ## Package `pkg/optimizer`
 
 | Symbol | Description |
-|:---|:---|
+| :--- | :--- |
 | `Optimizer[T]` | Interface: `Step(w, d []T) error`, `Reset()`, `LearningRate() T`, `SaveState/LoadState` |
 | `LearningRateSetter[T]` | Optional interface: `SetLearningRate(T)` — all built-ins implement it |
 | `Scheduler[T]` | Interface: `Step() T`, `Reset()`, `Granularity()`, `SaveState/LoadState` |
@@ -122,7 +122,7 @@ All types parameterized by `T utils.Float` (`float32 | float64`).
 ## Package `pkg/regularizer`
 
 | Symbol | Description |
-|:---|:---|
+| :--- | :--- |
 | `Regularizer[T]` | Interface: `Penalty([]T) T`, `ApplyMask([]T, training bool) []T` |
 | `NewL1[T](lambda)` | L1 penalty |
 | `NewL2[T](lambda)` | L2 penalty |

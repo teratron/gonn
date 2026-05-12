@@ -63,6 +63,7 @@ go test -cover ./pkg/mypackage/...
 ```
 
 Required test types:
+
 - `Test*` functions with `t.Run` subtests for ≥3 scenarios.
 - `Benchmark*` functions for hot paths (allocation target: 0 allocs/op after warm-up).
 - Always run with `-race`: `go test -race ./...`
@@ -115,7 +116,7 @@ Use `fmt.Errorf("...: %w", err)` to preserve the chain.
 Fields allowed in the `AI-Meta:` block (no others):
 
 | Field | Required for public API |
-|:---|:---|
+| :--- | :--- |
 | `Purpose` | Always |
 | `Usage` | Recommended |
 | `Lifecycle` | If lifecycle matters |
