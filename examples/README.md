@@ -1,6 +1,6 @@
 # GoNN Examples Catalog
 
-Implements the v0.2 multi-hidden subset of [`l2-usage-examples.md`](../.design/specifications/l2-usage-examples.md). Every active example is its own Go module with a smoke test.
+Implements various usage patterns for the GoNN library. Every active example is its own Go module with a smoke test.
 
 ## Active
 
@@ -31,7 +31,7 @@ Run any one example: `go run ./examples/{name}/`. Run the whole smoke suite from
 
 ## Coverage Matrix
 
-Cross-reference of `l2-usage-examples` §5.3 against active examples. **`covered`** means at least one active example exercises the element.
+Cross-reference of library features against active examples. **`covered`** means at least one active example exercises the element.
 
 | API Element | Status | Active examples | Notes |
 | :--- | :--- | :--- | :--- |

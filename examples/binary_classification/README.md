@@ -2,6 +2,19 @@
 
 This example demonstrates how to build and train a multi-hidden layer neural network for binary classification on a synthetic Gaussian-blob dataset using functional options.
 
+## Overview
+
+The network classifies 2-D points sampled from two well-separated Gaussian blobs centered at $(-1.5, -1.5)$ and $(+1.5, +1.5)$.
+
+## Network Topology
+
+The architecture follows a deep multi-hidden layer setup:
+
+- **Input**: 2 neurons (X, Y coordinates)
+- **Hidden Layer 1**: 8 neurons with `ReLU` activation
+- **Hidden Layer 2**: 8 neurons with `ReLU` activation
+- **Output**: 1 neuron with `Sigmoid` activation (binary label 0 or 1)
+
 ## Features
 
 - **Options API**: Network construction using functional options (`nn.New`).
