@@ -1,10 +1,10 @@
 # Master Task Index (Registry)
 
-**Version:** 2.3.0
-**Project Version:** 0.9.0 (Phase 10 active — v0.9.0 in progress)
+**Version:** 2.4.0
+**Project Version:** 0.10.0 (Phase 11 active — v0.10.0 in progress)
 **Generated:** 2026-04-29
-**Last Updated:** 2026-05-11
-**Based on:** .design/PLAN.md v2.4.0
+**Last Updated:** 2026-05-12
+**Based on:** .design/PLAN.md v2.5.0
 **Based on RULES:** .design/RULES.md v1.3.0
 **Execution Mode:** Parallel (C3)
 **Status:** Active
@@ -26,7 +26,8 @@ Tactical registry of all phases and their statuses. Atomic checklists (`T-XXXX`)
 | [Phase 7](tasks/phase-7.md) | Deep Builder + LR Scheduling + Developer Skills — `pkg/optimizer/` scheduler extension, `pkg/nn` bulk constructors, `skills/gonn/` | `Done` (2026-05-10) |
 | [Phase 8](tasks/phase-8.md) | LR Scheduling Extension + CLI Binary — `ExponentialLR`, `cmd/gonn/` binary, v0.7.0 release | `Done` (2026-05-10) |
 | [Phase 9](tasks/phase-9.md) | Metric Schedulers + Dynamic Topology + Observability Stack — `ReduceOnPlateau`, `OneCycleLR`, topology mutations, slog + viz HTTP server, v0.8.0 release | `Done` (2026-05-10) |
-| [Phase 10](tasks/phase-10.md) | Normalization Layers + Training Callbacks — `pkg/layer/norm/` (BatchNorm/LayerNorm/GroupNorm), `pkg/nn/callbacks.go`, v0.9.0 release | `Todo` |
+| [Phase 10](tasks/phase-10.md) | Normalization Layers + Training Callbacks — `pkg/layer/norm/` (BatchNorm/LayerNorm/GroupNorm), `pkg/nn/callbacks.go`, v0.9.0 release | `Done` (2026-05-12) |
+| [Phase 11](tasks/phase-11.md) | Meta-Learning Hooks + Convolutional Layers + Dataset Formats — `pkg/nn/meta.go`, `pkg/layer/conv/`, `pkg/dataset/mnist.go`, `pkg/nn/andtrain.go`, examples E06+E10, v0.10.0 release | `Todo` |
 
 ## Phase 0 — Already Complete
 
@@ -161,41 +162,64 @@ Six of the eight v0.6-gated entries (E03, E04, E05, E07, E08, E13) are now activ
 | `CHANGELOG.md` (v0.7.0 entry) | l1-release-policy v1.0.0 | `Done` |
 | `v0.7.0` git tag | l1-release-policy v1.0.0 §5.4 | `Done` |
 
-## Phase 9 Deliverables (Todo)
+## Phase 9 Deliverables (Done — 2026-05-10)
 
 | Asset | Spec | Status |
 | :--- | :--- | :--- |
-| `pkg/optimizer/metric_scheduler.go` | l2-metric-scheduler-impl v0.1.0 | `Todo` |
-| `pkg/optimizer/reduce_on_plateau.go` + test | l2-metric-scheduler-impl v0.1.0 §5.3 | `Todo` |
-| `pkg/optimizer/one_cycle_lr.go` + test | l2-metric-scheduler-impl v0.1.0 §5.4 | `Todo` |
-| `pkg/nn/train.go` (metric dispatch patch) | l2-metric-scheduler-impl v0.1.0 §5.5 | `Todo` |
-| `pkg/network/topology.go` | l2-dynamic-topology-impl v0.2.0 §5.1–5.6 | `Todo` |
-| `pkg/network/topology_test.go` | l2-dynamic-topology-impl v0.2.0 | `Todo` |
-| `pkg/utils/errors.go` (new DYN sentinels) | l2-dynamic-topology-impl v0.2.0 §5.6 | `Todo` |
-| `pkg/nn/options.go` + `builder.go` (WithTopologyMode) | l2-dynamic-topology-impl v0.2.0 §5.1 | `Todo` |
-| `pkg/utils/logger.go` (slog upgrade, LevelTrace) | l2-logging-strategy v0.2.0 §5.5 | `Todo` |
-| `pkg/visualization/server.go` + `handlers.go` + `middleware.go` | l2-visualization-api v0.2.0 §5.5–5.6 | `Todo` |
-| `pkg/nn/options.go` (WithLogger, WithVisualizationEndpoint) + `compile.go` | l2-visualization-api + l2-logging-strategy | `Todo` |
-| `CHANGELOG.md` (v0.8.0 entry) | l1-release-policy v1.0.0 | `Todo` |
-| `v0.8.0` git tag | l1-release-policy v1.0.0 §5.4 | `Todo` |
+| `pkg/optimizer/metric_scheduler.go` | l2-metric-scheduler-impl v0.1.0 | `Done` |
+| `pkg/optimizer/reduce_on_plateau.go` + test | l2-metric-scheduler-impl v0.1.0 §5.3 | `Done` |
+| `pkg/optimizer/one_cycle_lr.go` + test | l2-metric-scheduler-impl v0.1.0 §5.4 | `Done` |
+| `pkg/nn/train.go` (metric dispatch patch) | l2-metric-scheduler-impl v0.1.0 §5.5 | `Done` |
+| `pkg/network/topology.go` | l2-dynamic-topology-impl v0.2.0 §5.1–5.6 | `Done` |
+| `pkg/network/topology_test.go` | l2-dynamic-topology-impl v0.2.0 | `Done` |
+| `pkg/utils/errors.go` (new DYN sentinels) | l2-dynamic-topology-impl v0.2.0 §5.6 | `Done` |
+| `pkg/nn/options.go` + `builder.go` (WithTopologyMode) | l2-dynamic-topology-impl v0.2.0 §5.1 | `Done` |
+| `pkg/utils/logger.go` (slog upgrade, LevelTrace) | l2-logging-strategy v0.2.0 §5.5 | `Done` |
+| `pkg/visualization/server.go` + `handlers.go` + `middleware.go` | l2-visualization-api v0.2.0 §5.5–5.6 | `Done` |
+| `pkg/nn/options.go` (WithLogger, WithVisualizationEndpoint) + `compile.go` | l2-visualization-api + l2-logging-strategy | `Done` |
+| `CHANGELOG.md` (v0.8.0 entry) | l1-release-policy v1.0.0 | `Done` |
+| `v0.8.0` git tag | l1-release-policy v1.0.0 §5.4 | `Done` |
 
-## Phase 10 Deliverables (Todo)
+## Phase 10 Deliverables (Done — 2026-05-12)
 
 | Asset | Spec | Status |
 | :--- | :--- | :--- |
-| `pkg/layer/norm/norm.go` (interface + helpers) | l2-normalization-impl v0.1.0 | `Todo` |
-| `pkg/layer/norm/batchnorm.go` + `norm_test.go` | l2-normalization-impl v0.1.0 §5.2 | `Todo` |
-| `pkg/layer/norm/layernorm.go` + `groupnorm.go` | l2-normalization-impl v0.1.0 §5.2 | `Todo` |
-| `pkg/nn/options.go` (WithBatchNorm/WithLayerNorm/WithNormAfterLayer) | l2-normalization-impl v0.1.0 §5.3 | `Todo` |
-| `pkg/nn/compile.go` (norm layer injection + grad slots) | l2-normalization-impl v0.1.0 §6 | `Todo` |
-| `pkg/nn/nn.go` (SetTrain/SetEval propagation) | l2-normalization-impl v0.1.0 §5.4 | `Todo` |
-| `pkg/nn/callbacks.go` (CallbackRegistry[T], ErrStopTraining, fireEvent) | l2-callbacks-impl v0.1.0 | `Todo` |
-| `pkg/nn/callbacks_test.go` (BenchmarkNoCallbacks) | l2-callbacks-impl v0.1.0 §5.1 | `Todo` |
-| `pkg/nn/train.go` (defer fireOnTrainEnd + dispatch) | l2-callbacks-impl v0.1.0 §5.4 | `Todo` |
-| `pkg/nn/options.go` (WithOnIterationEnd/WithOnImprovementFound/WithOnTrainEnd) | l2-callbacks-impl v0.1.0 §5.3 | `Todo` |
-| `pkg/utils/errors.go` (ErrCallbackPanic sentinel) | l2-callbacks-impl v0.1.0 §6 | `Todo` |
-| `CHANGELOG.md` (v0.9.0 entry) | l1-release-policy v1.0.0 | `Todo` |
-| `v0.9.0` git tag | l1-release-policy v1.0.0 §5.4 | `Todo` |
+| `pkg/layer/norm/norm.go` (interface + helpers) | l2-normalization-impl v0.1.0 | `Done` |
+| `pkg/layer/norm/batchnorm.go` + `norm_test.go` | l2-normalization-impl v0.1.0 §5.2 | `Done` |
+| `pkg/layer/norm/layernorm.go` + `groupnorm.go` | l2-normalization-impl v0.1.0 §5.2 | `Done` |
+| `pkg/nn/options.go` (WithBatchNorm/WithLayerNorm/WithNormAfterLayer) | l2-normalization-impl v0.1.0 §5.3 | `Done` |
+| `pkg/nn/compile.go` (norm layer injection + grad slots) | l2-normalization-impl v0.1.0 §6 | `Done` |
+| `pkg/nn/nn.go` (SetTrain/SetEval propagation) | l2-normalization-impl v0.1.0 §5.4 | `Done` |
+| `pkg/nn/callbacks.go` (CallbackRegistry[T], ErrStopTraining, fireEvent) | l2-callbacks-impl v0.1.0 | `Done` |
+| `pkg/nn/callbacks_test.go` (BenchmarkNoCallbacks) | l2-callbacks-impl v0.1.0 §5.1 | `Done` |
+| `pkg/nn/train.go` (defer fireOnTrainEnd + dispatch) | l2-callbacks-impl v0.1.0 §5.4 | `Done` |
+| `pkg/nn/options.go` (WithOnIterationEnd/WithOnImprovementFound/WithOnTrainEnd) | l2-callbacks-impl v0.1.0 §5.3 | `Done` |
+| `pkg/utils/errors.go` (ErrCallbackPanic sentinel) | l2-callbacks-impl v0.1.0 §6 | `Done` |
+| `CHANGELOG.md` (v0.9.0 entry) | l1-release-policy v1.0.0 | `Done` |
+| `v0.9.0` git tag | l1-release-policy v1.0.0 §5.4 | `Done` |
 
-- **Last Updated**: 2026-05-11
+## Phase 11 Deliverables (Todo)
+
+| Asset | Spec | Status |
+| :--- | :--- | :--- |
+| `pkg/nn/meta.go` (ParamAccessor[T], ScalarParam[T], SliceParam[T], MetaLearner[T]) | l2-meta-learning-impl v0.1.0 §5.2 | `Todo` [A, blocked] |
+| `pkg/nn/options.go` (WithMetaLearner) + `config.go` | l2-meta-learning-impl v0.1.0 §5.5 | `Todo` [A, blocked] |
+| `pkg/nn/train.go` (meta hook after opt.Step) | l2-meta-learning-impl v0.1.0 §5.3 | `Todo` [A, blocked] |
+| `pkg/utils/errors.go` (ErrMetaLearnerShape, ErrMetaLearnerRunning) | l2-meta-learning-impl v0.1.0 §5.4 | `Todo` [A, blocked] |
+| `pkg/layer/conv/conv.go` (interface assertions) | l2-conv-layers-impl v0.1.0 §5.1 | `Todo` [B] |
+| `pkg/layer/conv/conv1d.go` (Conv1D[T]) | l2-conv-layers-impl v0.1.0 §5.2 | `Todo` [B] |
+| `pkg/layer/conv/pool.go` (MaxPool1D[T], AvgPool1D[T]) | l2-conv-layers-impl v0.1.0 §5.3 | `Todo` [B] |
+| `pkg/layer/conv/flatten.go` (Flatten[T]) | l2-conv-layers-impl v0.1.0 §5.4 | `Todo` [B] |
+| `pkg/nn/options.go` (WithConv1D, WithMaxPool1D, WithFlatten) | l2-conv-layers-impl v0.1.0 §5.5 | `Todo` [B] |
+| `pkg/nn/compile.go` (conv stack prepend + outputLen) | l2-conv-layers-impl v0.1.0 §5.6 | `Todo` [B] |
+| `pkg/utils/errors.go` (ErrConvShapeMismatch, ErrConvPoolSizeMismatch) | l2-conv-layers-impl v0.1.0 §5.7 | `Todo` [B] |
+| `pkg/dataset/mnist.go` (IDXReader, MNISTLoader[T]) | l2-dataset-loader-impl v0.1.0 §5.2–5.3 | `Todo` [C] |
+| `pkg/nn/andtrain.go` (AndTrain method) | l2-dataset-loader-impl v0.1.0 §5.4 | `Todo` [C] |
+| `pkg/utils/errors.go` (ErrIDXMagic, ErrMNISTRecordMismatch, ErrNetworkRunning) | l2-dataset-loader-impl v0.1.0 §5.5 | `Todo` [C] |
+| `examples/E06_mnist/` | l2-usage-examples v1.0.0 + l2-dataset-loader-impl v0.1.0 | `Todo` [C] |
+| `examples/E10_continuation/` | l2-usage-examples v1.0.0 + l2-dataset-loader-impl v0.1.0 | `Todo` [C] |
+| `CHANGELOG.md` (v0.10.0 entry) | l1-release-policy v1.0.0 | `Todo` |
+| `v0.10.0` git tag | l1-release-policy v1.0.0 §5.4 | `Todo` |
+
+- **Last Updated**: 2026-05-12
 - **Maintainer**: Core Team

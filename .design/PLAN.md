@@ -1,9 +1,9 @@
 # Implementation Plan
 
-**Version:** 2.4.0
+**Version:** 2.5.0
 **Project Version:** 0.9.0 (v0.9.0 scoped in Phase 10)
 **Generated:** 2026-04-29
-**Last Updated:** 2026-05-11
+**Last Updated:** 2026-05-12
 **Based on:** .design/INDEX.md v2.7.0
 **Based on RULES:** .design/RULES.md v1.3.0
 **Based on ROADMAP:** .design/ROADMAP.md v1.0.0
@@ -141,7 +141,7 @@ GoNN library implementation plan derived from `ROADMAP.md` Hybrid Path. Phase or
 - [x] **[B] Dynamic Topology** ([l2-dynamic-topology-impl.md](specifications/l2-dynamic-topology-impl.md)) [L2, Stable v0.2.0] — `TopologyMode` enum, mutation methods on `Network[T]`, `topologyTx` rollback, `rebalance`, `TopologyVersion()`, new error sentinels.
 - [x] **[C] Observability Stack** ([l2-visualization-api.md](specifications/l2-visualization-api.md) + [l2-logging-strategy.md](specifications/l2-logging-strategy.md)) [L2, Stable v0.2.0] — `pkg/visualization/server.go` + handlers; `pkg/utils/logger.go` slog upgrade with `LevelTrace`; `WithLogger`/`WithVisualizationEndpoint` option wiring.
 
-## Phase 10 — Normalization Layers + Training Callbacks (v0.9.0)
+## Phase 10 — Normalization Layers + Training Callbacks (v0.9.0) ✓ Done
 
 *Two parallel tracks delivering the normalization layer package and the callback event system.
 Track A: BatchNorm/LayerNorm/GroupNorm in pkg/layer/norm/. Track B: CallbackRegistry[T] wired
@@ -151,9 +151,10 @@ into pkg/nn/train.go. Light coordination on pkg/nn/train.go (Track B owns it; Tr
 **Requires:** Phase 9 ✓
 **Tasks file:** [tasks/phase-10.md](tasks/phase-10.md)
 **Track order:** A and B mostly parallel; Track B completes train.go changes first; T-10T01 after A, T-10T02 after B; Gate T-10Z01.
+**Outcome:** `pkg/layer/norm/` — `Normalizer[T]` interface + `BatchNorm/LayerNorm/GroupNorm[T]` + JSON round-trip; `pkg/nn/callbacks.go` — `CallbackRegistry[T]`, `ErrStopTraining`, panic-safe `invokeOne`, `WithOnIterationEnd/WithOnImprovementFound/WithOnTrainEnd` options; `BenchmarkNoCallbacks` at 0 allocs/op. Gate T-10Z01 green. v0.9.0 tagged.
 
-- [ ] **[A] Normalization Layers** ([l1-normalization-layers.md](specifications/l1-normalization-layers.md) + [l2-normalization-impl.md](specifications/l2-normalization-impl.md)) [L1+L2, Stable v1.0.0 / v0.1.0] — `pkg/layer/norm/`: `Normalizer[T]` interface; `BatchNorm/LayerNorm/GroupNorm[T]`; `WithBatchNorm`/`WithLayerNorm` options; `SetTrain`/`SetEval` propagation; JSON round-trip.
-- [ ] **[B] Training Callbacks** ([l1-training-callbacks.md](specifications/l1-training-callbacks.md) + [l2-callbacks-impl.md](specifications/l2-callbacks-impl.md)) [L1+L2, Stable v1.0.0 / v0.1.0] — `pkg/nn/callbacks.go`: `CallbackRegistry[T]`; `ErrStopTraining`; panic recovery; `defer fireOnTrainEnd`; `WithOnIterationEnd`/`WithOnImprovementFound`/`WithOnTrainEnd` options; 0-alloc benchmark.
+- [x] **[A] Normalization Layers** ([l1-normalization-layers.md](specifications/l1-normalization-layers.md) + [l2-normalization-impl.md](specifications/l2-normalization-impl.md)) [L1+L2, Stable v1.0.0 / v0.1.0] — `pkg/layer/norm/`: `Normalizer[T]` interface; `BatchNorm/LayerNorm/GroupNorm[T]`; `WithBatchNorm`/`WithLayerNorm` options; `SetTrain`/`SetEval` propagation; JSON round-trip.
+- [x] **[B] Training Callbacks** ([l1-training-callbacks.md](specifications/l1-training-callbacks.md) + [l2-callbacks-impl.md](specifications/l2-callbacks-impl.md)) [L1+L2, Stable v1.0.0 / v0.1.0] — `pkg/nn/callbacks.go`: `CallbackRegistry[T]`; `ErrStopTraining`; panic recovery; `defer fireOnTrainEnd`; `WithOnIterationEnd`/`WithOnImprovementFound`/`WithOnTrainEnd` options; 0-alloc benchmark.
 
 ## Backlog
 
@@ -167,7 +168,7 @@ into pkg/nn/train.go. Light coordination on pkg/nn/train.go (Track B owns it; Tr
 
 - [l2-ai-doc-metadata.md](specifications/l2-ai-doc-metadata.md) — RFC v0.1.0 (AI-Meta trailing block convention; gated on cmd/lint-aimeta delivery; rollout phased per §8)
 
-### L1 Concept (tracked — promoted to Stable 2026-05-01, parents of active Phase 3–9 specs)
+### L1 Concept (tracked — promoted to Stable, parents of active Phase 3–10 specs)
 
 - [l1-neural-network-architecture.md](specifications/l1-neural-network-architecture.md) — Stable v2.0.0
 - [l1-training-semantics.md](specifications/l1-training-semantics.md) — Stable v1.0.0
@@ -178,10 +179,26 @@ into pkg/nn/train.go. Light coordination on pkg/nn/train.go (Track B owns it; Tr
 - [l1-performance-contract.md](specifications/l1-performance-contract.md) — Stable v1.0.0
 - [l1-data-streaming.md](specifications/l1-data-streaming.md) — Stable v1.0.0
 - [l1-compute-backend.md](specifications/l1-compute-backend.md) — Stable v1.0.0
+- [l1-dynamic-topology.md](specifications/l1-dynamic-topology.md) — Stable v0.2.0 (parent of l2-dynamic-topology-impl.md, Phase 9 Track B; orphan resolved 2026-05-12)
 
 ### Phase 4 → Phase 5 promotion (multi-hidden)
 
-Six of the eight original v0.6-gated catalog entries (E03, E04, E05, E07, E08, E13) move from backlog into active Phase 5 work. E06 (MNIST preset — needs dataset-loader spec) and E10 (continuation — needs `AndTrain` API surface) stay deferred until their respective spec authoring lands.
+Six of the eight original v0.6-gated catalog entries (E03, E04, E05, E07, E08, E13) move from backlog into active Phase 5 work. E06 (MNIST preset) and E10 (AndTrain continuation) promoted to Phase 11 Track C once l1-dataset-formats.md reaches Stable.
+
+## Phase 11 — Meta-Learning Hooks + Convolutional Layers + Dataset Formats (v0.10.0)
+
+*Three parallel tracks covering the backlog Creative Sparks from the Phase 10 retrospective.
+Track A (Meta-Learning) is gated on l1-meta-learning-hooks RFC→Stable promotion; Tracks B and C
+are independent and can begin immediately.*
+
+**Subsystem:** `pkg/nn/` (meta), `pkg/layer/conv/` (new), `pkg/dataset/` (extend), `examples/E06`, `examples/E10`
+**Requires:** Phase 10 ✓
+**Tasks file:** [tasks/phase-11.md](tasks/phase-11.md)
+**Track order:** B and C fully parallel; A unblocked after l1-meta-learning-hooks → Stable; T-11T01/T-11T02/T-11T03 after each track; Gate T-11Z01.
+
+- [ ] **[A] Meta-Learning Hooks** ([l1-meta-learning-hooks.md](specifications/l1-meta-learning-hooks.md) + [l2-meta-learning-impl.md](specifications/l2-meta-learning-impl.md)) [L1 RFC→Stable pending, L2 Draft v0.1.0] — `pkg/nn/meta.go`: `ParamAccessor[T]`; `Tunable[T]`; `MetaLearner[T]`; `WithMetaLearner` option; train.go hook. *Blocked until l1-meta-learning-hooks reaches Stable via magic.spec review.*
+- [ ] **[B] Convolutional Layers** ([l1-conv-layers.md](specifications/l1-conv-layers.md) + [l2-conv-layers-impl.md](specifications/l2-conv-layers-impl.md)) [L1+L2, Draft v0.1.0] — `pkg/layer/conv/`: `Conv1D[T]`; `MaxPool1D[T]`; `Flatten[T]`; `WithConv1D`/`WithPooling` options; JSON round-trip.
+- [ ] **[C] Dataset Formats + Deferred Examples** ([l1-dataset-formats.md](specifications/l1-dataset-formats.md) + [l2-dataset-loader-impl.md](specifications/l2-dataset-loader-impl.md)) [L1+L2, Draft v0.1.0] — `pkg/dataset/`: `IDXReader`; `MNISTLoader[T]`; `AndTrain` functional extension in `pkg/nn/`; examples E06 (MNIST) and E10 (continuation).
 
 ## Build Order Diagram
 
@@ -197,6 +214,7 @@ graph LR
   G1 --> H1[Phase 8 — LR Extension + CLI Binary]
   H1 --> I1[Phase 9 — Metric Schedulers + Dynamic Topology + Observability]
   I1 --> J1[Phase 10 — Normalization Layers + Training Callbacks]
+  J1 --> K1[Phase 11 — Meta-Learning + Conv Layers + Dataset Formats]
 ```
 
 ## Document History
@@ -218,3 +236,4 @@ graph LR
 | 2.2.0 | 2026-05-10 | Phase 8 scoped: Track A (ExponentialLR, closes scheduler gap), Track B (gonn CLI binary). l2-lr-scheduling-impl + l2-dynamic-topology-impl orphans resolved. l2-cli-client promoted from Backlog (RFC→Stable). Backlog updated: l2-dynamic-topology-impl Draft added; deferred scheduler types (ReduceOnPlateau, OneCycleLR) noted. Based on INDEX.md v2.5.0. |
 | 2.3.0 | 2026-05-10 | Phase 8 marked Done (v0.7.0 tagged). Phase 9 scoped: Track A (MetricScheduler/ReduceOnPlateau/OneCycleLR), Track B (Dynamic Topology mutations), Track C (slog logging + viz HTTP server). Backlog: Dynamic Topology + MetricScheduler + Observability items moved to Phase 9. Based on INDEX.md v2.6.0. |
 | 2.4.0 | 2026-05-11 | Phase 9 marked Done (v0.8.0 tagged). Phase 10 scoped: Track A (normalization layers: BatchNorm/LayerNorm/GroupNorm), Track B (training callbacks: CallbackRegistry/ErrStopTraining). l1-meta-learning-hooks promoted Draft→RFC v0.3.0 (moved to Backlog). VERSION_DRIFT l2-lr-scheduling-impl synced v1.1.0→v1.2.0. Based on INDEX.md v2.7.0. |
+| 2.5.0 | 2026-05-12 | Phase 10 marked Done (v0.9.0 tagged). Orphan l1-dynamic-topology.md resolved (added to tracked Backlog). Phase 11 scoped: Track A (Meta-Learning Hooks), Track B (Convolutional Layers), Track C (Dataset Formats + E06/E10). 5 new Draft specs registered. Based on INDEX.md v2.8.0. |
