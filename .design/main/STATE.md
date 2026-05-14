@@ -5,15 +5,15 @@
 
 **Workspace:** main
 **Project Version:** 0.9.0 (Phase 10 complete)
-**Updated:** 2026-05-14 07:58
+**Updated:** 2026-05-14 12:34
 **Phase:** 11 — Meta-Learning Hooks + Convolutional Layers + Dataset Formats
 **Status:** Done
 
 ## Current Position
 
-- **Task:** T-11C01..C03 + T-11C05 (E10) done; conv package + AndTrain operational
+- **Task:** T-11B05 (conv prefix full integration into nn/network train+query)
 - **Spec:** l2-normalization-impl v0.1.0 + l2-callbacks-impl v0.1.0 fully implemented. CHANGELOG.md v0.9.0 written.
-- **Next Action:** Resume Phase 11 via /magic-run main. Pending: T-11B05 (network.Network refactor to wire conv stack into forward/backward), T-11C04 (E06 MNIST example — needs IDX data files in examples/E06_mnist/data/), T-11T02 final integration tests, T-11Z01 gate.
+- **Next Action:** Run /magic-run main to continue Phase 11: T-11C04 (E06 MNIST example — code template + README; needs user-supplied IDX data files), T-11T02/T-11T03 final integration validation, T-11Z01 Phase 11 gate (CHANGELOG v0.10.0 + v0.10.0 tag).
 
 ## Progress
 

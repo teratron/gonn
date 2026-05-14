@@ -21,7 +21,11 @@ func (n *NN[T]) Query(input []T) ([]T, error) {
 		return nil, utils.Newf(utils.ErrUserConfig,
 			"Query: network is %s, must be Operational (call Compile or use New)", n.stateField.String())
 	}
-	if err := n.SetInputs(input); err != nil {
+	netInput, err := n.runConvForward(input)
+	if err != nil {
+		return nil, err
+	}
+	if err := n.SetInputs(netInput); err != nil {
 		return nil, err
 	}
 	n.CalculateValues()

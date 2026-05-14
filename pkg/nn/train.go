@@ -1,6 +1,7 @@
 package nn
 
 import (
+	"github.com/teratron/gonn/pkg/layer/conv"
 	"github.com/teratron/gonn/pkg/optimizer"
 	"github.com/teratron/gonn/pkg/regularizer"
 	"github.com/teratron/gonn/pkg/utils"
@@ -45,9 +46,18 @@ func (n *NN[T]) Train(input, target []T) (T, error) {
 }
 
 // trainStep executes one forward + backward + optimizer step.
-// Shared by Train and the inner loop of Fit.
+// Shared by Train and the inner loop of Fit. When a conv prefix is
+// configured the input is first transformed through the conv stack; the
+// chain's final output replaces the raw input as the Network's Input.
+// Backward gradient flow runs symmetrically: Network.AppendInputGradient
+// produces ∂L/∂(conv output), which is piped through the conv layers in
+// reverse to accumulate conv-weight gradients (CONV-4).
 func (n *NN[T]) trainStep(input, target []T) (T, error) {
-	if err := n.Network.SetInputs(input); err != nil {
+	netInput, err := n.runConvForward(input)
+	if err != nil {
+		return 0, err
+	}
+	if err := n.Network.SetInputs(netInput); err != nil {
 		return 0, err
 	}
 	if err := n.Network.SetTargets(target); err != nil {
@@ -72,6 +82,14 @@ func (n *NN[T]) trainStep(input, target []T) (T, error) {
 
 	n.Network.CalculateMisses()
 
+	// Drive the conv backward pass BEFORE the optimizer overwrites the
+	// neuron axon weights — the input-gradient formula reads those weights
+	// to project the hidden-layer miss back onto the Input cells.
+	if len(n.convPrefix) > 0 {
+		n.convGradBuf = n.Network.AppendInputGradient(n.convGradBuf)
+		n.applyConvBackward(n.convGradBuf)
+	}
+
 	// Collect weights and gradients, delegate update to the optimizer.
 	n.weightBuf = n.Network.AppendFlatWeights(n.weightBuf)
 	n.gradBuf = n.Network.AppendFlatGradients(n.gradBuf)
@@ -81,6 +99,69 @@ func (n *NN[T]) trainStep(input, target []T) (T, error) {
 	n.Network.ApplyFlatWeights(n.weightBuf)
 
 	return lossVal, nil
+}
+
+// runConvForward pushes the raw input vector through the conv prefix and
+// returns the chain's final output. Returns the input unchanged when no
+// conv prefix is configured (zero allocation, zero overhead).
+//
+// AI-Meta:
+//   - Purpose: Run the conv prefix as a preprocessing stage before the Dense head.
+//   - Concurrency: NotSafe; mutates per-layer scratch buffers.
+//   - Related: [trainStep], [Query], [applyConvBackward].
+func (n *NN[T]) runConvForward(input []T) ([]T, error) {
+	if len(n.convPrefix) == 0 {
+		return input, nil
+	}
+	if n.rawInputSize != 0 && uint(len(input)) != n.rawInputSize {
+		return nil, utils.Newf(utils.ErrInputData,
+			"conv prefix: input length %d does not match declared raw size %d",
+			len(input), n.rawInputSize)
+	}
+	cur := input
+	for _, cl := range n.convPrefix {
+		cur = cl.Forward(cur)
+	}
+	n.convBuf = cur
+	return cur, nil
+}
+
+// applyConvBackward walks the conv chain in reverse, propagating the
+// upstream gradient and updating Conv1D kernel weights via an inline SGD
+// step against the network's learning rate. Pool and Flatten layers carry
+// no parameters — their Backward implementations just reshape / route the
+// gradient through. Wiring the conv weights through optimizer.Optimizer
+// is deferred to a future minor (v0.11) so this v0.10 release keeps the
+// integration small and observable.
+//
+// AI-Meta:
+//   - Purpose: Backward-pass conv stack with inline SGD weight update on Conv1D layers.
+//   - Concurrency: NotSafe; reads gradient slices and mutates conv weights.
+//   - Related: [trainStep], [conv.Conv1D.Backward], [conv.Conv1D.GradSlots].
+func (n *NN[T]) applyConvBackward(gradOut []T) {
+	upstream := gradOut
+	for i := len(n.convPrefix) - 1; i >= 0; i-- {
+		next := n.convPrefix[i].Backward(upstream)
+		if c1d, ok := n.convPrefix[i].(*conv.Conv1D[T]); ok {
+			gW, gB := c1d.GradSlots()
+			applyConvSGD(c1d.Weights, gW, n.LearningRate)
+			if c1d.UseBias && len(gB) > 0 {
+				applyConvSGD(c1d.Biases, gB, n.LearningRate)
+			}
+		}
+		upstream = next
+	}
+}
+
+// applyConvSGD performs w -= lr · g elementwise. Length parity is the
+// caller's invariant — Conv1D.GradSlots guarantees identical lengths.
+func applyConvSGD[T utils.Float](w, g []T, lr T) {
+	if len(g) == 0 {
+		return
+	}
+	for i := range w {
+		w[i] -= lr * g[i]
+	}
 }
 
 // Fit runs the managed multi-epoch training loop. Each epoch processes every

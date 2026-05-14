@@ -1,10 +1,12 @@
 package nn
 
 import (
+	"fmt"
 	"math/rand/v2"
 
 	"github.com/teratron/gonn/pkg/activation"
 	"github.com/teratron/gonn/pkg/layer"
+	"github.com/teratron/gonn/pkg/layer/conv"
 	normPkg "github.com/teratron/gonn/pkg/layer/norm"
 	"github.com/teratron/gonn/pkg/loss"
 	"github.com/teratron/gonn/pkg/network"
@@ -33,7 +35,28 @@ func compile[T utils.Float](n *NN[T], cfg *Config[T]) error {
 	}
 	emitSoftWarnings(cfg)
 
-	in := layer.NewInput[T](int(cfg.InputSize))
+	// Resolve the conv prefix BEFORE building Input — when present, the
+	// Input layer is sized to the conv stack's final output length, not
+	// the raw input length the user declared via WithInput. The raw size
+	// is preserved on NN for SetInputs-style validation in Train / Query.
+	rawInputSize := cfg.InputSize
+	effectiveInputSize := cfg.InputSize
+	if len(cfg.ConvPrefix) > 0 {
+		convOut, err := computeConvChainOutput(cfg.ConvPrefix, int(rawInputSize))
+		if err != nil {
+			return utils.Wrap(utils.ErrUserConfig, err, "compile: conv prefix shape resolution")
+		}
+		if convOut <= 0 {
+			return utils.Newf(utils.ErrUserConfig,
+				"compile: conv prefix collapses input length %d to zero — check kernel/pool sizes",
+				rawInputSize)
+		}
+		effectiveInputSize = uint(convOut)
+	}
+	n.rawInputSize = rawInputSize
+	n.convPrefix = cfg.ConvPrefix
+
+	in := layer.NewInput[T](int(effectiveInputSize))
 	// Build the multi-hidden chain per [l2-multihidden-impl] §5.5. Each
 	// HiddenLayerSpec carries its own Size / Activation / Bias, so the
 	// chain composes mixed-activation, mixed-bias topologies in one pass.
@@ -55,6 +78,15 @@ func compile[T utils.Float](n *NN[T], cfg *Config[T]) error {
 
 	if err := n.Build(); err != nil {
 		return utils.Wrap(utils.ErrUserConfig, err, "compile: Build failed")
+	}
+	// Initialise conv-stack kernel weights via the same RNG so reproducibility
+	// (WI-2 seed contract) extends to convolutional kernels. Only Conv1D
+	// layers carry trainable weights; Pool / Flatten implement Init as a
+	// type assertion no-op.
+	for _, cl := range n.convPrefix {
+		if init, ok := cl.(interface{ Init(rng *rand.Rand) }); ok {
+			init.Init(rng)
+		}
 	}
 	n.LearningRate = cfg.LearningRate
 
@@ -114,6 +146,37 @@ func startVisServer[T utils.Float](n *NN[T], cfg *Config[T]) error {
 	}
 	n.vis = vs
 	return nil
+}
+
+// computeConvChainOutput walks the conv prefix once with a dummy input of
+// length rawInputSize and returns the chain's final output length. Each
+// layer's Forward is invoked on a zero-filled scratch buffer purely to let
+// the layer record its inLen; the returned length comes from
+// [conv.Layer.OutputSize]. Layers whose OutputSize is zero on a non-zero
+// input indicate a shape mismatch (e.g. kernel larger than the feature
+// map) and the function returns an error wrapping
+// [utils.ErrConvShapeMismatch].
+//
+// AI-Meta:
+//   - Purpose: Shape-resolve the conv prefix at compile time so the Input layer gets the right size.
+//   - Concurrency: Safe; each layer is exercised once with a freshly allocated zero buffer.
+//   - Related: [compile], [conv.Layer], [conv.NewConv1D].
+func computeConvChainOutput[T utils.Float](chain []conv.Layer[T], rawInputSize int) (int, error) {
+	cur := rawInputSize
+	for i, cl := range chain {
+		if cur <= 0 {
+			return 0, fmt.Errorf("conv layer %d sees zero-length input: %w",
+				i, utils.ErrConvShapeMismatch)
+		}
+		out := cl.Forward(make([]T, cur))
+		size := len(out)
+		if size == 0 {
+			return 0, fmt.Errorf("conv layer %d produced empty output from input length %d: %w",
+				i, cur, utils.ErrConvShapeMismatch)
+		}
+		cur = size
+	}
+	return cur, nil
 }
 
 // weightSamplerFor converts a WeightInitMethod into the sampler function

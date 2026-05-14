@@ -16,10 +16,10 @@ duration_minutes: ~
 
 # Phase 11 — Meta-Learning Hooks + Convolutional Layers + Dataset Formats
 
-**Status:** In Progress (Track B core + Track C core landed; T-11B05 train-loop integration deferred; T-11C04 E06 MNIST example pending data)
+**Status:** In Progress (Tracks B + C fully integrated; T-11C04 E06 MNIST example pending external data; gate T-11Z01 pending)
 **Decomposed:** 2026-05-12
-**Last Updated:** 2026-05-14 (Session 2: Track C T-11C01..C03 implemented and tested; T-11C05 E10 continuation example runs end-to-end. Pending: T-11B05 train-loop integration, T-11C04 E06 MNIST example (needs IDX data files), T-11T02/03 final, T-11Z01 gate.)
-**Tasks:** 10 feature + 3 validation + 1 gate = 14 total — 7 feature done, 1 validation partial.
+**Last Updated:** 2026-05-14 (Session 3: T-11B05 full integration done — conv prefix runs end-to-end through Train/Fit/Query; `Network.AppendInputGradient` added; 7 new integration tests green. Pending: T-11C04 E06 MNIST (needs IDX data files), T-11T02/03 final, T-11Z01 gate + v0.10.0 tag.)
+**Tasks:** 10 feature + 3 validation + 1 gate = 14 total — 8 feature done, 1 validation partial.
 **Specs:** l2-meta-learning-impl v0.1.0 (Draft, blocked), l2-conv-layers-impl v0.1.0 (Stable), l2-dataset-loader-impl v0.1.0 (Stable)
 **Track order:** B and C are fully parallel and unblocked; A requires l1-meta-learning-hooks → Stable first;
                T-11T01 after Track A, T-11T02 after Track B, T-11T03 after Track C; Gate T-11Z01 after all.
@@ -86,12 +86,20 @@ Run `/magic.spec` to perform the RFC review and promotion.*
   Tests cover: outputLen all branches, Conv1D zero/known-kernel forward, ∂L/∂W finite-difference (CONV-4), JSON round-trip (CONV-7), Validate error paths, MaxPool/AvgPool forward/backward correctness, Flatten identity, accessor coverage, constructor clamp, shape-mismatch returns.
   **Remaining**: full network-integration tests (conv prefix in compile, training loop) deferred until T-11B05 train-loop integration lands.
 
-- [ ] **T-11B05** — Wire into `pkg/nn/`:
-  `pkg/nn/config.go`: add `ConvPrefix []layer.Layer[T]` field.
-  `pkg/nn/options.go`: add `WithConv1D[T]`, `WithMaxPool1D[T]`, `WithFlatten[T]` options
-  (each appends a new instance to `cfg.ConvPrefix`).
-  `pkg/nn/compile.go`: prepend `cfg.ConvPrefix` before the Dense hidden stack;
-  call `outputLen()` on each conv layer to compute the input size for the first Dense layer.
+- [x] **T-11B05** — Full conv-prefix integration into `pkg/nn/` + `pkg/network/`. **Done 2026-05-14.**
+  Architecture: conv prefix runs as a preprocessing stage BEFORE the Input layer; `compile()` resizes the Input layer to the conv chain's `outputLen()` output, raw input size preserved on `NN[T].rawInputSize` for `SetInputs`-style validation.
+  **Forward path** (`runConvForward`): raw input → chain of `cl.Forward` calls → result feeds `Network.SetInputs`.
+  **Backward path**: `Network.AppendInputGradient` (new method, formula `−Σ σ'(preact_j)·miss_j·axon[i→j].weight`) → piped through conv chain in reverse → each Conv1D accumulates ∂L/∂W in its internal scratch buffers → inline SGD `w -= lr·g`. (Wiring conv weights through `optimizer.Optimizer` deferred to v0.11.)
+  **Changes**:
+  - `pkg/network/propagation.go` (+45 lines): `AppendInputGradient` method.
+  - `pkg/nn/config.go` (+11 lines): `Config.ConvPrefix []conv.Layer[T]` field.
+  - `pkg/nn/nn.go` (+18 lines): `convPrefix`, `rawInputSize`, `convBuf`, `convGradBuf` fields on `NN[T]`.
+  - `pkg/nn/options.go` (+55 lines): `WithConv1D`, `WithMaxPool1D`, `WithAvgPool1D`, `WithFlatten` options.
+  - `pkg/nn/compile.go` (+45 lines): conv chain shape resolution, raw input size capture, Conv1D weight init.
+  - `pkg/nn/train.go` (+85 lines): `runConvForward`, `applyConvBackward`, `applyConvSGD`; `trainStep` integrates conv-FWD/BWD.
+  - `pkg/nn/query.go` (+4 lines): pre-stage `runConvForward` in inference path.
+  - `pkg/nn/conv_test.go` (+220 lines, 7 tests): shape resolution, error paths, training convergence, weight movement, zero-overhead pure-Dense path, MaxPool/AvgPool composability.
+  **Verify**: `go build ./...` clean; `go test -count=1 ./pkg/nn/... ./pkg/network/... ./pkg/layer/conv/...` green (pre-existing flakes `TestPauseResumeCycle`, `TestRepeatBuilderBenchmark100Layer` unaffected); coverage pkg/nn **80.9%**, pkg/network **88.6%**, pkg/layer/conv **83.0%**.
 
 ## Track C — Dataset Formats + Deferred Examples
 
