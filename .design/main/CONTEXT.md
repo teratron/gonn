@@ -1,6 +1,6 @@
 # Project Context
 
-**Generated:** 2026-05-13
+**Generated:** 2026-05-14
 
 ## Active Technologies
 
@@ -12,17 +12,8 @@
 .
 ├── .design/
 │   ├── .graph-cache/
-│   ├── CONTEXT.md
-│   ├── INDEX.md
-│   ├── PLAN.md
-│   ├── ROADMAP.md
 │   ├── RULES.md
-│   ├── STATE.md
-│   ├── TASKS.md
-│   ├── archives/
-│   ├── spec-graph.html
-│   ├── specifications/
-│   ├── tasks/
+│   ├── main/
 │   ├── wiki/
 │   └── workspace.json
 ├── examples/

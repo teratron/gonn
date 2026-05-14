@@ -18,8 +18,9 @@ duration_minutes: ~
 
 **Status:** Todo
 **Decomposed:** 2026-05-12
+**Last Updated:** 2026-05-14 (Trust Mode promotion: Tracks B + C specs now Stable; Track A still blocked.)
 **Tasks:** 10 feature + 3 validation + 1 gate = 14 total
-**Specs:** l2-meta-learning-impl v0.1.0, l2-conv-layers-impl v0.1.0, l2-dataset-loader-impl v0.1.0
+**Specs:** l2-meta-learning-impl v0.1.0 (Draft, blocked), l2-conv-layers-impl v0.1.0 (Stable), l2-dataset-loader-impl v0.1.0 (Stable)
 **Track order:** B and C are fully parallel and unblocked; A requires l1-meta-learning-hooks → Stable first;
                T-11T01 after Track A, T-11T02 after Track B, T-11T03 after Track C; Gate T-11Z01 after all.
 

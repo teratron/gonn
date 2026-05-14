@@ -1,7 +1,7 @@
 # Dataset Loader — Go Implementation
 
 **Version:** 0.1.0
-**Status:** Draft
+**Status:** Stable
 **Layer:** implementation
 **Implements:** l1-dataset-formats.md
 
@@ -122,3 +122,4 @@ func (nn *NN[T]) AndTrain(ds dataset.DataSet[T], opts ...Option[T]) (Result[T], 
 | Version | Date | Description |
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-05-12 | Initial Draft — IDXReader, MNISTLoader[T], AndTrain method. |
+| 0.1.0 | 2026-05-14 | Promoted Draft → Stable via magic.task Trust Mode (parent `l1-dataset-formats` Stable; MVC satisfied). |

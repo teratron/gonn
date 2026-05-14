@@ -1,10 +1,10 @@
 # Master Task Index (Registry)
 
-**Version:** 2.4.0
+**Version:** 2.5.0
 **Project Version:** 0.10.0 (Phase 11 active — v0.10.0 in progress)
 **Generated:** 2026-04-29
-**Last Updated:** 2026-05-12
-**Based on:** .design/main/PLAN.md v2.5.0
+**Last Updated:** 2026-05-14
+**Based on:** .design/main/PLAN.md v2.6.0
 **Based on RULES:** .design/RULES.md v1.3.0
 **Execution Mode:** Parallel (C3)
 **Status:** Active
@@ -221,5 +221,5 @@ Six of the eight v0.6-gated entries (E03, E04, E05, E07, E08, E13) are now activ
 | `CHANGELOG.md` (v0.10.0 entry) | l1-release-policy v1.0.0 | `Todo` |
 | `v0.10.0` git tag | l1-release-policy v1.0.0 §5.4 | `Todo` |
 
-- **Last Updated**: 2026-05-12
+- **Last Updated**: 2026-05-14 (Trust Mode batch via magic.task: 4 Phase 11 specs promoted Draft → Stable; Tracks B + C unblocked. Track A remains Blocked.)
 - **Maintainer**: Core Team

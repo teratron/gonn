@@ -1,7 +1,7 @@
 # Dataset Formats
 
-**Version:** 0.1.0
-**Status:** Draft
+**Version:** 1.0.0
+**Status:** Stable
 **Layer:** concept
 
 ## Overview
@@ -123,3 +123,4 @@ graph TD
 | Version | Date | Description |
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-05-12 | Initial Draft — IDX binary format + AndTrain continuation contract. |
+| 1.0.0 | 2026-05-14 | Promoted Draft → Stable via magic.task Trust Mode (MVC satisfied, no RULES conflicts, no cycles). |

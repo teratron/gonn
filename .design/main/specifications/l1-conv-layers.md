@@ -1,7 +1,7 @@
 # Convolutional Layers
 
-**Version:** 0.1.0
-**Status:** Draft
+**Version:** 1.0.0
+**Status:** Stable
 **Layer:** concept
 
 ## Overview
@@ -105,3 +105,4 @@ Backpropagation through the conv stack requires:
 | Version | Date | Description |
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-05-12 | Initial Draft — 1-D conv contract with 9 invariants. |
+| 1.0.0 | 2026-05-14 | Promoted Draft → Stable via magic.task Trust Mode (MVC satisfied, no RULES conflicts, no cycles). |

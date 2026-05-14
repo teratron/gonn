@@ -1,6 +1,6 @@
 # Workspace Specifications Registry
 
-**Version:** 2.8.0
+**Version:** 2.9.0
 **Status:** Active
 **Engine Version:** 2.1.25
 
@@ -62,13 +62,13 @@ Local registry of specifications for this workspace.
 | [l1-training-callbacks.md](specifications/l1-training-callbacks.md) | Training event callbacks — OnIterationEnd / OnImprovementFound / OnTrainEnd with StopTraining signal | Stable | L1 | 1.0.0 |
 | [l2-normalization-impl.md](specifications/l2-normalization-impl.md) | Go realization of normalization layers — pkg/layer/norm/ (BatchNorm/LayerNorm/GroupNorm) | Stable | L2 | 0.1.0 |
 | [l2-callbacks-impl.md](specifications/l2-callbacks-impl.md) | Go realization of training callbacks — pkg/nn/callbacks.go + train.go integration | Stable | L2 | 0.1.0 |
-| [l1-conv-layers.md](specifications/l1-conv-layers.md) | 1-D convolutional layer contract — Conv1D / MaxPool1D / Flatten with 9 invariants | Draft | L1 | 0.1.0 |
-| [l1-dataset-formats.md](specifications/l1-dataset-formats.md) | IDX binary format + AndTrain continuation contract | Draft | L1 | 0.1.0 |
+| [l1-conv-layers.md](specifications/l1-conv-layers.md) | 1-D convolutional layer contract — Conv1D / MaxPool1D / Flatten with 9 invariants | Stable | L1 | 1.0.0 |
+| [l1-dataset-formats.md](specifications/l1-dataset-formats.md) | IDX binary format + AndTrain continuation contract | Stable | L1 | 1.0.0 |
 | [l2-meta-learning-impl.md](specifications/l2-meta-learning-impl.md) | Go realization of meta-learning hooks — pkg/nn/meta.go (blocked on l1-meta-learning-hooks Stable) | Draft | L2 | 0.1.0 |
-| [l2-conv-layers-impl.md](specifications/l2-conv-layers-impl.md) | Go realization of convolutional layers — pkg/layer/conv/ (Conv1D/MaxPool1D/Flatten) | Draft | L2 | 0.1.0 |
-| [l2-dataset-loader-impl.md](specifications/l2-dataset-loader-impl.md) | Go realization of dataset formats — pkg/dataset/mnist.go + pkg/nn/andtrain.go | Draft | L2 | 0.1.0 |
+| [l2-conv-layers-impl.md](specifications/l2-conv-layers-impl.md) | Go realization of convolutional layers — pkg/layer/conv/ (Conv1D/MaxPool1D/Flatten) | Stable | L2 | 0.1.0 |
+| [l2-dataset-loader-impl.md](specifications/l2-dataset-loader-impl.md) | Go realization of dataset formats — pkg/dataset/mnist.go + pkg/nn/andtrain.go | Stable | L2 | 0.1.0 |
 
 ## Meta Information
 
 - **Maintainer**: Core Team
-- **Last Updated**: 2026-05-12 (5 new Draft specs for Phase 11: l1-conv-layers v0.1.0, l1-dataset-formats v0.1.0, l2-meta-learning-impl v0.1.0, l2-conv-layers-impl v0.1.0, l2-dataset-loader-impl v0.1.0. Orphan l1-dynamic-topology resolved in PLAN.md.)
+- **Last Updated**: 2026-05-14 (Trust Mode batch promotion via magic.task: l1-conv-layers Draft v0.1.0 → Stable v1.0.0, l1-dataset-formats Draft v0.1.0 → Stable v1.0.0, l2-conv-layers-impl Draft → Stable v0.1.0, l2-dataset-loader-impl Draft → Stable v0.1.0. l2-meta-learning-impl remains Draft pending l1-meta-learning-hooks RFC→Stable review via magic.spec.)

@@ -1,7 +1,7 @@
 # Convolutional Layers — Go Implementation
 
 **Version:** 0.1.0
-**Status:** Draft
+**Status:** Stable
 **Layer:** implementation
 **Implements:** l1-conv-layers.md
 
@@ -137,3 +137,4 @@ graph LR
 | Version | Date | Description |
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-05-12 | Initial Draft — Conv1D/MaxPool1D/Flatten; weight storage TODO left for user contribution. |
+| 0.1.0 | 2026-05-14 | Promoted Draft → Stable via magic.task Trust Mode (parent `l1-conv-layers` Stable; MVC satisfied). |

@@ -634,3 +634,8 @@ Promotes three specs to Stable.
   count, never wall-clock max). Surfaced by the deterministic
   `TestStopRequestsEarlyExit` synchronisation barrier, which was
   reporting `epochs=100000` even after a successful Stop.
+
+### Changed
+
+- Updated task plan and task index (main)
+
