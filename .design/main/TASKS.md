@@ -19,14 +19,14 @@ Tactical registry of all phases and their statuses. Atomic checklists (`T-XXXX`)
 | :--- | :--- | :--- |
 | [Phase 1](tasks/phase-1.md) | Foundation Rewrite (Track A) — `pkg/utils/{errors,init}`, `pkg/neuron`, `pkg/layer`, `pkg/network` | `Done` (2026-04-29) |
 | [Phase 2](tasks/phase-2.md) | Public Facade Restoration (Track B) — `pkg/nn` | `Done` (2026-04-30) |
-| [Phase 3](tasks/phase-3.md) | New Capability Packages (Track C) — persistence, checkpoint, dataset, compute, perf | `Done` (2026-05-01) |
+| [Phase 3](archives/tasks/phase-3.md) | New Capability Packages (Track C) — persistence, checkpoint, dataset, compute, perf | `Done (Archived)` (2026-05-01) |
 | [Phase 4](tasks/phase-4.md) | Examples Catalog (Track D) — `examples/E01..E15` (v0.5 scope: 7 entries) | `Done` (2026-05-02) |
 | [Phase 5](tasks/phase-5.md) | Multi-Hidden Topology (v0.6) — `pkg/network` chain + compile() lift + weights 1.1.0 + 6 catalog examples | `Done` (2026-05-06) |
 | [Phase 6](tasks/phase-6.md) | Feature Expansion + v0.6 Release — `pkg/optimizer/`, `pkg/regularizer/`, axon WeightInit fix, CHANGELOG, v0.6.0 tag | `Done` (2026-05-08) |
 | [Phase 7](tasks/phase-7.md) | Deep Builder + LR Scheduling + Developer Skills — `pkg/optimizer/` scheduler extension, `pkg/nn` bulk constructors, `skills/gonn/` | `Done` (2026-05-10) |
 | [Phase 8](tasks/phase-8.md) | LR Scheduling Extension + CLI Binary — `ExponentialLR`, `cmd/gonn/` binary, v0.7.0 release | `Done` (2026-05-10) |
-| [Phase 9](tasks/phase-9.md) | Metric Schedulers + Dynamic Topology + Observability Stack — `ReduceOnPlateau`, `OneCycleLR`, topology mutations, slog + viz HTTP server, v0.8.0 release | `Done` (2026-05-10) |
-| [Phase 10](tasks/phase-10.md) | Normalization Layers + Training Callbacks — `pkg/layer/norm/` (BatchNorm/LayerNorm/GroupNorm), `pkg/nn/callbacks.go`, v0.9.0 release | `Done` (2026-05-12) |
+| [Phase 9](archives/tasks/phase-9.md) | Metric Schedulers + Dynamic Topology + Observability Stack — `ReduceOnPlateau`, `OneCycleLR`, topology mutations, slog + viz HTTP server, v0.8.0 release | `Done (Archived)` (2026-05-10) |
+| [Phase 10](archives/tasks/phase-10.md) | Normalization Layers + Training Callbacks — `pkg/layer/norm/` (BatchNorm/LayerNorm/GroupNorm), `pkg/nn/callbacks.go`, v0.9.0 release | `Done (Archived)` (2026-05-12) |
 | [Phase 11](tasks/phase-11.md) | Meta-Learning Hooks + Convolutional Layers + Dataset Formats — `pkg/nn/meta.go`, `pkg/layer/conv/`, `pkg/dataset/mnist.go`, `pkg/nn/andtrain.go`, examples E06+E10, v0.10.0 release | `Todo` |
 
 ## Phase 0 — Already Complete

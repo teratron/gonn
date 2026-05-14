@@ -131,6 +131,62 @@ var ErrEmptyLayer = errors.New("empty-layer")
 //   - Usage: errors.Is(err, utils.ErrMutationFailed).
 var ErrMutationFailed = errors.New("mutation-failed")
 
+// Convolutional-layer sentinels (CONV-1, CONV-5, per l2-conv-layers-impl).
+
+// ErrConvShapeMismatch signals that the input feature map is shorter than the
+// kernel size under PadValid (CONV-1 violation: outputLen would be ≤ 0).
+//
+// AI-Meta:
+//   - Purpose: Sentinel for convolutional-layer input shorter than kernel size in PadValid mode.
+//   - Usage: errors.Is(err, utils.ErrConvShapeMismatch).
+//   - Related: [ErrConvPoolSizeMismatch], [ErrCompute].
+//   - Stability: Stable.
+var ErrConvShapeMismatch = errors.New("conv-shape-mismatch")
+
+// ErrConvPoolSizeMismatch signals that the pooling window is larger than the
+// feature map it operates on (CONV-5 violation: poolSize > len(input)).
+//
+// AI-Meta:
+//   - Purpose: Sentinel for pooling window larger than the feature map length.
+//   - Usage: errors.Is(err, utils.ErrConvPoolSizeMismatch).
+//   - Related: [ErrConvShapeMismatch], [ErrCompute].
+//   - Stability: Stable.
+var ErrConvPoolSizeMismatch = errors.New("conv-pool-size-mismatch")
+
+// Dataset / continuation sentinels (FMT-1, FMT-5, FMT-8, per l2-dataset-loader-impl).
+
+// ErrIDXMagic signals that the IDX header is malformed — either the leading
+// two zero bytes are missing or the dtype byte is not in the recognised set
+// (FMT-1 violation).
+//
+// AI-Meta:
+//   - Purpose: Sentinel for malformed IDX dataset header (bad magic or unknown dtype).
+//   - Usage: errors.Is(err, utils.ErrIDXMagic).
+//   - Related: [ErrMNISTRecordMismatch], [ErrIntegrity].
+//   - Stability: Stable.
+var ErrIDXMagic = errors.New("idx-magic")
+
+// ErrMNISTRecordMismatch signals that the image IDX file and the label IDX
+// file report different record counts (FMT-5 violation).
+//
+// AI-Meta:
+//   - Purpose: Sentinel for MNIST image/label record count mismatch.
+//   - Usage: errors.Is(err, utils.ErrMNISTRecordMismatch).
+//   - Related: [ErrIDXMagic], [ErrIntegrity].
+//   - Stability: Stable.
+var ErrMNISTRecordMismatch = errors.New("mnist-record-mismatch")
+
+// ErrNetworkRunning signals that an operation requiring the Idle training-
+// lifecycle state was attempted while the network was Training, Paused,
+// Stopping, or Stopped (FMT-8 / continuation-API guard).
+//
+// AI-Meta:
+//   - Purpose: Sentinel for AndTrain / lifecycle calls issued while the network is not Idle.
+//   - Usage: errors.Is(err, utils.ErrNetworkRunning).
+//   - Related: [ErrControl].
+//   - Stability: Stable.
+var ErrNetworkRunning = errors.New("network-running")
+
 // ErrCallbackPanic signals that a user-supplied training callback panicked.
 // The panic is recovered internally; training continues. The error wraps
 // ErrControl because a panicking callback is a programming fault in the

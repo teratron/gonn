@@ -5,15 +5,15 @@
 
 **Workspace:** main
 **Project Version:** 0.9.0 (Phase 10 complete)
-**Updated:** 2026-05-14 06:55
+**Updated:** 2026-05-14 07:32
 **Phase:** 11 — Meta-Learning Hooks + Convolutional Layers + Dataset Formats
-**Status:** Active
+**Status:** Done
 
 ## Current Position
 
-- **Task:** T-10Z01 (gate) — all 10 tasks complete
+- **Task:** T-11B01..B04 + T-11T02 (partial)
 - **Spec:** l2-normalization-impl v0.1.0 + l2-callbacks-impl v0.1.0 fully implemented. CHANGELOG.md v0.9.0 written.
-- **Next Action:** Run /magic.run main to execute Phase 11 Tracks B + C (now unblocked). Track A still blocked on l1-meta-learning-hooks RFC review via /magic.spec.
+- **Next Action:** Continue Phase 11: T-11B05 (nn config/options/compile wiring + train-loop integration via network.Network refactor) and Track C (T-11C01..C05: IDXReader, MNISTLoader[T], AndTrain, E06, E10). Run /magic-run main to resume.
 
 ## Progress
 

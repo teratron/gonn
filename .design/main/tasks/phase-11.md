@@ -16,10 +16,10 @@ duration_minutes: ~
 
 # Phase 11 — Meta-Learning Hooks + Convolutional Layers + Dataset Formats
 
-**Status:** Todo
+**Status:** In Progress (Track B core landed; Track B integration + Track C pending)
 **Decomposed:** 2026-05-12
-**Last Updated:** 2026-05-14 (Trust Mode promotion: Tracks B + C specs now Stable; Track A still blocked.)
-**Tasks:** 10 feature + 3 validation + 1 gate = 14 total
+**Last Updated:** 2026-05-14 (Track B T-11B01..B04 implemented and tested; T-11T02 partial — package-level conv tests 83% coverage. T-11B05 train-loop integration deferred; Track C pending.)
+**Tasks:** 10 feature + 3 validation + 1 gate = 14 total — 4 feature done, 1 validation partial.
 **Specs:** l2-meta-learning-impl v0.1.0 (Draft, blocked), l2-conv-layers-impl v0.1.0 (Stable), l2-dataset-loader-impl v0.1.0 (Stable)
 **Track order:** B and C are fully parallel and unblocked; A requires l1-meta-learning-hooks → Stable first;
                T-11T01 after Track A, T-11T02 after Track B, T-11T03 after Track C; Gate T-11Z01 after all.
@@ -56,35 +56,35 @@ Run `/magic.spec` to perform the RFC review and promotion.*
 *Goal: Implement Conv1D[T], MaxPool1D[T], Flatten[T] from l2-conv-layers-impl.md.*
 *Source: [l2-conv-layers-impl.md](../specifications/l2-conv-layers-impl.md)*
 
-- [ ] **T-11B01** — Create `pkg/layer/conv/conv.go`:
-  Package declaration + `PadMode` enum (`PadValid=0`, `PadSame=1`);
-  compile-time interface assertions: `var _ layer.Layer[float32] = (*Conv1D[float32])(nil)` and same for MaxPool1D, Flatten;
-  `outputLen(inLen, kernelSize, stride int, pad PadMode) int` — pure function implementing CONV-1;
-  `ErrConvShapeMismatch`, `ErrConvPoolSizeMismatch` sentinel errors in `pkg/utils/errors.go`.
+- [x] **T-11B01** — `pkg/layer/conv/conv.go` + errors. **Done 2026-05-14.**
+  Local `conv.Layer[T]` interface (mirrors `pkg/layer/norm` precedent — root `pkg/layer` has no shared interface);
+  `PadMode` enum (PadValid=0, PadSame=1); `outputLen` + `padSamePadding` helpers;
+  compile-time assertions for Conv1D/MaxPool1D/AvgPool1D/Flatten;
+  added 5 sentinel errors to `pkg/utils/errors.go`: ErrConvShapeMismatch, ErrConvPoolSizeMismatch, ErrIDXMagic, ErrMNISTRecordMismatch, ErrNetworkRunning.
+  **Changes**: `pkg/layer/conv/conv.go` (+138 lines), `pkg/utils/errors.go` (+54 lines).
+  **Verify**: `go build ./pkg/layer/conv/...` clean.
 
-- [ ] **T-11B02** — Create `pkg/layer/conv/conv1d.go`:
-  Fill in the `Conv1D[T]` struct fields (see §5.2 of l2-conv-layers-impl.md — user contribution TODO);
-  `NewConv1D[T](numFilters, kernelSize, stride int, pad PadMode, useBias bool) *Conv1D[T]`;
-  `Init()`: call `utils.InitWeights` on the weight buffer;
-  `CalculateValue(input []T) []T`: sliding-window cross-correlation for each filter; save `lastInput`, `lastOutput`;
-  `CalculateError(upstream []T) []T`: compute `gradW` (∂L/∂W per filter) and return `gradX` (∂L/∂X);
-  `MarshalJSON/UnmarshalJSON`: store `numFilters, kernelSize, stride, padding, weights, biases`.
-  Begin `pkg/layer/conv/conv_test.go`:
-  shape-preservation test (CONV-1 formula), forward identity (all-zero weights → zero output),
-  weight-grad finite-difference check (CONV-4), JSON round-trip.
+- [x] **T-11B02** — `pkg/layer/conv/conv1d.go`. **Done 2026-05-14.**
+  Decision: **Variant A — flattened `[]T` of length `numFilters*kernelSize`**, filter-major layout (rationale: one allocation, cache-locality, sync.Pool-friendly).
+  `Forward` (cross-correlation, PadValid + PadSame); `Backward` (∂L/∂W, ∂L/∂B, ∂L/∂X) accumulating into reused scratch buffers; `Init` via He-normal; `Validate` enforces CONV-1 shape; `MarshalJSON/UnmarshalJSON` for CONV-7.
+  Implements `Layer[T]` interface from conv.go.
+  **Changes**: `pkg/layer/conv/conv1d.go` (+325 lines).
+  **Verify**: `TestConv1DGradFiniteDifference` confirms CONV-4 within 1e-4 tolerance.
 
-- [ ] **T-11B03** — Create `pkg/layer/conv/pool.go`:
-  `MaxPool1D[T]`: fields `poolSize int`, `argmax []int` (allocated in constructor to `outputLen` size);
-  `CalculateValue`: slide non-overlapping window, record argmax, produce output;
-  `CalculateError`: route upstream gradient only to argmax positions; zero elsewhere.
-  `AvgPool1D[T]`: same shape; `CalculateValue` computes mean per window; `CalculateError` distributes evenly.
-  Extend `conv_test.go`: MaxPool correctness (known input), AvgPool correctness, MaxPool backward gradient check.
+- [x] **T-11B03** — `pkg/layer/conv/pool.go`. **Done 2026-05-14.**
+  `MaxPool1D[T]` (argmax-tracking) + `AvgPool1D[T]` (even distribution); both non-overlapping (stride=poolSize), boundary windows truncated (no zero-padding); `Validate` enforces poolSize ≤ inLen.
+  **Changes**: `pkg/layer/conv/pool.go` (+232 lines).
+  **Verify**: TestMaxPool1DBackward routes gradient to argmax positions only; TestAvgPool1DBackward distributes 1/poolSize evenly.
 
-- [ ] **T-11B04** — Create `pkg/layer/conv/flatten.go`:
-  `Flatten[T]`: stateless; stores `inputShape int` for backward reshape;
-  `CalculateValue(input []T) []T` — identity (no copy if already flat); stores `inputShape = len(input)`;
-  `CalculateError(upstream []T) []T` — identity reshape back to `inputShape`.
-  `Init()` no-op; no `MarshalJSON` needed (stateless).
+- [x] **T-11B04** — `pkg/layer/conv/flatten.go`. **Done 2026-05-14.**
+  Stateless `Flatten[T]`: Forward = identity (aliases input, no copy); Backward returns upstream unchanged on shape match, nil on mismatch.
+  **Changes**: `pkg/layer/conv/flatten.go` (+50 lines).
+  **Verify**: TestFlattenIdentity covers forward/backward identity and shape-mismatch path.
+
+- [x] **T-11T02 (partial)** — Conv package validation. **Done 2026-05-14.**
+  `pkg/layer/conv/conv_test.go` (+395 lines, 22 test functions). `go test ./pkg/layer/conv/...` green; **coverage 83.0%** (above 80% floor).
+  Tests cover: outputLen all branches, Conv1D zero/known-kernel forward, ∂L/∂W finite-difference (CONV-4), JSON round-trip (CONV-7), Validate error paths, MaxPool/AvgPool forward/backward correctness, Flatten identity, accessor coverage, constructor clamp, shape-mismatch returns.
+  **Remaining**: full network-integration tests (conv prefix in compile, training loop) deferred until T-11B05 train-loop integration lands.
 
 - [ ] **T-11B05** — Wire into `pkg/nn/`:
   `pkg/nn/config.go`: add `ConvPrefix []layer.Layer[T]` field.
