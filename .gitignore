@@ -86,22 +86,29 @@ GEMINI.md
 CODEX.md
 QWEN.md
 copilot-instructions.md
-.*/workflows/
+
+## Workflows
 .*/commands/
 .*/prompts/
-.*/skills/
-.*/rules/
+.*/workflows/
 !.agents/workflows/
+!.github/workflows/
+.agents/workflows/magic*.md
+
+## Skills
+.*/skills/
 !.agents/skills/
-!.agents/rules/
 .agents/skills/magic*
-.agents/rules/magic*
+
+## Rules
+.*/rules/
+!.agents/rules/
+.agents/rules/magic*.md
 
 # Magic Spec
 .magic/
-.agents/workflows/magic.*.md
 
-# Generated graph artifacts
+## Generated graph artifacts
 .design/spec-graph.html
 .design/spec-graph.json
 .design/.graph-cache/
