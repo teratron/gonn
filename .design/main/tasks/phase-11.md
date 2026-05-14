@@ -16,10 +16,10 @@ duration_minutes: ~
 
 # Phase 11 — Meta-Learning Hooks + Convolutional Layers + Dataset Formats
 
-**Status:** In Progress (Track B core landed; Track B integration + Track C pending)
+**Status:** In Progress (Track B core + Track C core landed; T-11B05 train-loop integration deferred; T-11C04 E06 MNIST example pending data)
 **Decomposed:** 2026-05-12
-**Last Updated:** 2026-05-14 (Track B T-11B01..B04 implemented and tested; T-11T02 partial — package-level conv tests 83% coverage. T-11B05 train-loop integration deferred; Track C pending.)
-**Tasks:** 10 feature + 3 validation + 1 gate = 14 total — 4 feature done, 1 validation partial.
+**Last Updated:** 2026-05-14 (Session 2: Track C T-11C01..C03 implemented and tested; T-11C05 E10 continuation example runs end-to-end. Pending: T-11B05 train-loop integration, T-11C04 E06 MNIST example (needs IDX data files), T-11T02/03 final, T-11Z01 gate.)
+**Tasks:** 10 feature + 3 validation + 1 gate = 14 total — 7 feature done, 1 validation partial.
 **Specs:** l2-meta-learning-impl v0.1.0 (Draft, blocked), l2-conv-layers-impl v0.1.0 (Stable), l2-dataset-loader-impl v0.1.0 (Stable)
 **Track order:** B and C are fully parallel and unblocked; A requires l1-meta-learning-hooks → Stable first;
                T-11T01 after Track A, T-11T02 after Track B, T-11T03 after Track C; Gate T-11Z01 after all.
@@ -98,31 +98,27 @@ Run `/magic.spec` to perform the RFC review and promotion.*
 *Goal: Implement IDXReader, MNISTLoader[T], AndTrain from l2-dataset-loader-impl.md; ship E06 + E10.*
 *Source: [l2-dataset-loader-impl.md](../specifications/l2-dataset-loader-impl.md)*
 
-- [ ] **T-11C01** — Create `pkg/dataset/mnist.go`:
-  `readIDXHeader(r io.Reader) (idxHeader, error)` — reads 4-byte magic + dimension bytes;
-  validate bytes 0-1 == 0x00, dtype in `{0x08,0x09,0x0B,0x0C,0x0D,0x0E}` → `ErrIDXMagic` otherwise;
-  read `ndim` big-endian int32 dimensions; compute `recLen = product(dims[1:])`.
-  `IDXReader` struct: wraps `io.Reader` + `idxHeader`; `Next() ([]byte, error)` reads one record.
-  Add `ErrIDXMagic`, `ErrMNISTRecordMismatch`, `ErrNetworkRunning` to `pkg/utils/errors.go`.
-  Begin `pkg/dataset/mnist_test.go`: valid IDX header parse, invalid magic error, record count.
+- [x] **T-11C01** — `pkg/dataset/mnist.go` IDXReader. **Done 2026-05-14.**
+  `readIDXHeader` validates magic bytes 0-1, dtype byte set, ndim ≥ 1; supports all 6 IDX dtypes (uint8/int8/int16/int32/float/double). `IDXReader` with reusable per-record buffer, `Next()` returning `io.EOF` at end, `Reset()` returning `ErrUnsupported` (single io.Reader).
+  Errors `ErrIDXMagic`, `ErrMNISTRecordMismatch`, `ErrNetworkRunning` added in earlier T-11B01 batch.
+  **Changes**: `pkg/dataset/mnist.go` (+135 lines for IDX layer).
+  **Verify**: TestReadIDXHeader{Valid,BadMagic,UnknownDType,ZeroNdim,ShortRead}, TestIDXReader{Iterate,ShortRecord}, TestElementSize.
 
-- [ ] **T-11C02** — Create `MNISTLoader[T]` in `pkg/dataset/mnist.go`:
-  `type MNISTLoader[T utils.Float] struct { images, labels *IDXReader; norm T }`;
-  `NewMNISTLoader[T](imageFile, labelFile string, norm T) (*MNISTLoader[T], error)`:
-  open both files, read headers, validate counts match (FMT-5);
-  `Next() (input []T, target []T, err error)`: read one image record, normalise pixels by `norm`,
-  read one label record, cast label byte to `T`; return `io.EOF` when exhausted.
-  Implement `dataset.DataSet[T]` interface (streaming, bounded memory).
-  Extend test: full record iteration, pixel normalisation, io.EOF on completion.
+- [x] **T-11C02** — `MNISTLoader[T]` in `pkg/dataset/mnist.go`. **Done 2026-05-14.**
+  `MNISTLoader[T]` implements the project's `Dataset[T]` interface (batch streaming, not single-record — aligns with existing `csv.go` / `slice.go` precedent).
+  Two constructors: `NewMNISTLoader` (BYO `*IDXReader` pair, no Reset support) and `NewMNISTLoaderFiles` (opens files, Reset reopens them). `Next` builds a `Batch[T]` of at most `batchSize` records; pixels normalised to [0, 1] via `T(b) / norm`. `Close` releases file handles tracked from `NewMNISTLoaderFiles`. Validation: image/label count mismatch → `ErrMNISTRecordMismatch`; nil readers / non-positive batch / non-positive norm → `ErrUserConfig`. Context cancellation honoured.
+  **Changes**: `pkg/dataset/mnist.go` (+185 lines for loader layer; total file 420 lines).
+  **Verify**: `go test ./pkg/dataset/...` green; **coverage 85.2%**. Tests: TestMNISTLoader{Batching,Mismatch,ArgValidation,FromFiles,FilesMissing,ContextCancelled}.
 
-- [ ] **T-11C03** — Create `pkg/nn/andtrain.go`:
-  `func (nn *NN[T]) AndTrain(ds dataset.DataSet[T], opts ...Option[T]) (Result[T], error)`:
-  check `nn.ctrl.State() == Idle` → `ErrNetworkRunning` if not;
-  apply `opts` to a shallow copy of `nn.cfg` (not mutating base config);
-  call shared inner `train(cfg, ds)` helper (refactor `Train` to extract this);
-  callbacks remain active; `OnTrainEnd` fires at completion; state returns to `Idle`.
-  Add `andtrain_test.go`: continuation preserves weights, fresh convergence counters,
-  `OnTrainEnd` fires for each call, error on Running state.
+- [x] **T-11C03** — `pkg/nn/andtrain.go`. **Done 2026-05-14.**
+  Decision: AndTrain signature mirrors existing `Fit` (`[]Sample[T]`, not the streaming `Dataset[T]` — aligns with how Fit consumes data, avoids streaming refactor). Snapshot cfg + opt/sched/reg pointers, apply opts to live cfg, delegate to Fit (which owns state-machine transitions + OnTrainEnd dispatch), restore on defer. Guards: `stateField == Operational` else `ErrUserConfig`; `control.Load() == Idle` else `ErrNetworkRunning`; empty samples → `ErrInputData`.
+  **Changes**: `pkg/nn/andtrain.go` (+80 lines), `pkg/nn/andtrain_test.go` (+125 lines).
+  **Verify**: TestAndTrain{ContinuationPreservesWeights, RestoresOriginalConfig, RejectsEmptySamples, RejectsNonOperational, RejectsRunning} — all green.
+
+- [x] **T-11C05** — `examples/E10_continuation/`. **Done 2026-05-14.**
+  Demonstrates FMT-6 end-to-end: trains XOR via Fit, then `AndTrain` with negated targets at lower LR. Post-AndTrain predictions invert from `[0.10, 0.92, 0.91, 0.07]` → `[0.92, 0.06, 0.06, 0.95]` confirming weight continuity. `main_test.go` asserts post-AndTrain L1 distance to negated targets < distance to original.
+  **Changes**: `examples/E10_continuation/{main.go,main_test.go,README.md,go.mod}`; `go.work` updated.
+  **Verify**: `go run ./examples/E10_continuation/` produces expected output; `go test ./examples/E10_continuation/` green.
 
 - [ ] **T-11C04** — Create `examples/E06_mnist/`:
   `main.go`: load MNIST train set via `MNISTLoader`, build 784→128→64→10 network with `WithBatchNorm`,
