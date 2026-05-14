@@ -166,7 +166,7 @@ without referencing RULES.md itself (process-artifact firewall).
 | Alias | Path | Purpose |
 | :--- | :--- | :--- |
 | `[SKILL]` | `skills/gonn/SKILL.md` | Main skill file — GoNN code generation instructions |
-| `[FACADE]` | `.design/specifications/l2-nn-facade.md` | API surface that the skill teaches |
+| `[FACADE]` | `.design/main/specifications/l2-nn-facade.md` | API surface that the skill teaches |
 | `[EXAMPLES]` | `examples/` | Canonical Go examples that skill references mirror |
 | `[README]` | `README.md` | Library entry point — will reference the skill |
 

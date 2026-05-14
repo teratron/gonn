@@ -109,7 +109,7 @@ to `LayerNorm` for single-sample inference.
 
 | Alias | Path | Purpose |
 | :--- | :--- | :--- |
-| `[L1]` | `.design/specifications/l1-normalization-layers.md` | Parent contract — NORM-1..9 invariants |
+| `[L1]` | `.design/main/specifications/l1-normalization-layers.md` | Parent contract — NORM-1..9 invariants |
 | `[LAYER-H]` | `pkg/layer/` | Existing layer interface to extend |
 | `[OPT]` | `pkg/optimizer/optimizer.go` | Gradient slot pattern for affine params |
 

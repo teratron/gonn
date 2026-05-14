@@ -171,8 +171,8 @@ The training loop queries the scheduler's `Granularity()` to determine when to c
 
 | Alias | Path | Purpose |
 | :--- | :--- | :--- |
-| `[OPT-L1]` | `.design/specifications/l1-optimizer-strategies.md` | Optimizer contract that schedulers wrap |
-| `[TRAIN-L1]` | `.design/specifications/l1-training-semantics.md` | Training loop integration point |
+| `[OPT-L1]` | `.design/main/specifications/l1-optimizer-strategies.md` | Optimizer contract that schedulers wrap |
+| `[TRAIN-L1]` | `.design/main/specifications/l1-training-semantics.md` | Training loop integration point |
 
 ## Document History
 

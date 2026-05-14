@@ -206,9 +206,9 @@ On removal: running stats and affine params are discarded. No rollback needed.
 
 | Alias | Path | Purpose |
 | :--- | :--- | :--- |
-| `[LAYER-TYPES]` | `.design/specifications/l2-layer-types.md` | L2 target — norm layers join this hierarchy |
-| `[PERF]` | `.design/specifications/l1-performance-contract.md` | Zero-alloc constraint for running stats |
-| `[PERSIST]` | `.design/specifications/l1-network-persistence.md` | JSON round-trip contract for running stats and affine params |
+| `[LAYER-TYPES]` | `.design/main/specifications/l2-layer-types.md` | L2 target — norm layers join this hierarchy |
+| `[PERF]` | `.design/main/specifications/l1-performance-contract.md` | Zero-alloc constraint for running stats |
+| `[PERSIST]` | `.design/main/specifications/l1-network-persistence.md` | JSON round-trip contract for running stats and affine params |
 
 ## Document History
 

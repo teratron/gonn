@@ -226,7 +226,7 @@ These are checked at `Compile()` (no new validation stage):
 
 | Alias | Path | Purpose |
 | :--- | :--- | :--- |
-| `[FACADE]` | `.design/specifications/l2-nn-facade.md` | Parent API spec |
+| `[FACADE]` | `.design/main/specifications/l2-nn-facade.md` | Parent API spec |
 | `[CONFIG]` | `pkg/nn/config.go` | HiddenLayers slice that all constructors populate |
 | `[PRESETS]` | `pkg/nn/presets.go` | Sequential/DeepNetwork — existing higher-order options |
 | `[BUILDER]` | `pkg/nn/builder.go` | Target file for Repeat/Pattern/HiddenLayers methods |

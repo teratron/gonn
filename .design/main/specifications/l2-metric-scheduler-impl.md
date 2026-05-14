@@ -211,7 +211,7 @@ if sched != nil && sched.Granularity() == optimizer.PerEpoch {
 | `[SCHED]` | `pkg/optimizer/scheduler.go` | Base `Scheduler[T]` interface and `BindScheduler` — MetricScheduler embeds this |
 | `[TRAIN]` | `pkg/nn/train.go` | Epoch-dispatch block receiving the type-assertion patch |
 | `[STEP-LR]` | `pkg/optimizer/step_lr.go` | Pattern reference for constructor / SaveState / Reset |
-| `[LR-IMPL]` | `.design/specifications/l2-lr-scheduling-impl.md` | Deferred list §5.3 that this spec closes |
+| `[LR-IMPL]` | `.design/main/specifications/l2-lr-scheduling-impl.md` | Deferred list §5.3 that this spec closes |
 
 ## Document History
 

@@ -107,8 +107,8 @@ for both training and inference without conditional branching in the caller.
 
 | Alias | Path | Purpose |
 | :--- | :--- | :--- |
-| `[TRAIN-L1]` | `.design/specifications/l1-training-semantics.md` | Training loop invariants that regularization must not violate |
-| `[MATH-L1]` | `.design/specifications/l1-math-functions.md` | Loss function contract that penalty term augments |
+| `[TRAIN-L1]` | `.design/main/specifications/l1-training-semantics.md` | Training loop invariants that regularization must not violate |
+| `[MATH-L1]` | `.design/main/specifications/l1-math-functions.md` | Loss function contract that penalty term augments |
 
 ## Document History
 

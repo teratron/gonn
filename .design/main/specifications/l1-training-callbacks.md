@@ -182,9 +182,9 @@ minor version bump on this spec when implemented.
 
 | Alias | Path | Purpose |
 | :--- | :--- | :--- |
-| `[TRAIN-SEM]` | `.design/specifications/l1-training-semantics.md` | Loop iteration boundaries; TRN-3 min-loss rollback applies on CB-6 stop |
-| `[OBS]` | `.design/specifications/l1-observability-protocol.md` | CallbackContext snapshot contract |
-| `[CTRL]` | `.design/specifications/l1-training-control.md` | CB-2 explains why callbacks must not call Stop/Pause directly |
+| `[TRAIN-SEM]` | `.design/main/specifications/l1-training-semantics.md` | Loop iteration boundaries; TRN-3 min-loss rollback applies on CB-6 stop |
+| `[OBS]` | `.design/main/specifications/l1-observability-protocol.md` | CallbackContext snapshot contract |
+| `[CTRL]` | `.design/main/specifications/l1-training-control.md` | CB-2 explains why callbacks must not call Stop/Pause directly |
 
 ## Document History
 

@@ -102,7 +102,7 @@ At Compile():
 | Alias | Path | Purpose |
 | :--- | :--- | :--- |
 | `[INIT]` | `pkg/utils/init.go` (new) | Sampling helpers |
-| `[FACADE-RES]` | `.design/specifications/l2-nn-facade.md#56-weight-initialization-methods` | Reserved symbols this spec realizes |
+| `[FACADE-RES]` | `.design/main/specifications/l2-nn-facade.md#56-weight-initialization-methods` | Reserved symbols this spec realizes |
 
 ## Document History
 

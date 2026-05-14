@@ -128,7 +128,7 @@ func (nn *NN[T]) Train(ctx, input, target):
 
 | Alias | Path | Purpose |
 | :--- | :--- | :--- |
-| `[L1]` | `.design/specifications/l1-training-callbacks.md` | Parent — CB-1..9 event contract |
+| `[L1]` | `.design/main/specifications/l1-training-callbacks.md` | Parent — CB-1..9 event contract |
 | `[TRAIN]` | `pkg/nn/train.go` | Integration target — iteration dispatch points |
 | `[ERRORS]` | `pkg/utils/errors.go` | `ErrCallbackPanic` sentinel addition |
 

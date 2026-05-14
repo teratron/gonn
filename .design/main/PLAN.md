@@ -4,9 +4,9 @@
 **Project Version:** 0.9.0 (v0.9.0 scoped in Phase 10)
 **Generated:** 2026-04-29
 **Last Updated:** 2026-05-12
-**Based on:** .design/INDEX.md v2.7.0
+**Based on:** .design/main/INDEX.md v2.7.0
 **Based on RULES:** .design/RULES.md v1.3.0
-**Based on ROADMAP:** .design/ROADMAP.md v1.0.0
+**Based on ROADMAP:** .design/main/ROADMAP.md v1.0.0
 **Status:** Active
 
 ## Overview

@@ -111,8 +111,8 @@ graph LR
 
 | Alias | Path | Purpose |
 | :--- | :--- | :--- |
-| `[ARCH-L1]` | `.design/specifications/l1-neural-network-architecture.md` | Public API entry point definition |
-| `[PERS-L1]` | `.design/specifications/l1-network-persistence.md` | Serialization contract for breaking-change classification |
+| `[ARCH-L1]` | `.design/main/specifications/l1-neural-network-architecture.md` | Public API entry point definition |
+| `[PERS-L1]` | `.design/main/specifications/l1-network-persistence.md` | Serialization contract for breaking-change classification |
 | `[CHANGELOG]` | `CHANGELOG.md` | Release notes (to be created for v0.6.0, updated for v0.7.0) |
 
 ## Document History

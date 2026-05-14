@@ -33,9 +33,9 @@ key_files:
     - pkg/network/network.go
     - pkg/network/bundle.go
     - pkg/network/propagation.go
-    - .design/specifications/l2-errors-impl.md
-    - .design/INDEX.md
-    - .design/PLAN.md
+    - .design/main/specifications/l2-errors-impl.md
+    - .design/main/INDEX.md
+    - .design/main/PLAN.md
 patterns_established:
   - "Hybrid 6-category error taxonomy (orthogonal): ErrUserConfig / ErrInputData / ErrCompute / ErrControl / ErrIntegrity / ErrIO"
   - "Multi-%w fmt.Errorf wrapping in Wrap() preserves both category and cause for errors.Is routing"

@@ -163,7 +163,7 @@ The following patterns are violations.
 
 ```go
 // AI-Meta:
-//   - Constraints: INV-2 (immutable topology), see .design/specifications/l1-neural-network-architecture.md.
+//   - Constraints: INV-2 (immutable topology), see .design/main/specifications/l1-neural-network-architecture.md.
 ```
 
 `INV-2` and the spec path are SDD process artifacts. Replace with self-contained natural language: `Topology is immutable after Compile`.

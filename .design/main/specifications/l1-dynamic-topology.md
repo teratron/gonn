@@ -182,10 +182,10 @@ graph TD
 
 | Alias | Path | Purpose |
 | :--- | :--- | :--- |
-| `[L1-ARCH]` | `.design/specifications/l1-neural-network-architecture.md` | Parent — INV-2 amended |
-| `[L1-INIT]` | `.design/specifications/l1-weight-initialization.md` | Weight init for new connections |
-| `[L1-CTRL]` | `.design/specifications/l1-training-control.md` | Safe-point state machine |
-| `[L1-CKPT]` | `.design/specifications/l1-checkpointing.md` | Snapshot topology version |
+| `[L1-ARCH]` | `.design/main/specifications/l1-neural-network-architecture.md` | Parent — INV-2 amended |
+| `[L1-INIT]` | `.design/main/specifications/l1-weight-initialization.md` | Weight init for new connections |
+| `[L1-CTRL]` | `.design/main/specifications/l1-training-control.md` | Safe-point state machine |
+| `[L1-CKPT]` | `.design/main/specifications/l1-checkpointing.md` | Snapshot topology version |
 
 ## Document History
 

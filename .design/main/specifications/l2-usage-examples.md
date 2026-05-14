@@ -384,7 +384,7 @@ or equivalent) and use looser thresholds to avoid flakiness.
 
 | Alias | Path | Purpose |
 | :--- | :--- | :--- |
-| `[FACADE]` | `.design/specifications/l2-nn-facade.md` | API contract these examples exercise |
+| `[FACADE]` | `.design/main/specifications/l2-nn-facade.md` | API contract these examples exercise |
 | `[EX-DIR]` | `examples/` | Top-level examples directory |
 | `[REF-V1]` | `.references/fluent_api/fluent_api_v1.go` | Source examples for Builder style (`ExampleSimpleXOR` etc.) |
 | `[REF-V3]` | `.references/fluent_api/fluent_api_v3.go` | Source examples for Options style + Presets |

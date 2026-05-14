@@ -95,6 +95,7 @@ copilot-instructions.md
 !.agents/skills/
 !.agents/rules/
 .agents/skills/magic*
+.agents/rules/magic*
 
 # Magic Spec
 .magic/

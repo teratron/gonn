@@ -103,8 +103,8 @@ from network configuration. This preserves backward compatibility with all v0.5 
 
 | Alias | Path | Purpose |
 | :--- | :--- | :--- |
-| `[TRAIN-L1]` | `.design/specifications/l1-training-semantics.md` | Training loop contract this optimizer hooks into |
-| `[INIT-L1]` | `.design/specifications/l1-weight-initialization.md` | Initial weight values before first Step |
+| `[TRAIN-L1]` | `.design/main/specifications/l1-training-semantics.md` | Training loop contract this optimizer hooks into |
+| `[INIT-L1]` | `.design/main/specifications/l1-weight-initialization.md` | Initial weight values before first Step |
 
 ## Document History
 

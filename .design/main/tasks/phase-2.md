@@ -27,11 +27,11 @@ key_files:
   - pkg/nn/verify.go
   - pkg/nn/train.go
   - examples/perceptron/main.go
-  - .design/specifications/l2-nn-facade.md
-  - .design/specifications/l2-training-loop.md
-  - .design/specifications/l2-control-impl.md
-  - .design/INDEX.md
-  - .design/PLAN.md
+  - .design/main/specifications/l2-nn-facade.md
+  - .design/main/specifications/l2-training-loop.md
+  - .design/main/specifications/l2-control-impl.md
+  - .design/main/INDEX.md
+  - .design/main/PLAN.md
 patterns_established:
 - "Dual fluent API converging on internal Config[T] via shared compile() — no duplicated logic between Builder and Options styles"
 - "State-machine guard via guardConfiguring(method): post-Compile mutations are Logger.Warn no-ops, never panics (preserves INV-2 immutable topology)"

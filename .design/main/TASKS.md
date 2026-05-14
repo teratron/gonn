@@ -4,7 +4,7 @@
 **Project Version:** 0.10.0 (Phase 11 active — v0.10.0 in progress)
 **Generated:** 2026-04-29
 **Last Updated:** 2026-05-12
-**Based on:** .design/PLAN.md v2.5.0
+**Based on:** .design/main/PLAN.md v2.5.0
 **Based on RULES:** .design/RULES.md v1.3.0
 **Execution Mode:** Parallel (C3)
 **Status:** Active
