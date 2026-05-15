@@ -29,7 +29,6 @@ Run any one example: `go run ./examples/{name}/`. Run the whole smoke suite from
 | :--- | :--- | :--- |
 | E06 | `examples/mnist/` | dataset-loader spec + MNIST download |
 
-
 ## Coverage Matrix
 
 Cross-reference of library features against active examples. **`covered`** means at least one active example exercises the element.
