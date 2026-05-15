@@ -5,6 +5,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/teratron/gonn/pkg/layer/conv"
 	"github.com/teratron/gonn/pkg/layer/norm"
 	"github.com/teratron/gonn/pkg/network"
 	"github.com/teratron/gonn/pkg/optimizer"
@@ -72,6 +73,24 @@ type NN[T utils.Float] struct {
 	// normLayers maps hidden-layer index → Normalizer applied post-activation
 	// in the forward pass (Phase 10). nil when no normalization is configured.
 	normLayers map[int]norm.Normalizer[T]
+
+	// convPrefix is the resolved 1-D convolutional preprocessing stack (Phase 11).
+	// Empty / nil when no conv prefix was configured — Forward/Backward then run
+	// the existing pure-Dense path with zero overhead.
+	convPrefix []conv.Layer[T]
+
+	// rawInputSize is the user-declared input length (WithInput value). When
+	// convPrefix is non-empty this differs from Network.Input.Len(): the latter
+	// equals the conv chain's output length so the first Dense layer wires
+	// correctly. Train/Query validate raw vectors against rawInputSize.
+	rawInputSize uint
+
+	// convBuf is the scratch buffer carrying the conv stack's output across
+	// Forward calls; reused to avoid hot-path allocations.
+	convBuf []T
+	// convGradBuf is the scratch buffer carrying ∂L/∂(input cell value)
+	// before being piped through the conv backward pass.
+	convGradBuf []T
 }
 
 // NewBuilder is the entry point for the Builder API. Returns an *NN[T] in

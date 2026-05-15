@@ -11,6 +11,7 @@ import (
 	"log/slog"
 
 	"github.com/teratron/gonn/pkg/activation"
+	"github.com/teratron/gonn/pkg/layer/conv"
 	"github.com/teratron/gonn/pkg/layer/norm"
 	"github.com/teratron/gonn/pkg/loss"
 	"github.com/teratron/gonn/pkg/network"
@@ -175,6 +176,13 @@ type Config[T utils.Float] struct {
 	// after the activation of that layer during forward and backward passes.
 	// nil map disables normalization (zero overhead when omitted).
 	NormLayers map[int]norm.Normalizer[T]
+	// ConvPrefix is the optional 1-D convolutional preprocessing stack
+	// inserted between the raw input vector and the first Dense hidden
+	// layer. When non-empty, compile() rewires the Input layer's size to
+	// the conv chain's final output length and runs the conv stack on every
+	// forward / backward pass. Order is preserved — the slice is consumed
+	// front-to-back.
+	ConvPrefix []conv.Layer[T]
 }
 
 // applyDefaults fills any zero-valued fields with the Defaults constants.

@@ -168,6 +168,55 @@ func (n *Network[T]) AppendFlatGradients(dst []T) []T {
 	return dst
 }
 
+// AppendInputGradient computes ∂L/∂(input cell value) for every Input cell
+// and appends the values into dst (reusing its backing array when capacity
+// allows). Must be called AFTER [CalculateMisses] — it reads miss and the
+// first hidden layer's pre-activation buffer.
+//
+// For input cell i the formula is:
+//
+//	∂L/∂x_i = − Σ_{j in Hiddens[0]}  σ'(preact_j) · miss_j · axon[i→j].weight
+//
+// The sign convention matches [AppendFlatGradients]: SGD applies
+// w -= lr · grad, so the negation here reproduces the existing inline
+// update w += lr · σ'(preact) · miss · axon.value for an upstream pre-stage
+// (e.g. a conv prefix) that needs ∂L/∂x to drive its own Backward pass.
+//
+// AI-Meta:
+//   - Purpose: Expose the input-cell gradient so an upstream stage (conv prefix) can run its backward pass.
+//   - Usage: gradX := n.AppendInputGradient(gradX[:0]).
+//   - Concurrency: NotSafe; must run after CalculateMisses, before CalculateWeights overwrites internal state.
+//   - Related: [CalculateMisses], [AppendFlatGradients], [SetInputs].
+//   - Stability: Stable.
+func (n *Network[T]) AppendInputGradient(dst []T) []T {
+	dst = dst[:0]
+	inLen := n.Input.Len()
+	if inLen == 0 || len(n.Hiddens) == 0 {
+		return dst
+	}
+	act := n.hiddenActs[0]
+	preact := n.preactHiddens[0]
+	// Build a map from input-cell identity → index, so the axon lookup is
+	// O(1) per axon. The Input bundle is small (matches the conv stack
+	// output), so the map cost is negligible.
+	inputIdx := make(map[any]int, inLen)
+	for i, c := range n.Input.cells {
+		inputIdx[any(c)] = i
+	}
+	dst = append(dst, make([]T, inLen)...)
+	for cellIdx, h := range n.Hiddens[0].cells {
+		deriv := activation.Derivative[T](preact[cellIdx], act)
+		miss := *h.GetMiss()
+		coef := deriv * miss
+		for _, a := range h.Axons {
+			if i, ok := inputIdx[any(a.Cell)]; ok {
+				dst[i] -= coef * a.Weight
+			}
+		}
+	}
+	return dst
+}
+
 // Train runs one full forward + backward + weight-update step on the
 // supplied (input, target) pair using the network's LearningRate.
 //

@@ -4,6 +4,7 @@ import (
 	"log/slog"
 
 	"github.com/teratron/gonn/pkg/activation"
+	"github.com/teratron/gonn/pkg/layer/conv"
 	"github.com/teratron/gonn/pkg/layer/norm"
 	"github.com/teratron/gonn/pkg/loss"
 	"github.com/teratron/gonn/pkg/network"
@@ -425,6 +426,62 @@ func WithVisualizationToken[T utils.Float](token string) Option[T] {
 func WithVisualizationCORS[T utils.Float](enable bool) Option[T] {
 	return func(cfg *Config[T]) {
 		cfg.VisCORS = enable
+	}
+}
+
+// ============================================================================
+// Convolutional prefix options (Phase 11 — l2-conv-layers-impl)
+// ============================================================================
+
+// WithConv1D appends a 1-D convolutional layer to the prefix stack consumed
+// before the Dense hidden chain. compile() rewires the Input layer to the
+// final conv-stack output size and initialises the kernel weights via the
+// configured WeightInit method.
+//
+// AI-Meta:
+//   - Purpose: Add a Conv1D layer to the preprocessing stack ahead of the Dense head.
+//   - Usage: nn.New[float32](WithInput[float32](28*28), WithConv1D[float32](16, 3, 1, conv.PadValid, true), WithFlatten[float32](), WithHiddenLayer[float32](64, activation.ReLU), WithOutput[float32](10, activation.SOFTMAX)).
+//   - Related: [WithMaxPool1D], [WithAvgPool1D], [WithFlatten], [conv.PadMode].
+//   - Stability: Stable.
+func WithConv1D[T utils.Float](numFilters, kernelSize, stride int, pad conv.PadMode, useBias bool) Option[T] {
+	return func(cfg *Config[T]) {
+		cfg.ConvPrefix = append(cfg.ConvPrefix,
+			conv.NewConv1D[T](numFilters, kernelSize, stride, pad, useBias))
+	}
+}
+
+// WithMaxPool1D appends a 1-D max-pooling layer to the prefix stack.
+//
+// AI-Meta:
+//   - Purpose: Add a MaxPool1D layer to the preprocessing stack.
+//   - Usage: nn.New[float32](..., WithConv1D[float32](16, 3, 1, conv.PadValid, true), WithMaxPool1D[float32](2), ...).
+//   - Related: [WithConv1D], [WithAvgPool1D], [WithFlatten].
+//   - Stability: Stable.
+func WithMaxPool1D[T utils.Float](poolSize int) Option[T] {
+	return func(cfg *Config[T]) {
+		cfg.ConvPrefix = append(cfg.ConvPrefix, conv.NewMaxPool1D[T](poolSize))
+	}
+}
+
+// WithAvgPool1D appends a 1-D average-pooling layer to the prefix stack.
+func WithAvgPool1D[T utils.Float](poolSize int) Option[T] {
+	return func(cfg *Config[T]) {
+		cfg.ConvPrefix = append(cfg.ConvPrefix, conv.NewAvgPool1D[T](poolSize))
+	}
+}
+
+// WithFlatten appends a stateless Flatten layer to the prefix stack — used
+// to collapse a multi-filter conv output into the 1-D vector consumed by
+// the first Dense layer.
+//
+// AI-Meta:
+//   - Purpose: Add a Flatten reshape layer to the preprocessing stack.
+//   - Usage: nn.New[float32](..., WithMaxPool1D[float32](2), WithFlatten[float32](), WithHiddenLayer[float32](64, activation.ReLU), ...).
+//   - Related: [WithConv1D], [WithMaxPool1D], [WithAvgPool1D].
+//   - Stability: Stable.
+func WithFlatten[T utils.Float]() Option[T] {
+	return func(cfg *Config[T]) {
+		cfg.ConvPrefix = append(cfg.ConvPrefix, conv.NewFlatten[T]())
 	}
 }
 
