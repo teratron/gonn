@@ -115,17 +115,17 @@ Run `/magic.spec` to perform the RFC review and promotion.*
   **Changes**: `pkg/nn/andtrain.go` (+80 lines), `pkg/nn/andtrain_test.go` (+125 lines).
   **Verify**: TestAndTrain{ContinuationPreservesWeights, RestoresOriginalConfig, RejectsEmptySamples, RejectsNonOperational, RejectsRunning} — all green.
 
-- [x] **T-11C05** — `examples/E10_continuation/`. **Done 2026-05-14.**
+- [x] **T-11C05** — `examples/continuation/`. **Done 2026-05-14.**
   Demonstrates FMT-6 end-to-end: trains XOR via Fit, then `AndTrain` with negated targets at lower LR. Post-AndTrain predictions invert from `[0.10, 0.92, 0.91, 0.07]` → `[0.92, 0.06, 0.06, 0.95]` confirming weight continuity. `main_test.go` asserts post-AndTrain L1 distance to negated targets < distance to original.
-  **Changes**: `examples/E10_continuation/{main.go,main_test.go,README.md,go.mod}`; `go.work` updated.
-  **Verify**: `go run ./examples/E10_continuation/` produces expected output; `go test ./examples/E10_continuation/` green.
+  **Changes**: `examples/continuation/{main.go,main_test.go,README.md,go.mod}`; `go.work` updated.
+  **Verify**: `go run ./examples/continuation/` produces expected output; `go test ./examples/continuation/` green.
 
 - [ ] **T-11C04** — Create `examples/E06_mnist/`:
   `main.go`: load MNIST train set via `MNISTLoader`, build 784→128→64→10 network with `WithBatchNorm`,
   train with `AndTrain` for a second epoch, query a sample image, print predicted digit.
   `README.md`: explains MNIST IDX format, one-hot encoding, why BatchNorm helps deep nets.
 
-- [ ] **T-11C05** — Create `examples/E10_continuation/`:
+- [ ] **T-11C05** — Create `examples/continuation/`:
   `main.go`: pre-train XOR network for 500 iterations, call `AndTrain` with a second dataset
   (negated XOR), demonstrate weight preservation and continued convergence.
   `README.md`: explains `AndTrain` semantics, when to use continuation vs rebuilding.
@@ -152,7 +152,7 @@ Run `/magic.spec` to perform the RFC review and promotion.*
   - Verify `ErrIDXMagic` on tampered magic bytes.
   - Verify `ErrMNISTRecordMismatch` when image/label counts differ.
   - `go run ./examples/E06_mnist/` — executes without panic (smoke test; no accuracy threshold).
-  - `go run ./examples/E10_continuation/` — executes without panic.
+  - `go run ./examples/continuation/` — executes without panic.
 
 ## Gate
 

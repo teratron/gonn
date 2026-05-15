@@ -1,4 +1,4 @@
-// Example E10 — AndTrain continuation.
+// Example: AndTrain continuation.
 //
 // See [.design/main/specifications/l2-dataset-loader-impl.md] §5.4
 // (FMT-6 / FMT-7 / FMT-8). The example demonstrates the AndTrain method:

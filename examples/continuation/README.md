@@ -1,4 +1,4 @@
-# Example E10 — `AndTrain` Continuation
+# Example: Continuation
 
 Demonstrates the `AndTrain` method for continuation training. The example
 trains a 2→4→1 XOR network on the canonical truth table, then calls
@@ -19,7 +19,7 @@ relationship without rebuilding the network or losing learned structure.
 ## Run
 
 ```bash
-go run ./examples/E10_continuation/
+go run ./examples/continuation/
 ```
 
 Expected output (weight init is seeded by wall-clock; numbers vary):
@@ -37,7 +37,7 @@ network re-learned the negated relationship using the same weight slab.
 ## Test
 
 ```bash
-go test ./examples/E10_continuation/
+go test ./examples/continuation/
 ```
 
 Asserts that the post-`AndTrain` predictions are closer to the negated

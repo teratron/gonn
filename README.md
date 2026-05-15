@@ -161,13 +161,14 @@ n.Stop()    // terminate loop, return completed epochs
 | E07 | `examples/regression_sin/` | Sine regression, TanH, RMSE ≤ 0.10 | Builder |
 | E08 | `examples/regression_multi/` | 5-input 3-output ReLU + He | Options |
 | E09 | `examples/persistence/` | Save / reload weights via `pkg/persistence` | Options |
+| E10 | `examples/continuation/` | Continuation training — `AndTrain` parity | Options |
 | E11 | `examples/callbacks/` | EpochCallback + BatchCallback | Options |
 | E12 | `examples/style_showcase/` | Same XOR built three ways | Both |
 | E13 | `examples/higher_order_options/` | Sequential + DeepNetwork preset | Options |
 | E14 | `examples/shared_options/` | Shared `[]Option[T]` across topologies | Options |
 | E15 | `examples/precision/` | float32 vs float64 comparison | Both |
 | E06 | _(deferred)_ | MNIST — awaits dataset-loader spec | — |
-| E10 | _(deferred)_ | Continuation training — awaits `AndTrain` API | — |
+
 
 ## Package Overview
 

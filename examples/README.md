@@ -14,6 +14,7 @@ Implements various usage patterns for the GoNN library. Every active example is 
 | E07 | [regression_sin](regression_sin/) | Options | 2-hidden TanH sine regression; RMSE target ≤ 0.10 |
 | E08 | [regression_multi](regression_multi/) | Options | 2-hidden ReLU+He; 5-input → 3-output regression, per-dim RMSE ≤ 0.20 |
 | E09 | [persistence](persistence/) | Builder + `pkg/persistence` | Save → reload → query, ULP-1 round-trip (PERS-4) |
+| E10 | [continuation](continuation/) | Options | `AndTrain` continuation — weight reuse parity |
 | E11 | [callbacks](callbacks/) | Options | `WithEpochCallback` + `WithBatchCallback` |
 | E12 | [style_showcase](style_showcase/) | Builder + Options + Preset | Three-style equivalence on the same network |
 | E13 | [higher_order_options](higher_order_options/) | Options | `Sequential` + `DeepNetwork` higher-order options; iris CSV reuse |
@@ -27,7 +28,7 @@ Run any one example: `go run ./examples/{name}/`. Run the whole smoke suite from
 | ID | Path | Gate |
 | :--- | :--- | :--- |
 | E06 | `examples/mnist/` | dataset-loader spec + MNIST download |
-| E10 | `examples/continuation/` | `AndTrain` API surface |
+
 
 ## Coverage Matrix
 
@@ -56,7 +57,7 @@ Cross-reference of library features against active examples. **`covered`** means
 | `Train` | covered | all actives via `Fit` | — |
 | `Query` | covered | E01, E04, E05, E07, E08, E09, E11, E12, E13, E14, E15 | — |
 | `Verify` | gap | (none) | planned E05/E07 extension |
-| `AndTrain` | gap | (none) | E10 deferred |
+| `AndTrain` | covered | E10 | — |
 | `Persistence` (Save / Reload) | covered | E09 | — |
 
-**Gap summary**: 4 elements (`PresetMNIST`, `PresetRegression`, `Verify`, `AndTrain`) remain uncovered pending E06/E10/loader work.
+**Gap summary**: 3 elements (`PresetMNIST`, `PresetRegression`, `Verify`) remain uncovered pending E06/loader work.

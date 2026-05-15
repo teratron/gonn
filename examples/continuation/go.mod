@@ -1,4 +1,4 @@
-module github.com/teratron/gonn/examples/E10_continuation
+module github.com/teratron/gonn/examples/continuation
 
 go 1.26.3
 

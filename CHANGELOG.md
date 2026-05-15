@@ -254,7 +254,7 @@ first feature-complete minor release of the GoNN v0.6 line.
 #### Deferred to v0.7
 
 - **E06 MNIST example** — awaits MNIST dataset-loader spec.
-- **E10 Continuation** — awaits `AndTrain` API surface.
+- **E10 Continuation** — demonstrates `AndTrain` weight reuse parity.
 - `context.Context` integration for training cancellation.
 - NaN-loss detection and recovery hooks.
 

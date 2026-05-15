@@ -217,7 +217,7 @@ Six of the eight v0.6-gated entries (E03, E04, E05, E07, E08, E13) are now activ
 | `pkg/nn/andtrain.go` (AndTrain method) | l2-dataset-loader-impl v0.1.0 §5.4 | `Todo` [C] |
 | `pkg/utils/errors.go` (ErrIDXMagic, ErrMNISTRecordMismatch, ErrNetworkRunning) | l2-dataset-loader-impl v0.1.0 §5.5 | `Todo` [C] |
 | `examples/E06_mnist/` | l2-usage-examples v1.0.0 + l2-dataset-loader-impl v0.1.0 | `Todo` [C] |
-| `examples/E10_continuation/` | l2-usage-examples v1.0.0 + l2-dataset-loader-impl v0.1.0 | `Todo` [C] |
+| `examples/continuation/` | l2-usage-examples v1.0.0 + l2-dataset-loader-impl v0.1.0 | `Todo` [C] |
 | `CHANGELOG.md` (v0.10.0 entry) | l1-release-policy v1.0.0 | `Todo` |
 | `v0.10.0` git tag | l1-release-policy v1.0.0 §5.4 | `Todo` |
 
