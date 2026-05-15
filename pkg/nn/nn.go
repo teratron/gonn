@@ -33,22 +33,22 @@ import (
 //   - Constraints: Topology is immutable after Compile; weights must not be mutated concurrently.
 //   - Stability: Stable.
 type NN[T utils.Float] struct {
+	callbacks          *CallbackRegistry[T]
+	normLayers         map[int]norm.Normalizer[T]
+	vis                *visualization.VisServer
+	network.Network[T] `json:"network" xml:"network"`
+	cfg                Config[T]
+	control            atomic.Int32
+	opt                optimizer.Optimizer[T]
 	reg                regularizer.Regularizer[T]
 	sched              optimizer.Scheduler[T]
-	opt                optimizer.Optimizer[T]
-	callbacks          *CallbackRegistry[T]
-	vis                *visualization.VisServer
-	normLayers         map[int]norm.Normalizer[T]
-	network.Network[T] `json:"network" xml:"network"`
-	weightBuf          []T
-	gradBuf            []T
-	convPrefix         []conv.Layer[T]
+	stateField         state
 	convBuf            []T
 	convGradBuf        []T
-	cfg                Config[T]
+	convPrefix         []conv.Layer[T]
+	gradBuf            []T
+	weightBuf          []T
 	rawInputSize       uint
-	control            atomic.Int32
-	stateField         state
 }
 
 // NewBuilder is the entry point for the Builder API. Returns an *NN[T] in

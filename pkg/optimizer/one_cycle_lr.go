@@ -25,14 +25,14 @@ import (
 //   - Related: [MetricScheduler], [BindScheduler], [ReduceOnPlateau].
 //   - Stability: Stable.
 type OneCycleLR[T utils.Float] struct {
-	maxLR      T
 	current    T
-	totalSteps uint
-	pctStart   float64
+	gran       Granularity
+	maxLR      T
 	divFactor  float64
 	finalDiv   float64
+	pctStart   float64
 	step       uint
-	gran       Granularity
+	totalSteps uint
 }
 
 // compile-time assertion (C26).

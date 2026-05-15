@@ -114,4 +114,8 @@ copilot-instructions.md
 .design/.graph-cache/
 .design/wiki/
 
+# Misc
+*.txt
+*.tgz
+*.zip
 cover*

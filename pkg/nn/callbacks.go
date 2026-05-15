@@ -175,7 +175,8 @@ func fireOnTrainEnd[T utils.Float](reg *CallbackRegistry[T], stopReason *StopRea
 //
 //go:fix inline
 func stopReasonPtr(r StopReason) *StopReason {
-	return new(r)
+	val := r
+	return &val
 }
 
 // callbackContextFrom constructs a CallbackContext from the current training state.
