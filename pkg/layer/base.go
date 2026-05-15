@@ -13,9 +13,9 @@ import (
 // the core via newCore before the base is usable.
 type base[T utils.Float, S neuron.Neuron[T]] struct {
 	*core[T, S]
+	bias       *cell.Bias[T]
 	Bias       bool            `json:"bias" xml:"bias"`
 	Activation activation.Type `json:"activation" xml:"activation"`
-	bias       *cell.Bias[T]
 }
 
 // newBase allocates a base layer with a fresh core of the given kind. If

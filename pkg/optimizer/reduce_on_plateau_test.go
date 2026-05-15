@@ -8,7 +8,7 @@ func TestReduceOnPlateau_PatienceTrigger(t *testing.T) {
 	sched := NewReduceOnPlateau[float64](0.1, WithROPPatience[float64](3), WithROPFactor[float64](0.5))
 
 	// 3 calls with no improvement should trigger reduction
-	for i := 0; i < 3; i++ {
+	for range 3 {
 		sched.StepWithMetric(0.5) // same metric, no improvement
 	}
 	got := sched.StepWithMetric(0.5) // 4th call — patience reset, rate reduced on count==patience
@@ -23,8 +23,8 @@ func TestReduceOnPlateau_PatientceExact(t *testing.T) {
 	sched := NewReduceOnPlateau[float64](0.1, WithROPPatience[float64](2), WithROPFactor[float64](0.5))
 
 	// First call is an improvement (0.5 < best=1e38), so patience doesn't start yet.
-	sched.StepWithMetric(0.5) // improvement: best=0.5, patienceCount=0
-	sched.StepWithMetric(0.5) // stale: patienceCount=1
+	sched.StepWithMetric(0.5)         // improvement: best=0.5, patienceCount=0
+	sched.StepWithMetric(0.5)         // stale: patienceCount=1
 	rate := sched.StepWithMetric(0.5) // stale: patienceCount=2=patience → reduce to 0.05
 	const want = 0.05
 	if rate != want {
@@ -40,8 +40,8 @@ func TestReduceOnPlateau_ModeMax(t *testing.T) {
 	)
 
 	// Improvement means metric increasing
-	sched.StepWithMetric(0.6) // best=0.6
-	sched.StepWithMetric(0.5) // no improvement (< best), patienceCount=1
+	sched.StepWithMetric(0.6)         // best=0.6
+	sched.StepWithMetric(0.5)         // no improvement (< best), patienceCount=1
 	rate := sched.StepWithMetric(0.5) // patienceCount=2 → reduce
 	if rate >= 0.1 {
 		t.Errorf("expected reduced LR, got %v", rate)
@@ -121,7 +121,7 @@ func TestReduceOnPlateau_MinLRFloor(t *testing.T) {
 		WithROPMinLR[float64](0.005),
 	)
 	// Trigger multiple reductions — rate should never go below minLR
-	for i := 0; i < 20; i++ {
+	for range 20 {
 		sched.StepWithMetric(0.5)
 	}
 	if sched.current < 0.005 {
@@ -146,8 +146,8 @@ func TestReduceOnPlateau_BindSchedulerForwards(t *testing.T) {
 		t.Fatal("BindScheduler result must implement MetricScheduler")
 	}
 	// Trigger patience (2 stale + reduction)
-	ms.StepWithMetric(0.5) // improvement (0.5 < 1e38)
-	ms.StepWithMetric(0.5) // no improvement, patienceCount=1=patience → reduce
+	ms.StepWithMetric(0.5)         // improvement (0.5 < 1e38)
+	ms.StepWithMetric(0.5)         // no improvement, patienceCount=1=patience → reduce
 	rate := ms.StepWithMetric(0.5) // patienceCount=0 again, current=0.05
 	_ = rate
 	if opt.LearningRate() >= 0.1 {

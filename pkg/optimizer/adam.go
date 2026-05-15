@@ -20,11 +20,13 @@ import (
 //   - Related: [Optimizer], [NewSGD], [NewRMSProp].
 //   - Stability: Stable.
 type Adam[T utils.Float] struct {
-	lr                T
-	beta1, beta2, eps float64
-	t                 int
-	m                 []float64 // first moment
-	v                 []float64 // second moment
+	lr    T
+	m     []float64
+	v     []float64
+	beta1 float64
+	beta2 float64
+	eps   float64
+	t     int
 }
 
 // compile-time interface verification (C26).
@@ -100,13 +102,13 @@ func (a *Adam[T]) SetLearningRate(rate T) { a.lr = rate }
 
 // adamState is the JSON-serialisable snapshot of Adam internal state.
 type adamState struct {
+	M     []float64 `json:"m"`
+	V     []float64 `json:"v"`
 	LR    float64   `json:"lr"`
 	Beta1 float64   `json:"beta1"`
 	Beta2 float64   `json:"beta2"`
 	Eps   float64   `json:"eps"`
 	T     int       `json:"t"`
-	M     []float64 `json:"m"`
-	V     []float64 `json:"v"`
 }
 
 // SaveState serialises lr, hyperparameters, t, m, v to JSON (OPT-6).

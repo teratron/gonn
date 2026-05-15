@@ -570,11 +570,9 @@ func TestPauseResumeCycle(t *testing.T) {
 	}
 
 	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		_, _, _ = n.Fit(dataset)
-	}()
+	})
 
 	// Spin until the worker has transitioned to Running. Avoids a flaky
 	// time.Sleep race — on slow CI the worker may not have entered Fit

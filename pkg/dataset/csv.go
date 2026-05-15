@@ -54,12 +54,12 @@ func NewCSVDataset[T utils.Float](path string, inputSize, outputSize, batchSize 
 }
 
 type csvDataset[T utils.Float] struct {
+	file       *os.File
+	reader     *csv.Reader
 	path       string
 	inputSize  int
 	outputSize int
 	batch      int
-	file       *os.File
-	reader     *csv.Reader
 }
 
 // bind attaches a freshly-opened file handle and configures the underlying

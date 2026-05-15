@@ -50,14 +50,14 @@ func WithLayerNormAffine[T utils.Float](a bool) LayerNormOption[T] {
 //   - Related: [NewLayerNorm], [Normalizer], [BatchNorm], [GroupNorm].
 //   - Stability: Stable.
 type LayerNorm[T utils.Float] struct {
-	features  int
 	eps       T
-	affine    bool
 	gamma     []T
 	beta      []T
 	gammaGrad []T
 	betaGrad  []T
-	mode      atomic.Int32 // stored but not used — kept for interface parity
+	features  int
+	mode      atomic.Int32
+	affine    bool
 }
 
 // NewLayerNorm constructs a LayerNorm for the given feature count.
@@ -164,11 +164,11 @@ func (l *LayerNorm[T]) OutputSize() int { return l.features }
 //   - Stability: Stable.
 func (l *LayerNorm[T]) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&struct {
-		Features int  `json:"features"`
 		Eps      T    `json:"eps"`
-		Affine   bool `json:"affine"`
 		Gamma    []T  `json:"gamma,omitempty"`
 		Beta     []T  `json:"beta,omitempty"`
+		Features int  `json:"features"`
+		Affine   bool `json:"affine"`
 	}{
 		Features: l.features,
 		Eps:      l.eps,
@@ -186,11 +186,11 @@ func (l *LayerNorm[T]) MarshalJSON() ([]byte, error) {
 //   - Stability: Stable.
 func (l *LayerNorm[T]) UnmarshalJSON(data []byte) error {
 	aux := &struct {
-		Features int  `json:"features"`
 		Eps      T    `json:"eps"`
-		Affine   bool `json:"affine"`
 		Gamma    []T  `json:"gamma,omitempty"`
 		Beta     []T  `json:"beta,omitempty"`
+		Features int  `json:"features"`
+		Affine   bool `json:"affine"`
 	}{}
 	if err := json.Unmarshal(data, aux); err != nil {
 		return err

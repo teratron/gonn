@@ -121,9 +121,7 @@ func StartSweeper(ctx context.Context, dir string, cfg SweepConfig, interval tim
 		interval = time.Minute
 	}
 	s := &Sweeper{stop: make(chan struct{})}
-	s.wg.Add(1)
-	go func() {
-		defer s.wg.Done()
+	s.wg.Go(func() {
 		ticker := time.NewTicker(interval)
 		defer ticker.Stop()
 		for {
@@ -136,7 +134,7 @@ func StartSweeper(ctx context.Context, dir string, cfg SweepConfig, interval tim
 				_, _, _, _ = Sweep(dir, cfg)
 			}
 		}
-	}()
+	})
 	return s
 }
 
@@ -150,9 +148,9 @@ func StartSweeper(ctx context.Context, dir string, cfg SweepConfig, interval tim
 //   - Concurrency: Safe; Stop uses sync.Once and WaitGroup internally.
 //   - Related: [StartSweeper], [Stop].
 type Sweeper struct {
-	once sync.Once
 	stop chan struct{}
 	wg   sync.WaitGroup
+	once sync.Once
 }
 
 // Stop signals the goroutine to exit and blocks until it has returned.
@@ -180,9 +178,10 @@ func joinErrors(errs []error) error {
 	if len(errs) == 1 {
 		return errs[0]
 	}
-	combined := errs[0].Error()
+	var combined strings.Builder
+	combined.WriteString(errs[0].Error())
 	for _, e := range errs[1:] {
-		combined += "; " + e.Error()
+		combined.WriteString("; " + e.Error())
 	}
-	return utils.Newf(utils.ErrIO, "Sweep: %d errors (%s)", len(errs), combined)
+	return utils.Newf(utils.ErrIO, "Sweep: %d errors (%s)", len(errs), combined.String())
 }

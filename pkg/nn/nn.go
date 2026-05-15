@@ -33,64 +33,22 @@ import (
 //   - Constraints: Topology is immutable after Compile; weights must not be mutated concurrently.
 //   - Stability: Stable.
 type NN[T utils.Float] struct {
+	reg                regularizer.Regularizer[T]
+	sched              optimizer.Scheduler[T]
+	opt                optimizer.Optimizer[T]
+	callbacks          *CallbackRegistry[T]
+	vis                *visualization.VisServer
+	normLayers         map[int]norm.Normalizer[T]
 	network.Network[T] `json:"network" xml:"network"`
-
-	// Internal staging buffer for both styles.
-	cfg Config[T]
-
-	// Construction-lifecycle position. Mutated only from the goroutine
-	// that calls Compile() / NewBuilder() / New() — read by post-compile
-	// guard helpers.
-	stateField state
-
-	// Training-control state cell. Atomic so Pause / Resume / Stop can
-	// be called from a different goroutine while Train is running. See
-	// [control.go] for the public surface.
-	control atomic.Int32
-
-	// opt is the resolved optimizer (always non-nil after compile).
-	opt optimizer.Optimizer[T]
-
-	// reg is the optional regularizer (nil = no regularization).
-	reg regularizer.Regularizer[T]
-
-	// sched is the optional learning-rate scheduler (nil = no scheduling).
-	sched optimizer.Scheduler[T]
-
-	// weightBuf / gradBuf are reused per training step to avoid
-	// per-sample allocations in the hot training loop.
-	weightBuf []T
-	gradBuf   []T
-
-	// vis is the optional HTTP observability server started by compile when
-	// WithVisualizationEndpoint is set. nil when disabled. Stopped by Close.
-	vis *visualization.VisServer
-
-	// callbacks holds per-event training callback registrations (Phase 10).
-	// nil when no callbacks are registered (CB-3 zero overhead).
-	callbacks *CallbackRegistry[T]
-
-	// normLayers maps hidden-layer index → Normalizer applied post-activation
-	// in the forward pass (Phase 10). nil when no normalization is configured.
-	normLayers map[int]norm.Normalizer[T]
-
-	// convPrefix is the resolved 1-D convolutional preprocessing stack (Phase 11).
-	// Empty / nil when no conv prefix was configured — Forward/Backward then run
-	// the existing pure-Dense path with zero overhead.
-	convPrefix []conv.Layer[T]
-
-	// rawInputSize is the user-declared input length (WithInput value). When
-	// convPrefix is non-empty this differs from Network.Input.Len(): the latter
-	// equals the conv chain's output length so the first Dense layer wires
-	// correctly. Train/Query validate raw vectors against rawInputSize.
-	rawInputSize uint
-
-	// convBuf is the scratch buffer carrying the conv stack's output across
-	// Forward calls; reused to avoid hot-path allocations.
-	convBuf []T
-	// convGradBuf is the scratch buffer carrying ∂L/∂(input cell value)
-	// before being piped through the conv backward pass.
-	convGradBuf []T
+	weightBuf          []T
+	gradBuf            []T
+	convPrefix         []conv.Layer[T]
+	convBuf            []T
+	convGradBuf        []T
+	cfg                Config[T]
+	rawInputSize       uint
+	control            atomic.Int32
+	stateField         state
 }
 
 // NewBuilder is the entry point for the Builder API. Returns an *NN[T] in

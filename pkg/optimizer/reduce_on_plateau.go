@@ -23,15 +23,15 @@ import (
 //   - Related: [MetricScheduler], [BindScheduler], [OneCycleLR].
 //   - Stability: Stable.
 type ReduceOnPlateau[T utils.Float] struct {
-	lr0           T
-	current       T
 	best          T
-	patienceCount uint
-	factor        float64
-	patience      uint
-	threshold     float64
+	current       T
+	lr0           T
 	minLR         T
 	mode          string
+	factor        float64
+	patience      uint
+	patienceCount uint
+	threshold     float64
 }
 
 // compile-time assertion (C26).
@@ -179,15 +179,15 @@ func (r *ReduceOnPlateau[T]) Granularity() Granularity { return PerEpoch }
 
 // reducePlateauState is the JSON-serialisable snapshot of ReduceOnPlateau.
 type reducePlateauState struct {
+	Mode          string  `json:"mode"`
 	LR0           float64 `json:"lr0"`
 	Current       float64 `json:"current"`
 	Best          float64 `json:"best"`
-	PatienceCount uint    `json:"patience_count"`
 	Factor        float64 `json:"factor"`
-	Patience      uint    `json:"patience"`
 	Threshold     float64 `json:"threshold"`
 	MinLR         float64 `json:"min_lr"`
-	Mode          string  `json:"mode"`
+	PatienceCount uint    `json:"patience_count"`
+	Patience      uint    `json:"patience"`
 }
 
 // SaveState serialises all ReduceOnPlateau state to JSON (LRS-6).

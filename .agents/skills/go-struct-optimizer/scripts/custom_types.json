@@ -1,0 +1,87 @@
+{
+  "StorageStrategy": {
+    "size": 1,
+    "align": 1,
+    "ptr": "none"
+  },
+  "TypeID": {
+    "size": 4,
+    "align": 4,
+    "ptr": "none"
+  },
+  "TypeTags": {
+    "size": 1,
+    "align": 1,
+    "ptr": "none"
+  },
+  "ArchetypeID": {
+    "size": 4,
+    "align": 4,
+    "ptr": "none"
+  },
+  "ListenerID": {
+    "size": 4,
+    "align": 4,
+    "ptr": "none"
+  },
+  "Tick": {
+    "size": 4,
+    "align": 4,
+    "ptr": "none"
+  },
+  "component.ID": {
+    "size": 4,
+    "align": 4,
+    "ptr": "none"
+  },
+  "entity.EntityID": {
+    "size": 8,
+    "align": 8,
+    "ptr": "none"
+  },
+  "entity.Entity": {
+    "size": 8,
+    "align": 8,
+    "ptr": "none"
+  },
+  "world.ArchetypeID": {
+    "size": 4,
+    "align": 4,
+    "ptr": "none"
+  },
+  "world.ListenerID": {
+    "size": 4,
+    "align": 4,
+    "ptr": "none"
+  },
+  "SystemNodeID": {
+    "size": 8,
+    "align": 8,
+    "ptr": "none"
+  },
+  "reflect.StructTag": {
+    "size": 16,
+    "align": 8,
+    "ptr": "mixed"
+  },
+  "reflect.Type": {
+    "size": 16,
+    "align": 8,
+    "ptr": "mixed"
+  },
+  "time.Duration": {
+    "size": 8,
+    "align": 8,
+    "ptr": "none"
+  },
+  "resolv.Vector": {
+    "size": 16,
+    "align": 8,
+    "ptr": "none"
+  },
+  "resolv.ShapeCollection": {
+    "size": 24,
+    "align": 8,
+    "ptr": "mixed"
+  }
+}

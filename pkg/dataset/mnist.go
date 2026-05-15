@@ -34,11 +34,11 @@ const (
 //   - Related: [readIDXHeader], [IDXReader], [MNISTLoader].
 //   - Stability: Stable.
 type idxHeader struct {
-	dtype  byte
-	ndim   byte
 	dims   []int32
 	count  int
 	recLen int
+	dtype  byte
+	ndim   byte
 }
 
 // readIDXHeader reads the 4-byte magic + ndim*4 dimension bytes from r and
@@ -127,8 +127,8 @@ func (h idxHeader) elementSize() int {
 //   - Stability: Stable.
 type IDXReader struct {
 	r      io.Reader
-	hdr    idxHeader
 	buf    []byte
+	hdr    idxHeader
 	cursor int // number of records already consumed
 }
 
@@ -196,19 +196,14 @@ func (ir *IDXReader) Reset() error {
 //   - Related: [Dataset], [NewMNISTLoader], [NewMNISTLoaderFiles], [IDXReader].
 //   - Stability: Stable.
 type MNISTLoader[T utils.Float] struct {
+	norm      T
 	images    *IDXReader
 	labels    *IDXReader
-	norm      T
-	batchSize int
+	openFn    func() (*IDXReader, *IDXReader, []io.Closer, error)
 	imagePath string
 	labelPath string
-	// File handles tracked so the loader can close them on Reset / Close.
-	// Empty in the NewMNISTLoader (BYO-reader) path.
 	openFiles []io.Closer
-	// Resettable when set — invoked by Reset to rebuild image/label readers
-	// from fresh file handles. Returns the readers and the file handles to
-	// track for Close.
-	openFn func() (*IDXReader, *IDXReader, []io.Closer, error)
+	batchSize int
 }
 
 // NewMNISTLoader wraps existing IDX readers. The images reader must point at

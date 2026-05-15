@@ -15,7 +15,7 @@ func cceLoss[T utils.Float](predicted, target []T) T {
 	var total T
 	epsilon := T(1e-7) // Small value to prevent log(0)
 
-	for i := 0; i < len(predicted); i++ {
+	for i := range predicted {
 		// Clamp predicted value to avoid log(0)
 		clampedPred := predicted[i]
 		if clampedPred < epsilon {

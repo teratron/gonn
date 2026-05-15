@@ -26,12 +26,12 @@ import (
 //   - Stability: Stable.
 type OneCycleLR[T utils.Float] struct {
 	maxLR      T
+	current    T
 	totalSteps uint
 	pctStart   float64
 	divFactor  float64
 	finalDiv   float64
 	step       uint
-	current    T
 	gran       Granularity
 }
 

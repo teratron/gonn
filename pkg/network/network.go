@@ -43,44 +43,20 @@ type WeightSampler[T utils.Float] func(fanIn, fanOut int) T
 //   - Concurrency: NotSafe; Train mutates cells, weights, and pre-activation buffers in place.
 //   - Related: [New], [SetLayers], [Build], [Train], [CalculateValues].
 type Network[T utils.Float] struct {
-	LearningRate T `json:"learningRate" xml:"learningRate"`
-
-	Input   bundle[T, *cell.Input[T]]    `json:"input" xml:"input"`
-	Hiddens []bundle[T, *cell.Hidden[T]] `json:"hiddens" xml:"hiddens"`
-	Output  bundle[T, *cell.Output[T]]   `json:"output" xml:"output"`
-
-	// hiddenBiases / hiddenActs are positional with Hiddens[i]: a layer
-	// with Bias == false contributes a nil entry so the lookup stays
-	// indexable without auxiliary maps.
-	hiddenBiases []*cell.Bias[T]
-	outputBias   *cell.Bias[T]
-	hiddenActs   []activation.Type
-	outputAct    activation.Type
-	lossMode     loss.Type
-
-	// preactHiddens[i] / preactOutput store the pre-activation linear
-	// sums so backprop can feed them to activation.Derivative. The
-	// dispatcher expects pre-activation input (it re-applies the
-	// activation inside to compute σ' = σ(x)·(1-σ(x)) for sigmoid and
-	// similar). Reusing the post-activation value would yield
-	// σ(σ(x))·(1-σ(σ(x))) — a vanishing gradient that prevents
-	// convergence. preactHiddens[i] is sized to Hiddens[i].Len() once at
-	// SetLayers time and never reslicing afterwards.
-	preactHiddens [][]T
-	preactOutput  []T
-
-	// initWeight is optionally set by SetWeightSampler before Build.
-	// nil reverts to axon.New which uses U[-0.5, 0.5].
-	initWeight WeightSampler[T]
-
-	// topologyMode governs whether runtime mutation methods are allowed.
-	// Defaults to Immutable (zero value). Set to Dynamic via the NN
-	// option / builder to enable AddNeuron / AddHiddenLayer etc.
-	topologyMode TopologyMode
-
-	// topologyVersion is a monotonic counter incremented by every
-	// successful topology mutation commit. Read via TopologyVersion().
+	LearningRate    T `json:"learningRate" xml:"learningRate"`
+	outputBias      *cell.Bias[T]
+	initWeight      WeightSampler[T]
+	hiddenBiases    []*cell.Bias[T]
+	Input           bundle[T, *cell.Input[T]] `json:"input" xml:"input"`
+	hiddenActs      []activation.Type
+	preactHiddens   [][]T
+	preactOutput    []T
+	Output          bundle[T, *cell.Output[T]]   `json:"output" xml:"output"`
+	Hiddens         []bundle[T, *cell.Hidden[T]] `json:"hiddens" xml:"hiddens"`
 	topologyVersion uint64
+	outputAct       activation.Type
+	lossMode        loss.Type
+	topologyMode    TopologyMode
 }
 
 // New returns a freshly constructed Network with empty bundles and the

@@ -72,7 +72,7 @@ var _ Normalizer[float32] = (*GroupNorm[float32])(nil)
 //   - Usage: sd := stddev(variance, eps) inside Forward implementations.
 //   - Concurrency: Safe; pure function, no state.
 func stddev[T utils.Float](variance, eps T) T {
-	return T(math.Sqrt(float64(variance+eps)))
+	return T(math.Sqrt(float64(variance + eps)))
 }
 
 // applyAffine scales each element of xHat by gamma[i] and adds beta[i].

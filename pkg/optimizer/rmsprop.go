@@ -21,9 +21,9 @@ import (
 //   - Stability: Stable.
 type RMSProp[T utils.Float] struct {
 	lr     T
+	sqGrad []float64
 	alpha  float64
 	eps    float64
-	sqGrad []float64
 }
 
 // compile-time interface verification (C26).
@@ -87,20 +87,20 @@ func (r *RMSProp[T]) SetLearningRate(rate T) { r.lr = rate }
 // SaveState serialises lr, hyperparameters, and squared-EMA buffer to JSON.
 func (r *RMSProp[T]) SaveState() ([]byte, error) {
 	return json.Marshal(struct {
+		SqGrad []float64 `json:"sq_grad"`
 		LR     float64   `json:"lr"`
 		Alpha  float64   `json:"alpha"`
 		Eps    float64   `json:"eps"`
-		SqGrad []float64 `json:"sq_grad"`
 	}{LR: float64(r.lr), Alpha: r.alpha, Eps: r.eps, SqGrad: r.sqGrad})
 }
 
 // LoadState restores from a SaveState blob.
 func (r *RMSProp[T]) LoadState(data []byte) error {
 	var st struct {
+		SqGrad []float64 `json:"sq_grad"`
 		LR     float64   `json:"lr"`
 		Alpha  float64   `json:"alpha"`
 		Eps    float64   `json:"eps"`
-		SqGrad []float64 `json:"sq_grad"`
 	}
 	if err := json.Unmarshal(data, &st); err != nil {
 		return err

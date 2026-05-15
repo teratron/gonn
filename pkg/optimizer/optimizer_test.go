@@ -112,7 +112,7 @@ func TestResetIdempotent(t *testing.T) {
 			wb := []float64{1, 2, 3}
 
 			// Warm up a by 5 steps, then reset.
-			for i := 0; i < 5; i++ {
+			for range 5 {
 				_ = tc.a.Step(wa, deltas)
 			}
 			tc.a.Reset()

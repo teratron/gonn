@@ -120,10 +120,7 @@ func outputLen(inLen, kernelSize, stride int, pad PadMode) int {
 //   - Related: [Conv1D.Forward], [outputLen].
 func padSamePadding(inLen, kernelSize, stride int) (left, right int) {
 	out := (inLen + stride - 1) / stride
-	total := (out-1)*stride + kernelSize - inLen
-	if total < 0 {
-		total = 0
-	}
+	total := max((out-1)*stride+kernelSize-inLen, 0)
 	left = total / 2
 	right = total - left
 	return

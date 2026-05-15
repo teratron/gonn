@@ -12,7 +12,7 @@ func cosineLossVector[T utils.Float](predicted, target []T) T {
 	}
 
 	var dotProduct, normPred, normTarget T
-	for i := 0; i < len(predicted); i++ {
+	for i := range predicted {
 		dotProduct += predicted[i] * target[i]
 		normPred += predicted[i] * predicted[i]
 		normTarget += target[i] * target[i]

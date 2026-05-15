@@ -135,54 +135,31 @@ type HiddenLayerSpec[T utils.Float] struct {
 //   - Related: [HiddenLayerSpec], [Compile], [Option], [NN.Config].
 //   - Stability: Stable.
 type Config[T utils.Float] struct {
-	HiddenLayers []HiddenLayerSpec[T]
-	// ProfilingAddr enables the optional pprof HTTP listener
-	// (PERF-5). Empty (zero value) keeps the listener disabled.
-	ProfilingAddr string
-	BatchCallback func(batch uint, lossValue T)
-	EpochCallback func(epoch uint, lossValue T)
-	InputSize     uint
-	LearningRate  T
-	LossLimit     T
-	LossType      loss.Type
-	MaxIterations uint
-	// Optimizer overrides the default SGD weight-update rule. nil resolves
-	// to DefaultOptimizer(LearningRate) in compile().
+	LearningRate     T
+	LossLimit        T
 	Optimizer        optimizer.Optimizer[T]
-	OutputActivation activation.Type
+	Regularizer      regularizer.Regularizer[T]
+	Scheduler        optimizer.Scheduler[T]
+	NormLayers       map[int]norm.Normalizer[T]
+	Callbacks        *CallbackRegistry[T]
+	Logger           *slog.Logger
+	BatchCallback    func(batch uint, lossValue T)
+	EpochCallback    func(epoch uint, lossValue T)
+	VisAddr          string
+	ProfilingAddr    string
+	VisToken         string
+	WeightInit       WeightInitMethod
+	HiddenLayers     []HiddenLayerSpec[T]
+	ConvPrefix       []conv.Layer[T]
+	MaxIterations    uint
+	InputSize        uint
 	OutputSize       uint
-	// Regularizer adds a generalization penalty and optional activation mask.
-	// nil disables regularization (no penalty, no dropout).
-	Regularizer regularizer.Regularizer[T]
-	// Scheduler adjusts the effective learning rate during training.
-	// nil disables scheduling (the default when WithScheduler is not called).
-	Scheduler optimizer.Scheduler[T]
-	WeightInit WeightInitMethod
-	// TopologyMode opts the network into Dynamic mutations after compile.
-	// Default Immutable — topology cannot change after Compile.
-	TopologyMode network.TopologyMode
-	// Logger routes structured training lifecycle events to a custom sink.
-	// nil falls back to utils.Logger.
-	Logger      *slog.Logger
-	VisAddr     string
-	VisToken    string
-	VisCORS     bool
-	DefaultBias bool
-	OutputBias  bool
-	// Callbacks holds the per-event training callback slices.
-	// nil disables all callback dispatching (CB-3 zero overhead).
-	Callbacks *CallbackRegistry[T]
-	// NormLayers maps hidden-layer index to a Normalizer applied
-	// after the activation of that layer during forward and backward passes.
-	// nil map disables normalization (zero overhead when omitted).
-	NormLayers map[int]norm.Normalizer[T]
-	// ConvPrefix is the optional 1-D convolutional preprocessing stack
-	// inserted between the raw input vector and the first Dense hidden
-	// layer. When non-empty, compile() rewires the Input layer's size to
-	// the conv chain's final output length and runs the conv stack on every
-	// forward / backward pass. Order is preserved — the slice is consumed
-	// front-to-back.
-	ConvPrefix []conv.Layer[T]
+	LossType         loss.Type
+	OutputActivation activation.Type
+	TopologyMode     network.TopologyMode
+	VisCORS          bool
+	DefaultBias      bool
+	OutputBias       bool
 }
 
 // applyDefaults fills any zero-valued fields with the Defaults constants.

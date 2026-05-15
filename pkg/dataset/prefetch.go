@@ -42,18 +42,17 @@ func Prefetch[T utils.Float](inner Dataset[T], prefetch int) (Dataset[T], error)
 }
 
 type prefetchResult[T utils.Float] struct {
-	batch Batch[T]
 	err   error
+	batch Batch[T]
 }
 
 type prefetchDataset[T utils.Float] struct {
 	inner    Dataset[T]
+	ch       chan prefetchResult[T]
+	cancel   context.CancelFunc
+	wg       sync.WaitGroup
 	capacity int
-
-	mu     sync.Mutex
-	ch     chan prefetchResult[T]
-	cancel context.CancelFunc
-	wg     sync.WaitGroup
+	mu       sync.Mutex
 }
 
 // start spawns the producer goroutine. Called from the constructor and

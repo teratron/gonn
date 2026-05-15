@@ -18,8 +18,8 @@ import (
 //   - Related: [Scheduler], [BindScheduler], [WarmUpLR], [ChainScheduler].
 //   - Stability: Stable.
 type CosineAnnealingLR[T utils.Float] struct {
-	lr0  T    // initial learning rate (lr₀)
-	lrMin T   // minimum learning rate
+	lr0   T    // initial learning rate (lr₀)
+	lrMin T    // minimum learning rate
 	tMax  uint // total annealing steps
 	step  uint // global step counter
 	gran  Granularity
@@ -39,10 +39,10 @@ var _ Scheduler[float32] = (*CosineAnnealingLR[float32])(nil)
 //   - Stability: Stable.
 func NewCosineAnnealingLR[T utils.Float](lr0, lrMin T, tMax uint) *CosineAnnealingLR[T] {
 	return &CosineAnnealingLR[T]{
-		lr0:  lr0,
+		lr0:   lr0,
 		lrMin: lrMin,
-		tMax: tMax,
-		gran: PerEpoch,
+		tMax:  tMax,
+		gran:  PerEpoch,
 	}
 }
 

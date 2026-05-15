@@ -35,11 +35,11 @@ const protocolVersion = "1.0.0"
 //   - Related: [VisServer], [RegisterNetwork].
 //   - Stability: Stable.
 type NetworkState struct {
-	TopologyVersion uint64      `json:"topology_version"`
 	Layers          []LayerInfo `json:"layers"`
-	Loss            float64     `json:"loss"`
-	Activations     [][]float64 `json:"activations"`
 	Control         string      `json:"control"`
+	Activations     [][]float64 `json:"activations"`
+	TopologyVersion uint64      `json:"topology_version"`
+	Loss            float64     `json:"loss"`
 	Epoch           uint64      `json:"epoch"`
 	Iteration       uint64      `json:"iteration"`
 }
@@ -51,9 +51,9 @@ type NetworkState struct {
 //   - Related: [NetworkState].
 //   - Stability: Stable.
 type LayerInfo struct {
+	Type  string `json:"type"`
 	Index int    `json:"index"`
 	Size  int    `json:"size"`
-	Type  string `json:"type"`
 }
 
 // SnapFn is the callback type supplied to RegisterNetwork. The VisServer calls
@@ -76,14 +76,14 @@ type SnapFn func() NetworkState
 //   - Related: [NewVisServer], [RegisterNetwork], [Start], [Stop].
 //   - Stability: Stable.
 type VisServer struct {
-	addr   string
-	token  string
-	cors   bool
 	srv    *http.Server
 	snapFn SnapFn
-	mu     sync.RWMutex
 	// listener holds the bound socket so tests can retrieve the actual port.
 	listener net.Listener
+	addr     string
+	token    string
+	mu       sync.RWMutex
+	cors     bool
 }
 
 // NewVisServer creates a VisServer that will listen on addr. token enables

@@ -31,11 +31,11 @@ type SchedulerSegment[T utils.Float] struct {
 //   - Related: [Scheduler], [SchedulerSegment], [BindScheduler].
 //   - Stability: Stable.
 type ChainScheduler[T utils.Float] struct {
-	segments    []SchedulerSegment[T]
-	globalStep  uint // total Step calls across all segments
-	segStep     uint // steps consumed in the current active segment
-	activeIdx   int  // index into segments
-	lastRate    T    // last rate returned by Step
+	lastRate   T
+	segments   []SchedulerSegment[T]
+	globalStep uint
+	segStep    uint
+	activeIdx  int
 }
 
 // compile-time interface verification (C26).
@@ -106,11 +106,11 @@ func (c *ChainScheduler[T]) Granularity() Granularity {
 // chainState is the JSON-serialisable snapshot of ChainScheduler metadata.
 // Sub-scheduler states are stored inline as raw JSON blobs.
 type chainState struct {
+	SubStates  []json.RawMessage `json:"sub_states"`
 	GlobalStep uint              `json:"global_step"`
 	SegStep    uint              `json:"seg_step"`
 	ActiveIdx  int               `json:"active_idx"`
 	LastRate   float64           `json:"last_rate"`
-	SubStates  []json.RawMessage `json:"sub_states"`
 }
 
 // SaveState serialises all ChainScheduler state including sub-scheduler

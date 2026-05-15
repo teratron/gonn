@@ -18,8 +18,8 @@ import (
 //   - Related: [NewOutput], [cell.Output], [Dense], [loss.Type].
 type Output[T utils.Float] struct {
 	*base[T, *cell.Output[T]]
-	Loss    loss.Type `json:"loss" xml:"loss"`
 	targets []T
+	Loss    loss.Type `json:"loss" xml:"loss"`
 }
 
 // NewOutput allocates an Output layer of the requested size with the

@@ -24,30 +24,19 @@ import (
 //   - Stability: Stable.
 //   - Related: [NewConv1D], [Layer], [MaxPool1D], [Flatten].
 type Conv1D[T utils.Float] struct {
-	NumFilters int     `json:"num_filters"`
+	gradB      []T     `json:"-"`
+	Weights    []T     `json:"weights"`
+	Biases     []T     `json:"biases,omitempty"`
+	gradW      []T     `json:"-"`
+	gradX      []T     `json:"-"`
+	lastInput  []T     `json:"-"`
+	lastOutput []T     `json:"-"`
 	KernelSize int     `json:"kernel_size"`
 	Stride     int     `json:"stride"`
+	InLen      int     `json:"in_len"`
+	NumFilters int     `json:"num_filters"`
 	Padding    PadMode `json:"padding"`
 	UseBias    bool    `json:"use_bias"`
-
-	// Weights laid out filter-major: weights[f*kernelSize + k] is tap k of
-	// filter f. Length = NumFilters * KernelSize.
-	Weights []T `json:"weights"`
-	// Biases has length NumFilters when UseBias, nil otherwise (CONV-2).
-	Biases []T `json:"biases,omitempty"`
-
-	// inLen is the input feature length the layer was last compiled for.
-	// Zero before the first Forward call. Persisted so JSON round-trips
-	// preserve the input-shape contract (CONV-7).
-	InLen int `json:"in_len"`
-
-	// Gradient and activation buffers. Excluded from JSON — they are
-	// recomputed each iteration. Forward / Backward grow them as needed.
-	gradW      []T `json:"-"`
-	gradB      []T `json:"-"`
-	gradX      []T `json:"-"`
-	lastInput  []T `json:"-"`
-	lastOutput []T `json:"-"`
 }
 
 // NewConv1D builds a Conv1D layer. The weight buffer is allocated but left
@@ -152,7 +141,7 @@ func (c *Conv1D[T]) Forward(x []T) []T {
 	for f := 0; f < c.NumFilters; f++ {
 		wBase := f * c.KernelSize
 		oBase := f * outPer
-		for i := 0; i < outPer; i++ {
+		for i := range outPer {
 			start := i*c.Stride - padL
 			var acc T
 			for k := 0; k < c.KernelSize; k++ {
@@ -230,7 +219,7 @@ func (c *Conv1D[T]) Backward(upstream []T) []T {
 	for f := 0; f < c.NumFilters; f++ {
 		wBase := f * c.KernelSize
 		oBase := f * outPer
-		for i := 0; i < outPer; i++ {
+		for i := range outPer {
 			up := upstream[oBase+i]
 			if c.UseBias {
 				c.gradB[f] += up

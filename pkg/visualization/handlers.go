@@ -10,8 +10,8 @@ import (
 // envelope wraps every response with protocol_version so clients can detect
 // schema incompatibilities without inspecting headers.
 type envelope struct {
-	ProtocolVersion string `json:"protocol_version"`
 	Data            any    `json:"data"`
+	ProtocolVersion string `json:"protocol_version"`
 }
 
 func writeJSON(w http.ResponseWriter, code int, data any) {

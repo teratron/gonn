@@ -19,8 +19,8 @@ import (
 //   - Stability: Stable.
 type SGDMomentum[T utils.Float] struct {
 	lr       T
-	momentum float64
 	velocity []float64
+	momentum float64
 }
 
 // compile-time interface verification (C26).
@@ -81,18 +81,18 @@ func (s *SGDMomentum[T]) SetLearningRate(rate T) { s.lr = rate }
 // SaveState serialises lr, momentum, and velocity to JSON.
 func (s *SGDMomentum[T]) SaveState() ([]byte, error) {
 	return json.Marshal(struct {
+		Velocity []float64 `json:"velocity"`
 		LR       float64   `json:"lr"`
 		Momentum float64   `json:"momentum"`
-		Velocity []float64 `json:"velocity"`
 	}{LR: float64(s.lr), Momentum: s.momentum, Velocity: s.velocity})
 }
 
 // LoadState restores from a SaveState blob.
 func (s *SGDMomentum[T]) LoadState(data []byte) error {
 	var st struct {
+		Velocity []float64 `json:"velocity"`
 		LR       float64   `json:"lr"`
 		Momentum float64   `json:"momentum"`
-		Velocity []float64 `json:"velocity"`
 	}
 	if err := json.Unmarshal(data, &st); err != nil {
 		return err

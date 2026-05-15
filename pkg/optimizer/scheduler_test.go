@@ -13,7 +13,7 @@ func TestStepLRBoundary(t *testing.T) {
 	t.Run("decay at boundary", func(t *testing.T) {
 		sched := optimizer.NewStepLR[float64](1.0, 3, 0.5)
 		// step 1,2 → interval 0 → lr = 1.0
-		for i := 0; i < 2; i++ {
+		for i := range 2 {
 			if r := sched.Step(); math.Abs(r-1.0) > 1e-12 {
 				t.Errorf("step %d: got %v, want 1.0", i+1, r)
 			}
@@ -23,7 +23,7 @@ func TestStepLRBoundary(t *testing.T) {
 			t.Errorf("step 3: got %v, want 0.5", r)
 		}
 		// step 6 → interval 2 → lr = 1.0 × 0.5^2 = 0.25
-		for i := 0; i < 2; i++ {
+		for range 2 {
 			sched.Step()
 		}
 		if r := sched.Step(); math.Abs(r-0.25) > 1e-12 {
@@ -33,7 +33,7 @@ func TestStepLRBoundary(t *testing.T) {
 
 	t.Run("gamma=1 no-op", func(t *testing.T) {
 		sched := optimizer.NewStepLR[float64](0.1, 5, 1.0)
-		for i := 0; i < 20; i++ {
+		for i := range 20 {
 			if r := sched.Step(); math.Abs(r-0.1) > 1e-12 {
 				t.Errorf("step %d: got %v, want 0.1 (gamma=1 no-op)", i+1, r)
 			}
@@ -42,7 +42,7 @@ func TestStepLRBoundary(t *testing.T) {
 
 	t.Run("gamma=0 zero-rate after first interval", func(t *testing.T) {
 		sched := optimizer.NewStepLR[float64](1.0, 2, 0.0)
-		sched.Step() // step 1 → interval 0 → 1.0
+		sched.Step()      // step 1 → interval 0 → 1.0
 		r := sched.Step() // step 2 → interval 1 → 0.0
 		if r != 0.0 {
 			t.Errorf("step 2: got %v, want 0.0", r)
@@ -71,7 +71,7 @@ func TestStepLRBoundary(t *testing.T) {
 
 	t.Run("Reset restores initial state", func(t *testing.T) {
 		sched := optimizer.NewStepLR[float64](1.0, 3, 0.5)
-		for i := 0; i < 6; i++ {
+		for range 6 {
 			sched.Step()
 		}
 		sched.Reset()
@@ -111,7 +111,7 @@ func TestWarmUpLRRamp(t *testing.T) {
 
 	t.Run("SaveState/LoadState round-trip", func(t *testing.T) {
 		s1 := optimizer.NewWarmUpLR[float64](0.5, 10)
-		for i := 0; i < 5; i++ {
+		for range 5 {
 			s1.Step()
 		}
 		blob, err := s1.SaveState()
@@ -134,7 +134,7 @@ func TestCosineAnnealingLR(t *testing.T) {
 	t.Run("mid-point is halfway", func(t *testing.T) {
 		// At t = tMax/2: cos(π/2) = 0 → rate = lrMin + 0.5*(lr0-lrMin)
 		sched := optimizer.NewCosineAnnealingLR[float64](1.0, 0.0, 100)
-		for i := 0; i < 50; i++ {
+		for range 50 {
 			sched.Step()
 		}
 		r := sched.Step() // step 51 ≈ midpoint check
@@ -146,7 +146,7 @@ func TestCosineAnnealingLR(t *testing.T) {
 
 	t.Run("plateau at lrMin after tMax", func(t *testing.T) {
 		sched := optimizer.NewCosineAnnealingLR[float64](1.0, 0.01, 10)
-		for i := 0; i < 15; i++ {
+		for range 15 {
 			sched.Step()
 		}
 		r := sched.Step()
@@ -157,7 +157,7 @@ func TestCosineAnnealingLR(t *testing.T) {
 
 	t.Run("SaveState/LoadState round-trip", func(t *testing.T) {
 		s1 := optimizer.NewCosineAnnealingLR[float64](1.0, 0.001, 100)
-		for i := 0; i < 40; i++ {
+		for range 40 {
 			s1.Step()
 		}
 		blob, err := s1.SaveState()
@@ -186,7 +186,7 @@ func TestChainSchedulerSequence(t *testing.T) {
 		})
 
 		// Warmup phase: 4 steps.
-		for i := 0; i < 4; i++ {
+		for i := range 4 {
 			r := chain.Step()
 			if r < 0 || r > 1.0 {
 				t.Errorf("warmup step %d: out of range %v", i+1, r)
@@ -197,7 +197,7 @@ func TestChainSchedulerSequence(t *testing.T) {
 		if math.Abs(r-1.0) > 1e-12 {
 			t.Errorf("decay step 1: got %v, want 1.0", r)
 		}
-		chain.Step() // decay step 2
+		chain.Step()     // decay step 2
 		r = chain.Step() // decay step 3 → interval 1 → 0.5
 		if math.Abs(r-0.5) > 1e-12 {
 			t.Errorf("decay step 3: got %v, want 0.5", r)
@@ -212,7 +212,7 @@ func TestChainSchedulerSequence(t *testing.T) {
 		chain.Step()
 		last := chain.Step() // last step in segment
 		// Segment exhausted — further Steps return last rate.
-		for i := 0; i < 3; i++ {
+		for i := range 3 {
 			r := chain.Step()
 			if math.Abs(r-last) > 1e-12 {
 				t.Errorf("post-exhaustion step %d: got %v, want %v", i+1, r, last)
@@ -227,7 +227,7 @@ func TestChainSchedulerSequence(t *testing.T) {
 			{Scheduler: warmup, Duration: 4},
 			{Scheduler: decay, Duration: 4},
 		})
-		for i := 0; i < 8; i++ {
+		for range 8 {
 			chain.Step()
 		}
 		chain.Reset()
@@ -253,7 +253,7 @@ func TestChainSchedulerSequence(t *testing.T) {
 			{Scheduler: d2, Duration: 4},
 		})
 
-		for i := 0; i < 5; i++ {
+		for range 5 {
 			c1.Step()
 		}
 		blob, err := c1.SaveState()
@@ -335,7 +335,7 @@ func TestExponentialLR(t *testing.T) {
 
 	t.Run("gamma=1 no-op", func(t *testing.T) {
 		sched := optimizer.NewExponentialLR[float64](0.1, 1.0)
-		for i := 0; i < 20; i++ {
+		for i := range 20 {
 			if r := sched.Step(); math.Abs(r-0.1) > 1e-12 {
 				t.Errorf("step %d: got %v, want 0.1 (gamma=1 no-op)", i+1, r)
 			}
@@ -345,7 +345,7 @@ func TestExponentialLR(t *testing.T) {
 	t.Run("gamma near-zero floor", func(t *testing.T) {
 		sched := optimizer.NewExponentialLR[float64](1.0, 1e-10)
 		// After enough steps the value should be effectively zero.
-		for i := 0; i < 50; i++ {
+		for range 50 {
 			sched.Step()
 		}
 		r := sched.Step()
@@ -356,7 +356,7 @@ func TestExponentialLR(t *testing.T) {
 
 	t.Run("SaveState/LoadState round-trip", func(t *testing.T) {
 		s1 := optimizer.NewExponentialLR[float64](1.0, 0.9)
-		for i := 0; i < 7; i++ {
+		for range 7 {
 			s1.Step()
 		}
 		blob, err := s1.SaveState()
@@ -375,7 +375,7 @@ func TestExponentialLR(t *testing.T) {
 
 	t.Run("Reset restores lr0", func(t *testing.T) {
 		sched := optimizer.NewExponentialLR[float64](0.5, 0.9)
-		for i := 0; i < 10; i++ {
+		for range 10 {
 			sched.Step()
 		}
 		sched.Reset()

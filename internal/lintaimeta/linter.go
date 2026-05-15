@@ -39,9 +39,9 @@ const (
 // Finding is one AI-Meta rule violation reported by the linter.
 type Finding struct {
 	File    string
-	Line    int
 	Symbol  string
 	Message string
+	Line    int
 }
 
 func (f Finding) String() string {
@@ -189,8 +189,8 @@ type declKind int
 
 const (
 	kindFunc      declKind = iota
-	kindType                // struct, alias, or other non-interface type
-	kindInterface           // interface type
+	kindType               // struct, alias, or other non-interface type
+	kindInterface          // interface type
 	kindConst
 	kindVar
 )

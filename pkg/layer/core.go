@@ -17,10 +17,10 @@ import (
 // to allocate core via newCore so the embedded pointer is non-nil — this
 // closes the nil-deref defect catalogued in [l2-layer-types] §5.3 #1-2.
 type core[T utils.Float, S neuron.Nucleus[T]] struct {
-	Type  uint8 `json:"type" xml:"type"`
+	cells []S
 	Id    uint  `json:"id" xml:"id"`
 	Size  uint  `json:"size" xml:"size"`
-	cells []S
+	Type  uint8 `json:"type" xml:"type"`
 }
 
 // newCore allocates a core ready for cell population. The cells slice is

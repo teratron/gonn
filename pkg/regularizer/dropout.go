@@ -22,8 +22,8 @@ import (
 //   - Related: [Regularizer], [Compose], [NewL2].
 //   - Stability: Stable.
 type Dropout[T utils.Float] struct {
-	p   float64
 	rng *rand.Rand
+	p   float64
 }
 
 // compile-time interface verification (C26).

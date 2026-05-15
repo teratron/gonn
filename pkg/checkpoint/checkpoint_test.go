@@ -221,8 +221,7 @@ func TestSweeperGoroutineLifecycle(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	s := StartSweeper(ctx, dir, SweepConfig{HotN: 1, ColdM: 1}, 5*time.Millisecond)
 	time.Sleep(40 * time.Millisecond)
 	s.Stop()

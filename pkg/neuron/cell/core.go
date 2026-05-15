@@ -17,8 +17,8 @@ var (
 // scalar value — and satisfies [neuron.Nucleus] via GetValue. Specialised
 // cells (Input, Bias, Dense, Output) extend it through Go embedding (C28).
 type core[T utils.Float] struct {
-	Id    [2]uint `json:"id" xml:"id"`
 	value T
+	Id    [2]uint `json:"id" xml:"id"`
 }
 
 // newCore returns a freshly allocated core with a zero value. id encodes

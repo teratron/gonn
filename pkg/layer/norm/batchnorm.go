@@ -82,17 +82,17 @@ func WithBatchNormAffine[T utils.Float](a bool) BatchNormOption[T] {
 //   - Related: [NewBatchNorm], [Normalizer], [LayerNorm], [GroupNorm].
 //   - Stability: Stable.
 type BatchNorm[T utils.Float] struct {
-	features    int
 	eps         T
 	momentum    T
-	affine      bool
+	runningMean T
+	runningVar  T
 	gamma       []T
 	beta        []T
 	gammaGrad   []T
 	betaGrad    []T
-	runningMean T
-	runningVar  T
+	features    int
 	mode        atomic.Int32
+	affine      bool
 }
 
 // NewBatchNorm constructs a BatchNorm layer for the given feature count.
@@ -231,15 +231,15 @@ func (b *BatchNorm[T]) OutputSize() int { return b.features }
 //   - Stability: Stable.
 func (b *BatchNorm[T]) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&struct {
-		Features    int   `json:"features"`
 		Eps         T     `json:"eps"`
 		Momentum    T     `json:"momentum"`
-		Affine      bool  `json:"affine"`
-		Gamma       []T   `json:"gamma,omitempty"`
-		Beta        []T   `json:"beta,omitempty"`
 		RunningMean T     `json:"running_mean"`
 		RunningVar  T     `json:"running_var"`
+		Gamma       []T   `json:"gamma,omitempty"`
+		Beta        []T   `json:"beta,omitempty"`
+		Features    int   `json:"features"`
 		Mode        int32 `json:"mode"`
+		Affine      bool  `json:"affine"`
 	}{
 		Features:    b.features,
 		Eps:         b.eps,
@@ -261,15 +261,15 @@ func (b *BatchNorm[T]) MarshalJSON() ([]byte, error) {
 //   - Stability: Stable.
 func (b *BatchNorm[T]) UnmarshalJSON(data []byte) error {
 	aux := &struct {
-		Features    int   `json:"features"`
 		Eps         T     `json:"eps"`
 		Momentum    T     `json:"momentum"`
-		Affine      bool  `json:"affine"`
-		Gamma       []T   `json:"gamma,omitempty"`
-		Beta        []T   `json:"beta,omitempty"`
 		RunningMean T     `json:"running_mean"`
 		RunningVar  T     `json:"running_var"`
+		Gamma       []T   `json:"gamma,omitempty"`
+		Beta        []T   `json:"beta,omitempty"`
+		Features    int   `json:"features"`
 		Mode        int32 `json:"mode"`
+		Affine      bool  `json:"affine"`
 	}{}
 	if err := json.Unmarshal(data, aux); err != nil {
 		return err

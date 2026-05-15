@@ -59,15 +59,15 @@ func WithGroupNormAffine[T utils.Float](a bool) GroupNormOption[T] {
 //   - Related: [NewGroupNorm], [Normalizer], [BatchNorm], [LayerNorm].
 //   - Stability: Stable.
 type GroupNorm[T utils.Float] struct {
-	features  int
-	groups    int
 	eps       T
-	affine    bool
 	gamma     []T
 	beta      []T
 	gammaGrad []T
 	betaGrad  []T
+	features  int
+	groups    int
 	mode      atomic.Int32
+	affine    bool
 }
 
 // NewGroupNorm constructs a GroupNorm layer. Returns ErrGroupSizeMismatch if
@@ -186,12 +186,12 @@ func (g *GroupNorm[T]) OutputSize() int { return g.features }
 //   - Stability: Stable.
 func (g *GroupNorm[T]) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&struct {
-		Features int  `json:"features"`
-		Groups   int  `json:"groups"`
 		Eps      T    `json:"eps"`
-		Affine   bool `json:"affine"`
 		Gamma    []T  `json:"gamma,omitempty"`
 		Beta     []T  `json:"beta,omitempty"`
+		Features int  `json:"features"`
+		Groups   int  `json:"groups"`
+		Affine   bool `json:"affine"`
 	}{
 		Features: g.features,
 		Groups:   g.groups,
@@ -210,12 +210,12 @@ func (g *GroupNorm[T]) MarshalJSON() ([]byte, error) {
 //   - Stability: Stable.
 func (g *GroupNorm[T]) UnmarshalJSON(data []byte) error {
 	aux := &struct {
-		Features int  `json:"features"`
-		Groups   int  `json:"groups"`
 		Eps      T    `json:"eps"`
-		Affine   bool `json:"affine"`
 		Gamma    []T  `json:"gamma,omitempty"`
 		Beta     []T  `json:"beta,omitempty"`
+		Features int  `json:"features"`
+		Groups   int  `json:"groups"`
+		Affine   bool `json:"affine"`
 	}{}
 	if err := json.Unmarshal(data, aux); err != nil {
 		return err

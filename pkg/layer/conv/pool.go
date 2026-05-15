@@ -17,11 +17,10 @@ import (
 //   - Stability: Stable.
 //   - Related: [NewMaxPool1D], [Layer], [AvgPool1D].
 type MaxPool1D[T utils.Float] struct {
+	argmax   []int
+	gradX    []T
 	PoolSize int `json:"pool_size"`
-
-	inLen  int
-	argmax []int
-	gradX  []T
+	inLen    int
 }
 
 // NewMaxPool1D builds a max-pool layer with the given window size. Stride
@@ -61,7 +60,7 @@ func (p *MaxPool1D[T]) Forward(x []T) []T {
 		p.argmax = p.argmax[:out]
 	}
 	y := make([]T, out)
-	for i := 0; i < out; i++ {
+	for i := range out {
 		start := i * p.PoolSize
 		bestIdx := start
 		best := x[start]
@@ -129,10 +128,9 @@ func (p *MaxPool1D[T]) Validate(inLen int) error {
 //   - Stability: Stable.
 //   - Related: [NewAvgPool1D], [Layer], [MaxPool1D].
 type AvgPool1D[T utils.Float] struct {
+	gradX    []T
 	PoolSize int `json:"pool_size"`
-
-	inLen int
-	gradX []T
+	inLen    int
 }
 
 // NewAvgPool1D builds an average-pool layer with the given window size.
@@ -164,7 +162,7 @@ func (p *AvgPool1D[T]) Forward(x []T) []T {
 		return []T{}
 	}
 	y := make([]T, out)
-	for i := 0; i < out; i++ {
+	for i := range out {
 		start := i * p.PoolSize
 		var sum T
 		count := 0

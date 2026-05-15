@@ -21,11 +21,11 @@ import (
 //   - Concurrency: NotSafe; only UpdateWeights may mutate Weights/Bias.
 //   - Related: [Backend], [Buffer].
 type LayerHandle[T utils.Float] struct {
-	Size       int
-	Weights    [][]T
-	Bias       []T
 	Activation func(T) T
 	Derivative func(T) T
+	Weights    [][]T
+	Bias       []T
+	Size       int
 }
 
 // Buffer is the explicit device-memory handle returned by Backend.Allocate.

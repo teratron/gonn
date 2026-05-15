@@ -44,8 +44,8 @@ const SchemaVersion = "1.1.0"
 //   - Purpose: Serialisable descriptor for one hidden layer inside ConfigDoc.HiddenLayers.
 //   - Related: [ConfigDoc], [OutputDoc].
 type HiddenLayerDoc struct {
-	Size       uint   `json:"size"`
 	Activation string `json:"activation"`
+	Size       uint   `json:"size"`
 	Bias       bool   `json:"bias"`
 }
 
@@ -56,8 +56,8 @@ type HiddenLayerDoc struct {
 //   - Purpose: Serialisable descriptor for the output layer inside ConfigDoc.Output.
 //   - Related: [ConfigDoc], [HiddenLayerDoc].
 type OutputDoc struct {
-	Size       uint   `json:"size"`
 	Activation string `json:"activation"`
+	Size       uint   `json:"size"`
 	Bias       bool   `json:"bias"`
 }
 
@@ -70,10 +70,10 @@ type OutputDoc struct {
 //   - Related: [ConfigDoc].
 type TrainingDoc[T utils.Float] struct {
 	LearningRate  T      `json:"learning_rate"`
-	Loss          string `json:"loss"`
 	LossLimit     T      `json:"loss_limit"`
-	MaxIterations uint   `json:"max_iterations"`
+	Loss          string `json:"loss"`
 	WeightInit    string `json:"weight_init"`
+	MaxIterations uint   `json:"max_iterations"`
 	RNGSeed       int64  `json:"rng_seed,omitempty"`
 }
 
@@ -88,10 +88,10 @@ type ConfigDoc[T utils.Float] struct {
 	SchemaVersion string           `json:"schema_version"`
 	LibVersion    string           `json:"lib_version,omitempty"`
 	Precision     string           `json:"precision"`
-	InputSize     uint             `json:"input_size"`
+	Training      TrainingDoc[T]   `json:"training"`
 	HiddenLayers  []HiddenLayerDoc `json:"hidden_layers"`
 	Output        OutputDoc        `json:"output"`
-	Training      TrainingDoc[T]   `json:"training"`
+	InputSize     uint             `json:"input_size"`
 }
 
 // WriteConfig serialises cfg to path atomically (tmp + Sync + Rename).

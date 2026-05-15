@@ -70,18 +70,18 @@ type Snapshot[T utils.Float] struct {
 //   - Related: [CallbackFn], [CallbackRegistry], [ErrStopTraining].
 //   - Stability: Stable.
 type CallbackContext[T utils.Float] struct {
-	// Iteration is the current epoch number (1-based).
-	Iteration int
-	// Loss is the mean loss for the current epoch.
-	Loss T
-	// MinLoss is the best (lowest) mean loss observed so far.
-	MinLoss T
-	// MinIter is the epoch at which MinLoss was first recorded.
-	MinIter int
 	// StopReason is non-nil only in OnTrainEnd callbacks; classifies why Fit ended.
 	StopReason *StopReason
 	// Snapshot holds a read-only weight copy; nil in OnTrainEnd when network is stopped.
 	Snapshot *Snapshot[T]
+	// Loss is the mean loss for the current epoch.
+	Loss T
+	// MinLoss is the best (lowest) mean loss observed so far.
+	MinLoss T
+	// Iteration is the current epoch number (1-based).
+	Iteration int
+	// MinIter is the epoch at which MinLoss was first recorded.
+	MinIter int
 }
 
 // CallbackFn is the function type all registered callbacks must satisfy.
@@ -172,8 +172,10 @@ func fireOnTrainEnd[T utils.Float](reg *CallbackRegistry[T], stopReason *StopRea
 
 // stopReasonPtr is a convenience helper that allocates a StopReason on the
 // heap and returns its pointer — avoids repetitive &localVar patterns.
+//
+//go:fix inline
 func stopReasonPtr(r StopReason) *StopReason {
-	return &r
+	return new(r)
 }
 
 // callbackContextFrom constructs a CallbackContext from the current training state.

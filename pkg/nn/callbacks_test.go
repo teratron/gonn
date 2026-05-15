@@ -116,7 +116,7 @@ func TestSnapshotFromWeightsNil(t *testing.T) {
 
 func TestStopReasonPtr(t *testing.T) {
 	t.Parallel()
-	p := stopReasonPtr(StopCallback)
+	p := new(StopCallback)
 	if p == nil {
 		t.Fatal("stopReasonPtr returned nil")
 	}

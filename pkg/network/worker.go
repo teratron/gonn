@@ -21,10 +21,10 @@ import (
 //   - Concurrency: Safe; Submit blocks on backpressure rather than dropping jobs.
 //   - Related: [NewWorkerPool], [Submit], [Stop].
 type WorkerPool struct {
-	Workers int
 	jobs    chan func()
 	wg      sync.WaitGroup
 	once    sync.Once
+	Workers int
 }
 
 // NewWorkerPool creates a pool sized to GOMAXPROCS so NN parallelism stays
