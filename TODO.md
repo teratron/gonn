@@ -28,5 +28,5 @@
 - [x] не везде используется utils.Float, где-то по прежнему используются float32 | float64
 - [x] как добавлять количество скрытых слоёв, если их много? → [l2-deep-builder.md](.design/specifications/l2-deep-builder.md) (Repeat/Pattern/HiddenLayers bulk constructors)
 - [x] сделать GoNN skills для разработчиков: Use our GoNN skills with your AI tools to generate high-performance GoNN code that follows best practices. → [l2-gonn-skills.md](.design/specifications/l2-gonn-skills.md) (skills/ directory at project root)
-- [ ] нужен этот файл pkg\nn.json?
+- [x] нужен этот файл pkg\nn.json?
 - [x] нужен этот файл pkg\network\phase6_test.go?
