@@ -37,14 +37,14 @@ func TestDeepStackRandomInitWarn(t *testing.T) {
 		WithInput[float64](2),
 		WithBias[float64](true),
 		WithOutput[float64](1, activation.SIGMOID),
-		WithLearningRate[float64](0.1),
+		WithLearningRate(0.1),
 		WithLoss[float64](loss.MSE),
 		WithWeightInit[float64](WeightInitRandom),
 	}
 	for range depth {
 		opts = append(opts, WithHiddenLayer[float64](4, activation.SIGMOID))
 	}
-	if _, err := New[float64](opts...); err != nil {
+	if _, err := New(opts...); err != nil {
 		t.Fatalf("deep-stack Compile must succeed in v0.6, got %v", err)
 	}
 
@@ -69,14 +69,14 @@ func TestDeepStackXavierNoWarn(t *testing.T) {
 		WithInput[float64](2),
 		WithBias[float64](true),
 		WithOutput[float64](1, activation.SIGMOID),
-		WithLearningRate[float64](0.1),
+		WithLearningRate(0.1),
 		WithLoss[float64](loss.MSE),
 		WithWeightInit[float64](WeightInitXavier),
 	}
 	for range depth {
 		opts = append(opts, WithHiddenLayer[float64](4, activation.SIGMOID))
 	}
-	if _, err := New[float64](opts...); err != nil {
+	if _, err := New(opts...); err != nil {
 		t.Fatalf("deep-stack Compile must succeed, got %v", err)
 	}
 	if strings.Contains(buf.String(), "deep stack") {
@@ -113,7 +113,7 @@ func TestCompileFitMultiHiddenChainDepths(t *testing.T) {
 				WithInput[float64](2),
 				WithBias[float64](true),
 				WithOutput[float64](1, activation.SIGMOID),
-				WithLearningRate[float64](0.3),
+				WithLearningRate(0.3),
 				WithLoss[float64](loss.MSE),
 				WithWeightInit[float64](WeightInitXavier),
 				WithMaxIterations[float64](200),
@@ -121,7 +121,7 @@ func TestCompileFitMultiHiddenChainDepths(t *testing.T) {
 			for range depth {
 				opts = append(opts, WithHiddenLayer[float64](4, activation.SIGMOID))
 			}
-			n, err := New[float64](opts...)
+			n, err := New(opts...)
 			if err != nil {
 				t.Fatalf("depth=%d Compile: %v", depth, err)
 			}
@@ -145,17 +145,17 @@ func TestCompileFitMultiHiddenChainDepths(t *testing.T) {
 // a Compile→Fit→Query loop measured at the user-visible API.
 func TestCompileMultiHiddenTwoHiddenConverges(t *testing.T) {
 	t.Parallel()
-	n, err := New[float64](
+	n, err := New(
 		WithInput[float64](2),
 		WithBias[float64](true),
 		WithHiddenLayer[float64](4, activation.SIGMOID),
 		WithHiddenLayer[float64](4, activation.SIGMOID),
 		WithOutput[float64](1, activation.SIGMOID),
-		WithLearningRate[float64](0.5),
+		WithLearningRate(0.5),
 		WithLoss[float64](loss.MSE),
 		WithWeightInit[float64](WeightInitXavier),
 		WithMaxIterations[float64](50000),
-		WithLossLimit[float64](0.05),
+		WithLossLimit(0.05),
 	)
 	if err != nil {
 		t.Fatalf("Compile: %v", err)

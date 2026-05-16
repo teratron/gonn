@@ -29,7 +29,7 @@ func xorDataset[T utils.Float]() []Sample[T] {
 // → 1 (Sigmoid). MustNew is fine because compile errors here would be
 // programming bugs, not runtime conditions.
 func newXORNetwork[T utils.Float]() *NN[T] {
-	return MustNew[T](
+	return MustNew(
 		WithInput[T](2),
 		WithHiddenLayer[T](4, activation.SIGMOID),
 		WithOutput[T](1, activation.SIGMOID),
@@ -43,9 +43,9 @@ func newXORNetwork[T utils.Float]() *NN[T] {
 func BenchmarkForward_XOR_f32(b *testing.B) {
 	nn := newXORNetwork[float32]()
 	input := []float32{1, 0}
-	b.ResetTimer()
+
 	b.ReportAllocs()
-	for range b.N {
+	for b.Loop() {
 		_, _ = nn.Query(input)
 	}
 }
@@ -55,9 +55,9 @@ func BenchmarkForward_XOR_f32(b *testing.B) {
 func BenchmarkBackward_XOR_f32(b *testing.B) {
 	nn := newXORNetwork[float32]()
 	in, tgt := []float32{1, 1}, []float32{0}
-	b.ResetTimer()
+
 	b.ReportAllocs()
-	for range b.N {
+	for b.Loop() {
 		_, _ = nn.Train(in, tgt)
 	}
 }
@@ -67,7 +67,7 @@ func BenchmarkBackward_XOR_f32(b *testing.B) {
 // when they land this benchmark grows accordingly.
 func BenchmarkCompile_DeepNetwork_f32(b *testing.B) {
 	b.ReportAllocs()
-	for range b.N {
+	for b.Loop() {
 		_ = newXORNetwork[float32]()
 	}
 }
@@ -77,10 +77,10 @@ func BenchmarkCompile_DeepNetwork_f32(b *testing.B) {
 // rollback machinery.
 func BenchmarkFit_XOR_f32(b *testing.B) {
 	data := xorDataset[float32]()
-	b.ResetTimer()
+
 	b.ReportAllocs()
-	for range b.N {
-		nn := MustNew[float32](
+	for b.Loop() {
+		nn := MustNew(
 			WithInput[float32](2),
 			WithHiddenLayer[float32](4, activation.SIGMOID),
 			WithOutput[float32](1, activation.SIGMOID),

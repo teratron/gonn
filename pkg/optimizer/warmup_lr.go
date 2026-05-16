@@ -17,10 +17,10 @@ import (
 //   - Related: [Scheduler], [BindScheduler], [StepLR], [ChainScheduler].
 //   - Stability: Stable.
 type WarmUpLR[T utils.Float] struct {
+	lr0         T
+	step        uint
+	warmupSteps uint
 	gran        Granularity
-	lr0         T    // target learning rate after warm-up
-	step        uint // global step counter
-	warmupSteps uint // number of warm-up steps
 }
 
 // compile-time interface verification (C26).

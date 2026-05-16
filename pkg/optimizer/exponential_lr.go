@@ -19,11 +19,11 @@ import (
 //   - Related: [Scheduler], [BindScheduler], [StepLR], [CosineAnnealingLR].
 //   - Stability: Stable.
 type ExponentialLR[T utils.Float] struct {
-	current T           // most recently computed rate
-	gran    Granularity // granularity of step calls
-	lr0     T           // initial learning rate (lr₀)
-	gamma   float64     // multiplicative decay factor per step
-	step    uint        // global step counter
+	current T
+	lr0     T
+	gamma   float64
+	step    uint
+	gran    Granularity
 }
 
 // compile-time interface verification (C26).

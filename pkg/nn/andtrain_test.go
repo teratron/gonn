@@ -12,13 +12,13 @@ import (
 // Uses float64 to share xorSamples() with the existing test corpus.
 func buildAndTrainNet(t *testing.T) *NN[float64] {
 	t.Helper()
-	n, err := New[float64](
+	n, err := New(
 		WithInput[float64](2),
 		WithHiddenLayer[float64](4, activation.SIGMOID),
 		WithOutput[float64](1, activation.SIGMOID),
-		WithLearningRate[float64](0.3),
+		WithLearningRate(0.3),
 		WithMaxIterations[float64](20),
-		WithLossLimit[float64](1e-4),
+		WithLossLimit(1e-4),
 	)
 	if err != nil {
 		t.Fatalf("New: %v", err)
@@ -81,7 +81,7 @@ func TestAndTrainRestoresOriginalConfig(t *testing.T) {
 	samples := xorSamples()
 
 	_, _, err := n.AndTrain(samples,
-		WithLearningRate[float64](0.001),
+		WithLearningRate(0.001),
 		WithMaxIterations[float64](2),
 	)
 	if err != nil {

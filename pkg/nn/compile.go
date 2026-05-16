@@ -94,7 +94,7 @@ func compile[T utils.Float](n *NN[T], cfg *Config[T]) error {
 	if cfg.Optimizer != nil {
 		n.opt = cfg.Optimizer
 	} else {
-		n.opt = optimizer.DefaultOptimizer[T](cfg.LearningRate)
+		n.opt = optimizer.DefaultOptimizer(cfg.LearningRate)
 	}
 	n.reg = cfg.Regularizer
 	n.sched = cfg.Scheduler

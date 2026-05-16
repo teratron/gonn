@@ -1,6 +1,8 @@
 package network
 
 import (
+	"slices"
+
 	"github.com/teratron/gonn/pkg/activation"
 	"github.com/teratron/gonn/pkg/loss"
 	"github.com/teratron/gonn/pkg/neuron/cell"
@@ -63,8 +65,8 @@ func (n *Network[T]) CalculateLoss(mode loss.Type) T {
 //   - Concurrency: NotSafe; mutates cell miss fields.
 //   - Related: [CalculateValues], [CalculateWeights], [Train].
 func (n *Network[T]) CalculateMisses() {
-	for i := len(n.Hiddens) - 1; i >= 0; i-- {
-		hb := n.Hiddens[i]
+	for i, hb := range slices.Backward(n.Hiddens) {
+
 		for _, h := range hb.cells {
 			h.SetMiss(0)
 		}

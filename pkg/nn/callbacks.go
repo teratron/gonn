@@ -170,15 +170,6 @@ func fireOnTrainEnd[T utils.Float](reg *CallbackRegistry[T], stopReason *StopRea
 	_ = fireEvent(reg.OnTrainEnd, ctx)
 }
 
-// stopReasonPtr is a convenience helper that allocates a StopReason on the
-// heap and returns its pointer — avoids repetitive &localVar patterns.
-//
-//go:fix inline
-func stopReasonPtr(r StopReason) *StopReason {
-	val := r
-	return &val
-}
-
 // callbackContextFrom constructs a CallbackContext from the current training state.
 func callbackContextFrom[T utils.Float](epoch int, loss, minLoss T, minIter int, snap *Snapshot[T]) CallbackContext[T] {
 	return CallbackContext[T]{

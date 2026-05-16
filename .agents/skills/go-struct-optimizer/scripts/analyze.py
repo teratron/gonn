@@ -7,46 +7,40 @@ ranges, then suggests optimal field orderings.
 Logic inspired by: https://github.com/padiazg/go-struct-analyzer (analyzer.ts)
 
 Usage:
-    python analyze.py <file_or_dir> [file_or_dir...]
+    python analyze.py <path> [path...] [--include-tests] [--arch ARCH]
+
+Path forms:
+    file.go            single file
+    ./internal/ecs     a directory (non-recursive walk of that tree)
+    ./...              Go-style recursive pattern from current dir
+    ./internal/...     Go-style recursive pattern rooted at ./internal
+
+By default *_test.go files (which hold both tests and benchmarks in Go) are
+skipped; pass --include-tests to analyze them too.
 """
 
 import os
 import re
 import sys
 import json
+import argparse
 from dataclasses import dataclass, field as dc_field
 from typing import Optional
 
-PTR_SIZE = 8  # amd64
+# --- Architecture / pointer width ---
 
-# --- Type size table (amd64) ---
+ARCH_PTR_SIZE = {"amd64": 8, "arm64": 8, "386": 4, "arm": 4}
+PTR_SIZE = 8  # set in main() from --arch
 
-BASIC_TYPES: dict[str, tuple[int, int, str]] = {
-    # type: (size, alignment, ptr_class)
-    "bool": (1, 1, "none"),
-    "int8": (1, 1, "none"),
-    "uint8": (1, 1, "none"),
-    "byte": (1, 1, "none"),
-    "int16": (2, 2, "none"),
-    "uint16": (2, 2, "none"),
-    "int32": (4, 4, "none"),
-    "uint32": (4, 4, "none"),
-    "rune": (4, 4, "none"),
-    "float32": (4, 4, "none"),
-    "int64": (8, 8, "none"),
-    "uint64": (8, 8, "none"),
-    "float64": (8, 8, "none"),
-    "complex64": (8, 4, "none"),
-    "complex128": (16, 8, "none"),
-    "int": (8, 8, "none"),
-    "uint": (8, 8, "none"),
-    "uintptr": (8, 8, "none"),
-    "string": (PTR_SIZE * 2, PTR_SIZE, "mixed"),
-}
+# Type table; rebuilt in main() once the architecture is known.
+BASIC_TYPES: dict[str, tuple[int, int, str]] = {}
+
+# Named types that could not be resolved (candidates for custom_types.json).
+UNRESOLVED: set[str] = set()
 
 
 def _load_custom_types() -> dict[str, tuple[int, int, str]]:
-    custom = {}
+    custom: dict[str, tuple[int, int, str]] = {}
     config_path = os.path.join(
         os.path.dirname(os.path.abspath(__file__)), "custom_types.json"
     )
@@ -55,12 +49,40 @@ def _load_custom_types() -> dict[str, tuple[int, int, str]]:
             data = json.load(f)
             for k, v in data.items():
                 custom[k] = (v["size"], v["align"], v["ptr"])
-    except Exception as e:
+    except FileNotFoundError:
+        pass
+    except Exception as e:  # noqa: BLE001 - report but keep going
         print(f"Warning: could not load custom_types.json: {e}", file=sys.stderr)
     return custom
 
 
-BASIC_TYPES.update(_load_custom_types())
+def init_type_table(ptr_size: int) -> dict[str, tuple[int, int, str]]:
+    """Build the (size, alignment, ptr_class) table for the given pointer width."""
+    t: dict[str, tuple[int, int, str]] = {
+        "bool": (1, 1, "none"),
+        "int8": (1, 1, "none"),
+        "uint8": (1, 1, "none"),
+        "byte": (1, 1, "none"),
+        "int16": (2, 2, "none"),
+        "uint16": (2, 2, "none"),
+        "int32": (4, 4, "none"),
+        "uint32": (4, 4, "none"),
+        "rune": (4, 4, "none"),
+        "float32": (4, 4, "none"),
+        "int64": (8, 8, "none"),
+        "uint64": (8, 8, "none"),
+        "float64": (8, 8, "none"),
+        "complex64": (8, 4, "none"),
+        "complex128": (16, 8, "none"),
+        # Architecture-dependent widths.
+        "int": (ptr_size, ptr_size, "none"),
+        "uint": (ptr_size, ptr_size, "none"),
+        "uintptr": (ptr_size, ptr_size, "none"),
+        "string": (ptr_size * 2, ptr_size, "mixed"),
+    }
+    # Project-specific cross-package types override/extend the defaults.
+    t.update(_load_custom_types())
+    return t
 
 
 @dataclass
@@ -92,6 +114,7 @@ class StructDef:
     name: str
     fields: list[Field] = dc_field(default_factory=list)
     line: int = 0
+    multi_name: bool = False  # had `a, b T` declarations (expanded below)
 
 
 # Registry for resolving embedded/named struct types within a file.
@@ -142,7 +165,7 @@ def resolve_type(
     if clean in ("interface{}", "any") or clean.startswith("interface{"):
         return PTR_SIZE * 2, PTR_SIZE, "pure"
 
-    # Basic type
+    # Basic / custom type
     if clean in BASIC_TYPES:
         return BASIC_TYPES[clean]
 
@@ -161,7 +184,9 @@ def resolve_type(
                 break
         return layout.total_size, layout.alignment, pc
 
-    # Fallback: unknown named type
+    # Fallback: unknown named type — record it so the user can add a precise
+    # entry to custom_types.json (the cleaned form matches the JSON key style).
+    UNRESOLVED.add(clean)
     return PTR_SIZE, PTR_SIZE, "mixed"
 
 
@@ -189,7 +214,7 @@ def compute_layout(fields: list[Field]) -> Layout:
     final_pad = calc_padding(offset, max_align)
     total = offset + final_pad
 
-    # GC scan range: end offset of last pointer-containing field word
+    # GC scan range: end offset of last pointer-containing field word.
     gc_scan = 0
     for lf in laid:
         if lf.field.ptr_class == "pure":
@@ -239,34 +264,51 @@ def extract_inline_comment(line: str) -> tuple[str, Optional[str]]:
     return line.strip(), None
 
 
-def parse_field_line(line: str) -> Optional[Field]:
-    """Parse a single struct field line into a Field."""
+def parse_field_line(line: str) -> list[Field]:
+    """Parse a struct field line into one or more Fields.
+
+    Multi-name declarations (`a, b, c T`) are expanded into one Field per
+    name, so the layout math is exact — an improvement over the reference,
+    which collapsed them to a single field.
+    """
     code, _ = extract_inline_comment(line)
 
     # Strip struct tag `...`
     code = re.sub(r"\s*`[^`]+`\s*$", "", code).strip()
     if not code:
-        return None
+        return []
 
     # Embedded field: no whitespace (just a type like T, *T, pkg.T)
     if not re.search(r"\s", code):
         type_str = code
         name = type_str.lstrip("*").rsplit(".", 1)[-1]
         size, align, pc = resolve_type(type_str)
-        return Field(
-            name=name, type_str=type_str, size=size, alignment=align, ptr_class=pc
-        )
+        return [
+            Field(
+                name=name,
+                type_str=type_str,
+                size=size,
+                alignment=align,
+                ptr_class=pc,
+            )
+        ]
 
-    # Multi-name field: name1, name2 type  →  treat each as separate field
+    # Multi-name field: name1, name2 type  ->  one Field per name
     multi_m = re.match(r"^(\w+(?:\s*,\s*\w+)+)\s+(.+)$", code)
     if multi_m:
-        # Take first name only (simplification)
-        name = multi_m.group(1).split(",")[0].strip()
+        names = [n.strip() for n in multi_m.group(1).split(",")]
         type_str = multi_m.group(2).strip()
         size, align, pc = resolve_type(type_str)
-        return Field(
-            name=name, type_str=type_str, size=size, alignment=align, ptr_class=pc
-        )
+        return [
+            Field(
+                name=n,
+                type_str=type_str,
+                size=size,
+                alignment=align,
+                ptr_class=pc,
+            )
+            for n in names
+        ]
 
     # Simple field: name type
     simple_m = re.match(r"^(\w+)\s+(.+)$", code)
@@ -274,11 +316,17 @@ def parse_field_line(line: str) -> Optional[Field]:
         name = simple_m.group(1)
         type_str = simple_m.group(2).strip()
         size, align, pc = resolve_type(type_str)
-        return Field(
-            name=name, type_str=type_str, size=size, alignment=align, ptr_class=pc
-        )
+        return [
+            Field(
+                name=name,
+                type_str=type_str,
+                size=size,
+                alignment=align,
+                ptr_class=pc,
+            )
+        ]
 
-    return None
+    return []
 
 
 def parse_file(filepath: str) -> list[StructDef]:
@@ -315,6 +363,7 @@ def parse_file(filepath: str) -> list[StructDef]:
                 # Parse fields
                 i += 1
                 fields: list[Field] = []
+                multi_name = False
                 brace_depth = 1
                 while i < len(lines) and brace_depth > 0:
                     fl = lines[i].strip()
@@ -322,15 +371,21 @@ def parse_file(filepath: str) -> list[StructDef]:
                     if brace_depth <= 0:
                         break
                     if fl and not fl.startswith("//") and not fl.startswith("/*"):
-                        field = parse_field_line(fl)
-                        if field:
-                            fields.append(field)
+                        parsed = parse_field_line(fl)
+                        if len(parsed) > 1:
+                            multi_name = True
+                        fields.extend(parsed)
                     i += 1
 
                 # Register and store
                 struct_registry[struct_name] = fields
                 structs.append(
-                    StructDef(name=struct_name, fields=fields, line=start_line)
+                    StructDef(
+                        name=struct_name,
+                        fields=fields,
+                        line=start_line,
+                        multi_name=multi_name,
+                    )
                 )
         i += 1
 
@@ -363,6 +418,18 @@ def print_layout(label: str, layout: Layout):
     print()
 
 
+def _struct_can_optimize(sd: StructDef) -> bool:
+    if not sd.fields:
+        return False
+    current = compute_layout(sd.fields)
+    size_opt = compute_layout(size_optimal_order(sd.fields))
+    gc_opt = compute_layout(gc_optimal_order(sd.fields))
+    return (
+        current.total_size - size_opt.total_size > 0
+        or current.gc_scan - gc_opt.gc_scan > 0
+    )
+
+
 def print_report(sd: StructDef):
     if not sd.fields:
         return
@@ -378,6 +445,11 @@ def print_report(sd: StructDef):
         return
 
     print(f"=== {sd.name} ===")
+    if sd.multi_name:
+        print(
+            "  note: struct has grouped `a, b T` fields — expanded per name; "
+            "preserve grouping when reordering manually"
+        )
     print(
         f"  Current:  {current.total_size} bytes (align {current.alignment}), GC scan: {current.gc_scan} bytes"
     )
@@ -410,41 +482,121 @@ def process_file(filepath: str):
     structs = parse_file(filepath)
     has_output = False
     for sd in structs:
-        if not sd.fields:
-            continue
-        current = compute_layout(sd.fields)
-        size_opt = compute_layout(size_optimal_order(sd.fields))
-        gc_opt = compute_layout(gc_optimal_order(sd.fields))
-        if (
-            current.total_size - size_opt.total_size > 0
-            or current.gc_scan - gc_opt.gc_scan > 0
-        ):
+        if _struct_can_optimize(sd):
             if not has_output:
                 print(f"--- {filepath} ---\n")
                 has_output = True
             print_report(sd)
 
 
-def process_path(path: str):
+# --- Path discovery ---
+
+# Directories skipped during recursive (`./...`) walks — mirrors `go ./...`.
+SKIP_DIRS = {"vendor", "testdata"}
+
+
+def _is_target_go_file(fname: str, include_tests: bool) -> bool:
+    if not fname.endswith(".go"):
+        return False
+    if not include_tests and fname.endswith("_test.go"):
+        return False
+    return True
+
+
+def _walk(root: str, include_tests: bool):
+    for cur, dirs, files in os.walk(root):
+        # Prune ignored / hidden directories in place.
+        dirs[:] = [
+            d for d in dirs if d not in SKIP_DIRS and not d.startswith((".", "_"))
+        ]
+        for fname in sorted(files):
+            if _is_target_go_file(fname, include_tests):
+                process_file(os.path.join(cur, fname))
+
+
+def process_path(path: str, include_tests: bool):
+    # Go-style recursive pattern: "./...", "internal/...", "..."
+    if path == "..." or path.endswith(("/...", "\\...")):
+        root = path[:-3].rstrip("/\\") or "."
+        if os.path.isdir(root):
+            _walk(root, include_tests)
+        else:
+            print(f"Warning: not a directory: {root}", file=sys.stderr)
+        return
+
     if os.path.isfile(path):
-        if path.endswith(".go") and not path.endswith("_test.go"):
+        if _is_target_go_file(os.path.basename(path), include_tests):
             process_file(path)
-    elif os.path.isdir(path):
-        for root, _, files in os.walk(path):
-            for fname in sorted(files):
-                if fname.endswith(".go") and not fname.endswith("_test.go"):
-                    process_file(os.path.join(root, fname))
+        return
+
+    if os.path.isdir(path):
+        _walk(path, include_tests)
+        return
+
+    print(f"Warning: path not found: {path}", file=sys.stderr)
+
+
+def _force_utf8_streams():
+    """Avoid mojibake for box-drawing dashes on legacy Windows code pages."""
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if reconfigure is not None:
+            try:
+                reconfigure(encoding="utf-8")
+            except (ValueError, OSError):
+                pass
 
 
 def main():
-    if len(sys.argv) < 2:
-        print(
-            "Usage: python analyze.py <file_or_dir> [file_or_dir...]", file=sys.stderr
-        )
-        sys.exit(1)
+    _force_utf8_streams()
+    parser = argparse.ArgumentParser(
+        description="Analyze Go struct memory layouts (padding, alignment, GC scan).",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=(
+            "Path forms:\n"
+            "  file.go            single file\n"
+            "  ./internal/ecs     a directory tree\n"
+            "  ./...              recursive from current dir\n"
+            "  ./internal/...     recursive rooted at ./internal\n\n"
+            "By default *_test.go files (tests AND benchmarks live there in Go)\n"
+            "are skipped; use --include-tests to analyze them too."
+        ),
+    )
+    parser.add_argument(
+        "paths",
+        nargs="+",
+        help="files, directories, or Go-style recursive patterns (e.g. ./...)",
+    )
+    parser.add_argument(
+        "--include-tests",
+        action="store_true",
+        help="also analyze *_test.go files (tests and benchmarks)",
+    )
+    parser.add_argument(
+        "--arch",
+        choices=sorted(ARCH_PTR_SIZE),
+        default="amd64",
+        help="target architecture for pointer width (default: amd64)",
+    )
+    args = parser.parse_args()
 
-    for arg in sys.argv[1:]:
-        process_path(arg)
+    global PTR_SIZE, BASIC_TYPES
+    PTR_SIZE = ARCH_PTR_SIZE[args.arch]
+    BASIC_TYPES = init_type_table(PTR_SIZE)
+    UNRESOLVED.clear()
+
+    for arg in args.paths:
+        process_path(arg, args.include_tests)
+
+    if UNRESOLVED:
+        print(
+            "\nUnresolved named types (assumed 8B/align8/mixed). Add precise "
+            "entries to custom_types.json for accuracy — ignore generic type "
+            "parameters such as T/K/V:",
+            file=sys.stderr,
+        )
+        for name in sorted(UNRESOLVED):
+            print(f"  - {name}", file=sys.stderr)
 
 
 if __name__ == "__main__":

@@ -16,7 +16,7 @@ import (
 // that, so the Network's Input layer should be sized to 12.
 func TestConvPrefixCompileShape(t *testing.T) {
 	t.Parallel()
-	n, err := New[float64](
+	n, err := New(
 		WithInput[float64](8),
 		WithConv1D[float64](2, 3, 1, conv.PadValid, false),
 		WithFlatten[float64](),
@@ -37,7 +37,7 @@ func TestConvPrefixCompileShape(t *testing.T) {
 // TestConvPrefixForwardShapeMismatch verifies the raw-input length guard.
 func TestConvPrefixForwardShapeMismatch(t *testing.T) {
 	t.Parallel()
-	n, err := New[float64](
+	n, err := New(
 		WithInput[float64](8),
 		WithConv1D[float64](2, 3, 1, conv.PadValid, false),
 		WithFlatten[float64](),
@@ -58,7 +58,7 @@ func TestConvPrefixForwardShapeMismatch(t *testing.T) {
 // return ErrConvShapeMismatch.
 func TestConvPrefixCompileError(t *testing.T) {
 	t.Parallel()
-	_, err := New[float64](
+	_, err := New(
 		WithInput[float64](2),
 		WithConv1D[float64](2, 5, 1, conv.PadValid, false), // kernel 5 > input 2
 		WithFlatten[float64](),
@@ -79,15 +79,15 @@ func TestConvPrefixCompileError(t *testing.T) {
 // kernel can latch onto and Dense can classify.
 func TestConvPrefixTrainConverges(t *testing.T) {
 	t.Parallel()
-	n, err := New[float64](
+	n, err := New(
 		WithInput[float64](6),
 		WithConv1D[float64](2, 3, 1, conv.PadValid, true),
 		WithFlatten[float64](),
 		WithHiddenLayer[float64](6, activation.SIGMOID),
 		WithOutput[float64](1, activation.SIGMOID),
-		WithLearningRate[float64](0.3),
+		WithLearningRate(0.3),
 		WithMaxIterations[float64](2000),
-		WithLossLimit[float64](1e-2),
+		WithLossLimit(1e-2),
 	)
 	if err != nil {
 		t.Fatalf("New: %v", err)
@@ -125,13 +125,13 @@ func TestConvPrefixTrainConverges(t *testing.T) {
 // actually moved — proves the inline SGD on Conv1D actually fires.
 func TestConvWeightsChange(t *testing.T) {
 	t.Parallel()
-	n, err := New[float64](
+	n, err := New(
 		WithInput[float64](6),
 		WithConv1D[float64](1, 3, 1, conv.PadValid, false),
 		WithFlatten[float64](),
 		WithHiddenLayer[float64](4, activation.SIGMOID),
 		WithOutput[float64](1, activation.SIGMOID),
-		WithLearningRate[float64](0.5),
+		WithLearningRate(0.5),
 		WithMaxIterations[float64](100),
 	)
 	if err != nil {
@@ -167,7 +167,7 @@ func TestConvWeightsChange(t *testing.T) {
 // runConvForward returns the input slice by identity.
 func TestNoConvPrefixZeroOverhead(t *testing.T) {
 	t.Parallel()
-	n, err := New[float64](
+	n, err := New(
 		WithInput[float64](2),
 		WithHiddenLayer[float64](4, activation.SIGMOID),
 		WithOutput[float64](1, activation.SIGMOID),
@@ -197,7 +197,7 @@ func TestNoConvPrefixZeroOverhead(t *testing.T) {
 // composable primitive.
 func TestMaxAndAvgPoolInPrefix(t *testing.T) {
 	t.Parallel()
-	n, err := New[float64](
+	n, err := New(
 		WithInput[float64](12),
 		WithConv1D[float64](1, 3, 1, conv.PadValid, false), // 12 → 10
 		WithMaxPool1D[float64](2),                          // 10 → 5
@@ -219,7 +219,7 @@ func TestMaxAndAvgPoolInPrefix(t *testing.T) {
 		t.Errorf("Fit MaxPool: %v", err)
 	}
 
-	n2, err := New[float64](
+	n2, err := New(
 		WithInput[float64](12),
 		WithConv1D[float64](1, 3, 1, conv.PadValid, false),
 		WithAvgPool1D[float64](2),

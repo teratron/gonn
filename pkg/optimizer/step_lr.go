@@ -18,12 +18,12 @@ import (
 //   - Related: [Scheduler], [BindScheduler], [WarmUpLR], [CosineAnnealingLR].
 //   - Stability: Stable.
 type StepLR[T utils.Float] struct {
-	current  T // most recently computed rate
+	current  T
+	lr0      T
+	gamma    float64
+	step     uint
+	stepSize uint
 	gran     Granularity
-	lr0      T       // initial learning rate (lr₀)
-	gamma    float64 // decay factor per interval
-	step     uint    // global step counter
-	stepSize uint    // interval length in steps
 }
 
 // compile-time interface verification (C26).

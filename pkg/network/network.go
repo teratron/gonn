@@ -8,6 +8,8 @@
 package network
 
 import (
+	"sync/atomic"
+
 	"github.com/teratron/gonn/pkg/activation"
 	"github.com/teratron/gonn/pkg/layer"
 	"github.com/teratron/gonn/pkg/loss"
@@ -53,7 +55,7 @@ type Network[T utils.Float] struct {
 	preactOutput    []T
 	Output          bundle[T, *cell.Output[T]]   `json:"output" xml:"output"`
 	Hiddens         []bundle[T, *cell.Hidden[T]] `json:"hiddens" xml:"hiddens"`
-	topologyVersion uint64
+	topologyVersion atomic.Uint64
 	outputAct       activation.Type
 	lossMode        loss.Type
 	topologyMode    TopologyMode
@@ -238,7 +240,7 @@ func (n *Network[T]) newAxon(
 	if n.initWeight != nil {
 		return axon.NewWithWeight(n.initWeight(fanIn, fanOut), src, dst)
 	}
-	return axon.New[T](src, dst)
+	return axon.New(src, dst)
 }
 
 // SetInputs writes one sample into the Input bundle. Slice length must

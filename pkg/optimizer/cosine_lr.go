@@ -18,11 +18,11 @@ import (
 //   - Related: [Scheduler], [BindScheduler], [WarmUpLR], [ChainScheduler].
 //   - Stability: Stable.
 type CosineAnnealingLR[T utils.Float] struct {
+	lr0   T
+	lrMin T
+	step  uint
+	tMax  uint
 	gran  Granularity
-	lr0   T    // initial learning rate (lr₀)
-	lrMin T    // minimum learning rate
-	step  uint // global step counter
-	tMax  uint // total annealing steps
 }
 
 // compile-time interface verification (C26).

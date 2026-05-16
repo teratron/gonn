@@ -1,6 +1,8 @@
 package nn
 
 import (
+	"slices"
+
 	"github.com/teratron/gonn/pkg/layer/conv"
 	"github.com/teratron/gonn/pkg/optimizer"
 	"github.com/teratron/gonn/pkg/regularizer"
@@ -140,9 +142,9 @@ func (n *NN[T]) runConvForward(input []T) ([]T, error) {
 //   - Related: [trainStep], [conv.Conv1D.Backward], [conv.Conv1D.GradSlots].
 func (n *NN[T]) applyConvBackward(gradOut []T) {
 	upstream := gradOut
-	for i := len(n.convPrefix) - 1; i >= 0; i-- {
-		next := n.convPrefix[i].Backward(upstream)
-		if c1d, ok := n.convPrefix[i].(*conv.Conv1D[T]); ok {
+	for _, v := range slices.Backward(n.convPrefix) {
+		next := v.Backward(upstream)
+		if c1d, ok := v.(*conv.Conv1D[T]); ok {
 			gW, gB := c1d.GradSlots()
 			applyConvSGD(c1d.Weights, gW, n.LearningRate)
 			if c1d.UseBias && len(gB) > 0 {

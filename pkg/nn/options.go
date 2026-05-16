@@ -72,7 +72,7 @@ func New[T utils.Float](opts ...Option[T]) (*NN[T], error) {
 //   - Related: [New], [NewBuilder], [MustCompile].
 //   - Stability: Stable.
 func MustNew[T utils.Float](opts ...Option[T]) *NN[T] {
-	n, err := New[T](opts...)
+	n, err := New(opts...)
 	if err != nil {
 		panic("nn.MustNew: " + err.Error())
 	}

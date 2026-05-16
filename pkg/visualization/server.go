@@ -76,12 +76,12 @@ type SnapFn func() NetworkState
 //   - Related: [NewVisServer], [RegisterNetwork], [Start], [Stop].
 //   - Stability: Stable.
 type VisServer struct {
+	listener net.Listener
 	srv      *http.Server
-	listener net.Listener // holds the bound socket so tests can retrieve the actual port.
-	mu       sync.RWMutex
 	snapFn   SnapFn
 	addr     string
 	token    string
+	mu       sync.RWMutex
 	cors     bool
 }
 

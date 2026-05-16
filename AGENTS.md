@@ -16,6 +16,7 @@
 - **Project Layout**: Follow standard Go project structure (`/cmd`, `/pkg`, `/internal`).
 - **Formatting**: Always use `gofmt` and `goimports` to maintain consistent code style.
 - **Linting**: Ensure code passes `golangci-lint` with the project's configuration before submission.
+- **Modernization**: Run `$(go env GOPATH)/bin/modernize ./...` after writing or refactoring Go code to ensure current idioms are used (e.g., `any` over `interface{}`, `slices.Contains`, `strings.Cut`, `sync.WaitGroup.Go`, `t.Context()` in tests). Apply fixes with `-fix`. No output means the code is already up to date.
 
 ### 2.2 Concurrency (Goroutines & Channels)
 
@@ -54,3 +55,5 @@ Before finishing any task, the agent MUST verify the following:
 - [ ] **Code Quality**:
   - [ ] All new Go files have at least 80% test coverage.
   - [ ] Code is formatted with `gofmt` and follows standard linting rules.
+  - [ ] **Modernization**: `$(go env GOPATH)/bin/modernize ./...` reports no suggestions (or fixes have been applied with `-fix`).
+  - [ ] **Struct Optimization**: Memory layouts of new/modified structs are optimized (via `go-struct-optimizer`).

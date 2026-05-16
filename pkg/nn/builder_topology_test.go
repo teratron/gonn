@@ -98,7 +98,7 @@ func TestHiddenLayersBuilderReplacesPrevious(t *testing.T) {
 
 // TestRepeatOptionAppends verifies the Options API Repeat function appends layers.
 func TestRepeatOptionAppends(t *testing.T) {
-	n, err := nn.New[float64](
+	n, err := nn.New(
 		nn.WithInput[float64](4),
 		nn.Repeat[float64](3, 16, activation.ReLU),
 		nn.WithOutput[float64](1, activation.SIGMOID),
@@ -117,9 +117,9 @@ func TestPatternOptionAppends(t *testing.T) {
 		{Size: 8, Activation: activation.SIGMOID, Bias: false},
 		{Size: 4, Activation: activation.SIGMOID, Bias: false},
 	}
-	n, err := nn.New[float64](
+	n, err := nn.New(
 		nn.WithInput[float64](4),
-		nn.Pattern[float64](block, 4), // 2 × 4 = 8 layers
+		nn.Pattern(block, 4), // 2 × 4 = 8 layers
 		nn.WithOutput[float64](1, activation.SIGMOID),
 	)
 	if err != nil {
@@ -193,12 +193,12 @@ func TestWithSchedulerBuilderSetsSched(t *testing.T) {
 
 // TestWithSchedulerOptionSetsSched verifies the Options API WithScheduler.
 func TestWithSchedulerOptionSetsSched(t *testing.T) {
-	sched := optimizer.NewCosineAnnealingLR[float64](0.1, 0.001, 100)
-	n, err := nn.New[float64](
+	sched := optimizer.NewCosineAnnealingLR(0.1, 0.001, 100)
+	n, err := nn.New(
 		nn.WithInput[float64](2),
 		nn.WithHiddenLayer[float64](4, activation.SIGMOID),
 		nn.WithOutput[float64](1, activation.SIGMOID),
-		nn.WithScheduler[float64](sched),
+		nn.WithScheduler(sched),
 	)
 	if err != nil {
 		t.Fatalf("New: %v", err)
@@ -211,7 +211,7 @@ func TestWithSchedulerOptionSetsSched(t *testing.T) {
 // TestSchedulerStepsOnEpoch verifies that a PerEpoch scheduler is called
 // during Fit by checking the optimizer's LR changes after training.
 func TestSchedulerStepsOnEpoch(t *testing.T) {
-	opt := optimizer.NewSGD[float64](1.0)
+	opt := optimizer.NewSGD(1.0)
 	// StepLR: decay by 0.5 every 1 epoch — after 5 epochs LR should be 1.0 × 0.5^5.
 	sched := optimizer.BindScheduler[float64](opt, optimizer.NewStepLR[float64](1.0, 1, 0.5))
 

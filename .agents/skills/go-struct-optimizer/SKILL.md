@@ -74,9 +74,27 @@ No dependencies required — stdlib only.
 # Analyze a single file
 python <skill_dir>/scripts/analyze.py <file.go>
 
-# Analyze all Go files in a directory
+# Analyze a directory tree
 python <skill_dir>/scripts/analyze.py ./internal/ecs/
+
+# Go-style recursive scan from the current dir (skips *_test.go, vendor,
+# testdata, and dot/underscore dirs — same exclusions as `go ./...`)
+python <skill_dir>/scripts/analyze.py ./...
+
+# Recursive scan rooted at a subtree
+python <skill_dir>/scripts/analyze.py ./internal/...
 ```
+
+### Flags
+
+| Flag | Effect |
+| --- | --- |
+| `--include-tests` | Also analyze `*_test.go` files. In Go, tests **and** benchmarks both live in `*_test.go`; there is no separate benchmark-file convention, so this one flag covers both. By default they are skipped because structs in test files are fixtures, not production hot-path data. |
+| `--arch {amd64,arm64,386,arm}` | Target pointer width (default `amd64`). `amd64`/`arm64` → 8-byte pointers; `386`/`arm` → 4-byte. Note: `custom_types.json` sizes are authored for 64-bit. |
+
+Unresolved named types (cross-package types not in `custom_types.json`) are
+assumed `8B / align 8 / mixed` and listed on stderr so you can add precise
+entries — ignore generic type parameters like `T`/`K`/`V` in that list.
 
 ### Output Format
 

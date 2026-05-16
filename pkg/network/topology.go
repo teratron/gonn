@@ -1,8 +1,6 @@
 package network
 
 import (
-	"sync/atomic"
-
 	"github.com/teratron/gonn/pkg/activation"
 	"github.com/teratron/gonn/pkg/neuron/cell"
 	"github.com/teratron/gonn/pkg/utils"
@@ -57,7 +55,7 @@ func (n *Network[T]) beginTx() topologyTx[T] {
 
 // Commit increments the topology version after a successful mutation.
 func (tx *topologyTx[T]) Commit() {
-	atomic.AddUint64(&tx.n.topologyVersion, 1)
+	tx.n.topologyVersion.Add(1)
 }
 
 // Rollback restores all topology slices to their pre-mutation values.
@@ -97,7 +95,7 @@ func (n *Network[T]) requireDynamic() error {
 //   - Related: [AddNeuron], [AddHiddenLayer].
 //   - Stability: Stable.
 func (n *Network[T]) TopologyVersion() uint64 {
-	return atomic.LoadUint64(&n.topologyVersion)
+	return n.topologyVersion.Load()
 }
 
 // AddNeuron adds count new cells to the hidden layer at layerIdx and
