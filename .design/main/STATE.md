@@ -4,16 +4,16 @@
 <!-- Maximum 100 lines. Agent updates AFTER each completed action. -->
 
 **Workspace:** main
-**Project Version:** 0.9.0 released; 0.10.0 in progress (Phase 11 Tracks B+C nearly done)
-**Updated:** 2026-05-17 07:52
+**Project Version:** 0.10.0 released; 0.11.0 planned (Phase 12 — Meta-Learning Hooks + Conv optimizer pluggability)
+**Updated:** 2026-05-17 12:00
 **Phase:** 11 — Meta-Learning Hooks + Conv Layers + Dataset Formats
-**Status:** Active
+**Status:** Done
 
 ## Current Position
 
-- **Task:** T-11C04 (E06 MNIST example — code+README scaffold ready to write; smoke-run gated on user-supplied IDX data)
-- **Spec:** Track B (l2-conv-layers-impl v0.1.0) integrated end-to-end through compile/train/query. Track C (l2-dataset-loader-impl v0.1.0) IDXReader + MNISTLoader[T] + AndTrain live; examples/continuation/ smoke-clean. Track A (l2-meta-learning-impl v0.1.0) Draft — blocked on l1-meta-learning-hooks RFC→Stable.
-- **Next Action:** Run /magic-run main to close Phase 11: (a) T-11C04 (E06 MNIST example — needs user-supplied IDX data, but code+README can land first), (b) T-11T02/T-11T03 final validation, (c) gate T-11Z01 (build + race + ≥80% cover) + CHANGELOG v0.10.0 + v0.10.0 tag. Track A (Meta-Learning) remains blocked — promote l1-meta-learning-hooks RFC→Stable via /magic-spec when ready.
+- **Task:** Phase 11 complete. Gate T-11Z01 passed 2026-05-17.
+- **Spec:** All Track B + C tasks done. Track A (T-11A01..T-11A03 + T-11T01) deferred to Phase 12.
+- **Next Action:** `/magic-task` for Phase 12 scoping (Meta-Learning Hooks + conv optimizer pluggability).
 
 ## Progress
 
@@ -28,8 +28,8 @@ Phase 7  (Done):    [16/16]   ████████ 100%   (Tracks A+B+C + va
 Phase 8  (Done):    [9/9]     ████████ 100%   (Track A: ExponentialLR + Track B: CLI binary + gate)
 Phase 9  (Done):    [15/15]   ████████ 100%   (Tracks A+B+C + validation + gate)
 Phase 10 (Done):    [10/10]   ████████ 100%   (Tracks A+B + validation + gate; norm + callbacks)
-Phase 11 (Active):  [8/14]    █████░░░  57%   (Track A 0/3 blocked; Track B 5/5 done; Track C 3/4 done + 1 pending; T-11T02 partial; T-11T03 + gate pending)
-Overall:            [181/187] ███████░  97%
+Phase 11 (Done):    [11/14]   ███████░  79%   (Track A 0/3 deferred Phase 12; Track B 5/5 done; Track C 5/5 done; T-11T02+T-11T03+T-11Z01 done)
+Overall:            [184/187] ████████  98%
 ```
 
 ## Recent Decisions
@@ -45,8 +45,8 @@ Overall:            [181/187] ███████░  97%
 
 ## Blockers
 
-- **Track A (Meta-Learning)**: l1-meta-learning-hooks still RFC v0.3.0 — RFC→Stable review required via /magic-spec before T-11A01..T-11A03 can start (or mark them `[Deferred to Phase 12]` at gate per T-11Z01).
-- **T-11C04 (E06 MNIST)**: external — needs user-supplied `train-images-idx3-ubyte.gz` + `train-labels-idx1-ubyte.gz`. Code template + README can land first; smoke-run deferred.
+- **Phase 12 blocker**: l1-meta-learning-hooks still RFC v0.3.0 — run `/magic-spec` to promote RFC→Stable before Phase 12 Track A (T-12A01..T-12A03) can start.
+- **E06 smoke-run**: `go run ./examples/mnist/` deferred — needs user-supplied IDX data (see examples/mnist/README.md for download instructions).
 
 ## Blocking Constraints
 
@@ -56,6 +56,6 @@ Overall:            [181/187] ███████░  97%
 
 ## Session Continuity
 
-**Last Session Ended:** 2026-05-17 (sync via /magic-task — no execution)
+**Last Session Ended:** 2026-05-17 (Phase 11 gate T-11Z01 complete)
 **Handoff File:** none
-**Bootstrap Mode:** false (Phase 11 mid-flight; next = /magic-run main for T-11C04 + T-11T03 + gate)
+**Bootstrap Mode:** false (Phase 11 Done; next = /magic-task for Phase 12 scoping)

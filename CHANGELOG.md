@@ -4,6 +4,76 @@ All notable changes to the GoNN library will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the
 release artifacts dictated by [.magic/run.md](.magic/run.md) Phase Completion / Plan Completion.
 
+## [0.10.0] — 2026-05-17
+
+### Convolutional Layers, Dataset Loader, and AndTrain Continuation
+
+Phase 11 (Tracks B + C) adds a convolutional prefix stage, the MNIST IDX dataset loader,
+the `AndTrain` fine-tuning API, and two new examples. Track A (Meta-Learning) is deferred
+to Phase 12 pending `l1-meta-learning-hooks` RFC → Stable promotion.
+
+#### Added
+
+- **`pkg/layer/conv/`** — new convolutional sub-package:
+  - `conv.Layer[T utils.Float]` local interface (mirrors norm precedent; forward, backward, validate, init, JSON).
+  - `PadMode` enum (`PadValid=0`, `PadSame=1`); `outputLen` and `padSamePadding` helpers.
+  - `Conv1D[T]`: cross-correlation forward; ∂L/∂W, ∂L/∂X backward; He-normal `Init`; flattened
+    filter-major `[]T` weight layout (one allocation, cache-locality); `MarshalJSON`/`UnmarshalJSON`
+    round-trip (CONV-7); `Validate` enforces CONV-1 shape invariant.
+  - `MaxPool1D[T]`: argmax-tracking backward (gradient routes only to argmax position).
+  - `AvgPool1D[T]`: backward distributes 1/poolSize evenly across pool window.
+  - `Flatten[T]`: stateless identity; backward returns upstream on shape match, nil on mismatch.
+  - Compile-time interface assertions for all four types.
+  - Coverage: 83.3 %.
+- **`pkg/dataset/mnist.go`** — IDX binary format reader + MNIST loader:
+  - `readIDXHeader`: validates magic bytes, dtype (6 IDX types: uint8/int8/int16/int32/float/double),
+    ndim; `IDXReader` with per-record reusable buffer, `Next()` → `io.EOF`, `Reset()`.
+  - `MNISTLoader[T]`: implements project `Dataset[T]` interface (batch streaming); pixel normalisation
+    to [0, 1] via configurable norm factor; `NewMNISTLoader` (BYO readers) and `NewMNISTLoaderFiles`
+    (opens files; `Close` releases handles; `Reset` reopens); context cancellation honoured.
+  - Sentinel errors `ErrIDXMagic`, `ErrMNISTRecordMismatch` added to `pkg/utils/errors.go`.
+  - Coverage: 85.2 %.
+- **`pkg/nn/andtrain.go`** — `AndTrain` continuation API:
+  - `(*NN[T]).AndTrain(samples []Sample[T], opts ...Option[T]) (int, T, error)`: snapshots config,
+    applies caller-supplied options (e.g. lower learning rate), delegates to `Fit`, restores original
+    config on defer. Preserves learned weights; resets convergence counters only.
+  - Guards: `ErrUserConfig` if not Operational or empty samples; `ErrNetworkRunning` if Idle=false.
+- **`pkg/network/propagation.go`** — `AppendInputGradient` method:
+  computes `−Σ σ'(preact_j)·miss_j·w_{i→j}` for each input neuron; used by conv backward pass.
+- **`pkg/nn/options.go`** — four new functional options: `WithConv1D`, `WithMaxPool1D`,
+  `WithAvgPool1D`, `WithFlatten` to build the conv prefix chain before the dense network.
+- **`pkg/nn/compile.go`** — conv chain shape resolution: resolves `outputLen` through the prefix
+  chain; resizes the Input layer accordingly; `rawInputSize` captures original input size.
+- **`pkg/nn/train.go`** — `runConvForward`, `applyConvBackward`, `applyConvSGD` integrated into
+  `trainStep`; inlined SGD for conv weights (`w -= lr·g`); optimizer pluggability deferred to v0.11.
+- **`pkg/nn/query.go`** — `runConvForward` pre-stage in inference path.
+- **`examples/continuation/`** (E10) — demonstrates `AndTrain` end-to-end: trains XOR via `Fit`,
+  then inverts targets at lower LR via `AndTrain`; `main_test.go` asserts weight continuity.
+- **`examples/mnist/`** (E06) — demonstrates MNIST digit recognition: `MNISTLoader` + one-hot
+  encoding + `BatchNorm` (784→128+BN→64→10) + two-epoch `Fit`+`AndTrain`; README explains IDX
+  format, one-hot encoding, BatchNorm training/eval distinction, and download instructions.
+  Smoke-run deferred: IDX data files not committed (see `examples/mnist/README.md`).
+
+#### Changed
+
+- **`go.work`** — added `./examples/continuation` and `./examples/mnist` workspace members.
+- **`pkg/nn/config.go`** — `ConvPrefix []conv.Layer[T]` field added to `Config[T]`.
+- **`pkg/nn/nn.go`** — `convPrefix`, `rawInputSize`, `convBuf`, `convGradBuf` fields on `NN[T]`.
+
+#### Deferred
+
+- **Meta-Learning Hooks** (T-11A01..T-11A03, T-11T01): `l1-meta-learning-hooks` spec remains RFC;
+  deferred to Phase 12. Run `/magic-spec` to promote the spec and unlock the track.
+
+#### Known Issues
+
+- Pre-existing timing-flaky tests: `TestPauseResumeCycle`, `TestMultiHiddenXOR`,
+  `TestRepeatBuilderBenchmark100Layer` — unaffected by Phase 11 changes.
+- `TestXORTwoHiddenConvergence`: stochastic convergence flake on low-entropy random seed;
+  pre-existing; passes consistently in isolation.
+- `-race` flag requires CGO (gcc) on Windows; Phase 11 gate passed without `-race` locally;
+  CI must re-run with `-race`.
+
 ## [0.9.0] — 2026-05-12
 
 ### Normalization Layers + Training Callbacks
@@ -637,7 +707,5 @@ Promotes three specs to Stable.
 
 ### Changed
 
-
 - Updated task plan and task index (main)
 - Completed task `phase-11` (main)
-

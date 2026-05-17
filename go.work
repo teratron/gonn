@@ -16,4 +16,5 @@ use (
 	./examples/regression_multi
 	./examples/higher_order_options
 	./examples/continuation
+	./examples/mnist
 )

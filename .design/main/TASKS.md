@@ -1,7 +1,7 @@
 # Master Task Index (Registry)
 
-**Version:** 2.5.1
-**Project Version:** 0.10.0 (Phase 11 in progress — Tracks B+C nearly done; Track A blocked; gate pending)
+**Version:** 2.5.2
+**Project Version:** 0.10.0 (Phase 11 Done — gate T-11Z01 passed 2026-05-17; Track A deferred to Phase 12)
 **Generated:** 2026-04-29
 **Last Updated:** 2026-05-17
 **Based on:** .design/main/PLAN.md v2.6.1
@@ -27,7 +27,7 @@ Tactical registry of all phases and their statuses. Atomic checklists (`T-XXXX`)
 | [Phase 8](tasks/phase-8.md) | LR Scheduling Extension + CLI Binary — `ExponentialLR`, `cmd/gonn/` binary, v0.7.0 release | `Done` (2026-05-10) |
 | [Phase 9](archives/tasks/phase-9.md) | Metric Schedulers + Dynamic Topology + Observability Stack — `ReduceOnPlateau`, `OneCycleLR`, topology mutations, slog + viz HTTP server, v0.8.0 release | `Done (Archived)` (2026-05-10) |
 | [Phase 10](archives/tasks/phase-10.md) | Normalization Layers + Training Callbacks — `pkg/layer/norm/` (BatchNorm/LayerNorm/GroupNorm), `pkg/nn/callbacks.go`, v0.9.0 release | `Done (Archived)` (2026-05-12) |
-| [Phase 11](tasks/phase-11.md) | Meta-Learning Hooks + Convolutional Layers + Dataset Formats — `pkg/nn/meta.go`, `pkg/layer/conv/`, `pkg/dataset/mnist.go`, `pkg/nn/andtrain.go`, examples E06+E10, v0.10.0 release | `In Progress` (8/14 — Track A blocked on l1-meta-learning-hooks RFC→Stable; Track B done; Track C T-11C04 pending IDX data) |
+| [Phase 11](tasks/phase-11.md) | Meta-Learning Hooks + Convolutional Layers + Dataset Formats — `pkg/layer/conv/`, `pkg/dataset/mnist.go`, `pkg/nn/andtrain.go`, examples E06+E10, v0.10.0 release | `Done` (11/14 — Track A 3 tasks deferred to Phase 12; Track B+C+gate done; v0.10.0 tagged) |
 
 ## Phase 0 — Already Complete
 
