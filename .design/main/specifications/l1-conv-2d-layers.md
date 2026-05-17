@@ -1,7 +1,7 @@
 # 2-D Convolutional Layers
 
 **Version:** 0.2.0
-**Status:** Draft
+**Status:** Stable
 **Layer:** concept
 
 ## Overview
@@ -246,3 +246,4 @@ boundaries that the L2 implementation MUST honour without prescribing the algori
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-05-17 | Initial Draft — Conv2D / MaxPool2D / AvgPool2D / Flatten2D contract with 9 invariants. |
 | 0.2.0 | 2026-05-17 | CONV2D-C9 frozen: tensor layout is CHW row-major; filter storage filter-major flat `[]T` of length `F * C_in * K_h * K_w`. Rationale: cache locality with existing `pkg/layer/norm/` primitives, PyTorch/cuDNN parity, natural generalisation of Conv1D Variant A storage. |
+| 0.2.0 | 2026-05-17 | Promoted Draft → Stable via magic-task Pre-Planning Stabilization (Trust Mode batch): no RULES conflicts, no hard-dependency cycles, MVC criteria satisfied (Overview + Core Invariants + Detailed Design). Eligible for active planning into Phase 13. |

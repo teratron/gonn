@@ -5,15 +5,15 @@
 
 **Workspace:** main
 **Project Version:** 0.11.0 released
-**Updated:** 2026-05-17 12:30
-**Phase:** 12 — Meta-Learning Hooks
-**Status:** Done
+**Updated:** 2026-05-17 13:55
+**Phase:** 13 — Convolutional 2-D Foundation
+**Status:** Active
 
 ## Current Position
 
 - **Task:** T-12Z01 Phase 12 gate complete. All 5 tasks done.
 - **Spec:** l1-meta-learning-hooks Stable v1.0.0 + l2-meta-learning-impl Stable v0.1.0.
-- **Next Action:** Phase 13 (not yet scoped). Run `/magic-task main` to plan next phase.
+- **Next Action:** Run /magic-run main to execute Phase 13 (delegates L2 spec authoring to /magic-spec via T-13A01)
 
 ## Progress
 

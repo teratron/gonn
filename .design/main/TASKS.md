@@ -1,10 +1,10 @@
 # Master Task Index (Registry)
 
-**Version:** 2.8.0
-**Project Version:** 0.11.0 released
+**Version:** 2.9.0
+**Project Version:** 0.11.0 released; 0.12.0 in progress (Phase 13 scoped)
 **Generated:** 2026-04-29
 **Last Updated:** 2026-05-17
-**Based on:** .design/main/PLAN.md v2.8.0
+**Based on:** .design/main/PLAN.md v2.9.0
 **Based on RULES:** .design/RULES.md v1.3.0
 **Execution Mode:** Parallel (C3)
 **Status:** Active
@@ -29,6 +29,7 @@ Tactical registry of all phases and their statuses. Atomic checklists (`T-XXXX`)
 | [Phase 10](archives/tasks/phase-10.md) | Normalization Layers + Training Callbacks — `pkg/layer/norm/` (BatchNorm/LayerNorm/GroupNorm), `pkg/nn/callbacks.go`, v0.9.0 release | `Done (Archived)` (2026-05-12) |
 | [Phase 11](tasks/phase-11.md) | Meta-Learning Hooks + Convolutional Layers + Dataset Formats — `pkg/layer/conv/`, `pkg/dataset/mnist.go`, `pkg/nn/andtrain.go`, examples E06+E10, v0.10.0 release | `Done` (14/14 — Track A 3/3 completed via Phase 12; Track B+C+gate done; v0.10.0 tagged) |
 | [Phase 12](archives/tasks/phase-12.md) | Meta-Learning Hooks — `pkg/nn/meta.go` (ParamAccessor[T]/ScalarParam[T]/SliceParam[T]/MetaLearner[T]), `WithMetaLearner` option, train.go hook, v0.11.0 release | `Done (Archived)` (5 tasks: T-12A01..A03 + T-12T01 + T-12Z01) |
+| [Phase 13](tasks/phase-13.md) | Convolutional 2-D Foundation — scoping phase: L1 contract Stable + queue L2 spec authoring (T-13A01) for `l2-conv-2d-impl.md` via `/magic-spec`; implementation tracks (`pkg/layer/conv/conv2d.go` + friends) deferred to follow-up | `Todo` (3 tasks: T-13A01 + T-13T01 + T-13Z01) |
 
 ## Phase 0 — Already Complete
 
@@ -236,5 +237,5 @@ Six of the eight v0.6-gated entries (E03, E04, E05, E07, E08, E13) are now activ
 | `CHANGELOG.md` (v0.11.0 entry) | l1-release-policy v1.0.0 | `Done` [Z] |
 | `v0.11.0` git tag | l1-release-policy v1.0.0 §5.4 | `Pending user` (run `git tag -a v0.11.0`) |
 
-- **Last Updated**: 2026-05-17 (Phase 12 gate passed: `go build ./...` clean; 19/19 packages green; `pkg/nn` 82.2 % coverage; CHANGELOG v0.11.0 written; phase-12.md archived; v0.11.0 tag pending user. TASKS.md v2.7.0 → v2.8.0.)
+- **Last Updated**: 2026-05-17 (Phase 13 scoped: Convolutional 2-D Foundation, single-track A delegating L2 spec authoring to `/magic-spec`. l1-conv-2d-layers promoted Draft → Stable v0.2.0 via Pre-Planning Stabilization. PLAN base v2.8.0 → v2.9.0; TASKS v2.8.0 → v2.9.0; INDEX v2.11.0 → v2.12.0.)
 - **Maintainer**: Core Team
