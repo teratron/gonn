@@ -1,10 +1,10 @@
 # Master Task Index (Registry)
 
-**Version:** 2.9.0
-**Project Version:** 0.11.0 released; 0.12.0 in progress (Phase 13 scoped)
+**Version:** 2.10.0
+**Project Version:** 0.11.0 released; 0.12.0 in progress (Phase 13 Done; Phase 14 scoped)
 **Generated:** 2026-04-29
 **Last Updated:** 2026-05-17
-**Based on:** .design/main/PLAN.md v2.9.0
+**Based on:** .design/main/PLAN.md v2.11.0
 **Based on RULES:** .design/RULES.md v1.3.0
 **Execution Mode:** Parallel (C3)
 **Status:** Active
@@ -30,6 +30,7 @@ Tactical registry of all phases and their statuses. Atomic checklists (`T-XXXX`)
 | [Phase 11](tasks/phase-11.md) | Meta-Learning Hooks + Convolutional Layers + Dataset Formats — `pkg/layer/conv/`, `pkg/dataset/mnist.go`, `pkg/nn/andtrain.go`, examples E06+E10, v0.10.0 release | `Done` (14/14 — Track A 3/3 completed via Phase 12; Track B+C+gate done; v0.10.0 tagged) |
 | [Phase 12](archives/tasks/phase-12.md) | Meta-Learning Hooks — `pkg/nn/meta.go` (ParamAccessor[T]/ScalarParam[T]/SliceParam[T]/MetaLearner[T]), `WithMetaLearner` option, train.go hook, v0.11.0 release | `Done (Archived)` (5 tasks: T-12A01..A03 + T-12T01 + T-12Z01) |
 | [Phase 13](archives/tasks/phase-13.md) | Convolutional 2-D Foundation — scoping phase: L1 contract Stable + queue L2 spec authoring (T-13A01) for `l2-conv-2d-impl.md` via `/magic-spec`; implementation tracks (`pkg/layer/conv/conv2d.go` + friends) deferred to follow-up | `Done (Archived)` (3 tasks: T-13A01 + T-13T01 + T-13Z01) |
+| [Phase 14](tasks/phase-14.md) | Conv2D Implementation + MNIST CNN Example — `pkg/layer/conv/conv2d.go` + `pool2d.go` + `flatten2d.go`, `pkg/nn/options.go` (WithConv2D+friends) + `compile.go` 2-D wiring, `pkg/dataset/` WithImageShape adapter, `examples/mnist_cnn/` E16, v0.12.0 release | `Todo` (12 tasks: T-14A01..A04 + B01..B02 + C01..C02 + D01..D02 + T01 + Z01) |
 
 ## Phase 0 — Already Complete
 

@@ -5,15 +5,15 @@
 
 **Workspace:** main
 **Project Version:** 0.11.0 released
-**Updated:** 2026-05-17 14:05
-**Phase:** 14 — Conv2D Implementation
+**Updated:** 2026-05-17 14:13
+**Phase:** 14 — Conv2D Implementation + MNIST CNN
 **Status:** Active
 
 ## Current Position
 
 - **Task:** T-13Z01 Phase 13 gate
 - **Spec:** l1-meta-learning-hooks Stable v1.0.0 + l2-meta-learning-impl Stable v0.1.0.
-- **Next Action:** Run /magic-task main to scope Phase 14 — Conv2D Implementation + MNIST CNN example (pkg/layer/conv/ 2-D primitives)
+- **Next Action:** Run /magic-run main to execute Phase 14 (12 tasks: T-14A01..A04 + B01..B02 + C01..C02 + D01..D02 + T01 + Z01)
 
 ## Progress
 
