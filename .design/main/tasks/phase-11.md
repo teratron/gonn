@@ -56,27 +56,27 @@ duration_minutes: ~
 **Track order:** B and C are fully parallel and unblocked; A requires l1-meta-learning-hooks → Stable first;
                T-11T01 after Track A, T-11T02 after Track B, T-11T03 after Track C; Gate T-11Z01 after all.
 
-## Track A — Meta-Learning Hooks (pkg/nn/meta.go) [BLOCKED]
+## Track A — Meta-Learning Hooks (pkg/nn/meta.go) [Done via Phase 12]
 
 *Goal: Implement ParamAccessor[T] + MetaLearner[T] from l2-meta-learning-impl.md.*
 *Source: [l2-meta-learning-impl.md](../specifications/l2-meta-learning-impl.md)*
 *Blocker: l1-meta-learning-hooks.md must be promoted RFC → Stable before this track can start.
 Run `/magic.spec` to perform the RFC review and promotion.*
 
-- [ ] **T-11A01** [Deferred to Phase 12] — Create `pkg/nn/meta.go`:
+- [x] **T-11A01** [Completed via Phase 12 as T-12A01] — Create `pkg/nn/meta.go`:
   `ParamAccessor[T utils.Float]` interface (`Get() []T`, `Set([]T) error`, `Name() string`);
   `ScalarParam[T]` wrapper (ptr `*T`; Get returns `[]T{*ptr}`; Set validates `len==1`);
   `SliceParam[T]` wrapper (ptr `*[]T`; Get returns copy; Set validates length match);
   `MetaLearner[T]` struct with `inner *NN[T]`, `params []ParamAccessor[T]`, `FeatureFunc func(loss T, iter int) []T`.
   Add `ErrMetaLearnerShape`, `ErrMetaLearnerRunning` to `pkg/utils/errors.go`.
 
-- [ ] **T-11A02** [Deferred to Phase 12] — Implement `MetaLearner[T].step(loss T, iter int) error`:
+- [x] **T-11A02** [Completed via Phase 12 as T-12A02] — Implement `MetaLearner[T].step(loss T, iter int) error`:
   Build feature vector via `FeatureFunc` (default: `[]T{loss, T(iter)/T(maxIter)}`);
   call `inner.Query(features)` → output slice;
   validate `len(output) == len(params)` → `ErrMetaLearnerShape` if not;
   call `params[i].Set([]T{output[i]})` for each; propagate first error, continue others.
 
-- [ ] **T-11A03** [Deferred to Phase 12] — Wire into `pkg/nn/`:
+- [x] **T-11A03** [Completed via Phase 12 as T-12A03] — Wire into `pkg/nn/`:
   `pkg/nn/config.go`: add `MetaLearner *MetaLearner[T]` field.
   `pkg/nn/options.go`: add `WithMetaLearner[T](ml *MetaLearner[T]) Option[T]`.
   `pkg/nn/train.go`: after `opt.Step` call, add:
@@ -170,7 +170,7 @@ Run `/magic.spec` to perform the RFC review and promotion.*
 
 ## Validation Tasks
 
-- [ ] **T-11T01** [Deferred to Phase 12] — Meta-Learning validation (after Track A):
+- [x] **T-11T01** [Completed via Phase 12 as T-12T01] — Meta-Learning validation (after Track A):
   - `go test -count=1 -race ./pkg/nn/...` — all tests green including new meta tests.
   - Verify `MetaLearner` with a 2→1 inner NN tuning outer learning rate converges faster than static LR on a synthetic task.
   - Verify `ErrMetaLearnerShape` fires when inner output size ≠ registered params.

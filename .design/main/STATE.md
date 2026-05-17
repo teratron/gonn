@@ -28,9 +28,9 @@ Phase 7  (Done):    [16/16]   ████████ 100%   (Tracks A+B+C + va
 Phase 8  (Done):    [9/9]     ████████ 100%   (Track A: ExponentialLR + Track B: CLI binary + gate)
 Phase 9  (Done):    [15/15]   ████████ 100%   (Tracks A+B+C + validation + gate)
 Phase 10 (Done):    [10/10]   ████████ 100%   (Tracks A+B + validation + gate; norm + callbacks)
-Phase 11 (Done):    [11/14]   ███████░  79%   (Track A 0/3 deferred Phase 12; Track B 5/5 done; Track C 5/5 done; T-11T02+T-11T03+T-11Z01 done)
+Phase 11 (Done):    [14/14]   ████████ 100%   (Track A 3/3 completed via Phase 12; Track B 5/5; Track C 5/5; gate done)
 Phase 12 (Done):    [5/5]     ████████ 100%   (Track A 3/3 done; T-12T01 + T-12Z01 done)
-Overall:            [189/192] ████████  98%
+Overall:            [192/192] ████████ 100%
 ```
 
 ## Recent Decisions

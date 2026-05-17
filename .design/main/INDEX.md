@@ -1,6 +1,6 @@
 # Workspace Specifications Registry
 
-**Version:** 2.10.0
+**Version:** 2.11.0
 **Status:** Active
 **Engine Version:** 2.1.25
 
@@ -67,8 +67,9 @@ Local registry of specifications for this workspace.
 | [l2-meta-learning-impl.md](specifications/l2-meta-learning-impl.md) | Go realization of meta-learning hooks — pkg/nn/meta.go | Stable | L2 | 0.1.0 |
 | [l2-conv-layers-impl.md](specifications/l2-conv-layers-impl.md) | Go realization of convolutional layers — pkg/layer/conv/ (Conv1D/MaxPool1D/Flatten) | Stable | L2 | 0.1.0 |
 | [l2-dataset-loader-impl.md](specifications/l2-dataset-loader-impl.md) | Go realization of dataset formats — pkg/dataset/mnist.go + pkg/nn/andtrain.go | Stable | L2 | 0.1.0 |
+| [l1-conv-2d-layers.md](specifications/l1-conv-2d-layers.md) | 2-D convolutional layer contract — Conv2D / MaxPool2D / AvgPool2D / Flatten2D, CHW layout, 9 invariants | Draft | L1 | 0.2.0 |
 
 ## Meta Information
 
 - **Maintainer**: Core Team
-- **Last Updated**: 2026-05-17 (magic-spec cascade promotion: l1-meta-learning-hooks RFC v0.3.0 → Stable v1.0.0 (8 TBDs closed in v0.3.0; META-1..META-7 invariants frozen; safety model authoritative). L2 child cascade: l2-meta-learning-impl Draft v0.1.0 → Stable v0.1.0 (`## Canonical References` section added to pass CANONICAL_MISSING gate). Unblocks Phase 12 Track A scoping via next `/magic-task` run. INDEX v2.9.0 → v2.10.0.)
+- **Last Updated**: 2026-05-17 (magic-spec Proactive Architect Spark 1 dispatch: created Draft `l1-conv-2d-layers.md` — sibling 2-D contract to existing 1-D `l1-conv-layers.md` Stable v1.0.0. Nine invariants `CONV2D-1..CONV2D-9` generalised from 1-D analogue. CONV2D-C9 frozen on CHW row-major layout (filter-major flat storage, PyTorch/cuDNN parity, generalises Conv1D Variant A). v0.1.0 → v0.2.0 minor bump on the same day to close the layout TBD before Post-Update Review. Unblocks Phase 13 scoping for next `/magic-task` run. INDEX v2.10.0 → v2.11.0.)
