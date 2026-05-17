@@ -135,8 +135,8 @@ func DefaultFeatureFunc[T utils.Float](loss T, iter int, maxIter int) []T {
 //   - Stability: Stable.
 type MetaLearner[T utils.Float] struct {
 	inner    *NN[T]
-	params   []ParamAccessor[T]
 	Features FeatureFunc[T]
+	params   []ParamAccessor[T]
 }
 
 // step executes one meta-learning iteration. It is called from train.go after

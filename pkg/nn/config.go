@@ -145,22 +145,22 @@ type Config[T utils.Float] struct {
 	Logger           *slog.Logger
 	BatchCallback    func(batch uint, lossValue T)
 	EpochCallback    func(epoch uint, lossValue T)
-	VisAddr          string
-	ProfilingAddr    string
+	MetaLearner      *MetaLearner[T]
 	VisToken         string
+	ProfilingAddr    string
 	WeightInit       WeightInitMethod
+	VisAddr          string
 	HiddenLayers     []HiddenLayerSpec[T]
 	ConvPrefix       []conv.Layer[T]
-	MaxIterations    uint
-	InputSize        uint
 	OutputSize       uint
+	InputSize        uint
+	MaxIterations    uint
 	LossType         loss.Type
 	OutputActivation activation.Type
 	TopologyMode     network.TopologyMode
 	VisCORS          bool
 	DefaultBias      bool
 	OutputBias       bool
-	MetaLearner      *MetaLearner[T]
 }
 
 // applyDefaults fills any zero-valued fields with the Defaults constants.
