@@ -61,6 +61,7 @@ coverage/
 tmp/
 temp/
 cache/
+.cache/
 .references/
 
 # Build outputs

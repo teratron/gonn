@@ -1,16 +1,48 @@
 ---
 phase: 11
 name: Meta-Learning Hooks + Convolutional Layers + Dataset Formats
-status: Todo
+status: In Progress
 subsystem: pkg/nn (meta), pkg/layer/conv (new), pkg/dataset (extend), pkg/nn (andtrain), examples/E06, examples/E10
 requires:
   - phase-10 (v0.9.0 tagged; pkg/layer/norm Stable; pkg/nn callbacks Stable)
   - l1-meta-learning-hooks RFC→Stable promotion (Track A only — explicit review required via magic.spec)
-provides: []
+  - External: MNIST IDX data files (Track C T-11C04 only — train-images-idx3-ubyte.gz + train-labels-idx1-ubyte.gz)
+provides:
+  - pkg/layer/conv (Conv1D[T], MaxPool1D[T], AvgPool1D[T], Flatten[T])
+  - pkg/dataset (IDXReader, MNISTLoader[T])
+  - pkg/nn (AndTrain, conv-prefix integration, WithConv1D/MaxPool1D/AvgPool1D/Flatten options)
+  - pkg/network (AppendInputGradient method)
 key_files:
-  created: []
-  modified: []
-patterns_established: []
+  created:
+    - pkg/layer/conv/conv.go
+    - pkg/layer/conv/conv1d.go
+    - pkg/layer/conv/pool.go
+    - pkg/layer/conv/flatten.go
+    - pkg/layer/conv/conv_test.go
+    - pkg/dataset/mnist.go
+    - pkg/nn/andtrain.go
+    - pkg/nn/andtrain_test.go
+    - pkg/nn/conv_test.go
+    - examples/continuation/main.go
+    - examples/continuation/main_test.go
+    - examples/continuation/README.md
+    - examples/continuation/go.mod
+  modified:
+    - pkg/utils/errors.go (ErrConvShapeMismatch, ErrConvPoolSizeMismatch, ErrIDXMagic, ErrMNISTRecordMismatch, ErrNetworkRunning)
+    - pkg/network/propagation.go (AppendInputGradient)
+    - pkg/nn/config.go (ConvPrefix field)
+    - pkg/nn/nn.go (convPrefix/rawInputSize/convBuf/convGradBuf)
+    - pkg/nn/options.go (WithConv1D/MaxPool1D/AvgPool1D/Flatten)
+    - pkg/nn/compile.go (conv chain shape resolution + Conv1D weight init)
+    - pkg/nn/train.go (runConvForward/applyConvBackward/applyConvSGD)
+    - pkg/nn/query.go (pre-stage runConvForward)
+    - go.work
+patterns_established:
+  - Conv prefix runs BEFORE Input layer; compile() resizes Input to conv outputLen; rawInputSize preserved for SetInputs
+  - Conv1D weights as flattened filter-major []T (one alloc, cache-locality, sync.Pool friendly)
+  - Conv backward inlined SGD (w -= lr·g); optimizer pluggability deferred to v0.11
+  - MNISTLoader batches via project Dataset[T] interface (aligns with csv.go / slice.go precedent)
+  - AndTrain delegates to Fit after live-cfg patch + defer restore (preserves state-machine + OnTrainEnd dispatch)
 duration_minutes: ~
 ---
 
@@ -132,11 +164,7 @@ Run `/magic.spec` to perform the RFC review and promotion.*
   `main.go`: load MNIST train set via `MNISTLoader`, build 784→128→64→10 network with `WithBatchNorm`,
   train with `AndTrain` for a second epoch, query a sample image, print predicted digit.
   `README.md`: explains MNIST IDX format, one-hot encoding, why BatchNorm helps deep nets.
-
-- [ ] **T-11C05** — Create `examples/continuation/`:
-  `main.go`: pre-train XOR network for 500 iterations, call `AndTrain` with a second dataset
-  (negated XOR), demonstrate weight preservation and continued convergence.
-  `README.md`: explains `AndTrain` semantics, when to use continuation vs rebuilding.
+  **Blocker (external)**: needs `train-images-idx3-ubyte.gz` + `train-labels-idx1-ubyte.gz` from MNIST mirror (user-supplied; not committed). Code template + README can land first; `go run` smoke test deferred until data available.
 
 ## Validation Tasks
 

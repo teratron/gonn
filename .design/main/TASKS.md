@@ -1,10 +1,10 @@
 # Master Task Index (Registry)
 
-**Version:** 2.5.0
-**Project Version:** 0.10.0 (Phase 11 active — v0.10.0 in progress)
+**Version:** 2.5.1
+**Project Version:** 0.10.0 (Phase 11 in progress — Tracks B+C nearly done; Track A blocked; gate pending)
 **Generated:** 2026-04-29
-**Last Updated:** 2026-05-14
-**Based on:** .design/main/PLAN.md v2.6.0
+**Last Updated:** 2026-05-17
+**Based on:** .design/main/PLAN.md v2.6.1
 **Based on RULES:** .design/RULES.md v1.3.0
 **Execution Mode:** Parallel (C3)
 **Status:** Active
@@ -27,7 +27,7 @@ Tactical registry of all phases and their statuses. Atomic checklists (`T-XXXX`)
 | [Phase 8](tasks/phase-8.md) | LR Scheduling Extension + CLI Binary — `ExponentialLR`, `cmd/gonn/` binary, v0.7.0 release | `Done` (2026-05-10) |
 | [Phase 9](archives/tasks/phase-9.md) | Metric Schedulers + Dynamic Topology + Observability Stack — `ReduceOnPlateau`, `OneCycleLR`, topology mutations, slog + viz HTTP server, v0.8.0 release | `Done (Archived)` (2026-05-10) |
 | [Phase 10](archives/tasks/phase-10.md) | Normalization Layers + Training Callbacks — `pkg/layer/norm/` (BatchNorm/LayerNorm/GroupNorm), `pkg/nn/callbacks.go`, v0.9.0 release | `Done (Archived)` (2026-05-12) |
-| [Phase 11](tasks/phase-11.md) | Meta-Learning Hooks + Convolutional Layers + Dataset Formats — `pkg/nn/meta.go`, `pkg/layer/conv/`, `pkg/dataset/mnist.go`, `pkg/nn/andtrain.go`, examples E06+E10, v0.10.0 release | `Todo` |
+| [Phase 11](tasks/phase-11.md) | Meta-Learning Hooks + Convolutional Layers + Dataset Formats — `pkg/nn/meta.go`, `pkg/layer/conv/`, `pkg/dataset/mnist.go`, `pkg/nn/andtrain.go`, examples E06+E10, v0.10.0 release | `In Progress` (8/14 — Track A blocked on l1-meta-learning-hooks RFC→Stable; Track B done; Track C T-11C04 pending IDX data) |
 
 ## Phase 0 — Already Complete
 
@@ -221,5 +221,5 @@ Six of the eight v0.6-gated entries (E03, E04, E05, E07, E08, E13) are now activ
 | `CHANGELOG.md` (v0.10.0 entry) | l1-release-policy v1.0.0 | `Todo` |
 | `v0.10.0` git tag | l1-release-policy v1.0.0 §5.4 | `Todo` |
 
-- **Last Updated**: 2026-05-14 (Trust Mode batch via magic.task: 4 Phase 11 specs promoted Draft → Stable; Tracks B + C unblocked. Track A remains Blocked.)
+- **Last Updated**: 2026-05-17 (Sync via magic.task: Phase 11 row Todo → In Progress reflecting 8/14 done. PLAN.md spec checkboxes remain `[ ]` per C10 until gate T-11Z01 closes. l2-meta-learning-impl remains Draft pending l1-meta-learning-hooks RFC→Stable review. Engine drift 2.1.25→2.1.27 acknowledged; snapshot kept stale per §1 n-branch.)
 - **Maintainer**: Core Team

@@ -1,9 +1,9 @@
 # Implementation Plan
 
-**Version:** 2.6.0
-**Project Version:** 0.10.0 (v0.10.0 scoped in Phase 11)
+**Version:** 2.6.1
+**Project Version:** 0.10.0 (v0.10.0 in progress — Phase 11 Tracks B+C green; Track A blocked; gate pending)
 **Generated:** 2026-04-29
-**Last Updated:** 2026-05-14
+**Last Updated:** 2026-05-17
 **Based on:** .design/main/INDEX.md v2.9.0
 **Based on RULES:** .design/RULES.md v1.3.0
 **Based on ROADMAP:** .design/main/ROADMAP.md v1.0.0
@@ -238,3 +238,4 @@ graph LR
 | 2.4.0 | 2026-05-11 | Phase 9 marked Done (v0.8.0 tagged). Phase 10 scoped: Track A (normalization layers: BatchNorm/LayerNorm/GroupNorm), Track B (training callbacks: CallbackRegistry/ErrStopTraining). l1-meta-learning-hooks promoted Draft→RFC v0.3.0 (moved to Backlog). VERSION_DRIFT l2-lr-scheduling-impl synced v1.1.0→v1.2.0. Based on INDEX.md v2.7.0. |
 | 2.5.0 | 2026-05-12 | Phase 10 marked Done (v0.9.0 tagged). Orphan l1-dynamic-topology.md resolved (added to tracked Backlog). Phase 11 scoped: Track A (Meta-Learning Hooks), Track B (Convolutional Layers), Track C (Dataset Formats + E06/E10). 5 new Draft specs registered. Based on INDEX.md v2.8.0. |
 | 2.6.0 | 2026-05-14 | Sync update via magic.task: Trust Mode batch promoted 4 Phase 11 specs to Stable (l1-conv-layers v1.0.0, l1-dataset-formats v1.0.0, l2-conv-layers-impl v0.1.0, l2-dataset-loader-impl v0.1.0). Tracks B + C unblocked for execution. Track A remains Blocked (l2-meta-learning-impl still Draft pending l1-meta-learning-hooks RFC review). Closes SYNC_GAP. Based on INDEX.md v2.9.0. |
+| 2.6.1 | 2026-05-17 | Sync via magic.task (no scope change): aligned header timestamp with TASKS.md v2.5.1 + STATE.md repair. PLAN.md spec checkboxes for Phase 11 remain `[ ]` per C10 (binary-on-phase-close); aggregate task progress (8/14) lives in TASKS.md row + phase-11.md frontmatter. No spec promotions; l2-meta-learning-impl stays Draft (parent l1-meta-learning-hooks still RFC). Engine drift 2.1.25→2.1.27 acknowledged but snapshot held stale per §1 n-branch. |

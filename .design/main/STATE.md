@@ -4,31 +4,32 @@
 <!-- Maximum 100 lines. Agent updates AFTER each completed action. -->
 
 **Workspace:** main
-**Project Version:** 0.9.0 (Phase 10 complete)
-**Updated:** 2026-05-14 12:34
-**Phase:** 11 — Meta-Learning Hooks + Convolutional Layers + Dataset Formats
-**Status:** Done
+**Project Version:** 0.9.0 released; 0.10.0 in progress (Phase 11 Tracks B+C nearly done)
+**Updated:** 2026-05-17 07:52
+**Phase:** 11 — Meta-Learning Hooks + Conv Layers + Dataset Formats
+**Status:** Active
 
 ## Current Position
 
-- **Task:** T-11B05 (conv prefix full integration into nn/network train+query)
-- **Spec:** l2-normalization-impl v0.1.0 + l2-callbacks-impl v0.1.0 fully implemented. CHANGELOG.md v0.9.0 written.
-- **Next Action:** Run /magic-run main to continue Phase 11: T-11C04 (E06 MNIST example — code template + README; needs user-supplied IDX data files), T-11T02/T-11T03 final integration validation, T-11Z01 Phase 11 gate (CHANGELOG v0.10.0 + v0.10.0 tag).
+- **Task:** T-11C04 (E06 MNIST example — code+README scaffold ready to write; smoke-run gated on user-supplied IDX data)
+- **Spec:** Track B (l2-conv-layers-impl v0.1.0) integrated end-to-end through compile/train/query. Track C (l2-dataset-loader-impl v0.1.0) IDXReader + MNISTLoader[T] + AndTrain live; examples/continuation/ smoke-clean. Track A (l2-meta-learning-impl v0.1.0) Draft — blocked on l1-meta-learning-hooks RFC→Stable.
+- **Next Action:** Run /magic-run main to close Phase 11: (a) T-11C04 (E06 MNIST example — needs user-supplied IDX data, but code+README can land first), (b) T-11T02/T-11T03 final validation, (c) gate T-11Z01 (build + race + ≥80% cover) + CHANGELOG v0.10.0 + v0.10.0 tag. Track A (Meta-Learning) remains blocked — promote l1-meta-learning-hooks RFC→Stable via /magic-spec when ready.
 
 ## Progress
 
 ```
-Phase 1 (Done):   [22/22]   ████████ 100%
-Phase 2 (Done):   [26/26]   ████████ 100%
-Phase 3 (Done):   [19/19]   ████████ 100%
-Phase 4 (Done):   [14/14]   ████████ 100%
-Phase 5 (Done):   [23/23]   ████████ 100%   (all tracks + gate complete)
-Phase 6 (Done):   [19/19]   ████████ 100%   (all tracks + validation + gate + tag)
-Phase 7 (Done):   [16/16]   ████████ 100%   (Tracks A+B+C + validation + gate)
-Phase 8 (Done):   [9/9]     ████████ 100%   (Track A: ExponentialLR + Track B: CLI binary + gate)
-Phase 9 (Done):   [15/15]   ████████ 100%   (Tracks A+B+C + validation + gate)
-Phase 10 (Done):  [10/10]   ████████ 100%   (Tracks A+B + validation + gate; norm + callbacks)
-Overall:          [173/173] ████████ 100%
+Phase 1  (Done):    [22/22]   ████████ 100%
+Phase 2  (Done):    [26/26]   ████████ 100%
+Phase 3  (Done):    [19/19]   ████████ 100%
+Phase 4  (Done):    [14/14]   ████████ 100%
+Phase 5  (Done):    [23/23]   ████████ 100%   (all tracks + gate complete)
+Phase 6  (Done):    [19/19]   ████████ 100%   (all tracks + validation + gate + tag)
+Phase 7  (Done):    [16/16]   ████████ 100%   (Tracks A+B+C + validation + gate)
+Phase 8  (Done):    [9/9]     ████████ 100%   (Track A: ExponentialLR + Track B: CLI binary + gate)
+Phase 9  (Done):    [15/15]   ████████ 100%   (Tracks A+B+C + validation + gate)
+Phase 10 (Done):    [10/10]   ████████ 100%   (Tracks A+B + validation + gate; norm + callbacks)
+Phase 11 (Active):  [8/14]    █████░░░  57%   (Track A 0/3 blocked; Track B 5/5 done; Track C 3/4 done + 1 pending; T-11T02 partial; T-11T03 + gate pending)
+Overall:            [181/187] ███████░  97%
 ```
 
 ## Recent Decisions
@@ -44,16 +45,17 @@ Overall:          [173/173] ████████ 100%
 
 ## Blockers
 
-- (none — Phase 10 complete)
+- **Track A (Meta-Learning)**: l1-meta-learning-hooks still RFC v0.3.0 — RFC→Stable review required via /magic-spec before T-11A01..T-11A03 can start (or mark them `[Deferred to Phase 12]` at gate per T-11Z01).
+- **T-11C04 (E06 MNIST)**: external — needs user-supplied `train-images-idx3-ubyte.gz` + `train-labels-idx1-ubyte.gz`. Code template + README can land first; smoke-run deferred.
 
 ## Blocking Constraints
 
-- (none — all tracks green, phase gate passed)
-- Note: race detector requires CGO on Windows (gcc not in PATH); tests run without -race.
-- Note: TestPauseResumeCycle + TestMultiHiddenXOR are pre-existing timing-flaky tests unrelated to Phase 10.
+- Note: race detector requires CGO on Windows (gcc not in PATH); tests run without -race locally — gate T-11Z01 must run -race in CI.
+- Note: TestPauseResumeCycle + TestMultiHiddenXOR + TestRepeatBuilderBenchmark100Layer are pre-existing timing-flaky tests, unaffected by Phase 11 work.
+- **Engine drift**: `.magic/.version` = 2.1.27 vs INDEX.md snapshot 2.1.25 — acknowledged but snapshot held stale per §1 n-branch. Run /magic-analyze when ready to revalidate.
 
 ## Session Continuity
 
-**Last Session Ended:** 2026-05-12
+**Last Session Ended:** 2026-05-17 (sync via /magic-task — no execution)
 **Handoff File:** none
-**Bootstrap Mode:** false (Phase 10 complete; next = tag v0.9.0 + plan Phase 11)
+**Bootstrap Mode:** false (Phase 11 mid-flight; next = /magic-run main for T-11C04 + T-11T03 + gate)

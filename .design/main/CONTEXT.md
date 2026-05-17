@@ -1,6 +1,6 @@
 # Project Context
 
-**Generated:** 2026-05-14
+**Generated:** 2026-05-17
 
 ## Active Technologies
 
@@ -11,15 +11,19 @@
 ```plaintext
 .
 ├── .design/
+│   ├── .cache/
 │   ├── .graph-cache/
+│   ├── .version
 │   ├── RULES.md
 │   ├── main/
+│   ├── spec-graph.html
 │   ├── wiki/
 │   └── workspace.json
 ├── examples/
 │   ├── README.md
 │   ├── binary_classification/
 │   ├── callbacks/
+│   ├── continuation/
 │   ├── higher_order_options/
 │   ├── iris/
 │   ├── logic_gates/
@@ -41,7 +45,6 @@
     ├── network/
     ├── neuron/
     ├── nn/
-    ├── nn.json
     ├── optimizer/
     ├── persistence/
     ├── regularizer/
