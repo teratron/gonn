@@ -1,6 +1,6 @@
 # Workspace Specifications Registry
 
-**Version:** 2.9.0
+**Version:** 2.10.0
 **Status:** Active
 **Engine Version:** 2.1.25
 
@@ -25,7 +25,7 @@ Local registry of specifications for this workspace.
 | [l1-data-streaming.md](specifications/l1-data-streaming.md) | Streaming dataset abstraction and bounded memory contract | Stable | L1 | 1.0.0 |
 | [l1-compute-backend.md](specifications/l1-compute-backend.md) | Pluggable compute backend (CPU baseline + GPU future) | Stable | L1 | 1.0.0 |
 | [l1-dynamic-topology.md](specifications/l1-dynamic-topology.md) | Dynamic mode — layer/neuron mutation lifecycle with transaction protocol | Stable | L1 | 0.2.0 |
-| [l1-meta-learning-hooks.md](specifications/l1-meta-learning-hooks.md) | Universal parameter access for recursive self-optimization via inner-network | RFC | L1 | 0.3.0 |
+| [l1-meta-learning-hooks.md](specifications/l1-meta-learning-hooks.md) | Universal parameter access for recursive self-optimization via inner-network | Stable | L1 | 1.0.0 |
 | [l2-nn-facade.md](specifications/l2-nn-facade.md) | Public API facade — dual-style fluent API (Builder + Functional Options) | Stable | L2 | 2.0.0 |
 | [l2-network-graph.md](specifications/l2-network-graph.md) | Internal computational graph — Network[T] and bundles | Stable | L2 | 1.1.0 |
 | [l2-layer-types.md](specifications/l2-layer-types.md) | Layer type hierarchy — Input, Dense, Output | Stable | L2 | 1.1.0 |
@@ -64,11 +64,11 @@ Local registry of specifications for this workspace.
 | [l2-callbacks-impl.md](specifications/l2-callbacks-impl.md) | Go realization of training callbacks — pkg/nn/callbacks.go + train.go integration | Stable | L2 | 0.1.0 |
 | [l1-conv-layers.md](specifications/l1-conv-layers.md) | 1-D convolutional layer contract — Conv1D / MaxPool1D / Flatten with 9 invariants | Stable | L1 | 1.0.0 |
 | [l1-dataset-formats.md](specifications/l1-dataset-formats.md) | IDX binary format + AndTrain continuation contract | Stable | L1 | 1.0.0 |
-| [l2-meta-learning-impl.md](specifications/l2-meta-learning-impl.md) | Go realization of meta-learning hooks — pkg/nn/meta.go (blocked on l1-meta-learning-hooks Stable) | Draft | L2 | 0.1.0 |
+| [l2-meta-learning-impl.md](specifications/l2-meta-learning-impl.md) | Go realization of meta-learning hooks — pkg/nn/meta.go | Stable | L2 | 0.1.0 |
 | [l2-conv-layers-impl.md](specifications/l2-conv-layers-impl.md) | Go realization of convolutional layers — pkg/layer/conv/ (Conv1D/MaxPool1D/Flatten) | Stable | L2 | 0.1.0 |
 | [l2-dataset-loader-impl.md](specifications/l2-dataset-loader-impl.md) | Go realization of dataset formats — pkg/dataset/mnist.go + pkg/nn/andtrain.go | Stable | L2 | 0.1.0 |
 
 ## Meta Information
 
 - **Maintainer**: Core Team
-- **Last Updated**: 2026-05-14 (Trust Mode batch promotion via magic.task: l1-conv-layers Draft v0.1.0 → Stable v1.0.0, l1-dataset-formats Draft v0.1.0 → Stable v1.0.0, l2-conv-layers-impl Draft → Stable v0.1.0, l2-dataset-loader-impl Draft → Stable v0.1.0. l2-meta-learning-impl remains Draft pending l1-meta-learning-hooks RFC→Stable review via magic.spec.)
+- **Last Updated**: 2026-05-17 (magic-spec cascade promotion: l1-meta-learning-hooks RFC v0.3.0 → Stable v1.0.0 (8 TBDs closed in v0.3.0; META-1..META-7 invariants frozen; safety model authoritative). L2 child cascade: l2-meta-learning-impl Draft v0.1.0 → Stable v0.1.0 (`## Canonical References` section added to pass CANONICAL_MISSING gate). Unblocks Phase 12 Track A scoping via next `/magic-task` run. INDEX v2.9.0 → v2.10.0.)

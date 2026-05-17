@@ -1,7 +1,7 @@
 # Meta-Learning Hooks
 
-**Version:** 0.3.0
-**Status:** RFC
+**Version:** 1.0.0
+**Status:** Stable
 **Layer:** concept
 
 ## Overview
@@ -284,3 +284,4 @@ outer network compilation. This prevents runtime shape errors.
 | 0.1.0 | 2026-04-27 | Initial Draft from TODO #14 — most experimental of the batch. |
 | 0.2.0 | 2026-05-01 | [MODIFIED] Universal parameter access: ParamDescriptor catalog, ParamAccessor interface, TuningContext v2, MetaConfig wiring, 9 parameter categories (scalar through raw weights), safety model diagram, META-5..META-7 invariants. v0.5.0 Tunable preserved as compatibility wrapper. From TODO #26. |
 | 0.3.0 | 2026-05-11 | [MODIFIED] Draft → RFC. Closed all 8 design TBDs: TuningContext schema frozen, meta-loss definition, serialization contract (nested JSON), ApplyAt cost model (EpochBarrier default), lazy stat caching, multi-objective deferred to v2, structural routing via dynamic-topology API, auto-sizing via compile-time dimension check. Added l1-training-callbacks to Related Specifications. |
+| 1.0.0 | 2026-05-17 | [MODIFIED] RFC → Stable via magic-spec promotion. All 7 invariants (META-1..META-7) frozen, 9 parameter categories ratified, safety model diagram authoritative. Unblocks l2-meta-learning-impl Trust Mode promotion and Phase 12 Track A scoping. No content changes from v0.3.0 — formal first stable cut. |

@@ -1,12 +1,9 @@
 # Meta-Learning Hooks — Go Implementation
 
 **Version:** 0.1.0
-**Status:** Draft
+**Status:** Stable
 **Layer:** implementation
 **Implements:** l1-meta-learning-hooks.md
-
-<!-- NOTE: Cannot reach RFC until l1-meta-learning-hooks.md is promoted from RFC → Stable.
-     Blocked on explicit user review per RULES.md §2. -->
 
 ## Overview
 
@@ -18,7 +15,7 @@ at each iteration rather than read from static config fields.
 
 ## Related Specifications
 
-- [l1-meta-learning-hooks.md](l1-meta-learning-hooks.md) — L1 parent (RFC v0.3.0, promotion pending)
+- [l1-meta-learning-hooks.md](l1-meta-learning-hooks.md) — L1 parent (Stable v1.0.0)
 - [l2-nn-facade.md](l2-nn-facade.md) — `WithMetaLearner` is a new functional option on `*NN[T]`
 - [l2-training-loop.md](l2-training-loop.md) — train.go integration point for per-iteration hook
 - [l2-callbacks-impl.md](l2-callbacks-impl.md) — `OnImprovementFound` can surface meta-learning signals
@@ -111,8 +108,18 @@ func WithMetaLearner[T utils.Float](ml *MetaLearner[T]) Option[T]
 4. `pkg/nn/train.go` — single `if nn.cfg.MetaLearner != nil { nn.cfg.MetaLearner.step(...) }` call after opt.Step.
 5. `pkg/utils/errors.go` — add `ErrMetaLearnerShape`, `ErrMetaLearnerRunning` sentinels.
 
+## Canonical References
+
+| Alias | Path | Purpose |
+| :--- | :--- | :--- |
+| `[META]` | `pkg/nn/meta.go` (new) | `ParamAccessor[T]`, `ScalarParam[T]`, `SliceParam[T]`, `MetaLearner[T]` types and `step` integration glue |
+| `[METAOPT]` | `pkg/nn/options.go` | `WithMetaLearner[T]` functional option (Phase 12) |
+| `[METAERR]` | `pkg/utils/errors.go` | `ErrMetaLearnerShape`, `ErrMetaLearnerRunning` sentinels |
+| `[METAHOOK]` | `pkg/nn/train.go` | Single-line meta hook after `opt.Step`, before `fireEvent(OnIterationEnd)` |
+
 ## Document History
 
 | Version | Date | Description |
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-05-12 | Initial Draft — blocked on l1-meta-learning-hooks RFC→Stable. |
+| 0.1.0 | 2026-05-17 | [MODIFIED] Draft → Stable via magic-spec cascade after L1 parent promoted to Stable v1.0.0. Added `## Canonical References` section (CANONICAL_MISSING gate). No version bump — content is unchanged from initial Draft; added section is a required structural element for Stable status, not new behaviour. Unblocks Phase 12 Track A planning. |
