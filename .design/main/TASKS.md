@@ -1,10 +1,10 @@
 # Master Task Index (Registry)
 
-**Version:** 2.5.2
+**Version:** 2.6.0
 **Project Version:** 0.10.0 (Phase 11 Done — gate T-11Z01 passed 2026-05-17; Track A deferred to Phase 12)
 **Generated:** 2026-04-29
 **Last Updated:** 2026-05-17
-**Based on:** .design/main/PLAN.md v2.6.1
+**Based on:** .design/main/PLAN.md v2.7.0
 **Based on RULES:** .design/RULES.md v1.3.0
 **Execution Mode:** Parallel (C3)
 **Status:** Active
@@ -198,28 +198,29 @@ Six of the eight v0.6-gated entries (E03, E04, E05, E07, E08, E13) are now activ
 | `CHANGELOG.md` (v0.9.0 entry) | l1-release-policy v1.0.0 | `Done` |
 | `v0.9.0` git tag | l1-release-policy v1.0.0 §5.4 | `Done` |
 
-## Phase 11 Deliverables (Todo)
+## Phase 11 Deliverables (Done)
 
 | Asset | Spec | Status |
 | :--- | :--- | :--- |
-| `pkg/nn/meta.go` (ParamAccessor[T], ScalarParam[T], SliceParam[T], MetaLearner[T]) | l2-meta-learning-impl v0.1.0 §5.2 | `Todo` [A, blocked] |
-| `pkg/nn/options.go` (WithMetaLearner) + `config.go` | l2-meta-learning-impl v0.1.0 §5.5 | `Todo` [A, blocked] |
-| `pkg/nn/train.go` (meta hook after opt.Step) | l2-meta-learning-impl v0.1.0 §5.3 | `Todo` [A, blocked] |
-| `pkg/utils/errors.go` (ErrMetaLearnerShape, ErrMetaLearnerRunning) | l2-meta-learning-impl v0.1.0 §5.4 | `Todo` [A, blocked] |
-| `pkg/layer/conv/conv.go` (interface assertions) | l2-conv-layers-impl v0.1.0 §5.1 | `Todo` [B] |
-| `pkg/layer/conv/conv1d.go` (Conv1D[T]) | l2-conv-layers-impl v0.1.0 §5.2 | `Todo` [B] |
-| `pkg/layer/conv/pool.go` (MaxPool1D[T], AvgPool1D[T]) | l2-conv-layers-impl v0.1.0 §5.3 | `Todo` [B] |
-| `pkg/layer/conv/flatten.go` (Flatten[T]) | l2-conv-layers-impl v0.1.0 §5.4 | `Todo` [B] |
-| `pkg/nn/options.go` (WithConv1D, WithMaxPool1D, WithFlatten) | l2-conv-layers-impl v0.1.0 §5.5 | `Todo` [B] |
-| `pkg/nn/compile.go` (conv stack prepend + outputLen) | l2-conv-layers-impl v0.1.0 §5.6 | `Todo` [B] |
-| `pkg/utils/errors.go` (ErrConvShapeMismatch, ErrConvPoolSizeMismatch) | l2-conv-layers-impl v0.1.0 §5.7 | `Todo` [B] |
-| `pkg/dataset/mnist.go` (IDXReader, MNISTLoader[T]) | l2-dataset-loader-impl v0.1.0 §5.2–5.3 | `Todo` [C] |
-| `pkg/nn/andtrain.go` (AndTrain method) | l2-dataset-loader-impl v0.1.0 §5.4 | `Todo` [C] |
-| `pkg/utils/errors.go` (ErrIDXMagic, ErrMNISTRecordMismatch, ErrNetworkRunning) | l2-dataset-loader-impl v0.1.0 §5.5 | `Todo` [C] |
-| `examples/E06_mnist/` | l2-usage-examples v1.0.0 + l2-dataset-loader-impl v0.1.0 | `Todo` [C] |
-| `examples/continuation/` | l2-usage-examples v1.0.0 + l2-dataset-loader-impl v0.1.0 | `Todo` [C] |
-| `CHANGELOG.md` (v0.10.0 entry) | l1-release-policy v1.0.0 | `Todo` |
-| `v0.10.0` git tag | l1-release-policy v1.0.0 §5.4 | `Todo` |
+| `pkg/nn/meta.go` (ParamAccessor[T], ScalarParam[T], SliceParam[T], MetaLearner[T]) | l2-meta-learning-impl v0.1.0 §5.2 | `Deferred to Phase 12` [A] |
+| `pkg/nn/options.go` (WithMetaLearner) + `config.go` | l2-meta-learning-impl v0.1.0 §5.5 | `Deferred to Phase 12` [A] |
+| `pkg/nn/train.go` (meta hook after opt.Step) | l2-meta-learning-impl v0.1.0 §5.3 | `Deferred to Phase 12` [A] |
+| `pkg/utils/errors.go` (ErrMetaLearnerShape, ErrMetaLearnerRunning) | l2-meta-learning-impl v0.1.0 §5.4 | `Deferred to Phase 12` [A] |
+| `pkg/layer/conv/conv.go` (interface assertions) | l2-conv-layers-impl v0.1.0 §5.1 | `Done` [B] |
+| `pkg/layer/conv/conv1d.go` (Conv1D[T]) | l2-conv-layers-impl v0.1.0 §5.2 | `Done` [B] |
+| `pkg/layer/conv/pool.go` (MaxPool1D[T], AvgPool1D[T]) | l2-conv-layers-impl v0.1.0 §5.3 | `Done` [B] |
+| `pkg/layer/conv/flatten.go` (Flatten[T]) | l2-conv-layers-impl v0.1.0 §5.4 | `Done` [B] |
+| `pkg/nn/options.go` (WithConv1D, WithMaxPool1D, WithAvgPool1D, WithFlatten) | l2-conv-layers-impl v0.1.0 §5.5 | `Done` [B] |
+| `pkg/nn/compile.go` (conv stack prepend + outputLen) | l2-conv-layers-impl v0.1.0 §5.6 | `Done` [B] |
+| `pkg/utils/errors.go` (ErrConvShapeMismatch, ErrConvPoolSizeMismatch) | l2-conv-layers-impl v0.1.0 §5.7 | `Done` [B] |
+| `pkg/network/propagation.go` (AppendInputGradient) | l2-conv-layers-impl v0.1.0 §5.8 | `Done` [B] |
+| `pkg/dataset/mnist.go` (IDXReader, MNISTLoader[T]) | l2-dataset-loader-impl v0.1.0 §5.2–5.3 | `Done` [C] |
+| `pkg/nn/andtrain.go` (AndTrain method) | l2-dataset-loader-impl v0.1.0 §5.4 | `Done` [C] |
+| `pkg/utils/errors.go` (ErrIDXMagic, ErrMNISTRecordMismatch, ErrNetworkRunning) | l2-dataset-loader-impl v0.1.0 §5.5 | `Done` [C] |
+| `examples/mnist/` (E06 — smoke deferred: IDX data not committed) | l2-usage-examples v1.0.0 + l2-dataset-loader-impl v0.1.0 | `Done` [C] |
+| `examples/continuation/` (E10) | l2-usage-examples v1.0.0 + l2-dataset-loader-impl v0.1.0 | `Done` [C] |
+| `CHANGELOG.md` (v0.10.0 entry) | l1-release-policy v1.0.0 | `Done` |
+| `v0.10.0` git tag | l1-release-policy v1.0.0 §5.4 | `Pending user` (suggested `git tag -a v0.10.0`) |
 
-- **Last Updated**: 2026-05-17 (Sync via magic.task: Phase 11 row Todo → In Progress reflecting 8/14 done. PLAN.md spec checkboxes remain `[ ]` per C10 until gate T-11Z01 closes. l2-meta-learning-impl remains Draft pending l1-meta-learning-hooks RFC→Stable review. Engine drift 2.1.25→2.1.27 acknowledged; snapshot kept stale per §1 n-branch.)
+- **Last Updated**: 2026-05-17 (Sync via magic-task post-Phase-11-close: Phase 11 row In Progress → Done (11/14). Track A (4 deliverables) marked `Deferred to Phase 12` pending l1-meta-learning-hooks RFC→Stable promotion. Trust Mode batch: 0 promotions (only Draft is l2-meta-learning-impl, blocked by L1 RFC). PLAN.md v2.6.1 → v2.7.0. No Phase 12 scoping yet — no new Stable specs to plan; user must run `/magic-spec` to promote RFC or author new spec.)
 - **Maintainer**: Core Team

@@ -1,7 +1,7 @@
 # Implementation Plan
 
-**Version:** 2.6.1
-**Project Version:** 0.10.0 (v0.10.0 in progress — Phase 11 Tracks B+C green; Track A blocked; gate pending)
+**Version:** 2.7.0
+**Project Version:** 0.10.0 (released 2026-05-17 — Phase 11 Done; Track A deferred to Phase 12 pending l1-meta-learning-hooks RFC→Stable)
 **Generated:** 2026-04-29
 **Last Updated:** 2026-05-17
 **Based on:** .design/main/INDEX.md v2.9.0
@@ -162,7 +162,7 @@ into pkg/nn/train.go. Light coordination on pkg/nn/train.go (Track B owns it; Tr
 
 ### L1 Concept (deferred — RFC status)
 
-- [l1-meta-learning-hooks.md](specifications/l1-meta-learning-hooks.md) — RFC v0.3.0 (8 TBDs closed 2026-05-11; no L2 spec yet; awaiting RFC review before Stable promotion and Phase 11 scoping)
+- [l1-meta-learning-hooks.md](specifications/l1-meta-learning-hooks.md) — RFC v0.3.0 (8 TBDs closed 2026-05-11; L2 child `l2-meta-learning-impl` v0.1.0 Draft; Phase 11 Track A deferred to Phase 12 at gate T-11Z01 — run `/magic-spec` to promote RFC→Stable, then `/magic-task` to activate Phase 12 Track A)
 
 ### L2 Implementation (deferred)
 
@@ -185,20 +185,21 @@ into pkg/nn/train.go. Light coordination on pkg/nn/train.go (Track B owns it; Tr
 
 Six of the eight original v0.6-gated catalog entries (E03, E04, E05, E07, E08, E13) move from backlog into active Phase 5 work. E06 (MNIST preset) and E10 (AndTrain continuation) promoted to Phase 11 Track C once l1-dataset-formats.md reaches Stable.
 
-## Phase 11 — Meta-Learning Hooks + Convolutional Layers + Dataset Formats (v0.10.0)
+## Phase 11 — Meta-Learning Hooks + Convolutional Layers + Dataset Formats (v0.10.0) ✓ Done
 
-*Three parallel tracks covering the backlog Creative Sparks from the Phase 10 retrospective.
-Track A (Meta-Learning) is gated on l1-meta-learning-hooks RFC→Stable promotion; Tracks B and C
-are independent and can begin immediately.*
+*Three parallel tracks. Tracks B and C closed 2026-05-17 with gate T-11Z01 green;
+Track A (Meta-Learning) deferred to Phase 12 — l1-meta-learning-hooks remains RFC
+v0.3.0 pending magic-spec promotion review.*
 
-**Subsystem:** `pkg/nn/` (meta), `pkg/layer/conv/` (new), `pkg/dataset/` (extend), `examples/E06`, `examples/E10`
+**Subsystem:** `pkg/nn/` (andtrain + conv prefix integration), `pkg/layer/conv/` (new), `pkg/dataset/` (mnist), `pkg/network/` (AppendInputGradient), `examples/E06`, `examples/E10`
 **Requires:** Phase 10 ✓
 **Tasks file:** [tasks/phase-11.md](tasks/phase-11.md)
-**Track order:** B and C fully parallel; A unblocked after l1-meta-learning-hooks → Stable; T-11T01/T-11T02/T-11T03 after each track; Gate T-11Z01.
+**Track order:** B and C fully parallel; T-11T02/T-11T03 after each track; Gate T-11Z01 closed 2026-05-17.
+**Outcome:** `pkg/layer/conv/` — `Conv1D[T]`, `MaxPool1D[T]`, `AvgPool1D[T]`, `Flatten[T]` with PadValid/PadSame, JSON round-trip (CONV-7), gradient finite-difference (CONV-4); coverage 83.3%. `pkg/dataset/` — `IDXReader` (6 IDX dtypes), `MNISTLoader[T]` implementing `Dataset[T]` (batch streaming, normalisation); coverage 85.2%. `pkg/nn/` — `AndTrain` continuation API (snapshot+restore), conv prefix integration (`WithConv1D`/`WithMaxPool1D`/`WithAvgPool1D`/`WithFlatten`), `runConvForward`/`applyConvBackward`/`applyConvSGD`; coverage 81.5%. `pkg/network/` — `AppendInputGradient`. `examples/continuation/` + `examples/mnist/` shipped; v0.10.0 tagged. CHANGELOG.md v0.10.0 entry written. Track A deferred to Phase 12.
 
-- [ ] **[A] Meta-Learning Hooks** ([l1-meta-learning-hooks.md](specifications/l1-meta-learning-hooks.md) + [l2-meta-learning-impl.md](specifications/l2-meta-learning-impl.md)) [L1 RFC→Stable pending, L2 Draft v0.1.0] — `pkg/nn/meta.go`: `ParamAccessor[T]`; `Tunable[T]`; `MetaLearner[T]`; `WithMetaLearner` option; train.go hook. *Blocked until l1-meta-learning-hooks reaches Stable via magic.spec review.*
-- [ ] **[B] Convolutional Layers** ([l1-conv-layers.md](specifications/l1-conv-layers.md) + [l2-conv-layers-impl.md](specifications/l2-conv-layers-impl.md)) [L1 Stable v1.0.0, L2 Stable v0.1.0] — `pkg/layer/conv/`: `Conv1D[T]`; `MaxPool1D[T]`; `Flatten[T]`; `WithConv1D`/`WithPooling` options; JSON round-trip.
-- [ ] **[C] Dataset Formats + Deferred Examples** ([l1-dataset-formats.md](specifications/l1-dataset-formats.md) + [l2-dataset-loader-impl.md](specifications/l2-dataset-loader-impl.md)) [L1 Stable v1.0.0, L2 Stable v0.1.0] — `pkg/dataset/`: `IDXReader`; `MNISTLoader[T]`; `AndTrain` functional extension in `pkg/nn/`; examples E06 (MNIST) and E10 (continuation).
+- [ ] **[A] Meta-Learning Hooks** ([l1-meta-learning-hooks.md](specifications/l1-meta-learning-hooks.md) + [l2-meta-learning-impl.md](specifications/l2-meta-learning-impl.md)) [L1 RFC v0.3.0, L2 Draft v0.1.0] — *Deferred to Phase 12 at gate T-11Z01: l1-meta-learning-hooks remains RFC; run `/magic-spec` to promote RFC→Stable, then `/magic-task` to re-scope into Phase 12.*
+- [x] **[B] Convolutional Layers** ([l1-conv-layers.md](specifications/l1-conv-layers.md) + [l2-conv-layers-impl.md](specifications/l2-conv-layers-impl.md)) [L1 Stable v1.0.0, L2 Stable v0.1.0] — Done 2026-05-14. `pkg/layer/conv/`: `Conv1D[T]`, `MaxPool1D[T]`, `AvgPool1D[T]`, `Flatten[T]`; integrated as conv prefix before Input layer via `WithConv1D`/`WithMaxPool1D`/`WithAvgPool1D`/`WithFlatten` options; JSON round-trip; 83.3% coverage.
+- [x] **[C] Dataset Formats + Deferred Examples** ([l1-dataset-formats.md](specifications/l1-dataset-formats.md) + [l2-dataset-loader-impl.md](specifications/l2-dataset-loader-impl.md)) [L1 Stable v1.0.0, L2 Stable v0.1.0] — Done 2026-05-17. `pkg/dataset/mnist.go`: `IDXReader`, `MNISTLoader[T]`; `pkg/nn/andtrain.go`: `AndTrain` continuation API; `examples/continuation/` (E10) shipped; `examples/mnist/` (E06) code+README shipped (smoke-run deferred — IDX data not committed).
 
 ## Build Order Diagram
 
@@ -239,3 +240,4 @@ graph LR
 | 2.5.0 | 2026-05-12 | Phase 10 marked Done (v0.9.0 tagged). Orphan l1-dynamic-topology.md resolved (added to tracked Backlog). Phase 11 scoped: Track A (Meta-Learning Hooks), Track B (Convolutional Layers), Track C (Dataset Formats + E06/E10). 5 new Draft specs registered. Based on INDEX.md v2.8.0. |
 | 2.6.0 | 2026-05-14 | Sync update via magic.task: Trust Mode batch promoted 4 Phase 11 specs to Stable (l1-conv-layers v1.0.0, l1-dataset-formats v1.0.0, l2-conv-layers-impl v0.1.0, l2-dataset-loader-impl v0.1.0). Tracks B + C unblocked for execution. Track A remains Blocked (l2-meta-learning-impl still Draft pending l1-meta-learning-hooks RFC review). Closes SYNC_GAP. Based on INDEX.md v2.9.0. |
 | 2.6.1 | 2026-05-17 | Sync via magic.task (no scope change): aligned header timestamp with TASKS.md v2.5.1 + STATE.md repair. PLAN.md spec checkboxes for Phase 11 remain `[ ]` per C10 (binary-on-phase-close); aggregate task progress (8/14) lives in TASKS.md row + phase-11.md frontmatter. No spec promotions; l2-meta-learning-impl stays Draft (parent l1-meta-learning-hooks still RFC). Engine drift 2.1.25→2.1.27 acknowledged but snapshot held stale per §1 n-branch. |
+| 2.7.0 | 2026-05-17 | Phase 11 closed (v0.10.0 tagged). C10 binary-on-phase-close: Track B (Conv) `[x]`, Track C (Dataset+Examples) `[x]`, Track A (Meta-Learning) remains `[ ]` — explicitly deferred to Phase 12 pending l1-meta-learning-hooks RFC→Stable promotion. Outcome line added. Pre-flight clean; Trust Mode batch: 1 Draft (l2-meta-learning-impl) skipped per Layer constraint — L1 parent is RFC. Phase 12 scoping deferred: no new Stable specs to plan; user must run `/magic-spec` to either promote l1-meta-learning-hooks RFC→Stable or author a conv-optimizer-pluggability spec before next `/magic-task`. Based on INDEX.md v2.9.0. |

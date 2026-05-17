@@ -11,7 +11,6 @@
 ```plaintext
 .
 ├── .design/
-│   ├── .cache/
 │   ├── .graph-cache/
 │   ├── .version
 │   ├── RULES.md
@@ -27,6 +26,7 @@
 │   ├── higher_order_options/
 │   ├── iris/
 │   ├── logic_gates/
+│   ├── mnist/
 │   ├── perceptron/
 │   ├── persistence/
 │   ├── precision/
