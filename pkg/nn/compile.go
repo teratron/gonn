@@ -121,6 +121,13 @@ func compile[T utils.Float](n *NN[T], cfg *Config[T]) error {
 	}
 	n.callbacks = cfg.Callbacks
 
+	// Validate MetaLearner: reject if the outer network is currently training
+	// (META-state guard per l2-meta-learning-impl §5.4, ErrMetaLearnerRunning).
+	if cfg.MetaLearner != nil && n.control.Load() != controlIdle {
+		return utils.Newf(utils.ErrMetaLearnerRunning,
+			"compile: WithMetaLearner cannot be applied while the network is training")
+	}
+
 	startProfilingServer(cfg.ProfilingAddr)
 	if err := startVisServer(n, cfg); err != nil {
 		return err

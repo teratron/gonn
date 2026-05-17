@@ -607,6 +607,23 @@ func WithOnImprovementFound[T utils.Float](fn CallbackFn[T]) Option[T] {
 	}
 }
 
+// WithMetaLearner attaches an inner network that tunes the outer network's
+// registered hyperparameters at each training iteration. ml must be fully
+// constructed (inner *NN[T] Operational, params registered) before Compile.
+// The option is rejected with ErrMetaLearnerRunning if the outer network is
+// already training at compile time.
+//
+// AI-Meta:
+//   - Purpose: Attach a MetaLearner to the outer NN for recursive self-optimization.
+//   - Usage: nn.New[float32](WithMetaLearner[float32](ml), ...).
+//   - Related: [Option], [MetaLearner], [ParamAccessor].
+//   - Stability: Stable.
+func WithMetaLearner[T utils.Float](ml *MetaLearner[T]) Option[T] {
+	return func(cfg *Config[T]) {
+		cfg.MetaLearner = ml
+	}
+}
+
 // WithOnTrainEnd registers fn to be called when Fit returns, regardless of
 // how training ended (normal completion, ErrStopTraining, error, or panic).
 // The CallbackContext.StopReason field is set (CB-8 guarantee).

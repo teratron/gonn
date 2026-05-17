@@ -293,6 +293,15 @@ func (n *NN[T]) Fit(dataset []Sample[T]) (uint, T, error) {
 			}
 		}
 
+		// Meta-learner hook: advisory per-epoch hyperparameter update.
+		// Executes after opt.Step (inside trainStep) and before OnIterationEnd.
+		// Errors are logged at Warn level and do NOT abort training (META-advisory).
+		if n.cfg.MetaLearner != nil {
+			if mlErr := n.cfg.MetaLearner.step(mean, int(epoch), int(n.cfg.MaxIterations)); mlErr != nil {
+				log.Warn("meta-learner step failed", "error", mlErr)
+			}
+		}
+
 		// Dispatch OnIterationEnd after the weight update block (CB-9).
 		if n.callbacks != nil {
 			snap := snapshotFromWeights(snapshot, epoch)

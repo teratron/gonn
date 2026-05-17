@@ -4,16 +4,16 @@
 <!-- Maximum 100 lines. Agent updates AFTER each completed action. -->
 
 **Workspace:** main
-**Project Version:** 0.10.0 released; 0.11.0 in progress (Phase 12 scoped — Meta-Learning Hooks)
-**Updated:** 2026-05-17 13:00
+**Project Version:** 0.11.0 released
+**Updated:** 2026-05-17 12:30
 **Phase:** 12 — Meta-Learning Hooks
-**Status:** Todo
+**Status:** Done
 
 ## Current Position
 
-- **Task:** Phase 12 scoped. Single-track A — Meta-Learning Hooks. 5 atomic tasks (T-12A01..A03 + T-12T01 + T-12Z01).
-- **Spec:** l1-meta-learning-hooks Stable v1.0.0 + l2-meta-learning-impl Stable v0.1.0 — both unblocked via magic-spec cascade.
-- **Next Action:** Run `/magic-run` (or `/magic-run main`) to begin T-12A01: create `pkg/nn/meta.go` with `ParamAccessor[T]` interface, `ScalarParam[T]`/`SliceParam[T]` wrappers, `MetaLearner[T]` struct, and the two new sentinels in `pkg/utils/errors.go`.
+- **Task:** T-12Z01 Phase 12 gate complete. All 5 tasks done.
+- **Spec:** l1-meta-learning-hooks Stable v1.0.0 + l2-meta-learning-impl Stable v0.1.0.
+- **Next Action:** Phase 13 (not yet scoped). Run `/magic-task main` to plan next phase.
 
 ## Progress
 
@@ -29,8 +29,8 @@ Phase 8  (Done):    [9/9]     ████████ 100%   (Track A: Exponent
 Phase 9  (Done):    [15/15]   ████████ 100%   (Tracks A+B+C + validation + gate)
 Phase 10 (Done):    [10/10]   ████████ 100%   (Tracks A+B + validation + gate; norm + callbacks)
 Phase 11 (Done):    [11/14]   ███████░  79%   (Track A 0/3 deferred Phase 12; Track B 5/5 done; Track C 5/5 done; T-11T02+T-11T03+T-11Z01 done)
-Phase 12 (Todo):    [0/5]     ░░░░░░░░   0%   (Track A 0/3; T-12T01 + T-12Z01 pending)
-Overall:            [184/192] ███████░  96%
+Phase 12 (Done):    [5/5]     ████████ 100%   (Track A 3/3 done; T-12T01 + T-12Z01 done)
+Overall:            [189/192] ████████  98%
 ```
 
 ## Recent Decisions
@@ -54,8 +54,12 @@ Overall:            [184/192] ███████░  96%
 - Note: TestPauseResumeCycle + TestMultiHiddenXOR + TestRepeatBuilderBenchmark100Layer are pre-existing timing-flaky tests, unaffected by Phase 11 work.
 - **Engine drift**: `.magic/.version` = 2.1.27 vs INDEX.md snapshot 2.1.25 — acknowledged but snapshot held stale per §1 n-branch. Run /magic-analyze when ready to revalidate.
 
+## Recent Decisions
+
+- 2026-05-17 **Decision:** Phase 12 complete. Track A: `pkg/nn/meta.go` — `ParamAccessor[T]`, `ScalarParam[T]`, `SliceParam[T]`, `FeatureFunc[T]`, `DefaultFeatureFunc[T]`, `MetaLearner[T]` with `step()` (continue-on-error); `pkg/utils/errors.go` — `ErrMetaLearnerShape`, `ErrMetaLearnerRunning`; `pkg/nn/config.go` + `options.go` — `MetaLearner` field + `WithMetaLearner` option + `ErrMetaLearnerRunning` compile guard; `pkg/nn/train.go` — advisory hook in Fit after opt.Step before OnIterationEnd; `pkg/nn/meta_test.go` — 14 tests; `pkg/nn` coverage 82.2 %. CHANGELOG.md v0.11.0 written. Gate T-12Z01: `go build ./...` clean; all 19 packages green; `pkg/nn` ≥ 80 %.
+
 ## Session Continuity
 
-**Last Session Ended:** 2026-05-17 (Phase 12 scoped via magic-task after magic-spec cascade)
+**Last Session Ended:** 2026-05-17 (Phase 12 complete — v0.11.0 gate passed)
 **Handoff File:** none
-**Bootstrap Mode:** false (Phase 12 Todo; next = /magic-run main to begin T-12A01)
+**Bootstrap Mode:** false (Phase 12 Done; next = /magic-task main to scope Phase 13)

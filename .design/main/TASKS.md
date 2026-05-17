@@ -1,7 +1,7 @@
 # Master Task Index (Registry)
 
-**Version:** 2.7.0
-**Project Version:** 0.10.0 released; 0.11.0 in progress (Phase 12 scoped — Meta-Learning Hooks)
+**Version:** 2.8.0
+**Project Version:** 0.11.0 released
 **Generated:** 2026-04-29
 **Last Updated:** 2026-05-17
 **Based on:** .design/main/PLAN.md v2.8.0
@@ -28,7 +28,7 @@ Tactical registry of all phases and their statuses. Atomic checklists (`T-XXXX`)
 | [Phase 9](archives/tasks/phase-9.md) | Metric Schedulers + Dynamic Topology + Observability Stack — `ReduceOnPlateau`, `OneCycleLR`, topology mutations, slog + viz HTTP server, v0.8.0 release | `Done (Archived)` (2026-05-10) |
 | [Phase 10](archives/tasks/phase-10.md) | Normalization Layers + Training Callbacks — `pkg/layer/norm/` (BatchNorm/LayerNorm/GroupNorm), `pkg/nn/callbacks.go`, v0.9.0 release | `Done (Archived)` (2026-05-12) |
 | [Phase 11](tasks/phase-11.md) | Meta-Learning Hooks + Convolutional Layers + Dataset Formats — `pkg/layer/conv/`, `pkg/dataset/mnist.go`, `pkg/nn/andtrain.go`, examples E06+E10, v0.10.0 release | `Done` (11/14 — Track A 3 tasks deferred to Phase 12; Track B+C+gate done; v0.10.0 tagged) |
-| [Phase 12](tasks/phase-12.md) | Meta-Learning Hooks — `pkg/nn/meta.go` (ParamAccessor[T]/ScalarParam[T]/SliceParam[T]/MetaLearner[T]), `WithMetaLearner` option, train.go hook, v0.11.0 release | `Todo` (5 tasks: T-12A01..A03 + T-12T01 + T-12Z01) |
+| [Phase 12](archives/tasks/phase-12.md) | Meta-Learning Hooks — `pkg/nn/meta.go` (ParamAccessor[T]/ScalarParam[T]/SliceParam[T]/MetaLearner[T]), `WithMetaLearner` option, train.go hook, v0.11.0 release | `Done (Archived)` (5 tasks: T-12A01..A03 + T-12T01 + T-12Z01) |
 
 ## Phase 0 — Already Complete
 
@@ -203,10 +203,10 @@ Six of the eight v0.6-gated entries (E03, E04, E05, E07, E08, E13) are now activ
 
 | Asset | Spec | Status |
 | :--- | :--- | :--- |
-| `pkg/nn/meta.go` (ParamAccessor[T], ScalarParam[T], SliceParam[T], MetaLearner[T]) | l2-meta-learning-impl v0.1.0 §5.2 | `Deferred to Phase 12` [A] |
-| `pkg/nn/options.go` (WithMetaLearner) + `config.go` | l2-meta-learning-impl v0.1.0 §5.5 | `Deferred to Phase 12` [A] |
-| `pkg/nn/train.go` (meta hook after opt.Step) | l2-meta-learning-impl v0.1.0 §5.3 | `Deferred to Phase 12` [A] |
-| `pkg/utils/errors.go` (ErrMetaLearnerShape, ErrMetaLearnerRunning) | l2-meta-learning-impl v0.1.0 §5.4 | `Deferred to Phase 12` [A] |
+| `pkg/nn/meta.go` (ParamAccessor[T], ScalarParam[T], SliceParam[T], MetaLearner[T]) | l2-meta-learning-impl v0.1.0 §5.2 | `Done (Phase 12)` |
+| `pkg/nn/options.go` (WithMetaLearner) + `config.go` | l2-meta-learning-impl v0.1.0 §5.5 | `Done (Phase 12)` |
+| `pkg/nn/train.go` (meta hook after opt.Step) | l2-meta-learning-impl v0.1.0 §5.3 | `Done (Phase 12)` |
+| `pkg/utils/errors.go` (ErrMetaLearnerShape, ErrMetaLearnerRunning) | l2-meta-learning-impl v0.1.0 §5.4 | `Done (Phase 12)` |
 | `pkg/layer/conv/conv.go` (interface assertions) | l2-conv-layers-impl v0.1.0 §5.1 | `Done` [B] |
 | `pkg/layer/conv/conv1d.go` (Conv1D[T]) | l2-conv-layers-impl v0.1.0 §5.2 | `Done` [B] |
 | `pkg/layer/conv/pool.go` (MaxPool1D[T], AvgPool1D[T]) | l2-conv-layers-impl v0.1.0 §5.3 | `Done` [B] |
@@ -223,18 +223,18 @@ Six of the eight v0.6-gated entries (E03, E04, E05, E07, E08, E13) are now activ
 | `CHANGELOG.md` (v0.10.0 entry) | l1-release-policy v1.0.0 | `Done` |
 | `v0.10.0` git tag | l1-release-policy v1.0.0 §5.4 | `Pending user` (suggested `git tag -a v0.10.0`) |
 
-## Phase 12 Deliverables (Todo)
+## Phase 12 Deliverables (Done — Archived)
 
 | Asset | Spec | Status |
 | :--- | :--- | :--- |
-| `pkg/nn/meta.go` (ParamAccessor[T], ScalarParam[T], SliceParam[T], MetaLearner[T], FeatureFunc[T]) | l2-meta-learning-impl v0.1.0 §5.2 | `Todo` [A] |
-| `pkg/nn/options.go` (WithMetaLearner) | l2-meta-learning-impl v0.1.0 §5.5 | `Todo` [A] |
-| `pkg/nn/config.go` (MetaLearner field) | l2-meta-learning-impl v0.1.0 §5.5 | `Todo` [A] |
-| `pkg/nn/train.go` (meta hook after opt.Step, before OnIterationEnd) | l2-meta-learning-impl v0.1.0 §5.3 | `Todo` [A] |
-| `pkg/utils/errors.go` (ErrMetaLearnerShape, ErrMetaLearnerRunning) | l2-meta-learning-impl v0.1.0 §5.4 | `Todo` [A] |
-| `pkg/nn/meta_test.go` (TestMetaLearnerStep* + convergence) | l2-meta-learning-impl v0.1.0 §5.3 + §5.5 | `Todo` [T] |
-| `CHANGELOG.md` (v0.11.0 entry) | l1-release-policy v1.0.0 | `Todo` [Z] |
-| `v0.11.0` git tag | l1-release-policy v1.0.0 §5.4 | `Todo` [Z] |
+| `pkg/nn/meta.go` (ParamAccessor[T], ScalarParam[T], SliceParam[T], MetaLearner[T], FeatureFunc[T]) | l2-meta-learning-impl v0.1.0 §5.2 | `Done` [A] |
+| `pkg/nn/options.go` (WithMetaLearner) | l2-meta-learning-impl v0.1.0 §5.5 | `Done` [A] |
+| `pkg/nn/config.go` (MetaLearner field) | l2-meta-learning-impl v0.1.0 §5.5 | `Done` [A] |
+| `pkg/nn/train.go` (meta hook after opt.Step, before OnIterationEnd) | l2-meta-learning-impl v0.1.0 §5.3 | `Done` [A] |
+| `pkg/utils/errors.go` (ErrMetaLearnerShape, ErrMetaLearnerRunning) | l2-meta-learning-impl v0.1.0 §5.4 | `Done` [A] |
+| `pkg/nn/meta_test.go` (14 tests: step variants + wiring + convergence) | l2-meta-learning-impl v0.1.0 §5.3 + §5.5 | `Done` [T] |
+| `CHANGELOG.md` (v0.11.0 entry) | l1-release-policy v1.0.0 | `Done` [Z] |
+| `v0.11.0` git tag | l1-release-policy v1.0.0 §5.4 | `Pending user` (run `git tag -a v0.11.0`) |
 
-- **Last Updated**: 2026-05-17 (Sync via magic-task post-magic-spec cascade: Phase 12 scoped (5 tasks, single-track A). Pre-flight clean (54 Stable, 0 Draft, 1 RFC unrelated). Trust Mode batch: 0 promotions needed. SYNC_GAP resolved — PLAN.md base v2.9.0 → v2.10.0. l1-meta-learning-hooks moved from Backlog → active Phase 12. PLAN.md v2.7.0 → v2.8.0; TASKS.md v2.6.0 → v2.7.0.)
+- **Last Updated**: 2026-05-17 (Phase 12 gate passed: `go build ./...` clean; 19/19 packages green; `pkg/nn` 82.2 % coverage; CHANGELOG v0.11.0 written; phase-12.md archived; v0.11.0 tag pending user. TASKS.md v2.7.0 → v2.8.0.)
 - **Maintainer**: Core Team

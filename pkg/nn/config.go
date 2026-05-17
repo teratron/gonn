@@ -160,6 +160,7 @@ type Config[T utils.Float] struct {
 	VisCORS          bool
 	DefaultBias      bool
 	OutputBias       bool
+	MetaLearner      *MetaLearner[T]
 }
 
 // applyDefaults fills any zero-valued fields with the Defaults constants.

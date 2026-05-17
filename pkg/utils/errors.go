@@ -187,6 +187,28 @@ var ErrMNISTRecordMismatch = errors.New("mnist-record-mismatch")
 //   - Stability: Stable.
 var ErrNetworkRunning = errors.New("network-running")
 
+// ErrMetaLearnerShape signals that the inner network's output length does not
+// match the number of registered ParamAccessors, or that a Set call received
+// a slice whose length violates the parameter's shape contract.
+//
+// AI-Meta:
+//   - Purpose: Sentinel for inner-NN output / param-count mismatch in meta-learning hooks.
+//   - Usage: errors.Is(err, utils.ErrMetaLearnerShape).
+//   - Related: [ErrMetaLearnerRunning], [ErrInputData].
+//   - Stability: Stable.
+var ErrMetaLearnerShape = errors.New("meta-learner-shape")
+
+// ErrMetaLearnerRunning signals that WithMetaLearner was applied while the
+// outer network was in a non-Idle training state (Training, Paused, Stopping,
+// or Stopped). The option is rejected; the network state is unchanged.
+//
+// AI-Meta:
+//   - Purpose: Sentinel for WithMetaLearner called while the outer network is not Idle.
+//   - Usage: errors.Is(err, utils.ErrMetaLearnerRunning).
+//   - Related: [ErrMetaLearnerShape], [ErrControl].
+//   - Stability: Stable.
+var ErrMetaLearnerRunning = errors.New("meta-learner-running")
+
 // ErrCallbackPanic signals that a user-supplied training callback panicked.
 // The panic is recovered internally; training continues. The error wraps
 // ErrControl because a panicking callback is a programming fault in the

@@ -4,6 +4,55 @@ All notable changes to the GoNN library will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the
 release artifacts dictated by [.magic/run.md](.magic/run.md) Phase Completion / Plan Completion.
 
+## [0.11.0] — 2026-05-17
+
+### Meta-Learning Hooks
+
+Phase 12 (Track A) ships `MetaLearner[T]` — an inner `*NN[T]` that queries
+its own inference output each training iteration to update registered hyperparameters
+of the outer network (learning rate, per-layer scales, etc.). The mechanism is
+advisory: errors from the inner network are logged at Warn level and do not abort
+training.
+
+#### Added
+
+- **`pkg/nn/meta.go`** — new meta-learning types:
+  - `ParamAccessor[T utils.Float]` interface: `Get() []T`, `Set([]T) error`, `Name() string`.
+  - `ScalarParam[T]` struct: wraps `*T`; `Get` returns one-element slice; `Set` validates `len==1`
+    or returns `ErrMetaLearnerShape`.
+  - `SliceParam[T]` struct: wraps `*[]T`; `Get` returns a defensive copy; `Set` validates length
+    matches or returns `ErrMetaLearnerShape`.
+  - `FeatureFunc[T]` named function type: `func(loss T, iter int, maxIter int) []T`.
+  - `DefaultFeatureFunc[T]`: returns `[]T{loss, T(iter)/T(maxIter)}` (loss + normalised progress).
+  - `MetaLearner[T]` struct (`inner *NN[T]`, `params []ParamAccessor[T]`, `Features FeatureFunc[T]`):
+    - `step(loss T, iter, maxIter int) error`: builds feature vector → `inner.Query` → apply
+      `params[i].Set([]T{output[i]})` for each param; continue-on-error (collects first error,
+      applies all); `ErrMetaLearnerShape` on output/param count mismatch.
+- **`pkg/nn/options.go`** — `WithMetaLearner[T](ml *MetaLearner[T]) Option[T]`:
+  sets `cfg.MetaLearner = ml`; rejected with `ErrMetaLearnerRunning` at compile time if
+  `control.Load() != Idle`.
+- **`pkg/nn/config.go`** — `MetaLearner *MetaLearner[T]` field added to `Config[T]` (nil = disabled).
+- **`pkg/nn/train.go`** — single meta hook in `Fit` after `opt.Step` (batch level) and before
+  `fireEvent(OnIterationEnd)`: `nn.cfg.MetaLearner.step(mean, epoch, MaxIterations)`;
+  error → `log.Warn("meta-learner step failed", ...)`.
+- **`pkg/utils/errors.go`** — two new sentinel errors:
+  - `ErrMetaLearnerShape`: inner output size ≠ registered params, or `Set` receives wrong-length slice.
+  - `ErrMetaLearnerRunning`: `WithMetaLearner` applied while outer network is training.
+- **`pkg/nn/meta_test.go`** — 14 tests covering `ScalarParam`, `SliceParam`, `DefaultFeatureFunc`,
+  `MetaLearner.step` (all 4 named cases), wiring, `ErrMetaLearnerRunning` guard, Fit integration,
+  and 3-seed convergence check.
+  `pkg/nn` coverage: 82.2 % (floor 80 %, no regression from v0.10.0).
+
+#### Changed
+
+- `pkg/nn/compile.go`: added `ErrMetaLearnerRunning` guard (rejects non-Idle compile with MetaLearner).
+
+#### Known Issues
+
+- Pre-existing timing-flaky tests: `TestPauseResumeCycle`, `TestMultiHiddenXOR`, `TestRepeatBuilderBenchmark100Layer`.
+- Race detector requires CGO on Windows (gcc not in PATH); `-race` deferred to CI.
+- `go run ./examples/mnist/` requires user-supplied IDX data; see `examples/mnist/README.md`.
+
 ## [0.10.0] — 2026-05-17
 
 ### Convolutional Layers, Dataset Loader, and AndTrain Continuation
@@ -708,7 +757,9 @@ Promotes three specs to Stable.
 ### Changed
 
 
+
 - Updated task plan and task index (main)
 - Completed task `phase-11` (main)
 - Updated 2 specifications (main)
+- Completed task `phase-12` (main)
 

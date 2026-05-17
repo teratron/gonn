@@ -1,7 +1,7 @@
 ---
 phase: 12
 name: Meta-Learning Hooks
-status: Todo
+status: Done
 subsystem: pkg/nn (new meta.go), pkg/utils (sentinels)
 requires:
   - phase-11 (v0.10.0 tagged; pkg/nn integration points stable)
@@ -12,10 +12,21 @@ provides:
   - pkg/nn (WithMetaLearner option, MetaLearner config field, train.go integration hook)
   - pkg/utils (ErrMetaLearnerShape, ErrMetaLearnerRunning sentinels)
 key_files:
-  created: []
-  modified: []
-patterns_established: []
-duration_minutes: ~
+  created:
+    - pkg/nn/meta.go
+    - pkg/nn/meta_test.go
+  modified:
+    - pkg/nn/config.go
+    - pkg/nn/options.go
+    - pkg/nn/compile.go
+    - pkg/nn/train.go
+    - pkg/utils/errors.go
+    - CHANGELOG.md
+patterns_established:
+  - ParamAccessor[T] uniform interface for meta-learning param registration
+  - MetaLearner advisory hook (Warn on error, does NOT abort training)
+  - continue-on-error semantics in step() — apply all, collect first error
+duration_minutes: 45
 ---
 
 # Phase 12 — Meta-Learning Hooks
@@ -31,7 +42,7 @@ duration_minutes: ~
 *Goal: Implement ParamAccessor[T] + MetaLearner[T] from l2-meta-learning-impl.md §5.2–5.3.*
 *Source: [l2-meta-learning-impl.md](../specifications/l2-meta-learning-impl.md)*
 
-- [ ] **T-12A01** — Create `pkg/nn/meta.go` with type definitions.
+- [x] **T-12A01** — Create `pkg/nn/meta.go` with type definitions.
   `ParamAccessor[T utils.Float]` interface (`Get() []T`, `Set([]T) error`, `Name() string`).
   `ScalarParam[T]` struct (`ptr *T`, `name string`); `Get` returns `[]T{*ptr}`; `Set` validates `len(v) == 1` else `ErrMetaLearnerShape`.
   `SliceParam[T]` struct (`ptr *[]T`, `name string`); `Get` returns copy; `Set` validates `len(v) == len(*ptr)` else `ErrMetaLearnerShape`.
@@ -40,7 +51,7 @@ duration_minutes: ~
   Add `ErrMetaLearnerShape` and `ErrMetaLearnerRunning` to `pkg/utils/errors.go` per §5.4.
   **Verify**: `go build ./pkg/nn/... ./pkg/utils/...` clean; `go vet ./pkg/nn/...` clean.
 
-- [ ] **T-12A02** — Implement `(m *MetaLearner[T]) step(loss T, iter, maxIter int) error`.
+- [x] **T-12A02** — Implement `(m *MetaLearner[T]) step(loss T, iter, maxIter int) error`.
   Sequence (per l2-meta-learning-impl.md §5.3 diagram):
   1. If `m.Features == nil`, fall back to `DefaultFeatureFunc[T]`.
   2. Build feature vector: `features := m.Features(loss, iter, maxIter)`.
@@ -49,7 +60,7 @@ duration_minutes: ~
   5. For each `i`, call `m.params[i].Set([]T{output[i]})`; collect FIRST error and return after applying all (continue-on-error semantics — partial application is intentional per §5.3 "continue others").
   **Verify**: TestMetaLearnerStepDefaultFeatures, TestMetaLearnerStepCustomFeatures, TestMetaLearnerStepShapeMismatch, TestMetaLearnerStepInnerQueryError — all green.
 
-- [ ] **T-12A03** — Wire `MetaLearner[T]` into `pkg/nn/`.
+- [x] **T-12A03** — Wire `MetaLearner[T]` into `pkg/nn/`.
   `pkg/nn/config.go`: add `MetaLearner *MetaLearner[T]` field (nil = disabled).
   `pkg/nn/options.go`: add `WithMetaLearner[T utils.Float](ml *MetaLearner[T]) Option[T]`:
     - Validates outer NN `control.Load() == Idle`; else returns option that errors `ErrMetaLearnerRunning` at compile-time.
@@ -68,7 +79,7 @@ duration_minutes: ~
 
 ## Validation Tasks
 
-- [ ] **T-12T01** — Meta-Learning end-to-end validation.
+- [x] **T-12T01** — Meta-Learning end-to-end validation.
   - `go test -count=1 ./pkg/nn/... ./pkg/utils/...` → exit 0; all new meta tests green (race flag deferred to CI per Windows gcc absence).
   - Coverage `pkg/nn/` ≥ 80% (must not regress from current 81.5%).
   - **Convergence check**: 2→1 inner NN tunes outer learning rate on a synthetic loss-decay task; converge faster than static LR (compare epochs-to-loss-limit, 3-seed average). Skip on CI low-power runners with `t.Skip` if benchmark wall time > 30s.
@@ -78,7 +89,7 @@ duration_minutes: ~
 
 ## Gate
 
-- [ ] **T-12Z01** — Phase 12 gate (v0.11.0 release):
+- [x] **T-12Z01** — Phase 12 gate (v0.11.0 release):
   - `go build ./...` clean (zero regressions across all 19 packages + examples).
   - `go test -count=1 -race ./...` all green (CI must enforce `-race`; local Windows runs without per gcc absence).
   - Coverage floor: `pkg/nn/` ≥ 80% (meta additions); `pkg/utils/` unchanged.
