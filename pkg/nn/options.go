@@ -486,6 +486,89 @@ func WithFlatten[T utils.Float]() Option[T] {
 }
 
 // ============================================================================
+// 2-D Convolutional options (Phase 14 — l2-conv-2d-impl)
+// ============================================================================
+
+// WithInputShape declares the (channels, height, width) shape of the raw
+// network input. Required when a [WithConv2D] / [WithMaxPool2D] /
+// [WithAvgPool2D] layer follows that needs to know its CHW dimensions.
+// Single-channel square inputs (e.g. flat 784 → (1, 28, 28)) MAY skip this
+// option — Conv2D.Forward auto-infers a single-channel square shape via
+// integer square root.
+//
+// AI-Meta:
+//   - Purpose: Declare the raw input CHW shape so 2-D conv layers can resolve OutputShape at compile time.
+//   - Usage: nn.New[float32](WithInput[float32](3*32*32), WithInputShape[float32](3, 32, 32), WithConv2D[float32](16, 3, 3, 3, 1, 1, conv.PadValid, true), ...).
+//   - Related: [WithConv2D], [WithMaxPool2D], [WithAvgPool2D], [WithFlatten2D].
+//   - Stability: Stable.
+func WithInputShape[T utils.Float](channels, height, width int) Option[T] {
+	return func(cfg *Config[T]) {
+		cfg.InputC = channels
+		cfg.InputH = height
+		cfg.InputW = width
+	}
+}
+
+// WithConv2D appends a 2-D convolutional layer to the prefix stack. CHW
+// layout per CONV2D-C9. Input must satisfy InChannels*InH*InW = previous
+// layer's flat output (or the raw input length declared via WithInput +
+// WithInputShape).
+//
+// AI-Meta:
+//   - Purpose: Add a Conv2D layer to the preprocessing stack ahead of the Dense head.
+//   - Usage: nn.New[float32](WithInput[float32](28*28), WithConv2D[float32](8, 1, 3, 3, 1, 1, conv.PadValid, true), WithMaxPool2D[float32](2, 2), WithFlatten2D[float32](), WithHiddenLayer[float32](64, activation.ReLU), WithOutput[float32](10, activation.SOFTMAX)).
+//   - Related: [WithMaxPool2D], [WithAvgPool2D], [WithFlatten2D], [WithInputShape], [conv.PadMode].
+//   - Stability: Stable.
+func WithConv2D[T utils.Float](numFilters, inChannels, kernelH, kernelW, strideH, strideW int, pad conv.PadMode, useBias bool) Option[T] {
+	return func(cfg *Config[T]) {
+		cfg.ConvPrefix = append(cfg.ConvPrefix,
+			conv.NewConv2D[T](numFilters, inChannels, kernelH, kernelW, strideH, strideW, pad, useBias))
+	}
+}
+
+// WithMaxPool2D appends a 2-D max-pooling layer to the prefix stack. Stride
+// equals (poolH, poolW) — non-overlapping windows.
+//
+// AI-Meta:
+//   - Purpose: Add a MaxPool2D layer to the preprocessing stack.
+//   - Usage: nn.New[float32](..., WithConv2D[float32](8, 1, 3, 3, 1, 1, conv.PadValid, true), WithMaxPool2D[float32](2, 2), ...).
+//   - Related: [WithConv2D], [WithAvgPool2D], [WithFlatten2D].
+//   - Stability: Stable.
+func WithMaxPool2D[T utils.Float](poolH, poolW int) Option[T] {
+	return func(cfg *Config[T]) {
+		cfg.ConvPrefix = append(cfg.ConvPrefix, conv.NewMaxPool2D[T](poolH, poolW))
+	}
+}
+
+// WithAvgPool2D appends a 2-D average-pooling layer to the prefix stack.
+//
+// AI-Meta:
+//   - Purpose: Add an AvgPool2D layer to the preprocessing stack.
+//   - Usage: nn.New[float32](..., WithConv2D[float32](8, 1, 3, 3, 1, 1, conv.PadValid, true), WithAvgPool2D[float32](2, 2), ...).
+//   - Related: [WithConv2D], [WithMaxPool2D], [WithFlatten2D].
+//   - Stability: Stable.
+func WithAvgPool2D[T utils.Float](poolH, poolW int) Option[T] {
+	return func(cfg *Config[T]) {
+		cfg.ConvPrefix = append(cfg.ConvPrefix, conv.NewAvgPool2D[T](poolH, poolW))
+	}
+}
+
+// WithFlatten2D appends a stateless 2-D Flatten layer to the prefix stack.
+// Collapses the CHW feature map into a 1-D vector consumed by the first
+// Dense layer; element order follows CONV2D-C9 flat-index formula.
+//
+// AI-Meta:
+//   - Purpose: Add a Flatten2D reshape layer to collapse CHW feature maps into a 1-D vector.
+//   - Usage: nn.New[float32](..., WithMaxPool2D[float32](2, 2), WithFlatten2D[float32](), WithHiddenLayer[float32](64, activation.ReLU), ...).
+//   - Related: [WithConv2D], [WithMaxPool2D], [WithAvgPool2D].
+//   - Stability: Stable.
+func WithFlatten2D[T utils.Float]() Option[T] {
+	return func(cfg *Config[T]) {
+		cfg.ConvPrefix = append(cfg.ConvPrefix, conv.NewFlatten2D[T]())
+	}
+}
+
+// ============================================================================
 // Normalization options (Phase 10 — l2-normalization-impl)
 // ============================================================================
 

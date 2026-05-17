@@ -288,6 +288,97 @@ func TestMNISTLoaderContextCancelled(t *testing.T) {
 	}
 }
 
+func TestMNISTLoaderImageShapeFromHeader(t *testing.T) {
+	t.Parallel()
+	// 3-D IDX: N=2, H=4, W=4 — ImageShape should return (1, 4, 4).
+	images := buildIDX3D([]int32{2, 4, 4}, make([]byte, 2*4*4))
+	labels := buildIDX([]int32{2}, []byte{0, 1})
+	imgR, err := NewIDXReader(bytes.NewReader(images))
+	if err != nil {
+		t.Fatalf("NewIDXReader images: %v", err)
+	}
+	lblR, _ := NewIDXReader(bytes.NewReader(labels))
+	ldr, err := NewMNISTLoader[float32](imgR, lblR, 1, 255)
+	if err != nil {
+		t.Fatalf("NewMNISTLoader: %v", err)
+	}
+	c, h, w := ldr.ImageShape()
+	if c != 1 || h != 4 || w != 4 {
+		t.Errorf("ImageShape() = (%d,%d,%d), want (1,4,4)", c, h, w)
+	}
+}
+
+func TestMNISTLoaderImageShapeWithImageShape(t *testing.T) {
+	t.Parallel()
+	// Flat 1-D IDX: 3*8*8=192 bytes per record; explicit WithImageShape(3,8,8).
+	images := buildIDX([]int32{2, 192}, make([]byte, 2*192))
+	labels := buildIDX([]int32{2}, []byte{0, 1})
+	imgR, _ := NewIDXReader(bytes.NewReader(images))
+	lblR, _ := NewIDXReader(bytes.NewReader(labels))
+	ldr, _ := NewMNISTLoader[float32](imgR, lblR, 1, 255)
+	ldr.WithImageShape(3, 8, 8)
+	c, h, w := ldr.ImageShape()
+	if c != 3 || h != 8 || w != 8 {
+		t.Errorf("WithImageShape(3,8,8): ImageShape() = (%d,%d,%d), want (3,8,8)", c, h, w)
+	}
+}
+
+func TestMNISTLoaderImageShapeIsqrtFallback(t *testing.T) {
+	t.Parallel()
+	// Flat 1-D IDX with recLen=784 (28*28). ImageShape should infer (1,28,28).
+	images := buildIDX([]int32{1, 784}, make([]byte, 784))
+	labels := buildIDX([]int32{1}, []byte{3})
+	imgR, _ := NewIDXReader(bytes.NewReader(images))
+	lblR, _ := NewIDXReader(bytes.NewReader(labels))
+	ldr, _ := NewMNISTLoader[float32](imgR, lblR, 1, 255)
+	c, h, w := ldr.ImageShape()
+	if c != 1 || h != 28 || w != 28 {
+		t.Errorf("isqrt fallback: ImageShape() = (%d,%d,%d), want (1,28,28)", c, h, w)
+	}
+}
+
+func TestMNISTLoaderImageShapeUnknown(t *testing.T) {
+	t.Parallel()
+	// Flat 1-D IDX with non-square recLen=100 (10*10 is 100 — actually this IS square).
+	// Use 200 to ensure non-square result.
+	images := buildIDX([]int32{1, 200}, make([]byte, 200))
+	labels := buildIDX([]int32{1}, []byte{0})
+	imgR, _ := NewIDXReader(bytes.NewReader(images))
+	lblR, _ := NewIDXReader(bytes.NewReader(labels))
+	ldr, _ := NewMNISTLoader[float32](imgR, lblR, 1, 255)
+	c, h, w := ldr.ImageShape()
+	if c != 0 || h != 0 || w != 0 {
+		t.Errorf("non-square: ImageShape() = (%d,%d,%d), want (0,0,0)", c, h, w)
+	}
+}
+
+func TestImageShaperInterface(t *testing.T) {
+	t.Parallel()
+	images := buildIDX([]int32{1, 784}, make([]byte, 784))
+	labels := buildIDX([]int32{1}, []byte{0})
+	imgR, _ := NewIDXReader(bytes.NewReader(images))
+	lblR, _ := NewIDXReader(bytes.NewReader(labels))
+	ldr, _ := NewMNISTLoader[float32](imgR, lblR, 1, 255)
+	var _ ImageShaper = ldr // compile-time interface check
+	if _, ok := any(ldr).(ImageShaper); !ok {
+		t.Error("MNISTLoader does not implement ImageShaper")
+	}
+}
+
+// buildIDX3D builds an in-memory 3-D IDX byte stream (N×H×W).
+func buildIDX3D(dims []int32, data []byte) []byte {
+	buf := &bytes.Buffer{}
+	buf.WriteByte(0x00)
+	buf.WriteByte(0x00)
+	buf.WriteByte(idxDTypeUInt8)
+	buf.WriteByte(byte(len(dims)))
+	for _, d := range dims {
+		_ = binary.Write(buf, binary.BigEndian, uint32(d))
+	}
+	buf.Write(data)
+	return buf.Bytes()
+}
+
 func TestElementSize(t *testing.T) {
 	t.Parallel()
 	cases := []struct {

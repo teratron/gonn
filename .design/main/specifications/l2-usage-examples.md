@@ -1,6 +1,6 @@
 # Usage Examples Catalog
 
-**Version:** 1.0.0
+**Version:** 1.1.0
 **Status:** Stable
 **Layer:** implementation
 **Implements:** l1-neural-network-architecture.md
@@ -292,6 +292,22 @@ Each example entry MUST specify the following fields:
 | Expected Output | Final loss for both; elapsed time for both; numeric drift. |
 | Status | MAY |
 
+#### 2-D Convolutional Examples
+
+##### E16 — MNIST CNN
+
+| Field | Value |
+| :--- | :--- |
+| Path | `examples/mnist_cnn/` |
+| Purpose | 2-D convolutional feature extractor (Conv2D → MaxPool2D → Flatten2D) followed by a fully-connected head trained on MNIST. Canonical E16 for the Conv2D layer set. |
+| Dataset | MNIST (IDX3 images, IDX1 labels — user-supplied). |
+| Topology | Input 1×28×28 → Conv2D(8, 3×3, PadSame) → MaxPool2D(2×2) → Flatten2D → Dense(128, ReLU) → Dense(64, ReLU) → Output(10, Sigmoid). |
+| Hyperparams | LR=0.01, MaxIter=1 (per epoch), norm=255. |
+| API Style | `New[T](opts...)`. |
+| Key Options | `WithInputShape`, `WithConv2D`, `WithMaxPool2D`, `WithFlatten2D`. |
+| Expected Output | Compile success message; epoch loss; sample 0 prediction vs actual. |
+| Status | MUST |
+
 ### 5.3 Coverage Matrix
 
 This matrix proves the catalog covers every public API element. Each cell lists the example IDs that
@@ -322,6 +338,11 @@ touch the element. **An empty cell is a coverage gap and should block promotion 
 | `Verify` | E04, E05, E07 |
 | `AndTrain` | E10 (gated) |
 | Persistence (Save/Reload) | E09 (gated) |
+| `WithInputShape` | E16 |
+| `WithConv2D` | E16 |
+| `WithMaxPool2D` | E16 |
+| `WithFlatten2D` | E16 |
+| `WithImageShape` (MNISTLoader) | E16 |
 
 ### 5.4 Implementation Order
 
@@ -343,6 +364,7 @@ graph TD
     E05 -.gated.-> E06["E06 — MNIST preset"]
     E01 -.gated.-> E09["E09 — Persistence"]
     E01 -.gated.-> E10["E10 — Continuation"]
+    E06 --> E16["E16 — MNIST CNN (Conv2D)"]
 ```
 
 Solid arrows are non-gated dependencies. Dashed arrows mark examples gated on future specs
@@ -398,3 +420,4 @@ or equivalent) and use looser thresholds to avoid flakiness.
 | 1.0.0 | 2026-04-27 | Initial Draft — 15-entry catalog with coverage matrix and implementation order. |
 | 1.0.0 | 2026-04-28 | E09 promoted from `MAY (gated)` to `SHOULD (gated on Stable)` after l1-network-persistence reached RFC. Status promoted Draft → RFC. |
 | 1.0.0 | 2026-05-01 | [Trust-Mode] RFC → Stable. MVC satisfied: Overview + Invariant Compliance + Detailed Design + Drawbacks + Coverage Matrix. E09 ungated (parent persistence Stable since 2026-05-01). C9 Trust Mode auto-promotion. |
+| 1.1.0 | 2026-05-17 | Added E16 — MNIST CNN example demonstrating Conv2D/MaxPool2D/Flatten2D prefix; updated coverage matrix with WithInputShape / WithConv2D / WithMaxPool2D / WithFlatten2D / WithImageShape; updated mermaid graph. |

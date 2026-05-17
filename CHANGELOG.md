@@ -4,6 +4,77 @@ All notable changes to the GoNN library will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the
 release artifacts dictated by [.magic/run.md](.magic/run.md) Phase Completion / Plan Completion.
 
+## [0.12.0] — 2026-05-17
+
+### 2-D Convolutional Layers (Conv2D, MaxPool2D, AvgPool2D, Flatten2D) + MNIST CNN Example
+
+Phase 14 ships a complete 2-D convolutional layer set in `pkg/layer/conv/`,
+integrates it with the `pkg/nn` options + compile pipeline, adds the MNIST
+image-shape adapter to `pkg/dataset/`, and delivers `examples/mnist_cnn/` (E16)
+as the canonical CNN demo. Gradient correctness is validated by a 4-case
+centred finite-difference test matrix (CONV2D-4).
+
+#### Added
+
+- **`pkg/layer/conv/conv2d.go`** — `Conv2D[T utils.Float]`:
+  - Constructor `NewConv2D[T](numFilters, inChannels, kernelH, kernelW, strideH, strideW int, pad PadMode, useBias bool)` with negative-arg clamp.
+  - `Forward`: 6-level CHW cross-correlation loop, PadValid/PadSame, saves `lastInput` for backward.
+  - `Backward`: CONV2D-4 gradW/gradX/gradB accumulation; PERF-4 cap-check + zero-reset → zero allocs/op in steady state.
+  - `Init(rng *rand.Rand)`: He-normal weight sampling; zero-bias init.
+  - `SetInputShape(inH, inW int)`, `OutputShape() (outH, outW int)`, `Validate(inC, inH, inW int) error`.
+  - `MarshalJSON` / `UnmarshalJSON` via struct-alias trick (excludes scratch buffers).
+  - Interface assertions in `conv.go`: `var _ Layer[float32] = (*Conv2D[float32])(nil)` + float64 variant.
+- **`pkg/layer/conv/pool2d.go`** — `MaxPool2D[T]` + `AvgPool2D[T]`:
+  - Non-overlapping per-channel 2-D pooling.
+  - `MaxPool2D.Backward`: routes upstream only to argmax position (argmaxH/argmaxW stored on Forward).
+  - `AvgPool2D.Backward`: distributes upstream × `1/(PoolH×PoolW)` across entire window.
+  - `SetInputShape(inC, inH, inW int)`, `OutputShape() (outH, outW int)`, `Validate`.
+- **`pkg/layer/conv/flatten2d.go`** — `Flatten2D[T]`:
+  - Stateless CHW-collapse: Forward is identity (no copy); Backward returns upstream unchanged.
+  - CONV2D-C9 element order: `(c, y, x)` → flat index `c*H*W + y*W + x`.
+  - Single-channel `isqrt` inference on Forward when `SetInputShape` not called.
+- **`pkg/layer/conv/conv2d_test.go`** — 17 test functions covering:
+  - Forward shape table (5 cases), outputShape arithmetic, JSON round-trip, PadValid guard.
+  - Centred finite-difference gradient check for `{PadValid, PadSame} × {C=1, C≥2}` (CONV2D-4).
+  - MaxPool2D/AvgPool2D backward semantics; Flatten2D element ordering.
+  - Accessor coverage: `InputSize`/`OutputSize`/`GradSlots`/`OutputShape`/`Validate` for all 2-D types.
+  - `pkg/layer/conv/` coverage: **81.9 %** (floor 80 %).
+- **`pkg/nn/options.go`** — five new functional options:
+  - `WithInputShape[T](channels, height, width int)` — stores CHW layout in `Config.InputC/H/W`.
+  - `WithConv2D[T](numFilters, inChannels, kernelH, kernelW, strideH, strideW int, pad, useBias)` — appends `*conv.Conv2D[T]` to `Config.ConvPrefix`.
+  - `WithMaxPool2D[T](poolH, poolW int)`, `WithAvgPool2D[T](poolH, poolW int)`, `WithFlatten2D[T]()`.
+- **`pkg/nn/compile.go`** — `setupConv2DShapes[T]` pre-pass:
+  - Propagates `(C, H, W)` through each 2-D layer (`Conv2D → MaxPool2D/AvgPool2D → Flatten2D`) before the dummy-Forward shape walk.
+  - Auto-infers `(1, S, S)` for flat square inputs (MNIST 784 → `(1, 28, 28)`) when `WithInputShape` not called.
+  - Validates `InputSize == InputC*InputH*InputW` when shape declared.
+  - Calls `SetInputShape` on each layer in sequence; guards mixed 1-D/2-D chains with `in2D` flag.
+  - Wraps validation errors as `ErrConv2DShapeMismatch`.
+- **`pkg/dataset/dataset.go`** — `ImageShaper` optional interface:
+  - `ImageShape() (channels, height, width int)` — detected by `compile()` via type assertion for auto `InputC/H/W` wiring when `WithInputShape` not called explicitly.
+- **`pkg/dataset/mnist.go`** — `MNISTLoader[T]` extensions:
+  - `WithImageShape(channels, height, width int) *MNISTLoader[T]` — explicit shape annotation.
+  - `ImageShape() (c, h, w int)` — resolves: explicit `WithImageShape` → IDX ndim==3 header → `isqrt` inference → `(0,0,0)`.
+  - `MNISTLoader[T]` now implements `ImageShaper`.
+- **`examples/mnist_cnn/`** — E16 CNN demo:
+  - Architecture: `Input 1×28×28 → Conv2D(8,1,3×3,PadSame) → MaxPool2D(2×2) → Flatten2D → Dense(128,ReLU) → Dense(64,ReLU) → Output(10,Sigmoid)`.
+  - Two-epoch training via `Fit` + `AndTrain` (fine-tune at LR=0.001).
+  - `README.md` documents download URLs, flag usage, and key API summary.
+- **`pkg/utils/errors.go`** — `ErrConv2DShapeMismatch` sentinel.
+
+#### Changed
+
+- `pkg/layer/conv/conv.go`: added 8 interface assertions for 2-D types (Conv2D/MaxPool2D/AvgPool2D/Flatten2D × float32/float64).
+- `pkg/nn/config.go`: added `InputC, InputH, InputW int` fields to `Config[T]` for 2-D shape propagation.
+- `.design/main/specifications/l2-dataset-loader-impl.md`: bumped v0.1.0 → v0.1.1 (added §5.3a WithImageShape + ImageShaper interface spec).
+- `.design/main/specifications/l2-usage-examples.md`: bumped v1.0.0 → v1.1.0 (added E16 entry, updated coverage matrix and mermaid graph).
+- `go.work`: added `./examples/mnist_cnn` module entry.
+
+#### Known Issues
+
+- Pre-existing timing-flaky tests: `TestPauseResumeCycle`, `TestMultiHiddenXOR`, `TestRepeatBuilderBenchmark100Layer`.
+- Race detector requires CGO on Windows (gcc not in PATH); `-race` deferred to CI.
+- `go run ./examples/mnist_cnn/` requires user-supplied IDX data; see `examples/mnist_cnn/README.md`.
+
 ## [0.11.0] — 2026-05-17
 
 ### Meta-Learning Hooks
@@ -760,10 +831,12 @@ Promotes three specs to Stable.
 
 
 
+
 - Updated task plan and task index (main)
 - Completed task `phase-11` (main)
 - Updated 2 specifications (main)
 - Completed task `phase-12` (main)
 - Added specification `conv-2d-layers` (main)
 - Completed 2 tasks (main)
+- Completed task `phase-14` (main)
 

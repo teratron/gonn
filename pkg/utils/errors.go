@@ -153,6 +153,17 @@ var ErrConvShapeMismatch = errors.New("conv-shape-mismatch")
 //   - Stability: Stable.
 var ErrConvPoolSizeMismatch = errors.New("conv-pool-size-mismatch")
 
+// ErrConv2DShapeMismatch signals that a 2-D convolutional input spatial
+// dimension is smaller than the kernel dimension under PadValid (CONV2D-1
+// violation: outputShape would be (0, 0) on at least one axis).
+//
+// AI-Meta:
+//   - Purpose: Sentinel for Conv2D input H or W shorter than the corresponding kernel dimension in PadValid mode.
+//   - Usage: errors.Is(err, utils.ErrConv2DShapeMismatch).
+//   - Related: [ErrConvShapeMismatch], [ErrConvPoolSizeMismatch], [ErrCompute].
+//   - Stability: Stable.
+var ErrConv2DShapeMismatch = errors.New("conv2d-shape-mismatch")
+
 // Dataset / continuation sentinels (FMT-1, FMT-5, FMT-8, per l2-dataset-loader-impl).
 
 // ErrIDXMagic signals that the IDX header is malformed — either the leading

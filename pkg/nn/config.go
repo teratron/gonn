@@ -135,25 +135,34 @@ type HiddenLayerSpec[T utils.Float] struct {
 //   - Related: [HiddenLayerSpec], [Compile], [Option], [NN.Config].
 //   - Stability: Stable.
 type Config[T utils.Float] struct {
-	LearningRate     T
-	LossLimit        T
-	Optimizer        optimizer.Optimizer[T]
-	Regularizer      regularizer.Regularizer[T]
-	Scheduler        optimizer.Scheduler[T]
-	NormLayers       map[int]norm.Normalizer[T]
-	Callbacks        *CallbackRegistry[T]
-	Logger           *slog.Logger
-	BatchCallback    func(batch uint, lossValue T)
-	EpochCallback    func(epoch uint, lossValue T)
-	MetaLearner      *MetaLearner[T]
-	VisToken         string
-	ProfilingAddr    string
-	WeightInit       WeightInitMethod
-	VisAddr          string
-	HiddenLayers     []HiddenLayerSpec[T]
-	ConvPrefix       []conv.Layer[T]
-	OutputSize       uint
-	InputSize        uint
+	LearningRate  T
+	LossLimit     T
+	Optimizer     optimizer.Optimizer[T]
+	Regularizer   regularizer.Regularizer[T]
+	Scheduler     optimizer.Scheduler[T]
+	NormLayers    map[int]norm.Normalizer[T]
+	Callbacks     *CallbackRegistry[T]
+	Logger        *slog.Logger
+	BatchCallback func(batch uint, lossValue T)
+	EpochCallback func(epoch uint, lossValue T)
+	MetaLearner   *MetaLearner[T]
+	VisToken      string
+	ProfilingAddr string
+	WeightInit    WeightInitMethod
+	VisAddr       string
+	HiddenLayers  []HiddenLayerSpec[T]
+	ConvPrefix    []conv.Layer[T]
+	OutputSize    uint
+	InputSize     uint
+	// InputC / InputH / InputW carry the optional 2-D input shape declared
+	// via [WithInputShape]. When non-zero, compile() propagates the shape
+	// through the Conv2D / Pool2D / Flatten2D prefix via [Conv2D.SetInputShape]
+	// and friends so the chain can resolve OutputShape() before the first
+	// Forward pass. Zero values fall back to single-channel square inference
+	// in [conv.Conv2D.Forward] for the simple MNIST-style case.
+	InputC           int
+	InputH           int
+	InputW           int
 	MaxIterations    uint
 	LossType         loss.Type
 	OutputActivation activation.Type

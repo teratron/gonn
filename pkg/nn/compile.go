@@ -42,6 +42,12 @@ func compile[T utils.Float](n *NN[T], cfg *Config[T]) error {
 	rawInputSize := cfg.InputSize
 	effectiveInputSize := cfg.InputSize
 	if len(cfg.ConvPrefix) > 0 {
+		// Pre-pass: propagate (C, H, W) through any Conv2D/MaxPool2D/AvgPool2D/
+		// Flatten2D layers so each layer's OutputShape() resolves during the
+		// dummy-Forward shape walk below.
+		if err := setupConv2DShapes(cfg); err != nil {
+			return utils.Wrap(utils.ErrUserConfig, err, "compile: conv2d shape propagation")
+		}
 		convOut, err := computeConvChainOutput(cfg.ConvPrefix, int(rawInputSize))
 		if err != nil {
 			return utils.Wrap(utils.ErrUserConfig, err, "compile: conv prefix shape resolution")
@@ -153,6 +159,127 @@ func startVisServer[T utils.Float](n *NN[T], cfg *Config[T]) error {
 	}
 	n.vis = vs
 	return nil
+}
+
+// setupConv2DShapes walks the conv prefix and propagates the (C, H, W)
+// shape declared via [WithInputShape] (or auto-inferred for single-channel
+// square inputs) through every Conv2D / MaxPool2D / AvgPool2D / Flatten2D
+// layer. Each layer's SetInputShape is called so subsequent OutputShape()
+// queries succeed without requiring a Forward pass first.
+//
+// 1-D conv layers (Conv1D / MaxPool1D / AvgPool1D / Flatten) interrupt the
+// 2-D chain: their flat output length is the only contract, so after a 1-D
+// layer the (C, H, W) tracker is cleared. Mixed chains are unusual but the
+// function handles them deterministically.
+//
+// AI-Meta:
+//   - Purpose: Pre-pass that propagates CHW shape through 2-D conv layers before computeConvChainOutput.
+//   - Concurrency: Safe; mutates layer InH/InW/InChannels fields, not shared state.
+//   - Related: [compile], [computeConvChainOutput], [conv.Conv2D.SetInputShape].
+func setupConv2DShapes[T utils.Float](cfg *Config[T]) error {
+	curC, curH, curW := cfg.InputC, cfg.InputH, cfg.InputW
+	// Auto-infer single-channel square shape from the raw input length when
+	// the user did not declare an explicit shape (MNIST 784 → (1, 28, 28)).
+	if curC == 0 && curH == 0 && curW == 0 {
+		raw := int(cfg.InputSize)
+		s := iSqrt(raw)
+		if s > 0 && s*s == raw {
+			curC, curH, curW = 1, s, s
+		}
+	}
+	if curC == 0 || curH == 0 || curW == 0 {
+		// No 2-D shape available — only 1-D layers (or no layers) supported.
+		// Validate that no 2-D layer is present without shape declaration.
+		for i, cl := range cfg.ConvPrefix {
+			switch cl.(type) {
+			case *conv.Conv2D[T], *conv.MaxPool2D[T], *conv.AvgPool2D[T], *conv.Flatten2D[T]:
+				return fmt.Errorf("conv layer %d is 2-D but no input shape declared (use WithInputShape(c, h, w)): %w",
+					i, utils.ErrConv2DShapeMismatch)
+			}
+		}
+		return nil
+	}
+
+	if int(cfg.InputSize) != curC*curH*curW {
+		return fmt.Errorf("InputSize %d != InputC*InputH*InputW (%d*%d*%d = %d): %w",
+			cfg.InputSize, curC, curH, curW, curC*curH*curW, utils.ErrConv2DShapeMismatch)
+	}
+
+	in2D := true
+	for i, cl := range cfg.ConvPrefix {
+		switch l := cl.(type) {
+		case *conv.Conv2D[T]:
+			if !in2D {
+				return fmt.Errorf("conv layer %d is Conv2D but follows a 1-D layer: %w",
+					i, utils.ErrConv2DShapeMismatch)
+			}
+			if l.InChannels != curC {
+				return fmt.Errorf("Conv2D layer %d declares InChannels=%d but receives %d channels: %w",
+					i, l.InChannels, curC, utils.ErrConv2DShapeMismatch)
+			}
+			l.SetInputShape(curH, curW)
+			if err := l.Validate(curC, curH, curW); err != nil {
+				return fmt.Errorf("Conv2D layer %d validate: %w", i, err)
+			}
+			oh, ow := l.OutputShape()
+			if oh == 0 || ow == 0 {
+				return fmt.Errorf("Conv2D layer %d collapses shape (%d, %d, %d) to zero: %w",
+					i, curC, curH, curW, utils.ErrConv2DShapeMismatch)
+			}
+			curC, curH, curW = l.NumFilters, oh, ow
+		case *conv.MaxPool2D[T]:
+			if !in2D {
+				return fmt.Errorf("conv layer %d is MaxPool2D but follows a 1-D layer: %w",
+					i, utils.ErrConv2DShapeMismatch)
+			}
+			l.SetInputShape(curC, curH, curW)
+			if err := l.Validate(curC, curH, curW); err != nil {
+				return fmt.Errorf("MaxPool2D layer %d validate: %w", i, err)
+			}
+			oh, ow := l.OutputShape()
+			curH, curW = oh, ow
+		case *conv.AvgPool2D[T]:
+			if !in2D {
+				return fmt.Errorf("conv layer %d is AvgPool2D but follows a 1-D layer: %w",
+					i, utils.ErrConv2DShapeMismatch)
+			}
+			l.SetInputShape(curC, curH, curW)
+			if err := l.Validate(curC, curH, curW); err != nil {
+				return fmt.Errorf("AvgPool2D layer %d validate: %w", i, err)
+			}
+			oh, ow := l.OutputShape()
+			curH, curW = oh, ow
+		case *conv.Flatten2D[T]:
+			if !in2D {
+				return fmt.Errorf("conv layer %d is Flatten2D but follows a 1-D layer: %w",
+					i, utils.ErrConv2DShapeMismatch)
+			}
+			l.SetInputShape(curC, curH, curW)
+			in2D = false // After Flatten2D the chain emits a flat vector — Conv1D-style layers may follow.
+		default:
+			// 1-D layer (Conv1D / MaxPool1D / AvgPool1D / Flatten) — the 2-D
+			// tracker is no longer meaningful. Subsequent 2-D layers are an
+			// error caught by the in2D guard.
+			in2D = false
+		}
+	}
+	return nil
+}
+
+// iSqrt is the package-level mirror of conv.isqrt (avoids importing private
+// helpers across packages). Returns the integer square root of n; zero for
+// n ≤ 0.
+func iSqrt(n int) int {
+	if n <= 0 {
+		return 0
+	}
+	x := n
+	y := (x + 1) / 2
+	for y < x {
+		x = y
+		y = (x + n/x) / 2
+	}
+	return x
 }
 
 // computeConvChainOutput walks the conv prefix once with a dummy input of

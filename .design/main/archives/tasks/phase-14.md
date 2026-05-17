@@ -1,7 +1,7 @@
 ---
 phase: 14
 name: "Conv2D Implementation + MNIST CNN Example"
-status: Todo
+status: Done
 subsystem: "pkg/layer/conv/ (new conv2d/pool2d/flatten2d); pkg/nn/ (options + compile); pkg/dataset/ (MNIST adapter); examples/mnist_cnn/"
 requires:
   - "Phase 13 ✓ (l2-conv-2d-impl Stable v0.1.0)"
@@ -9,12 +9,45 @@ requires:
   - "l2-conv-2d-impl Stable v0.1.0"
   - "sibling pkg/layer/conv/ Conv1D + Flatten Stable (Phase 11)"
   - "pkg/dataset/mnist.go MNISTLoader[T] (Phase 11 Track C)"
-provides: []
+provides:
+  - "pkg/layer/conv/conv2d.go — Conv2D[T] (Forward/Backward/Init/SetInputShape/Validate/JSON)"
+  - "pkg/layer/conv/pool2d.go — MaxPool2D[T] + AvgPool2D[T]"
+  - "pkg/layer/conv/flatten2d.go — Flatten2D[T]"
+  - "pkg/nn/options.go — WithConv2D / WithMaxPool2D / WithAvgPool2D / WithFlatten2D / WithInputShape"
+  - "pkg/nn/compile.go — setupConv2DShapes CHW pre-pass"
+  - "pkg/dataset/dataset.go — ImageShaper interface"
+  - "pkg/dataset/mnist.go — WithImageShape / ImageShape()"
+  - "examples/mnist_cnn/ — E16 CNN demo (go.mod + main.go + README.md)"
+  - "l2-dataset-loader-impl.md v0.1.1 + l2-usage-examples.md v1.1.0 (spec amendments)"
+  - "CHANGELOG.md v0.12.0 entry"
 key_files:
-  created: []
-  modified: []
-patterns_established: []
-duration_minutes: ~
+  created:
+    - pkg/layer/conv/conv2d.go
+    - pkg/layer/conv/pool2d.go
+    - pkg/layer/conv/flatten2d.go
+    - pkg/layer/conv/conv2d_test.go
+    - examples/mnist_cnn/main.go
+    - examples/mnist_cnn/go.mod
+    - examples/mnist_cnn/README.md
+  modified:
+    - pkg/layer/conv/conv.go
+    - pkg/nn/config.go
+    - pkg/nn/options.go
+    - pkg/nn/compile.go
+    - pkg/dataset/dataset.go
+    - pkg/dataset/mnist.go
+    - pkg/dataset/mnist_test.go
+    - pkg/utils/errors.go
+    - go.work
+    - .design/main/specifications/l2-dataset-loader-impl.md
+    - .design/main/specifications/l2-usage-examples.md
+    - .design/main/INDEX.md
+patterns_established:
+  - "setupConv2DShapes CHW pre-pass in compile() — propagates (C,H,W) through 2-D prefix before shape-walk"
+  - "ImageShaper optional interface in dataset package — detected by compile() via type assertion for auto InputC/H/W wiring"
+  - "isqrt(784)=28 auto-inference — single-channel square shapes inferred without explicit WithInputShape"
+  - "PERF-4 zero-alloc backward — cap-check + zero-reset pattern for gradW/gradB/gradX in Conv2D.Backward"
+duration_minutes: 240
 ---
 
 # Phase 14 Tasks — Conv2D Implementation + MNIST CNN Example
@@ -27,30 +60,30 @@ duration_minutes: ~
 
 ### Track A — Conv2D Primitives (parallel-safe: A01/A03/A04 independent; A02 follows A01)
 
-- [ ] [T-14A01] `pkg/layer/conv/conv2d.go` — Conv2D[T] type + NewConv2D + Forward + Init + outputShape + Validate
-- [ ] [T-14A02] `pkg/layer/conv/conv2d.go` — Conv2D[T].Backward + GradSlots + MarshalJSON/UnmarshalJSON
-- [ ] [T-14A03] `pkg/layer/conv/pool2d.go` — MaxPool2D[T] + AvgPool2D[T] with argmax tracking
-- [ ] [T-14A04] `pkg/layer/conv/flatten2d.go` — Flatten2D[T] stateless CHW collapse + reshape backward
+- [x] [T-14A01] `pkg/layer/conv/conv2d.go` — Conv2D[T] type + NewConv2D + Forward + Init + outputShape + Validate
+- [x] [T-14A02] `pkg/layer/conv/conv2d.go` — Conv2D[T].Backward + GradSlots + MarshalJSON/UnmarshalJSON
+- [x] [T-14A03] `pkg/layer/conv/pool2d.go` — MaxPool2D[T] + AvgPool2D[T] with argmax tracking
+- [x] [T-14A04] `pkg/layer/conv/flatten2d.go` — Flatten2D[T] stateless CHW collapse + reshape backward
 
 ### Track B — NN Integration (serial after Track A)
 
-- [ ] [T-14B01] `pkg/nn/options.go` + `pkg/nn/config.go` — WithConv2D/WithMaxPool2D/WithAvgPool2D/WithFlatten2D + Conv2DPrefix field
-- [ ] [T-14B02] `pkg/nn/compile.go` — prepend Conv2D prefix; chain outputShape() to size first Dense layer
+- [x] [T-14B01] `pkg/nn/options.go` + `pkg/nn/config.go` — WithConv2D/WithMaxPool2D/WithAvgPool2D/WithFlatten2D + Conv2DPrefix field
+- [x] [T-14B02] `pkg/nn/compile.go` — prepend Conv2D prefix; chain outputShape() to size first Dense layer
 
 ### Track C — MNIST 2-D Adapter (parallel with Track A)
 
-- [ ] [T-14C01] Amend `l2-dataset-loader-impl.md` (patch v0.1.0 → v0.1.1) — add WithImageShape requirement section
-- [ ] [T-14C02] `pkg/dataset/mnist.go` — WithImageShape(channels, height, width) decorator + round-trip test
+- [x] [T-14C01] Amend `l2-dataset-loader-impl.md` (patch v0.1.0 → v0.1.1) — add WithImageShape requirement section
+- [x] [T-14C02] `pkg/dataset/mnist.go` — WithImageShape(channels, height, width) decorator + round-trip test
 
 ### Track D — MNIST CNN Example (serial after A+B+C)
 
-- [ ] [T-14D01] `examples/mnist_cnn/main.go` + `examples/mnist_cnn/README.md` — E16 full CNN demo
-- [ ] [T-14D02] Amend `l2-usage-examples.md` (minor v1.0.0 → v1.1.0) — register E16
+- [x] [T-14D01] `examples/mnist_cnn/main.go` + `examples/mnist_cnn/README.md` — E16 full CNN demo
+- [x] [T-14D02] Amend `l2-usage-examples.md` (minor v1.0.0 → v1.1.0) — register E16
 
 ### Validation + Gate
 
-- [ ] [T-14T01] `pkg/layer/conv/conv2d_test.go` — full backward test matrix (CONV2D-4) with finite-difference gradient check
-- [ ] [T-14Z01] Phase 14 gate — build + test + coverage + v0.12.0 release candidate
+- [x] [T-14T01] `pkg/layer/conv/conv2d_test.go` — full backward test matrix (CONV2D-4) with finite-difference gradient check
+- [x] [T-14Z01] Phase 14 gate — build + test + coverage + v0.12.0 release candidate
 
 ## Detailed Tracking
 

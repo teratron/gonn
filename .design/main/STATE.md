@@ -5,15 +5,15 @@
 
 **Workspace:** main
 **Project Version:** 0.11.0 released
-**Updated:** 2026-05-17 14:13
+**Updated:** 2026-05-17 18:00
 **Phase:** 14 — Conv2D Implementation + MNIST CNN
-**Status:** Active
+**Status:** Done → v0.12.0 RC ready
 
 ## Current Position
 
-- **Task:** T-13Z01 Phase 13 gate
-- **Spec:** l1-meta-learning-hooks Stable v1.0.0 + l2-meta-learning-impl Stable v0.1.0.
-- **Next Action:** Run /magic-run main to execute Phase 14 (12 tasks: T-14A01..A04 + B01..B02 + C01..C02 + D01..D02 + T01 + Z01)
+- **Task:** T-14Z01 Phase 14 gate — COMPLETE
+- **Spec:** l2-conv-2d-impl Stable v0.1.0; l2-dataset-loader-impl Stable v0.1.1; l2-usage-examples Stable v1.1.0
+- **Next Action:** User runs `git tag -a v0.12.0 -m "v0.12.0: Conv2D + MNIST CNN"` then `/magic-task` to scope Phase 15
 
 ## Progress
 
@@ -30,10 +30,14 @@ Phase 9  (Done):    [15/15]   ████████ 100%   (Tracks A+B+C + va
 Phase 10 (Done):    [10/10]   ████████ 100%   (Tracks A+B + validation + gate; norm + callbacks)
 Phase 11 (Done):    [14/14]   ████████ 100%   (Track A 3/3 completed via Phase 12; Track B 5/5; Track C 5/5; gate done)
 Phase 12 (Done):    [5/5]     ████████ 100%   (Track A 3/3 done; T-12T01 + T-12Z01 done)
-Overall:            [192/192] ████████ 100%
+Phase 13 (Done):    [2/2]     ████████ 100%   (L1 + L2 spec authoring; gate done)
+Phase 14 (Done):    [12/12]   ████████ 100%   (Tracks A+B+C+D + T01 + Z01; v0.12.0 RC)
+Overall:            [206/206] ████████ 100%
 ```
 
 ## Recent Decisions
+
+- 2026-05-17 **Decision:** Phase 14 complete. Track A: `conv2d.go` (Conv2D[T] Forward/Backward/Init/JSON, CONV2D-C9 CHW layout, PERF-4 zero-alloc Backward), `pool2d.go` (MaxPool2D argmax routing + AvgPool2D even distribution), `flatten2d.go` (stateless identity reshape). Track B: `WithConv2D/MaxPool2D/AvgPool2D/Flatten2D/InputShape` options + `setupConv2DShapes` CHW pre-pass in compile(), isqrt auto-inference (MNIST 784→1×28×28). Track C: `ImageShaper` interface in dataset package + `WithImageShape`/`ImageShape()` on MNISTLoader. Track D: `examples/mnist_cnn/` E16 (LeNet-style, two-epoch Fit+AndTrain). T-14T01: 4-case FD gradient check all PASS. Gate T-14Z01: `go build ./...` clean; all 18+1 packages green; `pkg/layer/conv/` 81.9%; `pkg/dataset/` 85.9%; `pkg/nn/` 77.1% (pre-existing). CHANGELOG v0.12.0 written.
 - 2026-05-17 **Decision:** Phase 13 complete. Provides: l1-conv-2d-layers Stable v0.2.0 (9 invariants CONV2D-1..9, CHW layout) + l2-conv-2d-impl Stable v0.1.0 (filter-major flat []T storage, all 9 invariants mapped, MNIST adapter requirement in §6). Spec-critic: zero Substantive Compliance failures. check-prerequisites ok:true. Implementation tracks deferred to Phase 14.
 
 - 2026-05-10 **Decision:** Phase 8 complete. Track A: `pkg/optimizer/exponential_lr.go` — `ExponentialLR[T]` (lr₀ × gamma^t), LRS-1..LRS-6, default PerEpoch, JSON SaveState/LoadState; `pkg/optimizer/` coverage 88.2%. Track B: `cmd/gonn/` — `main.go` (dispatch), `train.go`, `query.go`, `verify.go`, `version.go`, `exitcode.go`, `load.go`, `csv.go` — full CLI binary with train/query/verify/version subcommands, `--precision float32|float64` generic dispatch, 64 MB streaming threshold, `--json` output, exit-code contract (0-7), XOR end-to-end smoke test; coverage 83.7%. l2-lr-scheduling-impl.md bumped to v1.1.0. CHANGELOG.md v0.7.0 entry written. Gate T-8Z01: `go build ./...` clean; `go test ./...` all 16 packages green; all packages ≥80%.
@@ -61,6 +65,6 @@ Overall:            [192/192] ████████ 100%
 
 ## Session Continuity
 
-**Last Session Ended:** 2026-05-17 (Phase 12 complete — v0.11.0 gate passed)
+**Last Session Ended:** 2026-05-17 (Phase 14 complete — v0.12.0 gate passed)
 **Handoff File:** none
-**Bootstrap Mode:** false (Phase 12 Done; next = /magic-task main to scope Phase 13)
+**Bootstrap Mode:** false (Phase 14 Done; next = user runs `git tag -a v0.12.0`, then /magic-task main to scope Phase 15)

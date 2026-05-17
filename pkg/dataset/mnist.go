@@ -190,10 +190,13 @@ func (ir *IDXReader) Reset() error {
 // constructor invocation — call Reset to rewind, which reopens the
 // underlying files when they were obtained from NewMNISTLoaderFiles.
 //
+// MNISTLoader also implements [ImageShaper] when WithImageShape is applied or
+// when the IDX header carries ndim==3 (images file has explicit H×W dims).
+//
 // AI-Meta:
 //   - Purpose: Stream MNIST IDX image + label pairs as Dataset batches with normalised pixels.
 //   - Concurrency: NotSafe; Next mutates internal cursors.
-//   - Related: [Dataset], [NewMNISTLoader], [NewMNISTLoaderFiles], [IDXReader].
+//   - Related: [Dataset], [ImageShaper], [NewMNISTLoader], [NewMNISTLoaderFiles], [IDXReader].
 //   - Stability: Stable.
 type MNISTLoader[T utils.Float] struct {
 	norm      T
@@ -204,6 +207,72 @@ type MNISTLoader[T utils.Float] struct {
 	labelPath string
 	openFiles []io.Closer
 	batchSize int
+	// imgShape holds the explicit (C, H, W) set by WithImageShape.
+	// Zero value means "derive from IDX header or fall back to isqrt".
+	imgShape [3]int
+}
+
+// WithImageShape sets the (channels, height, width) layout for the image
+// records in the loader. When applied, compile() reads ImageShape() to
+// populate Config.InputC/InputH/InputW automatically without requiring a
+// separate WithInputShape call.
+//
+// Validation deferred to ImageShape(): channels*height*width must equal the
+// IDX record length at the point where the shape is first consumed.
+//
+// AI-Meta:
+//   - Purpose: Attach a 2-D image shape to MNISTLoader for automatic compile() integration.
+//   - Usage: ldr.WithImageShape(1, 28, 28).
+//   - Related: [ImageShaper], [MNISTLoader.ImageShape].
+//   - Stability: Stable.
+func (m *MNISTLoader[T]) WithImageShape(channels, height, width int) *MNISTLoader[T] {
+	m.imgShape = [3]int{channels, height, width}
+	return m
+}
+
+// ImageShape implements [ImageShaper]. Returns the shape set by WithImageShape
+// when non-zero. Falls back to the IDX header dims when the images file has
+// ndim==3 (standard MNIST 3-D file: N×H×W for single-channel). When ndim==1
+// and the record length is a perfect square, infers (1, S, S). Returns (0,0,0)
+// when neither condition holds.
+//
+// AI-Meta:
+//   - Purpose: Expose (C,H,W) for compile() auto-wiring; satisfies [ImageShaper].
+//   - Usage: c, h, w := loader.ImageShape().
+//   - Related: [ImageShaper], [WithImageShape].
+//   - Stability: Stable.
+func (m *MNISTLoader[T]) ImageShape() (channels, height, width int) {
+	if m.imgShape[0] != 0 {
+		return m.imgShape[0], m.imgShape[1], m.imgShape[2]
+	}
+	if m.images == nil {
+		return 0, 0, 0
+	}
+	hdr := m.images.Header()
+	if hdr.ndim == 3 {
+		// Standard MNIST 3-D layout: dims = [N, H, W]; single channel.
+		return 1, int(hdr.dims[1]), int(hdr.dims[2])
+	}
+	// Flat 1-D record: try isqrt inference for single-channel square images.
+	if hdr.ndim == 1 || (hdr.ndim == 2 && hdr.dims[1] > 0) {
+		s := mnistISqrt(hdr.recLen)
+		if s*s == hdr.recLen {
+			return 1, s, s
+		}
+	}
+	return 0, 0, 0
+}
+
+// mnistISqrt returns the integer square root of n (largest k with k*k <= n).
+func mnistISqrt(n int) int {
+	if n <= 0 {
+		return 0
+	}
+	s := 1
+	for s*s <= n {
+		s++
+	}
+	return s - 1
 }
 
 // NewMNISTLoader wraps existing IDX readers. The images reader must point at

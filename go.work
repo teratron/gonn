@@ -17,4 +17,5 @@ use (
 	./examples/higher_order_options
 	./examples/continuation
 	./examples/mnist
+	./examples/mnist_cnn
 )

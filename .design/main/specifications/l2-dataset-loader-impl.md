@@ -1,6 +1,6 @@
 # Dataset Loader — Go Implementation
 
-**Version:** 0.1.0
+**Version:** 0.1.1
 **Status:** Stable
 **Layer:** implementation
 **Implements:** l1-dataset-formats.md
@@ -76,15 +76,51 @@ type IDXReader struct {
 ```
 // [REFERENCE]
 type MNISTLoader[T utils.Float] struct {
-    images *IDXReader
-    labels *IDXReader
-    norm   T          // pixel normalization divisor (255.0 for uint8 images)
+    images    *IDXReader
+    labels    *IDXReader
+    norm      T          // pixel normalization divisor (255.0 for uint8 images)
+    imgShape  [3]int     // [C, H, W]; zero means "infer from IDX dims"
 }
 
 // implements dataset.DataSet[T]:
 // Next() (input []T, target []T, err error)
-// input  = image pixels normalised to [0,1]
+// input  = image pixels normalised to [0,1], length = C*H*W
 // target = one-element slice with raw label cast to T (caller encodes one-hot)
+```
+
+### 5.3a WithImageShape
+
+`WithImageShape` is a functional option for `MNISTLoader[T]` that overrides the
+image shape used during the training run. When provided, `nn.compile()` reads
+`Channels`, `Height`, `Width` from the loader and sets `Config.InputC / InputH /
+InputW` automatically — the user does not need to call `WithInputShape` separately.
+
+```
+// [REFERENCE]
+func WithImageShape[T utils.Float](channels, height, width int) MNISTOption[T]
+// Validates: channels >= 1, height >= 1, width >= 1, channels*height*width == images.RecordLen().
+// Stored as loader.imgShape = [3]int{channels, height, width}.
+```
+
+The `MNISTLoader[T]` exposes its resolved shape via:
+
+```
+// ImageShape returns (channels, height, width) as set by WithImageShape, or
+// inferred from IDX header dims when ndim == 3 and WithImageShape was not used.
+// Returns (1, S, S) for flat ndim==1 files with perfect-square record length.
+func (m *MNISTLoader[T]) ImageShape() (channels, height, width int)
+```
+
+`compile()` integration point: when `cfg.InputC == 0` and the first element of
+`cfg.ConvPrefix` is a `*conv.Conv2D[T]`, `setupConv2DShapes` calls `ImageShape()`
+on the dataset (if it satisfies the optional `ImageShaper` interface below):
+
+```
+// ImageShaper is an optional interface satisfied by MNISTLoader and any
+// dataset adapter that carries a known (C, H, W) image shape.
+type ImageShaper interface {
+    ImageShape() (channels, height, width int)
+}
 ```
 
 ### 5.4 AndTrain
@@ -123,3 +159,4 @@ func (nn *NN[T]) AndTrain(ds dataset.DataSet[T], opts ...Option[T]) (Result[T], 
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-05-12 | Initial Draft — IDXReader, MNISTLoader[T], AndTrain method. |
 | 0.1.0 | 2026-05-14 | Promoted Draft → Stable via magic.task Trust Mode (parent `l1-dataset-formats` Stable; MVC satisfied). |
+| 0.1.1 | 2026-05-17 | Added §5.3a WithImageShape — MNISTLoader 2-D shape option, ImageShape() accessor, ImageShaper interface, compile() integration point (Phase 14 / CONV2D-5). |
