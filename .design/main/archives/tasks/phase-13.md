@@ -1,19 +1,26 @@
 ---
 phase: 13
 name: "Convolutional 2-D Foundation"
-status: Todo
+status: Done
 subsystem: ".design/main/specifications/ (L2 authoring); future pkg/layer/conv/, pkg/dataset/, examples/"
 requires:
   - "Phase 11 ✓ (Conv1D Track B)"
   - "Phase 12 ✓ (Meta-Learning Hooks)"
   - "l1-conv-2d-layers Stable v0.2.0"
   - "sibling l1-conv-layers Stable v1.0.0"
-provides: []
+provides:
+  - "l1-conv-2d-layers Stable v0.2.0"
+  - "l2-conv-2d-impl Stable v0.1.0"
 key_files:
-  created: []
-  modified: []
-patterns_established: []
-duration_minutes: ~
+  created:
+    - ".design/main/specifications/l2-conv-2d-impl.md"
+  modified:
+    - ".design/main/INDEX.md"
+    - ".design/main/TASKS.md"
+patterns_established:
+  - "Filter-major flat []T storage for 2-D: Weights[f*(C_in*K_h*K_w) + c*(K_h*K_w) + i*K_w + j] (CHW, generalises Conv1D Variant A)"
+  - "L2 spec Trust Mode promotion: Draft→Stable when MVC satisfied + L1 parent Stable + no RULES conflicts"
+duration_minutes: 40
 ---
 
 # Phase 13 Tasks — Convolutional 2-D Foundation
@@ -24,9 +31,9 @@ duration_minutes: ~
 
 ## Atomic Checklist
 
-- [ ] [T-13A01] Author L2 implementation spec `l2-conv-2d-impl.md`
-- [ ] [T-13T01] Validation — verify CONV2D-1..9 invariants are fully mapped in the new L2 spec
-- [ ] [T-13Z01] Phase 13 gate
+- [x] [T-13A01] Author L2 implementation spec `l2-conv-2d-impl.md`
+- [x] [T-13T01] Validation — verify CONV2D-1..9 invariants are fully mapped in the new L2 spec
+- [x] [T-13Z01] Phase 13 gate
 
 ## Detailed Tracking
 

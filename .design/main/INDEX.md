@@ -1,6 +1,6 @@
 # Workspace Specifications Registry
 
-**Version:** 2.12.0
+**Version:** 2.13.0
 **Status:** Active
 **Engine Version:** 2.1.25
 
@@ -68,8 +68,9 @@ Local registry of specifications for this workspace.
 | [l2-conv-layers-impl.md](specifications/l2-conv-layers-impl.md) | Go realization of convolutional layers — pkg/layer/conv/ (Conv1D/MaxPool1D/Flatten) | Stable | L2 | 0.1.0 |
 | [l2-dataset-loader-impl.md](specifications/l2-dataset-loader-impl.md) | Go realization of dataset formats — pkg/dataset/mnist.go + pkg/nn/andtrain.go | Stable | L2 | 0.1.0 |
 | [l1-conv-2d-layers.md](specifications/l1-conv-2d-layers.md) | 2-D convolutional layer contract — Conv2D / MaxPool2D / AvgPool2D / Flatten2D, CHW layout, 9 invariants | Stable | L1 | 0.2.0 |
+| [l2-conv-2d-impl.md](specifications/l2-conv-2d-impl.md) | Go realization of 2-D convolutional layers — pkg/layer/conv/ (Conv2D/MaxPool2D/AvgPool2D/Flatten2D) | Stable | L2 | 0.1.0 |
 
 ## Meta Information
 
 - **Maintainer**: Core Team
-- **Last Updated**: 2026-05-17 (magic-task Pre-Planning Stabilization: promoted `l1-conv-2d-layers` Draft v0.2.0 → Stable v0.2.0 via Trust Mode batch (no RULES conflicts, no cycles, MVC satisfied). Phase 13 — Convolutional 2-D Foundation scoped. INDEX v2.11.0 → v2.12.0.)
+- **Last Updated**: 2026-05-17 (magic-run Phase 13 T-13A01: authored `l2-conv-2d-impl.md` Stable v0.1.0 — all 9 CONV2D invariants mapped, CHW layout verbatim, Trust Mode promoted Draft→Stable. INDEX v2.12.0 → v2.13.0.)

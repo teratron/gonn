@@ -1,10 +1,10 @@
 # Implementation Plan
 
-**Version:** 2.9.0
-**Project Version:** 0.11.0 (released; 0.12.0 in progress — Phase 13 scoped for Convolutional 2-D Foundation)
+**Version:** 2.10.0
+**Project Version:** 0.11.0 (released; 0.12.0 in progress — Phase 13 Done; Phase 14 Conv2D Implementation to be scoped)
 **Generated:** 2026-04-29
 **Last Updated:** 2026-05-17
-**Based on:** .design/main/INDEX.md v2.12.0
+**Based on:** .design/main/INDEX.md v2.13.0
 **Based on RULES:** .design/RULES.md v1.3.0
 **Based on ROADMAP:** .design/main/ROADMAP.md v1.0.0
 **Status:** Active
@@ -226,10 +226,12 @@ pass after the L2 spec is authored — see T-13A01.*
 
 **Subsystem:** `.design/main/specifications/` (L2 authoring); future `pkg/layer/conv/`, `pkg/dataset/`, `examples/`
 **Requires:** Phase 11 ✓; Phase 12 ✓; l1-conv-2d-layers Stable v0.2.0 ✓; sibling l1-conv-layers Stable v1.0.0 ✓
-**Tasks file:** [tasks/phase-13.md](tasks/phase-13.md)
+**Tasks file:** [archives/tasks/phase-13.md](archives/tasks/phase-13.md)
 **Track order:** Single track A (L2 spec authoring) → T-13T01 validation → Gate T-13Z01. Implementation expansion deferred to follow-up phase / re-scoping.
 
-- [ ] **[A] 2-D Convolutional Layer Contract** ([l1-conv-2d-layers.md](specifications/l1-conv-2d-layers.md)) [L1, Stable v0.2.0] — CONV2D-1..CONV2D-9 invariants finalised; CHW layout fixed; sibling to existing 1-D `l1-conv-layers.md` Stable v1.0.0. L2 implementation spec `l2-conv-2d-impl.md` to be authored via `/magic-spec` as T-13A01 — implementation packages (`pkg/layer/conv/conv2d.go` and friends) follow in a subsequent phase scoped after L2 is Stable.
+**Outcome:** `l1-conv-2d-layers` Stable v0.2.0 (9 invariants CONV2D-1..9); `l2-conv-2d-impl` Stable v0.1.0 (CHW filter-major flat `[]T`, all 9 invariants mapped, MNIST adapter requirement documented). Implementation tracks (Phase 14) scoped by next `/magic-task main`.
+
+- [x] **[A] 2-D Convolutional Layer Contract** ([l1-conv-2d-layers.md](specifications/l1-conv-2d-layers.md)) [L1, Stable v0.2.0] — CONV2D-1..CONV2D-9 invariants finalised; CHW layout fixed; sibling to existing 1-D `l1-conv-layers.md` Stable v1.0.0. L2 implementation spec `l2-conv-2d-impl.md` authored Stable v0.1.0 — implementation packages (`pkg/layer/conv/conv2d.go` and friends) follow in Phase 14.
 
 ## Build Order Diagram
 
@@ -275,3 +277,4 @@ graph LR
 | 2.7.0 | 2026-05-17 | Phase 11 closed (v0.10.0 tagged). C10 binary-on-phase-close: Track B (Conv) `[x]`, Track C (Dataset+Examples) `[x]`, Track A (Meta-Learning) remains `[ ]` — explicitly deferred to Phase 12 pending l1-meta-learning-hooks RFC→Stable promotion. Outcome line added. Pre-flight clean; Trust Mode batch: 1 Draft (l2-meta-learning-impl) skipped per Layer constraint — L1 parent is RFC. Phase 12 scoping deferred: no new Stable specs to plan; user must run `/magic-spec` to either promote l1-meta-learning-hooks RFC→Stable or author a conv-optimizer-pluggability spec before next `/magic-task`. Based on INDEX.md v2.9.0. |
 | 2.8.0 | 2026-05-17 | Phase 12 scoped (v0.11.0 target). Single-track A — Meta-Learning Hooks — unblocked by magic-spec cascade promotion (l1-meta-learning-hooks v1.0.0 + l2-meta-learning-impl v0.1.0 both Stable). 3 atomic tasks (T-12A01..A03) + 1 validation (T-12T01) + 1 gate (T-12Z01) = 5 total. l1-meta-learning-hooks moved from Backlog into active Phase 12. SYNC_GAP (PLAN base v2.9.0 → INDEX v2.10.0) resolved. Based on INDEX.md v2.10.0. |
 | 2.9.0 | 2026-05-17 | Phase 12 marked Done (v0.11.0 release-ready). Phase 13 scoped: Convolutional 2-D Foundation. Pre-Planning Stabilization: 1 Draft promoted Stable (l1-conv-2d-layers v0.2.0) via Trust Mode batch (no RULES conflicts, no cycles, MVC satisfied). Single track A authoring task (T-13A01 — delegate L2 spec to `/magic-spec`) + validation (T-13T01) + gate (T-13Z01). Implementation tracks (B/C) deferred to follow-up phase after L2 stabilises. ORPHANED_SPEC + SYNC_GAP warnings resolved (PLAN base v2.10.0 → INDEX v2.12.0). Based on INDEX.md v2.12.0. |
+| 2.10.0 | 2026-05-17 | Phase 13 marked Done. `l2-conv-2d-impl` Stable v0.1.0 authored (T-13A01); all 9 CONV2D invariants mapped + spec-critic clean (T-13T01); gate T-13Z01 passed. Provides: `l1-conv-2d-layers` Stable v0.2.0 + `l2-conv-2d-impl` Stable v0.1.0. Phase 14 (Conv2D Implementation) deferred to next `/magic-task main`. SYNC_GAP resolved. Based on INDEX.md v2.13.0. |

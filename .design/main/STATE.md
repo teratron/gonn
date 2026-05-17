@@ -5,15 +5,15 @@
 
 **Workspace:** main
 **Project Version:** 0.11.0 released
-**Updated:** 2026-05-17 13:55
-**Phase:** 13 — Convolutional 2-D Foundation
+**Updated:** 2026-05-17 14:05
+**Phase:** 14 — Conv2D Implementation
 **Status:** Active
 
 ## Current Position
 
-- **Task:** T-12Z01 Phase 12 gate complete. All 5 tasks done.
+- **Task:** T-13Z01 Phase 13 gate
 - **Spec:** l1-meta-learning-hooks Stable v1.0.0 + l2-meta-learning-impl Stable v0.1.0.
-- **Next Action:** Run /magic-run main to execute Phase 13 (delegates L2 spec authoring to /magic-spec via T-13A01)
+- **Next Action:** Run /magic-task main to scope Phase 14 — Conv2D Implementation + MNIST CNN example (pkg/layer/conv/ 2-D primitives)
 
 ## Progress
 
@@ -34,6 +34,7 @@ Overall:            [192/192] ████████ 100%
 ```
 
 ## Recent Decisions
+- 2026-05-17 **Decision:** Phase 13 complete. Provides: l1-conv-2d-layers Stable v0.2.0 (9 invariants CONV2D-1..9, CHW layout) + l2-conv-2d-impl Stable v0.1.0 (filter-major flat []T storage, all 9 invariants mapped, MNIST adapter requirement in §6). Spec-critic: zero Substantive Compliance failures. check-prerequisites ok:true. Implementation tracks deferred to Phase 14.
 
 - 2026-05-10 **Decision:** Phase 8 complete. Track A: `pkg/optimizer/exponential_lr.go` — `ExponentialLR[T]` (lr₀ × gamma^t), LRS-1..LRS-6, default PerEpoch, JSON SaveState/LoadState; `pkg/optimizer/` coverage 88.2%. Track B: `cmd/gonn/` — `main.go` (dispatch), `train.go`, `query.go`, `verify.go`, `version.go`, `exitcode.go`, `load.go`, `csv.go` — full CLI binary with train/query/verify/version subcommands, `--precision float32|float64` generic dispatch, 64 MB streaming threshold, `--json` output, exit-code contract (0-7), XOR end-to-end smoke test; coverage 83.7%. l2-lr-scheduling-impl.md bumped to v1.1.0. CHANGELOG.md v0.7.0 entry written. Gate T-8Z01: `go build ./...` clean; `go test ./...` all 16 packages green; all packages ≥80%.
 - 2026-05-10 **Decision:** Phase 7 complete. Track A: `pkg/optimizer/` extended with `Scheduler[T]` interface, `BindScheduler[T]`, `LearningRateSetter[T]` optional extension, and four scheduler types — `StepLR[T]` (step decay), `WarmUpLR[T]` (linear ramp, PerStep default), `CosineAnnealingLR[T]` (cosine decay), `ChainScheduler[T]` (sequential composition). All four existing optimizers (SGD/Adam/RMSProp/SGDMomentum) implement `LearningRateSetter[T]` via `SetLearningRate(T)`. `pkg/optimizer/scheduler_test.go` covers all scheduler types, BindScheduler wiring, Granularity defaults, and SaveState/LoadState round-trips; coverage 88.9 %. Track B: `pkg/nn/builder.go` + `pkg/nn/options.go` extended with bulk constructors `Repeat`/`Pattern`/`HiddenLayers` (Builder, setter/append semantics distinguished) and `Repeat[T]`/`Pattern[T]`/`WithHiddenLayers[T]` (Options, append); `WithScheduler` added to both; `pkg/nn/train.go` dispatches `sched.Step()` per `Granularity()` (PerEpoch after epoch, PerStep per batch); `pkg/nn/config.go` adds `Scheduler` field; `pkg/nn/phase7_test.go` covers 11 test functions + 2 benchmarks; coverage 86.4 %. Track C: `skills/gonn/` created with `SKILL.md` (10 sections, YAML frontmatter), 3 example files (builder-xor, options-mnist, deep-network), and 2 resource files (api-reference, conventions). Gate T-7Z01: `go build ./...` clean; `go test ./pkg/...` all green; all packages ≥80 %; skills directory matches spec §5.1; 3 orphaned specs resolved.
