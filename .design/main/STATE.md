@@ -4,16 +4,16 @@
 <!-- Maximum 100 lines. Agent updates AFTER each completed action. -->
 
 **Workspace:** main
-**Project Version:** 0.10.0 released; 0.11.0 planned (Phase 12 — Meta-Learning Hooks + Conv optimizer pluggability)
-**Updated:** 2026-05-17 12:30
-**Phase:** 11 — Meta-Learning Hooks + Conv Layers + Dataset Formats
-**Status:** Done
+**Project Version:** 0.10.0 released; 0.11.0 in progress (Phase 12 scoped — Meta-Learning Hooks)
+**Updated:** 2026-05-17 13:00
+**Phase:** 12 — Meta-Learning Hooks
+**Status:** Todo
 
 ## Current Position
 
-- **Task:** Phase 11 closed in PLAN.md (v2.6.1 → v2.7.0). Trust Mode batch: 0 promotions; only Draft (l2-meta-learning-impl) blocked by L1 parent (l1-meta-learning-hooks RFC).
-- **Spec:** No plannable specs for Phase 12 — Track A still gated on RFC review.
-- **Next Action:** Run `/magic-spec` to promote `l1-meta-learning-hooks` RFC v0.3.0 → Stable (unblocks Phase 12 Track A scoping). Alternatively, author new spec for conv-optimizer pluggability (Phase 11 deferred note). Then re-run `/magic-task`.
+- **Task:** Phase 12 scoped. Single-track A — Meta-Learning Hooks. 5 atomic tasks (T-12A01..A03 + T-12T01 + T-12Z01).
+- **Spec:** l1-meta-learning-hooks Stable v1.0.0 + l2-meta-learning-impl Stable v0.1.0 — both unblocked via magic-spec cascade.
+- **Next Action:** Run `/magic-run` (or `/magic-run main`) to begin T-12A01: create `pkg/nn/meta.go` with `ParamAccessor[T]` interface, `ScalarParam[T]`/`SliceParam[T]` wrappers, `MetaLearner[T]` struct, and the two new sentinels in `pkg/utils/errors.go`.
 
 ## Progress
 
@@ -29,7 +29,8 @@ Phase 8  (Done):    [9/9]     ████████ 100%   (Track A: Exponent
 Phase 9  (Done):    [15/15]   ████████ 100%   (Tracks A+B+C + validation + gate)
 Phase 10 (Done):    [10/10]   ████████ 100%   (Tracks A+B + validation + gate; norm + callbacks)
 Phase 11 (Done):    [11/14]   ███████░  79%   (Track A 0/3 deferred Phase 12; Track B 5/5 done; Track C 5/5 done; T-11T02+T-11T03+T-11Z01 done)
-Overall:            [184/187] ████████  98%
+Phase 12 (Todo):    [0/5]     ░░░░░░░░   0%   (Track A 0/3; T-12T01 + T-12Z01 pending)
+Overall:            [184/192] ███████░  96%
 ```
 
 ## Recent Decisions
@@ -45,8 +46,7 @@ Overall:            [184/187] ████████  98%
 
 ## Blockers
 
-- **Phase 12 blocker**: l1-meta-learning-hooks still RFC v0.3.0 — run `/magic-spec` to promote RFC→Stable before Phase 12 Track A (T-12A01..T-12A03) can start.
-- **E06 smoke-run**: `go run ./examples/mnist/` deferred — needs user-supplied IDX data (see examples/mnist/README.md for download instructions).
+- **E06 smoke-run**: `go run ./examples/mnist/` deferred — needs user-supplied IDX data (see examples/mnist/README.md for download instructions). Not a Phase 12 blocker.
 
 ## Blocking Constraints
 
@@ -56,6 +56,6 @@ Overall:            [184/187] ████████  98%
 
 ## Session Continuity
 
-**Last Session Ended:** 2026-05-17 (Phase 11 gate T-11Z01 complete)
+**Last Session Ended:** 2026-05-17 (Phase 12 scoped via magic-task after magic-spec cascade)
 **Handoff File:** none
-**Bootstrap Mode:** false (Phase 11 Done; next = /magic-task for Phase 12 scoping)
+**Bootstrap Mode:** false (Phase 12 Todo; next = /magic-run main to begin T-12A01)
