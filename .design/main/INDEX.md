@@ -1,6 +1,6 @@
 # Workspace Specifications Registry
 
-**Version:** 2.15.0
+**Version:** 2.16.0
 **Status:** Active
 **Engine Version:** 2.1.27
 
@@ -74,8 +74,9 @@ Local registry of specifications for this workspace.
 | [l1-recurrent-layers.md](specifications/l1-recurrent-layers.md) | Recurrent layer contract — SimpleRNN / LSTM / GRU with BPTT, 9 invariants (REC-1..9) | Stable | L1 | 0.1.0 |
 | [l2-recurrent-impl.md](specifications/l2-recurrent-impl.md) | Go realization of recurrent layers — pkg/layer/recurrent/ (SimpleRNN/LSTM/GRU/LastStep) + WithGradClipNorm | Stable | L2 | 0.1.0 |
 | [l1-attention.md](specifications/l1-attention.md) | Attention mechanism contract — scaled dot-product, Self/Multi-Head, causal + padding masks, 10 invariants (ATT-1..10) | Stable | L1 | 0.1.0 |
+| [l2-attention-impl.md](specifications/l2-attention-impl.md) | Go realization of attention — pkg/layer/attention/ (single MultiHeadAttention[T] + NewAttention sugar, MaskedLayer[T] interface, softmax row-wise helpers in cell.go) | Stable | L2 | 0.1.0 |
 
 ## Meta Information
 
 - **Maintainer**: Core Team
-- **Last Updated**: 2026-05-18 (magic-spec Blank Trigger Spark 1: l1-attention v0.1.0 authored Stable via Trust Mode — 10 invariants ATT-1..10 covering scaled dot-product, Self/Multi-Head, causal + padding masks, four-path backward, Xavier-init projections. Highest-coverage architectural gap post-Phase-15: completes Conv + RNN + Attention sequence-primitive trio, unblocks Transformer encoder composition. L2 deferred (3-phase plan documented in §6). INDEX v2.14.0 → v2.15.0.)
+- **Last Updated**: 2026-05-18 (magic-spec Blank Trigger follow-up: l2-attention-impl v0.1.0 authored Stable via Trust Mode — Implements l1-attention.md with full ATT-1..10 Invariant Compliance table; single MultiHeadAttention[T] struct + NumHeads field covers all three L1 variants; MaskedLayer[T] interface for runtime padding mask; cell.go softmax helpers (row-wise + masked + backward); 5-phase implementation plan α-ε; reserves Dropout field stub for future ATT-C7 amendment. Closes the Phase 17 prerequisite gap flagged by previous /magic-task @role:planner audit. INDEX v2.15.0 → v2.16.0.)

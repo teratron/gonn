@@ -835,6 +835,7 @@ Promotes three specs to Stable.
 
 
 
+
 - Updated task plan and task index (main)
 - Completed task `phase-11` (main)
 - Updated 2 specifications (main)
@@ -845,4 +846,5 @@ Promotes three specs to Stable.
 - Updated 5 specifications (main)
 - Completed task `phase-15` (main)
 - Added specification `attention` (main)
+- Added specification `attention-impl` (main)
 
