@@ -1,6 +1,6 @@
 # Workspace Specifications Registry
 
-**Version:** 2.13.1
+**Version:** 2.14.0
 **Status:** Active
 **Engine Version:** 2.1.27
 
@@ -51,7 +51,7 @@ Local registry of specifications for this workspace.
 | [l1-regularization.md](specifications/l1-regularization.md) | Regularization contract — L1 / L2 / Dropout / Compose | Stable | L1 | 1.0.0 |
 | [l2-regularization-impl.md](specifications/l2-regularization-impl.md) | Go realization of regularization — pkg/regularizer package | Stable | L2 | 1.0.0 |
 | [l1-release-policy.md](specifications/l1-release-policy.md) | Semantic versioning and release gate contract for GoNN | Stable | L1 | 1.0.0 |
-| [l2-ai-doc-metadata.md](specifications/l2-ai-doc-metadata.md) | AI-Meta trailing block for doc comments — closed vocabulary, tier-gated, process-artifact firewall | RFC | L2 | 0.1.0 |
+| [l2-ai-doc-metadata.md](specifications/l2-ai-doc-metadata.md) | AI-Meta trailing block for doc comments — closed vocabulary, tier-gated, process-artifact firewall | Stable | L2 | 1.0.0 |
 | [l1-lr-scheduling.md](specifications/l1-lr-scheduling.md) | Learning rate scheduler contract — StepLR / CosineAnnealing / WarmUp / ChainScheduler | Stable | L1 | 1.0.0 |
 | [l2-deep-builder.md](specifications/l2-deep-builder.md) | Deep network builder ergonomics — Repeat / Pattern / HiddenLayers bulk constructors | Stable | L2 | 1.0.0 |
 | [l2-gonn-skills.md](specifications/l2-gonn-skills.md) | GoNN developer AI skills — SKILL.md for AI-assisted code generation | Stable | L2 | 1.0.0 |
@@ -69,8 +69,12 @@ Local registry of specifications for this workspace.
 | [l2-dataset-loader-impl.md](specifications/l2-dataset-loader-impl.md) | Go realization of dataset formats — pkg/dataset/mnist.go + pkg/nn/andtrain.go | Stable | L2 | 0.1.1 |
 | [l1-conv-2d-layers.md](specifications/l1-conv-2d-layers.md) | 2-D convolutional layer contract — Conv2D / MaxPool2D / AvgPool2D / Flatten2D, CHW layout, 9 invariants | Stable | L1 | 0.2.0 |
 | [l2-conv-2d-impl.md](specifications/l2-conv-2d-impl.md) | Go realization of 2-D convolutional layers — pkg/layer/conv/ (Conv2D/MaxPool2D/AvgPool2D/Flatten2D) | Stable | L2 | 0.1.0 |
+| [l2-aimeta-linter.md](specifications/l2-aimeta-linter.md) | cmd/lint-aimeta — stdlib-only AST walker enforcing AI-Meta convention; pkg/aimeta importable adapter for TestAIMetaCompliance | Stable | L2 | 0.1.0 |
+| [l2-backend-gpu.md](specifications/l2-backend-gpu.md) | GPU compute backend — pkg/compute/gpu/ umbrella + opencl/ + cuda/ sub-packages (cgo + build-tag isolated) | Stable | L2 | 0.1.0 |
+| [l1-recurrent-layers.md](specifications/l1-recurrent-layers.md) | Recurrent layer contract — SimpleRNN / LSTM / GRU with BPTT, 9 invariants (REC-1..9) | Stable | L1 | 0.1.0 |
+| [l2-recurrent-impl.md](specifications/l2-recurrent-impl.md) | Go realization of recurrent layers — pkg/layer/recurrent/ (SimpleRNN/LSTM/GRU/LastStep) + WithGradClipNorm | Stable | L2 | 0.1.0 |
 
 ## Meta Information
 
 - **Maintainer**: Core Team
-- **Last Updated**: 2026-05-18 (magic-analyze: engine drift resolved — Engine Version snapshot 2.1.25 → 2.1.27, wiki refreshed. INDEX v2.13.0 → v2.13.1.)
+- **Last Updated**: 2026-05-18 (magic-spec Phase 15 scoping: 4 new specs authored Stable via Trust Mode — l2-aimeta-linter v0.1.0, l2-backend-gpu v0.1.0, l1-recurrent-layers v0.1.0, l2-recurrent-impl v0.1.0; l2-ai-doc-metadata promoted RFC v0.1.0 → Stable v1.0.0 (+Canonical References). INDEX v2.13.1 → v2.14.0.)

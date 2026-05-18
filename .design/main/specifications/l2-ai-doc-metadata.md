@@ -1,7 +1,7 @@
 # AI-Meta Doc-Comment Annotation
 
-**Version:** 0.1.0
-**Status:** RFC
+**Version:** 1.0.0
+**Status:** Stable
 **Layer:** implementation
 **Implements:** (none — meta-convention)
 
@@ -246,8 +246,26 @@ Examples directory and `cmd/` (other than `lint-aimeta`) are out of scope — th
 
 If a future Go release introduces an official structured doc format, the trailing-block design is forward-rollable: the block is still valid prose godoc. A one-pass migration script can remove every `AI-Meta:` block back to the prose-only baseline if desired.
 
+## Canonical References
+
+| Alias | Path | Purpose |
+| :--- | :--- | :--- |
+| `[GRAMMAR]` | `.design/main/specifications/l2-ai-doc-metadata.md` (§3) | Grammar — block label, indentation, single-line value rule, 12-line cap |
+| `[VOCAB]` | `.design/main/specifications/l2-ai-doc-metadata.md` (§4) | Closed vocabulary — Field Matrix (§4.1), Field Semantics (§4.2), Closed Enums (§4.3) |
+| `[EXAMPLES]` | `.design/main/specifications/l2-ai-doc-metadata.md` (§5) | Canonical examples for type / function / interface / sentinel |
+| `[ANTI]` | `.design/main/specifications/l2-ai-doc-metadata.md` (§6) | Anti-patterns — SDD-artifact leakage, vocabulary creep, multi-line value, mid-comment placement, line-cap overshoot |
+| `[VERIFY]` | `.design/main/specifications/l2-ai-doc-metadata.md` (§7) | Verification — manual checklist (§7.1), automated linter contract (§7.2) consumed by `l2-aimeta-linter.md` |
+| `[ROLLOUT]` | `.design/main/specifications/l2-ai-doc-metadata.md` (§8) | Phased rollout map (Phase 2-6) — package order constraint for `Related:` / `Implementations:` resolution |
+| `[ERR-PKG]` | `pkg/utils/errors.go` | Source of sentinel error names referenced from `Errors:` field |
+| `[CONTROL-PKG]` | `pkg/nn/control.go` | Source of state-machine names referenced from `Lifecycle:` field |
+
+<!-- Downstream agent instruction: §3 grammar + §4 vocabulary are normative. §5 examples illustrate
+     correct application; §6 anti-patterns are negative examples. Do NOT invent fields outside §4.1
+     vocabulary — see l2-aimeta-linter.md for automated enforcement. -->
+
 ## Document History
 
 | Version | Date | Description |
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-05-07 | Initial RFC from TODO #27. Closed vocabulary, tier matrix, process-artifact firewall, phased rollout. |
+| 1.0.0 | 2026-05-18 | Promoted RFC → Stable via `/magic-spec`. Added Canonical References section. No content changes to §1-§9 — RFC scope locked as the v1.0.0 contract. cmd/lint-aimeta delivery moves to its own L2 spec (l2-aimeta-linter.md). |
