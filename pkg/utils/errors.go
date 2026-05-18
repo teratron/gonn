@@ -131,6 +131,39 @@ var ErrEmptyLayer = errors.New("empty-layer")
 //   - Usage: errors.Is(err, utils.ErrMutationFailed).
 var ErrMutationFailed = errors.New("mutation-failed")
 
+// GPU / compute-backend sentinels (per l2-backend-gpu §5.2).
+
+// ErrBackendUnavailable signals that the requested GPU backend is not
+// available in the current build (missing cgo tag, no device present, or
+// driver initialisation failure). The engine falls back to the CPU backend.
+//
+// AI-Meta:
+//   - Purpose: Sentinel for a GPU backend that cannot be initialised; triggers CPU fallback.
+//   - Usage: errors.Is(err, utils.ErrBackendUnavailable) to detect unavailable GPU backend.
+//   - Related: [ErrBackendTransfer], [ErrBackendKernel], [ErrCompute].
+//   - Stability: Stable.
+var ErrBackendUnavailable = errors.New("backend-unavailable")
+
+// ErrBackendTransfer signals that a host↔device memory transfer failed —
+// e.g., a Write or Read on a device Buffer returned an OpenCL / CUDA error.
+//
+// AI-Meta:
+//   - Purpose: Sentinel for failed host-to-device or device-to-host memory transfer.
+//   - Usage: errors.Is(err, utils.ErrBackendTransfer) to detect GPU transfer errors.
+//   - Related: [ErrBackendUnavailable], [ErrBackendKernel], [ErrCompute].
+//   - Stability: Stable.
+var ErrBackendTransfer = errors.New("backend-transfer")
+
+// ErrBackendKernel signals that a GPU kernel failed to compile or dispatch —
+// e.g., clBuildProgram returned an error or the kernel argument count is wrong.
+//
+// AI-Meta:
+//   - Purpose: Sentinel for GPU kernel compilation or dispatch failure.
+//   - Usage: errors.Is(err, utils.ErrBackendKernel) to detect kernel execution errors.
+//   - Related: [ErrBackendUnavailable], [ErrBackendTransfer], [ErrCompute].
+//   - Stability: Stable.
+var ErrBackendKernel = errors.New("backend-kernel")
+
 // Convolutional-layer sentinels (CONV-1, CONV-5, per l2-conv-layers-impl).
 
 // ErrConvShapeMismatch signals that the input feature map is shorter than the

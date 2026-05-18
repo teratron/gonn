@@ -91,6 +91,83 @@ func HeNormal[T Float](rng *rand.Rand, fanIn int) T {
 	return T(rng.NormFloat64() * sigma)
 }
 
+// Orthogonal generates an n×n orthonormal matrix Q (Q·Q^T = I) using the
+// modified Gram-Schmidt algorithm on an n×n Gaussian matrix. The result is
+// returned as a flattened row-major slice of length n*n.
+//
+// Typical use: initialise W_hh in recurrent layers (REC-7). Orthogonal init
+// keeps singular values at 1.0 at the start of training, which mitigates
+// vanishing/exploding gradients in BPTT.
+//
+// Orthogonal panics when rng is nil or n ≤ 0.
+//
+// AI-Meta:
+//   - Purpose: Generate an n×n orthonormal matrix (rows form an orthonormal basis) for recurrent W_hh init.
+//   - Usage: q := utils.Orthogonal[float64](rng, hidden) — returned slice length is hidden*hidden.
+//   - Concurrency: NotSafe; rng must not be shared across goroutines.
+//   - Related: [NewRNG], [XavierUniform], [HeNormal].
+//   - Stability: Stable.
+func Orthogonal[T Float](rng *rand.Rand, n int) []T {
+	if rng == nil {
+		panic("utils.Orthogonal: nil *rand.Rand")
+	}
+	if n <= 0 {
+		panic("utils.Orthogonal: n must be positive")
+	}
+
+	// Build n×n matrix of standard-normal entries in float64 for numerical
+	// precision during Gram-Schmidt. Rows are processed in-place.
+	a := make([][]float64, n)
+	for i := range a {
+		a[i] = make([]float64, n)
+		for j := range a[i] {
+			a[i][j] = rng.NormFloat64()
+		}
+	}
+
+	// Modified Gram-Schmidt on rows: for row i, subtract its projections onto
+	// the already-orthogonalised rows 0..i-1 (using the updated rows, not the
+	// originals — this is what makes it "modified" and numerically stabler).
+	for i := range n {
+		for k := range i {
+			dot := 0.0
+			for j := range n {
+				dot += a[k][j] * a[i][j]
+			}
+			for j := range n {
+				a[i][j] -= dot * a[k][j]
+			}
+		}
+		norm := 0.0
+		for _, v := range a[i] {
+			norm += v * v
+		}
+		norm = math.Sqrt(norm)
+		if norm < 1e-10 {
+			// Degenerate row (near-zero after orthogonalisation) — fall back to
+			// the standard basis vector. Extremely unlikely for random matrices
+			// but required for correctness under adversarial seeds.
+			for j := range n {
+				a[i][j] = 0
+			}
+			a[i][i] = 1
+		} else {
+			inv := 1.0 / norm
+			for j := range n {
+				a[i][j] *= inv
+			}
+		}
+	}
+
+	out := make([]T, n*n)
+	for i := range n {
+		for j := range n {
+			out[i*n+j] = T(a[i][j])
+		}
+	}
+	return out
+}
+
 // Uniform samples one weight from U[-1, 1).
 //
 // Uniform panics when rng is nil.

@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"math"
 	"testing"
 )
@@ -167,6 +168,95 @@ func TestSamplersPanicOnNilRNG(t *testing.T) {
 			c.fn()
 		})
 	}
+}
+
+func TestOrthogonal(t *testing.T) {
+	t.Parallel()
+	ns := []int{4, 32, 128}
+	for _, n := range ns {
+		rng, _ := NewRNG(uint64(n) * 12345)
+
+		// float64: Frobenius distance ‖Q·Q^T - I‖_F < 1e-10.
+		q64 := Orthogonal[float64](rng, n)
+		if err := checkOrthogonalityF64(q64, n, 1e-10); err != nil {
+			t.Errorf("Orthogonal[float64](n=%d): %v", n, err)
+		}
+
+		rng, _ = NewRNG(uint64(n) * 99999)
+
+		// float32: looser tolerance due to float32 precision.
+		q32 := Orthogonal[float32](rng, n)
+		if err := checkOrthogonalityF32(q32, n, 1e-5); err != nil {
+			t.Errorf("Orthogonal[float32](n=%d): %v", n, err)
+		}
+	}
+}
+
+func TestOrthogonalPanicOnNilRNG(t *testing.T) {
+	t.Parallel()
+	defer func() {
+		if r := recover(); r == nil {
+			t.Fatal("Orthogonal with nil rng must panic")
+		}
+	}()
+	Orthogonal[float64](nil, 4)
+}
+
+func TestOrthogonalPanicOnZeroN(t *testing.T) {
+	t.Parallel()
+	defer func() {
+		if r := recover(); r == nil {
+			t.Fatal("Orthogonal with n=0 must panic")
+		}
+	}()
+	rng, _ := NewRNG(1)
+	Orthogonal[float64](rng, 0)
+}
+
+// checkOrthogonalityF64 computes ‖Q·Q^T - I‖_F and compares against tol.
+func checkOrthogonalityF64(q []float64, n int, tol float64) error {
+	frob := 0.0
+	for i := range n {
+		for j := range n {
+			dot := 0.0
+			for k := range n {
+				dot += q[i*n+k] * q[j*n+k]
+			}
+			diff := dot
+			if i == j {
+				diff -= 1.0
+			}
+			frob += diff * diff
+		}
+	}
+	frob = math.Sqrt(frob)
+	if frob >= tol {
+		return fmt.Errorf("Frobenius dist ‖Q·Q^T - I‖_F = %v, want < %v", frob, tol)
+	}
+	return nil
+}
+
+// checkOrthogonalityF32 computes ‖Q·Q^T - I‖_F for float32 inputs.
+func checkOrthogonalityF32(q []float32, n int, tol float64) error {
+	frob := 0.0
+	for i := range n {
+		for j := range n {
+			dot := 0.0
+			for k := range n {
+				dot += float64(q[i*n+k]) * float64(q[j*n+k])
+			}
+			diff := dot
+			if i == j {
+				diff -= 1.0
+			}
+			frob += diff * diff
+		}
+	}
+	frob = math.Sqrt(frob)
+	if frob >= tol {
+		return fmt.Errorf("Frobenius dist ‖Q·Q^T - I‖_F = %v, want < %v", frob, tol)
+	}
+	return nil
 }
 
 // BenchmarkXavierUniformFloat32 covers the hot path in layer initialization;

@@ -42,14 +42,14 @@ duration_minutes: ~
 
 ### Track C — AI-Meta Linter (parallel with Tracks A and B; C01 sequential before C02 before C03)
 
-- [ ] [T-15C01] `pkg/aimeta/` grammar package — `vocab.go` (closed `AllowedFields` + `Stability`/`Concurrency` enums + `TierRequiredFields`), `grammar.go` (`ParseBlock` returning `(Block, []Violation)`), `ast.go` (`ExtractBlock(*ast.CommentGroup)`), `violation.go` (`Violation` + 9 rule codes: LABEL/INDENT/CAP/LAST/VOCAB/TIER/MULTI/ENUM/ARTIFACT); golden-file tests in `pkg/aimeta/testdata/`
-- [ ] [T-15C02] `cmd/lint-aimeta/` CLI binary — `main.go` (dispatch to `aimeta.Check`), `output.go` (text + JSON formatters), `exitcode.go` (0/1/2/3 contract per l2-cli-client §5.3); end-to-end smoke test against `pkg/aimeta/testdata/` fixtures
-- [ ] [T-15C03] `pkg/utils/aimeta_test.go` — first per-package `TestAIMetaCompliance` hook (smallest package, simplest annotations); becomes the template for §8 rollout phases 2-5
+- [x] [T-15C01] `pkg/aimeta/` grammar package — `vocab.go` (closed `AllowedFields` + `Stability`/`Concurrency` enums + `TierRequiredFields`), `grammar.go` (`ParseBlock` returning `(Block, []Violation)`), `ast.go` (`ExtractBlock(*ast.CommentGroup)`), `violation.go` (`Violation` + 9 rule codes: LABEL/INDENT/CAP/LAST/VOCAB/TIER/MULTI/ENUM/ARTIFACT); golden-file tests in `pkg/aimeta/testdata/`
+- [x] [T-15C02] `cmd/lint-aimeta/` CLI binary — `main.go` (dispatch to `aimeta.Check`), `output.go` (text + JSON formatters), `exitcode.go` (0/1/2/3 contract per l2-cli-client §5.3); end-to-end smoke test against `pkg/aimeta/testdata/` fixtures
+- [x] [T-15C03] `pkg/utils/aimeta_test.go` — first per-package `TestAIMetaCompliance` hook (smallest package, simplest annotations); becomes the template for §8 rollout phases 2-5
 
 ### Validation + Gate
 
 - [ ] [T-15T01] `pkg/layer/recurrent/{simple_rnn,lstm}_test.go` — finite-difference gradient check for `SimpleRNN` (3 cases) + `LSTM` (3 cases) within `1e-4` (float64) tolerance; orthogonality test for `utils.Orthogonal` (`‖Q·Q^T - I‖_F < 1e-10`)
-- [ ] [T-15T02] `pkg/aimeta/testdata/` golden-file matrix — all 5 §6 anti-patterns from `l2-ai-doc-metadata.md` produce exact expected `Violation` slices via `pkg/aimeta.Check`; clean fixtures produce empty violation list
+- [x] [T-15T02] `pkg/aimeta/testdata/` golden-file matrix — all 5 §6 anti-patterns from `l2-ai-doc-metadata.md` produce exact expected `Violation` slices via `pkg/aimeta.Check`; clean fixtures produce empty violation list
 - [ ] [T-15T03] `pkg/compute/gpu/unavailable_test.go` (pure-Go) — `gpu.New[T]("opencl")` without `cgo,opencl` build tag returns `ErrBackendUnavailable`; CPU fallback wired in `pkg/nn/compile.go` returns `cpu` backend on the same input with a `Warn` log captured by `slogtest`
 - [ ] [T-15Z01] Phase 15 gate — `go build ./...` clean (default tags); `go build -tags 'opencl' ./...` clean on CI runner with OpenCL ICD installed (SKIP locally if unavailable); `go test ./...` all green; `pkg/layer/recurrent/` ≥80% coverage; `pkg/aimeta/` ≥80% coverage; `pkg/compute/gpu/` ≥80% coverage (excluding cgo-tagged files); v0.13.0 RC ready
 
