@@ -5,15 +5,15 @@
 
 **Workspace:** main
 **Project Version:** 0.11.0 released
-**Updated:** 2026-05-18 08:10
-**Phase:** 14 — Conv2D Implementation + MNIST CNN
-**Status:** Done — v0.12.0 RC ready
+**Updated:** 2026-05-18 08:40
+**Phase:** 15 — Recurrent Foundation + GPU Skeleton + AI-Meta Linter
+**Status:** Todo (Active)
 
 ## Current Position
 
-- **Task:** T-14Z01 Phase 14 gate — COMPLETE
-- **Spec:** l2-conv-2d-impl Stable v0.1.0; l2-dataset-loader-impl Stable v0.1.1; l2-usage-examples Stable v1.1.0
-- **Next Action:** User runs git tag -a v0.12.0 -m 'v0.12.0: Conv2D + MNIST CNN' then /magic-spec to author new specs for Phase 15 (or /magic-task once new Stable specs exist)
+- **Task:** Phase 15 scoped — 14 atomic tasks (T-15A01..A04 / B01..B03 / C01..C03 / T01..T03 / Z01) ready for execution
+- **Spec:** l1-recurrent-layers Stable v0.1.0; l2-recurrent-impl Stable v0.1.0; l2-backend-gpu Stable v0.1.0; l2-aimeta-linter Stable v0.1.0; l2-ai-doc-metadata Stable v1.0.0 (promoted from RFC)
+- **Next Action:** Run /magic-run to execute Phase 15 — start with T-15A01 (utils.Orthogonal) + T-15B01 (gpu umbrella) + T-15C01 (pkg/aimeta grammar) in parallel
 
 ## Progress
 
@@ -32,11 +32,13 @@ Phase 11 (Done):    [14/14]   ████████ 100%   (Track A 3/3 compl
 Phase 12 (Done):    [5/5]     ████████ 100%   (Track A 3/3 done; T-12T01 + T-12Z01 done)
 Phase 13 (Done):    [2/2]     ████████ 100%   (L1 + L2 spec authoring; gate done)
 Phase 14 (Done):    [12/12]   ████████ 100%   (Tracks A+B+C+D + T01 + Z01; v0.12.0 RC)
-Overall:            [206/206] ████████ 100%
+Phase 15 (Todo):    [0/14]    ░░░░░░░░   0%   (Tracks A+B+C foundation; v0.13.0 target)
+Overall:            [206/220] ███████░  93.6%
 ```
 
 ## Recent Decisions
 
+- 2026-05-18 **Decision:** Phase 15 scoped via /magic-task. Three fully parallel foundation tracks: A (Recurrent — SimpleRNN+LSTM with BPTT and `utils.Orthogonal`), B (GPU — `pkg/compute/gpu/` umbrella + opencl/ skeleton + Dense Forward kernel), C (Linter — `pkg/aimeta` + `cmd/lint-aimeta` + first hook in `pkg/utils`). 14 atomic tasks. Per @role:planner audit: full spec implementation plans (Recurrent α-θ, GPU A-G, Linter A-D) compressed to foundation scope; GRU/LastStep/CUDA/perf-gate/resolver/rollout-2-5 deferred to Phase 16+. All 3 new specs authored Stable in same session via prior /magic-spec; l2-ai-doc-metadata promoted RFC v0.1.0 → Stable v1.0.0. PLAN v2.12.0 → v2.13.0; TASKS v2.10.1 → v2.11.0; INDEX v2.13.1 → v2.14.0 (61 specs).
 - 2026-05-17 **Decision:** Phase 14 complete. Track A: `conv2d.go` (Conv2D[T] Forward/Backward/Init/JSON, CONV2D-C9 CHW layout, PERF-4 zero-alloc Backward), `pool2d.go` (MaxPool2D argmax routing + AvgPool2D even distribution), `flatten2d.go` (stateless identity reshape). Track B: `WithConv2D/MaxPool2D/AvgPool2D/Flatten2D/InputShape` options + `setupConv2DShapes` CHW pre-pass in compile(), isqrt auto-inference (MNIST 784→1×28×28). Track C: `ImageShaper` interface in dataset package + `WithImageShape`/`ImageShape()` on MNISTLoader. Track D: `examples/mnist_cnn/` E16 (LeNet-style, two-epoch Fit+AndTrain). T-14T01: 4-case FD gradient check all PASS. Gate T-14Z01: `go build ./...` clean; all 18+1 packages green; `pkg/layer/conv/` 81.9%; `pkg/dataset/` 85.9%; `pkg/nn/` 77.1% (pre-existing). CHANGELOG v0.12.0 written.
 - 2026-05-17 **Decision:** Phase 13 complete. Provides: l1-conv-2d-layers Stable v0.2.0 (9 invariants CONV2D-1..9, CHW layout) + l2-conv-2d-impl Stable v0.1.0 (filter-major flat []T storage, all 9 invariants mapped, MNIST adapter requirement in §6). Spec-critic: zero Substantive Compliance failures. check-prerequisites ok:true. Implementation tracks deferred to Phase 14.
 

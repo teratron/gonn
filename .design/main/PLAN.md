@@ -1,10 +1,10 @@
 # Implementation Plan
 
-**Version:** 2.12.0
-**Project Version:** 0.11.0 released; 0.12.0 RC ready (Phase 14 Done — pending `git tag -a v0.12.0`)
+**Version:** 2.13.0
+**Project Version:** 0.11.0 released; 0.12.0 RC ready (Phase 14 Done — pending `git tag -a v0.12.0`); 0.13.0 in progress (Phase 15 scoped)
 **Generated:** 2026-04-29
 **Last Updated:** 2026-05-18
-**Based on:** .design/main/INDEX.md v2.13.1
+**Based on:** .design/main/INDEX.md v2.14.0
 **Based on RULES:** .design/RULES.md v1.3.0
 **Based on ROADMAP:** .design/main/ROADMAP.md v1.0.0
 **Status:** Active
@@ -253,6 +253,27 @@ All 12 tasks green; gate T-14Z01 passed; v0.12.0 RC ready (pending `git tag -a v
 - [x] **[C] MNIST 2-D Adapter** ([l2-dataset-loader-impl.md](specifications/l2-dataset-loader-impl.md)) [L2, Stable v0.1.1] — amended §Detailed Design with `WithImageShape(channels, height, width int)` requirement; implemented in `pkg/dataset/mnist.go` as a decorator that wraps the flat 784-byte tensor into a CHW `(1, 28, 28)` view without copying; round-trip test (flat → CHW → flat); coverage maintained ≥80%.
 - [x] **[D] MNIST CNN Example** ([l2-usage-examples.md](specifications/l2-usage-examples.md)) [L2, Stable v1.1.0] — `examples/mnist_cnn/main.go` + `examples/mnist_cnn/README.md`: full E16 CNN — `Conv2D(8, 1, 3, 3, 1, 1, PadValid)` → `MaxPool2D(2, 2)` → `Conv2D(16, 8, 3, 3, 1, 1, PadValid)` → `MaxPool2D(2, 2)` → `Flatten2D` → `Dense(64)` → `Output(10)`; end-to-end training over MNIST; smoke-run deferred to user-supplied IDX data (same pattern as E06). E16 registered in `l2-usage-examples.md`.
 
+## Phase 15 — Recurrent Foundation + GPU Backend Skeleton + AI-Meta Linter (v0.13.0)
+
+*Three parallel foundation tracks scoping the next release. Track A delivers `SimpleRNN[T]`
+and `LSTM[T]` end-to-end (BPTT + orthogonal init). Track B delivers the `pkg/compute/gpu/`
+umbrella with OpenCL skeleton and Dense Forward kernel cross-referenced vs CPU. Track C
+delivers `pkg/aimeta` grammar with `cmd/lint-aimeta` CLI plus the first per-package
+`TestAIMetaCompliance` hook in `pkg/utils`. Secondary scope (GRU, LastStep,
+`WithGradClipNorm`, `optimizer.ClipByGlobalNorm`, `pkg/nn` recurrent options + compile
+wiring, OpenCL Backward, CUDA, GPU perf gate, `--resolve` flag, `TestAIMetaCompliance`
+rollout phases 3-5) explicitly deferred to Phase 16+.*
+
+**Subsystem:** `pkg/layer/recurrent/` (new SimpleRNN + LSTM), `pkg/compute/gpu/` (new umbrella + opencl skeleton), `pkg/aimeta/` (new), `cmd/lint-aimeta/` (new), `pkg/utils/` (Orthogonal helper + sentinels + AI-Meta annotations)
+**Requires:** Phase 14 ✓; l1-recurrent-layers Stable v0.1.0 ✓; l2-recurrent-impl Stable v0.1.0 ✓; l2-backend-gpu Stable v0.1.0 ✓; l2-aimeta-linter Stable v0.1.0 ✓; l2-ai-doc-metadata Stable v1.0.0 ✓; l1-compute-backend Stable v1.0.0 ✓
+**Tasks file:** [tasks/phase-15.md](tasks/phase-15.md)
+**Track order:** Tracks A, B, C fully parallel (no shared write paths between tracks); within Track A: A01 → A02 → (A03 ∥ A04); within Track B: B01 → B02 → B03; within Track C: C01 → C02 → C03. T-15T01/T-15T02/T-15T03 after each track's foundation lands; Gate T-15Z01.
+**@role:planner audit:** Optimism Bias — Track A's full 8-phase plan (α-θ) compressed to 4 tasks (α, β, γ, δ) defers GRU/LastStep/clip/nn-options. Track B's full 7-phase plan (A-G) compressed to 3 tasks (A, B, C) defers Backward/CUDA/fallback/perf — Backward path is the largest deferred work. Track C's full 4-phase plan (A-D) maps 1:1 (resolver Phase C deferred — flag accepted but ignored). Hidden Dependencies — all three tracks add sentinels to `pkg/utils/errors.go`; additive, no overlapping edits expected. Cascade Risk — each track is independently mergeable; no downstream phase depends on any of the three.
+
+- [ ] **[A] Recurrent Foundation** ([l1-recurrent-layers.md](specifications/l1-recurrent-layers.md) + [l2-recurrent-impl.md](specifications/l2-recurrent-impl.md)) [L1 + L2, Stable v0.1.0 each] — `pkg/utils/init.go`: `Orthogonal[T](rng, n)` helper via modified Gram-Schmidt (T-15A01). `pkg/layer/recurrent/cell.go` + `doc.go`: shared helpers — sigmoid/tanh fused, state cache buffers, layer-interface boilerplate (T-15A02). `pkg/layer/recurrent/simple_rnn.go`: `SimpleRNN[T]` Forward + Backward + Init (Xavier + Orthogonal) + Step + JSON (T-15A03). `pkg/layer/recurrent/lstm.go`: `LSTM[T]` 4-gate fused-matmul Forward + Backward + Init (with forget-bias=1.0) + Step + JSON (T-15A04). Deferred to Phase 16: GRU, LastStep, WithGradClipNorm, optimizer.ClipByGlobalNorm, pkg/nn recurrent options + compile wiring.
+- [ ] **[B] GPU Backend Skeleton** ([l2-backend-gpu.md](specifications/l2-backend-gpu.md)) [L2, Stable v0.1.0] — `pkg/compute/gpu/`: umbrella `doc.go` + `unavailable.go` shim returning `ErrBackendUnavailable`, sentinel additions `ErrBackendUnavailable`/`ErrBackendTransfer`/`ErrBackendKernel` to `pkg/utils/errors.go` (T-15B01). `pkg/compute/gpu/opencl/`: cgo bindings + buffer Allocate/Free/Write/Read (build tag `cgo,opencl`) (T-15B02). `pkg/compute/gpu/opencl/kernels.{cl,go}`: Dense Forward kernel cross-referenced vs CPU within tolerance (T-15B03). Deferred to Phase 16: OpenCL Backward, CUDA mirror, `pkg/nn/compile.go` fallback wiring, perf benchmark gate.
+- [ ] **[C] AI-Meta Linter** ([l2-aimeta-linter.md](specifications/l2-aimeta-linter.md)) [L2, Stable v0.1.0] — `pkg/aimeta/`: grammar package — `vocab.go` + `grammar.go` + `ast.go` + `violation.go` with 9 rule codes (LABEL/INDENT/CAP/LAST/VOCAB/TIER/MULTI/ENUM/ARTIFACT); golden-file fixtures in `testdata/` (T-15C01). `cmd/lint-aimeta/`: CLI binary — text + JSON output, exit-code contract per l2-cli-client §5.3 (T-15C02). `pkg/utils/aimeta_test.go`: first `TestAIMetaCompliance` hook + AI-Meta annotations on `pkg/utils/` exported symbols (T-15C03). Deferred to Phase 16: `--resolve` flag wiring, RESOLVE rule code, `TestAIMetaCompliance` rollout phases 3-5 (`pkg/activation`, `pkg/loss`, `pkg/neuron`+`pkg/layer`, `pkg/network`, `pkg/dataset`+`pkg/checkpoint`+`pkg/compute`+`pkg/persistence`, `pkg/nn`).
+
 ## Build Order Diagram
 
 ```mermaid
@@ -271,6 +292,7 @@ graph LR
   K1 --> L1[Phase 12 — Meta-Learning Hooks]
   L1 --> M1[Phase 13 — Convolutional 2-D Foundation]
   M1 --> N1[Phase 14 — Conv2D Implementation + MNIST CNN]
+  N1 --> O1[Phase 15 — Recurrent Foundation + GPU Skeleton + AI-Meta Linter]
 ```
 
 ## Document History
@@ -301,3 +323,4 @@ graph LR
 | 2.10.0 | 2026-05-17 | Phase 13 marked Done. `l2-conv-2d-impl` Stable v0.1.0 authored (T-13A01); all 9 CONV2D invariants mapped + spec-critic clean (T-13T01); gate T-13Z01 passed. Provides: `l1-conv-2d-layers` Stable v0.2.0 + `l2-conv-2d-impl` Stable v0.1.0. Phase 14 (Conv2D Implementation) deferred to next `/magic-task main`. SYNC_GAP resolved. Based on INDEX.md v2.13.0. |
 | 2.11.0 | 2026-05-17 | Phase 14 scoped: Conv2D Implementation + MNIST CNN Example (v0.12.0 target). Four tracks: A (Conv2D primitives — conv2d/pool2d/flatten2d), B (NN integration — options + compile), C (MNIST 2-D adapter — `WithImageShape` + `l2-dataset-loader-impl` patch), D (E16 MNIST CNN example + `l2-usage-examples` minor). Tracks A+C parallel; B serial after A; D serial after A+B+C. 12 atomic tasks (T-14A01..A04 + B01..B02 + C01..C02 + D01..D02 + T01 + Z01). `@role:planner` audit: Conv2D backward 6-level loop nesting flagged as 2-3× Conv1D complexity (split into T-14A02 alone); MNIST CNN cascade risk mitigated by mandatory finite-difference gradient check in T-14T01. Based on INDEX.md v2.13.0. |
 | 2.12.0 | 2026-05-18 | Phase 14 marked Done (v0.12.0 RC ready). All 12 tasks green; gate T-14Z01 passed; spec amendments l2-dataset-loader-impl v0.1.1 + l2-usage-examples v1.1.0 promoted via Trust Mode (VERSION_DRIFT reconciled in INDEX). Engine snapshot drift resolved: 2.1.25 → 2.1.27. Pre-Planning Stabilization: zero Draft promotions (no Drafts in INDEX); single RFC remains (l2-ai-doc-metadata gated on cmd/lint-aimeta delivery). No new phase scoped — all 57 Stable specs covered by Phases 1-14; next scope requires `/magic-spec` to author new specs. Based on INDEX.md v2.13.1. |
+| 2.13.0 | 2026-05-18 | Phase 15 scoped: Recurrent Foundation + GPU Backend Skeleton + AI-Meta Linter (v0.13.0 target). Three fully parallel foundation tracks: A (Recurrent — SimpleRNN+LSTM with BPTT and orthogonal init), B (GPU — pkg/compute/gpu/ umbrella + opencl/ skeleton + Dense Forward kernel), C (Linter — pkg/aimeta grammar + cmd/lint-aimeta CLI + first per-package compliance hook in pkg/utils). 14 atomic tasks (T-15A01..A04 + B01..B03 + C01..C03 + T01..T03 + Z01). Pre-Planning Stabilization: zero Draft promotions (all 4 new specs already Stable via Trust Mode in prior `/magic-spec`); RFC count 1→0 (l2-ai-doc-metadata promoted in same `/magic-spec` run). @role:planner audit recorded under Phase 15: Optimism Bias (3 spec implementation plans compressed; GRU/CUDA/perf-gate/resolver deferred to Phase 16+); Hidden Dependencies (all 3 tracks add sentinels to pkg/utils/errors.go — additive, non-overlapping); Cascade Risk (each track independently mergeable, none gates downstream). Based on INDEX.md v2.14.0. |

@@ -1,10 +1,10 @@
 # Master Task Index (Registry)
 
-**Version:** 2.10.1
-**Project Version:** 0.11.0 released; 0.12.0 RC ready (Phase 14 Done — pending `git tag -a v0.12.0`)
+**Version:** 2.11.0
+**Project Version:** 0.11.0 released; 0.12.0 RC ready (Phase 14 Done — pending `git tag -a v0.12.0`); 0.13.0 in progress (Phase 15 scoped)
 **Generated:** 2026-04-29
 **Last Updated:** 2026-05-18
-**Based on:** .design/main/PLAN.md v2.12.0
+**Based on:** .design/main/PLAN.md v2.13.0
 **Based on RULES:** .design/RULES.md v1.3.0
 **Execution Mode:** Parallel (C3)
 **Status:** Active
@@ -31,6 +31,7 @@ Tactical registry of all phases and their statuses. Atomic checklists (`T-XXXX`)
 | [Phase 12](archives/tasks/phase-12.md) | Meta-Learning Hooks — `pkg/nn/meta.go` (ParamAccessor[T]/ScalarParam[T]/SliceParam[T]/MetaLearner[T]), `WithMetaLearner` option, train.go hook, v0.11.0 release | `Done (Archived)` (5 tasks: T-12A01..A03 + T-12T01 + T-12Z01) |
 | [Phase 13](archives/tasks/phase-13.md) | Convolutional 2-D Foundation — scoping phase: L1 contract Stable + queue L2 spec authoring (T-13A01) for `l2-conv-2d-impl.md` via `/magic-spec`; implementation tracks (`pkg/layer/conv/conv2d.go` + friends) deferred to follow-up | `Done (Archived)` (3 tasks: T-13A01 + T-13T01 + T-13Z01) |
 | [Phase 14](archives/tasks/phase-14.md) | Conv2D Implementation + MNIST CNN Example — `pkg/layer/conv/conv2d.go` + `pool2d.go` + `flatten2d.go`, `pkg/nn/options.go` (WithConv2D+friends) + `compile.go` 2-D wiring, `pkg/dataset/` WithImageShape adapter, `examples/mnist_cnn/` E16, v0.12.0 release | `Done (Archived)` (12 tasks: T-14A01..A04 + B01..B02 + C01..C02 + D01..D02 + T01 + Z01) |
+| [Phase 15](tasks/phase-15.md) | Recurrent Foundation + GPU Backend Skeleton + AI-Meta Linter — Track A (`pkg/layer/recurrent/` SimpleRNN+LSTM with BPTT + `utils.Orthogonal`), Track B (`pkg/compute/gpu/` umbrella + opencl/ skeleton + Dense Forward kernel), Track C (`pkg/aimeta/` grammar + `cmd/lint-aimeta` CLI + first per-package compliance hook in `pkg/utils`), v0.13.0 target | `Todo` (14 tasks: T-15A01..A04 + B01..B03 + C01..C03 + T01..T03 + Z01) |
 
 ## Phase 0 — Already Complete
 
@@ -238,5 +239,5 @@ Six of the eight v0.6-gated entries (E03, E04, E05, E07, E08, E13) are now activ
 | `CHANGELOG.md` (v0.11.0 entry) | l1-release-policy v1.0.0 | `Done` [Z] |
 | `v0.11.0` git tag | l1-release-policy v1.0.0 §5.4 | `Pending user` (run `git tag -a v0.11.0`) |
 
-- **Last Updated**: 2026-05-18 (Sync via magic-task: Phase 14 closed (Done (Archived) — all 12 tasks; gate T-14Z01 green; v0.12.0 RC). PLAN v2.11.0 → v2.12.0; TASKS v2.10.0 → v2.10.1 (sync only). INDEX v2.13.0 → v2.13.1 (VERSION_DRIFT reconciled: l2-usage-examples v1.1.0 + l2-dataset-loader-impl v0.1.1). Engine snapshot 2.1.25 → 2.1.27. Pre-Planning Stabilization: zero Drafts to promote. No new Phase 15 scoped — pending `/magic-spec` for new specs.)
+- **Last Updated**: 2026-05-18 (Phase 15 scoped via magic-task: Recurrent Foundation + GPU Backend Skeleton + AI-Meta Linter (v0.13.0 target). Three fully parallel tracks A/B/C, 14 atomic tasks. PLAN v2.12.0 → v2.13.0; TASKS v2.10.1 → v2.11.0. Based on INDEX.md v2.14.0 (4 new specs + 1 RFC→Stable promotion from prior `/magic-spec`). @role:planner audit recorded in PLAN.md Phase 15. Pre-Planning Stabilization: zero Draft promotions (all new specs already Stable).)
 - **Maintainer**: Core Team
