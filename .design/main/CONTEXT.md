@@ -1,6 +1,6 @@
 # Project Context
 
-**Generated:** 2026-05-17
+**Generated:** 2026-05-18
 
 ## Active Technologies
 
@@ -27,6 +27,7 @@
 │   ├── iris/
 │   ├── logic_gates/
 │   ├── mnist/
+│   ├── mnist_cnn/
 │   ├── perceptron/
 │   ├── persistence/
 │   ├── precision/

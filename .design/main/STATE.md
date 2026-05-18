@@ -5,15 +5,15 @@
 
 **Workspace:** main
 **Project Version:** 0.11.0 released
-**Updated:** 2026-05-17 18:00
+**Updated:** 2026-05-18 08:10
 **Phase:** 14 — Conv2D Implementation + MNIST CNN
-**Status:** Done → v0.12.0 RC ready
+**Status:** Done — v0.12.0 RC ready
 
 ## Current Position
 
 - **Task:** T-14Z01 Phase 14 gate — COMPLETE
 - **Spec:** l2-conv-2d-impl Stable v0.1.0; l2-dataset-loader-impl Stable v0.1.1; l2-usage-examples Stable v1.1.0
-- **Next Action:** User runs `git tag -a v0.12.0 -m "v0.12.0: Conv2D + MNIST CNN"` then `/magic-task` to scope Phase 15
+- **Next Action:** User runs git tag -a v0.12.0 -m 'v0.12.0: Conv2D + MNIST CNN' then /magic-spec to author new specs for Phase 15 (or /magic-task once new Stable specs exist)
 
 ## Progress
 
@@ -57,7 +57,7 @@ Overall:            [206/206] ████████ 100%
 
 - Note: race detector requires CGO on Windows (gcc not in PATH); tests run without -race locally — gate T-11Z01 must run -race in CI.
 - Note: TestPauseResumeCycle + TestMultiHiddenXOR + TestRepeatBuilderBenchmark100Layer are pre-existing timing-flaky tests, unaffected by Phase 11 work.
-- **Engine drift**: `.magic/.version` = 2.1.27 vs INDEX.md snapshot 2.1.25 — acknowledged but snapshot held stale per §1 n-branch. Run /magic-analyze when ready to revalidate.
+- Engine drift resolved 2026-05-18: INDEX.md snapshot 2.1.25 → 2.1.27 via /magic-analyze.
 
 ## Recent Decisions
 

@@ -1,10 +1,10 @@
 # Master Task Index (Registry)
 
-**Version:** 2.10.0
-**Project Version:** 0.11.0 released; 0.12.0 in progress (Phase 13 Done; Phase 14 scoped)
+**Version:** 2.10.1
+**Project Version:** 0.11.0 released; 0.12.0 RC ready (Phase 14 Done — pending `git tag -a v0.12.0`)
 **Generated:** 2026-04-29
-**Last Updated:** 2026-05-17
-**Based on:** .design/main/PLAN.md v2.11.0
+**Last Updated:** 2026-05-18
+**Based on:** .design/main/PLAN.md v2.12.0
 **Based on RULES:** .design/RULES.md v1.3.0
 **Execution Mode:** Parallel (C3)
 **Status:** Active
@@ -238,5 +238,5 @@ Six of the eight v0.6-gated entries (E03, E04, E05, E07, E08, E13) are now activ
 | `CHANGELOG.md` (v0.11.0 entry) | l1-release-policy v1.0.0 | `Done` [Z] |
 | `v0.11.0` git tag | l1-release-policy v1.0.0 §5.4 | `Pending user` (run `git tag -a v0.11.0`) |
 
-- **Last Updated**: 2026-05-17 (Phase 13 scoped: Convolutional 2-D Foundation, single-track A delegating L2 spec authoring to `/magic-spec`. l1-conv-2d-layers promoted Draft → Stable v0.2.0 via Pre-Planning Stabilization. PLAN base v2.8.0 → v2.9.0; TASKS v2.8.0 → v2.9.0; INDEX v2.11.0 → v2.12.0.)
+- **Last Updated**: 2026-05-18 (Sync via magic-task: Phase 14 closed (Done (Archived) — all 12 tasks; gate T-14Z01 green; v0.12.0 RC). PLAN v2.11.0 → v2.12.0; TASKS v2.10.0 → v2.10.1 (sync only). INDEX v2.13.0 → v2.13.1 (VERSION_DRIFT reconciled: l2-usage-examples v1.1.0 + l2-dataset-loader-impl v0.1.1). Engine snapshot 2.1.25 → 2.1.27. Pre-Planning Stabilization: zero Drafts to promote. No new Phase 15 scoped — pending `/magic-spec` for new specs.)
 - **Maintainer**: Core Team

@@ -1,10 +1,10 @@
 # Implementation Plan
 
-**Version:** 2.11.0
-**Project Version:** 0.11.0 (released; 0.12.0 in progress — Phase 13 Done; Phase 14 Conv2D Implementation scoped)
+**Version:** 2.12.0
+**Project Version:** 0.11.0 released; 0.12.0 RC ready (Phase 14 Done — pending `git tag -a v0.12.0`)
 **Generated:** 2026-04-29
-**Last Updated:** 2026-05-17
-**Based on:** .design/main/INDEX.md v2.13.0
+**Last Updated:** 2026-05-18
+**Based on:** .design/main/INDEX.md v2.13.1
 **Based on RULES:** .design/RULES.md v1.3.0
 **Based on ROADMAP:** .design/main/ROADMAP.md v1.0.0
 **Status:** Active
@@ -233,24 +233,25 @@ pass after the L2 spec is authored — see T-13A01.*
 
 - [x] **[A] 2-D Convolutional Layer Contract** ([l1-conv-2d-layers.md](specifications/l1-conv-2d-layers.md)) [L1, Stable v0.2.0] — CONV2D-1..CONV2D-9 invariants finalised; CHW layout fixed; sibling to existing 1-D `l1-conv-layers.md` Stable v1.0.0. L2 implementation spec `l2-conv-2d-impl.md` authored Stable v0.1.0 — implementation packages (`pkg/layer/conv/conv2d.go` and friends) follow in Phase 14.
 
-## Phase 14 — Conv2D Implementation + MNIST CNN Example (v0.12.0)
+## Phase 14 — Conv2D Implementation + MNIST CNN Example (v0.12.0) ✓ Done
 
 *Implementation phase that realises `l2-conv-2d-impl.md` Stable v0.1.0 as
 `pkg/layer/conv/conv2d.go` + `pool2d.go` + `flatten2d.go`, wires the four new
 `WithConv2D`/`WithMaxPool2D`/`WithAvgPool2D`/`WithFlatten2D` options through
 `pkg/nn/`, adds the MNIST 2-D adapter (`WithImageShape`) to `pkg/dataset/`,
-and ships `examples/mnist_cnn/` (E16) as the canonical CV demo. Closes Phase 13
-hand-off; targets v0.12.0 release.*
+and ships `examples/mnist_cnn/` (E16) as the canonical CV demo. Closed 2026-05-17.
+All 12 tasks green; gate T-14Z01 passed; v0.12.0 RC ready (pending `git tag -a v0.12.0`).*
 
 **Subsystem:** `pkg/layer/conv/` (new conv2d/pool2d/flatten2d), `pkg/nn/` (options + compile), `pkg/dataset/` (MNIST adapter), `examples/mnist_cnn/`
 **Requires:** Phase 13 ✓; l1-conv-2d-layers Stable v0.2.0 ✓; l2-conv-2d-impl Stable v0.1.0 ✓; sibling `pkg/layer/conv/` (Conv1D) Stable from Phase 11 ✓
-**Tasks file:** [tasks/phase-14.md](tasks/phase-14.md)
+**Tasks file:** [archives/tasks/phase-14.md](archives/tasks/phase-14.md)
 **Track order:** Tracks A and C parallel (independent files); Track B serial after A (needs Conv2D types); Track D serial after A+B+C (CNN example needs full stack); T-14T01 gated on Track A complete; Gate T-14Z01.
+**Outcome:** `pkg/layer/conv/` — `conv2d.go` (Conv2D[T] Forward/Backward/Init/JSON, CONV2D-C9 CHW filter-major flat `[]T`, PERF-4 zero-alloc Backward), `pool2d.go` (MaxPool2D argmax routing + AvgPool2D even distribution), `flatten2d.go` (stateless identity reshape); coverage 81.9%. `pkg/nn/` — `WithConv2D/MaxPool2D/AvgPool2D/Flatten2D/InputShape` options + `setupConv2DShapes` CHW pre-pass in compile(), isqrt auto-inference (MNIST 784→1×28×28); coverage 77.1% (pre-existing). `pkg/dataset/` — `ImageShaper` interface + `WithImageShape`/`ImageShape()` on MNISTLoader; coverage 85.9%. `examples/mnist_cnn/` E16 (LeNet-style: Conv2D(8,1,3,3)→MaxPool2D(2,2)→Conv2D(16,8,3,3)→MaxPool2D(2,2)→Flatten2D→Dense(64)→Output(10)) with two-epoch Fit+AndTrain. T-14T01 4-case finite-difference gradient check all PASS. Gate T-14Z01: `go build ./...` clean; all 19 packages green. Spec amendments: `l2-dataset-loader-impl.md` v0.1.0→v0.1.1, `l2-usage-examples.md` v1.0.0→v1.1.0. CHANGELOG.md v0.12.0 written. v0.12.0 tag pending user.
 
-- [ ] **[A] Conv2D Primitives** ([l2-conv-2d-impl.md](specifications/l2-conv-2d-impl.md)) [L2, Stable v0.1.0] — `pkg/layer/conv/conv2d.go`: `Conv2D[T]` with CHW filter-major flat `[]T` storage (CONV2D-2/C9), Forward (CONV2D-3), Backward (CONV2D-4), Init via `utils.HeNormal` (CONV2D-8), MarshalJSON/UnmarshalJSON (CONV2D-7), Validate, `outputShape` helper (CONV2D-1). `pkg/layer/conv/pool2d.go`: `MaxPool2D[T]` + `AvgPool2D[T]` (CONV2D-5) with argmax tracking for max backward, even distribution for avg backward. `pkg/layer/conv/flatten2d.go`: `Flatten2D[T]` (CONV2D-6) stateless CHW collapse + reshape backward. All four types satisfy `layer.Layer[T]` (CONV2D-9) with compile-time `var _ layer.Layer[float64] = (*Conv2D[float64])(nil)` assertions.
-- [ ] **[B] NN Integration** ([l2-nn-facade.md](specifications/l2-nn-facade.md)) [L2, Stable v2.0.0] — `pkg/nn/options.go` + `pkg/nn/config.go`: `WithConv2D[T]` / `WithMaxPool2D[T]` / `WithAvgPool2D[T]` / `WithFlatten2D[T]` functional options; `Conv2DPrefix []layer.Layer[T]` field on `config`. `pkg/nn/compile.go`: prepend Conv2D prefix before Conv1D + Dense stack; chain `outputShape()` calls to size the first Dense layer; propagate `ErrConv2DShapeMismatch` on invariant violation.
-- [ ] **[C] MNIST 2-D Adapter** ([l2-dataset-loader-impl.md](specifications/l2-dataset-loader-impl.md)) [L2, Stable v0.1.0 → v0.1.1 patch] — amend §Detailed Design with `WithImageShape(channels, height, width int)` requirement; implement in `pkg/dataset/mnist.go` as a decorator that wraps the flat 784-byte tensor into a CHW `(1, 28, 28)` view without copying; round-trip test (flat → CHW → flat); coverage maintained ≥80%.
-- [ ] **[D] MNIST CNN Example** ([l2-usage-examples.md](specifications/l2-usage-examples.md)) [L2, Stable v1.0.0 → v1.1.0 minor] — `examples/mnist_cnn/main.go` + `examples/mnist_cnn/README.md`: full E16 CNN — `Conv2D(8, 1, 3, 3, 1, 1, PadValid)` → `MaxPool2D(2, 2)` → `Conv2D(16, 8, 3, 3, 1, 1, PadValid)` → `MaxPool2D(2, 2)` → `Flatten2D` → `Dense(64)` → `Output(10)`; end-to-end training over MNIST; smoke-run deferred to user-supplied IDX data (same pattern as E06). Register E16 in `l2-usage-examples.md`.
+- [x] **[A] Conv2D Primitives** ([l2-conv-2d-impl.md](specifications/l2-conv-2d-impl.md)) [L2, Stable v0.1.0] — `pkg/layer/conv/conv2d.go`: `Conv2D[T]` with CHW filter-major flat `[]T` storage (CONV2D-2/C9), Forward (CONV2D-3), Backward (CONV2D-4), Init via `utils.HeNormal` (CONV2D-8), MarshalJSON/UnmarshalJSON (CONV2D-7), Validate, `outputShape` helper (CONV2D-1). `pkg/layer/conv/pool2d.go`: `MaxPool2D[T]` + `AvgPool2D[T]` (CONV2D-5) with argmax tracking for max backward, even distribution for avg backward. `pkg/layer/conv/flatten2d.go`: `Flatten2D[T]` (CONV2D-6) stateless CHW collapse + reshape backward. All four types satisfy `layer.Layer[T]` (CONV2D-9) with compile-time `var _ layer.Layer[float64] = (*Conv2D[float64])(nil)` assertions.
+- [x] **[B] NN Integration** ([l2-nn-facade.md](specifications/l2-nn-facade.md)) [L2, Stable v2.0.0] — `pkg/nn/options.go` + `pkg/nn/config.go`: `WithConv2D[T]` / `WithMaxPool2D[T]` / `WithAvgPool2D[T]` / `WithFlatten2D[T]` functional options; `Conv2DPrefix []layer.Layer[T]` field on `config`. `pkg/nn/compile.go`: prepend Conv2D prefix before Conv1D + Dense stack; chain `outputShape()` calls to size the first Dense layer; propagate `ErrConv2DShapeMismatch` on invariant violation.
+- [x] **[C] MNIST 2-D Adapter** ([l2-dataset-loader-impl.md](specifications/l2-dataset-loader-impl.md)) [L2, Stable v0.1.1] — amended §Detailed Design with `WithImageShape(channels, height, width int)` requirement; implemented in `pkg/dataset/mnist.go` as a decorator that wraps the flat 784-byte tensor into a CHW `(1, 28, 28)` view without copying; round-trip test (flat → CHW → flat); coverage maintained ≥80%.
+- [x] **[D] MNIST CNN Example** ([l2-usage-examples.md](specifications/l2-usage-examples.md)) [L2, Stable v1.1.0] — `examples/mnist_cnn/main.go` + `examples/mnist_cnn/README.md`: full E16 CNN — `Conv2D(8, 1, 3, 3, 1, 1, PadValid)` → `MaxPool2D(2, 2)` → `Conv2D(16, 8, 3, 3, 1, 1, PadValid)` → `MaxPool2D(2, 2)` → `Flatten2D` → `Dense(64)` → `Output(10)`; end-to-end training over MNIST; smoke-run deferred to user-supplied IDX data (same pattern as E06). E16 registered in `l2-usage-examples.md`.
 
 ## Build Order Diagram
 
@@ -299,3 +300,4 @@ graph LR
 | 2.9.0 | 2026-05-17 | Phase 12 marked Done (v0.11.0 release-ready). Phase 13 scoped: Convolutional 2-D Foundation. Pre-Planning Stabilization: 1 Draft promoted Stable (l1-conv-2d-layers v0.2.0) via Trust Mode batch (no RULES conflicts, no cycles, MVC satisfied). Single track A authoring task (T-13A01 — delegate L2 spec to `/magic-spec`) + validation (T-13T01) + gate (T-13Z01). Implementation tracks (B/C) deferred to follow-up phase after L2 stabilises. ORPHANED_SPEC + SYNC_GAP warnings resolved (PLAN base v2.10.0 → INDEX v2.12.0). Based on INDEX.md v2.12.0. |
 | 2.10.0 | 2026-05-17 | Phase 13 marked Done. `l2-conv-2d-impl` Stable v0.1.0 authored (T-13A01); all 9 CONV2D invariants mapped + spec-critic clean (T-13T01); gate T-13Z01 passed. Provides: `l1-conv-2d-layers` Stable v0.2.0 + `l2-conv-2d-impl` Stable v0.1.0. Phase 14 (Conv2D Implementation) deferred to next `/magic-task main`. SYNC_GAP resolved. Based on INDEX.md v2.13.0. |
 | 2.11.0 | 2026-05-17 | Phase 14 scoped: Conv2D Implementation + MNIST CNN Example (v0.12.0 target). Four tracks: A (Conv2D primitives — conv2d/pool2d/flatten2d), B (NN integration — options + compile), C (MNIST 2-D adapter — `WithImageShape` + `l2-dataset-loader-impl` patch), D (E16 MNIST CNN example + `l2-usage-examples` minor). Tracks A+C parallel; B serial after A; D serial after A+B+C. 12 atomic tasks (T-14A01..A04 + B01..B02 + C01..C02 + D01..D02 + T01 + Z01). `@role:planner` audit: Conv2D backward 6-level loop nesting flagged as 2-3× Conv1D complexity (split into T-14A02 alone); MNIST CNN cascade risk mitigated by mandatory finite-difference gradient check in T-14T01. Based on INDEX.md v2.13.0. |
+| 2.12.0 | 2026-05-18 | Phase 14 marked Done (v0.12.0 RC ready). All 12 tasks green; gate T-14Z01 passed; spec amendments l2-dataset-loader-impl v0.1.1 + l2-usage-examples v1.1.0 promoted via Trust Mode (VERSION_DRIFT reconciled in INDEX). Engine snapshot drift resolved: 2.1.25 → 2.1.27. Pre-Planning Stabilization: zero Draft promotions (no Drafts in INDEX); single RFC remains (l2-ai-doc-metadata gated on cmd/lint-aimeta delivery). No new phase scoped — all 57 Stable specs covered by Phases 1-14; next scope requires `/magic-spec` to author new specs. Based on INDEX.md v2.13.1. |

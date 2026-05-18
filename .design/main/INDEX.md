@@ -1,8 +1,8 @@
 # Workspace Specifications Registry
 
-**Version:** 2.13.0
+**Version:** 2.13.1
 **Status:** Active
-**Engine Version:** 2.1.25
+**Engine Version:** 2.1.27
 
 ## Overview
 
@@ -32,7 +32,7 @@ Local registry of specifications for this workspace.
 | [l2-neuron-model.md](specifications/l2-neuron-model.md) | Neuron/Cell/Axon model and interfaces | Stable | L2 | 1.1.0 |
 | [l2-activation-functions.md](specifications/l2-activation-functions.md) | 10 activation functions with dispatcher pattern | Stable | L2 | 1.0.0 |
 | [l2-loss-functions.md](specifications/l2-loss-functions.md) | 18 loss functions with dispatcher pattern | Stable | L2 | 1.0.0 |
-| [l2-usage-examples.md](specifications/l2-usage-examples.md) | Canonical example catalog — 15 entries with coverage matrix | Stable | L2 | 1.0.0 |
+| [l2-usage-examples.md](specifications/l2-usage-examples.md) | Canonical example catalog — 16 entries with coverage matrix (E16 MNIST CNN added) | Stable | L2 | 1.1.0 |
 | [l2-cli-client.md](specifications/l2-cli-client.md) | CLI binary `gonn` — train/query/verify subcommands | Stable | L2 | 0.2.0 |
 | [l2-visualization-api.md](specifications/l2-visualization-api.md) | HTTP/JSON adapter exposing observability for external GUIs — pkg/visualization/ package structure | Stable | L2 | 0.2.0 |
 | [l2-logging-strategy.md](specifications/l2-logging-strategy.md) | Structured logging via `log/slog` — goLogger wrapper, LevelTrace, WithLogger option | Stable | L2 | 0.2.0 |
@@ -66,11 +66,11 @@ Local registry of specifications for this workspace.
 | [l1-dataset-formats.md](specifications/l1-dataset-formats.md) | IDX binary format + AndTrain continuation contract | Stable | L1 | 1.0.0 |
 | [l2-meta-learning-impl.md](specifications/l2-meta-learning-impl.md) | Go realization of meta-learning hooks — pkg/nn/meta.go | Stable | L2 | 0.1.0 |
 | [l2-conv-layers-impl.md](specifications/l2-conv-layers-impl.md) | Go realization of convolutional layers — pkg/layer/conv/ (Conv1D/MaxPool1D/Flatten) | Stable | L2 | 0.1.0 |
-| [l2-dataset-loader-impl.md](specifications/l2-dataset-loader-impl.md) | Go realization of dataset formats — pkg/dataset/mnist.go + pkg/nn/andtrain.go | Stable | L2 | 0.1.0 |
+| [l2-dataset-loader-impl.md](specifications/l2-dataset-loader-impl.md) | Go realization of dataset formats — pkg/dataset/mnist.go + pkg/nn/andtrain.go | Stable | L2 | 0.1.1 |
 | [l1-conv-2d-layers.md](specifications/l1-conv-2d-layers.md) | 2-D convolutional layer contract — Conv2D / MaxPool2D / AvgPool2D / Flatten2D, CHW layout, 9 invariants | Stable | L1 | 0.2.0 |
 | [l2-conv-2d-impl.md](specifications/l2-conv-2d-impl.md) | Go realization of 2-D convolutional layers — pkg/layer/conv/ (Conv2D/MaxPool2D/AvgPool2D/Flatten2D) | Stable | L2 | 0.1.0 |
 
 ## Meta Information
 
 - **Maintainer**: Core Team
-- **Last Updated**: 2026-05-17 (magic-run Phase 13 T-13A01: authored `l2-conv-2d-impl.md` Stable v0.1.0 — all 9 CONV2D invariants mapped, CHW layout verbatim, Trust Mode promoted Draft→Stable. INDEX v2.12.0 → v2.13.0.)
+- **Last Updated**: 2026-05-18 (magic-analyze: engine drift resolved — Engine Version snapshot 2.1.25 → 2.1.27, wiki refreshed. INDEX v2.13.0 → v2.13.1.)
