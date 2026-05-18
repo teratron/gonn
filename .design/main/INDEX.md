@@ -1,6 +1,6 @@
 # Workspace Specifications Registry
 
-**Version:** 2.14.0
+**Version:** 2.15.0
 **Status:** Active
 **Engine Version:** 2.1.27
 
@@ -73,8 +73,9 @@ Local registry of specifications for this workspace.
 | [l2-backend-gpu.md](specifications/l2-backend-gpu.md) | GPU compute backend — pkg/compute/gpu/ umbrella + opencl/ + cuda/ sub-packages (cgo + build-tag isolated) | Stable | L2 | 0.1.0 |
 | [l1-recurrent-layers.md](specifications/l1-recurrent-layers.md) | Recurrent layer contract — SimpleRNN / LSTM / GRU with BPTT, 9 invariants (REC-1..9) | Stable | L1 | 0.1.0 |
 | [l2-recurrent-impl.md](specifications/l2-recurrent-impl.md) | Go realization of recurrent layers — pkg/layer/recurrent/ (SimpleRNN/LSTM/GRU/LastStep) + WithGradClipNorm | Stable | L2 | 0.1.0 |
+| [l1-attention.md](specifications/l1-attention.md) | Attention mechanism contract — scaled dot-product, Self/Multi-Head, causal + padding masks, 10 invariants (ATT-1..10) | Stable | L1 | 0.1.0 |
 
 ## Meta Information
 
 - **Maintainer**: Core Team
-- **Last Updated**: 2026-05-18 (magic-spec Phase 15 scoping: 4 new specs authored Stable via Trust Mode — l2-aimeta-linter v0.1.0, l2-backend-gpu v0.1.0, l1-recurrent-layers v0.1.0, l2-recurrent-impl v0.1.0; l2-ai-doc-metadata promoted RFC v0.1.0 → Stable v1.0.0 (+Canonical References). INDEX v2.13.1 → v2.14.0.)
+- **Last Updated**: 2026-05-18 (magic-spec Blank Trigger Spark 1: l1-attention v0.1.0 authored Stable via Trust Mode — 10 invariants ATT-1..10 covering scaled dot-product, Self/Multi-Head, causal + padding masks, four-path backward, Xavier-init projections. Highest-coverage architectural gap post-Phase-15: completes Conv + RNN + Attention sequence-primitive trio, unblocks Transformer encoder composition. L2 deferred (3-phase plan documented in §6). INDEX v2.14.0 → v2.15.0.)
