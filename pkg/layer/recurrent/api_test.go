@@ -163,7 +163,10 @@ func TestLSTMUnmarshalErrors(t *testing.T) {
 // TestItoaHelper exercises the itoa helper via the error message path.
 func TestItoaHelper(t *testing.T) {
 	t.Parallel()
-	cases := []struct{ n int; want string }{
+	cases := []struct {
+		n    int
+		want string
+	}{
 		{0, "0"},
 		{1, "1"},
 		{-1, "-1"},

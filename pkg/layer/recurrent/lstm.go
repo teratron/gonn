@@ -161,10 +161,10 @@ func (l *LSTM[T]) Forward(input []T) []T {
 		matVecAdd(gates, l.Wh, l.lastHidden[hPrevOff:hPrevOff+l.Hidden], g4, l.Hidden)
 
 		// Apply activations per gate: sigmoid(i,f,o), tanh(g).
-		applySigmoidFused(gates, 0, l.Hidden)               // i gate
-		applySigmoidFused(gates, l.Hidden, l.Hidden)         // f gate
-		applyTanhFused(gates, 2*l.Hidden, l.Hidden)          // g gate (cell input)
-		applySigmoidFused(gates, 3*l.Hidden, l.Hidden)       // o gate
+		applySigmoidFused(gates, 0, l.Hidden)          // i gate
+		applySigmoidFused(gates, l.Hidden, l.Hidden)   // f gate
+		applyTanhFused(gates, 2*l.Hidden, l.Hidden)    // g gate (cell input)
+		applySigmoidFused(gates, 3*l.Hidden, l.Hidden) // o gate
 
 		// Cache post-activation gates.
 		copy(l.lastGateActiv[gOff:gOff+g4], gates)
