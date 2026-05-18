@@ -17,8 +17,9 @@ param(
 # 1. Agent Registry — loaded from agents.json
 # ───────────────────────────────────────────────────────────────────────────────
 
-$ScriptDir  = Split-Path -Parent $MyInvocation.MyCommand.Path
-$RegistryFile = Join-Path (Split-Path -Parent $ScriptDir) "agents.json"
+$ScriptDir    = Split-Path -Parent $MyInvocation.MyCommand.Path
+$RepoRoot     = (Get-Item $ScriptDir).Parent.Parent.Parent.Parent.FullName
+$RegistryFile = Join-Path $ScriptDir "agents.json"
 
 if (-not (Test-Path $RegistryFile)) {
     Write-Error "Registry not found: $RegistryFile"
@@ -34,8 +35,8 @@ foreach ($prop in $json.PSObject.Properties) {
         dir       = $prop.Value.dir
         workflows = $prop.Value.workflows
         skills    = $prop.Value.skills
-        rules    = $prop.Value.rules
-        files    = if ($prop.Value.files) { @($prop.Value.files) } else { @() }
+        rules     = $prop.Value.rules
+        files     = if ($prop.Value.files) { @($prop.Value.files) } else { @() }
     }
 }
 
@@ -99,7 +100,7 @@ foreach ($agent in $targets) {
 
     if ($cfg.workflows) { $gitUntrack += "$dir/$($cfg.workflows)" }
     if ($cfg.skills)    { $gitUntrack += "$dir/$($cfg.skills)" }
-    if ($cfg.rules)    { $gitUntrack += "$dir/$($cfg.rules)" }
+    if ($cfg.rules)     { $gitUntrack += "$dir/$($cfg.rules)" }
 
     foreach ($f in $cfg.files) { $gitUntrack += $f }
 }
@@ -124,10 +125,10 @@ foreach ($agent in $targets) {
         New-Item -ItemType Directory -Path $dir -Force | Out-Null
     }
 
-    # Junctions
-    if ($cfg.workflows) { New-Junction "$dir\$($cfg.workflows)" ".agents\workflows" }
-    if ($cfg.skills)    { New-Junction "$dir\$($cfg.skills)"   ".agents\skills" }
-    if ($cfg.rules)    { New-Junction "$dir\$($cfg.rules)"    ".agents\rules" }
+    # Junctions (targets must be absolute paths on Windows)
+    if ($cfg.workflows) { New-Junction "$dir\$($cfg.workflows)" (Join-Path $RepoRoot ".agents\workflows") }
+    if ($cfg.skills)    { New-Junction "$dir\$($cfg.skills)"    (Join-Path $RepoRoot ".agents\skills") }
+    if ($cfg.rules)     { New-Junction "$dir\$($cfg.rules)"     (Join-Path $RepoRoot ".agents\rules") }
 
     # Hardlinks: instruction files → AGENTS.md
     foreach ($f in $cfg.files) {

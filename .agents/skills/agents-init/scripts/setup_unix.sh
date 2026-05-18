@@ -13,7 +13,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REGISTRY_FILE="$(dirname "$SCRIPT_DIR")/agents.json"
+REGISTRY_FILE="$SCRIPT_DIR/agents.json"
 
 # ───────────────────────────────────────────────────────────────────────────────
 # 1. Agent Registry — loaded from agents.json

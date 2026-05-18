@@ -112,7 +112,7 @@ To add a new agent — edit only that file; the scripts read it automatically
 
 ## Resources
 
-- [agents.json](agents.json)                             — agent registry
+- [agents.json](scripts/agents.json)                     — agent registry
 - [scripts/setup_windows.ps1](scripts/setup_windows.ps1) — PowerShell (Windows)
 - [scripts/setup_unix.sh](scripts/setup_unix.sh)         — Bash (Unix/macOS)
 
