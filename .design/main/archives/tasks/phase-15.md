@@ -1,7 +1,7 @@
 ---
 phase: 15
 name: "Recurrent Foundation + GPU Backend Skeleton + AI-Meta Linter"
-status: In Progress
+status: Done
 subsystem: "pkg/layer/recurrent/ (new SimpleRNN + LSTM); pkg/compute/gpu/ (new umbrella + opencl skeleton); pkg/aimeta/ (new); cmd/lint-aimeta/ (new)"
 requires:
   - "Phase 14 ✓ (v0.12.0 RC)"
@@ -29,16 +29,16 @@ duration_minutes: ~
 
 ### Track A — Recurrent Foundation (parallel-safe: A01/A02 sequential; A03/A04 parallel-after-A02)
 
-- [ ] [T-15A01] `pkg/utils/init.go` — `Orthogonal[T](rng, n)` helper via modified Gram-Schmidt
-- [ ] [T-15A02] `pkg/layer/recurrent/cell.go` + `doc.go` — shared helpers (sigmoid/tanh fused, state cache buffers, layer-interface boilerplate)
-- [ ] [T-15A03] `pkg/layer/recurrent/simple_rnn.go` — `SimpleRNN[T]` Forward + Backward + Init + Step + MarshalJSON/UnmarshalJSON
-- [ ] [T-15A04] `pkg/layer/recurrent/lstm.go` — `LSTM[T]` 4-gate fused-matmul Forward + Backward + Init + Step + MarshalJSON/UnmarshalJSON
+- [x] [T-15A01] `pkg/utils/init.go` — `Orthogonal[T](rng, n)` helper via modified Gram-Schmidt
+- [x] [T-15A02] `pkg/layer/recurrent/cell.go` + `doc.go` — shared helpers (sigmoid/tanh fused, state cache buffers, layer-interface boilerplate)
+- [x] [T-15A03] `pkg/layer/recurrent/simple_rnn.go` — `SimpleRNN[T]` Forward + Backward + Init + Step + MarshalJSON/UnmarshalJSON
+- [x] [T-15A04] `pkg/layer/recurrent/lstm.go` — `LSTM[T]` 4-gate fused-matmul Forward + Backward + Init + Step + MarshalJSON/UnmarshalJSON
 
 ### Track B — GPU Backend Skeleton (parallel with Track A; B01 sequential before B02)
 
-- [ ] [T-15B01] `pkg/compute/gpu/` umbrella — `doc.go` constants (`VendorOpenCL`/`VendorCUDA`), `unavailable.go` shim returning `ErrBackendUnavailable`, sentinel additions to `pkg/utils/errors.go` (`ErrBackendUnavailable`/`ErrBackendTransfer`/`ErrBackendKernel`)
-- [ ] [T-15B02] `pkg/compute/gpu/opencl/` skeleton — `opencl.go` cgo bindings + `clGetPlatformIDs` discovery, `buffer.go` `Buffer[T]` wrapping `cl_mem`, `Allocate`/`Free`/`Write`/`Read` with round-trip test (no kernels yet)
-- [ ] [T-15B03] `pkg/compute/gpu/opencl/kernels.go` + `kernels.cl` — Dense Forward kernel (matmul + bias + activation fused) launched via `clEnqueueNDRangeKernel`; cross-reference vs CPU within `cpu.ToleranceF32`/`ToleranceF64`
+- [x] [T-15B01] `pkg/compute/gpu/` umbrella — `doc.go` constants (`VendorOpenCL`/`VendorCUDA`), `unavailable.go` shim returning `ErrBackendUnavailable`, sentinel additions to `pkg/utils/errors.go` (`ErrBackendUnavailable`/`ErrBackendTransfer`/`ErrBackendKernel`)
+- [x] [T-15B02] `pkg/compute/gpu/opencl/` skeleton — `opencl.go` cgo bindings + `clGetPlatformIDs` discovery, `buffer.go` `Buffer[T]` wrapping `cl_mem`, `Allocate`/`Free`/`Write`/`Read` with round-trip test (no kernels yet)
+- [x] [T-15B03] `pkg/compute/gpu/opencl/kernels.go` + `kernels.cl` — Dense Forward kernel (matmul + bias + activation fused) launched via `clEnqueueNDRangeKernel`; cross-reference vs CPU within `cpu.ToleranceF32`/`ToleranceF64`
 
 ### Track C — AI-Meta Linter (parallel with Tracks A and B; C01 sequential before C02 before C03)
 
@@ -48,10 +48,10 @@ duration_minutes: ~
 
 ### Validation + Gate
 
-- [ ] [T-15T01] `pkg/layer/recurrent/{simple_rnn,lstm}_test.go` — finite-difference gradient check for `SimpleRNN` (3 cases) + `LSTM` (3 cases) within `1e-4` (float64) tolerance; orthogonality test for `utils.Orthogonal` (`‖Q·Q^T - I‖_F < 1e-10`)
+- [x] [T-15T01] `pkg/layer/recurrent/{simple_rnn,lstm}_test.go` — finite-difference gradient check for `SimpleRNN` (3 cases) + `LSTM` (3 cases) within `1e-4` (float64) tolerance; orthogonality test for `utils.Orthogonal` (`‖Q·Q^T - I‖_F < 1e-10`)
 - [x] [T-15T02] `pkg/aimeta/testdata/` golden-file matrix — all 5 §6 anti-patterns from `l2-ai-doc-metadata.md` produce exact expected `Violation` slices via `pkg/aimeta.Check`; clean fixtures produce empty violation list
-- [ ] [T-15T03] `pkg/compute/gpu/unavailable_test.go` (pure-Go) — `gpu.New[T]("opencl")` without `cgo,opencl` build tag returns `ErrBackendUnavailable`; CPU fallback wired in `pkg/nn/compile.go` returns `cpu` backend on the same input with a `Warn` log captured by `slogtest`
-- [ ] [T-15Z01] Phase 15 gate — `go build ./...` clean (default tags); `go build -tags 'opencl' ./...` clean on CI runner with OpenCL ICD installed (SKIP locally if unavailable); `go test ./...` all green; `pkg/layer/recurrent/` ≥80% coverage; `pkg/aimeta/` ≥80% coverage; `pkg/compute/gpu/` ≥80% coverage (excluding cgo-tagged files); v0.13.0 RC ready
+- [x] [T-15T03] `pkg/compute/gpu/unavailable_test.go` (pure-Go) — `gpu.New[T]("opencl")` without `cgo,opencl` build tag returns `ErrBackendUnavailable`; CPU fallback wired in `pkg/nn/compile.go` returns `cpu` backend on the same input with a `Warn` log captured by `slogtest`
+- [x] [T-15Z01] Phase 15 gate — `go build ./...` clean (default tags); `go build -tags 'opencl' ./...` clean on CI runner with OpenCL ICD installed (SKIP locally if unavailable); `go test ./...` all green; `pkg/layer/recurrent/` ≥80% coverage; `pkg/aimeta/` ≥80% coverage; `pkg/compute/gpu/` ≥80% coverage (excluding cgo-tagged files); v0.13.0 RC ready
 
 ## Detailed Tracking
 

@@ -164,6 +164,39 @@ var ErrBackendTransfer = errors.New("backend-transfer")
 //   - Stability: Stable.
 var ErrBackendKernel = errors.New("backend-kernel")
 
+// Recurrent-layer sentinels (REC-1, REC-6, REC-7, per l2-recurrent-impl §5.11).
+
+// ErrRecurrentShape signals that the input or output tensor shape passed to a
+// recurrent layer does not match the layer's declared (SeqLen, InSize, Hidden)
+// configuration (REC-1 violation).
+//
+// AI-Meta:
+//   - Purpose: Sentinel for recurrent layer input/output shape mismatch (REC-1).
+//   - Usage: errors.Is(err, utils.ErrRecurrentShape).
+//   - Related: [ErrCompute].
+//   - Stability: Stable.
+var ErrRecurrentShape = errors.New("recurrent-shape")
+
+// ErrRecurrentStepNoInit signals that Step() was called on a recurrent layer
+// before Init(rng) had been called, i.e., the weight matrices are nil.
+//
+// AI-Meta:
+//   - Purpose: Sentinel for Step called on an uninitialised recurrent layer.
+//   - Usage: errors.Is(err, utils.ErrRecurrentStepNoInit).
+//   - Related: [ErrCompute].
+//   - Stability: Stable.
+var ErrRecurrentStepNoInit = errors.New("recurrent-step-no-init")
+
+// ErrGradClipInvalid signals that a WithGradClipNorm threshold value is ≤ 0,
+// which is a caller-side configuration error.
+//
+// AI-Meta:
+//   - Purpose: Sentinel for invalid (non-positive) gradient-clip threshold.
+//   - Usage: errors.Is(err, utils.ErrGradClipInvalid).
+//   - Related: [ErrUserConfig].
+//   - Stability: Stable.
+var ErrGradClipInvalid = errors.New("grad-clip-invalid")
+
 // Convolutional-layer sentinels (CONV-1, CONV-5, per l2-conv-layers-impl).
 
 // ErrConvShapeMismatch signals that the input feature map is shorter than the
