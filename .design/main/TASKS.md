@@ -1,10 +1,10 @@
 # Master Task Index (Registry)
 
-**Version:** 2.11.1
+**Version:** 2.11.2
 **Project Version:** 0.11.0 released; 0.12.0 RC ready (Phase 14 Done — pending `git tag -a v0.12.0`); 0.13.0 in progress (Phase 15 — 4/14 tasks done)
 **Generated:** 2026-04-29
 **Last Updated:** 2026-05-18
-**Based on:** .design/main/PLAN.md v2.13.0
+**Based on:** .design/main/PLAN.md v2.14.0
 **Based on RULES:** .design/RULES.md v1.3.0
 **Execution Mode:** Parallel (C3)
 **Status:** Active
@@ -239,5 +239,5 @@ Six of the eight v0.6-gated entries (E03, E04, E05, E07, E08, E13) are now activ
 | `CHANGELOG.md` (v0.11.0 entry) | l1-release-policy v1.0.0 | `Done` [Z] |
 | `v0.11.0` git tag | l1-release-policy v1.0.0 §5.4 | `Pending user` (run `git tag -a v0.11.0`) |
 
-- **Last Updated**: 2026-05-18 (Sync via magic-task: Phase 15 status Track C done (C01+C02+C03+T02 = 4/14). Phase 15 row updated In Progress. PLAN.md Backlog l2-ai-doc-metadata synced RFC→Stable v1.0.0. TASKS v2.11.0 → v2.11.1.)
+- **Last Updated**: 2026-05-18 (Sync via magic-task post `/magic-spec` Blank Trigger: PLAN base bumped v2.13.0 → v2.14.0 (new Backlog entry for l1-attention.md Stable v0.1.0); no task-progress changes — Phase 15 stays at 4/14 with Tracks A+B pending. TASKS v2.11.1 → v2.11.2.)
 - **Maintainer**: Core Team

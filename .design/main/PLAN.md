@@ -1,10 +1,10 @@
 # Implementation Plan
 
-**Version:** 2.13.1
+**Version:** 2.14.0
 **Project Version:** 0.11.0 released; 0.12.0 RC ready (Phase 14 Done — pending `git tag -a v0.12.0`); 0.13.0 in progress (Phase 15 — 4/14 tasks done)
 **Generated:** 2026-04-29
 **Last Updated:** 2026-05-18
-**Based on:** .design/main/INDEX.md v2.14.0
+**Based on:** .design/main/INDEX.md v2.15.0
 **Based on RULES:** .design/RULES.md v1.3.0
 **Based on ROADMAP:** .design/main/ROADMAP.md v1.0.0
 **Status:** Active
@@ -181,6 +181,10 @@ into pkg/nn/train.go. Light coordination on pkg/nn/train.go (Track B owns it; Tr
 - [l1-compute-backend.md](specifications/l1-compute-backend.md) — Stable v1.0.0
 - [l1-dynamic-topology.md](specifications/l1-dynamic-topology.md) — Stable v0.2.0 (parent of l2-dynamic-topology-impl.md, Phase 9 Track B; orphan resolved 2026-05-12)
 
+### L1 Concept (Stable, awaiting L2 authoring — next /magic-spec run)
+
+- [l1-attention.md](specifications/l1-attention.md) — Stable v0.1.0 (Attention mechanism contract — scaled dot-product, Self/Multi-Head, causal + padding masks; 10 invariants ATT-1..10; no L2 sibling yet — run `/magic-spec` to draft `l2-attention-impl.md` before Phase 17 scoping; orphan resolved 2026-05-18 via magic-task sync)
+
 ### Phase 4 → Phase 5 promotion (multi-hidden)
 
 Six of the eight original v0.6-gated catalog entries (E03, E04, E05, E07, E08, E13) move from backlog into active Phase 5 work. E06 (MNIST preset) and E10 (AndTrain continuation) promoted to Phase 11 Track C once l1-dataset-formats.md reaches Stable.
@@ -325,3 +329,4 @@ graph LR
 | 2.12.0 | 2026-05-18 | Phase 14 marked Done (v0.12.0 RC ready). All 12 tasks green; gate T-14Z01 passed; spec amendments l2-dataset-loader-impl v0.1.1 + l2-usage-examples v1.1.0 promoted via Trust Mode (VERSION_DRIFT reconciled in INDEX). Engine snapshot drift resolved: 2.1.25 → 2.1.27. Pre-Planning Stabilization: zero Draft promotions (no Drafts in INDEX); single RFC remains (l2-ai-doc-metadata gated on cmd/lint-aimeta delivery). No new phase scoped — all 57 Stable specs covered by Phases 1-14; next scope requires `/magic-spec` to author new specs. Based on INDEX.md v2.13.1. |
 | 2.13.0 | 2026-05-18 | Phase 15 scoped: Recurrent Foundation + GPU Backend Skeleton + AI-Meta Linter (v0.13.0 target). Three fully parallel foundation tracks: A (Recurrent — SimpleRNN+LSTM with BPTT and orthogonal init), B (GPU — pkg/compute/gpu/ umbrella + opencl/ skeleton + Dense Forward kernel), C (Linter — pkg/aimeta grammar + cmd/lint-aimeta CLI + first per-package compliance hook in pkg/utils). 14 atomic tasks (T-15A01..A04 + B01..B03 + C01..C03 + T01..T03 + Z01). Pre-Planning Stabilization: zero Draft promotions (all 4 new specs already Stable via Trust Mode in prior `/magic-spec`); RFC count 1→0 (l2-ai-doc-metadata promoted in same `/magic-spec` run). @role:planner audit recorded under Phase 15: Optimism Bias (3 spec implementation plans compressed; GRU/CUDA/perf-gate/resolver deferred to Phase 16+); Hidden Dependencies (all 3 tracks add sentinels to pkg/utils/errors.go — additive, non-overlapping); Cascade Risk (each track independently mergeable, none gates downstream). Based on INDEX.md v2.14.0. |
 | 2.13.1 | 2026-05-18 | Sync patch: Phase 15 In Progress (4/14 — Track C C01+C02+C03+T02 done). Backlog l2-ai-doc-metadata updated RFC v0.1.0 → Stable v1.0.0 with rollout-phases-2-5 note. |
+| 2.14.0 | 2026-05-18 | Sync via magic-task post `/magic-spec` Blank Trigger: added l1-attention.md Stable v0.1.0 (Attention mechanism — scaled dot-product, Self/Multi-Head, causal + padding masks; 10 invariants ATT-1..10) into new Backlog category "L1 Concept (Stable, awaiting L2 authoring)". @role:planner audit recorded: Optimism Bias (Phase 16 scoping deferred — Phase 15 at 28% complete with Tracks A+B blocking); Hidden Dependencies (ATT-7 softmax-backward + ATT-4 zero-copy multi-head reshape not covered by existing helpers — flagged for future L2); Cascade Risk (Phase-15 closeouts + Attention L2 in one phase = 8-track risk — recommend split into Phase 16 closeouts + Phase 17 attention). ORPHANED_SPEC + SYNC_GAP warnings resolved. Phase 15 row unchanged (4/14). Based on INDEX.md v2.15.0. |
