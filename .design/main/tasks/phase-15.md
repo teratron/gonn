@@ -1,7 +1,7 @@
 ---
 phase: 15
 name: "Recurrent Foundation + GPU Backend Skeleton + AI-Meta Linter"
-status: Todo
+status: In Progress
 subsystem: "pkg/layer/recurrent/ (new SimpleRNN + LSTM); pkg/compute/gpu/ (new umbrella + opencl skeleton); pkg/aimeta/ (new); cmd/lint-aimeta/ (new)"
 requires:
   - "Phase 14 ✓ (v0.12.0 RC)"

@@ -5,16 +5,16 @@
 
 **Workspace:** main
 **Project Version:** 0.11.0 released
-**Updated:** 2026-05-18 16:00
+**Updated:** 2026-05-18 18:00
 **Phase:** 15 — Recurrent Foundation + GPU Skeleton + AI-Meta Linter
-**Status:** In Progress
+**Status:** Active
 
 ## Current Position
 
-- **Task:** T-15C03 complete (pkg/utils AI-Meta annotations + TestAIMetaCompliance)
-- **Track C Done:** T-15C01 ✓ (pkg/aimeta grammar package), T-15C02 ✓ (cmd/lint-aimeta CLI), T-15C03 ✓ (pkg/utils aimeta_test.go)
+- **Task:** T-15T02 ✓ (AI-Meta golden-file matrix) — last completed; Track C fully done (C01+C02+C03+T02 = 4/14)
+- **Track C Done:** T-15C01 ✓ (pkg/aimeta grammar package), T-15C02 ✓ (cmd/lint-aimeta CLI), T-15C03 ✓ (pkg/utils aimeta_test.go), T-15T02 ✓ (golden-file matrix)
 - **Spec:** l1-recurrent-layers Stable v0.1.0; l2-recurrent-impl Stable v0.1.0; l2-backend-gpu Stable v0.1.0; l2-aimeta-linter Stable v0.1.0; l2-ai-doc-metadata Stable v1.0.0 (promoted from RFC)
-- **Next Action:** T-15T01/T-15T02/T-15T03 validation tasks (Track A+B+C), then T-15Z01 gate
+- **Next Action:** Run T-15A01..A04 (Track A) + T-15B01..B03 (Track B) in parallel; after each track T-15T01 (Track A) + T-15T03 (Track B) validation; then T-15Z01 gate
 
 ## Progress
 
@@ -33,8 +33,8 @@ Phase 11 (Done):    [14/14]   ████████ 100%   (Track A 3/3 compl
 Phase 12 (Done):    [5/5]     ████████ 100%   (Track A 3/3 done; T-12T01 + T-12Z01 done)
 Phase 13 (Done):    [2/2]     ████████ 100%   (L1 + L2 spec authoring; gate done)
 Phase 14 (Done):    [12/12]   ████████ 100%   (Tracks A+B+C+D + T01 + Z01; v0.12.0 RC)
-Phase 15 (Todo):    [0/14]    ░░░░░░░░   0%   (Tracks A+B+C foundation; v0.13.0 target)
-Overall:            [206/220] ███████░  93.6%
+Phase 15 (In Progress): [4/14]  ██░░░░░░  28.6%  (Track C ✓ · T-15T02 ✓; Tracks A+B pending; v0.13.0 target)
+Overall:            [210/220] ████████  95.5%
 ```
 
 ## Recent Decisions

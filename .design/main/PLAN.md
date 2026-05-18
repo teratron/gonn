@@ -1,7 +1,7 @@
 # Implementation Plan
 
-**Version:** 2.13.0
-**Project Version:** 0.11.0 released; 0.12.0 RC ready (Phase 14 Done — pending `git tag -a v0.12.0`); 0.13.0 in progress (Phase 15 scoped)
+**Version:** 2.13.1
+**Project Version:** 0.11.0 released; 0.12.0 RC ready (Phase 14 Done — pending `git tag -a v0.12.0`); 0.13.0 in progress (Phase 15 — 4/14 tasks done)
 **Generated:** 2026-04-29
 **Last Updated:** 2026-05-18
 **Based on:** .design/main/INDEX.md v2.14.0
@@ -164,9 +164,9 @@ into pkg/nn/train.go. Light coordination on pkg/nn/train.go (Track B owns it; Tr
 
 - [l1-meta-learning-hooks.md](specifications/l1-meta-learning-hooks.md) — Stable v1.0.0 (promoted 2026-05-17 via magic-spec; active in Phase 12 Track A)
 
-### L2 Implementation (deferred)
+### L2 Implementation (rollout in progress)
 
-- [l2-ai-doc-metadata.md](specifications/l2-ai-doc-metadata.md) — RFC v0.1.0 (AI-Meta trailing block convention; gated on cmd/lint-aimeta delivery; rollout phased per §8)
+- [l2-ai-doc-metadata.md](specifications/l2-ai-doc-metadata.md) — Stable v1.0.0 (AI-Meta trailing block convention; cmd/lint-aimeta delivered Phase 15 Track C; rollout phases 2-5 deferred to Phase 16+ per §8)
 
 ### L1 Concept (tracked — promoted to Stable, parents of active Phase 3–10 specs)
 
@@ -324,3 +324,4 @@ graph LR
 | 2.11.0 | 2026-05-17 | Phase 14 scoped: Conv2D Implementation + MNIST CNN Example (v0.12.0 target). Four tracks: A (Conv2D primitives — conv2d/pool2d/flatten2d), B (NN integration — options + compile), C (MNIST 2-D adapter — `WithImageShape` + `l2-dataset-loader-impl` patch), D (E16 MNIST CNN example + `l2-usage-examples` minor). Tracks A+C parallel; B serial after A; D serial after A+B+C. 12 atomic tasks (T-14A01..A04 + B01..B02 + C01..C02 + D01..D02 + T01 + Z01). `@role:planner` audit: Conv2D backward 6-level loop nesting flagged as 2-3× Conv1D complexity (split into T-14A02 alone); MNIST CNN cascade risk mitigated by mandatory finite-difference gradient check in T-14T01. Based on INDEX.md v2.13.0. |
 | 2.12.0 | 2026-05-18 | Phase 14 marked Done (v0.12.0 RC ready). All 12 tasks green; gate T-14Z01 passed; spec amendments l2-dataset-loader-impl v0.1.1 + l2-usage-examples v1.1.0 promoted via Trust Mode (VERSION_DRIFT reconciled in INDEX). Engine snapshot drift resolved: 2.1.25 → 2.1.27. Pre-Planning Stabilization: zero Draft promotions (no Drafts in INDEX); single RFC remains (l2-ai-doc-metadata gated on cmd/lint-aimeta delivery). No new phase scoped — all 57 Stable specs covered by Phases 1-14; next scope requires `/magic-spec` to author new specs. Based on INDEX.md v2.13.1. |
 | 2.13.0 | 2026-05-18 | Phase 15 scoped: Recurrent Foundation + GPU Backend Skeleton + AI-Meta Linter (v0.13.0 target). Three fully parallel foundation tracks: A (Recurrent — SimpleRNN+LSTM with BPTT and orthogonal init), B (GPU — pkg/compute/gpu/ umbrella + opencl/ skeleton + Dense Forward kernel), C (Linter — pkg/aimeta grammar + cmd/lint-aimeta CLI + first per-package compliance hook in pkg/utils). 14 atomic tasks (T-15A01..A04 + B01..B03 + C01..C03 + T01..T03 + Z01). Pre-Planning Stabilization: zero Draft promotions (all 4 new specs already Stable via Trust Mode in prior `/magic-spec`); RFC count 1→0 (l2-ai-doc-metadata promoted in same `/magic-spec` run). @role:planner audit recorded under Phase 15: Optimism Bias (3 spec implementation plans compressed; GRU/CUDA/perf-gate/resolver deferred to Phase 16+); Hidden Dependencies (all 3 tracks add sentinels to pkg/utils/errors.go — additive, non-overlapping); Cascade Risk (each track independently mergeable, none gates downstream). Based on INDEX.md v2.14.0. |
+| 2.13.1 | 2026-05-18 | Sync patch: Phase 15 In Progress (4/14 — Track C C01+C02+C03+T02 done). Backlog l2-ai-doc-metadata updated RFC v0.1.0 → Stable v1.0.0 with rollout-phases-2-5 note. |
