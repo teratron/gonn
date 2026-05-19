@@ -5,15 +5,15 @@
 
 **Workspace:** main
 **Project Version:** 0.14.0 RC ready (Phase 16 Done — pending `git tag -a v0.14.0`)
-**Updated:** 2026-05-19 14:30
-**Phase:** 16 — Recurrent Completion + GPU Backward + AI-Meta Rollout
-**Status:** Done
+**Updated:** 2026-05-19 17:50
+**Phase:** 17 — NLP Foundation: Attention Implementation + Embedding Layers
+**Status:** Active
 
 ## Current Position
 
 - **Task:** Phase 16 complete — all 14 tasks done (T-16A01..A04, B01..B03, C01..C03, T01..T03, Z01).
 - **Spec:** l1-recurrent-layers + l2-recurrent-impl v0.1.0; l2-backend-gpu v0.1.0; l2-aimeta-linter v0.1.0; l2-ai-doc-metadata v1.0.0. No new specs.
-- **Next Action:** User runs `git tag -a v0.14.0` to complete release. Phase 17 (Attention implementation) gated on T-16Z01 closeout — now unblocked.
+- **Next Action:** Run /magic-run to execute Phase 17 Tracks A+B in parallel (Track A=Attention, Track B=Embedding); cross-track sequence T-17A05 before T-17B06
 
 ## Progress
 

@@ -1,10 +1,10 @@
 # Master Task Index (Registry)
 
-**Version:** 2.13.0
-**Project Version:** 0.11.0 released; 0.12.0 RC ready (Phase 14 Done — pending `git tag -a v0.12.0`); 0.13.0 RC ready (Phase 15 Done — pending `git tag -a v0.13.0`); 0.14.0 target (Phase 16 active)
+**Version:** 2.14.0
+**Project Version:** 0.11.0 released; 0.12.0 RC ready (Phase 14 Done — pending `git tag -a v0.12.0`); 0.13.0 RC ready (Phase 15 Done — pending `git tag -a v0.13.0`); 0.14.0 RC ready (Phase 16 Done — pending `git tag -a v0.14.0`); 0.15.0 target (Phase 17 active)
 **Generated:** 2026-04-29
 **Last Updated:** 2026-05-19
-**Based on:** .design/main/PLAN.md v2.17.0
+**Based on:** .design/main/PLAN.md v2.18.0
 **Based on RULES:** .design/RULES.md v1.3.0
 **Execution Mode:** Parallel (C3)
 **Status:** Active
@@ -32,7 +32,8 @@ Tactical registry of all phases and their statuses. Atomic checklists (`T-XXXX`)
 | [Phase 13](archives/tasks/phase-13.md) | Convolutional 2-D Foundation — scoping phase: L1 contract Stable + queue L2 spec authoring (T-13A01) for `l2-conv-2d-impl.md` via `/magic-spec`; implementation tracks (`pkg/layer/conv/conv2d.go` + friends) deferred to follow-up | `Done (Archived)` (3 tasks: T-13A01 + T-13T01 + T-13Z01) |
 | [Phase 14](archives/tasks/phase-14.md) | Conv2D Implementation + MNIST CNN Example — `pkg/layer/conv/conv2d.go` + `pool2d.go` + `flatten2d.go`, `pkg/nn/options.go` (WithConv2D+friends) + `compile.go` 2-D wiring, `pkg/dataset/` WithImageShape adapter, `examples/mnist_cnn/` E16, v0.12.0 release | `Done (Archived)` (12 tasks: T-14A01..A04 + B01..B02 + C01..C02 + D01..D02 + T01 + Z01) |
 | [Phase 15](archives/tasks/phase-15.md) | Recurrent Foundation + GPU Backend Skeleton + AI-Meta Linter — Track A (`pkg/layer/recurrent/` SimpleRNN+LSTM with BPTT + `utils.Orthogonal`, coverage 97.2%), Track B (`pkg/compute/gpu/` umbrella + opencl/ skeleton + Dense Forward kernel, coverage 90.0%), Track C (`pkg/aimeta/` grammar + `cmd/lint-aimeta` CLI + first per-package compliance hook in `pkg/utils`, coverage 82.9%), v0.13.0 released | `Done (Archived)` (14/14 — all tracks complete; gate T-15Z01 green) |
-| [Phase 16](tasks/phase-16.md) | Recurrent Completion + GPU Backward + AI-Meta Rollout — Track A (GRU + LastStep + ClipByGlobalNorm + WithSimpleRNN/LSTM/GRU/LastStep options + compile wiring), Track B (OpenCL Dense Backward kernel + `WithBackend(...)` CPU graceful fallback + perf bench gate), Track C (`--resolve` flag + RESOLVE rule + TestAIMetaCompliance rollout phases 3+4+5 across pkg/activation/loss/neuron/layer/network/dataset/checkpoint/compute/persistence/nn), v0.14.0 target | `Active` (0/14 — scoped 2026-05-19) |
+| [Phase 16](tasks/phase-16.md) | Recurrent Completion + GPU Backward + AI-Meta Rollout — Track A (GRU + LastStep + ClipByGlobalNorm + WithSimpleRNN/LSTM/GRU/LastStep options + compile wiring), Track B (OpenCL Dense Backward kernel + `WithBackend(...)` CPU graceful fallback + perf bench gate), Track C (`--resolve` flag + RESOLVE rule + TestAIMetaCompliance rollout phases 3+4+5 across pkg/activation/loss/neuron/layer/network/dataset/checkpoint/compute/persistence/nn), v0.14.0 RC | `Done` (14/14 — closed 2026-05-19) |
+| [Phase 17](tasks/phase-17.md) | NLP Foundation — Attention Implementation + Embedding Layers — Track A (`pkg/layer/attention/` MultiHeadAttention[T] + cell.go softmax helpers + MaskedLayer[T] + three pkg/nn options), Track B (`pkg/layer/embedding/` TokenEmbedding[T] + single PositionalEncoding[T] with PositionalMode enum + EmbeddingStack[T] + sparseGrad[T] + IDLayer[T] sub-interface + SparseParamAccessor[T] optimizer extension + three pkg/nn options), v0.15.0 target | `Active` (0/15 — scoped 2026-05-19) |
 
 ## Phase 0 — Already Complete
 
