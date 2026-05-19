@@ -1,10 +1,10 @@
 # Master Task Index (Registry)
 
-**Version:** 2.12.0
-**Project Version:** 0.11.0 released; 0.12.0 RC ready (Phase 14 Done — pending `git tag -a v0.12.0`); 0.13.0 RC ready (Phase 15 Done — pending `git tag -a v0.13.0`)
+**Version:** 2.13.0
+**Project Version:** 0.11.0 released; 0.12.0 RC ready (Phase 14 Done — pending `git tag -a v0.12.0`); 0.13.0 RC ready (Phase 15 Done — pending `git tag -a v0.13.0`); 0.14.0 target (Phase 16 active)
 **Generated:** 2026-04-29
 **Last Updated:** 2026-05-19
-**Based on:** .design/main/PLAN.md v2.16.0
+**Based on:** .design/main/PLAN.md v2.17.0
 **Based on RULES:** .design/RULES.md v1.3.0
 **Execution Mode:** Parallel (C3)
 **Status:** Active
@@ -32,6 +32,7 @@ Tactical registry of all phases and their statuses. Atomic checklists (`T-XXXX`)
 | [Phase 13](archives/tasks/phase-13.md) | Convolutional 2-D Foundation — scoping phase: L1 contract Stable + queue L2 spec authoring (T-13A01) for `l2-conv-2d-impl.md` via `/magic-spec`; implementation tracks (`pkg/layer/conv/conv2d.go` + friends) deferred to follow-up | `Done (Archived)` (3 tasks: T-13A01 + T-13T01 + T-13Z01) |
 | [Phase 14](archives/tasks/phase-14.md) | Conv2D Implementation + MNIST CNN Example — `pkg/layer/conv/conv2d.go` + `pool2d.go` + `flatten2d.go`, `pkg/nn/options.go` (WithConv2D+friends) + `compile.go` 2-D wiring, `pkg/dataset/` WithImageShape adapter, `examples/mnist_cnn/` E16, v0.12.0 release | `Done (Archived)` (12 tasks: T-14A01..A04 + B01..B02 + C01..C02 + D01..D02 + T01 + Z01) |
 | [Phase 15](archives/tasks/phase-15.md) | Recurrent Foundation + GPU Backend Skeleton + AI-Meta Linter — Track A (`pkg/layer/recurrent/` SimpleRNN+LSTM with BPTT + `utils.Orthogonal`, coverage 97.2%), Track B (`pkg/compute/gpu/` umbrella + opencl/ skeleton + Dense Forward kernel, coverage 90.0%), Track C (`pkg/aimeta/` grammar + `cmd/lint-aimeta` CLI + first per-package compliance hook in `pkg/utils`, coverage 82.9%), v0.13.0 released | `Done (Archived)` (14/14 — all tracks complete; gate T-15Z01 green) |
+| [Phase 16](tasks/phase-16.md) | Recurrent Completion + GPU Backward + AI-Meta Rollout — Track A (GRU + LastStep + ClipByGlobalNorm + WithSimpleRNN/LSTM/GRU/LastStep options + compile wiring), Track B (OpenCL Dense Backward kernel + `WithBackend(...)` CPU graceful fallback + perf bench gate), Track C (`--resolve` flag + RESOLVE rule + TestAIMetaCompliance rollout phases 3+4+5 across pkg/activation/loss/neuron/layer/network/dataset/checkpoint/compute/persistence/nn), v0.14.0 target | `Active` (0/14 — scoped 2026-05-19) |
 
 ## Phase 0 — Already Complete
 
@@ -239,5 +240,5 @@ Six of the eight v0.6-gated entries (E03, E04, E05, E07, E08, E13) are now activ
 | `CHANGELOG.md` (v0.11.0 entry) | l1-release-policy v1.0.0 | `Done` [Z] |
 | `v0.11.0` git tag | l1-release-policy v1.0.0 §5.4 | `Pending user` (run `git tag -a v0.11.0`) |
 
-- **Last Updated**: 2026-05-19 (Phase 15 complete via /magic-run: all 14/14 tasks done; PLAN v2.15.0 → v2.16.0; Phase 15 row updated to 14/14; Phase 17 Attention Foundation scoping condition now met (T-15Z01 passed). TASKS v2.11.3 → v2.12.0.)
+- **Last Updated**: 2026-05-19 (Phase 16 scoped via /magic-task: 14 atomic tasks across Tracks A+B+C; PLAN v2.16.0 → v2.17.0; Phase 16 row added Active; Phase 17 Attention scoping condition tightened — now gated on Phase 16 T-16Z01 closeout. TASKS v2.12.0 → v2.13.0.)
 - **Maintainer**: Core Team

@@ -4,17 +4,16 @@
 <!-- Maximum 100 lines. Agent updates AFTER each completed action. -->
 
 **Workspace:** main
-**Project Version:** 0.11.0 released
-**Updated:** 2026-05-19 06:21
-**Phase:** 15 — Recurrent Foundation + GPU Skeleton + AI-Meta Linter
-**Status:** Done
+**Project Version:** 0.11.0 released; 0.14.0 target (Phase 16 active)
+**Updated:** 2026-05-19 06:41
+**Phase:** 16 — Recurrent Completion + GPU Backward + AI-Meta Rollout
+**Status:** Active
 
 ## Current Position
 
-- **Task:** T-15Z01 Phase 15 gate
-- **Track C Done:** T-15C01 ✓ (pkg/aimeta grammar package), T-15C02 ✓ (cmd/lint-aimeta CLI), T-15C03 ✓ (pkg/utils aimeta_test.go), T-15T02 ✓ (golden-file matrix)
-- **Spec:** l1-recurrent-layers Stable v0.1.0; l2-recurrent-impl Stable v0.1.0; l2-backend-gpu Stable v0.1.0; l2-aimeta-linter Stable v0.1.0; l2-ai-doc-metadata Stable v1.0.0 (promoted from RFC)
-- **Next Action:** Run /magic-task to scope Phase 16 (Attention Foundation activation + Phase 15 deferred scope: GRU, LastStep, WithGradClipNorm, OpenCL Backward, CUDA, TestAIMetaCompliance rollout). Phase 17 (Attention implementation) unblocks once Phase 16 closes.
+- **Task:** T-16A01..A04 (Track A recurrent completion) ∥ T-16B01..B03 (Track B GPU Backward) ∥ T-16C01..C03 (Track C AI-Meta rollout). Sequence within: A01 ∥ A02 ∥ A03 → A04; B01 → (B02 ∥ B03); C01 → (C02 ∥ C03). Cross-track sequence: A04 must commit before B02 (shared `pkg/nn/options.go` + `compile.go`).
+- **Spec:** Phase 16 consumes existing Stable specs — l1-recurrent-layers + l2-recurrent-impl v0.1.0; l2-backend-gpu v0.1.0; l2-aimeta-linter v0.1.0; l2-ai-doc-metadata v1.0.0. No new specs registered.
+- **Next Action:** Run /magic-run main to execute Phase 16 (Tracks A+B+C in parallel; A04 sequential after A01+A02+A03; B02 after A04 due to shared pkg/nn/options.go + compile.go)
 
 ## Progress
 
@@ -33,11 +32,15 @@ Phase 11 (Done):    [14/14]   ████████ 100%   (Track A 3/3 compl
 Phase 12 (Done):    [5/5]     ████████ 100%   (Track A 3/3 done; T-12T01 + T-12Z01 done)
 Phase 13 (Done):    [2/2]     ████████ 100%   (L1 + L2 spec authoring; gate done)
 Phase 14 (Done):    [12/12]   ████████ 100%   (Tracks A+B+C+D + T01 + Z01; v0.12.0 RC)
-Phase 15 (In Progress): [4/14]  ██░░░░░░  28.6%  (Track C ✓ · T-15T02 ✓; Tracks A+B pending; v0.13.0 target)
-Overall:            [210/220] ████████  95.5%
+Phase 15 (Done):    [14/14]   ████████ 100%   (Tracks A+B+C + T01..T03 + Z01; v0.13.0 RC)
+Phase 16 (Active):  [0/14]    ░░░░░░░░   0%   (Tracks A+B+C scoped; v0.14.0 target)
+Overall:            [220/234] ████████  94.0%
 ```
 
 ## Recent Decisions
+
+- 2026-05-19 **Decision:** Phase 16 scoped via /magic-task. Three closeout tracks consuming 8 of 9 Phase-15 deferred items (CUDA mirror explicitly held to Phase 18+). Track A (4 tasks): GRU + LastStep + ClipByGlobalNorm + recurrent options/compile wiring. Track B (3 tasks): OpenCL Dense Backward kernel + WithBackend graceful CPU fallback + perf bench. Track C (3 tasks): --resolve flag + RESOLVE rule + TestAIMetaCompliance rollout phases 3+4+5 across pkg/activation/loss/neuron/layer/network/dataset/checkpoint/compute/persistence/nn. Total 14 atomic tasks (T-16A01..A04 + B01..B03 + C01..C03 + T01..T03 + Z01). Sequential within phase: A04 must commit before B02 (shared pkg/nn/options.go + compile.go). Pre-Planning Stabilization: 0 Drafts (no-op). PLAN v2.16.0 → v2.17.0; TASKS v2.12.0 → v2.13.0. Phase 17 (Attention implementation per l2-attention-impl.md §6 α-ε) now gated on Phase 16 T-16Z01 closeout.
+
 - 2026-05-19 **Decision:** Phase 15 complete. Track A: SimpleRNN[T]+LSTM[T] BPTT+orthogonal init (coverage 97.2%); Track B: pkg/compute/gpu/ umbrella+opencl skeleton+Dense Forward kernel (coverage 90.0%); Track C: pkg/aimeta/ grammar+cmd/lint-aimeta+TestAIMetaCompliance hook (coverage 82.9%). Gate T-15Z01: go build ./... clean; new packages individually green (full go test ./... blocked by Windows VA pressure -- documented alongside -race caveat); coverage floor met for all 3 new packages. CHANGELOG.md v0.13.0 written.
 
 - 2026-05-18 **Decision:** Phase 15 scoped via /magic-task. Three fully parallel foundation tracks: A (Recurrent — SimpleRNN+LSTM with BPTT and `utils.Orthogonal`), B (GPU — `pkg/compute/gpu/` umbrella + opencl/ skeleton + Dense Forward kernel), C (Linter — `pkg/aimeta` + `cmd/lint-aimeta` + first hook in `pkg/utils`). 14 atomic tasks. Per @role:planner audit: full spec implementation plans (Recurrent α-θ, GPU A-G, Linter A-D) compressed to foundation scope; GRU/LastStep/CUDA/perf-gate/resolver/rollout-2-5 deferred to Phase 16+. All 3 new specs authored Stable in same session via prior /magic-spec; l2-ai-doc-metadata promoted RFC v0.1.0 → Stable v1.0.0. PLAN v2.12.0 → v2.13.0; TASKS v2.10.1 → v2.11.0; INDEX v2.13.1 → v2.14.0 (61 specs).
@@ -68,6 +71,6 @@ Overall:            [210/220] ████████  95.5%
 
 ## Session Continuity
 
-**Last Session Ended:** 2026-05-17 (Phase 14 complete — v0.12.0 gate passed)
+**Last Session Ended:** 2026-05-19 (Phase 16 scoped via /magic-task — 14 atomic tasks across Tracks A+B+C; v0.14.0 target)
 **Handoff File:** none
-**Bootstrap Mode:** false (Phase 14 Done; next = user runs `git tag -a v0.12.0`, then /magic-task main to scope Phase 15)
+**Bootstrap Mode:** false (Phase 15 Done; Phase 16 Active; next = `/magic-run main` to execute Tracks A+B+C in parallel)

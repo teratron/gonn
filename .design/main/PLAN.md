@@ -1,7 +1,7 @@
 # Implementation Plan
 
-**Version:** 2.16.0
-**Project Version:** 0.11.0 released; 0.12.0 RC ready (Phase 14 Done — pending `git tag -a v0.12.0`); 0.13.0 RC ready (Phase 15 Done — pending `git tag -a v0.13.0`)
+**Version:** 2.17.0
+**Project Version:** 0.11.0 released; 0.12.0 RC ready (Phase 14 Done — pending `git tag -a v0.12.0`); 0.13.0 RC ready (Phase 15 Done — pending `git tag -a v0.13.0`); 0.14.0 target (Phase 16 active)
 **Generated:** 2026-04-29
 **Last Updated:** 2026-05-19
 **Based on:** .design/main/INDEX.md v2.16.0
@@ -181,12 +181,12 @@ into pkg/nn/train.go. Light coordination on pkg/nn/train.go (Track B owns it; Tr
 - [l1-compute-backend.md](specifications/l1-compute-backend.md) — Stable v1.0.0
 - [l1-dynamic-topology.md](specifications/l1-dynamic-topology.md) — Stable v0.2.0 (parent of l2-dynamic-topology-impl.md, Phase 9 Track B; orphan resolved 2026-05-12)
 
-### Attention Foundation (Stable L1+L2 pair — Phase 17 scoping deferred until Phase 15 closes)
+### Attention Foundation (Stable L1+L2 pair — Phase 17 scoping deferred until Phase 16 gate closes)
 
 - [l1-attention.md](specifications/l1-attention.md) — Stable v0.1.0 (Attention mechanism contract — scaled dot-product, Self/Multi-Head, causal + padding masks; 10 invariants ATT-1..10)
 - [l2-attention-impl.md](specifications/l2-attention-impl.md) — Stable v0.1.0 (Go realization — `pkg/layer/attention/` with single `MultiHeadAttention[T]` struct, `MaskedLayer[T]` interface, `cell.go` softmax helpers; 5-phase implementation plan α-ε in §6)
 
-> **Phase 17 scoping conditions**: Phase 15 gate T-15Z01 now **PASSED** (2026-05-19). Attention Foundation L1+L2 specs are Stable and scoping-ready. Activate with `/magic-task` to scope Phase 17. Recommended sequencing: scope Phase 16 first (Phase 15 deferred items — GRU, LastStep, OpenCL Backward, TestAIMetaCompliance rollout phases 3-5, pkg/nn recurrent options) then Phase 17 (Attention implementation).
+> **Phase 17 scoping conditions**: Phase 16 closeout gate T-16Z01 must close first. Attention Foundation L1+L2 specs are Stable; the L2 §6 5-phase plan (α-ε) is ready to scope into Phase 17 as soon as Phase 16 lands the recurrent options + `WithBackend` wiring (Attention will reuse the `pkg/nn` option pattern + share `pkg/compute/gpu/opencl/` kernels for Q·K^T and softmax-weighted V). Activate with `/magic-task` after `/magic-run` reports Phase 16 Done.
 
 ### Phase 4 → Phase 5 promotion (multi-hidden)
 
@@ -283,6 +283,27 @@ rollout phases 3-5) explicitly deferred to Phase 16+.*
 
 **Outcome:** `pkg/layer/recurrent/` — `SimpleRNN[T]` (Xavier+Orthogonal init, BPTT, Step, JSON) + `LSTM[T]` (4-gate fused-matmul, forget-bias=1.0, BPTT, Step, JSON) + `cell.go` shared sigmoid/tanh fused helpers; coverage 97.2%. `pkg/utils/init.go` — `Orthogonal[T](rng, n)` Gram-Schmidt; Q·Q^T Frobenius < 1e-10. `pkg/compute/gpu/` — `unavailable.go` shim + `ErrBackendUnavailable`/`ErrBackendTransfer`/`ErrBackendKernel` sentinels; `pkg/compute/gpu/opencl/` — cgo `bindings.go` + `buffer.go` Buffer[T] + `kernels.go`/`kernels.cl` Dense Forward; coverage 90.0%. `pkg/aimeta/` — 9-rule-code grammar package + `lint.go` Check() + golden-file testdata/; coverage 82.9%. `cmd/lint-aimeta/` — text+JSON output, 0/1/2/3 exit-code, testdata/clean_pkg + testdata/violating_pkg. `pkg/utils/aimeta_test.go` — TestAIMetaCompliance hook (template for Phase 16+ rollout). CHANGELOG.md v0.13.0 entry. v0.13.0 RC pending `git tag -a v0.13.0`.
 
+## Phase 16 — Recurrent Completion + GPU Backward + AI-Meta Rollout (v0.14.0)
+
+*Three parallel closeout tracks consuming Phase 15's deferred scope. Track A finishes
+`pkg/layer/recurrent/` with `GRU[T]`, `LastStep[T]`, `ClipByGlobalNorm[T]` + `WithGradClipNorm`,
+and wires `WithSimpleRNN/LSTM/GRU/LastStep` options through `pkg/nn/`. Track B adds the
+OpenCL Dense Backward kernel + `WithBackend(...)` graceful-fallback wiring + perf benchmark gate.
+Track C ships `--resolve` flag + RESOLVE rule code in the linter, then rolls
+`TestAIMetaCompliance` hooks across the remaining 10 packages (rollout phases 3+4+5 per
+`l2-aimeta-linter.md §8`). CUDA mirror, recurrent Dropout, and `pkg/aimeta` perf bench
+explicitly deferred to Phase 18+ per @role:planner audit.*
+
+**Subsystem:** `pkg/layer/recurrent/` (GRU + LastStep), `pkg/optimizer/` (ClipByGlobalNorm), `pkg/nn/` (recurrent options + WithBackend + WithGradClipNorm + compile wiring), `pkg/compute/gpu/opencl/` (Dense Backward kernel + bench), `cmd/lint-aimeta/` + `pkg/aimeta/` (--resolve + RESOLVE rule), `pkg/activation`, `pkg/loss`, `pkg/neuron`, `pkg/layer`, `pkg/network`, `pkg/dataset`, `pkg/checkpoint`, `pkg/compute`, `pkg/persistence`, `pkg/nn` (AI-Meta annotations + TestAIMetaCompliance hooks rollout phases 3-5)
+**Requires:** Phase 15 ✓; l1-recurrent-layers + l2-recurrent-impl Stable v0.1.0 ✓; l2-backend-gpu Stable v0.1.0 ✓; l2-aimeta-linter Stable v0.1.0 ✓; l2-ai-doc-metadata Stable v1.0.0 ✓
+**Tasks file:** [tasks/phase-16.md](tasks/phase-16.md)
+**Track order:** Track A internal — A01 ∥ A02 ∥ A03 → A04 (A04 needs all three siblings). Track B internal — B01 → (B02 ∥ B03). Track C internal — C01 → (C02 ∥ C03). Cross-track sequence — A04 must commit before B02 (both touch `pkg/nn/options.go` + `compile.go`). Tracks C is fully independent. T-16T01/T-16T02/T-16T03 after each track's foundation lands; Gate T-16Z01 (v0.14.0 RC).
+**@role:planner audit:** Optimism Bias — 8 of 9 Phase-15 deferred items packed in; CUDA mirror explicitly held back to Phase 18+. Hidden Dependencies — A04 and B02 share `pkg/nn/options.go` + `compile.go` (sequential within phase); Track C is independent. Cascade Risk — B02 is highest-risk single task (`compile.go` backend fallback wiring); mitigated by `compute.CPUBackend[T]()` default + opt-in `WithBackend()` pattern; A04 medium-risk, mitigated by Phase 14's proven Conv2D prefix template.
+
+- [ ] **[A] Recurrent Completion** ([l1-recurrent-layers.md](specifications/l1-recurrent-layers.md) + [l2-recurrent-impl.md](specifications/l2-recurrent-impl.md)) [L1+L2, Stable v0.1.0 each] — `pkg/layer/recurrent/gru.go` (`GRU[T]` 3-gate Forward/Backward/Init/Step/JSON, T-16A01). `pkg/layer/recurrent/laststep.go` (`LastStep[T]` stateless sequence→vector collapse, T-16A02). `pkg/optimizer/clip.go` + `pkg/nn/options.go` (`ClipByGlobalNorm[T]` + `WithGradClipNorm[T]` + train.go pre-step hook, T-16A03). `pkg/nn/options.go` + `pkg/nn/compile.go` (`WithSimpleRNN/LSTM/GRU/LastStep` options + recurrent stack prepend + `setupRecurrentShapes` time-major pre-pass, T-16A04).
+- [ ] **[B] GPU Backward + Fallback Wiring** ([l2-backend-gpu.md](specifications/l2-backend-gpu.md)) [L2, Stable v0.1.0] — `pkg/compute/gpu/opencl/kernels.cl` + `kernels.go` (Dense Backward kernel pair: dense_grad_w + dense_grad_x; cross-referenced vs CPU within 1e-4, T-16B01). `pkg/nn/options.go` + `pkg/nn/compile.go` (`WithBackend(compute.Backend[T])` + `ErrBackendUnavailable` graceful CPU fallback + Warn log, T-16B02). `pkg/compute/gpu/opencl/bench_test.go` (Dense Forward+Backward GPU vs CPU benchmark gate documenting ≥2× speedup floor for ≥256×256 matrices, T-16B03).
+- [ ] **[C] AI-Meta Rollout + --resolve** ([l2-aimeta-linter.md](specifications/l2-aimeta-linter.md) + [l2-ai-doc-metadata.md](specifications/l2-ai-doc-metadata.md)) [L2, Stable v0.1.0 / v1.0.0] — `pkg/aimeta/resolver.go` + `cmd/lint-aimeta/main.go` + `cmd/lint-aimeta/resolve.go` (`--resolve` flag + RESOLVE rule code + known-recipe fixes: INDENT, LABEL Title-Case, missing terminal newline, T-16C01). Rollout phase 3+4 — `pkg/activation` + `pkg/loss` + `pkg/neuron` + `pkg/layer` + `pkg/network` aimeta_test.go + annotations (T-16C02). Rollout phase 5 — `pkg/dataset` + `pkg/checkpoint` + `pkg/compute` + `pkg/persistence` + `pkg/nn` aimeta_test.go + annotations (largest API surface — `pkg/nn` allocated dedicated review pass, T-16C03).
+
 ## Build Order Diagram
 
 ```mermaid
@@ -302,6 +323,8 @@ graph LR
   L1 --> M1[Phase 13 — Convolutional 2-D Foundation]
   M1 --> N1[Phase 14 — Conv2D Implementation + MNIST CNN]
   N1 --> O1[Phase 15 — Recurrent Foundation + GPU Skeleton + AI-Meta Linter]
+  O1 --> P1[Phase 16 — Recurrent Completion + GPU Backward + AI-Meta Rollout]
+  P1 -.-> Q1[Phase 17 — Attention Implementation, unlocked after Phase 16 gate]
 ```
 
 ## Document History
@@ -337,3 +360,4 @@ graph LR
 | 2.14.0 | 2026-05-18 | Sync via magic-task post `/magic-spec` Blank Trigger: added l1-attention.md Stable v0.1.0 (Attention mechanism — scaled dot-product, Self/Multi-Head, causal + padding masks; 10 invariants ATT-1..10) into new Backlog category "L1 Concept (Stable, awaiting L2 authoring)". @role:planner audit recorded: Optimism Bias (Phase 16 scoping deferred — Phase 15 at 28% complete with Tracks A+B blocking); Hidden Dependencies (ATT-7 softmax-backward + ATT-4 zero-copy multi-head reshape not covered by existing helpers — flagged for future L2); Cascade Risk (Phase-15 closeouts + Attention L2 in one phase = 8-track risk — recommend split into Phase 16 closeouts + Phase 17 attention). ORPHANED_SPEC + SYNC_GAP warnings resolved. Phase 15 row unchanged (4/14). Based on INDEX.md v2.15.0. |
 | 2.15.0 | 2026-05-19 | Sync via magic-task post `/magic-spec` (L2 sibling authoring): l2-attention-impl.md Stable v0.1.0 added — closes the Hidden Dependencies gap flagged by previous audit (ATT-7 softmax-backward + ATT-4 head-major flat layout both explicitly mapped in §4 Invariant Compliance; softmax helpers in `pkg/layer/attention/cell.go` per §5.5). Backlog restructured: "L1 Concept (Stable, awaiting L2 authoring)" merged into new "Attention Foundation (Stable L1+L2 pair — Phase 17 scoping deferred)" section with explicit unblock condition (Phase 15 gate T-15Z01). @role:planner re-audit 2026-05-19: defer rationale holds — Phase 15 still 4/14, capacity contention with future Phase 16 closeouts unchanged, `pkg/utils/errors.go` + `pkg/nn/options.go` resource overlap unresolved. SYNC_GAP warning resolved. Phase 15 row unchanged. Based on INDEX.md v2.16.0. |
 | 2.16.0 | 2026-05-19 | Phase 15 marked Done (v0.13.0 RC ready). Track A: `pkg/layer/recurrent/` — SimpleRNN[T]+LSTM[T] BPTT+orthogonal init (97.2% coverage); `pkg/utils/init.go` — Orthogonal[T] helper. Track B: `pkg/compute/gpu/` umbrella+shim+sentinels; `pkg/compute/gpu/opencl/` cgo bindings+Buffer[T]+Dense Forward kernel (90.0%). Track C: `pkg/aimeta/` grammar+lint (82.9%); `cmd/lint-aimeta/` CLI; `pkg/utils/aimeta_test.go` compliance hook. Gate T-15Z01: `go build ./...` clean; new packages individually green (full `go test ./...` skips on Windows VA pressure — documented alongside -race caveat); all new packages ≥80% coverage. Attention Foundation Phase 17 scoping condition now met (T-15Z01 passed). Backlog note updated. Based on INDEX.md v2.16.0. |
+| 2.17.0 | 2026-05-19 | Phase 16 scoped: Recurrent Completion + GPU Backward + AI-Meta Rollout (v0.14.0 target). Three closeout tracks consuming 8 of 9 Phase-15 deferred items (CUDA mirror explicitly held back to Phase 18+ per @role:planner audit). Track A (4 tasks): GRU + LastStep + ClipByGlobalNorm + WithSimpleRNN/LSTM/GRU/LastStep options. Track B (3 tasks): OpenCL Dense Backward kernel + `WithBackend(...)` graceful CPU fallback + perf bench gate. Track C (3 tasks): `--resolve` flag + RESOLVE rule + TestAIMetaCompliance rollout phases 3+4+5 across 10 remaining packages. 14 atomic tasks (T-16A01..A04 + B01..B03 + C01..C03 + T01..T03 + Z01). Sequential constraint within phase: A04 must commit before B02 (shared `pkg/nn/options.go` + `compile.go`). Phase 17 (Attention implementation) scoping condition tightened: now gated on Phase 16 closeout gate T-16Z01. Pre-Planning Stabilization: zero Draft promotions (all 63 specs already Stable). No new specs registered. Based on INDEX.md v2.16.0. |
