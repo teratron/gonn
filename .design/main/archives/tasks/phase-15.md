@@ -11,11 +11,54 @@ requires:
   - "l2-aimeta-linter Stable v0.1.0 ✓"
   - "l2-ai-doc-metadata Stable v1.0.0 ✓ (parent contract for Track C)"
   - "l1-compute-backend Stable v1.0.0 ✓ (parent for Track B)"
-provides: []
+provides:
+  - "pkg/layer/recurrent/ — SimpleRNN[T] + LSTM[T] with BPTT, orthogonal init, Step/ResetState, MarshalJSON/UnmarshalJSON; coverage 97.2%"
+  - "pkg/utils/init.go — Orthogonal[T](rng, n) helper via modified Gram-Schmidt; Q·Q^T Frobenius < 1e-10 (float64)"
+  - "pkg/compute/gpu/ — umbrella doc.go + unavailable.go shim + ErrBackendUnavailable/ErrBackendTransfer/ErrBackendKernel sentinels; coverage 90.0%"
+  - "pkg/compute/gpu/opencl/ — cgo bindings (clGetPlatformIDs, clCreateBuffer, clEnqueue*), Buffer[T], Dense Forward kernel kernels.cl; build-tag isolated (cgo,opencl)"
+  - "pkg/aimeta/ — grammar package (vocab.go, grammar.go, ast.go, violation.go, lint.go) with 9 rule codes (LABEL/INDENT/CAP/LAST/VOCAB/TIER/MULTI/ENUM/ARTIFACT); coverage 82.9%"
+  - "cmd/lint-aimeta/ — CLI binary with text+JSON output, exit-code contract 0/1/2/3, testdata/ fixtures"
+  - "pkg/utils/aimeta_test.go — TestAIMetaCompliance hook (template for Phase 16+ rollout)"
+  - "CHANGELOG.md — v0.13.0 entry documenting all three tracks"
 key_files:
-  created: []
-  modified: []
-patterns_established: []
+  created:
+    - pkg/layer/recurrent/doc.go
+    - pkg/layer/recurrent/cell.go
+    - pkg/layer/recurrent/simple_rnn.go
+    - pkg/layer/recurrent/lstm.go
+    - pkg/layer/recurrent/recurrent_test.go
+    - pkg/layer/recurrent/simple_rnn_test.go
+    - pkg/layer/recurrent/lstm_test.go
+    - pkg/layer/recurrent/api_test.go
+    - pkg/compute/gpu/doc.go
+    - pkg/compute/gpu/unavailable.go
+    - pkg/compute/gpu/unavailable_test.go
+    - pkg/compute/gpu/opencl/bindings.go
+    - pkg/compute/gpu/opencl/buffer.go
+    - pkg/compute/gpu/opencl/opencl.go
+    - pkg/compute/gpu/opencl/kernels.go
+    - pkg/compute/gpu/opencl/opencl_test.go
+    - pkg/aimeta/vocab.go
+    - pkg/aimeta/grammar.go
+    - pkg/aimeta/ast.go
+    - pkg/aimeta/violation.go
+    - pkg/aimeta/lint.go
+    - pkg/aimeta/lint_test.go
+    - cmd/lint-aimeta/main.go
+    - cmd/lint-aimeta/output.go
+    - cmd/lint-aimeta/exitcode.go
+    - cmd/lint-aimeta/main_test.go
+    - pkg/utils/aimeta_test.go
+  modified:
+    - pkg/utils/init.go
+    - pkg/utils/errors.go
+    - CHANGELOG.md
+patterns_established:
+  - "Orthogonal weight init via modified Gram-Schmidt — stdlib-only, type-param generic Orthogonal[T](rng, n) in pkg/utils/init.go"
+  - "Build-tag isolation for cgo backends — //go:build cgo && opencl separates pure-Go shim from cgo-linked code; pure-Go tests always pass"
+  - "Optional interface extension pattern — MaskedLayer[T] (introduced in l2-attention-impl) + SetInitialState[T] (recurrent) as opt-in extensions to Layer[T], no breaking changes"
+  - "Forget-bias=1.0 LSTM init trick — standard LSTM initialization encouraging long-term memory at training start"
+  - "AI-Meta linter TestAIMetaCompliance hook pattern — per-package aimeta_test.go calling aimeta.Check('.', ...) as compliance gate template for Phase 16+ rollout"
 duration_minutes: ~
 ---
 

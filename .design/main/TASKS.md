@@ -1,10 +1,10 @@
 # Master Task Index (Registry)
 
-**Version:** 2.11.3
-**Project Version:** 0.11.0 released; 0.12.0 RC ready (Phase 14 Done — pending `git tag -a v0.12.0`); 0.13.0 in progress (Phase 15 — 4/14 tasks done)
+**Version:** 2.12.0
+**Project Version:** 0.11.0 released; 0.12.0 RC ready (Phase 14 Done — pending `git tag -a v0.12.0`); 0.13.0 RC ready (Phase 15 Done — pending `git tag -a v0.13.0`)
 **Generated:** 2026-04-29
 **Last Updated:** 2026-05-19
-**Based on:** .design/main/PLAN.md v2.15.0
+**Based on:** .design/main/PLAN.md v2.16.0
 **Based on RULES:** .design/RULES.md v1.3.0
 **Execution Mode:** Parallel (C3)
 **Status:** Active
@@ -31,7 +31,7 @@ Tactical registry of all phases and their statuses. Atomic checklists (`T-XXXX`)
 | [Phase 12](archives/tasks/phase-12.md) | Meta-Learning Hooks — `pkg/nn/meta.go` (ParamAccessor[T]/ScalarParam[T]/SliceParam[T]/MetaLearner[T]), `WithMetaLearner` option, train.go hook, v0.11.0 release | `Done (Archived)` (5 tasks: T-12A01..A03 + T-12T01 + T-12Z01) |
 | [Phase 13](archives/tasks/phase-13.md) | Convolutional 2-D Foundation — scoping phase: L1 contract Stable + queue L2 spec authoring (T-13A01) for `l2-conv-2d-impl.md` via `/magic-spec`; implementation tracks (`pkg/layer/conv/conv2d.go` + friends) deferred to follow-up | `Done (Archived)` (3 tasks: T-13A01 + T-13T01 + T-13Z01) |
 | [Phase 14](archives/tasks/phase-14.md) | Conv2D Implementation + MNIST CNN Example — `pkg/layer/conv/conv2d.go` + `pool2d.go` + `flatten2d.go`, `pkg/nn/options.go` (WithConv2D+friends) + `compile.go` 2-D wiring, `pkg/dataset/` WithImageShape adapter, `examples/mnist_cnn/` E16, v0.12.0 release | `Done (Archived)` (12 tasks: T-14A01..A04 + B01..B02 + C01..C02 + D01..D02 + T01 + Z01) |
-| [Phase 15](archives/tasks/phase-15.md) | Recurrent Foundation + GPU Backend Skeleton + AI-Meta Linter — Track A (`pkg/layer/recurrent/` SimpleRNN+LSTM with BPTT + `utils.Orthogonal`), Track B (`pkg/compute/gpu/` umbrella + opencl/ skeleton + Dense Forward kernel), Track C (`pkg/aimeta/` grammar + `cmd/lint-aimeta` CLI + first per-package compliance hook in `pkg/utils`), v0.13.0 target | `Done (Archived)` (4/14 — Track C: C01 ✓ C02 ✓ C03 ✓; T-15T02 ✓; Tracks A + B pending) |
+| [Phase 15](archives/tasks/phase-15.md) | Recurrent Foundation + GPU Backend Skeleton + AI-Meta Linter — Track A (`pkg/layer/recurrent/` SimpleRNN+LSTM with BPTT + `utils.Orthogonal`, coverage 97.2%), Track B (`pkg/compute/gpu/` umbrella + opencl/ skeleton + Dense Forward kernel, coverage 90.0%), Track C (`pkg/aimeta/` grammar + `cmd/lint-aimeta` CLI + first per-package compliance hook in `pkg/utils`, coverage 82.9%), v0.13.0 released | `Done (Archived)` (14/14 — all tracks complete; gate T-15Z01 green) |
 
 ## Phase 0 — Already Complete
 
@@ -239,5 +239,5 @@ Six of the eight v0.6-gated entries (E03, E04, E05, E07, E08, E13) are now activ
 | `CHANGELOG.md` (v0.11.0 entry) | l1-release-policy v1.0.0 | `Done` [Z] |
 | `v0.11.0` git tag | l1-release-policy v1.0.0 §5.4 | `Pending user` (run `git tag -a v0.11.0`) |
 
-- **Last Updated**: 2026-05-19 (Sync via magic-task post `/magic-spec` L2 authoring: PLAN base bumped v2.14.0 → v2.15.0 (Attention Foundation L1+L2 pair restructured in Backlog with explicit Phase 17 scoping unblock condition tied to Phase 15 gate T-15Z01); @role:planner re-audit confirms defer holds. No task-progress changes — Phase 15 stays at 4/14 with Tracks A+B pending. TASKS v2.11.2 → v2.11.3.)
+- **Last Updated**: 2026-05-19 (Phase 15 complete via /magic-run: all 14/14 tasks done; PLAN v2.15.0 → v2.16.0; Phase 15 row updated to 14/14; Phase 17 Attention Foundation scoping condition now met (T-15Z01 passed). TASKS v2.11.3 → v2.12.0.)
 - **Maintainer**: Core Team
