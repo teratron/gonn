@@ -1,10 +1,10 @@
 # Implementation Plan
 
-**Version:** 2.14.0
+**Version:** 2.15.0
 **Project Version:** 0.11.0 released; 0.12.0 RC ready (Phase 14 Done — pending `git tag -a v0.12.0`); 0.13.0 in progress (Phase 15 — 4/14 tasks done)
 **Generated:** 2026-04-29
-**Last Updated:** 2026-05-18
-**Based on:** .design/main/INDEX.md v2.15.0
+**Last Updated:** 2026-05-19
+**Based on:** .design/main/INDEX.md v2.16.0
 **Based on RULES:** .design/RULES.md v1.3.0
 **Based on ROADMAP:** .design/main/ROADMAP.md v1.0.0
 **Status:** Active
@@ -181,9 +181,12 @@ into pkg/nn/train.go. Light coordination on pkg/nn/train.go (Track B owns it; Tr
 - [l1-compute-backend.md](specifications/l1-compute-backend.md) — Stable v1.0.0
 - [l1-dynamic-topology.md](specifications/l1-dynamic-topology.md) — Stable v0.2.0 (parent of l2-dynamic-topology-impl.md, Phase 9 Track B; orphan resolved 2026-05-12)
 
-### L1 Concept (Stable, awaiting L2 authoring — next /magic-spec run)
+### Attention Foundation (Stable L1+L2 pair — Phase 17 scoping deferred until Phase 15 closes)
 
-- [l1-attention.md](specifications/l1-attention.md) — Stable v0.1.0 (Attention mechanism contract — scaled dot-product, Self/Multi-Head, causal + padding masks; 10 invariants ATT-1..10; no L2 sibling yet — run `/magic-spec` to draft `l2-attention-impl.md` before Phase 17 scoping; orphan resolved 2026-05-18 via magic-task sync)
+- [l1-attention.md](specifications/l1-attention.md) — Stable v0.1.0 (Attention mechanism contract — scaled dot-product, Self/Multi-Head, causal + padding masks; 10 invariants ATT-1..10)
+- [l2-attention-impl.md](specifications/l2-attention-impl.md) — Stable v0.1.0 (Go realization — `pkg/layer/attention/` with single `MultiHeadAttention[T]` struct, `MaskedLayer[T]` interface, `cell.go` softmax helpers; 5-phase implementation plan α-ε in §6)
+
+> **Phase 17 scoping conditions**: blocked on Phase 15 closure (currently In Progress 4/14 — Tracks A+B pending). @role:planner audit 2026-05-19 confirms previous defer rationale still holds — capacity contention with Phase 15 Tracks A+B + Phase 16 closeouts; resource overlap on `pkg/utils/errors.go` and `pkg/nn/options.go`. Both specs are scoping-ready; activate with `/magic-task` once Phase 15 gate T-15Z01 passes.
 
 ### Phase 4 → Phase 5 promotion (multi-hidden)
 
@@ -330,3 +333,4 @@ graph LR
 | 2.13.0 | 2026-05-18 | Phase 15 scoped: Recurrent Foundation + GPU Backend Skeleton + AI-Meta Linter (v0.13.0 target). Three fully parallel foundation tracks: A (Recurrent — SimpleRNN+LSTM with BPTT and orthogonal init), B (GPU — pkg/compute/gpu/ umbrella + opencl/ skeleton + Dense Forward kernel), C (Linter — pkg/aimeta grammar + cmd/lint-aimeta CLI + first per-package compliance hook in pkg/utils). 14 atomic tasks (T-15A01..A04 + B01..B03 + C01..C03 + T01..T03 + Z01). Pre-Planning Stabilization: zero Draft promotions (all 4 new specs already Stable via Trust Mode in prior `/magic-spec`); RFC count 1→0 (l2-ai-doc-metadata promoted in same `/magic-spec` run). @role:planner audit recorded under Phase 15: Optimism Bias (3 spec implementation plans compressed; GRU/CUDA/perf-gate/resolver deferred to Phase 16+); Hidden Dependencies (all 3 tracks add sentinels to pkg/utils/errors.go — additive, non-overlapping); Cascade Risk (each track independently mergeable, none gates downstream). Based on INDEX.md v2.14.0. |
 | 2.13.1 | 2026-05-18 | Sync patch: Phase 15 In Progress (4/14 — Track C C01+C02+C03+T02 done). Backlog l2-ai-doc-metadata updated RFC v0.1.0 → Stable v1.0.0 with rollout-phases-2-5 note. |
 | 2.14.0 | 2026-05-18 | Sync via magic-task post `/magic-spec` Blank Trigger: added l1-attention.md Stable v0.1.0 (Attention mechanism — scaled dot-product, Self/Multi-Head, causal + padding masks; 10 invariants ATT-1..10) into new Backlog category "L1 Concept (Stable, awaiting L2 authoring)". @role:planner audit recorded: Optimism Bias (Phase 16 scoping deferred — Phase 15 at 28% complete with Tracks A+B blocking); Hidden Dependencies (ATT-7 softmax-backward + ATT-4 zero-copy multi-head reshape not covered by existing helpers — flagged for future L2); Cascade Risk (Phase-15 closeouts + Attention L2 in one phase = 8-track risk — recommend split into Phase 16 closeouts + Phase 17 attention). ORPHANED_SPEC + SYNC_GAP warnings resolved. Phase 15 row unchanged (4/14). Based on INDEX.md v2.15.0. |
+| 2.15.0 | 2026-05-19 | Sync via magic-task post `/magic-spec` (L2 sibling authoring): l2-attention-impl.md Stable v0.1.0 added — closes the Hidden Dependencies gap flagged by previous audit (ATT-7 softmax-backward + ATT-4 head-major flat layout both explicitly mapped in §4 Invariant Compliance; softmax helpers in `pkg/layer/attention/cell.go` per §5.5). Backlog restructured: "L1 Concept (Stable, awaiting L2 authoring)" merged into new "Attention Foundation (Stable L1+L2 pair — Phase 17 scoping deferred)" section with explicit unblock condition (Phase 15 gate T-15Z01). @role:planner re-audit 2026-05-19: defer rationale holds — Phase 15 still 4/14, capacity contention with future Phase 16 closeouts unchanged, `pkg/utils/errors.go` + `pkg/nn/options.go` resource overlap unresolved. SYNC_GAP warning resolved. Phase 15 row unchanged. Based on INDEX.md v2.16.0. |

@@ -5,7 +5,7 @@
 
 **Workspace:** main
 **Project Version:** 0.11.0 released
-**Updated:** 2026-05-18 18:43
+**Updated:** 2026-05-19 05:57
 **Phase:** 15 — Recurrent Foundation + GPU Skeleton + AI-Meta Linter
 **Status:** Active
 
@@ -14,7 +14,7 @@
 - **Task:** T-15T02 ✓ (AI-Meta golden-file matrix) — last completed; Track C fully done (C01+C02+C03+T02 = 4/14)
 - **Track C Done:** T-15C01 ✓ (pkg/aimeta grammar package), T-15C02 ✓ (cmd/lint-aimeta CLI), T-15C03 ✓ (pkg/utils aimeta_test.go), T-15T02 ✓ (golden-file matrix)
 - **Spec:** l1-recurrent-layers Stable v0.1.0; l2-recurrent-impl Stable v0.1.0; l2-backend-gpu Stable v0.1.0; l2-aimeta-linter Stable v0.1.0; l2-ai-doc-metadata Stable v1.0.0 (promoted from RFC)
-- **Next Action:** Resume Phase 15 via /magic-run (Tracks A+B pending). Or run /magic-spec to draft l2-attention-impl.md for future Phase 17 scoping.
+- **Next Action:** Resume Phase 15 via /magic-run (Tracks A+B pending: SimpleRNN+LSTM, opencl Dense Forward kernel). Attention Foundation L1+L2 specs ready in Backlog — Phase 17 scoping deferred until Phase 15 gate T-15Z01 passes.
 
 ## Progress
 
