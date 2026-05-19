@@ -33,7 +33,7 @@ func run(args []string, stdout, stderr io.Writer) int {
 	jsonOut := fs.Bool("json", false, "emit newline-delimited JSON instead of text")
 	noInternal := fs.Bool("no-internal", false, "skip TIER checks for internal-tier symbols")
 	_ = fs.Bool("include-tests", false, "include _test.go files (reserved)")
-	_ = fs.Bool("resolve", false, "activate symbol resolver (Phase 16)") // TODO Phase 16: wire resolver
+	resolve := fs.Bool("resolve", false, "auto-fix LABEL/INDENT/LAST violations in-place")
 
 	if err := fs.Parse(args); err != nil {
 		fmt.Fprintf(stderr, "lint-aimeta: %v\n", err)
@@ -49,6 +49,12 @@ func run(args []string, stdout, stderr io.Writer) int {
 
 	opts := aimeta.Options{
 		IncludeInternal: !*noInternal,
+		Resolve:         *resolve,
+	}
+
+	// --resolve: apply mechanical fixes first, report what was changed.
+	if *resolve {
+		return runResolve(paths, opts, stdout, stderr)
 	}
 
 	var all []aimeta.Violation

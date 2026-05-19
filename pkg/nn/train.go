@@ -18,6 +18,7 @@ const libVersion = "0.8.0"
 // AI-Meta:
 //   - Purpose: Typed container for one training sample passed to Fit.
 //   - Usage: Fit([]nn.Sample[float32]{{Input: x, Target: y}, ...}).
+//   - Concurrency: NotSafe.
 //   - Related: [Fit].
 //   - Stability: Stable.
 type Sample[T utils.Float] struct {
@@ -95,6 +96,9 @@ func (n *NN[T]) trainStep(input, target []T) (T, error) {
 	// Collect weights and gradients, delegate update to the optimizer.
 	n.weightBuf = n.Network.AppendFlatWeights(n.weightBuf)
 	n.gradBuf = n.Network.AppendFlatGradients(n.gradBuf)
+	if n.cfg.GradClipNorm > 0 {
+		optimizer.ClipByGlobalNorm([][]T{n.gradBuf}, n.cfg.GradClipNorm)
+	}
 	if err := n.opt.Step(n.weightBuf, n.gradBuf); err != nil {
 		return lossVal, err
 	}

@@ -97,7 +97,7 @@ func (o *Output[T]) SetTarget(idx int, value T) {
 //
 // AI-Meta:
 //   - Purpose: Read the current target vector (e.g. to compute aggregate loss after a forward pass).
-//   - Concurrency: ReadSafe after SetTarget completes; do not read during SetTarget.
+//   - Concurrency: ReadSafe.
 //   - Related: [SetTarget].
 func (o *Output[T]) Targets() []T {
 	return o.targets

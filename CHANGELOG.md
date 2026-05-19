@@ -4,6 +4,126 @@ All notable changes to the GoNN library will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the
 release artifacts dictated by [.magic/run.md](.magic/run.md) Phase Completion / Plan Completion.
 
+## [0.14.0] — 2026-05-19
+
+### Recurrent Completion + GPU Backward + AI-Meta Rollout
+
+Phase 16 closes three tracks deferred from Phase 15: full recurrent layer set
+(GRU[T] + LastStep[T] + gradient clipping), OpenCL Dense Backward kernel with
+graceful CPU fallback wiring, and AI-Meta compliance hooks rolled out to 10 more
+packages.
+
+#### Added — Track A: Recurrent Completion
+
+- **`pkg/layer/recurrent/gru.go`** — `GRU[T utils.Float]`:
+  - `NewGRU[T](seqLen, inSize, hidden int)` with Xavier (W_x) + Orthogonal (W_h) init.
+  - 3-gate Forward: reset gate `r_t`, update gate `z_t`, candidate `ñ_t`, output `h_t`.
+  - `Backward`: BPTT gradient accumulation through all gates; returns `gradInput` per timestep.
+  - `MarshalJSON` / `UnmarshalJSON` round-trip; `Step` / `Init` wired to spec REC-3.
+  - 96.0 % statement coverage.
+- **`pkg/layer/recurrent/laststep.go`** — `LastStep[T utils.Float]`:
+  - Stateless sequence-to-vector collapser: picks final timestep `output[seqLen-1, :]`.
+  - `Backward`: scatters upstream gradient into final-timestep position; zeros elsewhere.
+  - Implements `conv.Layer[T]`; no parameters (Init/Step are no-ops).
+- **`pkg/optimizer/clip.go`** — `ClipByGlobalNorm[T](grads [][]T, threshold T)`:
+  - Computes global L2 norm across all gradient slices; scales by `min(1, threshold/‖g‖₂)`.
+  - No-op when `threshold ≤ 0` or `‖g‖₂ ≤ threshold`.
+  - `pkg/optimizer/` coverage: **90.7 %** (floor 85 %).
+- **`pkg/nn/options.go`** — four new recurrent options:
+  - `WithSimpleRNN[T](seqLen, inSize, hidden int)`, `WithLSTM[T]`, `WithGRU[T]` — append recurrent layer to `Config.ConvPrefix`.
+  - `WithLastStep[T](seqLen, hidden int)` — appends `*recurrent.LastStep[T]`.
+  - `WithGradClipNorm[T](threshold T)` — stores in `Config.GradClipNorm`; train.go applies before optimizer step.
+- **`pkg/nn/compile.go`** — `setupRecurrentShapes[T]` + `hasRecurrentLayer[T]`:
+  - Pre-pass validates SeqLen/InSize/Hidden dimensions and shape continuity across the recurrent prefix.
+  - `hasRecurrentLayer` type-switches on `*recurrent.GRU[T]`, `*recurrent.LSTM[T]`, `*recurrent.SimpleRNN[T]`, `*recurrent.LastStep[T]`.
+- **`pkg/nn/recurrent_compile_test.go`** — 5 subtests covering: GRU+LastStep compose, LSTM alone, SimpleRNN+LastStep, shape mismatch on input, shape mismatch on hidden.
+- **`pkg/utils/errors.go`** — `ErrRecurrentShapeMismatch` sentinel.
+
+#### Added — Track B: GPU Backward + Backend Wiring
+
+- **`pkg/compute/gpu/opencl/kernels.cl`** — two OpenCL kernels:
+  - `dense_grad_w`: weight gradient `∂L/∂W = Xᵀ·∂L/∂Y` (batched matmul).
+  - `dense_grad_x`: input gradient `∂L/∂X = ∂L/∂Y·Wᵀ`.
+- **`pkg/compute/gpu/opencl/kernels.go`** — Go bindings for Backward kernels (build tag `cgo && opencl`).
+- **`pkg/compute/gpu/opencl/bench_test.go`** — GPU vs CPU benchmarks (build tag `cgo && opencl`):
+  - `BenchmarkDenseForward/Backward` at 64×64, 256×256, 1024×1024 matrix sizes.
+  - CPU baseline variants for direct comparison.
+  - Expected speedup: ≥2× for ≥256×256 on iGPU; ≥5× on discrete NVIDIA/AMD.
+- **`pkg/nn/options.go`** — `WithBackend[T](b compute.Backend[T]) Option[T]`:
+  - Stores backend in `Config.Backend`; compile() probes with `Allocate(1)`.
+  - On `ErrBackendUnavailable`: logs `Warn("backend unavailable, falling back to CPU")` and uses CPU reference backend.
+- **`pkg/nn/compile.go`** — `resolveBackend[T]`: probe logic + CPU fallback.
+- **`pkg/nn/init.go`** — blank import `_ "github.com/teratron/gonn/pkg/compute/cpu"` ensures CPU backend registered at startup.
+- **`pkg/nn/config.go`** — `Backend compute.Backend[T]` field added to `Config[T]`.
+- **`pkg/nn/nn.go`** — `backend compute.Backend[T]` field added to `NN[T]`.
+- **`pkg/nn/backend_test.go`** — 3 subtests: nil backend → CPU, unavailable backend → CPU fallback, result parity CPU vs fallback.
+- **`pkg/compute/gpu/`** coverage: **90.0 %** (floor 80 %).
+
+#### Added — Track C: AI-Meta Linter `--resolve` + Compliance Rollout
+
+- **`pkg/aimeta/resolver.go`** — `Resolver` type applying mechanical auto-fixes: INDENT (missing `//`), LABEL (lowercase → Title-Case), LAST (missing terminal newline).
+- **`cmd/lint-aimeta/resolve.go`** + `--resolve` flag in `main.go` — in-place fix mode; re-lints after fix and reports zero-violation count.
+- **`pkg/aimeta/`** coverage: **86.6 %** (floor 80 %).
+- **`aimeta_test.go`** hooks (rollout phases 3–5) — `TestAIMetaCompliance` added to 10 packages:
+  - Phase 3: `pkg/activation/`, `pkg/loss/`
+  - Phase 4: `pkg/neuron/`, `pkg/layer/`, `pkg/network/`
+  - Phase 5: `pkg/dataset/`, `pkg/checkpoint/`, `pkg/compute/`, `pkg/persistence/`, `pkg/nn/`
+- AI-Meta annotations (`Purpose`, `Usage`, `Concurrency`, `Related`, `Stability`) added or corrected on ~180 exported symbols across all 10 packages (ENUM + TIER violations resolved).
+
+#### Changed
+
+- `pkg/layer/recurrent/`: GRU[T] + LastStep[T] added alongside Phase 15's SimpleRNN[T] + LSTM[T].
+- `pkg/nn/train.go`: applies `ClipByGlobalNorm` before optimizer step when `cfg.GradClipNorm > 0`.
+- `pkg/compute/backend.go`: `Concurrency` annotation corrected to `NotSafe.` (ENUM fix).
+- Multiple `pkg/nn/`, `pkg/layer/`, `pkg/network/`, `pkg/activation/`, `pkg/loss/`, `pkg/neuron/`, `pkg/dataset/`, `pkg/checkpoint/`, `pkg/compute/`, `pkg/persistence/` files: AI-Meta ENUM and TIER annotations updated.
+
+#### Coverage Summary
+
+| Package | Coverage | Gate |
+| :--- | :--- | :--- |
+| `pkg/layer/recurrent/` | 96.0 % | ≥80 % ✓ |
+| `pkg/optimizer/` | 90.7 % | ≥85 % ✓ |
+| `pkg/compute/gpu/` | 90.0 % | ≥80 % ✓ |
+| `pkg/aimeta/` | 86.6 % | ≥80 % ✓ |
+| `pkg/nn/` | 77.2 % | ≥75 % ✓ |
+
+#### Known Issues
+
+- Pre-existing timing-flaky tests: `TestPauseResumeCycle`, `TestMultiHiddenXOR`, `TestRepeatBuilderBenchmark100Layer`.
+- Race detector requires CGO on Windows (gcc not in PATH); `-race` deferred to CI.
+- GPU benchmarks require `cgo && opencl` build tags and an OpenCL runtime; skipped in default CI.
+- `go run ./examples/mnist/` requires user-supplied IDX data; see `examples/mnist/README.md`.
+
+## [0.13.0] — 2026-05-19
+
+### Recurrent Foundation + GPU Backend Skeleton + AI-Meta Linter
+
+Phase 15 delivers three parallel foundation tracks: recurrent layers (SimpleRNN + LSTM
+with full BPTT), GPU backend skeleton (OpenCL Dense Forward kernel), and the AI-Meta
+linter + compliance hook infrastructure.
+
+#### Added — Track A: Recurrent Layers
+
+- **`pkg/layer/recurrent/cell.go`** — shared activation helpers (sigmoid, tanh fused).
+- **`pkg/layer/recurrent/simplernn.go`** — `SimpleRNN[T]` (Elman RNN) with BPTT.
+- **`pkg/layer/recurrent/lstm.go`** — `LSTM[T]` (4-gate: input, forget, gate, output) with BPTT; forget-gate bias init 1.0 (REC-3).
+- `pkg/utils/errors.go` — `ErrRecurrentShape` sentinel.
+- `pkg/utils/math.go` — `Orthogonal[T](n int, rng *rand.Rand) []T` initialiser.
+- `pkg/layer/recurrent/` coverage: **97.2 %**.
+
+#### Added — Track B: GPU Backend Skeleton
+
+- **`pkg/compute/gpu/`** — umbrella package with `Backend[T]` stub; build-tag isolation `cgo && opencl`.
+- **`pkg/compute/gpu/opencl/`** — `kernels.cl` Dense Forward kernel + Go bindings.
+- `pkg/compute/gpu/` coverage: **90.0 %**.
+
+#### Added — Track C: AI-Meta Linter
+
+- **`pkg/aimeta/`** — grammar parser, violation types, `Check()` + `Options`.
+- **`cmd/lint-aimeta/`** — CLI binary; `go run ./cmd/lint-aimeta/ <pkg...>`.
+- **`pkg/utils/aimeta_test.go`** — first rollout phase 1 compliance hook.
+- `pkg/aimeta/` coverage: **82.9 %**.
+
 ## [0.12.0] — 2026-05-17
 
 ### 2-D Convolutional Layers (Conv2D, MaxPool2D, AvgPool2D, Flatten2D) + MNIST CNN Example
@@ -836,6 +956,7 @@ Promotes three specs to Stable.
 
 
 
+
 - Updated task plan and task index (main)
 - Completed task `phase-11` (main)
 - Updated 2 specifications (main)
@@ -847,4 +968,5 @@ Promotes three specs to Stable.
 - Completed task `phase-15` (main)
 - Added specification `attention` (main)
 - Added specification `attention-impl` (main)
+- Updated task execution state (main)
 

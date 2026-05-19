@@ -230,6 +230,17 @@ var ErrConvPoolSizeMismatch = errors.New("conv-pool-size-mismatch")
 //   - Stability: Stable.
 var ErrConv2DShapeMismatch = errors.New("conv2d-shape-mismatch")
 
+// ErrRecurrentShapeMismatch signals that a recurrent layer's declared shape
+// (seqLen × inSize or seqLen × hidden) does not match the preceding output
+// size in the prefix chain (REC-9 composition rule).
+//
+// AI-Meta:
+//   - Purpose: Sentinel for recurrent-layer input/output shape inconsistency in the prefix chain.
+//   - Usage: errors.Is(err, utils.ErrRecurrentShapeMismatch).
+//   - Related: [ErrConvShapeMismatch], [ErrUserConfig].
+//   - Stability: Stable.
+var ErrRecurrentShapeMismatch = errors.New("recurrent-shape-mismatch")
+
 // Dataset / continuation sentinels (FMT-1, FMT-5, FMT-8, per l2-dataset-loader-impl).
 
 // ErrIDXMagic signals that the IDX header is malformed — either the leading

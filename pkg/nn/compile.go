@@ -1,13 +1,16 @@
 package nn
 
 import (
+	"errors"
 	"fmt"
 	"math/rand/v2"
 
 	"github.com/teratron/gonn/pkg/activation"
+	"github.com/teratron/gonn/pkg/compute"
 	"github.com/teratron/gonn/pkg/layer"
 	"github.com/teratron/gonn/pkg/layer/conv"
 	normPkg "github.com/teratron/gonn/pkg/layer/norm"
+	"github.com/teratron/gonn/pkg/layer/recurrent"
 	"github.com/teratron/gonn/pkg/loss"
 	"github.com/teratron/gonn/pkg/network"
 	"github.com/teratron/gonn/pkg/optimizer"
@@ -42,6 +45,14 @@ func compile[T utils.Float](n *NN[T], cfg *Config[T]) error {
 	rawInputSize := cfg.InputSize
 	effectiveInputSize := cfg.InputSize
 	if len(cfg.ConvPrefix) > 0 {
+		// Pre-pass: validate recurrent layer shapes before the 2-D conv and
+		// dummy-Forward walks. This catches seqLen/inSize/hidden mismatches
+		// with an actionable error message before computeConvChainOutput runs.
+		if hasRecurrentLayer(cfg.ConvPrefix) {
+			if err := setupRecurrentShapes(cfg); err != nil {
+				return utils.Wrap(utils.ErrUserConfig, err, "compile: recurrent shape propagation")
+			}
+		}
 		// Pre-pass: propagate (C, H, W) through any Conv2D/MaxPool2D/AvgPool2D/
 		// Flatten2D layers so each layer's OutputShape() resolves during the
 		// dummy-Forward shape walk below.
@@ -134,11 +145,32 @@ func compile[T utils.Float](n *NN[T], cfg *Config[T]) error {
 			"compile: WithMetaLearner cannot be applied while the network is training")
 	}
 
+	// Wire compute backend. Probe the requested backend via Allocate(1);
+	// on ErrBackendUnavailable fall back to the CPU reference (COMP-3).
+	n.backend = resolveBackend[T](cfg.Backend)
+
 	startProfilingServer(cfg.ProfilingAddr)
 	if err := startVisServer(n, cfg); err != nil {
 		return err
 	}
 	return nil
+}
+
+// resolveBackend returns a ready Backend[T]. When b is nil or returns
+// ErrBackendUnavailable on a 1-element Allocate probe, the always-available
+// CPU backend is substituted and a Warn is emitted (l1-compute-backend §5.3).
+func resolveBackend[T utils.Float](b compute.Backend[T]) compute.Backend[T] {
+	if b != nil {
+		if _, err := b.Allocate(1); !errors.Is(err, utils.ErrBackendUnavailable) {
+			// Backend is live — use it.
+			return b
+		}
+		utils.Logger.Warn("backend unavailable, falling back to CPU",
+			"backend", b.Name(), "err", utils.ErrBackendUnavailable)
+	}
+	// CPU backend is always registered via the blank import in init.go.
+	cpu, _ := compute.Get[T]("cpu")
+	return cpu
 }
 
 // startVisServer starts the visualization HTTP server when cfg.VisAddr is
@@ -261,6 +293,81 @@ func setupConv2DShapes[T utils.Float](cfg *Config[T]) error {
 			// tracker is no longer meaningful. Subsequent 2-D layers are an
 			// error caught by the in2D guard.
 			in2D = false
+		}
+	}
+	return nil
+}
+
+// hasRecurrentLayer reports whether chain contains any recurrent layer
+// (GRU, LSTM, SimpleRNN, or LastStep).
+func hasRecurrentLayer[T utils.Float](chain []conv.Layer[T]) bool {
+	for _, cl := range chain {
+		switch cl.(type) {
+		case *recurrent.GRU[T], *recurrent.LSTM[T], *recurrent.SimpleRNN[T], *recurrent.LastStep[T]:
+			return true
+		}
+	}
+	return false
+}
+
+// setupRecurrentShapes validates that recurrent layers in cfg.ConvPrefix have
+// self-consistent shapes and that each layer's InputSize() matches the
+// preceding layer's OutputSize() (or the raw cfg.InputSize for the first
+// layer). Non-recurrent layers interrupt tracking — their output is unknown
+// without a Forward pass, which is left to computeConvChainOutput.
+//
+// AI-Meta:
+//   - Purpose: Pre-pass shape validation for recurrent prefix layers; provides actionable errors before computeConvChainOutput.
+//   - Concurrency: Safe; read-only on layer fields.
+//   - Related: [compile], [computeConvChainOutput], [hasRecurrentLayer].
+func setupRecurrentShapes[T utils.Float](cfg *Config[T]) error {
+	cur := int(cfg.InputSize)
+	for i, cl := range cfg.ConvPrefix {
+		switch l := cl.(type) {
+		case *recurrent.GRU[T]:
+			if l.SeqLen <= 0 || l.InSize <= 0 || l.Hidden <= 0 {
+				return fmt.Errorf("GRU layer %d: seqLen=%d inSize=%d hidden=%d must all be >0: %w",
+					i, l.SeqLen, l.InSize, l.Hidden, utils.ErrRecurrentShapeMismatch)
+			}
+			if cur > 0 && cur != l.InputSize() {
+				return fmt.Errorf("GRU layer %d expects input %d (seqLen=%d * inSize=%d) but receives %d: %w",
+					i, l.InputSize(), l.SeqLen, l.InSize, cur, utils.ErrRecurrentShapeMismatch)
+			}
+			cur = l.OutputSize()
+		case *recurrent.LSTM[T]:
+			if l.SeqLen <= 0 || l.InSize <= 0 || l.Hidden <= 0 {
+				return fmt.Errorf("LSTM layer %d: seqLen=%d inSize=%d hidden=%d must all be >0: %w",
+					i, l.SeqLen, l.InSize, l.Hidden, utils.ErrRecurrentShapeMismatch)
+			}
+			if cur > 0 && cur != l.InputSize() {
+				return fmt.Errorf("LSTM layer %d expects input %d (seqLen=%d * inSize=%d) but receives %d: %w",
+					i, l.InputSize(), l.SeqLen, l.InSize, cur, utils.ErrRecurrentShapeMismatch)
+			}
+			cur = l.OutputSize()
+		case *recurrent.SimpleRNN[T]:
+			if l.SeqLen <= 0 || l.InSize <= 0 || l.Hidden <= 0 {
+				return fmt.Errorf("SimpleRNN layer %d: seqLen=%d inSize=%d hidden=%d must all be >0: %w",
+					i, l.SeqLen, l.InSize, l.Hidden, utils.ErrRecurrentShapeMismatch)
+			}
+			if cur > 0 && cur != l.InputSize() {
+				return fmt.Errorf("SimpleRNN layer %d expects input %d (seqLen=%d * inSize=%d) but receives %d: %w",
+					i, l.InputSize(), l.SeqLen, l.InSize, cur, utils.ErrRecurrentShapeMismatch)
+			}
+			cur = l.OutputSize()
+		case *recurrent.LastStep[T]:
+			if l.SeqLen <= 0 || l.Hidden <= 0 {
+				return fmt.Errorf("LastStep layer %d: seqLen=%d hidden=%d must all be >0: %w",
+					i, l.SeqLen, l.Hidden, utils.ErrRecurrentShapeMismatch)
+			}
+			if cur > 0 && cur != l.InputSize() {
+				return fmt.Errorf("LastStep layer %d expects input %d (seqLen=%d * hidden=%d) but receives %d: %w",
+					i, l.InputSize(), l.SeqLen, l.Hidden, cur, utils.ErrRecurrentShapeMismatch)
+			}
+			cur = l.OutputSize()
+		default:
+			// Non-recurrent layer: output size unknown before Forward.
+			// Reset tracker; computeConvChainOutput handles shape from here.
+			cur = 0
 		}
 	}
 	return nil

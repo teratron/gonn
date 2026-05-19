@@ -4,8 +4,10 @@ import (
 	"log/slog"
 
 	"github.com/teratron/gonn/pkg/activation"
+	"github.com/teratron/gonn/pkg/compute"
 	"github.com/teratron/gonn/pkg/layer/conv"
 	"github.com/teratron/gonn/pkg/layer/norm"
+	"github.com/teratron/gonn/pkg/layer/recurrent"
 	"github.com/teratron/gonn/pkg/loss"
 	"github.com/teratron/gonn/pkg/network"
 	"github.com/teratron/gonn/pkg/optimizer"
@@ -20,6 +22,7 @@ import (
 // AI-Meta:
 //   - Purpose: Functional option type for the Options API; applied by New before compile().
 //   - Usage: Pass to New[float32](WithInput[float32](4), WithOutput[float32](1, ...)).
+//   - Concurrency: Safe.
 //   - Related: [New], [MustNew], [WithInput], [WithHiddenLayer], [WithOutput].
 //   - Stability: Stable.
 type Option[T utils.Float] func(*Config[T])
@@ -39,7 +42,7 @@ type Option[T utils.Float] func(*Config[T])
 //   - Purpose: Construct and compile a network in one call using functional options.
 //   - Usage: n, err := nn.New[float32](WithInput[float32](4), WithHiddenLayer[float32](8, activation.ReLU), WithOutput[float32](1, activation.SIGMOID)).
 //   - Lifecycle: Returns NN directly in Operational state.
-//   - Concurrency: SingleGoroutine during construction; ReadSafe for Query after return.
+//   - Concurrency: SingleGoroutine.
 //   - Errors: ErrUserConfig (validation failure, see Compile).
 //   - Related: [NewBuilder], [MustNew], [Option].
 //   - Stability: Stable.
@@ -68,7 +71,7 @@ func New[T utils.Float](opts ...Option[T]) (*NN[T], error) {
 //   - Purpose: Panicking wrapper around New; eliminates error handling in contexts where errors are impossible.
 //   - Usage: n := nn.MustNew[float32](PresetXOR[float32]()).
 //   - Lifecycle: Returns NN in Operational state.
-//   - Concurrency: SingleGoroutine during construction.
+//   - Concurrency: SingleGoroutine.
 //   - Related: [New], [NewBuilder], [MustCompile].
 //   - Stability: Stable.
 func MustNew[T utils.Float](opts ...Option[T]) *NN[T] {
@@ -88,6 +91,7 @@ func MustNew[T utils.Float](opts ...Option[T]) *NN[T] {
 // AI-Meta:
 //   - Purpose: Set the number of input features in the Options API.
 //   - Usage: nn.New[float32](WithInput[float32](4), ...).
+//   - Concurrency: Safe.
 //   - Related: [Option], [New], [NN.Input].
 //   - Stability: Stable.
 func WithInput[T utils.Float](size uint) Option[T] {
@@ -103,6 +107,7 @@ func WithInput[T utils.Float](size uint) Option[T] {
 // AI-Meta:
 //   - Purpose: Add one hidden layer to the network topology in the Options API.
 //   - Usage: nn.New[float32](WithHiddenLayer[float32](8, activation.ReLU), ...).
+//   - Concurrency: Safe.
 //   - Related: [Option], [New], [NN.Dense], [Sequential].
 //   - Stability: Stable.
 func WithHiddenLayer[T utils.Float](size uint, act activation.Type) Option[T] {
@@ -121,6 +126,7 @@ func WithHiddenLayer[T utils.Float](size uint, act activation.Type) Option[T] {
 // AI-Meta:
 //   - Purpose: Declare the output layer size and activation in the Options API.
 //   - Usage: nn.New[float32](WithOutput[float32](1, activation.SIGMOID), ...).
+//   - Concurrency: Safe.
 //   - Related: [Option], [New], [NN.Output].
 //   - Stability: Stable.
 func WithOutput[T utils.Float](size uint, act activation.Type) Option[T] {
@@ -139,6 +145,8 @@ func WithOutput[T utils.Float](size uint, act activation.Type) Option[T] {
 //
 // AI-Meta:
 //   - Purpose: Set the SGD learning rate in the Options API.
+//   - Usage: nn.New[float32](WithLearningRate[float32](0.01), ...).
+//   - Concurrency: Safe.
 //   - Related: [Option], [NN.WithLearningRate], [DefaultLearningRate].
 //   - Stability: Stable.
 func WithLearningRate[T utils.Float](rate T) Option[T] {
@@ -151,6 +159,8 @@ func WithLearningRate[T utils.Float](rate T) Option[T] {
 //
 // AI-Meta:
 //   - Purpose: Set the loss function in the Options API.
+//   - Usage: nn.New[float32](WithLoss[float32](loss.MSE), ...).
+//   - Concurrency: Safe.
 //   - Related: [Option], [NN.WithLoss], [loss.Type].
 //   - Stability: Stable.
 func WithLoss[T utils.Float](lossType loss.Type) Option[T] {
@@ -165,6 +175,8 @@ func WithLoss[T utils.Float](lossType loss.Type) Option[T] {
 //
 // AI-Meta:
 //   - Purpose: Set the default bias flag for subsequently added layers in the Options API.
+//   - Usage: nn.New[float32](WithBias[float32](true), WithHiddenLayer[float32](8, activation.ReLU), ...).
+//   - Concurrency: Safe.
 //   - Related: [Option], [NN.WithBias], [WithHiddenLayer], [WithOutput].
 //   - Stability: Stable.
 func WithBias[T utils.Float](use bool) Option[T] {
@@ -177,6 +189,8 @@ func WithBias[T utils.Float](use bool) Option[T] {
 //
 // AI-Meta:
 //   - Purpose: Select the weight-init strategy in the Options API.
+//   - Usage: nn.New[float32](WithWeightInit[float32](WeightInitHe), ...).
+//   - Concurrency: Safe.
 //   - Related: [Option], [NN.WithWeightInit], [WeightInitMethod].
 //   - Stability: Stable.
 func WithWeightInit[T utils.Float](method WeightInitMethod) Option[T] {
@@ -189,6 +203,8 @@ func WithWeightInit[T utils.Float](method WeightInitMethod) Option[T] {
 //
 // AI-Meta:
 //   - Purpose: Set the early-stopping loss threshold in the Options API.
+//   - Usage: nn.New[float32](WithLossLimit[float32](1e-5), ...).
+//   - Concurrency: Safe.
 //   - Related: [Option], [NN.WithLossLimit], [DefaultLossLimit].
 //   - Stability: Stable.
 func WithLossLimit[T utils.Float](threshold T) Option[T] {
@@ -201,6 +217,8 @@ func WithLossLimit[T utils.Float](threshold T) Option[T] {
 //
 // AI-Meta:
 //   - Purpose: Set the maximum epoch count in the Options API.
+//   - Usage: nn.New[float32](WithMaxIterations[float32](5000), ...).
+//   - Concurrency: Safe.
 //   - Related: [Option], [NN.WithMaxIterations], [DefaultMaxIterations].
 //   - Stability: Stable.
 func WithMaxIterations[T utils.Float](count uint) Option[T] {
@@ -213,6 +231,8 @@ func WithMaxIterations[T utils.Float](count uint) Option[T] {
 //
 // AI-Meta:
 //   - Purpose: Register a per-epoch progress callback in the Options API.
+//   - Usage: nn.New[float32](WithEpochCallback[float32](func(epoch uint, loss float32) { log.Printf("epoch %d loss %.4f", epoch, loss) }), ...).
+//   - Concurrency: Safe.
 //   - Related: [Option], [NN.WithEpochCallback], [WithBatchCallback].
 //   - Stability: Stable.
 func WithEpochCallback[T utils.Float](fn func(epoch uint, lossValue T)) Option[T] {
@@ -225,6 +245,8 @@ func WithEpochCallback[T utils.Float](fn func(epoch uint, lossValue T)) Option[T
 //
 // AI-Meta:
 //   - Purpose: Register a per-batch progress callback in the Options API.
+//   - Usage: nn.New[float32](WithBatchCallback[float32](func(batch uint, loss float32) { log.Printf("batch %d loss %.4f", batch, loss) }), ...).
+//   - Concurrency: Safe.
 //   - Related: [Option], [NN.WithBatchCallback], [WithEpochCallback].
 //   - Stability: Stable.
 func WithBatchCallback[T utils.Float](fn func(batch uint, lossValue T)) Option[T] {
@@ -240,6 +262,7 @@ func WithBatchCallback[T utils.Float](fn func(batch uint, lossValue T)) Option[T
 // AI-Meta:
 //   - Purpose: Opt in to pprof profiling at a given address in the Options API.
 //   - Usage: nn.New[float32](WithProfiling[float32](":6060"), ...).
+//   - Concurrency: Safe.
 //   - Related: [Option], [New].
 //   - Stability: Stable.
 func WithProfiling[T utils.Float](addr string) Option[T] {
@@ -254,6 +277,7 @@ func WithProfiling[T utils.Float](addr string) Option[T] {
 // AI-Meta:
 //   - Purpose: Plug in an alternative optimizer (Adam, RMSProp, SGD+Momentum) in the Options API.
 //   - Usage: nn.New[float32](WithOptimizer[float32](optimizer.NewAdam[float32](0.001)), ...).
+//   - Concurrency: Safe.
 //   - Related: [Option], [New], [optimizer.Optimizer].
 //   - Stability: Stable.
 func WithOptimizer[T utils.Float](opt optimizer.Optimizer[T]) Option[T] {
@@ -268,6 +292,7 @@ func WithOptimizer[T utils.Float](opt optimizer.Optimizer[T]) Option[T] {
 // AI-Meta:
 //   - Purpose: Attach L1/L2/Dropout or a Compose regularizer in the Options API.
 //   - Usage: nn.New[float32](WithRegularizer[float32](regularizer.NewL2[float32](0.01)), ...).
+//   - Concurrency: Safe.
 //   - Related: [Option], [New], [regularizer.Regularizer].
 //   - Stability: Stable.
 func WithRegularizer[T utils.Float](reg regularizer.Regularizer[T]) Option[T] {
@@ -285,6 +310,7 @@ func WithRegularizer[T utils.Float](reg regularizer.Regularizer[T]) Option[T] {
 // AI-Meta:
 //   - Purpose: Attach an LR scheduler (StepLR, WarmUpLR, CosineAnnealingLR, ChainScheduler) in the Options API.
 //   - Usage: nn.New[float32](WithScheduler[float32](optimizer.BindScheduler(myOpt, optimizer.NewStepLR[float32](0.1, 10, 0.5))), ...).
+//   - Concurrency: Safe.
 //   - Related: [Option], [New], [optimizer.Scheduler], [optimizer.BindScheduler].
 //   - Stability: Stable.
 func WithScheduler[T utils.Float](sched optimizer.Scheduler[T]) Option[T] {
@@ -304,6 +330,7 @@ func WithScheduler[T utils.Float](sched optimizer.Scheduler[T]) Option[T] {
 // AI-Meta:
 //   - Purpose: Add N identical hidden layers in one Options API call; replaces repeated WithHiddenLayer.
 //   - Usage: nn.New[float32](Repeat[float32](100, 256, activation.ReLU), ...).
+//   - Concurrency: Safe.
 //   - Related: [Option], [WithHiddenLayer], [Pattern], [WithHiddenLayers], [Sequential].
 //   - Stability: Stable.
 func Repeat[T utils.Float](count, size uint, act activation.Type) Option[T] {
@@ -325,6 +352,7 @@ func Repeat[T utils.Float](count, size uint, act activation.Type) Option[T] {
 // AI-Meta:
 //   - Purpose: Add a repeating multi-layer block to the topology in the Options API.
 //   - Usage: nn.New[float32](Pattern[float32](block, 33), ...).
+//   - Concurrency: Safe.
 //   - Related: [Option], [Repeat], [WithHiddenLayers].
 //   - Stability: Stable.
 func Pattern[T utils.Float](block []HiddenLayerSpec[T], repeats uint) Option[T] {
@@ -342,6 +370,7 @@ func Pattern[T utils.Float](block []HiddenLayerSpec[T], repeats uint) Option[T] 
 // AI-Meta:
 //   - Purpose: Bulk-append a pre-built slice of hidden layer specs in the Options API.
 //   - Usage: nn.New[float32](WithHiddenLayers[float32](layers), ...).
+//   - Concurrency: Safe.
 //   - Related: [Option], [HiddenLayerSpec], [WithHiddenLayer], [Repeat], [Pattern].
 //   - Stability: Stable.
 func WithHiddenLayers[T utils.Float](layers []HiddenLayerSpec[T]) Option[T] {
@@ -361,6 +390,7 @@ func WithHiddenLayers[T utils.Float](layers []HiddenLayerSpec[T]) Option[T] {
 // AI-Meta:
 //   - Purpose: Opt a compiled network into dynamic topology mutation at construction time.
 //   - Usage: nn.New[float32](WithTopologyMode[float32](network.Dynamic), ...).
+//   - Concurrency: Safe.
 //   - Related: [Option], [network.TopologyMode], [network.Dynamic].
 //   - Stability: Stable.
 func WithTopologyMode[T utils.Float](mode network.TopologyMode) Option[T] {
@@ -379,6 +409,7 @@ func WithTopologyMode[T utils.Float](mode network.TopologyMode) Option[T] {
 // AI-Meta:
 //   - Purpose: Attach a custom slog.Logger for per-network lifecycle events.
 //   - Usage: nn.New[float32](WithLogger[float32](slog.New(...)), ...).
+//   - Concurrency: Safe.
 //   - Related: [Option], [utils.GoLogger], [utils.LevelTrace].
 //   - Stability: Stable.
 func WithLogger[T utils.Float](l *slog.Logger) Option[T] {
@@ -394,6 +425,7 @@ func WithLogger[T utils.Float](l *slog.Logger) Option[T] {
 // AI-Meta:
 //   - Purpose: Start the HTTP visualization server at the given address after compile.
 //   - Usage: nn.New[float32](WithVisualizationEndpoint[float32](":8080"), ...).
+//   - Concurrency: Safe.
 //   - Related: [Option], [visualization.VisServer].
 //   - Stability: Stable.
 func WithVisualizationEndpoint[T utils.Float](addr string) Option[T] {
@@ -408,6 +440,8 @@ func WithVisualizationEndpoint[T utils.Float](addr string) Option[T] {
 //
 // AI-Meta:
 //   - Purpose: Protect the visualization HTTP endpoint with bearer-token auth.
+//   - Usage: nn.New[float32](WithVisualizationToken[float32]("my-secret"), ...).
+//   - Concurrency: Safe.
 //   - Related: [Option], [WithVisualizationEndpoint].
 //   - Stability: Stable.
 func WithVisualizationToken[T utils.Float](token string) Option[T] {
@@ -421,6 +455,8 @@ func WithVisualizationToken[T utils.Float](token string) Option[T] {
 //
 // AI-Meta:
 //   - Purpose: Enable CORS on the visualization HTTP server for browser dashboards.
+//   - Usage: nn.New[float32](WithVisualizationCORS[float32](true), ...).
+//   - Concurrency: Safe.
 //   - Related: [Option], [WithVisualizationEndpoint].
 //   - Stability: Stable.
 func WithVisualizationCORS[T utils.Float](enable bool) Option[T] {
@@ -441,6 +477,7 @@ func WithVisualizationCORS[T utils.Float](enable bool) Option[T] {
 // AI-Meta:
 //   - Purpose: Add a Conv1D layer to the preprocessing stack ahead of the Dense head.
 //   - Usage: nn.New[float32](WithInput[float32](28*28), WithConv1D[float32](16, 3, 1, conv.PadValid, true), WithFlatten[float32](), WithHiddenLayer[float32](64, activation.ReLU), WithOutput[float32](10, activation.SOFTMAX)).
+//   - Concurrency: Safe.
 //   - Related: [WithMaxPool1D], [WithAvgPool1D], [WithFlatten], [conv.PadMode].
 //   - Stability: Stable.
 func WithConv1D[T utils.Float](numFilters, kernelSize, stride int, pad conv.PadMode, useBias bool) Option[T] {
@@ -455,6 +492,7 @@ func WithConv1D[T utils.Float](numFilters, kernelSize, stride int, pad conv.PadM
 // AI-Meta:
 //   - Purpose: Add a MaxPool1D layer to the preprocessing stack.
 //   - Usage: nn.New[float32](..., WithConv1D[float32](16, 3, 1, conv.PadValid, true), WithMaxPool1D[float32](2), ...).
+//   - Concurrency: Safe.
 //   - Related: [WithConv1D], [WithAvgPool1D], [WithFlatten].
 //   - Stability: Stable.
 func WithMaxPool1D[T utils.Float](poolSize int) Option[T] {
@@ -464,6 +502,13 @@ func WithMaxPool1D[T utils.Float](poolSize int) Option[T] {
 }
 
 // WithAvgPool1D appends a 1-D average-pooling layer to the prefix stack.
+//
+// AI-Meta:
+//   - Purpose: Add an AvgPool1D layer to the preprocessing stack.
+//   - Usage: nn.New[float32](..., WithConv1D[float32](16, 3, 1, conv.PadValid, true), WithAvgPool1D[float32](2), ...).
+//   - Concurrency: Safe.
+//   - Related: [WithConv1D], [WithMaxPool1D], [WithFlatten].
+//   - Stability: Stable.
 func WithAvgPool1D[T utils.Float](poolSize int) Option[T] {
 	return func(cfg *Config[T]) {
 		cfg.ConvPrefix = append(cfg.ConvPrefix, conv.NewAvgPool1D[T](poolSize))
@@ -477,6 +522,7 @@ func WithAvgPool1D[T utils.Float](poolSize int) Option[T] {
 // AI-Meta:
 //   - Purpose: Add a Flatten reshape layer to the preprocessing stack.
 //   - Usage: nn.New[float32](..., WithMaxPool1D[float32](2), WithFlatten[float32](), WithHiddenLayer[float32](64, activation.ReLU), ...).
+//   - Concurrency: Safe.
 //   - Related: [WithConv1D], [WithMaxPool1D], [WithAvgPool1D].
 //   - Stability: Stable.
 func WithFlatten[T utils.Float]() Option[T] {
@@ -499,6 +545,7 @@ func WithFlatten[T utils.Float]() Option[T] {
 // AI-Meta:
 //   - Purpose: Declare the raw input CHW shape so 2-D conv layers can resolve OutputShape at compile time.
 //   - Usage: nn.New[float32](WithInput[float32](3*32*32), WithInputShape[float32](3, 32, 32), WithConv2D[float32](16, 3, 3, 3, 1, 1, conv.PadValid, true), ...).
+//   - Concurrency: Safe.
 //   - Related: [WithConv2D], [WithMaxPool2D], [WithAvgPool2D], [WithFlatten2D].
 //   - Stability: Stable.
 func WithInputShape[T utils.Float](channels, height, width int) Option[T] {
@@ -517,6 +564,7 @@ func WithInputShape[T utils.Float](channels, height, width int) Option[T] {
 // AI-Meta:
 //   - Purpose: Add a Conv2D layer to the preprocessing stack ahead of the Dense head.
 //   - Usage: nn.New[float32](WithInput[float32](28*28), WithConv2D[float32](8, 1, 3, 3, 1, 1, conv.PadValid, true), WithMaxPool2D[float32](2, 2), WithFlatten2D[float32](), WithHiddenLayer[float32](64, activation.ReLU), WithOutput[float32](10, activation.SOFTMAX)).
+//   - Concurrency: Safe.
 //   - Related: [WithMaxPool2D], [WithAvgPool2D], [WithFlatten2D], [WithInputShape], [conv.PadMode].
 //   - Stability: Stable.
 func WithConv2D[T utils.Float](numFilters, inChannels, kernelH, kernelW, strideH, strideW int, pad conv.PadMode, useBias bool) Option[T] {
@@ -532,6 +580,7 @@ func WithConv2D[T utils.Float](numFilters, inChannels, kernelH, kernelW, strideH
 // AI-Meta:
 //   - Purpose: Add a MaxPool2D layer to the preprocessing stack.
 //   - Usage: nn.New[float32](..., WithConv2D[float32](8, 1, 3, 3, 1, 1, conv.PadValid, true), WithMaxPool2D[float32](2, 2), ...).
+//   - Concurrency: Safe.
 //   - Related: [WithConv2D], [WithAvgPool2D], [WithFlatten2D].
 //   - Stability: Stable.
 func WithMaxPool2D[T utils.Float](poolH, poolW int) Option[T] {
@@ -545,6 +594,7 @@ func WithMaxPool2D[T utils.Float](poolH, poolW int) Option[T] {
 // AI-Meta:
 //   - Purpose: Add an AvgPool2D layer to the preprocessing stack.
 //   - Usage: nn.New[float32](..., WithConv2D[float32](8, 1, 3, 3, 1, 1, conv.PadValid, true), WithAvgPool2D[float32](2, 2), ...).
+//   - Concurrency: Safe.
 //   - Related: [WithConv2D], [WithMaxPool2D], [WithFlatten2D].
 //   - Stability: Stable.
 func WithAvgPool2D[T utils.Float](poolH, poolW int) Option[T] {
@@ -560,6 +610,7 @@ func WithAvgPool2D[T utils.Float](poolH, poolW int) Option[T] {
 // AI-Meta:
 //   - Purpose: Add a Flatten2D reshape layer to collapse CHW feature maps into a 1-D vector.
 //   - Usage: nn.New[float32](..., WithMaxPool2D[float32](2, 2), WithFlatten2D[float32](), WithHiddenLayer[float32](64, activation.ReLU), ...).
+//   - Concurrency: Safe.
 //   - Related: [WithConv2D], [WithMaxPool2D], [WithAvgPool2D].
 //   - Stability: Stable.
 func WithFlatten2D[T utils.Float]() Option[T] {
@@ -580,6 +631,7 @@ func WithFlatten2D[T utils.Float]() Option[T] {
 // AI-Meta:
 //   - Purpose: Register a custom Normalizer to be applied after hidden layer idx during training.
 //   - Usage: nn.New[float32](WithNormAfterLayer[float32](0, norm.NewBatchNorm[float32](8)), ...).
+//   - Concurrency: Safe.
 //   - Related: [Option], [WithBatchNorm], [WithLayerNorm], [norm.Normalizer].
 //   - Stability: Stable.
 func WithNormAfterLayer[T utils.Float](idx int, n norm.Normalizer[T]) Option[T] {
@@ -601,6 +653,7 @@ func WithNormAfterLayer[T utils.Float](idx int, n norm.Normalizer[T]) Option[T] 
 // AI-Meta:
 //   - Purpose: Convenience shortcut to add BatchNorm after hidden layer idx without specifying features.
 //   - Usage: nn.New[float32](WithHiddenLayer[float32](8, activation.ReLU), WithBatchNorm[float32](0), ...).
+//   - Concurrency: Safe.
 //   - Related: [Option], [WithNormAfterLayer], [norm.NewBatchNorm].
 //   - Stability: Stable.
 func WithBatchNorm[T utils.Float](idx int) Option[T] {
@@ -629,6 +682,7 @@ func WithBatchNorm[T utils.Float](idx int) Option[T] {
 // AI-Meta:
 //   - Purpose: Convenience shortcut to add LayerNorm after hidden layer idx.
 //   - Usage: nn.New[float32](WithHiddenLayer[float32](8, activation.ReLU), WithLayerNorm[float32](0), ...).
+//   - Concurrency: Safe.
 //   - Related: [Option], [WithNormAfterLayer], [norm.NewLayerNorm].
 //   - Stability: Stable.
 func WithLayerNorm[T utils.Float](idx int) Option[T] {
@@ -661,6 +715,7 @@ func WithLayerNorm[T utils.Float](idx int) Option[T] {
 // AI-Meta:
 //   - Purpose: Register a per-epoch callback invoked after weight update completes (CB-9).
 //   - Usage: nn.New[float32](WithOnIterationEnd[float32](func(ctx nn.CallbackContext[float32]) error { return nil }), ...).
+//   - Concurrency: Safe.
 //   - Related: [Option], [CallbackFn], [ErrStopTraining], [WithOnImprovementFound], [WithOnTrainEnd].
 //   - Stability: Stable.
 func WithOnIterationEnd[T utils.Float](fn CallbackFn[T]) Option[T] {
@@ -679,6 +734,7 @@ func WithOnIterationEnd[T utils.Float](fn CallbackFn[T]) Option[T] {
 // AI-Meta:
 //   - Purpose: Register a callback triggered on each new loss minimum, ideal for checkpoint saves.
 //   - Usage: nn.New[float32](WithOnImprovementFound[float32](saveFn), ...).
+//   - Concurrency: Safe.
 //   - Related: [Option], [CallbackFn], [ErrStopTraining], [WithOnIterationEnd].
 //   - Stability: Stable.
 func WithOnImprovementFound[T utils.Float](fn CallbackFn[T]) Option[T] {
@@ -699,6 +755,7 @@ func WithOnImprovementFound[T utils.Float](fn CallbackFn[T]) Option[T] {
 // AI-Meta:
 //   - Purpose: Attach a MetaLearner to the outer NN for recursive self-optimization.
 //   - Usage: nn.New[float32](WithMetaLearner[float32](ml), ...).
+//   - Concurrency: Safe.
 //   - Related: [Option], [MetaLearner], [ParamAccessor].
 //   - Stability: Stable.
 func WithMetaLearner[T utils.Float](ml *MetaLearner[T]) Option[T] {
@@ -714,6 +771,7 @@ func WithMetaLearner[T utils.Float](ml *MetaLearner[T]) Option[T] {
 // AI-Meta:
 //   - Purpose: Register a finalisation callback that fires on any Fit exit path (CB-8).
 //   - Usage: nn.New[float32](WithOnTrainEnd[float32](logResultFn), ...).
+//   - Concurrency: Safe.
 //   - Related: [Option], [CallbackFn], [StopReason], [WithOnIterationEnd].
 //   - Stability: Stable.
 func WithOnTrainEnd[T utils.Float](fn CallbackFn[T]) Option[T] {
@@ -722,5 +780,116 @@ func WithOnTrainEnd[T utils.Float](fn CallbackFn[T]) Option[T] {
 			cfg.Callbacks = &CallbackRegistry[T]{}
 		}
 		cfg.Callbacks.OnTrainEnd = append(cfg.Callbacks.OnTrainEnd, fn)
+	}
+}
+
+// ============================================================================
+// Recurrent prefix options (Phase 16 — l2-recurrent-impl REC-9)
+// ============================================================================
+
+// WithSimpleRNN appends an Elman SimpleRNN layer to the prefix stack. The
+// layer satisfies [conv.Layer] and is initialised by compile() via the shared
+// weight-sampler path alongside convolutional kernels (REC-9 composition).
+//
+// AI-Meta:
+//   - Purpose: Add a SimpleRNN layer to the preprocessing stack ahead of the Dense head.
+//   - Usage: nn.New[float64](WithInput[float64](seqLen*inSize), WithSimpleRNN[float64](seqLen, inSize, hidden), WithLastStep[float64](seqLen, hidden), WithHiddenLayer[float64](8, activation.ReLU), WithOutput[float64](1, activation.SIGMOID)).
+//   - Concurrency: Safe.
+//   - Related: [WithGRU], [WithLSTM], [WithLastStep], [recurrent.SimpleRNN].
+//   - Stability: Stable.
+func WithSimpleRNN[T utils.Float](seqLen, inSize, hidden int) Option[T] {
+	return func(cfg *Config[T]) {
+		cfg.ConvPrefix = append(cfg.ConvPrefix, recurrent.NewSimpleRNN[T](seqLen, inSize, hidden))
+	}
+}
+
+// WithLSTM appends an LSTM layer to the prefix stack. Forget-gate bias is
+// initialised to 1.0 per REC-3 convention during compile().
+//
+// AI-Meta:
+//   - Purpose: Add an LSTM layer to the preprocessing stack ahead of the Dense head.
+//   - Usage: nn.New[float64](WithInput[float64](seqLen*inSize), WithLSTM[float64](seqLen, inSize, hidden), WithLastStep[float64](seqLen, hidden), WithHiddenLayer[float64](8, activation.ReLU), WithOutput[float64](1, activation.SIGMOID)).
+//   - Concurrency: Safe.
+//   - Related: [WithGRU], [WithSimpleRNN], [WithLastStep], [recurrent.LSTM].
+//   - Stability: Stable.
+func WithLSTM[T utils.Float](seqLen, inSize, hidden int) Option[T] {
+	return func(cfg *Config[T]) {
+		cfg.ConvPrefix = append(cfg.ConvPrefix, recurrent.NewLSTM[T](seqLen, inSize, hidden))
+	}
+}
+
+// WithGRU appends a GRU (Gated Recurrent Unit) layer to the prefix stack.
+// The 3-gate fused matmul (reset, update, candidate) is weight-initialised
+// by compile() via the shared Init path (REC-9).
+//
+// AI-Meta:
+//   - Purpose: Add a GRU layer to the preprocessing stack ahead of the Dense head.
+//   - Usage: nn.New[float64](WithInput[float64](seqLen*inSize), WithGRU[float64](seqLen, inSize, hidden), WithLastStep[float64](seqLen, hidden), WithHiddenLayer[float64](8, activation.ReLU), WithOutput[float64](1, activation.SIGMOID)).
+//   - Concurrency: Safe.
+//   - Related: [WithLSTM], [WithSimpleRNN], [WithLastStep], [recurrent.GRU].
+//   - Stability: Stable.
+func WithGRU[T utils.Float](seqLen, inSize, hidden int) Option[T] {
+	return func(cfg *Config[T]) {
+		cfg.ConvPrefix = append(cfg.ConvPrefix, recurrent.NewGRU[T](seqLen, inSize, hidden))
+	}
+}
+
+// WithLastStep appends a stateless LastStep collapser to the prefix stack.
+// It reduces the flat sequence output [seqLen*hidden] to the final-timestep
+// vector [hidden] before the Dense head (REC-8).
+//
+// AI-Meta:
+//   - Purpose: Add a LastStep sequence-to-vector collapser to the preprocessing stack.
+//   - Usage: nn.New[float64](..., WithGRU[float64](seqLen, inSize, hidden), WithLastStep[float64](seqLen, hidden), ...).
+//   - Concurrency: Safe.
+//   - Related: [WithGRU], [WithLSTM], [WithSimpleRNN], [recurrent.LastStep].
+//   - Stability: Stable.
+func WithLastStep[T utils.Float](seqLen, hidden int) Option[T] {
+	return func(cfg *Config[T]) {
+		cfg.ConvPrefix = append(cfg.ConvPrefix, recurrent.NewLastStep[T](seqLen, hidden))
+	}
+}
+
+// ============================================================================
+// Compute backend options (Phase 16 — l2-backend-gpu §6 phase D)
+// ============================================================================
+
+// WithBackend sets the compute backend used for Dense layer kernels. When the
+// supplied backend returns [utils.ErrBackendUnavailable] on compile-time probe,
+// compile() logs a Warn and substitutes the always-available CPU reference
+// backend (l1-compute-backend §5.3 graceful fallback). nil is equivalent to
+// omitting this option — both result in the CPU backend.
+//
+// AI-Meta:
+//   - Purpose: Select a compute backend (CPU, OpenCL, CUDA) at construction time; unavailable backends fall back to CPU.
+//   - Usage: nn.New[float32](WithBackend[float32](myGPUBackend), ...).
+//   - Concurrency: Safe.
+//   - Errors: Never surfaces ErrBackendUnavailable to the caller; compile() absorbs it with a Warn log.
+//   - Related: [Option], [compute.Backend], [utils.ErrBackendUnavailable].
+//   - Stability: Stable.
+func WithBackend[T utils.Float](b compute.Backend[T]) Option[T] {
+	return func(cfg *Config[T]) {
+		cfg.Backend = b
+	}
+}
+
+// ============================================================================
+// Gradient clipping (Phase 16 — l2-recurrent-impl REC-7)
+// ============================================================================
+
+// WithGradClipNorm enables gradient clipping by global L2 norm. Before each
+// optimizer step, [optimizer.ClipByGlobalNorm] scales all gradient slices so
+// that their global L2 norm does not exceed threshold. A threshold ≤ 0
+// disables clipping (the default).
+//
+// AI-Meta:
+//   - Purpose: Clip gradients in-place before the optimizer step to stabilise BPTT (REC-7).
+//   - Usage: nn.New[float32](WithGradClipNorm[float32](1.0), ...).
+//   - Concurrency: Safe.
+//   - Related: [Option], [optimizer.ClipByGlobalNorm], [WithSimpleRNN], [WithLSTM], [WithGRU].
+//   - Stability: Stable.
+func WithGradClipNorm[T utils.Float](threshold T) Option[T] {
+	return func(cfg *Config[T]) {
+		cfg.GradClipNorm = threshold
 	}
 }

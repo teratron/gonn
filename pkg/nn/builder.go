@@ -252,7 +252,7 @@ func (n *NN[T]) WithMaxIterations(count uint) *NN[T] {
 //
 // AI-Meta:
 //   - Purpose: Register an epoch-level progress hook for logging or early-stopping logic.
-//   - Concurrency: Callback runs on the Fit goroutine; must be goroutine-safe if sharing state.
+//   - Concurrency: SingleGoroutine.
 //   - Related: [WithEpochCallback], [WithBatchCallback], [Fit].
 //   - Stability: Stable.
 func (n *NN[T]) WithEpochCallback(fn func(epoch uint, lossValue T)) *NN[T] {
@@ -268,7 +268,7 @@ func (n *NN[T]) WithEpochCallback(fn func(epoch uint, lossValue T)) *NN[T] {
 //
 // AI-Meta:
 //   - Purpose: Register a batch-level progress hook for fine-grained loss monitoring.
-//   - Concurrency: Callback runs on the Fit goroutine; must be goroutine-safe if sharing state.
+//   - Concurrency: SingleGoroutine.
 //   - Related: [WithBatchCallback], [WithEpochCallback], [Fit].
 //   - Stability: Stable.
 func (n *NN[T]) WithBatchCallback(fn func(batch uint, lossValue T)) *NN[T] {

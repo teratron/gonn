@@ -21,6 +21,7 @@ import (
 // AI-Meta:
 //   - Purpose: Uniform interface for reading and writing a registered tunable parameter.
 //   - Usage: Pass &ScalarParam[T]{...} or &SliceParam[T]{...} to MetaLearner.params.
+//   - Concurrency: SingleGoroutine.
 //   - Related: [ScalarParam], [SliceParam], [MetaLearner].
 //   - Stability: Stable.
 type ParamAccessor[T utils.Float] interface {
@@ -35,6 +36,7 @@ type ParamAccessor[T utils.Float] interface {
 // AI-Meta:
 //   - Purpose: ParamAccessor adapter for scalar (*T) hyperparameters such as LearningRate.
 //   - Usage: &ScalarParam[float32]{ptr: &cfg.LearningRate, name: "lr"}.
+//   - Concurrency: SingleGoroutine.
 //   - Related: [ParamAccessor], [SliceParam], [MetaLearner].
 //   - Stability: Stable.
 type ScalarParam[T utils.Float] struct {
@@ -64,6 +66,7 @@ func (p *ScalarParam[T]) Name() string { return p.name }
 // AI-Meta:
 //   - Purpose: ParamAccessor adapter for slice (*[]T) hyperparameters such as per-layer scales.
 //   - Usage: &SliceParam[float32]{ptr: &someSlice, name: "scales"}.
+//   - Concurrency: SingleGoroutine.
 //   - Related: [ParamAccessor], [ScalarParam], [MetaLearner].
 //   - Stability: Stable.
 type SliceParam[T utils.Float] struct {
@@ -98,6 +101,7 @@ func (p *SliceParam[T]) Name() string { return p.name }
 // AI-Meta:
 //   - Purpose: Callback type for constructing the inner-network feature vector from training state.
 //   - Usage: Set MetaLearner.Features to override the default two-element vector.
+//   - Concurrency: SingleGoroutine.
 //   - Related: [DefaultFeatureFunc], [MetaLearner].
 //   - Stability: Stable.
 type FeatureFunc[T utils.Float] func(loss T, iter int, maxIter int) []T
@@ -109,6 +113,7 @@ type FeatureFunc[T utils.Float] func(loss T, iter int, maxIter int) []T
 // AI-Meta:
 //   - Purpose: Default feature builder: normalized training progress plus current loss.
 //   - Usage: Assigned automatically when MetaLearner.Features is nil at step() time.
+//   - Concurrency: SingleGoroutine.
 //   - Related: [FeatureFunc], [MetaLearner].
 //   - Stability: Stable.
 func DefaultFeatureFunc[T utils.Float](loss T, iter int, maxIter int) []T {

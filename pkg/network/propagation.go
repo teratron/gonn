@@ -43,7 +43,7 @@ func (n *Network[T]) CalculateValues() {
 //
 // AI-Meta:
 //   - Purpose: Compute scalar training loss after a forward pass; useful for logging or early stopping.
-//   - Concurrency: ReadSafe after CalculateValues; does not mutate cell state.
+//   - Concurrency: ReadSafe.
 //   - Related: [CalculateLossDefault], [CalculateValues], [loss.CalculateTotalLoss].
 func (n *Network[T]) CalculateLoss(mode loss.Type) T {
 	misses := make([]*T, n.Output.Len())
@@ -125,7 +125,7 @@ func (n *Network[T]) CalculateWeights(rate *T) {
 //
 // AI-Meta:
 //   - Purpose: Compute loss using the layer-configured mode; convenience wrapper around CalculateLoss.
-//   - Concurrency: ReadSafe after CalculateValues.
+//   - Concurrency: ReadSafe.
 //   - Related: [CalculateLoss], [LossMode].
 func (n *Network[T]) CalculateLossDefault() T {
 	return n.CalculateLoss(n.lossMode)

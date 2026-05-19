@@ -47,7 +47,7 @@ type Buffer[T utils.Float] struct {
 // AI-Meta:
 //   - Purpose: Pluggable compute boundary between math kernels and the rest of the library.
 //   - Implementations: CPU reference backend (internal); future: OpenCL, CUDA.
-//   - Concurrency: Depends on implementation; CPU backend is NotSafe by default.
+//   - Concurrency: NotSafe.
 //   - Related: [LayerHandle], [Buffer], [Register], [Get].
 type Backend[T utils.Float] interface {
 	Name() string

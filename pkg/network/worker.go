@@ -60,7 +60,7 @@ func (p *WorkerPool) run() {
 //
 // AI-Meta:
 //   - Purpose: Dispatch a job to the pool; must not be called after Stop.
-//   - Concurrency: Safe to call from multiple goroutines.
+//   - Concurrency: Safe.
 //   - Related: [Stop], [WorkerPool].
 func (p *WorkerPool) Submit(fn func()) {
 	p.jobs <- fn

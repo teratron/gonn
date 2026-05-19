@@ -18,8 +18,12 @@ import (
 var kernelSource string
 
 const (
-	kernelDenseF32 = "dense_forward_f32"
-	kernelDenseF64 = "dense_forward_f64"
+	kernelDenseF32    = "dense_forward_f32"
+	kernelDenseF64    = "dense_forward_f64"
+	kernelGradWF32    = "dense_grad_w_f32"
+	kernelGradXF32    = "dense_grad_x_f32"
+	kernelGradWF64    = "dense_grad_w_f64"
+	kernelGradXF64    = "dense_grad_x_f64"
 )
 
 // buildProgram compiles kernels.cl on the given context and device.
@@ -173,4 +177,172 @@ func kernelDenseForward[T utils.Float](b *openclBackend[T], layer compute.LayerH
 		return nil, err
 	}
 	return output, nil
+}
+
+// kernelDenseBackward launches the dense_grad_w + dense_grad_x kernel pair for T.
+// Returns (gradW, gradX) or an error. b.program must be non-nil.
+//
+// gradW = dY ⊗ input  (∂L/∂W)   shape: outSize * inSize
+// gradX = W^T · dY    (∂L/∂X)   shape: inSize
+func kernelDenseBackward[T utils.Float](b *openclBackend[T], layer compute.LayerHandle[T], input, dY []T) ([]T, []T, error) {
+	if b.program == nil {
+		prog, err := buildProgram(b.ctx)
+		if err != nil {
+			return nil, nil, err
+		}
+		b.program = prog
+	}
+
+	outSize := len(dY)
+	inSize := len(input)
+
+	var zero T
+	var nameGW, nameGX string
+	if unsafe.Sizeof(zero) == 4 {
+		nameGW, nameGX = kernelGradWF32, kernelGradXF32
+	} else {
+		nameGW, nameGX = kernelGradWF64, kernelGradXF64
+	}
+
+	// Flatten weights for gradX computation.
+	weights := make([]T, outSize*inSize)
+	for i, row := range layer.Weights {
+		copy(weights[i*inSize:], row)
+	}
+
+	// Allocate device buffers.
+	dYBuf, err := allocBuf[T](b.reg, b.ctx, outSize)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer freeBuf[T](b.reg, dYBuf)
+
+	inBuf, err := allocBuf[T](b.reg, b.ctx, inSize)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer freeBuf[T](b.reg, inBuf)
+
+	wBuf, err := allocBuf[T](b.reg, b.ctx, outSize*inSize)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer freeBuf[T](b.reg, wBuf)
+
+	gwBuf, err := allocBuf[T](b.reg, b.ctx, outSize*inSize)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer freeBuf[T](b.reg, gwBuf)
+
+	gxBuf, err := allocBuf[T](b.reg, b.ctx, inSize)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer freeBuf[T](b.reg, gxBuf)
+
+	if err := writeBuf[T](b.reg, b.queue, dYBuf, dY); err != nil {
+		return nil, nil, err
+	}
+	if err := writeBuf[T](b.reg, b.queue, inBuf, input); err != nil {
+		return nil, nil, err
+	}
+	if err := writeBuf[T](b.reg, b.queue, wBuf, weights); err != nil {
+		return nil, nil, err
+	}
+
+	setArg := func(k C.cl_kernel, idx C.cl_uint, obj C.cl_mem) error {
+		if ret := C.clSetKernelArg(k, idx, C.size_t(unsafe.Sizeof(obj)), unsafe.Pointer(&obj)); ret != C.CL_SUCCESS {
+			return utils.Newf(utils.ErrBackendKernel, "opencl: clSetKernelArg(%d) failed (%d)", idx, int(ret))
+		}
+		return nil
+	}
+	setIntArg := func(k C.cl_kernel, idx C.cl_uint, v C.int) error {
+		if ret := C.clSetKernelArg(k, idx, C.size_t(unsafe.Sizeof(v)), unsafe.Pointer(&v)); ret != C.CL_SUCCESS {
+			return utils.Newf(utils.ErrBackendKernel, "opencl: clSetKernelArg int(%d) failed (%d)", idx, int(ret))
+		}
+		return nil
+	}
+
+	dYEntry, _ := lookupBuf[T](b.reg, dYBuf)
+	inEntry, _ := lookupBuf[T](b.reg, inBuf)
+	wEntry, _ := lookupBuf[T](b.reg, wBuf)
+	gwEntry, _ := lookupBuf[T](b.reg, gwBuf)
+	gxEntry, _ := lookupBuf[T](b.reg, gxBuf)
+
+	// Launch dense_grad_w: global size = outSize * inSize.
+	{
+		cname := C.CString(nameGW)
+		defer C.free(unsafe.Pointer(cname))
+		var errCode C.cl_int
+		k := C.clCreateKernel(b.program, cname, &errCode)
+		if errCode != C.CL_SUCCESS {
+			return nil, nil, utils.Newf(utils.ErrBackendKernel, "opencl: clCreateKernel(%s) failed (%d)", nameGW, int(errCode))
+		}
+		defer C.clReleaseKernel(k)
+		if err := setArg(k, 0, dYEntry.mem); err != nil {
+			return nil, nil, err
+		}
+		if err := setArg(k, 1, inEntry.mem); err != nil {
+			return nil, nil, err
+		}
+		if err := setArg(k, 2, gwEntry.mem); err != nil {
+			return nil, nil, err
+		}
+		if err := setIntArg(k, 3, C.int(inSize)); err != nil {
+			return nil, nil, err
+		}
+		if err := setIntArg(k, 4, C.int(outSize)); err != nil {
+			return nil, nil, err
+		}
+		gs := C.size_t(outSize * inSize)
+		if ret := C.clEnqueueNDRangeKernel(b.queue, k, 1, nil, &gs, nil, 0, nil, nil); ret != C.CL_SUCCESS {
+			return nil, nil, utils.Newf(utils.ErrBackendKernel, "opencl: dense_grad_w NDRange failed (%d)", int(ret))
+		}
+	}
+
+	// Launch dense_grad_x: global size = inSize.
+	{
+		cname := C.CString(nameGX)
+		defer C.free(unsafe.Pointer(cname))
+		var errCode C.cl_int
+		k := C.clCreateKernel(b.program, cname, &errCode)
+		if errCode != C.CL_SUCCESS {
+			return nil, nil, utils.Newf(utils.ErrBackendKernel, "opencl: clCreateKernel(%s) failed (%d)", nameGX, int(errCode))
+		}
+		defer C.clReleaseKernel(k)
+		if err := setArg(k, 0, wEntry.mem); err != nil {
+			return nil, nil, err
+		}
+		if err := setArg(k, 1, dYEntry.mem); err != nil {
+			return nil, nil, err
+		}
+		if err := setArg(k, 2, gxEntry.mem); err != nil {
+			return nil, nil, err
+		}
+		if err := setIntArg(k, 3, C.int(inSize)); err != nil {
+			return nil, nil, err
+		}
+		if err := setIntArg(k, 4, C.int(outSize)); err != nil {
+			return nil, nil, err
+		}
+		gs := C.size_t(inSize)
+		if ret := C.clEnqueueNDRangeKernel(b.queue, k, 1, nil, &gs, nil, 0, nil, nil); ret != C.CL_SUCCESS {
+			return nil, nil, utils.Newf(utils.ErrBackendKernel, "opencl: dense_grad_x NDRange failed (%d)", int(ret))
+		}
+	}
+
+	if ret := C.clFinish(b.queue); ret != C.CL_SUCCESS {
+		return nil, nil, utils.Newf(utils.ErrBackendKernel, "opencl: clFinish (backward) failed (%d)", int(ret))
+	}
+
+	gradW := make([]T, outSize*inSize)
+	if err := readBuf[T](b.reg, b.queue, gwBuf, gradW); err != nil {
+		return nil, nil, err
+	}
+	gradX := make([]T, inSize)
+	if err := readBuf[T](b.reg, b.queue, gxBuf, gradX); err != nil {
+		return nil, nil, err
+	}
+	return gradW, gradX, nil
 }

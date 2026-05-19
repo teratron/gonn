@@ -15,6 +15,7 @@ import (
 // AI-Meta:
 //   - Purpose: Sentinel returned by callbacks to trigger early stopping with best-weight rollback.
 //   - Usage: return fmt.Errorf("patience exceeded: %w", nn.ErrStopTraining) inside a CallbackFn.
+//   - Concurrency: Safe.
 //   - Related: [CallbackFn], [CallbackRegistry], [ErrStopTraining].
 //   - Stability: Stable.
 var ErrStopTraining = errors.New("stop training")
@@ -25,6 +26,7 @@ var ErrStopTraining = errors.New("stop training")
 // AI-Meta:
 //   - Purpose: Enum classifying the reason Fit returned; available to OnTrainEnd callbacks.
 //   - Usage: if ctx.StopReason != nil && *ctx.StopReason == nn.StopCallback { ... }.
+//   - Concurrency: Safe.
 //   - Related: [CallbackContext], [ErrStopTraining].
 //   - Stability: Stable.
 type StopReason int
@@ -66,6 +68,7 @@ type Snapshot[T utils.Float] struct {
 //
 // AI-Meta:
 //   - Purpose: Immutable event payload passed to each registered callback during Fit.
+//   - Usage: Access ctx.Loss, ctx.Iteration, ctx.Snapshot inside a CallbackFn to observe training state.
 //   - Concurrency: ReadSafe; all fields are values or read-only copies.
 //   - Related: [CallbackFn], [CallbackRegistry], [ErrStopTraining].
 //   - Stability: Stable.
@@ -93,6 +96,7 @@ type CallbackContext[T utils.Float] struct {
 // AI-Meta:
 //   - Purpose: Typed callback signature for all Fit training events.
 //   - Usage: func myCallback(ctx nn.CallbackContext[float32]) error { ...; return nil }.
+//   - Concurrency: SingleGoroutine.
 //   - Related: [CallbackContext], [ErrStopTraining], [CallbackRegistry].
 //   - Stability: Stable.
 type CallbackFn[T utils.Float] func(ctx CallbackContext[T]) error
@@ -104,6 +108,7 @@ type CallbackFn[T utils.Float] func(ctx CallbackContext[T]) error
 // AI-Meta:
 //   - Purpose: Per-event container for registered callbacks; nil slices produce zero overhead (CB-3).
 //   - Usage: Populated via WithOnIterationEnd / WithOnImprovementFound / WithOnTrainEnd options.
+//   - Concurrency: NotSafe; populated during construction, read-only during Fit.
 //   - Related: [CallbackFn], [ErrStopTraining], [fireEvent].
 //   - Stability: Stable.
 type CallbackRegistry[T utils.Float] struct {

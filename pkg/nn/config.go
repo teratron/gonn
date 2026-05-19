@@ -11,6 +11,7 @@ import (
 	"log/slog"
 
 	"github.com/teratron/gonn/pkg/activation"
+	"github.com/teratron/gonn/pkg/compute"
 	"github.com/teratron/gonn/pkg/layer/conv"
 	"github.com/teratron/gonn/pkg/layer/norm"
 	"github.com/teratron/gonn/pkg/loss"
@@ -57,6 +58,7 @@ func (s state) String() string {
 // AI-Meta:
 //   - Purpose: Closed string enum for selecting the weight-init strategy applied at Compile.
 //   - Usage: Pass WeightInitXavier / WeightInitHe / WeightInitRandom to WithWeightInit.
+//   - Concurrency: Safe.
 //   - Related: [WeightInitXavier], [WeightInitHe], [WeightInitRandom], [WithWeightInit].
 //   - Stability: Stable.
 type WeightInitMethod string
@@ -68,6 +70,8 @@ const (
 	//
 	// AI-Meta:
 	//   - Purpose: Glorot uniform weight initialiser; optimal for tanh/sigmoid activations.
+	//   - Usage: Pass WeightInitXavier to WithWeightInit or set Config.WeightInit directly.
+	//   - Concurrency: Safe.
 	//   - Related: [WeightInitMethod], [WeightInitHe], [WeightInitRandom], [WithWeightInit].
 	//   - Stability: Stable.
 	WeightInitXavier WeightInitMethod = "xavier"
@@ -77,6 +81,8 @@ const (
 	//
 	// AI-Meta:
 	//   - Purpose: He normal weight initialiser; optimal for ReLU/LeakyReLU activations.
+	//   - Usage: Pass WeightInitHe to WithWeightInit for ReLU-based topologies.
+	//   - Concurrency: Safe.
 	//   - Related: [WeightInitMethod], [WeightInitXavier], [WeightInitRandom], [WithWeightInit].
 	//   - Stability: Stable.
 	WeightInitHe WeightInitMethod = "he"
@@ -87,6 +93,8 @@ const (
 	//
 	// AI-Meta:
 	//   - Purpose: Uniform random weight initialiser; use only for shallow or experimental networks.
+	//   - Usage: Pass WeightInitRandom to WithWeightInit for quick experiments.
+	//   - Concurrency: Safe.
 	//   - Related: [WeightInitMethod], [WeightInitXavier], [WeightInitHe], [WithWeightInit].
 	//   - Stability: Stable.
 	WeightInitRandom WeightInitMethod = "random"
@@ -99,6 +107,7 @@ const (
 // AI-Meta:
 //   - Purpose: Canonical baseline values for hyperparameters; applied by applyDefaults before compile.
 //   - Usage: Reference in assertions or option chains that need to override then restore defaults.
+//   - Concurrency: Safe.
 //   - Related: [Config], [Compile].
 //   - Stability: Stable.
 const (
@@ -116,6 +125,7 @@ const (
 // AI-Meta:
 //   - Purpose: Per-layer shape descriptor for one element of the multi-hidden chain.
 //   - Usage: Populated by Dense / Hidden builder methods or WithHiddenLayer; stored in Config.HiddenLayers.
+//   - Concurrency: NotSafe.
 //   - Related: [Config], [Dense], [WithHiddenLayer], [Sequential], [DeepNetwork].
 //   - Stability: Stable.
 type HiddenLayerSpec[T utils.Float] struct {
@@ -130,6 +140,7 @@ type HiddenLayerSpec[T utils.Float] struct {
 //
 // AI-Meta:
 //   - Purpose: Unified configuration struct shared by both construction styles; frozen by Compile.
+//   - Usage: Populated via builder chain or option functions; passed to compile() internally.
 //   - Lifecycle: Populated in Configuring state; read-only after Compile transitions NN to Operational.
 //   - Concurrency: NotSafe; mutated by builder/option methods, read by compile().
 //   - Related: [HiddenLayerSpec], [Compile], [Option], [NN.Config].
@@ -170,6 +181,11 @@ type Config[T utils.Float] struct {
 	VisCORS          bool
 	DefaultBias      bool
 	OutputBias       bool
+	GradClipNorm     T // 0 = disabled; >0 = clip global L2 norm to this threshold (REC-7)
+	// Backend selects the compute backend for Dense layer kernels. nil or an
+	// unavailable backend both fall back to the CPU reference path at Compile
+	// time (l1-compute-backend §5.3 graceful fallback).
+	Backend compute.Backend[T]
 }
 
 // applyDefaults fills any zero-valued fields with the Defaults constants.

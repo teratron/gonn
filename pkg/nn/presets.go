@@ -16,6 +16,7 @@ import (
 // AI-Meta:
 //   - Purpose: Add N identical hidden layers in one Options API call.
 //   - Usage: nn.New[float32](Sequential[float32](3, 64, activation.ReLU), ...).
+//   - Concurrency: Safe.
 //   - Related: [Option], [WithHiddenLayer], [DeepNetwork].
 //   - Stability: Stable.
 func Sequential[T utils.Float](count, size uint, act activation.Type) Option[T] {
@@ -36,6 +37,7 @@ func Sequential[T utils.Float](count, size uint, act activation.Type) Option[T] 
 // AI-Meta:
 //   - Purpose: Add a pyramid of hidden layers with halving size in the Options API.
 //   - Usage: nn.New[float32](DeepNetwork[float32](128, 4, activation.ReLU), ...).
+//   - Concurrency: Safe.
 //   - Related: [Option], [Sequential], [WithHiddenLayer].
 //   - Stability: Stable.
 func DeepNetwork[T utils.Float](startSize, layers uint, act activation.Type) Option[T] {
@@ -61,6 +63,7 @@ func DeepNetwork[T utils.Float](startSize, layers uint, act activation.Type) Opt
 // AI-Meta:
 //   - Purpose: Apply a sensible baseline configuration in one Options API call.
 //   - Usage: nn.New[float32](StandardSetup[float32](0.1), WithInput[float32](4), ...).
+//   - Concurrency: Safe.
 //   - Related: [Option], [WithLearningRate], [PresetXOR].
 //   - Stability: Stable.
 func StandardSetup[T utils.Float](rate T) Option[T] {
@@ -82,6 +85,7 @@ func StandardSetup[T utils.Float](rate T) Option[T] {
 // AI-Meta:
 //   - Purpose: One-option XOR baseline for smoke tests and tutorials.
 //   - Usage: n := nn.MustNew[float32](nn.PresetXOR[float32]()).
+//   - Concurrency: Safe.
 //   - Related: [Option], [MustNew], [StandardSetup].
 //   - Stability: Stable.
 func PresetXOR[T utils.Float]() Option[T] {
@@ -106,6 +110,7 @@ func PresetXOR[T utils.Float]() Option[T] {
 // AI-Meta:
 //   - Purpose: Standard multi-layer MNIST digit classifier preset.
 //   - Usage: n, err := nn.New[float32](nn.PresetMNIST[float32]()).
+//   - Concurrency: Safe.
 //   - Related: [Option], [New], [PresetRegression].
 //   - Stability: Stable.
 func PresetMNIST[T utils.Float]() Option[T] {
@@ -130,6 +135,7 @@ func PresetMNIST[T utils.Float]() Option[T] {
 // AI-Meta:
 //   - Purpose: Generic continuous-output regression preset parameterised by input and hidden sizes.
 //   - Usage: n, err := nn.New[float32](nn.PresetRegression[float32](10, 64)).
+//   - Concurrency: Safe.
 //   - Related: [Option], [New], [PresetMNIST].
 //   - Stability: Stable.
 func PresetRegression[T utils.Float](inputSize, hiddenSize uint) Option[T] {

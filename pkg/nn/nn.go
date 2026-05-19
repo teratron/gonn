@@ -5,6 +5,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/teratron/gonn/pkg/compute"
 	"github.com/teratron/gonn/pkg/layer/conv"
 	"github.com/teratron/gonn/pkg/layer/norm"
 	"github.com/teratron/gonn/pkg/network"
@@ -28,7 +29,7 @@ import (
 //   - Purpose: Public network handle for topology configuration, training, and inference.
 //   - Usage: Configure via NewBuilder or New, call Train/Fit for learning, Query for inference.
 //   - Lifecycle: Configuring (after NewBuilder) → Operational (after Compile / New / MustNew).
-//   - Concurrency: ReadSafe for Query after Compile; Train and Fit require SingleGoroutine.
+//   - Concurrency: ReadSafe.
 //   - Related: [NewBuilder], [New], [MustNew], [network.Network].
 //   - Constraints: Topology is immutable after Compile; weights must not be mutated concurrently.
 //   - Stability: Stable.
@@ -40,6 +41,7 @@ type NN[T utils.Float] struct {
 	vis                *visualization.VisServer
 	callbacks          *CallbackRegistry[T]
 	normLayers         map[int]norm.Normalizer[T]
+	backend            compute.Backend[T] // CPU by default; set by WithBackend; nil impossible after compile
 	convPrefix         []conv.Layer[T]
 	convBuf            []T
 	convGradBuf        []T
