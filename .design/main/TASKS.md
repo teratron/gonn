@@ -1,7 +1,7 @@
 # Master Task Index (Registry)
 
-**Version:** 2.15.0
-**Project Version:** 0.11.0 released; 0.12.0 RC ready (Phase 14 Done — pending `git tag -a v0.12.0`); 0.13.0 RC ready (Phase 15 Done — pending `git tag -a v0.13.0`); 0.14.0 RC ready (Phase 16 Done — pending `git tag -a v0.14.0`); 0.15.0 RC ready (Phase 17 Done — pending `git tag -a v0.15.0`); 0.16.0 target (Phase 18 active)
+**Version:** 2.16.0
+**Project Version:** 0.11.0 released; 0.12.0 RC ready (Phase 14 Done — pending `git tag -a v0.12.0`); 0.13.0 RC ready (Phase 15 Done — pending `git tag -a v0.13.0`); 0.14.0 RC ready (Phase 16 Done — pending `git tag -a v0.14.0`); 0.15.0 RC ready (Phase 17 Done — pending `git tag -a v0.15.0`); 0.16.0 target (Phase 18 active); 0.17.0 target (Phase 19 scoped)
 **Generated:** 2026-04-29
 **Last Updated:** 2026-05-20
 **Based on:** .design/main/PLAN.md v2.19.0
@@ -34,7 +34,8 @@ Tactical registry of all phases and their statuses. Atomic checklists (`T-XXXX`)
 | [Phase 15](archives/tasks/phase-15.md) | Recurrent Foundation + GPU Backend Skeleton + AI-Meta Linter — Track A (`pkg/layer/recurrent/` SimpleRNN+LSTM with BPTT + `utils.Orthogonal`, coverage 97.2%), Track B (`pkg/compute/gpu/` umbrella + opencl/ skeleton + Dense Forward kernel, coverage 90.0%), Track C (`pkg/aimeta/` grammar + `cmd/lint-aimeta` CLI + first per-package compliance hook in `pkg/utils`, coverage 82.9%), v0.13.0 released | `Done (Archived)` (14/14 — all tracks complete; gate T-15Z01 green) |
 | [Phase 16](tasks/phase-16.md) | Recurrent Completion + GPU Backward + AI-Meta Rollout — Track A (GRU + LastStep + ClipByGlobalNorm + WithSimpleRNN/LSTM/GRU/LastStep options + compile wiring), Track B (OpenCL Dense Backward kernel + `WithBackend(...)` CPU graceful fallback + perf bench gate), Track C (`--resolve` flag + RESOLVE rule + TestAIMetaCompliance rollout phases 3+4+5 across pkg/activation/loss/neuron/layer/network/dataset/checkpoint/compute/persistence/nn), v0.14.0 RC | `Done` (14/14 — closed 2026-05-19) |
 | [Phase 17](tasks/phase-17.md) | NLP Foundation — Attention Implementation + Embedding Layers — Track A (`pkg/layer/attention/` MultiHeadAttention[T] + cell.go softmax helpers + MaskedLayer[T] + three pkg/nn options), Track B (`pkg/layer/embedding/` TokenEmbedding[T] + single PositionalEncoding[T] with PositionalMode enum + EmbeddingStack[T] + sparseGrad[T] + IDLayer[T] sub-interface + three pkg/nn options), v0.15.0 RC | `Done` (12/12 — closed 2026-05-20) |
-| [Phase 18](tasks/phase-18.md) | Transformer Block Implementation — single sequential track A (`pkg/layer/transformer/` EncoderBlock[T] + DecoderBlock[T] + Stack[T] + internal FFN primitive + Block[T] interface + TransformerConfig[T]; composes MultiHeadAttention + LayerNorm + Dropout + activation; `pkg/layer/norm/` LayerNorm[T].Backward; four pkg/nn options → ConvPrefix), v0.16.0 RC | `Todo` (0/14 — scoped 2026-05-20) |
+| [Phase 18](tasks/phase-18.md) | Transformer Block Implementation — single sequential track A (`pkg/layer/transformer/` EncoderBlock[T] + DecoderBlock[T] + Stack[T] + internal FFN primitive + Block[T] interface + TransformerConfig[T]; composes MultiHeadAttention + LayerNorm + Dropout + activation; `pkg/layer/norm/` LayerNorm[T].Backward; four pkg/nn options → ConvPrefix), v0.16.0 RC | `In Progress` (9/14 — T-18A01..A09 Done; T-18A10..A11, T-18T01..T02, T-18Z01 Todo) |
+| [Phase 19](tasks/phase-19.md) | Quantization L2 Implementation — `pkg/quantization/` PTQ int8 (weight-only Dense/Conv1D/Conv2D Phase α; CalibrationRunner + full-int8 GEMM Phase β; attention projection matrices Phase γ; `Quantize[T]`/`Load[T]`/`Evaluate[T]` top-level API; `.qnn.json` persistence), v0.17.0 RC | `Todo` (0/14 — scoped 2026-05-20) |
 
 ## Phase 0 — Already Complete
 
@@ -242,5 +243,5 @@ Six of the eight v0.6-gated entries (E03, E04, E05, E07, E08, E13) are now activ
 | `CHANGELOG.md` (v0.11.0 entry) | l1-release-policy v1.0.0 | `Done` [Z] |
 | `v0.11.0` git tag | l1-release-policy v1.0.0 §5.4 | `Pending user` (run `git tag -a v0.11.0`) |
 
-- **Last Updated**: 2026-05-19 (Phase 16 scoped via /magic-task: 14 atomic tasks across Tracks A+B+C; PLAN v2.16.0 → v2.17.0; Phase 16 row added Active; Phase 17 Attention scoping condition tightened — now gated on Phase 16 T-16Z01 closeout. TASKS v2.12.0 → v2.13.0.)
+- **Last Updated**: 2026-05-20 (Phase 19 scoped via /magic-task: 14 atomic tasks (T-19A01..A11 + T01..T02 + Z01) across three delivery phases α/β/γ; `tasks/phase-19.md` created; Phase 18 row updated In Progress (9/14 — T-18A01..A09 Done); PLAN v2.19.0 → v2.20.0; TASKS v2.15.0 → v2.16.0. Activation conditions met: Phase 18 T-18A01..A09 Done + l2-quantization-impl.md Stable v0.1.0 registered in INDEX v2.18.0.)
 - **Maintainer**: Core Team
