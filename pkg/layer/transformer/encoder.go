@@ -140,7 +140,7 @@ func (e *EncoderBlock[T]) Forward(x []T) []T {
 
 // forwardPostNorm: LN after residual add (standard BERT-style).
 func (e *EncoderBlock[T]) forwardPostNorm(x []T) []T {
-	seqLen, dmodel := e.Cfg.SeqLen, e.Cfg.Dmodel
+	seqLen := e.Cfg.SeqLen
 
 	// --- sub-layer 1: self-attention ---
 	attnOut := e.Attn.Forward(x)
@@ -148,12 +148,8 @@ func (e *EncoderBlock[T]) forwardPostNorm(x []T) []T {
 	// residual 1: bufZ = x + attnOut
 	copy(e.bufZ, x)
 	addInPlace(e.bufZ, attnOut)
-	// LN1 applied per position; result stored in cacheZ1 (= FFN input).
-	for p := range seqLen {
-		base := p * dmodel
-		pos := e.Norm1.Forward(e.bufZ[base : base+dmodel])
-		copy(e.cacheZ1[base:base+dmodel], pos)
-	}
+	// LN1 per position via ForwardSeq; per-position cache stored for backward.
+	copy(e.cacheZ1, e.Norm1.ForwardSeq(e.bufZ, seqLen))
 
 	// --- sub-layer 2: FFN ---
 	ffnOut := e.FFN.Forward(e.cacheZ1)
@@ -161,13 +157,8 @@ func (e *EncoderBlock[T]) forwardPostNorm(x []T) []T {
 	// residual 2: bufF = cacheZ1 + ffnOut
 	copy(e.bufF, e.cacheZ1)
 	addInPlace(e.bufF, ffnOut)
-	// LN2 applied per position.
-	out := make([]T, seqLen*dmodel)
-	for p := range seqLen {
-		base := p * dmodel
-		pos := e.Norm2.Forward(e.bufF[base : base+dmodel])
-		copy(out[base:base+dmodel], pos)
-	}
+	// LN2 per position via ForwardSeq.
+	out := e.Norm2.ForwardSeq(e.bufF, seqLen)
 
 	copy(e.cacheX, x)
 	return out
@@ -201,19 +192,13 @@ func (e *EncoderBlock[T]) Backward(upstream []T) []T {
 	return e.backwardPostNorm(upstream)
 }
 
-// backwardPostNorm reverses the post-norm forward chain.
-// NOTE: Norm1/Norm2 caches hold only the last-forwarded position; full
-// per-position cache support is completed in T-18A05.
+// backwardPostNorm reverses the post-norm forward chain using per-position
+// BackwardSeq for correct multi-position LN gradient accumulation (T-18A05).
 func (e *EncoderBlock[T]) backwardPostNorm(upstream []T) []T {
-	seqLen, dmodel := e.Cfg.SeqLen, e.Cfg.Dmodel
+	seqLen := e.Cfg.SeqLen
 
-	// reverse LN2 per position
-	dBufF := make([]T, seqLen*dmodel)
-	for p := range seqLen {
-		base := p * dmodel
-		pos := e.Norm2.Backward(upstream[base : base+dmodel])
-		copy(dBufF[base:base+dmodel], pos)
-	}
+	// reverse LN2 — BackwardSeq uses per-position xHat/invSd cached by ForwardSeq
+	dBufF := e.Norm2.BackwardSeq(upstream, seqLen)
 
 	// reverse residual 2: gradient flows to both FFN path and z1 path
 	dFFNOut := make([]T, len(dBufF))
@@ -225,17 +210,12 @@ func (e *EncoderBlock[T]) backwardPostNorm(upstream []T) []T {
 	dZ1fromFFN := e.FFN.Backward(dFFNOut)
 
 	// combine z1 gradients
-	dZ1 := make([]T, seqLen*dmodel)
+	dZ1 := make([]T, len(dZ1fromRes2))
 	copy(dZ1, dZ1fromRes2)
 	addInPlace(dZ1, dZ1fromFFN)
 
-	// reverse LN1 per position
-	dBufZ := make([]T, seqLen*dmodel)
-	for p := range seqLen {
-		base := p * dmodel
-		pos := e.Norm1.Backward(dZ1[base : base+dmodel])
-		copy(dBufZ[base:base+dmodel], pos)
-	}
+	// reverse LN1 — BackwardSeq uses per-position xHat/invSd cached by ForwardSeq
+	dBufZ := e.Norm1.BackwardSeq(dZ1, seqLen)
 
 	// reverse residual 1: gradient flows to both Attn path and input path
 	dAttnOut := make([]T, len(dBufZ))
@@ -247,7 +227,7 @@ func (e *EncoderBlock[T]) backwardPostNorm(upstream []T) []T {
 	dXfromAttn := e.Attn.Backward(dAttnOut)
 
 	// combine input gradients
-	dx := make([]T, seqLen*dmodel)
+	dx := make([]T, len(dXfromRes1))
 	copy(dx, dXfromRes1)
 	addInPlace(dx, dXfromAttn)
 

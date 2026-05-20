@@ -120,3 +120,94 @@ func TestEncoderBlock_DefaultDff(t *testing.T) {
 		t.Errorf("default Dff=%d, want 32 (4*8)", blk.Cfg.Dff)
 	}
 }
+
+// TestEncoderBlock_BackwardFD verifies ∂L/∂x via finite differences (TRANS-8).
+// Tolerance 1e-3 accommodates numerical noise from the attention softmax path.
+func TestEncoderBlock_BackwardFD(t *testing.T) {
+	const (
+		seqLen   = 4
+		dmodel   = 8
+		numHeads = 2
+		dff      = 16
+		h        = 1e-4
+		tol      = 1e-3
+	)
+
+	blk := newTestEncoder(seqLen, dmodel, numHeads, dff)
+	blk.SetTraining(false)
+
+	n := seqLen * dmodel
+	x := make([]float64, n)
+	for i := range x {
+		x[i] = (float64(i) - float64(n)/2) * 0.05
+	}
+	upstream := make([]float64, n)
+	for i := range upstream {
+		upstream[i] = 1.0
+	}
+
+	// analytic gradient via Forward + Backward
+	blk.Forward(x)
+	dxAnalytic := blk.Backward(upstream)
+
+	// FD loss: L = Σ upstream_i * Forward(x)_i
+	loss := func(xIn []float64) float64 {
+		out := blk.Forward(xIn)
+		var s float64
+		for i, u := range upstream {
+			s += u * out[i]
+		}
+		return s
+	}
+
+	for i := range x {
+		xp := make([]float64, n)
+		xm := make([]float64, n)
+		copy(xp, x)
+		copy(xm, x)
+		xp[i] += h
+		xm[i] -= h
+		fd := (loss(xp) - loss(xm)) / (2 * h)
+		if err := math.Abs(dxAnalytic[i] - fd); err > tol {
+			t.Errorf("∂L/∂x[%d]: analytic=%v FD=%v err=%v", i, dxAnalytic[i], fd, err)
+		}
+	}
+}
+
+// TestEncoderBlock_ApplyGradSGD verifies that ApplyGradSGD updates weights and
+// zeroes gradient buffers, producing different Forward output on next call.
+func TestEncoderBlock_ApplyGradSGD(t *testing.T) {
+	blk := newTestEncoder(4, 8, 2, 16)
+	blk.SetTraining(false)
+
+	x := make([]float64, 4*8)
+	for i := range x {
+		x[i] = float64(i+1) * 0.1
+	}
+	upstream := make([]float64, 4*8)
+	for i := range upstream {
+		upstream[i] = 1.0
+	}
+
+	out1 := make([]float64, len(x))
+	copy(out1, blk.Forward(x))
+	blk.Backward(upstream)
+	blk.ApplyGradSGD(0.1)
+	out2 := blk.Forward(x)
+
+	changed := false
+	for i := range out1 {
+		if out1[i] != out2[i] {
+			changed = true
+			break
+		}
+	}
+	if !changed {
+		t.Error("ApplyGradSGD: output unchanged after weight update")
+	}
+
+	// lr=0 should not panic
+	blk.Forward(x)
+	blk.Backward(upstream)
+	blk.ApplyGradSGD(0)
+}

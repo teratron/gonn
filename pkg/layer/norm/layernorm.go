@@ -56,8 +56,11 @@ type LayerNorm[T utils.Float] struct {
 	gammaGrad []T
 	betaGrad  []T
 	// xHat and invSd are cached by Forward for use in Backward.
-	xHat     []T
-	invSd    T
+	xHat    []T
+	invSd   T
+	// xHatBuf and invSdBuf store per-position caches for ForwardSeq/BackwardSeq.
+	xHatBuf  []T
+	invSdBuf []T
 	features int
 	mode     atomic.Int32
 	affine   bool
@@ -215,6 +218,54 @@ func (l *LayerNorm[T]) ApplyGradSGD(lr T) {
 		l.beta[i] -= lr * l.betaGrad[i]
 		l.betaGrad[i] = 0
 	}
+}
+
+// ForwardSeq applies LayerNorm to each of seqLen positions in a flat
+// [seqLen*features] input tensor and returns a flat output of the same shape.
+// Caches per-position xHat and invSd in xHatBuf/invSdBuf for BackwardSeq.
+func (l *LayerNorm[T]) ForwardSeq(x []T, seqLen int) []T {
+	needed := seqLen * l.features
+	if len(l.xHatBuf) < needed {
+		l.xHatBuf = make([]T, needed)
+	}
+	if len(l.invSdBuf) < seqLen {
+		l.invSdBuf = make([]T, seqLen)
+	}
+	out := make([]T, needed)
+	for p := 0; p < seqLen; p++ {
+		base := p * l.features
+		posOut := l.Forward(x[base : base+l.features])
+		copy(out[base:base+l.features], posOut)
+		copy(l.xHatBuf[base:base+l.features], l.xHat)
+		l.invSdBuf[p] = l.invSd
+	}
+	return out
+}
+
+// BackwardSeq reverses ForwardSeq for all seqLen positions. Accumulates
+// affine parameter gradients from every position into the shared gamma/beta
+// grad buffers and returns ∂L/∂x with shape [seqLen*features].
+// Must be called after ForwardSeq on the same input.
+func (l *LayerNorm[T]) BackwardSeq(upstream []T, seqLen int) []T {
+	dx := make([]T, seqLen*l.features)
+	for p := 0; p < seqLen; p++ {
+		base := p * l.features
+		l.xHat = l.xHatBuf[base : base+l.features]
+		l.invSd = l.invSdBuf[p]
+		posGrad := l.Backward(upstream[base : base+l.features])
+		copy(dx[base:base+l.features], posGrad)
+	}
+	return dx
+}
+
+// Params returns the live gamma and beta parameter slices.
+// Modifying the returned slices directly modifies the LayerNorm parameters.
+// Returns (nil, nil) when affine is disabled.
+func (l *LayerNorm[T]) Params() (gamma, beta []T) {
+	if !l.affine {
+		return nil, nil
+	}
+	return l.gamma, l.beta
 }
 
 // InputSize returns the expected input feature count.

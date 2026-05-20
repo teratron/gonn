@@ -440,6 +440,83 @@ func TestLayerNorm_BackwardAffineDisabled(t *testing.T) {
 	}
 }
 
+// TestLayerNorm_ForwardSeq verifies that ForwardSeq normalizes each position
+// independently and matches standalone Forward calls.
+func TestLayerNorm_ForwardSeq(t *testing.T) {
+	const (
+		features = 4
+		seqLen   = 3
+	)
+	ln := NewLayerNorm[float64](features)
+	ln2 := NewLayerNorm[float64](features)
+
+	x := make([]float64, seqLen*features)
+	for i := range x {
+		x[i] = float64(i+1) * 0.1
+	}
+
+	got := ln.ForwardSeq(x, seqLen)
+	if len(got) != seqLen*features {
+		t.Fatalf("ForwardSeq len=%d want %d", len(got), seqLen*features)
+	}
+
+	for p := range seqLen {
+		base := p * features
+		want := ln2.Forward(x[base : base+features])
+		for i := range features {
+			if math.Abs(got[base+i]-want[i]) > 1e-12 {
+				t.Errorf("pos %d feat %d: got %v want %v", p, i, got[base+i], want[i])
+			}
+		}
+	}
+}
+
+// TestLayerNorm_BackwardSeqFD verifies BackwardSeq ∂L/∂x via finite differences.
+func TestLayerNorm_BackwardSeqFD(t *testing.T) {
+	const (
+		features = 4
+		seqLen   = 3
+		h        = 1e-5
+		tol      = 1e-4
+	)
+
+	x := make([]float64, seqLen*features)
+	for i := range x {
+		x[i] = float64(i+1) * 0.1
+	}
+	upstream := make([]float64, seqLen*features)
+	for i := range upstream {
+		upstream[i] = 1.0
+	}
+
+	ln := NewLayerNorm[float64](features)
+	ln.ForwardSeq(x, seqLen)
+	dxAnalytic := ln.BackwardSeq(upstream, seqLen)
+
+	lnLossSeq := func(xIn []float64) float64 {
+		l := NewLayerNorm[float64](features)
+		out := l.ForwardSeq(xIn, seqLen)
+		var s float64
+		for i, u := range upstream {
+			s += u * out[i]
+		}
+		return s
+	}
+
+	for i := range x {
+		xp := make([]float64, len(x))
+		xm := make([]float64, len(x))
+		copy(xp, x)
+		copy(xm, x)
+		xp[i] += h
+		xm[i] -= h
+		fd := (lnLossSeq(xp) - lnLossSeq(xm)) / (2 * h)
+		if err := math.Abs(dxAnalytic[i] - fd); err > tol {
+			t.Errorf("BackwardSeq ∂L/∂x[%d]: analytic=%v FD=%v err=%v", i, dxAnalytic[i], fd, err)
+		}
+	}
+}
+
 // TestLayerNorm_ApplyGradSGD verifies that ApplyGradSGD updates gamma/beta and
 // zeros the gradient buffers.
 func TestLayerNorm_ApplyGradSGD(t *testing.T) {

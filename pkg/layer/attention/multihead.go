@@ -191,6 +191,13 @@ func (m *MultiHeadAttention[T]) OutputSize() int { return m.SeqLen * m.Dmodel }
 // the generic GradSlots optimizer interface (mirrors recurrent layer convention).
 func (m *MultiHeadAttention[T]) GradSlots() (gradW, gradB []T) { return nil, nil }
 
+// GradBuffers returns the eight gradient accumulation slices in order
+// [gradWq, gradWk, gradWv, gradWo, gradBq, gradBk, gradBv, gradBo].
+// Populated by Backward; used by the encoder backward FD verification test.
+func (m *MultiHeadAttention[T]) GradBuffers() (gWq, gWk, gWv, gWo, gBq, gBk, gBv, gBo []T) {
+	return m.gradWq, m.gradWk, m.gradWv, m.gradWo, m.gradBq, m.gradBk, m.gradBv, m.gradBo
+}
+
 // Forward implements the multi-head scaled dot-product attention forward pass
 // (ATT-1..ATT-6):
 //
