@@ -1,6 +1,7 @@
 package transformer
 
 import (
+	"encoding/json"
 	"math"
 	"math/rand/v2"
 	"testing"
@@ -210,4 +211,51 @@ func TestEncoderBlock_ApplyGradSGD(t *testing.T) {
 	blk.Forward(x)
 	blk.Backward(upstream)
 	blk.ApplyGradSGD(0)
+}
+
+// TestEncoderBlock_JSON verifies MarshalJSON/UnmarshalJSON round-trip per TRANS-9:
+// Config and every child parameter tensor must be restored bit-exact, and
+// Forward on the restored block must match the original block's output.
+func TestEncoderBlock_JSON(t *testing.T) {
+	blk := newTestEncoder(4, 8, 2, 16)
+	blk.SetTraining(false)
+
+	x := make([]float64, 4*8)
+	for i := range x {
+		x[i] = float64(i+1) * 0.05
+	}
+	wantOut := blk.Forward(x)
+
+	data, err := json.Marshal(blk)
+	if err != nil {
+		t.Fatalf("MarshalJSON: %v", err)
+	}
+
+	blk2 := &EncoderBlock[float64]{}
+	if err := json.Unmarshal(data, blk2); err != nil {
+		t.Fatalf("UnmarshalJSON: %v", err)
+	}
+
+	// Config round-trip
+	if blk2.Cfg.SeqLen != blk.Cfg.SeqLen || blk2.Cfg.Dmodel != blk.Cfg.Dmodel ||
+		blk2.Cfg.NumHeads != blk.Cfg.NumHeads || blk2.Cfg.Dff != blk.Cfg.Dff {
+		t.Errorf("Config mismatch: got %+v want %+v", blk2.Cfg, blk.Cfg)
+	}
+
+	// Forward output must match bit-exact after restore
+	gotOut := blk2.Forward(x)
+	if len(gotOut) != len(wantOut) {
+		t.Fatalf("output len mismatch: got %d want %d", len(gotOut), len(wantOut))
+	}
+	for i := range wantOut {
+		if gotOut[i] != wantOut[i] {
+			t.Errorf("out[%d]: got %v want %v (not bit-exact after round-trip)", i, gotOut[i], wantOut[i])
+		}
+	}
+
+	// Wrong Type tag must return error
+	bad := []byte(`{"Type":"transformer.DecoderBlock","Config":{},"Attn":{},"Norm1":{},"Norm2":{},"FFN":{}}`)
+	if err := json.Unmarshal(bad, &EncoderBlock[float64]{}); err == nil {
+		t.Error("UnmarshalJSON: expected error for wrong Type tag, got nil")
+	}
 }

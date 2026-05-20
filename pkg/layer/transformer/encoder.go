@@ -1,6 +1,8 @@
 package transformer
 
 import (
+	"encoding/json"
+	"fmt"
 	"math/rand/v2"
 
 	"github.com/teratron/gonn/pkg/activation"
@@ -272,6 +274,103 @@ func (e *EncoderBlock[T]) ApplyGradSGD(lr T) {
 //   - Stability: Experimental.
 func (e *EncoderBlock[T]) SetPaddingMask(mask []bool) {
 	e.Attn.SetPaddingMask(mask)
+}
+
+// MarshalJSON serialises the EncoderBlock to a JSON envelope per TRANS-9.
+// Each child is embedded as a pre-marshalled raw object so child schema
+// evolution stays decoupled from the envelope format.
+//
+// AI-Meta:
+//   - Purpose: JSON persistence for EncoderBlock checkpoint and round-trip.
+//   - Related: [EncoderBlock.UnmarshalJSON], [TransformerConfig].
+//   - Stability: Experimental.
+func (e *EncoderBlock[T]) MarshalJSON() ([]byte, error) {
+	attnRaw, err := json.Marshal(e.Attn)
+	if err != nil {
+		return nil, fmt.Errorf("EncoderBlock.MarshalJSON Attn: %w", err)
+	}
+	norm1Raw, err := json.Marshal(e.Norm1)
+	if err != nil {
+		return nil, fmt.Errorf("EncoderBlock.MarshalJSON Norm1: %w", err)
+	}
+	norm2Raw, err := json.Marshal(e.Norm2)
+	if err != nil {
+		return nil, fmt.Errorf("EncoderBlock.MarshalJSON Norm2: %w", err)
+	}
+	ffnRaw, err := json.Marshal(e.FFN)
+	if err != nil {
+		return nil, fmt.Errorf("EncoderBlock.MarshalJSON FFN: %w", err)
+	}
+	return json.Marshal(&struct {
+		Type   string               `json:"Type"`
+		Config TransformerConfig[T] `json:"Config"`
+		Attn   json.RawMessage      `json:"Attn"`
+		Norm1  json.RawMessage      `json:"Norm1"`
+		Norm2  json.RawMessage      `json:"Norm2"`
+		FFN    json.RawMessage      `json:"FFN"`
+	}{
+		Type:   "transformer.EncoderBlock",
+		Config: e.Cfg,
+		Attn:   attnRaw,
+		Norm1:  norm1Raw,
+		Norm2:  norm2Raw,
+		FFN:    ffnRaw,
+	})
+}
+
+// UnmarshalJSON restores an EncoderBlock from a JSON envelope. Validates the
+// Type tag, reconstructs all children, rebuilds Dropout from DropoutRate, and
+// pre-allocates forward-cache buffers so Forward is ready without Init.
+//
+// AI-Meta:
+//   - Purpose: JSON restoration for EncoderBlock checkpoint round-trip.
+//   - Related: [EncoderBlock.MarshalJSON], [NewEncoderBlock].
+//   - Stability: Experimental.
+func (e *EncoderBlock[T]) UnmarshalJSON(data []byte) error {
+	aux := &struct {
+		Type   string               `json:"Type"`
+		Config TransformerConfig[T] `json:"Config"`
+		Attn   json.RawMessage      `json:"Attn"`
+		Norm1  json.RawMessage      `json:"Norm1"`
+		Norm2  json.RawMessage      `json:"Norm2"`
+		FFN    json.RawMessage      `json:"FFN"`
+	}{}
+	if err := json.Unmarshal(data, aux); err != nil {
+		return err
+	}
+	if aux.Type != "transformer.EncoderBlock" {
+		return fmt.Errorf("EncoderBlock.UnmarshalJSON: unexpected Type %q", aux.Type)
+	}
+	e.Cfg = aux.Config
+
+	e.Attn = &attention.MultiHeadAttention[T]{}
+	if err := json.Unmarshal(aux.Attn, e.Attn); err != nil {
+		return fmt.Errorf("EncoderBlock.UnmarshalJSON Attn: %w", err)
+	}
+	e.Norm1 = &norm.LayerNorm[T]{}
+	if err := json.Unmarshal(aux.Norm1, e.Norm1); err != nil {
+		return fmt.Errorf("EncoderBlock.UnmarshalJSON Norm1: %w", err)
+	}
+	e.Norm2 = &norm.LayerNorm[T]{}
+	if err := json.Unmarshal(aux.Norm2, e.Norm2); err != nil {
+		return fmt.Errorf("EncoderBlock.UnmarshalJSON Norm2: %w", err)
+	}
+	e.FFN = &ffn[T]{}
+	if err := json.Unmarshal(aux.FFN, e.FFN); err != nil {
+		return fmt.Errorf("EncoderBlock.UnmarshalJSON FFN: %w", err)
+	}
+
+	p := retentionProb(e.Cfg.DropoutRate)
+	e.Drop1 = regularizer.NewDropout[T](p)
+	e.Drop2 = regularizer.NewDropout[T](p)
+
+	size := e.Cfg.SeqLen * e.Cfg.Dmodel
+	e.bufAttn = make([]T, size)
+	e.bufZ = make([]T, size)
+	e.bufF = make([]T, size)
+	e.cacheX = make([]T, size)
+	e.cacheZ1 = make([]T, size)
+	return nil
 }
 
 // Compile-time interface assertions.

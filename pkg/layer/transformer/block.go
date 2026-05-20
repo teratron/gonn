@@ -1,6 +1,7 @@
 package transformer
 
 import (
+	"encoding/json"
 	"math/rand/v2"
 
 	"github.com/teratron/gonn/pkg/activation"
@@ -197,6 +198,49 @@ func (f *ffn[T]) ApplyGradSGD(lr T) {
 		f.b2[i] -= lr * f.gb2[i]
 		f.gb2[i] = 0
 	}
+}
+
+// MarshalJSON serializes the FFN weight matrices and shape metadata.
+// Gradient buffers and forward-cache slices are not persisted.
+func (f *ffn[T]) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&struct {
+		W1      []T            `json:"W1"`
+		B1      []T            `json:"b1"`
+		W2      []T            `json:"W2"`
+		B2      []T            `json:"b2"`
+		SeqLen  int            `json:"seqLen"`
+		Dmodel  int            `json:"dmodel"`
+		Dff     int            `json:"dff"`
+		ActMode activation.Type `json:"actMode"`
+	}{
+		W1: f.W1, B1: f.b1, W2: f.W2, B2: f.b2,
+		SeqLen: f.seqLen, Dmodel: f.dmodel, Dff: f.dff, ActMode: f.actMode,
+	})
+}
+
+// UnmarshalJSON restores the FFN from JSON. Gradient buffers are zeroed and
+// forward-cache slices are left nil (lazily allocated on first Forward call).
+func (f *ffn[T]) UnmarshalJSON(data []byte) error {
+	aux := &struct {
+		W1      []T            `json:"W1"`
+		B1      []T            `json:"b1"`
+		W2      []T            `json:"W2"`
+		B2      []T            `json:"b2"`
+		SeqLen  int            `json:"seqLen"`
+		Dmodel  int            `json:"dmodel"`
+		Dff     int            `json:"dff"`
+		ActMode activation.Type `json:"actMode"`
+	}{}
+	if err := json.Unmarshal(data, aux); err != nil {
+		return err
+	}
+	f.W1, f.b1, f.W2, f.b2 = aux.W1, aux.B1, aux.W2, aux.B2
+	f.seqLen, f.dmodel, f.dff, f.actMode = aux.SeqLen, aux.Dmodel, aux.Dff, aux.ActMode
+	f.gW1 = make([]T, len(f.W1))
+	f.gb1 = make([]T, len(f.b1))
+	f.gW2 = make([]T, len(f.W2))
+	f.gb2 = make([]T, len(f.b2))
+	return nil
 }
 
 // GradSlots returns the gradient buffers for W1+W2 (weights) and b1+b2 (biases)

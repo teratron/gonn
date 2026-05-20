@@ -93,7 +93,7 @@ content is §3 Core Invariants + §4 Invariant Compliance. The plan below is gro
 - [x] [T-18A03] `pkg/layer/transformer/block.go` — `Block[T]` private interface (`layer.Layer[T]` + `attention.MaskedLayer[T]` + `children()`); `addInPlace[T](dst, src []T)` residual helper (TRANS-6 — no scale/clip/normalize); internal position-wise FFN primitive `ffn[T]` (two weight matrices `Dmodel→Dff` + `Dff→Dmodel` + biases, `utils.Xavier` init, `Forward`/`Backward` with grad buffers); child-construction helpers
 - [x] [T-18A04] `pkg/layer/transformer/encoder.go` — `EncoderBlock[T]` struct + typed children (`Attn *attention.MultiHeadAttention[T]`, `Norm1`/`Norm2 *norm.LayerNorm[T]`, `FFN *ffn[T]`, `Drop1`/`Drop2 *regularizer.Dropout[T]`) + forward-cache buffer fields; `NewEncoderBlock` constructor (inner MHA `Causal:false`); post-norm `Forward` per TRANS-2; `Init(rng)` forks RNG per child
 - [x] [T-18A05] `pkg/layer/transformer/encoder.go` — post-norm `Backward` per TRANS-8 (reverse cascade: Norm2 → FFN → Drop2 → residual split → Norm1 → Attn → Drop1 → residual split); `GradSlots()` aggregating child grad buffers; `ApplyGradSGD(lr T)` fanning the inline-SGD step to every child
-- [ ] [T-18A06] `pkg/layer/transformer/encoder.go` — `MarshalJSON`/`UnmarshalJSON` child-delegated envelope per TRANS-9 (`{Type, Config, Attn, Norm1, Norm2, FFN1, FFN2}` — each child pre-marshalled, no field-level remarshalling); `SetPaddingMask(m []bool)` forwarding to inner MHA per TRANS-10; compile-time assertions `var _ layer.Layer[T]` + `var _ attention.MaskedLayer[T]`
+- [x] [T-18A06] `pkg/layer/transformer/encoder.go` — `MarshalJSON`/`UnmarshalJSON` child-delegated envelope per TRANS-9 (`{Type, Config, Attn, Norm1, Norm2, FFN1, FFN2}` — each child pre-marshalled, no field-level remarshalling); `SetPaddingMask(m []bool)` forwarding to inner MHA per TRANS-10; compile-time assertions `var _ layer.Layer[T]` + `var _ attention.MaskedLayer[T]`
 
 #### Phase β — Pre-norm + Dropout
 
@@ -168,9 +168,10 @@ content is §3 Core Invariants + §4 Invariant Compliance. The plan below is gro
 ### [T-18A06] `pkg/layer/transformer/encoder.go` — JSON + SetPaddingMask + interface assertions
 
 - **Spec:** `l2-transformer-impl.md` §5.9 + §4 TRANS-9 / TRANS-10
-- **Status:** Todo
+- **Status:** Done
 - **Assignment:** Agent
-- **Verify:** `go test -run TestEncoderBlock_JSON -count=1 ./pkg/layer/transformer/` PASS — round-trip restores topology + every child parameter bit-exact; `var _ layer.Layer[float64] = (*EncoderBlock[float64])(nil)` and `var _ attention.MaskedLayer[float64] = (*EncoderBlock[float64])(nil)` compile-time assertions compile
+- **Verify:** `go test -run TestEncoderBlock_JSON -count=1 ./pkg/layer/transformer/` PASS — round-trip restores topology + every child parameter bit-exact; compile-time `Block[T]`/`Layer[T]`/`MaskedLayer[T]` assertions compile; coverage 89.2%
+- **Changes:** Added `ffn.MarshalJSON`/`UnmarshalJSON` to `block.go` (W1/b1/W2/b2 + shape metadata; grad buffers zeroed; caches nil for lazy alloc); added `EncoderBlock.MarshalJSON`/`UnmarshalJSON` to `encoder.go` (`json.RawMessage` child envelope, Type tag validation, Dropout reconstructed from DropoutRate, cache buffers pre-allocated); added `TestEncoderBlock_JSON` to `encoder_test.go`
 - **Handoff:** A09 reuses the JSON pattern for `DecoderBlock`; A10 wraps blocks in the `Stack` envelope.
 - **Notes:** `MarshalJSON` writes `{Type:"transformer.EncoderBlock", Config:{...}, Attn, Norm1, Norm2, FFN1, FFN2}` — each named child is its own pre-marshalled object (TRANS-9: no field-level remarshalling; child schema evolution stays decoupled). `UnmarshalJSON` validates the `Type` tag, then dispatches into each child's `UnmarshalJSON`. `SetPaddingMask(m)` simply forwards to `Attn.SetPaddingMask(m)` — LayerNorm and FFN are mask-agnostic per TRANS-§4.6. Padding mask is runtime-only, never serialized.
 
