@@ -308,3 +308,165 @@ func TestGroupNormJSONRoundTrip(t *testing.T) {
 		t.Errorf("features/groups mismatch after round-trip")
 	}
 }
+
+// ─── LayerNorm Backward Tests ────────────────────────────────────────────────
+
+// lnLoss computes the scalar L = Σ upstream_i * LayerNorm(x)_i used for FD checks.
+func lnLoss(ln *LayerNorm[float64], x, upstream []float64) float64 {
+	out := ln.Forward(x)
+	var s float64
+	for i, u := range upstream {
+		s += u * float64(out[i])
+	}
+	return s
+}
+
+// TestLayerNorm_Backward verifies ∂L/∂x, ∂L/∂γ, ∂L/∂β via finite differences.
+// Threshold: max_abs_err < 1e-4 for T=float64.
+func TestLayerNorm_Backward(t *testing.T) {
+	const (
+		n   = 6
+		h   = 1e-5 // FD step
+		tol = 1e-4
+	)
+
+	x := []float64{0.5, -1.2, 0.3, 2.1, -0.8, 1.6}
+	upstream := []float64{1.0, -0.5, 0.3, 0.7, -0.2, 0.9}
+
+	// --- ∂L/∂x via FD ---
+	ln := NewLayerNorm[float64](n)
+	// Set non-trivial gamma so affine gradient is exercised.
+	for i := range ln.gamma {
+		ln.gamma[i] = float64(i+1) * 0.3
+	}
+	ln.Forward(x)
+	dxAnalytic := ln.Backward(upstream)
+
+	for i := range x {
+		xp := make([]float64, n)
+		copy(xp, x)
+		xp[i] += h
+		xm := make([]float64, n)
+		copy(xm, x)
+		xm[i] -= h
+
+		lp := lnLoss(NewLayerNorm[float64](n), xp, upstream)
+		lm := lnLoss(NewLayerNorm[float64](n), xm, upstream)
+		// Use default gamma=1 in helper; we only compare shapes so use a fresh ln
+		// with same gamma for FD.
+		lnFD := NewLayerNorm[float64](n)
+		for j := range lnFD.gamma {
+			lnFD.gamma[j] = float64(j+1) * 0.3
+		}
+		lp = lnLoss(lnFD, xp, upstream)
+		lnFD2 := NewLayerNorm[float64](n)
+		for j := range lnFD2.gamma {
+			lnFD2.gamma[j] = float64(j+1) * 0.3
+		}
+		lm = lnLoss(lnFD2, xm, upstream)
+
+		dxFD := (lp - lm) / (2 * h)
+		if err := math.Abs(dxAnalytic[i] - dxFD); err > tol {
+			t.Errorf("∂L/∂x[%d]: analytic=%v FD=%v err=%v", i, dxAnalytic[i], dxFD, err)
+		}
+	}
+
+	// --- ∂L/∂γ via FD ---
+	lnG := NewLayerNorm[float64](n)
+	for i := range lnG.gamma {
+		lnG.gamma[i] = float64(i+1) * 0.3
+	}
+	lnG.Forward(x)
+	lnG.Backward(upstream)
+	dgAnalytic := make([]float64, n)
+	copy(dgAnalytic, lnG.gammaGrad)
+
+	for i := range x {
+		lnp := NewLayerNorm[float64](n)
+		lnm := NewLayerNorm[float64](n)
+		for j := range lnp.gamma {
+			lnp.gamma[j] = float64(j+1) * 0.3
+			lnm.gamma[j] = float64(j+1) * 0.3
+		}
+		lnp.gamma[i] += h
+		lnm.gamma[i] -= h
+		lp := lnLoss(lnp, x, upstream)
+		lm := lnLoss(lnm, x, upstream)
+		dgFD := (lp - lm) / (2 * h)
+		if err := math.Abs(dgAnalytic[i] - dgFD); err > tol {
+			t.Errorf("∂L/∂γ[%d]: analytic=%v FD=%v err=%v", i, dgAnalytic[i], dgFD, err)
+		}
+	}
+
+	// --- ∂L/∂β via FD ---
+	lnB := NewLayerNorm[float64](n)
+	lnB.Forward(x)
+	lnB.Backward(upstream)
+	dbAnalytic := make([]float64, n)
+	copy(dbAnalytic, lnB.betaGrad)
+
+	for i := range x {
+		lnp := NewLayerNorm[float64](n)
+		lnm := NewLayerNorm[float64](n)
+		lnp.beta[i] += h
+		lnm.beta[i] -= h
+		lp := lnLoss(lnp, x, upstream)
+		lm := lnLoss(lnm, x, upstream)
+		dbFD := (lp - lm) / (2 * h)
+		if err := math.Abs(dbAnalytic[i] - dbFD); err > tol {
+			t.Errorf("∂L/∂β[%d]: analytic=%v FD=%v err=%v", i, dbAnalytic[i], dbFD, err)
+		}
+	}
+}
+
+// TestLayerNorm_BackwardAffineDisabled verifies Backward returns non-zero ∂L/∂x
+// even when affine is disabled (no gamma/beta params to update).
+func TestLayerNorm_BackwardAffineDisabled(t *testing.T) {
+	ln := NewLayerNorm[float64](4, WithLayerNormAffine[float64](false))
+	x := []float64{1, 2, 3, 4}
+	upstream := []float64{1, 1, 1, 1}
+	ln.Forward(x)
+	dx := ln.Backward(upstream)
+	if len(dx) != 4 {
+		t.Fatalf("Backward len: got %d, want 4", len(dx))
+	}
+	// Sum of gradients of a normalized output wrt constant upstream should be ~0.
+	var sum float64
+	for _, v := range dx {
+		sum += v
+	}
+	if math.Abs(sum) > 1e-9 {
+		t.Errorf("sum(∂L/∂x) with constant upstream should be ~0, got %v", sum)
+	}
+}
+
+// TestLayerNorm_ApplyGradSGD verifies that ApplyGradSGD updates gamma/beta and
+// zeros the gradient buffers.
+func TestLayerNorm_ApplyGradSGD(t *testing.T) {
+	ln := NewLayerNorm[float64](3)
+	x := []float64{1, 2, 3}
+	upstream := []float64{1, 0, -1}
+	ln.Forward(x)
+	ln.Backward(upstream)
+
+	gammaGradBefore := make([]float64, 3)
+	copy(gammaGradBefore, ln.gammaGrad)
+	gammaBefore := make([]float64, 3)
+	copy(gammaBefore, ln.gamma)
+
+	lr := 0.1
+	ln.ApplyGradSGD(lr)
+
+	for i := range ln.gamma {
+		want := gammaBefore[i] - lr*gammaGradBefore[i]
+		if math.Abs(ln.gamma[i]-want) > 1e-12 {
+			t.Errorf("gamma[%d] after SGD: got %v want %v", i, ln.gamma[i], want)
+		}
+		if ln.gammaGrad[i] != 0 {
+			t.Errorf("gammaGrad[%d] not zeroed after ApplyGradSGD", i)
+		}
+		if ln.betaGrad[i] != 0 {
+			t.Errorf("betaGrad[%d] not zeroed after ApplyGradSGD", i)
+		}
+	}
+}

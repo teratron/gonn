@@ -5,15 +5,15 @@
 
 **Workspace:** main
 **Project Version:** 0.14.0 RC ready (Phase 16 Done — pending `git tag -a v0.14.0`)
-**Updated:** 2026-05-20 05:34
+**Updated:** 2026-05-20 05:58
 **Phase:** 18 — Transformer Block Implementation
-**Status:** Active
+**Status:** Done
 
 ## Current Position
 
-- **Task:** Phase 16 complete — all 14 tasks done (T-16A01..A04, B01..B03, C01..C03, T01..T03, Z01).
-- **Spec:** l1-recurrent-layers + l2-recurrent-impl v0.1.0; l2-backend-gpu v0.1.0; l2-aimeta-linter v0.1.0; l2-ai-doc-metadata v1.0.0. No new specs.
-- **Next Action:** Run /magic-run to execute Phase 18 Track A (T-18A01..A11 sequential α→β→γ); start with T-18A01 LayerNorm.Backward prerequisite
+- **Task:** T-18A04 encoder.go — EncoderBlock struct + post-norm Forward + Init (Done)
+- **Spec:** l1-transformer-block Stable v0.1.0; l2-transformer-impl Stable v0.1.0.
+- **Next Action:** T-18A05 encoder.go — post-norm Backward + GradSlots + ApplyGradSGD + FD check
 
 ## Progress
 
@@ -33,7 +33,7 @@ Phase 12 (Done):    [5/5]     ████████ 100%   (Track A 3/3 done;
 Phase 13 (Done):    [2/2]     ████████ 100%   (L1 + L2 spec authoring; gate done)
 Phase 14 (Done):    [12/12]   ████████ 100%   (Tracks A+B+C+D + T01 + Z01; v0.12.0 RC)
 Phase 15 (Done):    [14/14]   ████████ 100%   (Tracks A+B+C + T01..T03 + Z01; v0.13.0 RC)
-Phase 16 (Done):    [14/14]   ████████ 100%  (Tracks A+B+C + T01..T03 + Z01; v0.14.0 RC)
+Phase 16 (Done):    [14/14]   ████████ 100%   (Tracks A+B+C + T01..T03 + Z01; v0.14.0 RC)
 Overall:            [234/234] ████████ 100%
 ```
 

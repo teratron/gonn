@@ -55,6 +55,9 @@ type LayerNorm[T utils.Float] struct {
 	beta      []T
 	gammaGrad []T
 	betaGrad  []T
+	// xHat and invSd are cached by Forward for use in Backward.
+	xHat  []T
+	invSd T
 	features  int
 	mode      atomic.Int32
 	affine    bool
@@ -95,6 +98,7 @@ func NewLayerNorm[T utils.Float](features int, opts ...LayerNormOption[T]) *Laye
 
 // Forward normalizes x per-sample (NORM-2: axis over x directly) and applies
 // the optional affine transform. Returns a slice of the same length as x (NORM-1).
+// Caches the normalized vector and inverse std-dev for use by Backward.
 //
 // AI-Meta:
 //   - Purpose: Compute per-sample mean/variance normalization across all features.
@@ -107,11 +111,16 @@ func (l *LayerNorm[T]) Forward(x []T) []T {
 	}
 	mean, variance := batchStats(x)
 	sd := stddev(variance, l.eps)
-	xHat := make([]T, len(x))
-	for i, v := range x {
-		xHat[i] = (v - mean) / sd
+	if cap(l.xHat) < len(x) {
+		l.xHat = make([]T, len(x))
+	} else {
+		l.xHat = l.xHat[:len(x)]
 	}
-	return applyAffine(xHat, l.gamma, l.beta)
+	for i, v := range x {
+		l.xHat[i] = (v - mean) / sd
+	}
+	l.invSd = 1 / sd
+	return applyAffine(l.xHat, l.gamma, l.beta)
 }
 
 // SetMode is accepted for Normalizer interface compatibility; LayerNorm's
@@ -138,6 +147,74 @@ func (l *LayerNorm[T]) GradSlots() (gamma, beta []T) {
 		return nil, nil
 	}
 	return l.gammaGrad, l.betaGrad
+}
+
+// Backward computes the input gradient ∂L/∂x given the upstream gradient ∂L/∂y,
+// accumulating ∂L/∂γ and ∂L/∂β into the GradSlots buffers.
+// Must be called after Forward on the same input (uses cached xHat and invSd).
+//
+// Gradient derivation (all indices over N = len(upstream)):
+//   dL/dxHat_i = upstream_i * γ_i     (or upstream_i when affine disabled)
+//   dL/dx_i    = invSd/N * (N·dL/dxHat_i − Σ dL/dxHat_j − xHat_i·Σ(dL/dxHat_j·xHat_j))
+//
+// AI-Meta:
+//   - Purpose: Backprop through LayerNorm; accumulates affine gradients, returns ∂L/∂x.
+//   - Concurrency: NotSafe; reads cached Forward state (xHat, invSd).
+//   - Related: [LayerNorm], [Forward], [GradSlots], [ApplyGradSGD].
+//   - Stability: Stable.
+func (l *LayerNorm[T]) Backward(upstream []T) []T {
+	n := len(upstream)
+	if n == 0 || len(l.xHat) == 0 {
+		return make([]T, n)
+	}
+
+	dxHat := make([]T, n)
+	var sumDxHat, sumDxHatXHat T
+	for i, u := range upstream {
+		g := u
+		if l.affine {
+			if l.gammaGrad != nil {
+				l.gammaGrad[i] += u * l.xHat[i]
+			}
+			if l.betaGrad != nil {
+				l.betaGrad[i] += u
+			}
+			g *= l.gamma[i]
+		}
+		dxHat[i] = g
+		sumDxHat += g
+		sumDxHatXHat += g * l.xHat[i]
+	}
+
+	dx := make([]T, n)
+	scale := l.invSd / T(n)
+	for i, d := range dxHat {
+		dx[i] = scale * (T(n)*d - sumDxHat - l.xHat[i]*sumDxHatXHat)
+	}
+	return dx
+}
+
+// ApplyGradSGD updates the affine parameters gamma and beta in-place using the
+// accumulated gradient buffers: w -= lr * grad. Zeros the gradient buffers after
+// the update, matching the conv-prefix inline-SGD convention (applyConvSGD).
+//
+// AI-Meta:
+//   - Purpose: Inline SGD update for LayerNorm affine params in the conv-prefix backward path.
+//   - Concurrency: NotSafe.
+//   - Related: [LayerNorm], [Backward], [GradSlots].
+//   - Stability: Stable.
+func (l *LayerNorm[T]) ApplyGradSGD(lr T) {
+	if !l.affine {
+		return
+	}
+	for i := range l.gamma {
+		l.gamma[i] -= lr * l.gammaGrad[i]
+		l.gammaGrad[i] = 0
+	}
+	for i := range l.beta {
+		l.beta[i] -= lr * l.betaGrad[i]
+		l.betaGrad[i] = 0
+	}
 }
 
 // InputSize returns the expected input feature count.

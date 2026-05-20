@@ -88,10 +88,10 @@ content is §3 Core Invariants + §4 Invariant Compliance. The plan below is gro
 
 #### Phase α — Prerequisites + EncoderBlock (post-norm baseline)
 
-- [ ] [T-18A01] `pkg/layer/norm/layernorm.go` — add `Backward(upstream []T) []T` (canonical LayerNorm backprop: accumulates ∂L/∂γ + ∂L/∂β into existing `GradSlots()` buffers, returns ∂L/∂x) + `ApplyGradSGD(lr T)` for the inline-SGD conv-prefix path; cache the per-call normalized input / mean / inv-std needed by Backward
-- [ ] [T-18A02] `pkg/layer/transformer/config.go` + `pkg/layer/transformer/doc.go` — `TransformerConfig[T]` struct (`SeqLen`, `Dmodel`, `NumHeads`, `Dff`, `PreNorm bool`, `DropoutRate T`, `Activation activation.Type`); `Mode` enum (`EncoderMode`/`DecoderMode`); package doc + AI-Meta block; `applyActivationInPlace[T](mode activation.Type, x []T)` slice-wise helper looping the scalar `activation.Activation[T]` dispatcher
-- [ ] [T-18A03] `pkg/layer/transformer/block.go` — `Block[T]` private interface (`layer.Layer[T]` + `attention.MaskedLayer[T]` + `children()`); `addInPlace[T](dst, src []T)` residual helper (TRANS-6 — no scale/clip/normalize); internal position-wise FFN primitive `ffn[T]` (two weight matrices `Dmodel→Dff` + `Dff→Dmodel` + biases, `utils.Xavier` init, `Forward`/`Backward` with grad buffers); child-construction helpers
-- [ ] [T-18A04] `pkg/layer/transformer/encoder.go` — `EncoderBlock[T]` struct + typed children (`Attn *attention.MultiHeadAttention[T]`, `Norm1`/`Norm2 *norm.LayerNorm[T]`, `FFN *ffn[T]`, `Drop1`/`Drop2 *regularizer.Dropout[T]`) + forward-cache buffer fields; `NewEncoderBlock` constructor (inner MHA `Causal:false`); post-norm `Forward` per TRANS-2; `Init(rng)` forks RNG per child
+- [x] [T-18A01] `pkg/layer/norm/layernorm.go` — add `Backward(upstream []T) []T` (canonical LayerNorm backprop: accumulates ∂L/∂γ + ∂L/∂β into existing `GradSlots()` buffers, returns ∂L/∂x) + `ApplyGradSGD(lr T)` for the inline-SGD conv-prefix path; cache the per-call normalized input / mean / inv-std needed by Backward
+- [x] [T-18A02] `pkg/layer/transformer/config.go` + `pkg/layer/transformer/doc.go` — `TransformerConfig[T]` struct (`SeqLen`, `Dmodel`, `NumHeads`, `Dff`, `PreNorm bool`, `DropoutRate T`, `Activation activation.Type`); `Mode` enum (`EncoderMode`/`DecoderMode`); package doc + AI-Meta block; `applyActivationInPlace[T](mode activation.Type, x []T)` slice-wise helper looping the scalar `activation.Activation[T]` dispatcher
+- [x] [T-18A03] `pkg/layer/transformer/block.go` — `Block[T]` private interface (`layer.Layer[T]` + `attention.MaskedLayer[T]` + `children()`); `addInPlace[T](dst, src []T)` residual helper (TRANS-6 — no scale/clip/normalize); internal position-wise FFN primitive `ffn[T]` (two weight matrices `Dmodel→Dff` + `Dff→Dmodel` + biases, `utils.Xavier` init, `Forward`/`Backward` with grad buffers); child-construction helpers
+- [x] [T-18A04] `pkg/layer/transformer/encoder.go` — `EncoderBlock[T]` struct + typed children (`Attn *attention.MultiHeadAttention[T]`, `Norm1`/`Norm2 *norm.LayerNorm[T]`, `FFN *ffn[T]`, `Drop1`/`Drop2 *regularizer.Dropout[T]`) + forward-cache buffer fields; `NewEncoderBlock` constructor (inner MHA `Causal:false`); post-norm `Forward` per TRANS-2; `Init(rng)` forks RNG per child
 - [ ] [T-18A05] `pkg/layer/transformer/encoder.go` — post-norm `Backward` per TRANS-8 (reverse cascade: Norm2 → FFN → Drop2 → residual split → Norm1 → Attn → Drop1 → residual split); `GradSlots()` aggregating child grad buffers; `ApplyGradSGD(lr T)` fanning the inline-SGD step to every child
 - [ ] [T-18A06] `pkg/layer/transformer/encoder.go` — `MarshalJSON`/`UnmarshalJSON` child-delegated envelope per TRANS-9 (`{Type, Config, Attn, Norm1, Norm2, FFN1, FFN2}` — each child pre-marshalled, no field-level remarshalling); `SetPaddingMask(m []bool)` forwarding to inner MHA per TRANS-10; compile-time assertions `var _ layer.Layer[T]` + `var _ attention.MaskedLayer[T]`
 
@@ -120,9 +120,10 @@ content is §3 Core Invariants + §4 Invariant Compliance. The plan below is gro
 ### [T-18A01] `pkg/layer/norm/layernorm.go` — LayerNorm Backward + ApplyGradSGD
 
 - **Spec:** `l2-transformer-impl.md` §4 TRANS-8 row + `l2-normalization-impl.md` (LayerNorm parent)
-- **Status:** Todo
+- **Status:** Done
 - **Assignment:** Agent
-- **Verify:** `go test -run TestLayerNorm_Backward -count=1 ./pkg/layer/norm/` PASS — finite-difference gradient check (max_abs_err < 1e-4 for `T=float64`) covers ∂L/∂x, ∂L/∂γ, ∂L/∂β; `go test ./pkg/layer/norm/` PASS (no regression on existing Forward tests); `pkg/layer/norm/` coverage ≥ 80%
+- **Verify:** `go test -run TestLayerNorm_Backward -count=1 ./pkg/layer/norm/` PASS — finite-difference gradient check (max_abs_err < 1e-4 for `T=float64`) covers ∂L/∂x, ∂L/∂γ, ∂L/∂β; `go test ./pkg/layer/norm/` PASS (no regression on existing Forward tests); `pkg/layer/norm/` coverage 83.8% ≥ 80%
+- **Changes:** Added `Backward(upstream []T) []T` + `ApplyGradSGD(lr T)` to `pkg/layer/norm/layernorm.go`; added `xHat []T` + `invSd T` cache fields to struct; modified `Forward` to cache these values; added `TestLayerNorm_Backward`, `TestLayerNorm_BackwardAffineDisabled`, `TestLayerNorm_ApplyGradSGD` to `norm_test.go`. All 7 LayerNorm tests PASS; coverage 83.8%.
 - **Handoff:** A04/A05 compose LayerNorm as Norm1/Norm2 children; A05 Backward routes through it.
 - **Notes:** **Prerequisite — not in L2 §6 plan.** `LayerNorm[T]` currently has `Forward` + `GradSlots()` but no `Backward`. Canonical LN backprop needs the per-call normalized input `x̂`, mean `μ`, and inverse std `1/σ` — cache them in `Forward` (or a small scratch struct). `Backward` accumulates `∂L/∂γ = Σ(upstream ⊙ x̂)` and `∂L/∂β = Σ upstream` into the `GradSlots()` buffers, returns `∂L/∂x`. `ApplyGradSGD(lr T)` does `γ -= lr·gγ; β -= lr·gβ` so blocks can drive LayerNorm via the inline-SGD `applyConvBackward` path. Additive change — no existing caller breaks.
 
@@ -147,11 +148,12 @@ content is §3 Core Invariants + §4 Invariant Compliance. The plan below is gro
 ### [T-18A04] `pkg/layer/transformer/encoder.go` — struct + NewEncoderBlock + post-norm Forward + Init
 
 - **Spec:** `l2-transformer-impl.md` §5.3 + §5.7 + TRANS-1 / TRANS-2
-- **Status:** Todo
+- **Status:** Done
 - **Assignment:** Agent
-- **Verify:** `go test -run TestEncoderBlock_Forward -count=1 ./pkg/layer/transformer/` PASS — shape `(SeqLen×Dmodel) → (SeqLen×Dmodel)` preserved per TRANS-1; post-norm chain attn→drop→add→norm₁→ffn→drop→add→norm₂ produces finite output (no NaN/Inf) on random init
-- **Handoff:** A05 adds Backward; A06 adds JSON + mask; A07 adds the pre-norm branch.
-- **Notes:** Typed children — `Attn`, `Norm1`, `Norm2`, `FFN`, `Drop1`, `Drop2` as named fields (TRANS §3 typed ownership — no `[]Layer[T]`). Forward-cache buffers (`bufAttn`, `bufZ`, `bufF`) reused across calls (PERF-4). `NewEncoderBlock` constructs the inner MHA via `attention.NewMultiHeadAttention(SeqLen, Dmodel, NumHeads)` (`Causal:false`), two `norm.NewLayerNorm(Dmodel)`, the `ffn[T]`, two `regularizer.NewDropout`. `Init(rng)` forks the RNG so each child sees a distinct stream.
+- **Verify:** `go test -run TestEncoderBlock -count=1 ./pkg/layer/transformer/` PASS — all 6 encoder forward tests PASS; shape `(SeqLen×Dmodel) → (SeqLen×Dmodel)` preserved per TRANS-1; full package 22/22 tests green
+- **Handoff:** A05 adds Backward FD check; A06 adds JSON + mask; A07 adds the pre-norm branch.
+- **Changes:** Created `pkg/layer/transformer/encoder.go` (EncoderBlock[T], NewEncoderBlock, forwardPostNorm with per-position LN loops, backwardPostNorm with per-position LN, Init, ApplyGradSGD, SetPaddingMask, compile-time assertions); created `pkg/layer/transformer/encoder_test.go` (6 tests); updated `block.go` (`newFFN` gains `seqLen` param, `ffn.Forward`/`Backward` iterate over all positions with shared weight gradients, `ffn.Init` pre-allocates per-position caches, lazy cache allocation in Forward for cloneFFN support); updated `block_test.go` (seqLen=1 in newTestFFN, seqLen field in cloneFFN)
+- **Notes:** Typed children — `Attn`, `Norm1`, `Norm2`, `FFN`, `Drop1`, `Drop2` as named fields (TRANS §3 typed ownership — no `[]Layer[T]`). Per-position LN is the key design: LayerNorm has features=Dmodel so it cannot receive the full SeqLen×Dmodel tensor; encoder loops over seqLen positions independently. FFN is sequence-aware (`seqLen` parameter) and processes all positions in one call with shared weight gradient accumulation across positions.
 
 ### [T-18A05] `pkg/layer/transformer/encoder.go` — post-norm Backward + GradSlots + ApplyGradSGD
 
