@@ -1,6 +1,6 @@
 # Workspace Specifications Registry
 
-**Version:** 2.17.0
+**Version:** 2.18.0
 **Status:** Active
 **Engine Version:** 2.1.27
 

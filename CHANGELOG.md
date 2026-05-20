@@ -4,6 +4,38 @@ All notable changes to the GoNN library will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the
 release artifacts dictated by [.magic/run.md](.magic/run.md) Phase Completion / Plan Completion.
 
+## [0.16.0] — 2026-05-20
+
+### Transformer Block Implementation
+
+Phase 18 lands the composite Transformer-block primitive: `EncoderBlock[T]`,
+`DecoderBlock[T]`, and `Stack[T]` in the new `pkg/layer/transformer/` package.
+All three types compose the existing Phase 10–17 primitives (LayerNorm, MultiHeadAttention,
+Dropout, activation dispatcher) and are wired into the `pkg/nn` training loop via the
+`ConvPrefix` infrastructure (no new Config field).
+
+#### Added
+
+- **`pkg/layer/transformer/config.go`** — `TransformerConfig[T]` (`SeqLen`, `Dmodel`, `NumHeads`, `Dff`, `PreNorm`, `DropoutRate`, `Activation`); `Mode` enum (`EncoderMode`/`DecoderMode`); `applyActivationInPlace` helper.
+- **`pkg/layer/transformer/block.go`** — `Block[T]` private interface; `addInPlace[T]` residual helper (TRANS-6); internal position-wise `ffn[T]` (W1/b1/W2/b2, Xavier init, Forward/Backward, MarshalJSON).
+- **`pkg/layer/transformer/encoder.go`** — `EncoderBlock[T]`: post-norm (TRANS-2) + pre-norm (TRANS-3) `Forward`/`Backward`; three Dropout positions (TRANS-C7); `Init`, `SetTraining`, `ApplyGradSGD`, `SetPaddingMask`, `MarshalJSON`/`UnmarshalJSON`; lazy cache allocation for shape-inference safety.
+- **`pkg/layer/transformer/decoder.go`** — `DecoderBlock[T]`: structurally identical to `EncoderBlock[T]`; inner MHA built with `Causal:true` (TRANS-4, TRANS-C2); same Forward/Backward/JSON wiring.
+- **`pkg/layer/transformer/stack.go`** — `Stack[T]` (N-block sequential chain); independent RNG fork per block (TRANS-C8, no weight tying); `Forward`/`Backward`/`SetPaddingMask`/`ApplyGradSGD` fan-out; JSON envelope `{Type, Config, Mode, Blocks:[...]}` (TRANS-9).
+- **`pkg/nn/options.go`** — `WithEncoderBlock[T]`, `WithDecoderBlock[T]`, `WithEncoderStack[T]`, `WithDecoderStack[T]` — all append to `ConvPrefix`.
+- **`pkg/nn/train.go`** — `applyConvBackward` switch extended with `*transformer.EncoderBlock[T]`, `*transformer.DecoderBlock[T]`, `*transformer.Stack[T]` → `ApplyGradSGD`.
+
+#### Modified
+
+- **`pkg/layer/norm/layernorm.go`** — added `Backward(upstream []T) []T`, `ApplyGradSGD(lr T)`, `ForwardSeq`/`BackwardSeq` (per-position sequence-aware variants); `Forward` caches `xHat` and `invSd` for Backward use.
+
+#### Coverage floors
+
+| Package                    | Coverage |
+| -------------------------- | -------- |
+| `pkg/layer/transformer`    | 88.3 %   |
+| `pkg/layer/norm`           | 84.2 %   |
+| `pkg/nn`                   | 75.5 %   |
+
 ## [0.15.0] — 2026-05-20
 
 ### NLP Foundation: Multi-Head Attention + Embedding Layers

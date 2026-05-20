@@ -11,6 +11,7 @@ import (
 	"github.com/teratron/gonn/pkg/layer/embedding"
 	"github.com/teratron/gonn/pkg/layer/norm"
 	"github.com/teratron/gonn/pkg/layer/recurrent"
+	"github.com/teratron/gonn/pkg/layer/transformer"
 	"github.com/teratron/gonn/pkg/loss"
 	"github.com/teratron/gonn/pkg/network"
 	"github.com/teratron/gonn/pkg/optimizer"
@@ -991,5 +992,74 @@ func WithTokenEmbedding[T utils.Float](vocabSize, seqLen, dmodel int) Option[T] 
 	return func(cfg *Config[T]) {
 		cfg.ConvPrefix = append(cfg.ConvPrefix,
 			embedding.NewTokenEmbedding[T](vocabSize, seqLen, dmodel))
+	}
+}
+
+// ============================================================================
+// Transformer block options (Phase 18 — l2-transformer-impl TRANS-1..TRANS-10)
+// ============================================================================
+
+// WithEncoderBlock appends a single [transformer.EncoderBlock] (bidirectional
+// self-attention + FFN + two residuals + two LayerNorms) to the prefix stack.
+// compile() Xavier-initialises the block's weight matrices via the shared RNG
+// (TRANS-C8; no weight tying across independently added blocks).
+//
+// AI-Meta:
+//   - Purpose: Add one Transformer encoder block to the preprocessing stack.
+//   - Usage: nn.New[float64](WithInput[float64](seqLen*dmodel), WithEncoderBlock[float64](cfg), WithOutput[float64](numClasses, activation.SOFTMAX)).
+//   - Concurrency: Safe.
+//   - Related: [WithDecoderBlock], [WithEncoderStack], [transformer.EncoderBlock].
+//   - Stability: Experimental.
+func WithEncoderBlock[T utils.Float](cfg transformer.TransformerConfig[T]) Option[T] {
+	return func(c *Config[T]) {
+		c.ConvPrefix = append(c.ConvPrefix, transformer.NewEncoderBlock(cfg))
+	}
+}
+
+// WithDecoderBlock appends a single [transformer.DecoderBlock] (causal
+// self-attention + FFN) to the prefix stack. compile() Xavier-initialises the
+// block's weight matrices (TRANS-C8).
+//
+// AI-Meta:
+//   - Purpose: Add one Transformer decoder block (Causal=true) to the preprocessing stack.
+//   - Usage: nn.New[float64](WithInput[float64](seqLen*dmodel), WithDecoderBlock[float64](cfg), WithOutput[float64](vocabSize, activation.SOFTMAX)).
+//   - Concurrency: Safe.
+//   - Related: [WithEncoderBlock], [WithDecoderStack], [transformer.DecoderBlock].
+//   - Stability: Experimental.
+func WithDecoderBlock[T utils.Float](cfg transformer.TransformerConfig[T]) Option[T] {
+	return func(c *Config[T]) {
+		c.ConvPrefix = append(c.ConvPrefix, transformer.NewDecoderBlock(cfg))
+	}
+}
+
+// WithEncoderStack appends an N-block [transformer.Stack] (EncoderMode) to
+// the prefix stack. compile() Xavier-initialises every block with an
+// independent RNG stream so weights are unique across layers (TRANS-C8).
+//
+// AI-Meta:
+//   - Purpose: Add an N-layer Transformer encoder stack to the preprocessing stack (TRANS-7, TRANS-C8).
+//   - Usage: nn.New[float64](WithInput[float64](seqLen*dmodel), WithEncoderStack[float64](cfg, 6), WithOutput[float64](numClasses, activation.SOFTMAX)).
+//   - Concurrency: Safe.
+//   - Related: [WithDecoderStack], [WithEncoderBlock], [transformer.Stack].
+//   - Stability: Experimental.
+func WithEncoderStack[T utils.Float](cfg transformer.TransformerConfig[T], numBlocks int) Option[T] {
+	return func(c *Config[T]) {
+		c.ConvPrefix = append(c.ConvPrefix, transformer.NewStack(cfg, transformer.EncoderMode, numBlocks))
+	}
+}
+
+// WithDecoderStack appends an N-block [transformer.Stack] (DecoderMode) to
+// the prefix stack. Each block has causal masking (TRANS-4). compile()
+// Xavier-initialises every block independently (TRANS-C8).
+//
+// AI-Meta:
+//   - Purpose: Add an N-layer Transformer decoder stack to the preprocessing stack (TRANS-7, TRANS-C8).
+//   - Usage: nn.New[float64](WithInput[float64](seqLen*dmodel), WithDecoderStack[float64](cfg, 6), WithOutput[float64](vocabSize, activation.SOFTMAX)).
+//   - Concurrency: Safe.
+//   - Related: [WithEncoderStack], [WithDecoderBlock], [transformer.Stack].
+//   - Stability: Experimental.
+func WithDecoderStack[T utils.Float](cfg transformer.TransformerConfig[T], numBlocks int) Option[T] {
+	return func(c *Config[T]) {
+		c.ConvPrefix = append(c.ConvPrefix, transformer.NewStack(cfg, transformer.DecoderMode, numBlocks))
 	}
 }

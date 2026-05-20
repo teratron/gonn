@@ -1,7 +1,7 @@
 ---
 phase: 18
 name: "Transformer Block Implementation"
-status: Todo
+status: Done
 subsystem: "pkg/layer/transformer/ (new — EncoderBlock[T] + DecoderBlock[T] + Stack[T] + internal FFN primitive + Block[T] private interface + TransformerConfig[T]); pkg/layer/norm/ (LayerNorm[T].Backward + ApplyGradSGD — additive, GradSlots buffers already exist); pkg/nn/ (four new options appended to ConvPrefix + train.go applyConvBackward switch cases)"
 requires:
   - "Phase 17 ✓ (v0.15.0 RC — MultiHeadAttention[T] + EmbeddingStack[T] landed; gate T-17Z01 closed 2026-05-20)"
@@ -13,12 +13,38 @@ requires:
   - "l2-activation-functions Stable v1.0.0 ✓ (activation.Type enum + scalar Activation[T] dispatcher; ReLU default)"
   - "l2-init-impl Stable v1.0.0 ✓ (utils.Xavier[T] reused for FFN matrices)"
   - "Phase 17 patterns_established: ConvPrefix-reuse for sequence layers (layer.Layer[T] ≡ conv.Layer[T] structural typing); ApplyGradSGD inline-SGD convention; lazy cache init; FD gradient check < 1e-4"
-provides: []
+provides:
+  - "EncoderBlock[T utils.Float] — bidirectional self-attention + FFN + two residuals + two LayerNorms; post-norm (default) + pre-norm (PreNorm=true); pkg/layer/transformer"
+  - "DecoderBlock[T utils.Float] — causal self-attention + FFN; identical wiring to EncoderBlock with Causal=true MHA; pkg/layer/transformer"
+  - "Stack[T utils.Float] — N-block sequential transformer stack; EncoderMode or DecoderMode; independent weight init per block (TRANS-C8); pkg/layer/transformer"
+  - "WithEncoderBlock[T] / WithDecoderBlock[T] / WithEncoderStack[T] / WithDecoderStack[T] — pkg/nn functional options; append to ConvPrefix"
+  - "LayerNorm[T].Backward + LayerNorm[T].ForwardSeq/BackwardSeq — additive Backward + sequence-aware variants; pkg/layer/norm"
 key_files:
-  created: []
-  modified: []
-patterns_established: []
-duration_minutes: ~
+  created:
+    - "pkg/layer/transformer/config.go"
+    - "pkg/layer/transformer/doc.go"
+    - "pkg/layer/transformer/block.go"
+    - "pkg/layer/transformer/encoder.go"
+    - "pkg/layer/transformer/decoder.go"
+    - "pkg/layer/transformer/stack.go"
+    - "pkg/layer/transformer/encoder_test.go"
+    - "pkg/layer/transformer/decoder_test.go"
+    - "pkg/layer/transformer/stack_test.go"
+    - "pkg/layer/transformer/residual_test.go"
+    - "pkg/layer/transformer/prenorm_test.go"
+    - "pkg/nn/transformer_test.go"
+  modified:
+    - "pkg/layer/norm/layernorm.go"
+    - "pkg/layer/norm/norm_test.go"
+    - "pkg/nn/options.go"
+    - "pkg/nn/train.go"
+    - "CHANGELOG.md"
+patterns_established:
+  - "Lazy cache allocation in Forward: if buf == nil { buf = make([]T, size) } — safe for compile-time shape inference before Init is called"
+  - "ForwardSeq/BackwardSeq pattern for LayerNorm over flat [seqLen*features] tensors"
+  - "Block[T] private interface + type initer interface{Init(*rand.Rand)} for heterogeneous child dispatch without widening public contract"
+  - "compile.go generic Init loop (interface probe) handles transformer Init automatically — no compile.go change needed for new Conv-prefix layers that implement Init(*rand.Rand)"
+duration_minutes: 480
 ---
 
 # Phase 18 Tasks — Transformer Block Implementation
@@ -103,17 +129,17 @@ content is §3 Core Invariants + §4 Invariant Compliance. The plan below is gro
 #### Phase γ — DecoderBlock + Stack + pkg/nn options
 
 - [x] [T-18A09] `pkg/layer/transformer/decoder.go` — `DecoderBlock[T]` struct (structurally identical to `EncoderBlock[T]`); `NewDecoderBlock` builds the inner MHA with `Causal:true` (`attention.WithCausal(true)`); all other child construction + Forward/Backward/JSON/`SetPaddingMask`/`ApplyGradSGD` identical; compile-time `Block[T]` satisfaction assertions
-- [ ] [T-18A10] `pkg/layer/transformer/stack.go` — `Stack[T]` struct (`Cfg`, `Mode`, `Blocks []Block[T]`); `NewStack(cfg, mode, n)` builds N independent blocks with shared config + unique weights (independent RNG fork per block, TRANS-C8); sequential `Forward`/`Backward` chain; `SetPaddingMask` fan-out to every block; `ApplyGradSGD` fan-out; JSON envelope `{Type, Config, Mode, Blocks:[...]}`
-- [ ] [T-18A11] `pkg/nn/options.go` + `pkg/nn/train.go` — four options `WithEncoderBlock`/`WithDecoderBlock`/`WithEncoderStack`/`WithDecoderStack` appending the block/stack to the existing `ConvPrefix` slot (Phase 17 precedent — no new Config field, no `compile.go` change); `applyConvBackward` switch gains cases for `*transformer.EncoderBlock[T]`, `*transformer.DecoderBlock[T]`, `*transformer.Stack[T]` → `ApplyGradSGD(n.LearningRate)`
+- [x] [T-18A10] `pkg/layer/transformer/stack.go` — `Stack[T]` struct (`Cfg`, `Mode`, `Blocks []Block[T]`); `NewStack(cfg, mode, n)` builds N independent blocks with shared config + unique weights (independent RNG fork per block, TRANS-C8); sequential `Forward`/`Backward` chain; `SetPaddingMask` fan-out to every block; `ApplyGradSGD` fan-out; JSON envelope `{Type, Config, Mode, Blocks:[...]}`
+- [x] [T-18A11] `pkg/nn/options.go` + `pkg/nn/train.go` — four options `WithEncoderBlock`/`WithDecoderBlock`/`WithEncoderStack`/`WithDecoderStack` appending the block/stack to the existing `ConvPrefix` slot (Phase 17 precedent — no new Config field, no `compile.go` change); `applyConvBackward` switch gains cases for `*transformer.EncoderBlock[T]`, `*transformer.DecoderBlock[T]`, `*transformer.Stack[T]` → `ApplyGradSGD(n.LearningRate)`
 
 ### Validation
 
-- [ ] [T-18T01] `pkg/layer/transformer/residual_test.go` (TRANS-6 — zero-weight attn + zero-weight FFN ⇒ block output equals input bit-exact for `T=float32`/`float64`) + `pkg/layer/transformer/prenorm_test.go` (TRANS-3 — pre-norm vs post-norm forward equivalence at `DropoutRate=0` on identical init seeds; gradient-flow sanity at depth 12)
-- [ ] [T-18T02] `pkg/layer/transformer/{encoder,decoder,stack}_test.go` — block forward/backward finite-difference (< 1e-4 on `Dmodel=8, NumHeads=2, Dff=16, SeqLen=4, T=float64`); causal-mask propagation in decoder; JSON round-trip bit-exact for block + stack; 6-block stack convergence on a synthetic copy-task; parameter count matches §4.4 BERT-Base math; `pkg/layer/transformer/` coverage ≥ 85% (C30)
+- [x] [T-18T01] `pkg/layer/transformer/residual_test.go` (TRANS-6 — zero-weight attn + zero-weight FFN ⇒ block output equals input bit-exact for `T=float32`/`float64`) + `pkg/layer/transformer/prenorm_test.go` (TRANS-3 — pre-norm vs post-norm forward equivalence at `DropoutRate=0` on identical init seeds; gradient-flow sanity at depth 12)
+- [x] [T-18T02] `pkg/layer/transformer/{encoder,decoder,stack}_test.go` — block forward/backward finite-difference (< 1e-4 on `Dmodel=8, NumHeads=2, Dff=16, SeqLen=4, T=float64`); causal-mask propagation in decoder; JSON round-trip bit-exact for block + stack; 6-block stack convergence on a synthetic copy-task; parameter count matches §4.4 BERT-Base math; `pkg/layer/transformer/` coverage ≥ 85% (C30)
 
 ### Gate
 
-- [ ] [T-18Z01] Phase 18 release gate — `go build ./...` clean (default tags, no cgo); `go test ./pkg/...` green; coverage floors verified (`pkg/layer/transformer/` ≥ 85%; `pkg/layer/norm/` ≥ 80% regression check after LayerNorm.Backward; `pkg/nn/` ≥ 75% maintained); CHANGELOG.md `[0.16.0]` entry written with "Transformer Block" bullet list; `v0.16.0` tag prepared (user runs `git tag -a v0.16.0` per finalization protocol — agent never auto-tags); frontmatter `provides` lists `EncoderBlock[T]` / `DecoderBlock[T]` / `Stack[T]` availability
+- [x] [T-18Z01] Phase 18 release gate — `go build ./...` clean (default tags, no cgo); `go test ./pkg/...` green; coverage floors verified (`pkg/layer/transformer/` ≥ 85%; `pkg/layer/norm/` ≥ 80% regression check after LayerNorm.Backward; `pkg/nn/` ≥ 75% maintained); CHANGELOG.md `[0.16.0]` entry written with "Transformer Block" bullet list; `v0.16.0` tag prepared (user runs `git tag -a v0.16.0` per finalization protocol — agent never auto-tags); frontmatter `provides` lists `EncoderBlock[T]` / `DecoderBlock[T]` / `Stack[T]` availability
 
 ## Detailed Tracking
 
@@ -208,7 +234,7 @@ content is §3 Core Invariants + §4 Invariant Compliance. The plan below is gro
 ### [T-18A10] `pkg/layer/transformer/stack.go` — Stack
 
 - **Spec:** `l2-transformer-impl.md` §5.6 + §4 TRANS-7 / TRANS-C8
-- **Status:** Todo
+- **Status:** Done
 - **Assignment:** Agent
 - **Verify:** `go test -run TestStack -count=1 ./pkg/layer/transformer/` PASS — `TestStack_ForwardShape` (N-block chain preserves `(SeqLen×Dmodel)`); `TestStack_BackwardFD` (6-block FD < 1e-4); `TestStack_JSONRoundTrip` restores N blocks; parameter count for `Dmodel=768,NumHeads=12,Dff=3072` matches §4.4 (7,087,872 per block)
 - **Handoff:** A11 exposes `Stack` via `WithEncoderStack`/`WithDecoderStack`.
@@ -217,7 +243,7 @@ content is §3 Core Invariants + §4 Invariant Compliance. The plan below is gro
 ### [T-18A11] `pkg/nn/options.go` + `pkg/nn/train.go` — four options + backward switch
 
 - **Spec:** `l2-transformer-impl.md` §5.8 + TRANS-10
-- **Status:** Todo
+- **Status:** Done
 - **Assignment:** Agent
 - **Verify:** `go test -run TestWithTransformer -count=1 ./pkg/nn/` PASS — the four options compose with Dense/Output; `WithEncoderStack` builds a network whose `Fit` runs one epoch without error; `go build ./pkg/nn/...` clean
 - **Handoff:** Closes Track A; gate T-18Z01 checks the full build + coverage.

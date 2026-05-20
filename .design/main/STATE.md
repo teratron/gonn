@@ -4,16 +4,17 @@
 <!-- Maximum 100 lines. Agent updates AFTER each completed action. -->
 
 **Workspace:** main
-**Project Version:** 0.14.0 RC ready (Phase 16 Done — pending `git tag -a v0.14.0`)
-**Updated:** 2026-05-20 16:44
-**Phase:** 18 — Transformer Block Implementation
-**Status:** Done
+**Project Version:** 0.15.0 RC ready (Phase 17 Done — pending `git tag -a v0.15.0`); 0.16.0 target (Phase 18 active 9/14); 0.17.0 target (Phase 19 scoped)
+**Updated:** 2026-05-20
+**Phase:** 18 — Transformer Block Implementation (In Progress 9/14); Phase 19 — Quantization L2 (Scoped)
+**Status:** In Progress
 
 ## Current Position
 
-- **Task:** T-18A09 DecoderBlock[T] decoder.go
-- **Spec:** l1-transformer-block Stable v0.1.0; l2-transformer-impl Stable v0.1.0.
-- **Next Action:** T-18A10 Stack[T] stack.go
+- **Task:** T-18A10 Stack[T] stack.go (next to execute)
+- **Spec:** l1-transformer-block Stable v0.1.0; l2-transformer-impl Stable v0.1.0
+- **Completed:** T-18A01..A09 Done (LayerNorm.Backward, config, FFN, EncoderBlock post-norm/backward/JSON, PreNorm, Dropout, DecoderBlock)
+- **Next Action:** T-18A10 → T-18A11 → T-18T01 → T-18T02 → T-18Z01 (Phase 18 close); then Phase 19
 
 ## Progress
 
@@ -39,6 +40,8 @@ Overall:            [234/234] ████████ 100%
 
 ## Recent Decisions
 
+- 2026-05-20 **Decision:** Phase 19 scoped via /magic-task. Single-track A realizing `l2-quantization-impl.md §5 α-β-γ` as new `pkg/quantization/` peer package. 14 atomic tasks (T-19A01..A11 + T19T01..T02 + T19Z01). Phase α (A01-A06) = weight-only Dense/Conv1D/Conv2D; Phase β (A07-A09) = CalibrationRunner + full-int8 int32 GEMM; Phase γ (A10-A11) = attention projections Wq/Wk/Wv/Wo. Both activation conditions met: Phase 18 T-18A01..A09 Done + l2-quantization-impl.md Stable v0.1.0 authored 2026-05-20. PLAN v2.19.0 → v2.20.0; TASKS v2.15.0 → v2.16.0. Target v0.17.0.
+- 2026-05-20 **Decision:** Phase 18 T-18A09 (DecoderBlock[T]) Done. `decoder.go` structurally identical to `encoder.go`; only delta is `NewDecoderBlock` builds inner MHA with `Causal:true`. 11 decoder tests PASS (including FD backward tol=1e-3, JSON round-trip bit-exact, causal flag preserved). pkg/layer/transformer/ 87.6% ≥ 85%. Remaining Phase 18: T-18A10 (Stack[T]), T-18A11 (pkg/nn options), T-18T01..T02, T-18Z01.
 - 2026-05-19 **Decision:** Phase 16 complete. Track A: GRU[T] 3-gate BPTT + LastStep[T] sequence collapser + ClipByGlobalNorm[T] + WithSimpleRNN/LSTM/GRU/LastStep/GradClipNorm options + setupRecurrentShapes compile pre-pass; pkg/layer/recurrent/ 96.0%. Track B: OpenCL Dense Backward kernels (dense_grad_w + dense_grad_x) + WithBackend graceful ErrBackendUnavailable→CPU fallback + GPU vs CPU perf bench; pkg/compute/gpu/ 90.0%. Track C: --resolve flag + Resolver (INDENT/LABEL/LAST auto-fix) + TestAIMetaCompliance rollout to 10 packages (activation/loss/neuron/layer/network/dataset/checkpoint/compute/persistence/nn) + ~180 ENUM/TIER annotation fixes; pkg/aimeta/ 86.6%, pkg/nn/ 77.2%. Gate T-16Z01: go build ./... clean; all coverage floors met; CHANGELOG.md v0.13.0+v0.14.0 written.
 - 2026-05-19 **Decision:** Phase 16 scoped via /magic-task. Three closeout tracks consuming 8 of 9 Phase-15 deferred items (CUDA mirror explicitly held to Phase 18+). Track A (4 tasks): GRU + LastStep + ClipByGlobalNorm + recurrent options/compile wiring. Track B (3 tasks): OpenCL Dense Backward kernel + WithBackend graceful CPU fallback + perf bench. Track C (3 tasks): --resolve flag + RESOLVE rule + TestAIMetaCompliance rollout phases 3+4+5 across pkg/activation/loss/neuron/layer/network/dataset/checkpoint/compute/persistence/nn. Total 14 atomic tasks (T-16A01..A04 + B01..B03 + C01..C03 + T01..T03 + Z01). Sequential within phase: A04 must commit before B02 (shared pkg/nn/options.go + compile.go). Pre-Planning Stabilization: 0 Drafts (no-op). PLAN v2.16.0 → v2.17.0; TASKS v2.12.0 → v2.13.0. Phase 17 (Attention implementation per l2-attention-impl.md §6 α-ε) now gated on Phase 16 T-16Z01 closeout.
 
@@ -72,6 +75,6 @@ Overall:            [234/234] ████████ 100%
 
 ## Session Continuity
 
-**Last Session Ended:** 2026-05-19 (Phase 16 scoped via /magic-task — 14 atomic tasks across Tracks A+B+C; v0.14.0 target)
+**Last Session Ended:** 2026-05-20 (Phase 19 scoped via /magic-task — 14 atomic tasks T-19A01..A11 + T01..T02 + Z01; PLAN v2.20.0; TASKS v2.16.0)
 **Handoff File:** none
-**Bootstrap Mode:** false (Phase 15 Done; Phase 16 Active; next = `/magic-run main` to execute Tracks A+B+C in parallel)
+**Bootstrap Mode:** false (Phase 18 In Progress 9/14; Phase 19 Scoped; next = `/magic-run T-18A10` to continue Phase 18 Track A)

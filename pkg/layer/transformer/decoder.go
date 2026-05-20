@@ -110,6 +110,15 @@ func (d *DecoderBlock[T]) SetTraining(training bool) {
 //   - Related: [DecoderBlock.Backward], [DecoderBlock.Init].
 //   - Stability: Experimental.
 func (d *DecoderBlock[T]) Forward(x []T) []T {
+	// Lazy-allocate cache buffers if Init has not been called yet.
+	if d.bufZ == nil {
+		size := d.Cfg.SeqLen * d.Cfg.Dmodel
+		d.bufAttn = make([]T, size)
+		d.bufZ = make([]T, size)
+		d.bufF = make([]T, size)
+		d.cacheX = make([]T, size)
+		d.cacheZ1 = make([]T, size)
+	}
 	if d.Cfg.PreNorm {
 		return d.forwardPreNorm(x)
 	}

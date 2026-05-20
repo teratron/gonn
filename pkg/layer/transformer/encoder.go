@@ -139,6 +139,16 @@ func (e *EncoderBlock[T]) SetTraining(training bool) {
 //   - Related: [EncoderBlock.Backward], [EncoderBlock.Init].
 //   - Stability: Experimental.
 func (e *EncoderBlock[T]) Forward(x []T) []T {
+	// Lazy-allocate cache buffers if Init has not been called yet (e.g. during
+	// compile-time shape inference via computeConvChainOutput).
+	if e.bufZ == nil {
+		size := e.Cfg.SeqLen * e.Cfg.Dmodel
+		e.bufAttn = make([]T, size)
+		e.bufZ = make([]T, size)
+		e.bufF = make([]T, size)
+		e.cacheX = make([]T, size)
+		e.cacheZ1 = make([]T, size)
+	}
 	if e.Cfg.PreNorm {
 		return e.forwardPreNorm(x)
 	}

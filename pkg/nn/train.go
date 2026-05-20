@@ -6,6 +6,7 @@ import (
 	"github.com/teratron/gonn/pkg/layer/attention"
 	"github.com/teratron/gonn/pkg/layer/conv"
 	"github.com/teratron/gonn/pkg/layer/embedding"
+	"github.com/teratron/gonn/pkg/layer/transformer"
 	"github.com/teratron/gonn/pkg/optimizer"
 	"github.com/teratron/gonn/pkg/regularizer"
 	"github.com/teratron/gonn/pkg/utils"
@@ -167,6 +168,12 @@ func (n *NN[T]) applyConvBackward(gradOut []T) {
 				gW, _ := l.Positional.GradSlots()
 				applyConvSGD(l.Positional.Table, gW, n.LearningRate)
 			}
+		case *transformer.EncoderBlock[T]:
+			l.ApplyGradSGD(n.LearningRate)
+		case *transformer.DecoderBlock[T]:
+			l.ApplyGradSGD(n.LearningRate)
+		case *transformer.Stack[T]:
+			l.ApplyGradSGD(n.LearningRate)
 		}
 		upstream = next
 	}
