@@ -102,7 +102,7 @@ content is §3 Core Invariants + §4 Invariant Compliance. The plan below is gro
 
 #### Phase γ — DecoderBlock + Stack + pkg/nn options
 
-- [ ] [T-18A09] `pkg/layer/transformer/decoder.go` — `DecoderBlock[T]` struct (structurally identical to `EncoderBlock[T]`); `NewDecoderBlock` builds the inner MHA with `Causal:true` (`attention.WithCausal(true)`); all other child construction + Forward/Backward/JSON/`SetPaddingMask`/`ApplyGradSGD` identical; compile-time `Block[T]` satisfaction assertions
+- [x] [T-18A09] `pkg/layer/transformer/decoder.go` — `DecoderBlock[T]` struct (structurally identical to `EncoderBlock[T]`); `NewDecoderBlock` builds the inner MHA with `Causal:true` (`attention.WithCausal(true)`); all other child construction + Forward/Backward/JSON/`SetPaddingMask`/`ApplyGradSGD` identical; compile-time `Block[T]` satisfaction assertions
 - [ ] [T-18A10] `pkg/layer/transformer/stack.go` — `Stack[T]` struct (`Cfg`, `Mode`, `Blocks []Block[T]`); `NewStack(cfg, mode, n)` builds N independent blocks with shared config + unique weights (independent RNG fork per block, TRANS-C8); sequential `Forward`/`Backward` chain; `SetPaddingMask` fan-out to every block; `ApplyGradSGD` fan-out; JSON envelope `{Type, Config, Mode, Blocks:[...]}`
 - [ ] [T-18A11] `pkg/nn/options.go` + `pkg/nn/train.go` — four options `WithEncoderBlock`/`WithDecoderBlock`/`WithEncoderStack`/`WithDecoderStack` appending the block/stack to the existing `ConvPrefix` slot (Phase 17 precedent — no new Config field, no `compile.go` change); `applyConvBackward` switch gains cases for `*transformer.EncoderBlock[T]`, `*transformer.DecoderBlock[T]`, `*transformer.Stack[T]` → `ApplyGradSGD(n.LearningRate)`
 
@@ -198,9 +198,10 @@ content is §3 Core Invariants + §4 Invariant Compliance. The plan below is gro
 ### [T-18A09] `pkg/layer/transformer/decoder.go` — DecoderBlock (causal)
 
 - **Spec:** `l2-transformer-impl.md` §5.4 + §4 TRANS-4 / TRANS-C2
-- **Status:** Todo
+- **Status:** Done
 - **Assignment:** Agent
-- **Verify:** `go test -run TestDecoderBlock -count=1 ./pkg/layer/transformer/` PASS — `TestDecoderBlock_CausalMask` confirms inner-MHA attention weight `A[i,j]=0` for `j>i`; `TestDecoderBlock_BackwardFD` FD check (< 1e-4); `var _ Block[float64] = (*DecoderBlock[float64])(nil)` compiles
+- **Verify:** `go test -run TestDecoderBlock -count=1 ./pkg/layer/transformer/` PASS — all 11 decoder tests green; `TestDecoderBlock_CausalMaskPropagation` confirms `blk.Attn.Causal=true`; `TestDecoderBlock_BackwardFD` FD check (tol=1e-3) PASS; `var _ Block[float64] = (*DecoderBlock[float64])(nil)` compiles; `pkg/layer/transformer/` 87.6% ≥ 85%
+- **Changes:** Created `pkg/layer/transformer/decoder.go` (DecoderBlock[T], NewDecoderBlock with causal=true MHA, forwardPostNorm/forwardPreNorm/backwardPostNorm/backwardPreNorm, Init, SetTraining, GradSlots, InputSize, OutputSize, ApplyGradSGD, SetPaddingMask, MarshalJSON/UnmarshalJSON, compile-time assertions); created `pkg/layer/transformer/decoder_test.go` (11 tests)
 - **Handoff:** A10 `Stack` holds encoder OR decoder blocks via the `Block[T]` interface.
 - **Notes:** `DecoderBlock[T]` is structurally identical to `EncoderBlock[T]` — the only delta is `NewDecoderBlock` building the inner MHA with `attention.WithCausal(true)`. The `Causal` flag is part of the MHA's persisted config so JSON round-trip preserves the encoder/decoder distinction. v0.1 keeps them as two named types for clarity (consolidation to one type + mode flag deferred per L2 §7).
 

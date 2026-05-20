@@ -5,15 +5,15 @@
 
 **Workspace:** main
 **Project Version:** 0.14.0 RC ready (Phase 16 Done — pending `git tag -a v0.14.0`)
-**Updated:** 2026-05-20 05:58
+**Updated:** 2026-05-20 16:44
 **Phase:** 18 — Transformer Block Implementation
 **Status:** Done
 
 ## Current Position
 
-- **Task:** T-18A04 encoder.go — EncoderBlock struct + post-norm Forward + Init (Done)
+- **Task:** T-18A09 DecoderBlock[T] decoder.go
 - **Spec:** l1-transformer-block Stable v0.1.0; l2-transformer-impl Stable v0.1.0.
-- **Next Action:** T-18A05 encoder.go — post-norm Backward + GradSlots + ApplyGradSGD + FD check
+- **Next Action:** T-18A10 Stack[T] stack.go
 
 ## Progress
 
