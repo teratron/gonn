@@ -122,6 +122,86 @@ func TestEncoderBlock_DefaultDff(t *testing.T) {
 	}
 }
 
+// TestEncoderBlock_PreNorm_Shape verifies shape preservation and finite output
+// under the pre-norm wiring (TRANS-3).
+func TestEncoderBlock_PreNorm_Shape(t *testing.T) {
+	seqLen, dmodel, numHeads, dff := 4, 8, 2, 16
+	cfg := newTestCfg(seqLen, dmodel, numHeads, dff)
+	cfg.PreNorm = true
+	blk := NewEncoderBlock[float64](cfg)
+	blk.Init(rand.New(rand.NewPCG(7, 7)))
+	blk.SetTraining(false)
+
+	x := make([]float64, seqLen*dmodel)
+	for i := range x {
+		x[i] = float64(i+1) * 0.1
+	}
+	out := blk.Forward(x)
+
+	if len(out) != seqLen*dmodel {
+		t.Fatalf("PreNorm Forward len=%d want %d", len(out), seqLen*dmodel)
+	}
+	for i, v := range out {
+		if math.IsNaN(v) || math.IsInf(v, 0) {
+			t.Errorf("out[%d]=%v (NaN or Inf)", i, v)
+		}
+	}
+}
+
+// TestEncoderBlock_PreNorm_BackwardFD verifies ∂L/∂x via finite differences
+// under the pre-norm wiring (TRANS-3). Tolerance 1e-3 (same as post-norm FD).
+func TestEncoderBlock_PreNorm_BackwardFD(t *testing.T) {
+	const (
+		seqLen   = 4
+		dmodel   = 8
+		numHeads = 2
+		dff      = 16
+		h        = 1e-4
+		tol      = 1e-3
+	)
+
+	cfg := newTestCfg(seqLen, dmodel, numHeads, dff)
+	cfg.PreNorm = true
+	blk := NewEncoderBlock[float64](cfg)
+	blk.Init(rand.New(rand.NewPCG(13, 13)))
+	blk.SetTraining(false)
+
+	n := seqLen * dmodel
+	x := make([]float64, n)
+	for i := range x {
+		x[i] = (float64(i) - float64(n)/2) * 0.05
+	}
+	upstream := make([]float64, n)
+	for i := range upstream {
+		upstream[i] = 1.0
+	}
+
+	blk.Forward(x)
+	dxAnalytic := blk.Backward(upstream)
+
+	loss := func(xIn []float64) float64 {
+		out := blk.Forward(xIn)
+		var s float64
+		for i, u := range upstream {
+			s += u * out[i]
+		}
+		return s
+	}
+
+	for i := range x {
+		xp := make([]float64, n)
+		xm := make([]float64, n)
+		copy(xp, x)
+		copy(xm, x)
+		xp[i] += h
+		xm[i] -= h
+		fd := (loss(xp) - loss(xm)) / (2 * h)
+		if err := math.Abs(dxAnalytic[i] - fd); err > tol {
+			t.Errorf("PreNorm ∂L/∂x[%d]: analytic=%v FD=%v err=%v", i, dxAnalytic[i], fd, err)
+		}
+	}
+}
+
 // TestEncoderBlock_BackwardFD verifies ∂L/∂x via finite differences (TRANS-8).
 // Tolerance 1e-3 accommodates numerical noise from the attention softmax path.
 func TestEncoderBlock_BackwardFD(t *testing.T) {

@@ -16,7 +16,7 @@ import (
 // EncoderBlock implements a single Transformer encoder layer:
 //
 //	Post-norm:  y = LN₂(Z + FFN(LN₁(X + Attn(X))))
-//	Pre-norm:   y = X + Attn(LN₁(X)); Z = X + FFN(LN₂(Z))  (TRANS-3)
+//	Pre-norm:   Y = X + Attn(LN₁(X)); Z = Y + FFN(LN₂(Y))  (TRANS-3)
 //
 // Dropout is applied at the three TRANS-C7 positions when training=true.
 // Children are owned as named typed fields (TRANS §3 typed ownership) to
@@ -51,6 +51,11 @@ type EncoderBlock[T utils.Float] struct {
 // Applies default substitutions: Activation → ReLU when zero (TRANS-C4),
 // Dff → 4·Dmodel when zero (TRANS-C5).
 // Call Init(rng) before use to Xavier-initialize all weight matrices.
+//
+// PreNorm note: pre-norm wiring (cfg.PreNorm=true) is recommended for stacks of
+// 6+ layers because the gradient flows through the residual connections without
+// passing through LayerNorm, which keeps the effective learning rate stable at
+// depth. Post-norm is the default (BERT-style) and works well for shallower stacks.
 //
 // AI-Meta:
 //   - Purpose: Allocate an EncoderBlock with default-filled config; weights zeroed until Init.
@@ -166,12 +171,34 @@ func (e *EncoderBlock[T]) forwardPostNorm(x []T) []T {
 	return out
 }
 
-// forwardPreNorm: LN before sub-layer (recommended for deep stacks, TRANS-3).
-// Implemented in T-18A07; placeholder routes to post-norm until then.
+// forwardPreNorm: LN before each sub-layer (TRANS-3).
+//
+//	Y = X + Drop1(Attn(LN₁(X)))
+//	Z = Y + Drop2(FFN(LN₂(Y)))
+//
+// ForwardSeq caches per-position xHat in Norm1/Norm2 xHatBuf for BackwardSeq.
 func (e *EncoderBlock[T]) forwardPreNorm(x []T) []T {
-	// T-18A07 fills this in. For now identical to post-norm to keep the encoder
-	// buildable; the pre-norm branch is gated by T-18A07 tests.
-	return e.forwardPostNorm(x)
+	seqLen := e.Cfg.SeqLen
+
+	// sub-layer 1: attention on LN1-normalized input, then residual
+	ln1Out := e.Norm1.ForwardSeq(x, seqLen)
+	attnOut := e.Attn.Forward(ln1Out)
+	attnOut = e.Drop1.ApplyMask(attnOut, e.training)
+	copy(e.bufZ, x)
+	addInPlace(e.bufZ, attnOut) // y = x + Drop1(Attn(LN1(x)))
+	copy(e.cacheZ1, e.bufZ)    // cache y so LN2 sees it in ForwardSeq
+
+	// sub-layer 2: FFN on LN2-normalized residual, then residual
+	ln2Out := e.Norm2.ForwardSeq(e.cacheZ1, seqLen)
+	ffnOut := e.FFN.Forward(ln2Out)
+	ffnOut = e.Drop2.ApplyMask(ffnOut, e.training)
+	copy(e.bufF, e.cacheZ1)
+	addInPlace(e.bufF, ffnOut) // z = y + Drop2(FFN(LN2(y)))
+
+	copy(e.cacheX, x)
+	out := make([]T, len(e.bufF))
+	copy(out, e.bufF)
+	return out
 }
 
 // Backward computes ∂L/∂x given the upstream gradient and accumulates
@@ -236,9 +263,50 @@ func (e *EncoderBlock[T]) backwardPostNorm(upstream []T) []T {
 	return dx
 }
 
-// backwardPreNorm reverses the pre-norm forward chain (filled in T-18A07).
+// backwardPreNorm reverses the pre-norm forward chain (TRANS-3 + TRANS-8).
+//
+//	upstream → residual₂ split → FFN → LN₂ ┐
+//	                                         ├→ combine → residual₁ split → Attn → LN₁ ┐
+//	                  residual₂ direct ──────┘                                           ├→ dx
+//	                                                        residual₁ direct ────────────┘
 func (e *EncoderBlock[T]) backwardPreNorm(upstream []T) []T {
-	return e.backwardPostNorm(upstream)
+	seqLen := e.Cfg.SeqLen
+
+	// reverse second residual: z = y + Drop2(FFN(LN2(y)))
+	dFFNOut := make([]T, len(upstream))
+	copy(dFFNOut, upstream)
+	dYfromRes2 := upstream // identity path through residual
+
+	// reverse Drop2 (mask-backward wired in T-18A08; pass-through for now)
+	// reverse FFN
+	dLN2Out := e.FFN.Backward(dFFNOut)
+
+	// reverse LN2 — BackwardSeq uses per-position xHat from ForwardSeq(y)
+	dYfromLN2 := e.Norm2.BackwardSeq(dLN2Out, seqLen)
+
+	// combine y gradients
+	dY := make([]T, len(dYfromRes2))
+	copy(dY, dYfromRes2)
+	addInPlace(dY, dYfromLN2)
+
+	// reverse first residual: y = x + Drop1(Attn(LN1(x)))
+	dAttnOut := make([]T, len(dY))
+	copy(dAttnOut, dY)
+	dXfromRes1 := dY // identity path through residual
+
+	// reverse Drop1 (mask-backward wired in T-18A08; pass-through for now)
+	// reverse Attn
+	dLN1Out := e.Attn.Backward(dAttnOut)
+
+	// reverse LN1 — BackwardSeq uses per-position xHat from ForwardSeq(x)
+	dXfromLN1 := e.Norm1.BackwardSeq(dLN1Out, seqLen)
+
+	// combine input gradients
+	dx := make([]T, len(dXfromRes1))
+	copy(dx, dXfromRes1)
+	addInPlace(dx, dXfromLN1)
+
+	return dx
 }
 
 // GradSlots satisfies layer.Layer[T]. Returns (nil, nil) — the EncoderBlock
