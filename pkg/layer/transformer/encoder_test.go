@@ -10,10 +10,10 @@ import (
 
 func newTestCfg(seqLen, dmodel, numHeads, dff int) TransformerConfig[float64] {
 	return TransformerConfig[float64]{
-		SeqLen:   seqLen,
-		Dmodel:   dmodel,
-		NumHeads: numHeads,
-		Dff:      dff,
+		SeqLen:     seqLen,
+		Dmodel:     dmodel,
+		NumHeads:   numHeads,
+		Dff:        dff,
 		Activation: activation.ReLU,
 	}
 }

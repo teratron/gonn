@@ -56,11 +56,11 @@ type LayerNorm[T utils.Float] struct {
 	gammaGrad []T
 	betaGrad  []T
 	// xHat and invSd are cached by Forward for use in Backward.
-	xHat  []T
-	invSd T
-	features  int
-	mode      atomic.Int32
-	affine    bool
+	xHat     []T
+	invSd    T
+	features int
+	mode     atomic.Int32
+	affine   bool
 }
 
 // NewLayerNorm constructs a LayerNorm for the given feature count.

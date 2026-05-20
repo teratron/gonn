@@ -149,7 +149,7 @@ func (e *EncoderBlock[T]) forwardPostNorm(x []T) []T {
 	copy(e.bufZ, x)
 	addInPlace(e.bufZ, attnOut)
 	// LN1 applied per position; result stored in cacheZ1 (= FFN input).
-	for p := 0; p < seqLen; p++ {
+	for p := range seqLen {
 		base := p * dmodel
 		pos := e.Norm1.Forward(e.bufZ[base : base+dmodel])
 		copy(e.cacheZ1[base:base+dmodel], pos)
@@ -163,7 +163,7 @@ func (e *EncoderBlock[T]) forwardPostNorm(x []T) []T {
 	addInPlace(e.bufF, ffnOut)
 	// LN2 applied per position.
 	out := make([]T, seqLen*dmodel)
-	for p := 0; p < seqLen; p++ {
+	for p := range seqLen {
 		base := p * dmodel
 		pos := e.Norm2.Forward(e.bufF[base : base+dmodel])
 		copy(out[base:base+dmodel], pos)
@@ -209,7 +209,7 @@ func (e *EncoderBlock[T]) backwardPostNorm(upstream []T) []T {
 
 	// reverse LN2 per position
 	dBufF := make([]T, seqLen*dmodel)
-	for p := 0; p < seqLen; p++ {
+	for p := range seqLen {
 		base := p * dmodel
 		pos := e.Norm2.Backward(upstream[base : base+dmodel])
 		copy(dBufF[base:base+dmodel], pos)
@@ -231,7 +231,7 @@ func (e *EncoderBlock[T]) backwardPostNorm(upstream []T) []T {
 
 	// reverse LN1 per position
 	dBufZ := make([]T, seqLen*dmodel)
-	for p := 0; p < seqLen; p++ {
+	for p := range seqLen {
 		base := p * dmodel
 		pos := e.Norm1.Backward(dZ1[base : base+dmodel])
 		copy(dBufZ[base:base+dmodel], pos)
@@ -296,10 +296,10 @@ func (e *EncoderBlock[T]) SetPaddingMask(mask []bool) {
 
 // Compile-time interface assertions.
 var (
-	_ layer.Layer[float32]            = (*EncoderBlock[float32])(nil)
-	_ layer.Layer[float64]            = (*EncoderBlock[float64])(nil)
-	_ attention.MaskedLayer[float32]  = (*EncoderBlock[float32])(nil)
-	_ attention.MaskedLayer[float64]  = (*EncoderBlock[float64])(nil)
-	_ Block[float32]                  = (*EncoderBlock[float32])(nil)
-	_ Block[float64]                  = (*EncoderBlock[float64])(nil)
+	_ layer.Layer[float32]           = (*EncoderBlock[float32])(nil)
+	_ layer.Layer[float64]           = (*EncoderBlock[float64])(nil)
+	_ attention.MaskedLayer[float32] = (*EncoderBlock[float32])(nil)
+	_ attention.MaskedLayer[float64] = (*EncoderBlock[float64])(nil)
+	_ Block[float32]                 = (*EncoderBlock[float32])(nil)
+	_ Block[float64]                 = (*EncoderBlock[float64])(nil)
 )

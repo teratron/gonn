@@ -24,10 +24,10 @@ type sparseGrad[T utils.Float] struct {
 func newSparseGrad[T utils.Float](rows, dmodel int) sparseGrad[T] {
 	words := (rows + 63) / 64
 	return sparseGrad[T]{
-		Buf:    make([]T, rows*dmodel),
+		Buf:     make([]T, rows*dmodel),
 		Touched: make([]uint64, words),
-		Rows:   rows,
-		Dmodel: dmodel,
+		Rows:    rows,
+		Dmodel:  dmodel,
 	}
 }
 

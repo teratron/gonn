@@ -21,7 +21,7 @@ import (
 //   - Related: [TokenEmbedding], [PositionalEncoding], [layer.IDLayer].
 //   - Stability: Stable.
 type EmbeddingStack[T utils.Float] struct {
-	Token      *TokenEmbedding[T]    `json:"token"`
+	Token      *TokenEmbedding[T]     `json:"token"`
 	Positional *PositionalEncoding[T] `json:"positional"`
 }
 
@@ -87,7 +87,7 @@ func (es *EmbeddingStack[T]) Backward(upstream []T) []T {
 // embeddingStackJSON is the on-wire representation.
 type embeddingStackJSON[T utils.Float] struct {
 	Type       string                 `json:"type"`
-	Token      *TokenEmbedding[T]    `json:"token"`
+	Token      *TokenEmbedding[T]     `json:"token"`
 	Positional *PositionalEncoding[T] `json:"positional"`
 }
 

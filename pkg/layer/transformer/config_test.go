@@ -9,10 +9,10 @@ import (
 
 func TestApplyActivationInPlace(t *testing.T) {
 	cases := []struct {
-		name   string
-		mode   activation.Type
-		input  []float64
-		check  func(in, out float64) bool
+		name  string
+		mode  activation.Type
+		input []float64
+		check func(in, out float64) bool
 	}{
 		{
 			name:  "ReLU zero clamp",

@@ -2,6 +2,7 @@ package nn
 
 import (
 	"log/slog"
+	"slices"
 
 	"github.com/teratron/gonn/pkg/activation"
 	"github.com/teratron/gonn/pkg/compute"
@@ -945,8 +946,8 @@ func WithMultiHeadAttention[T utils.Float](seqLen, dmodel, numHeads int) Option[
 //   - Stability: Stable.
 func WithCausalAttention[T utils.Float]() Option[T] {
 	return func(cfg *Config[T]) {
-		for i := len(cfg.ConvPrefix) - 1; i >= 0; i-- {
-			if mha, ok := cfg.ConvPrefix[i].(*attention.MultiHeadAttention[T]); ok {
+		for _, v := range slices.Backward(cfg.ConvPrefix) {
+			if mha, ok := v.(*attention.MultiHeadAttention[T]); ok {
 				mha.Causal = true
 				return
 			}
