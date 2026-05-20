@@ -22,8 +22,9 @@ import (
 //   - Related: [Regularizer], [Compose], [NewL2].
 //   - Stability: Stable.
 type Dropout[T utils.Float] struct {
-	rng *rand.Rand
-	p   float64
+	rng  *rand.Rand
+	p    float64
+	mask []bool // retain mask from the last training-mode ApplyMask call
 }
 
 // compile-time interface verification (C26).
@@ -60,17 +61,44 @@ func (d *Dropout[T]) Penalty(_ []T) T { return 0 }
 // ApplyMask applies the inverted Bernoulli mask when training=true.
 // Each element is zeroed with probability (1-p); retained elements are
 // scaled by 1/p (REG-5). Returns acts unchanged when training=false (REG-3).
+// Stores the retain mask for use by BackwardMask on the same pass.
 func (d *Dropout[T]) ApplyMask(acts []T, training bool) []T {
 	if !training {
+		d.mask = d.mask[:0]
 		return acts
+	}
+	if cap(d.mask) < len(acts) {
+		d.mask = make([]bool, len(acts))
+	} else {
+		d.mask = d.mask[:len(acts)]
 	}
 	scale := T(1.0 / d.p)
 	for i, a := range acts {
 		if d.rng.Float64() < d.p {
 			acts[i] = a * scale
+			d.mask[i] = true
 		} else {
 			acts[i] = 0
+			d.mask[i] = false
 		}
 	}
 	return acts
+}
+
+// BackwardMask applies the retain mask from the last ApplyMask call to upstream,
+// returning ∂L/∂acts before the dropout gate. Dropped positions get zero gradient;
+// retained positions are scaled by 1/p to match the forward scaling.
+// Returns upstream unchanged when training was false (empty mask).
+func (d *Dropout[T]) BackwardMask(upstream []T) []T {
+	if len(d.mask) == 0 {
+		return upstream
+	}
+	scale := T(1.0 / d.p)
+	out := make([]T, len(upstream))
+	for i, u := range upstream {
+		if i < len(d.mask) && d.mask[i] {
+			out[i] = u * scale
+		}
+	}
+	return out
 }

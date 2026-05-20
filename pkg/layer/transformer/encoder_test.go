@@ -122,6 +122,63 @@ func TestEncoderBlock_DefaultDff(t *testing.T) {
 	}
 }
 
+// TestEncoderBlock_DropoutZeroEquivalence verifies that DropoutRate=0 produces
+// bit-identical output regardless of the training flag (TRANS-C7).
+func TestEncoderBlock_DropoutZeroEquivalence(t *testing.T) {
+	blk := newTestEncoder(4, 8, 2, 16) // default DropoutRate=0
+
+	x := make([]float64, 4*8)
+	for i := range x {
+		x[i] = float64(i+1) * 0.1
+	}
+
+	blk.SetTraining(false)
+	outInference := make([]float64, len(x))
+	copy(outInference, blk.Forward(x))
+
+	blk.SetTraining(true)
+	outTraining := blk.Forward(x)
+
+	for i := range outInference {
+		if outInference[i] != outTraining[i] {
+			t.Errorf("DropoutRate=0: training vs inference differ at [%d]: got %v want %v",
+				i, outTraining[i], outInference[i])
+		}
+	}
+}
+
+// TestEncoderBlock_DropoutTrainingDiffers verifies that DropoutRate>0 with
+// training=true produces different output than inference mode (TRANS-C7).
+func TestEncoderBlock_DropoutTrainingDiffers(t *testing.T) {
+	cfg := newTestCfg(4, 8, 2, 16)
+	cfg.DropoutRate = 0.5
+	blk := NewEncoderBlock[float64](cfg)
+	blk.Init(rand.New(rand.NewPCG(7, 7)))
+
+	x := make([]float64, 4*8)
+	for i := range x {
+		x[i] = float64(i+1) * 0.1
+	}
+
+	blk.SetTraining(false)
+	outInference := make([]float64, len(x))
+	copy(outInference, blk.Forward(x))
+
+	blk.SetTraining(true)
+	outTraining := blk.Forward(x)
+
+	diff := false
+	for i := range outInference {
+		if outInference[i] != outTraining[i] {
+			diff = true
+			break
+		}
+	}
+	if !diff {
+		t.Error("DropoutRate=0.5: training output should differ from inference, got identical")
+	}
+}
+
 // TestEncoderBlock_PreNorm_Shape verifies shape preservation and finite output
 // under the pre-norm wiring (TRANS-3).
 func TestEncoderBlock_PreNorm_Shape(t *testing.T) {

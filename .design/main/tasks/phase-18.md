@@ -98,7 +98,7 @@ content is §3 Core Invariants + §4 Invariant Compliance. The plan below is gro
 #### Phase β — Pre-norm + Dropout
 
 - [x] [T-18A07] `pkg/layer/transformer/encoder.go` — `PreNorm` branch added to `Forward` and `Backward` per TRANS-3 (residual bypasses both LayerNorms); single method with a top-level `if e.Cfg.PreNorm` so buffer-reuse logic stays centralized (per the L2 spec downstream-agent instruction)
-- [ ] [T-18A08] `pkg/layer/transformer/encoder.go` — wire the three TRANS-C7 Dropout positions: `Drop1` post-attention, `Drop2` post-FFN (via `regularizer.Dropout[T].ApplyMask`), attention-weight dropout gated through `Cfg.DropoutRate` on the inner MHA constructor; Backward routes the dropout mask scaling
+- [x] [T-18A08] `pkg/layer/transformer/encoder.go` — wire the three TRANS-C7 Dropout positions: `Drop1` post-attention, `Drop2` post-FFN (via `regularizer.Dropout[T].ApplyMask`), attention-weight dropout gated through `Cfg.DropoutRate` on the inner MHA constructor; Backward routes the dropout mask scaling
 
 #### Phase γ — DecoderBlock + Stack + pkg/nn options
 
@@ -188,9 +188,10 @@ content is §3 Core Invariants + §4 Invariant Compliance. The plan below is gro
 ### [T-18A08] `pkg/layer/transformer/encoder.go` — three Dropout positions (TRANS-C7)
 
 - **Spec:** `l2-transformer-impl.md` §5.3 (Drop1/Drop2 fields) + §4 TRANS-C7
-- **Status:** Todo
+- **Status:** Done
 - **Assignment:** Agent
-- **Verify:** `go test -run TestEncoderBlock_Dropout -count=1 ./pkg/layer/transformer/` PASS — `TestEncoderBlock_DropoutZeroEquivalence` confirms Forward output is bit-identical with `DropoutRate=0` vs the no-dropout path; with `DropoutRate>0` the post-attention and post-FFN activations differ from the deterministic path
+- **Verify:** `go test -run TestEncoderBlock_Dropout -count=1 ./pkg/layer/transformer/` PASS — `TestEncoderBlock_DropoutZeroEquivalence` + `TestEncoderBlock_DropoutTrainingDiffers` PASS; `TestDropoutBackwardMask` + `TestDropoutBackwardMaskInference` PASS; `pkg/regularizer/` coverage 83.1% ≥ 80%; `pkg/layer/transformer/` coverage 93.5% ≥ 85%
+- **Changes:** Added `mask []bool` field + updated `ApplyMask` (stores retain mask when training=true, clears when false) + added `BackwardMask` to `pkg/regularizer/dropout.go`; wired `Drop2.BackwardMask`/`Drop1.BackwardMask` into `backwardPostNorm` and `backwardPreNorm` in `encoder.go`; added `TestEncoderBlock_DropoutZeroEquivalence` + `TestEncoderBlock_DropoutTrainingDiffers` to `encoder_test.go`; added `TestDropoutBackwardMask` + `TestDropoutBackwardMaskInference` to `regularizer_test.go`
 - **Handoff:** Closes Phase β; A09 begins Phase γ.
 - **Notes:** `regularizer.Dropout[T]` exposes `ApplyMask(acts, training)` — not `Forward`. Drop1 applied to the attention output before the first residual add; Drop2 to the FFN output before the second. The third TRANS-C7 position (attention-weight dropout post-softmax) is gated through `Cfg.DropoutRate` passed to the inner MHA at construction. All three share the single `Cfg.DropoutRate` field. Backward must scale the gradient by the same dropout mask.
 

@@ -98,6 +98,61 @@ func TestComposeAdditivity(t *testing.T) {
 	}
 }
 
+// TestDropoutBackwardMask verifies that BackwardMask zeros dropped positions and
+// scales retained positions by 1/p, matching the forward mask.
+func TestDropoutBackwardMask(t *testing.T) {
+	p := 0.8
+	reg := regularizer.NewDropoutSeeded[float64](p, 42)
+	n := 1000
+	acts := make([]float64, n)
+	for i := range acts {
+		acts[i] = 1.0
+	}
+
+	// Forward: apply mask, recording which elements are retained (non-zero).
+	out := reg.ApplyMask(acts, true)
+	retained := make([]bool, n)
+	for i, v := range out {
+		retained[i] = v != 0
+	}
+
+	// Backward: BackwardMask should apply the same mask to upstream.
+	upstream := make([]float64, n)
+	for i := range upstream {
+		upstream[i] = 1.0
+	}
+	grad := reg.BackwardMask(upstream)
+
+	scale := 1.0 / p
+	for i := range grad {
+		if retained[i] {
+			if math.Abs(grad[i]-scale) > 1e-9 {
+				t.Errorf("BackwardMask[%d]: retained, got %v want %v", i, grad[i], scale)
+			}
+		} else {
+			if grad[i] != 0 {
+				t.Errorf("BackwardMask[%d]: dropped, got %v want 0", i, grad[i])
+			}
+		}
+	}
+}
+
+// TestDropoutBackwardMaskInference verifies BackwardMask returns upstream
+// unchanged when the last ApplyMask call used training=false.
+func TestDropoutBackwardMaskInference(t *testing.T) {
+	reg := regularizer.NewDropoutSeeded[float64](0.5, 1)
+	acts := []float64{1.0, 2.0, 3.0}
+	reg.ApplyMask(acts, false) // inference mode: no mask stored
+
+	upstream := []float64{0.1, 0.2, 0.3}
+	grad := reg.BackwardMask(upstream)
+	for i, v := range grad {
+		if v != upstream[i] {
+			t.Errorf("BackwardMask inference [%d]: got %v want %v", i, v, upstream[i])
+		}
+	}
+}
+
 // TestNilGuards verifies Apply and Penalty helpers are nil-safe.
 func TestNilGuards(t *testing.T) {
 	acts := []float64{1.0, 2.0, 3.0}

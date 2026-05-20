@@ -234,7 +234,8 @@ func (e *EncoderBlock[T]) backwardPostNorm(upstream []T) []T {
 	copy(dFFNOut, dBufF)
 	dZ1fromRes2 := dBufF
 
-	// reverse Drop2 (mask-backward wired in T-18A08; pass-through for now)
+	// reverse Drop2 — BackwardMask re-applies the stored retain mask (TRANS-C7)
+	dFFNOut = e.Drop2.BackwardMask(dFFNOut)
 	// reverse FFN (full sequence)
 	dZ1fromFFN := e.FFN.Backward(dFFNOut)
 
@@ -251,7 +252,8 @@ func (e *EncoderBlock[T]) backwardPostNorm(upstream []T) []T {
 	copy(dAttnOut, dBufZ)
 	dXfromRes1 := dBufZ
 
-	// reverse Drop1 (mask-backward wired in T-18A08; pass-through for now)
+	// reverse Drop1 — BackwardMask re-applies the stored retain mask (TRANS-C7)
+	dAttnOut = e.Drop1.BackwardMask(dAttnOut)
 	// reverse Attn (full sequence)
 	dXfromAttn := e.Attn.Backward(dAttnOut)
 
@@ -277,7 +279,8 @@ func (e *EncoderBlock[T]) backwardPreNorm(upstream []T) []T {
 	copy(dFFNOut, upstream)
 	dYfromRes2 := upstream // identity path through residual
 
-	// reverse Drop2 (mask-backward wired in T-18A08; pass-through for now)
+	// reverse Drop2 — BackwardMask re-applies the stored retain mask (TRANS-C7)
+	dFFNOut = e.Drop2.BackwardMask(dFFNOut)
 	// reverse FFN
 	dLN2Out := e.FFN.Backward(dFFNOut)
 
@@ -294,7 +297,8 @@ func (e *EncoderBlock[T]) backwardPreNorm(upstream []T) []T {
 	copy(dAttnOut, dY)
 	dXfromRes1 := dY // identity path through residual
 
-	// reverse Drop1 (mask-backward wired in T-18A08; pass-through for now)
+	// reverse Drop1 — BackwardMask re-applies the stored retain mask (TRANS-C7)
+	dAttnOut = e.Drop1.BackwardMask(dAttnOut)
 	// reverse Attn
 	dLN1Out := e.Attn.Backward(dAttnOut)
 
