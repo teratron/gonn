@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/rand/v2"
+	"slices"
 
 	"github.com/teratron/gonn/pkg/layer"
 	"github.com/teratron/gonn/pkg/layer/attention"
@@ -27,8 +28,8 @@ import (
 //   - Stability: Experimental.
 type Stack[T utils.Float] struct {
 	Cfg    TransformerConfig[T]
-	Mode   Mode
 	Blocks []Block[T]
+	Mode   Mode
 }
 
 // NewStack allocates a Stack of n blocks with the given cfg and mode.
@@ -120,8 +121,8 @@ func (s *Stack[T]) Forward(x []T) []T {
 //   - Stability: Experimental.
 func (s *Stack[T]) Backward(upstream []T) []T {
 	grad := upstream
-	for i := len(s.Blocks) - 1; i >= 0; i-- {
-		grad = s.Blocks[i].Backward(grad)
+	for _, v := range slices.Backward(s.Blocks) {
+		grad = v.Backward(grad)
 	}
 	return grad
 }
@@ -178,10 +179,10 @@ func (s *Stack[T]) MarshalJSON() ([]byte, error) {
 		rawBlocks[i] = data
 	}
 	return json.Marshal(&struct {
-		Type   string               `json:"Type"`
 		Config TransformerConfig[T] `json:"Config"`
-		Mode   Mode                 `json:"Mode"`
+		Type   string               `json:"Type"`
 		Blocks []json.RawMessage    `json:"Blocks"`
+		Mode   Mode                 `json:"Mode"`
 	}{
 		Type:   "transformer.Stack",
 		Config: s.Cfg,
@@ -200,10 +201,10 @@ func (s *Stack[T]) MarshalJSON() ([]byte, error) {
 //   - Stability: Experimental.
 func (s *Stack[T]) UnmarshalJSON(data []byte) error {
 	aux := &struct {
-		Type   string               `json:"Type"`
 		Config TransformerConfig[T] `json:"Config"`
-		Mode   Mode                 `json:"Mode"`
+		Type   string               `json:"Type"`
 		Blocks []json.RawMessage    `json:"Blocks"`
+		Mode   Mode                 `json:"Mode"`
 	}{}
 	if err := json.Unmarshal(data, aux); err != nil {
 		return err

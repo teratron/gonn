@@ -23,8 +23,8 @@ import (
 //   - Stability: Stable.
 type Dropout[T utils.Float] struct {
 	rng  *rand.Rand
+	mask []bool
 	p    float64
-	mask []bool // retain mask from the last training-mode ApplyMask call
 }
 
 // compile-time interface verification (C26).

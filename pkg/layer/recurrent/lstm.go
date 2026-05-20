@@ -22,30 +22,22 @@ import (
 //   - Related: [SimpleRNN], [conv.Layer], [utils.Orthogonal].
 //   - Stability: Stable.
 type LSTM[T utils.Float] struct {
-	// Fused gate matrices concatenated [i, f, g, o] along the leading axis.
-	Wx []T `json:"wx"` // [4*Hidden, InSize] row-major
-	Wh []T `json:"wh"` // [4*Hidden, Hidden] row-major
-	B  []T `json:"b"`  // [4*Hidden]; B[Hidden:2*Hidden] = 1.0 (forget-gate bias)
-
-	SeqLen int `json:"seq_len"`
-	InSize int `json:"in_size"`
-	Hidden int `json:"hidden"`
-
-	// BPTT caches — populated by Forward, consumed by Backward.
-	lastInput     []T // [SeqLen, InSize]
-	lastHidden    []T // [SeqLen+1, Hidden]; h_0 at index 0
-	lastCell      []T // [SeqLen+1, Hidden]; c_0 at index 0
-	lastGateActiv []T // [SeqLen, 4*Hidden] post-activation (i, f, g, o)
-
-	// Gradient accumulators — zeroed at the start of each Backward.
-	gradWx []T
-	gradWh []T
-	gradB  []T
-	gradX  []T
-
-	// Step() API state — separate from BPTT caches.
-	stepH []T // [Hidden]
-	stepC []T // [Hidden]
+	gradB         []T
+	gradWx        []T
+	B             []T `json:"b"`
+	stepC         []T
+	stepH         []T
+	gradX         []T
+	Wh            []T `json:"wh"`
+	lastGateActiv []T
+	lastCell      []T
+	lastHidden    []T
+	lastInput     []T
+	gradWh        []T
+	Wx            []T `json:"wx"`
+	Hidden        int `json:"hidden"`
+	InSize        int `json:"in_size"`
+	SeqLen        int `json:"seq_len"`
 }
 
 // Compile-time assertion: LSTM must satisfy conv.Layer (REC-9).
@@ -338,12 +330,12 @@ func (l *LSTM[T]) ResetState() {
 func (l *LSTM[T]) MarshalJSON() ([]byte, error) {
 	type wire struct {
 		Type   string `json:"type"`
-		SeqLen int    `json:"seq_len"`
-		InSize int    `json:"in_size"`
-		Hidden int    `json:"hidden"`
 		Wx     []T    `json:"wx"`
 		Wh     []T    `json:"wh"`
 		B      []T    `json:"b"`
+		SeqLen int    `json:"seq_len"`
+		InSize int    `json:"in_size"`
+		Hidden int    `json:"hidden"`
 	}
 	return json.Marshal(wire{
 		Type:   "LSTM",
@@ -360,12 +352,12 @@ func (l *LSTM[T]) MarshalJSON() ([]byte, error) {
 func (l *LSTM[T]) UnmarshalJSON(data []byte) error {
 	type wire struct {
 		Type   string `json:"type"`
-		SeqLen int    `json:"seq_len"`
-		InSize int    `json:"in_size"`
-		Hidden int    `json:"hidden"`
 		Wx     []T    `json:"wx"`
 		Wh     []T    `json:"wh"`
 		B      []T    `json:"b"`
+		SeqLen int    `json:"seq_len"`
+		InSize int    `json:"in_size"`
+		Hidden int    `json:"hidden"`
 	}
 	var w wire
 	if err := json.Unmarshal(data, &w); err != nil {

@@ -22,14 +22,13 @@ import (
 //   - Related: [EmbeddingStack], [sparseGrad], [layer.IDLayer].
 //   - Stability: Stable.
 type TokenEmbedding[T utils.Float] struct {
+	Table     []T `json:"table"`
+	lastIDs   []int
+	lastOut   []T
+	gradTable sparseGrad[T]
 	VocabSize int `json:"vocabSize"`
 	SeqLen    int `json:"seqLen"`
 	Dmodel    int `json:"dmodel"`
-	Table     []T `json:"table"` // [VocabSize × Dmodel] row-major flat
-
-	gradTable sparseGrad[T] // sparse gradient accumulator
-	lastIDs   []int         // [SeqLen] cached for backward
-	lastOut   []T           // [SeqLen × Dmodel] output buffer
 }
 
 // compile-time assertions.
@@ -136,10 +135,10 @@ func (te *TokenEmbedding[T]) Backward(upstream []T) []T {
 // tokenEmbeddingJSON is the on-wire representation for MarshalJSON / UnmarshalJSON.
 type tokenEmbeddingJSON[T utils.Float] struct {
 	Type      string `json:"type"`
+	Table     []T    `json:"table"`
 	VocabSize int    `json:"vocabSize"`
 	SeqLen    int    `json:"seqLen"`
 	Dmodel    int    `json:"dmodel"`
-	Table     []T    `json:"table"`
 }
 
 // MarshalJSON serialises the learnable table; transient caches are omitted.

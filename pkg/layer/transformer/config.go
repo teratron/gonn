@@ -39,23 +39,13 @@ const (
 //   - Concurrency: Immutable after construction; safe to share across blocks.
 //   - Stability: Experimental.
 type TransformerConfig[T utils.Float] struct {
-	// SeqLen is the maximum sequence length (number of positions per sample).
-	SeqLen int
-	// Dmodel is the model dimension (embedding / hidden size).
-	Dmodel int
-	// NumHeads is the number of attention heads. Must divide Dmodel evenly.
-	NumHeads int
-	// Dff is the inner dimension of the position-wise FFN.
-	// If zero, constructors set it to 4·Dmodel (TRANS-C5).
-	Dff int
-	// PreNorm selects pre-layer-norm wiring (true) vs post-layer-norm (false).
-	PreNorm bool
-	// DropoutRate is the dropout probability applied at the three TRANS-C7
-	// positions. Zero disables dropout.
 	DropoutRate T
-	// Activation is the non-linearity applied inside the FFN hidden layer.
-	// Zero-value is ELISH; constructors substitute ReLU when zero (TRANS-C4).
-	Activation activation.Type
+	SeqLen      int
+	Dmodel      int
+	NumHeads    int
+	Dff         int
+	PreNorm     bool
+	Activation  activation.Type
 }
 
 // applyActivationInPlace applies the named activation function to every element

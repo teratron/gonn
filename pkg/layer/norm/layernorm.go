@@ -56,8 +56,8 @@ type LayerNorm[T utils.Float] struct {
 	gammaGrad []T
 	betaGrad  []T
 	// xHat and invSd are cached by Forward for use in Backward.
-	xHat    []T
-	invSd   T
+	xHat  []T
+	invSd T
 	// xHatBuf and invSdBuf store per-position caches for ForwardSeq/BackwardSeq.
 	xHatBuf  []T
 	invSdBuf []T
@@ -157,8 +157,9 @@ func (l *LayerNorm[T]) GradSlots() (gamma, beta []T) {
 // Must be called after Forward on the same input (uses cached xHat and invSd).
 //
 // Gradient derivation (all indices over N = len(upstream)):
-//   dL/dxHat_i = upstream_i * γ_i     (or upstream_i when affine disabled)
-//   dL/dx_i    = invSd/N * (N·dL/dxHat_i − Σ dL/dxHat_j − xHat_i·Σ(dL/dxHat_j·xHat_j))
+//
+//	dL/dxHat_i = upstream_i * γ_i     (or upstream_i when affine disabled)
+//	dL/dx_i    = invSd/N * (N·dL/dxHat_i − Σ dL/dxHat_j − xHat_i·Σ(dL/dxHat_j·xHat_j))
 //
 // AI-Meta:
 //   - Purpose: Backprop through LayerNorm; accumulates affine gradients, returns ∂L/∂x.
@@ -232,7 +233,7 @@ func (l *LayerNorm[T]) ForwardSeq(x []T, seqLen int) []T {
 		l.invSdBuf = make([]T, seqLen)
 	}
 	out := make([]T, needed)
-	for p := 0; p < seqLen; p++ {
+	for p := range seqLen {
 		base := p * l.features
 		posOut := l.Forward(x[base : base+l.features])
 		copy(out[base:base+l.features], posOut)
@@ -248,7 +249,7 @@ func (l *LayerNorm[T]) ForwardSeq(x []T, seqLen int) []T {
 // Must be called after ForwardSeq on the same input.
 func (l *LayerNorm[T]) BackwardSeq(upstream []T, seqLen int) []T {
 	dx := make([]T, seqLen*l.features)
-	for p := 0; p < seqLen; p++ {
+	for p := range seqLen {
 		base := p * l.features
 		l.xHat = l.xHatBuf[base : base+l.features]
 		l.invSd = l.invSdBuf[p]

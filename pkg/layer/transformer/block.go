@@ -204,13 +204,13 @@ func (f *ffn[T]) ApplyGradSGD(lr T) {
 // Gradient buffers and forward-cache slices are not persisted.
 func (f *ffn[T]) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&struct {
-		W1      []T            `json:"W1"`
-		B1      []T            `json:"b1"`
-		W2      []T            `json:"W2"`
-		B2      []T            `json:"b2"`
-		SeqLen  int            `json:"seqLen"`
-		Dmodel  int            `json:"dmodel"`
-		Dff     int            `json:"dff"`
+		W1      []T             `json:"W1"`
+		B1      []T             `json:"b1"`
+		W2      []T             `json:"W2"`
+		B2      []T             `json:"b2"`
+		SeqLen  int             `json:"seqLen"`
+		Dmodel  int             `json:"dmodel"`
+		Dff     int             `json:"dff"`
 		ActMode activation.Type `json:"actMode"`
 	}{
 		W1: f.W1, B1: f.b1, W2: f.W2, B2: f.b2,
@@ -222,13 +222,13 @@ func (f *ffn[T]) MarshalJSON() ([]byte, error) {
 // forward-cache slices are left nil (lazily allocated on first Forward call).
 func (f *ffn[T]) UnmarshalJSON(data []byte) error {
 	aux := &struct {
-		W1      []T            `json:"W1"`
-		B1      []T            `json:"b1"`
-		W2      []T            `json:"W2"`
-		B2      []T            `json:"b2"`
-		SeqLen  int            `json:"seqLen"`
-		Dmodel  int            `json:"dmodel"`
-		Dff     int            `json:"dff"`
+		W1      []T             `json:"W1"`
+		B1      []T             `json:"b1"`
+		W2      []T             `json:"W2"`
+		B2      []T             `json:"b2"`
+		SeqLen  int             `json:"seqLen"`
+		Dmodel  int             `json:"dmodel"`
+		Dff     int             `json:"dff"`
 		ActMode activation.Type `json:"actMode"`
 	}{}
 	if err := json.Unmarshal(data, aux); err != nil {

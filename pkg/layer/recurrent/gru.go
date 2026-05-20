@@ -21,29 +21,21 @@ import (
 //   - Related: [LSTM], [SimpleRNN], [conv.Layer], [utils.Orthogonal].
 //   - Stability: Stable.
 type GRU[T utils.Float] struct {
-	// Fused gate matrices concatenated [r, z, n] along the leading axis.
-	Wx []T `json:"wx"` // [3*Hidden, InSize] row-major
-	Wh []T `json:"wh"` // [3*Hidden, Hidden] row-major; n-gate multiplies r_t⊙h_{t-1}
-	B  []T `json:"b"`  // [3*Hidden]
-
-	SeqLen int `json:"seq_len"`
-	InSize int `json:"in_size"`
-	Hidden int `json:"hidden"`
-
-	// BPTT caches — populated by Forward, consumed by Backward.
-	lastInput  []T // [SeqLen, InSize]
-	lastHidden []T // [SeqLen+1, Hidden]; h_0 at index 0
-	lastGates  []T // [SeqLen, 3*Hidden] post-activation (r, z, n)
-	lastRH     []T // [SeqLen, Hidden] r_t ⊙ h_{t-1}
-
-	// Gradient accumulators — zeroed at the start of each Backward.
-	gradWx []T
-	gradWh []T
-	gradB  []T
-	gradX  []T
-
-	// Step() API state — separate from BPTT caches.
-	stepH []T // [Hidden]
+	lastRH     []T
+	lastHidden []T
+	B          []T `json:"b"`
+	stepH      []T
+	gradX      []T
+	gradB      []T
+	Wh         []T `json:"wh"`
+	gradWx     []T
+	lastInput  []T
+	Wx         []T `json:"wx"`
+	lastGates  []T
+	gradWh     []T
+	Hidden     int `json:"hidden"`
+	InSize     int `json:"in_size"`
+	SeqLen     int `json:"seq_len"`
 }
 
 // Compile-time assertion: GRU must satisfy conv.Layer (REC-9).
@@ -396,12 +388,12 @@ func (g *GRU[T]) ResetState() {
 func (g *GRU[T]) MarshalJSON() ([]byte, error) {
 	type wire struct {
 		Type   string `json:"type"`
-		SeqLen int    `json:"seq_len"`
-		InSize int    `json:"in_size"`
-		Hidden int    `json:"hidden"`
 		Wx     []T    `json:"wx"`
 		Wh     []T    `json:"wh"`
 		B      []T    `json:"b"`
+		SeqLen int    `json:"seq_len"`
+		InSize int    `json:"in_size"`
+		Hidden int    `json:"hidden"`
 	}
 	return json.Marshal(wire{
 		Type:   "GRU",
@@ -418,12 +410,12 @@ func (g *GRU[T]) MarshalJSON() ([]byte, error) {
 func (g *GRU[T]) UnmarshalJSON(data []byte) error {
 	type wire struct {
 		Type   string `json:"type"`
-		SeqLen int    `json:"seq_len"`
-		InSize int    `json:"in_size"`
-		Hidden int    `json:"hidden"`
 		Wx     []T    `json:"wx"`
 		Wh     []T    `json:"wh"`
 		B      []T    `json:"b"`
+		SeqLen int    `json:"seq_len"`
+		InSize int    `json:"in_size"`
+		Hidden int    `json:"hidden"`
 	}
 	var w wire
 	if err := json.Unmarshal(data, &w); err != nil {

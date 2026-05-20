@@ -314,7 +314,7 @@ func TestStack_CopyTask(t *testing.T) {
 	}
 
 	firstLoss := math.MaxFloat64
-	for step := 0; step < steps; step++ {
+	for step := range steps {
 		out := s.Forward(x)
 		if step == 0 {
 			firstLoss = mse(out, x)

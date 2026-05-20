@@ -86,9 +86,9 @@ func (es *EmbeddingStack[T]) Backward(upstream []T) []T {
 
 // embeddingStackJSON is the on-wire representation.
 type embeddingStackJSON[T utils.Float] struct {
-	Type       string                 `json:"type"`
 	Token      *TokenEmbedding[T]     `json:"token"`
 	Positional *PositionalEncoding[T] `json:"positional"`
+	Type       string                 `json:"type"`
 }
 
 // MarshalJSON serialises both sub-layers.

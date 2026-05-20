@@ -29,13 +29,12 @@ const (
 //   - Related: [TokenEmbedding], [EmbeddingStack], [buildSinusoidalTable].
 //   - Stability: Stable.
 type PositionalEncoding[T utils.Float] struct {
-	SeqLen int            `json:"seqLen"`
-	Dmodel int            `json:"dmodel"`
-	Mode   PositionalMode `json:"mode"`
-	Table  []T            `json:"table"` // [SeqLen × Dmodel]
-
-	gradTable []T // accumulated gradient; non-nil only in Learnable mode
-	lastIn    []T // [SeqLen × Dmodel] cached input for Backward
+	Table     []T `json:"table"`
+	gradTable []T
+	lastIn    []T
+	SeqLen    int            `json:"seqLen"`
+	Dmodel    int            `json:"dmodel"`
+	Mode      PositionalMode `json:"mode"`
 }
 
 // compile-time assertions.
@@ -114,10 +113,10 @@ func (pe *PositionalEncoding[T]) Backward(upstream []T) []T {
 // positionalEncodingJSON is the on-wire representation.
 type positionalEncodingJSON[T utils.Float] struct {
 	Type   string         `json:"type"`
+	Table  []T            `json:"table"`
 	SeqLen int            `json:"seqLen"`
 	Dmodel int            `json:"dmodel"`
 	Mode   PositionalMode `json:"mode"`
-	Table  []T            `json:"table"`
 }
 
 // MarshalJSON serialises the table and mode; caches are omitted.

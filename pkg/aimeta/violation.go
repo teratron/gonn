@@ -23,16 +23,10 @@ import "go/token"
 //   - Related: [Check], [ParseBlock].
 //   - Stability: Stable.
 type Violation struct {
-	// Pos is the source position of the offending doc comment or line.
-	// Zero value when position information is unavailable.
-	Pos token.Position
-	// Symbol is the name of the exported identifier whose doc comment contains
-	// the violation. Empty when the violation is file-level.
-	Symbol string
-	// Rule is one of the RuleXxx constants.
-	Rule string
-	// Message is a human-readable description of the violation.
+	Symbol  string
+	Rule    string
 	Message string
+	Pos     token.Position
 }
 
 // Rule codes for AI-Meta violations.

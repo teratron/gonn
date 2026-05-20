@@ -196,7 +196,7 @@ func (e *EncoderBlock[T]) forwardPreNorm(x []T) []T {
 	attnOut = e.Drop1.ApplyMask(attnOut, e.training)
 	copy(e.bufZ, x)
 	addInPlace(e.bufZ, attnOut) // y = x + Drop1(Attn(LN1(x)))
-	copy(e.cacheZ1, e.bufZ)    // cache y so LN2 sees it in ForwardSeq
+	copy(e.cacheZ1, e.bufZ)     // cache y so LN2 sees it in ForwardSeq
 
 	// sub-layer 2: FFN on LN2-normalized residual, then residual
 	ln2Out := e.Norm2.ForwardSeq(e.cacheZ1, seqLen)

@@ -21,26 +21,19 @@ import (
 //   - Related: [LSTM], [conv.Layer], [utils.Orthogonal].
 //   - Stability: Stable.
 type SimpleRNN[T utils.Float] struct {
-	Wxh []T `json:"wxh"` // [Hidden, InSize] row-major
-	Whh []T `json:"whh"` // [Hidden, Hidden] row-major
-	Bh  []T `json:"bh"`  // [Hidden]
-
-	SeqLen int `json:"seq_len"`
-	InSize int `json:"in_size"`
-	Hidden int `json:"hidden"`
-
-	// BPTT cache — populated by Forward, consumed by Backward.
-	lastInput  []T // [SeqLen, InSize]
-	lastHidden []T // [SeqLen+1, Hidden]; h_0 at index 0
-
-	// Gradient accumulators — zeroed at the start of each Backward.
-	gradWxh []T
-	gradWhh []T
-	gradBh  []T
-	gradX   []T
-
-	// Step() API — running hidden state for stateful streaming inference.
-	stepH []T // [Hidden]
+	gradWhh    []T
+	Whh        []T `json:"whh"`
+	Bh         []T `json:"bh"`
+	lastInput  []T
+	lastHidden []T
+	gradWxh    []T
+	Wxh        []T `json:"wxh"`
+	gradBh     []T
+	gradX      []T
+	stepH      []T
+	SeqLen     int `json:"seq_len"`
+	InSize     int `json:"in_size"`
+	Hidden     int `json:"hidden"`
 }
 
 // Compile-time assertion: SimpleRNN must satisfy conv.Layer (REC-9).
@@ -267,12 +260,12 @@ func (r *SimpleRNN[T]) ResetState() {
 func (r *SimpleRNN[T]) MarshalJSON() ([]byte, error) {
 	type wire struct {
 		Type   string `json:"type"`
-		SeqLen int    `json:"seq_len"`
-		InSize int    `json:"in_size"`
-		Hidden int    `json:"hidden"`
 		Wxh    []T    `json:"wxh"`
 		Whh    []T    `json:"whh"`
 		Bh     []T    `json:"bh"`
+		SeqLen int    `json:"seq_len"`
+		InSize int    `json:"in_size"`
+		Hidden int    `json:"hidden"`
 	}
 	return json.Marshal(wire{
 		Type:   "SimpleRNN",
@@ -289,12 +282,12 @@ func (r *SimpleRNN[T]) MarshalJSON() ([]byte, error) {
 func (r *SimpleRNN[T]) UnmarshalJSON(data []byte) error {
 	type wire struct {
 		Type   string `json:"type"`
-		SeqLen int    `json:"seq_len"`
-		InSize int    `json:"in_size"`
-		Hidden int    `json:"hidden"`
 		Wxh    []T    `json:"wxh"`
 		Whh    []T    `json:"whh"`
 		Bh     []T    `json:"bh"`
+		SeqLen int    `json:"seq_len"`
+		InSize int    `json:"in_size"`
+		Hidden int    `json:"hidden"`
 	}
 	var w wire
 	if err := json.Unmarshal(data, &w); err != nil {

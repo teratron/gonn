@@ -26,33 +26,35 @@ import (
 //   - Related: [MaskedLayer], [layer.Layer], [utils.XavierUniform].
 //   - Stability: Stable.
 type MultiHeadAttention[T utils.Float] struct {
-	SeqLen   int
-	Dmodel   int
-	NumHeads int
-	Dk       int  // Dmodel / NumHeads — cached at construction
-	Causal   bool // when true, applyCausalMask is called each Forward
-
-	// Projection matrices — each [Dmodel, Dmodel] row-major flat.
-	Wq, Wk, Wv, Wo []T
-	Bq, Bk, Bv, Bo []T
-
-	// Forward cache — populated by Forward, consumed by Backward.
-	lastInput   []T // [SeqLen, Dmodel]
-	lastQ       []T // [NumHeads, SeqLen, Dk] head-major
-	lastK       []T // [NumHeads, SeqLen, Dk] head-major
-	lastV       []T // [NumHeads, SeqLen, Dk] head-major
-	lastWeights []T // [NumHeads, SeqLen, SeqLen] post-softmax
-
-	// Per-call padding mask — set via SetPaddingMask, consumed and cleared in Forward.
-	padMask []bool // [SeqLen]; nil = all positions valid
-
-	// Gradient slots — pre-allocated by Init, zeroed at start of each Backward.
-	gradWq, gradWk, gradWv, gradWo []T
-	gradBq, gradBk, gradBv, gradBo []T
-	gradX                          []T // [SeqLen, Dmodel]
-
-	// Precomputed scaling constant 1 / sqrt(Dk) (ATT-3).
-	scale T
+	scale       T
+	lastQ       []T
+	gradBk      []T
+	gradX       []T
+	gradBo      []T
+	lastK       []T
+	Wk          []T
+	Wv          []T
+	Wo          []T
+	Bq          []T
+	Bk          []T
+	Bv          []T
+	Bo          []T
+	gradBv      []T
+	lastInput   []T
+	Wq          []T
+	lastV       []T
+	lastWeights []T
+	padMask     []bool
+	gradWq      []T
+	gradWk      []T
+	gradWv      []T
+	gradWo      []T
+	gradBq      []T
+	SeqLen      int
+	NumHeads    int
+	Dk          int
+	Dmodel      int
+	Causal      bool
 }
 
 // Compile-time assertions: MultiHeadAttention must satisfy layer.Layer (ATT-10).
@@ -462,18 +464,18 @@ func accumInputGrad[T utils.Float](dProj, W, dX []T, seqLen, dmodel int) {
 func (m *MultiHeadAttention[T]) MarshalJSON() ([]byte, error) {
 	type wire struct {
 		Type     string `json:"type"`
-		SeqLen   int    `json:"seq_len"`
-		Dmodel   int    `json:"dmodel"`
-		NumHeads int    `json:"num_heads"`
-		Causal   bool   `json:"causal"`
+		Bq       []T    `json:"bq"`
 		Wq       []T    `json:"wq"`
 		Wk       []T    `json:"wk"`
 		Wv       []T    `json:"wv"`
 		Wo       []T    `json:"wo"`
-		Bq       []T    `json:"bq"`
 		Bk       []T    `json:"bk"`
 		Bv       []T    `json:"bv"`
 		Bo       []T    `json:"bo"`
+		Dmodel   int    `json:"dmodel"`
+		NumHeads int    `json:"num_heads"`
+		SeqLen   int    `json:"seq_len"`
+		Causal   bool   `json:"causal"`
 	}
 	return json.Marshal(wire{
 		Type:     "MultiHeadAttention",
@@ -501,18 +503,18 @@ func (m *MultiHeadAttention[T]) MarshalJSON() ([]byte, error) {
 func (m *MultiHeadAttention[T]) UnmarshalJSON(data []byte) error {
 	type wire struct {
 		Type     string `json:"type"`
-		SeqLen   int    `json:"seq_len"`
-		Dmodel   int    `json:"dmodel"`
-		NumHeads int    `json:"num_heads"`
-		Causal   bool   `json:"causal"`
+		Bq       []T    `json:"bq"`
 		Wq       []T    `json:"wq"`
 		Wk       []T    `json:"wk"`
 		Wv       []T    `json:"wv"`
 		Wo       []T    `json:"wo"`
-		Bq       []T    `json:"bq"`
 		Bk       []T    `json:"bk"`
 		Bv       []T    `json:"bv"`
 		Bo       []T    `json:"bo"`
+		Dmodel   int    `json:"dmodel"`
+		NumHeads int    `json:"num_heads"`
+		SeqLen   int    `json:"seq_len"`
+		Causal   bool   `json:"causal"`
 	}
 	var w wire
 	if err := json.Unmarshal(data, &w); err != nil {

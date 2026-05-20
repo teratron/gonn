@@ -24,11 +24,11 @@ func printText(w io.Writer, violations []aimeta.Violation) {
 // violationJSON is the on-wire shape for JSON output.
 type violationJSON struct {
 	File    string `json:"file,omitempty"`
-	Line    int    `json:"line,omitempty"`
-	Column  int    `json:"column,omitempty"`
 	Symbol  string `json:"symbol,omitempty"`
 	Rule    string `json:"rule"`
 	Message string `json:"message"`
+	Line    int    `json:"line,omitempty"`
+	Column  int    `json:"column,omitempty"`
 }
 
 // printJSON writes newline-delimited JSON records, one per violation.
