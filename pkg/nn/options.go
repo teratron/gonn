@@ -5,7 +5,9 @@ import (
 
 	"github.com/teratron/gonn/pkg/activation"
 	"github.com/teratron/gonn/pkg/compute"
+	"github.com/teratron/gonn/pkg/layer/attention"
 	"github.com/teratron/gonn/pkg/layer/conv"
+	"github.com/teratron/gonn/pkg/layer/embedding"
 	"github.com/teratron/gonn/pkg/layer/norm"
 	"github.com/teratron/gonn/pkg/layer/recurrent"
 	"github.com/teratron/gonn/pkg/loss"
@@ -891,5 +893,102 @@ func WithBackend[T utils.Float](b compute.Backend[T]) Option[T] {
 func WithGradClipNorm[T utils.Float](threshold T) Option[T] {
 	return func(cfg *Config[T]) {
 		cfg.GradClipNorm = threshold
+	}
+}
+
+// ============================================================================
+// Attention options (Phase 17 — l1-attention ATT-1..ATT-10)
+// ============================================================================
+
+// WithAttention appends a single-head scaled dot-product attention layer to
+// the prefix stack. Equivalent to WithMultiHeadAttention with numHeads=1.
+// Use WithCausalAttention after this call to enable causal masking.
+//
+// AI-Meta:
+//   - Purpose: Add a single-head attention layer (NumHeads=1) to the preprocessing stack.
+//   - Usage: nn.New[float64](WithInput[float64](seqLen*dmodel), WithAttention[float64](seqLen, dmodel), WithOutput[float64](numClasses, activation.SOFTMAX)).
+//   - Concurrency: Safe.
+//   - Related: [WithMultiHeadAttention], [WithCausalAttention], [attention.MultiHeadAttention].
+//   - Stability: Stable.
+func WithAttention[T utils.Float](seqLen, dmodel int) Option[T] {
+	return func(cfg *Config[T]) {
+		cfg.ConvPrefix = append(cfg.ConvPrefix, attention.NewAttention[T](seqLen, dmodel, false))
+	}
+}
+
+// WithMultiHeadAttention appends a multi-head attention layer to the prefix
+// stack. panics if dmodel is not divisible by numHeads.
+// Use WithCausalAttention after this call to enable causal masking.
+//
+// AI-Meta:
+//   - Purpose: Add a multi-head attention layer to the preprocessing stack (ATT-1..ATT-10).
+//   - Usage: nn.New[float64](WithInput[float64](seqLen*dmodel), WithMultiHeadAttention[float64](seqLen, dmodel, numHeads), WithOutput[float64](numClasses, activation.SOFTMAX)).
+//   - Concurrency: Safe.
+//   - Related: [WithAttention], [WithCausalAttention], [attention.MultiHeadAttention].
+//   - Stability: Stable.
+func WithMultiHeadAttention[T utils.Float](seqLen, dmodel, numHeads int) Option[T] {
+	return func(cfg *Config[T]) {
+		cfg.ConvPrefix = append(cfg.ConvPrefix,
+			attention.NewMultiHeadAttention[T](seqLen, dmodel, numHeads, false))
+	}
+}
+
+// WithCausalAttention sets Causal=true on the most recently added
+// [attention.MultiHeadAttention] layer in the prefix stack. It is a no-op
+// when no attention layer has been added yet.
+//
+// AI-Meta:
+//   - Purpose: Enable causal (autoregressive) masking on the last attention layer (ATT-5).
+//   - Usage: nn.New[float64](WithMultiHeadAttention[float64](seqLen, dmodel, numHeads), WithCausalAttention[float64](), ...).
+//   - Concurrency: Safe.
+//   - Related: [WithAttention], [WithMultiHeadAttention], [attention.MultiHeadAttention.Causal].
+//   - Stability: Stable.
+func WithCausalAttention[T utils.Float]() Option[T] {
+	return func(cfg *Config[T]) {
+		for i := len(cfg.ConvPrefix) - 1; i >= 0; i-- {
+			if mha, ok := cfg.ConvPrefix[i].(*attention.MultiHeadAttention[T]); ok {
+				mha.Causal = true
+				return
+			}
+		}
+	}
+}
+
+// ============================================================================
+// Embedding options (Phase 17 — l1-embedding EMB-1..EMB-10)
+// ============================================================================
+
+// WithEmbeddingStack appends an [embedding.EmbeddingStack] to the prefix stack.
+// It combines a learnable token lookup table with a positional encoding layer
+// (sinusoidal by default) into a single IDLayer. Accepts integer token IDs
+// via the Forward(x []T) path (IDs encoded as float values).
+//
+// AI-Meta:
+//   - Purpose: Add a combined token+positional embedding layer (EMB-1..EMB-10) to the prefix stack.
+//   - Usage: nn.New[float64](WithInput[float64](seqLen), WithEmbeddingStack[float64](vocabSize, seqLen, dmodel, embedding.Sinusoidal), WithMultiHeadAttention[float64](seqLen, dmodel, numHeads), WithOutput[float64](numClasses, activation.SOFTMAX)).
+//   - Concurrency: Safe.
+//   - Related: [WithTokenEmbedding], [embedding.EmbeddingStack], [embedding.PositionalMode].
+//   - Stability: Stable.
+func WithEmbeddingStack[T utils.Float](vocabSize, seqLen, dmodel int, mode embedding.PositionalMode) Option[T] {
+	return func(cfg *Config[T]) {
+		cfg.ConvPrefix = append(cfg.ConvPrefix,
+			embedding.NewEmbeddingStack[T](vocabSize, seqLen, dmodel, mode))
+	}
+}
+
+// WithTokenEmbedding appends a bare [embedding.TokenEmbedding] (no positional
+// encoding) to the prefix stack. Use when positional information is provided
+// by another mechanism or is not required.
+//
+// AI-Meta:
+//   - Purpose: Add a learnable token lookup table without positional encoding (EMB-1..EMB-4, EMB-9).
+//   - Usage: nn.New[float64](WithInput[float64](seqLen), WithTokenEmbedding[float64](vocabSize, seqLen, dmodel), ...).
+//   - Concurrency: Safe.
+//   - Related: [WithEmbeddingStack], [embedding.TokenEmbedding].
+//   - Stability: Stable.
+func WithTokenEmbedding[T utils.Float](vocabSize, seqLen, dmodel int) Option[T] {
+	return func(cfg *Config[T]) {
+		cfg.ConvPrefix = append(cfg.ConvPrefix,
+			embedding.NewTokenEmbedding[T](vocabSize, seqLen, dmodel))
 	}
 }

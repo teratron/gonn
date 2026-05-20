@@ -309,6 +309,36 @@ var ErrMetaLearnerRunning = errors.New("meta-learner-running")
 //   - Stability: Stable.
 var ErrCallbackPanic = errors.New("callback-panic")
 
+// ErrAttentionHeadsMismatch signals that Dmodel is not divisible by NumHeads
+// at construction time. Wraps ErrCompute per ATT-C3.
+//
+// AI-Meta:
+//   - Purpose: Sentinel for Dmodel % NumHeads != 0 in NewMultiHeadAttention.
+//   - Usage: errors.Is(err, utils.ErrAttentionHeadsMismatch).
+//   - Related: [ErrAttentionMaskLength], [ErrCompute].
+//   - Stability: Stable.
+var ErrAttentionHeadsMismatch = fmt.Errorf("attention-heads-mismatch: %w", ErrCompute)
+
+// ErrAttentionMaskLength signals that the padding mask length does not equal
+// the layer's SeqLen. Wraps ErrCompute per ATT-C4.
+//
+// AI-Meta:
+//   - Purpose: Sentinel for len(mask) != SeqLen in SetPaddingMask.
+//   - Usage: errors.Is(err, utils.ErrAttentionMaskLength).
+//   - Related: [ErrAttentionHeadsMismatch], [ErrCompute].
+//   - Stability: Stable.
+var ErrAttentionMaskLength = fmt.Errorf("attention-mask-length: %w", ErrCompute)
+
+// ErrVocabOutOfRange signals that an embedding lookup ID is outside [0, V).
+// Wraps ErrUserConfig per EMB-7 / C32.
+//
+// AI-Meta:
+//   - Purpose: Sentinel for TokenEmbedding lookup when id < 0 or id >= V.
+//   - Usage: errors.Is(err, utils.ErrVocabOutOfRange); errors.Is(err, utils.ErrUserConfig) also true.
+//   - Related: [ErrUserConfig].
+//   - Stability: Stable.
+var ErrVocabOutOfRange = fmt.Errorf("vocab-out-of-range: %w", ErrUserConfig)
+
 // Newf builds a new error that wraps the given category sentinel and
 // carries the caller-supplied identifying fields. The format string MUST
 // be specific per C32 §1: it MUST identify the offending value (or its

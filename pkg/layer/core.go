@@ -4,12 +4,49 @@
 // `core → base → Input/Dense/Output`. core owns the shared identity
 // (Type, Id, Size) and the cell slice; base extends it with activation
 // and bias; concrete types specialise per role.
+//
+// Sequence-processing layers (attention, embedding, recurrent, conv) that
+// operate on flat []T vectors implement the [Layer] interface. Embedding
+// layers that accept integer ID input additionally implement [IDLayer].
 package layer
 
 import (
 	"github.com/teratron/gonn/pkg/neuron"
 	"github.com/teratron/gonn/pkg/utils"
 )
+
+// Layer is the interface implemented by sequence-processing layers that
+// operate on flat []T vectors (attention, recurrent, convolutional, embedding).
+// The method set is identical to conv.Layer[T]; any conv.Layer[T] implementor
+// satisfies Layer[T] automatically via Go structural typing.
+//
+// AI-Meta:
+//   - Purpose: Common interface for sequence-processing layers operating on flat []T vectors.
+//   - Usage: var _ layer.Layer[float64] = (*attention.MultiHeadAttention[float64])(nil).
+//   - Related: [IDLayer], [conv.Layer].
+//   - Stability: Stable.
+type Layer[T utils.Float] interface {
+	Forward(x []T) []T
+	Backward(upstream []T) []T
+	InputSize() int
+	OutputSize() int
+	GradSlots() (gradW, gradB []T)
+}
+
+// IDLayer is the optional sub-interface implemented by layers that accept
+// integer ID input rather than a continuous-valued tensor. Currently only
+// TokenEmbedding and EmbeddingStack satisfy it. The topology compiler
+// dispatches via type assertion at compile() time.
+//
+// AI-Meta:
+//   - Purpose: Allow embedding layers to consume integer ID sequences directly.
+//   - Usage: compile() checks if the input layer implements IDLayer to route data flow.
+//   - Related: [Layer].
+//   - Stability: Experimental.
+type IDLayer[T utils.Float] interface {
+	Layer[T]
+	ForwardIDs(ids []int) ([]T, error)
+}
 
 // core is the unexported foundation shared by every layer type. It holds
 // the layer kind tag, the position index inside the network, the declared

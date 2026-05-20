@@ -3,7 +3,9 @@ package nn
 import (
 	"slices"
 
+	"github.com/teratron/gonn/pkg/layer/attention"
 	"github.com/teratron/gonn/pkg/layer/conv"
+	"github.com/teratron/gonn/pkg/layer/embedding"
 	"github.com/teratron/gonn/pkg/optimizer"
 	"github.com/teratron/gonn/pkg/regularizer"
 	"github.com/teratron/gonn/pkg/utils"
@@ -148,15 +150,32 @@ func (n *NN[T]) applyConvBackward(gradOut []T) {
 	upstream := gradOut
 	for _, v := range slices.Backward(n.convPrefix) {
 		next := v.Backward(upstream)
-		if c1d, ok := v.(*conv.Conv1D[T]); ok {
-			gW, gB := c1d.GradSlots()
-			applyConvSGD(c1d.Weights, gW, n.LearningRate)
-			if c1d.UseBias && len(gB) > 0 {
-				applyConvSGD(c1d.Biases, gB, n.LearningRate)
+		switch l := v.(type) {
+		case *conv.Conv1D[T]:
+			gW, gB := l.GradSlots()
+			applyConvSGD(l.Weights, gW, n.LearningRate)
+			if l.UseBias && len(gB) > 0 {
+				applyConvSGD(l.Biases, gB, n.LearningRate)
+			}
+		case *attention.MultiHeadAttention[T]:
+			l.ApplyGradSGD(n.LearningRate)
+		case *embedding.TokenEmbedding[T]:
+			applyTokenEmbeddingSGD(l, n.LearningRate)
+		case *embedding.EmbeddingStack[T]:
+			applyTokenEmbeddingSGD(l.Token, n.LearningRate)
+			if l.Positional.Mode == embedding.Learnable {
+				gW, _ := l.Positional.GradSlots()
+				applyConvSGD(l.Positional.Table, gW, n.LearningRate)
 			}
 		}
 		upstream = next
 	}
+}
+
+// applyTokenEmbeddingSGD delegates the sparse SGD update to the embedding's
+// own ApplyGradSGD method, which walks only touched rows (EMB-9).
+func applyTokenEmbeddingSGD[T utils.Float](te *embedding.TokenEmbedding[T], lr T) {
+	te.ApplyGradSGD(lr)
 }
 
 // applyConvSGD performs w -= lr · g elementwise. Length parity is the

@@ -4,6 +4,51 @@ All notable changes to the GoNN library will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the
 release artifacts dictated by [.magic/run.md](.magic/run.md) Phase Completion / Plan Completion.
 
+## [0.15.0] — 2026-05-20
+
+### NLP Foundation: Multi-Head Attention + Embedding Layers
+
+Phase 17 adds two parallel NLP tracks: full multi-head scaled dot-product attention
+(ATT-1..ATT-10) and token/positional embedding (EMB-1..EMB-10), with both tracks
+wired into the `pkg/nn` training loop via the existing `ConvPrefix` infrastructure.
+
+#### Added — Track A: Attention
+
+- **`pkg/layer/attention/multihead.go`** — `MultiHeadAttention[T utils.Float]`:
+  - `NewAttention[T](seqLen, dmodel int, causal bool)` — single-head sugar (NumHeads=1).
+  - `NewMultiHeadAttention[T](seqLen, dmodel, numHeads int, causal bool)` — multi-head; panics with `ErrAttentionHeadsMismatch` when `dmodel % numHeads != 0`.
+  - `Forward`: project Q/K/V → `splitHeads` → scaled scores → causal+padding masks → row-wise softmax → context × V → `joinHeads` → output projection.
+  - `Backward`: ATT-7 four-path: output projection, V-path, softmax-backward, Q/K projection.
+  - `ApplyGradSGD(lr T)` — inline SGD update for all 8 weight/bias matrices.
+  - `MarshalJSON` / `UnmarshalJSON` round-trip.
+  - 91.3 % statement coverage.
+- **`pkg/layer/attention/cell.go`** — shared helpers: `softmaxRowwise`, `softmaxRowwiseWithMask`, `softmaxBackwardRowwise`, `attentionScores`, `applyCausalMask`, `applyPaddingMask`, `projMat`, `contextMul`, `splitHeads`, `joinHeads`.
+- **`pkg/layer/attention/masked_layer.go`** — `MaskedLayer[T]` interface + `SetPaddingMask` implementation (per-call semantics, cleared after Forward).
+- **`pkg/nn/options.go`** — `WithAttention[T]`, `WithMultiHeadAttention[T]`, `WithCausalAttention[T]`.
+- **`pkg/nn/train.go`** — `applyConvBackward` extended to type-assert `*attention.MultiHeadAttention[T]` and call `ApplyGradSGD`.
+
+#### Added — Track B: Embedding
+
+- **`pkg/layer/embedding/sparse.go`** — `sparseGrad[T]` bitset accumulator: O(unique IDs × Dmodel) per step via `[]uint64` bitset + `bits.TrailingZeros64` iteration.
+- **`pkg/layer/embedding/token.go`** — `TokenEmbedding[T]`: learnable lookup table, `ForwardIDs`, sparse `Backward`, `ApplyGradSGD`, JSON round-trip. Implements `layer.IDLayer[T]`.
+- **`pkg/layer/embedding/table.go`** — `buildSinusoidalTable[T]`: Vaswani et al. 2017 PE(pos, 2i) = sin / PE(pos, 2i+1) = cos formula.
+- **`pkg/layer/embedding/positional.go`** — `PositionalEncoding[T]` with `Sinusoidal` / `Learnable` mode; `Forward` adds table to input; `Backward` passes gradient through (accumulates for Learnable).
+- **`pkg/layer/embedding/stack.go`** — `EmbeddingStack[T]` composing `TokenEmbedding` + `PositionalEncoding` as a single `layer.IDLayer[T]`. 90.7 % statement coverage.
+- **`pkg/nn/options.go`** — `WithEmbeddingStack[T]`, `WithTokenEmbedding[T]`.
+- **`pkg/nn/train.go`** — sparse SGD applied via `applyTokenEmbeddingSGD`; Learnable positional table updated via dense `applyConvSGD`.
+
+#### Modified
+
+- **`pkg/layer/core.go`** — added `Layer[T utils.Float]` and `IDLayer[T utils.Float]` interfaces (same method set as `conv.Layer[T]`; structural typing satisfies both).
+- **`pkg/utils/errors.go`** — added `ErrAttentionHeadsMismatch`, `ErrAttentionMaskLength`, `ErrVocabOutOfRange` sentinels.
+
+#### Coverage floors
+
+| Package                | Coverage |
+| ---------------------- | -------- |
+| `pkg/layer/attention`  | 91.3 %   |
+| `pkg/layer/embedding`  | 90.7 %   |
+
 ## [0.14.0] — 2026-05-19
 
 ### Recurrent Completion + GPU Backward + AI-Meta Rollout
