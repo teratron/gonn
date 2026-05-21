@@ -66,11 +66,11 @@ func TestRegularizerConvergence(t *testing.T) {
 		regularizer.NewDropoutSeeded[float64](0.9, 1),
 	)
 	n, err := New(
-		WithInput(2),
-		WithHiddenLayer(16, activation.SIGMOID),
-		WithOutput(1, activation.SIGMOID),
+		WithInput[float64](2),
+		WithHiddenLayer[float64](16, activation.SIGMOID),
+		WithOutput[float64](1, activation.SIGMOID),
 		WithLearningRate(0.3),
-		WithMaxIterations(50_000),
+		WithMaxIterations[float64](50_000),
 		WithLossLimit(0.05),
 		WithRegularizer(reg),
 	)
@@ -94,9 +94,9 @@ func TestRegularizerConvergence(t *testing.T) {
 func TestInferenceNoDropout(t *testing.T) {
 	reg := regularizer.NewDropoutSeeded[float64](0.5, 99)
 	n, err := New(
-		WithInput(2),
-		WithHiddenLayer(4, activation.SIGMOID),
-		WithOutput(1, activation.SIGMOID),
+		WithInput[float64](2),
+		WithHiddenLayer[float64](4, activation.SIGMOID),
+		WithOutput[float64](1, activation.SIGMOID),
 		WithRegularizer(reg),
 	)
 	if err != nil {
@@ -138,10 +138,10 @@ func TestOptimizerIntegration(t *testing.T) {
 	for _, tc := range opts {
 		t.Run(tc.name, func(t *testing.T) {
 			n, err := New(
-				WithInput(2),
-				WithHiddenLayer(4, activation.SIGMOID),
-				WithOutput(1, activation.SIGMOID),
-				WithMaxIterations(50_000),
+				WithInput[float64](2),
+				WithHiddenLayer[float64](4, activation.SIGMOID),
+				WithOutput[float64](1, activation.SIGMOID),
+				WithMaxIterations[float64](50_000),
 				WithLossLimit(0.05),
 				WithOptimizer(tc.opt),
 			)

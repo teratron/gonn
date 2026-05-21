@@ -58,7 +58,6 @@ func (d *QuantizedDense[T]) forwardWeightOnly(x []T) []T {
 // Per-channel scale: y[c] = scale_W[c] * scale_x * float64(acc[c]) + bias[c].
 // Zero-point correction: acc[c] -= zp_W[c] * sum(x_int8).
 func (d *QuantizedDense[T]) forwardFullInt8(x []T) []T {
-	// Quantize input vector.
 	xInt8 := make([]int8, d.Cin)
 	var xSum int32
 	for k := range d.Cin {
@@ -98,8 +97,6 @@ func (d *QuantizedDense[T]) forwardFullInt8(x []T) []T {
 	return out
 }
 
-// newQuantizedDense constructs a QuantizedDense by quantizing the float64
-// weight tensor w (Cout×Cin row-major) with the granularity from cfg.
 func newQuantizedDense[T utils.Float](w []float64, bias []float64, cout, cin int, cfg QuantizationConfig[T]) *QuantizedDense[T] {
 	qw, params := quantizeWeightsTensor(w, cout, cin, cfg.WeightGranularity)
 	params.Strategy = cfg.Strategy

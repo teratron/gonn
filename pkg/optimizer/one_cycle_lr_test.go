@@ -53,9 +53,9 @@ func TestOneCycleLR_LRS4HoldAfterTotalSteps(t *testing.T) {
 
 func TestOneCycleLR_SaveLoadState(t *testing.T) {
 	orig := NewOneCycleLR[float64](0.05, 200,
-		WithPctStart(0.2),
-		WithDivFactor(10),
-		WithFinalDiv(1000),
+		WithPctStart[float64](0.2),
+		WithDivFactor[float64](10),
+		WithFinalDiv[float64](1000),
 	)
 	for range 50 {
 		orig.Step()
@@ -107,7 +107,7 @@ func TestOneCycleLR_Reset(t *testing.T) {
 }
 
 func TestOneCycleLR_WarmupLinear(t *testing.T) {
-	sched := NewOneCycleLR[float64](1.0, 100, WithPctStart(0.5))
+	sched := NewOneCycleLR[float64](1.0, 100, WithPctStart[float64](0.5))
 	// warmupSteps = 50; startLR = 1.0/25 = 0.04
 	// step 25 → progress = 25/50 = 0.5 → LR = 0.04 + 0.5*(1.0-0.04) = 0.04 + 0.48 = 0.52
 	var r float64

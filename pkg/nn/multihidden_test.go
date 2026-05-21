@@ -34,15 +34,15 @@ func TestDeepStackRandomInitWarn(t *testing.T) {
 
 	const depth = 7
 	opts := []Option[float64]{
-		WithInput(2),
-		WithBias(true),
-		WithOutput(1, activation.SIGMOID),
+		WithInput[float64](2),
+		WithBias[float64](true),
+		WithOutput[float64](1, activation.SIGMOID),
 		WithLearningRate(0.1),
-		WithLoss(loss.MSE),
-		WithWeightInit(WeightInitRandom),
+		WithLoss[float64](loss.MSE),
+		WithWeightInit[float64](WeightInitRandom),
 	}
 	for range depth {
-		opts = append(opts, WithHiddenLayer(4, activation.SIGMOID))
+		opts = append(opts, WithHiddenLayer[float64](4, activation.SIGMOID))
 	}
 	if _, err := New(opts...); err != nil {
 		t.Fatalf("deep-stack Compile must succeed in v0.6, got %v", err)
@@ -66,15 +66,15 @@ func TestDeepStackXavierNoWarn(t *testing.T) {
 
 	const depth = 7
 	opts := []Option[float64]{
-		WithInput(2),
-		WithBias(true),
-		WithOutput(1, activation.SIGMOID),
+		WithInput[float64](2),
+		WithBias[float64](true),
+		WithOutput[float64](1, activation.SIGMOID),
 		WithLearningRate(0.1),
-		WithLoss(loss.MSE),
-		WithWeightInit(WeightInitXavier),
+		WithLoss[float64](loss.MSE),
+		WithWeightInit[float64](WeightInitXavier),
 	}
 	for range depth {
-		opts = append(opts, WithHiddenLayer(4, activation.SIGMOID))
+		opts = append(opts, WithHiddenLayer[float64](4, activation.SIGMOID))
 	}
 	if _, err := New(opts...); err != nil {
 		t.Fatalf("deep-stack Compile must succeed, got %v", err)
@@ -110,16 +110,16 @@ func TestCompileFitMultiHiddenChainDepths(t *testing.T) {
 		t.Run("depth_"+itoa(depth), func(t *testing.T) {
 			t.Parallel()
 			opts := []Option[float64]{
-				WithInput(2),
-				WithBias(true),
-				WithOutput(1, activation.SIGMOID),
+				WithInput[float64](2),
+				WithBias[float64](true),
+				WithOutput[float64](1, activation.SIGMOID),
 				WithLearningRate(0.3),
-				WithLoss(loss.MSE),
-				WithWeightInit(WeightInitXavier),
-				WithMaxIterations(200),
+				WithLoss[float64](loss.MSE),
+				WithWeightInit[float64](WeightInitXavier),
+				WithMaxIterations[float64](200),
 			}
 			for range depth {
-				opts = append(opts, WithHiddenLayer(4, activation.SIGMOID))
+				opts = append(opts, WithHiddenLayer[float64](4, activation.SIGMOID))
 			}
 			n, err := New(opts...)
 			if err != nil {
@@ -146,15 +146,15 @@ func TestCompileFitMultiHiddenChainDepths(t *testing.T) {
 func TestCompileMultiHiddenTwoHiddenConverges(t *testing.T) {
 	t.Parallel()
 	n, err := New(
-		WithInput(2),
-		WithBias(true),
-		WithHiddenLayer(4, activation.SIGMOID),
-		WithHiddenLayer(4, activation.SIGMOID),
-		WithOutput(1, activation.SIGMOID),
+		WithInput[float64](2),
+		WithBias[float64](true),
+		WithHiddenLayer[float64](4, activation.SIGMOID),
+		WithHiddenLayer[float64](4, activation.SIGMOID),
+		WithOutput[float64](1, activation.SIGMOID),
 		WithLearningRate(0.5),
-		WithLoss(loss.MSE),
-		WithWeightInit(WeightInitXavier),
-		WithMaxIterations(50000),
+		WithLoss[float64](loss.MSE),
+		WithWeightInit[float64](WeightInitXavier),
+		WithMaxIterations[float64](50000),
 		WithLossLimit(0.05),
 	)
 	if err != nil {

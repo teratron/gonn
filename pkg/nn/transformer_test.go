@@ -24,11 +24,11 @@ func TestWithTransformer_EncoderBlock(t *testing.T) {
 	t.Parallel()
 	cfg := newTestTrCfg()
 	n, err := New(
-		WithInput(uint(cfg.SeqLen*cfg.Dmodel)),
+		WithInput[float64](uint(cfg.SeqLen*cfg.Dmodel)),
 		WithEncoderBlock(cfg),
-		WithHiddenLayer(4, activation.ReLU),
-		WithOutput(1, activation.SIGMOID),
-		WithLoss(loss.MSE),
+		WithHiddenLayer[float64](4, activation.ReLU),
+		WithOutput[float64](1, activation.SIGMOID),
+		WithLoss[float64](loss.MSE),
 		WithLearningRate(0.01),
 	)
 	if err != nil {
@@ -44,11 +44,11 @@ func TestWithTransformer_DecoderBlock(t *testing.T) {
 	t.Parallel()
 	cfg := newTestTrCfg()
 	n, err := New(
-		WithInput(uint(cfg.SeqLen*cfg.Dmodel)),
+		WithInput[float64](uint(cfg.SeqLen*cfg.Dmodel)),
 		WithDecoderBlock(cfg),
-		WithHiddenLayer(4, activation.ReLU),
-		WithOutput(1, activation.SIGMOID),
-		WithLoss(loss.MSE),
+		WithHiddenLayer[float64](4, activation.ReLU),
+		WithOutput[float64](1, activation.SIGMOID),
+		WithLoss[float64](loss.MSE),
 		WithLearningRate(0.01),
 	)
 	if err != nil {
@@ -64,11 +64,11 @@ func TestWithTransformer_EncoderStack(t *testing.T) {
 	t.Parallel()
 	cfg := newTestTrCfg()
 	n, err := New(
-		WithInput(uint(cfg.SeqLen*cfg.Dmodel)),
+		WithInput[float64](uint(cfg.SeqLen*cfg.Dmodel)),
 		WithEncoderStack(cfg, 2),
-		WithHiddenLayer(4, activation.ReLU),
-		WithOutput(1, activation.SIGMOID),
-		WithLoss(loss.MSE),
+		WithHiddenLayer[float64](4, activation.ReLU),
+		WithOutput[float64](1, activation.SIGMOID),
+		WithLoss[float64](loss.MSE),
 		WithLearningRate(0.01),
 	)
 	if err != nil {
@@ -84,11 +84,11 @@ func TestWithTransformer_DecoderStack(t *testing.T) {
 	t.Parallel()
 	cfg := newTestTrCfg()
 	n, err := New(
-		WithInput(uint(cfg.SeqLen*cfg.Dmodel)),
+		WithInput[float64](uint(cfg.SeqLen*cfg.Dmodel)),
 		WithDecoderStack(cfg, 2),
-		WithHiddenLayer(4, activation.ReLU),
-		WithOutput(1, activation.SIGMOID),
-		WithLoss(loss.MSE),
+		WithHiddenLayer[float64](4, activation.ReLU),
+		WithOutput[float64](1, activation.SIGMOID),
+		WithLoss[float64](loss.MSE),
 		WithLearningRate(0.01),
 	)
 	if err != nil {
@@ -104,13 +104,13 @@ func TestWithTransformer_DecoderStack(t *testing.T) {
 func TestWithTransformer_EncoderStackFit(t *testing.T) {
 	cfg := newTestTrCfg()
 	n, err := New(
-		WithInput(uint(cfg.SeqLen*cfg.Dmodel)),
+		WithInput[float64](uint(cfg.SeqLen*cfg.Dmodel)),
 		WithEncoderStack(cfg, 2),
-		WithHiddenLayer(4, activation.ReLU),
-		WithOutput(1, activation.SIGMOID),
-		WithLoss(loss.MSE),
+		WithHiddenLayer[float64](4, activation.ReLU),
+		WithOutput[float64](1, activation.SIGMOID),
+		WithLoss[float64](loss.MSE),
 		WithLearningRate(0.01),
-		WithMaxIterations(1),
+		WithMaxIterations[float64](1),
 	)
 	if err != nil {
 		t.Fatalf("New: %v", err)

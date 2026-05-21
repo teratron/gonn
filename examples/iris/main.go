@@ -84,6 +84,37 @@ func argmax(v []float32) int {
 	return best
 }
 
+// minMaxNorm normalises all records in-place to [0, 1] per feature using
+// the global min/max over the full slice. Must be called before splitting
+// so the same scale is applied to both train and test partitions.
+func minMaxNorm(recs []irisRecord) {
+	if len(recs) == 0 {
+		return
+	}
+	var mins, maxs [4]float32
+	for i := range 4 {
+		mins[i] = recs[0].features[i]
+		maxs[i] = recs[0].features[i]
+	}
+	for _, r := range recs[1:] {
+		for i := range 4 {
+			if r.features[i] < mins[i] {
+				mins[i] = r.features[i]
+			}
+			if r.features[i] > maxs[i] {
+				maxs[i] = r.features[i]
+			}
+		}
+	}
+	for ri := range recs {
+		for i := range 4 {
+			if span := maxs[i] - mins[i]; span > 0 {
+				recs[ri].features[i] = (recs[ri].features[i] - mins[i]) / span
+			}
+		}
+	}
+}
+
 // runE05 builds the network, trains on an 80 % split, and reports
 // train / test accuracy plus the final mean-epoch loss. seed is
 // forwarded to the shuffle so smoke tests can pin a deterministic split.
@@ -92,6 +123,10 @@ func runE05(seed uint64) (trainAcc, testAcc, finalLoss float32, err error) {
 	if err != nil {
 		return 0, 0, 0, err
 	}
+
+	// Scale features to [0, 1] before shuffling so both partitions share
+	// the same normalisation statistics (derived from all 150 samples).
+	minMaxNorm(all)
 
 	rng := rand.New(rand.NewPCG(seed, seed^0xDEADBEEFCAFEBABE))
 	rng.Shuffle(len(all), func(i, j int) { all[i], all[j] = all[j], all[i] })

@@ -66,7 +66,6 @@ func (c *QuantizedConv1D[T]) Forward(x []T) []T {
 	return out
 }
 
-// newQuantizedConv1D quantizes a Conv1D layer's weights to int8.
 func newQuantizedConv1D[T utils.Float](src *convpkg.Conv1D[T], cfg QuantizationConfig[T]) *QuantizedConv1D[T] {
 	wf64 := toFloat64Slice(src.Weights)
 	qw, params := quantizeWeightsTensor(wf64, src.NumFilters, src.KernelSize, cfg.WeightGranularity)
@@ -184,7 +183,6 @@ func (c *QuantizedConv2D[T]) Forward(x []T) []T {
 	return out
 }
 
-// newQuantizedConv2D quantizes a Conv2D layer's weights to int8.
 func newQuantizedConv2D[T utils.Float](src *convpkg.Conv2D[T], cfg QuantizationConfig[T]) *QuantizedConv2D[T] {
 	cin := src.InChannels * src.KernelH * src.KernelW
 	wf64 := toFloat64Slice(src.Weights)

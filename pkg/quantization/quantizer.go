@@ -150,7 +150,6 @@ type floatPassthrough[T utils.Float] struct {
 
 func (f *floatPassthrough[T]) Forward(x []T) []T { return f.inner.Forward(x) }
 
-// baselineHash computes SHA-256 of the canonical JSON serialisation of net.
 func baselineHash[T utils.Float](net *nn.NN[T]) (string, error) {
 	data, err := json.Marshal(net)
 	if err != nil {
@@ -160,8 +159,7 @@ func baselineHash[T utils.Float](net *nn.NN[T]) (string, error) {
 	return hex.EncodeToString(sum[:]), nil
 }
 
-// rowMinMax returns the min and max of row c (length cin) in a Cout×Cin
-// row-major flat slice.
+// rowMinMax returns min/max of row c in a Cout×Cin row-major flat slice.
 func rowMinMax(w []float64, c, cin int) (float64, float64) {
 	base := c * cin
 	mn, mx := w[base], w[base]
@@ -177,7 +175,6 @@ func rowMinMax(w []float64, c, cin int) (float64, float64) {
 	return mn, mx
 }
 
-// sliceMinMax returns the min and max over the whole slice.
 func sliceMinMax(w []float64) (float64, float64) {
 	if len(w) == 0 {
 		return 0, 0
@@ -194,7 +191,6 @@ func sliceMinMax(w []float64) (float64, float64) {
 	return mn, mx
 }
 
-// toFloat64Slice converts a []T weight slice to []float64 for quantization math.
 func toFloat64Slice[T utils.Float](src []T) []float64 {
 	dst := make([]float64, len(src))
 	for i, v := range src {
@@ -203,7 +199,6 @@ func toFloat64Slice[T utils.Float](src []T) []float64 {
 	return dst
 }
 
-// clampF64 constrains v to [lo, hi].
 func clampF64(v, lo, hi float64) float64 {
 	return math.Max(lo, math.Min(hi, v))
 }

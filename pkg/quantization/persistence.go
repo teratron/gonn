@@ -132,7 +132,6 @@ func (q *QuantizedNetwork[T]) Save(path string) error {
 	return os.WriteFile(path, data, 0o644)
 }
 
-// marshalLayer encodes one quantizedLayer to QuantizedLayerJSON.
 func marshalLayer[T utils.Float](l quantizedLayer[T]) (QuantizedLayerJSON, error) {
 	switch v := l.(type) {
 	case *QuantizedDense[T]:
@@ -222,7 +221,6 @@ func marshalLayer[T utils.Float](l quantizedLayer[T]) (QuantizedLayerJSON, error
 	}
 }
 
-// unmarshalLayer reconstructs a quantizedLayer from a QuantizedLayerJSON record.
 func unmarshalLayer[T utils.Float](rec QuantizedLayerJSON) (quantizedLayer[T], error) {
 	wp := QuantizationParams{
 		Scale:       rec.Scale,
@@ -331,7 +329,6 @@ type opaquePassthrough[T utils.Float] struct{}
 
 func (o *opaquePassthrough[T]) Forward(x []T) []T { return x }
 
-// encodeInt8 encodes an int8 slice as base64 standard encoding.
 func encodeInt8(w []int8) string {
 	b := make([]byte, len(w))
 	for i, v := range w {
@@ -340,7 +337,6 @@ func encodeInt8(w []int8) string {
 	return base64.StdEncoding.EncodeToString(b)
 }
 
-// decodeInt8 decodes a base64-encoded int8 slice.
 func decodeInt8(s string) ([]int8, error) {
 	if s == "" {
 		return nil, nil
@@ -387,7 +383,6 @@ func decodeFloat64(s string) ([]float64, error) {
 	return f, nil
 }
 
-// convPad converts an int to the appropriate padding type (defined in conv.go).
 func convPad(v int) convPadMode {
 	return convPadMode(v)
 }

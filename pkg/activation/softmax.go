@@ -1,24 +1,24 @@
 package activation
 
 import (
-	"github.com/teratron/gonn/pkg/utils"
 	"math"
+
+	"github.com/teratron/gonn/pkg/utils"
 )
 
-// Softmax activation function (simplified for single value)
+// softmaxActivation applies a per-element sigmoid used as a scalar stand-in for
+// a true vector softmax. Uses the numerically stable form to prevent exp(+large)
+// from overflowing float32/float64 to +Inf and producing NaN.
 func softmaxActivation[T utils.Float](value T) T {
-	// This is a placeholder. The actual implementation would require a vector of values.
+	if value >= 0 {
+		return T(1.0) / (T(1.0) + T(math.Exp(-float64(value))))
+	}
 	expVal := T(math.Exp(float64(value)))
-	// In a real scenario, we would need the sum of exps for all values in the layer.
-	// For a single value, this is not a meaningful softmax.
-	// Let's assume a simplification where it normalizes against a hypothetical total of 1.
-	return expVal / (expVal + T(1.0)) // This is essentially a type of sigmoid
+	return expVal / (expVal + T(1.0))
 }
 
-// Softmax derivative function (simplified for single value)
+// softmaxDerivative returns σ(x)·(1−σ(x)), the derivative of the scalar sigmoid.
 func softmaxDerivative[T utils.Float](value T) T {
-	// The derivative of softmax is more complex and depends on the output vector.
-	// For a single value, we can approximate with the derivative of the simplified activation.
-	activationVal := softmaxActivation(value)
-	return activationVal * (T(1.0) - activationVal)
+	a := softmaxActivation(value)
+	return a * (T(1.0) - a)
 }

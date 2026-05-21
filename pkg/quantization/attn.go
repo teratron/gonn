@@ -43,17 +43,14 @@ func (q *QuantizedAttentionProjections[T]) Forward(x []T) []T {
 	dk := q.Dmodel / q.NumHeads
 	scale := T(1.0 / math.Sqrt(float64(dk)))
 
-	// Project input → Q, K, V using dequantized weights.
 	projQ := attnDequantProject(x, q.Wq, q.WqParams, q.Bq, q.SeqLen, q.Dmodel)
 	projK := attnDequantProject(x, q.Wk, q.WkParams, q.Bk, q.SeqLen, q.Dmodel)
 	projV := attnDequantProject(x, q.Wv, q.WvParams, q.Bv, q.SeqLen, q.Dmodel)
 
-	// Split to head-major [NumHeads, SeqLen, Dk].
 	hQ := attnSplitHeads(projQ, q.NumHeads, q.SeqLen, dk)
 	hK := attnSplitHeads(projK, q.NumHeads, q.SeqLen, dk)
 	hV := attnSplitHeads(projV, q.NumHeads, q.SeqLen, dk)
 
-	// Scaled dot-product scores [NumHeads, SeqLen, SeqLen].
 	ss := q.SeqLen * q.SeqLen
 	scores := make([]T, q.NumHeads*ss)
 	for h := range q.NumHeads {
@@ -71,7 +68,6 @@ func (q *QuantizedAttentionProjections[T]) Forward(x []T) []T {
 		}
 	}
 
-	// Causal mask.
 	if q.Causal {
 		for h := range q.NumHeads {
 			off := h * ss
@@ -83,13 +79,11 @@ func (q *QuantizedAttentionProjections[T]) Forward(x []T) []T {
 		}
 	}
 
-	// Softmax per head row-wise.
 	for h := range q.NumHeads {
 		off := h * ss
 		attnSoftmaxRows(scores[off:off+ss], q.SeqLen)
 	}
 
-	// Context = A × V [NumHeads, SeqLen, Dk].
 	ctx := make([]T, q.NumHeads*q.SeqLen*dk)
 	for h := range q.NumHeads {
 		aOff := h * ss
@@ -106,10 +100,7 @@ func (q *QuantizedAttentionProjections[T]) Forward(x []T) []T {
 		}
 	}
 
-	// Join heads → sequence-major [SeqLen, Dmodel].
 	merged := attnJoinHeads(ctx, q.NumHeads, q.SeqLen, dk)
-
-	// Output projection.
 	return attnDequantProject(merged, q.Wo, q.WoParams, q.Bo, q.SeqLen, q.Dmodel)
 }
 
@@ -180,8 +171,6 @@ func attnSoftmaxRows[T utils.Float](scores []T, n int) {
 	}
 }
 
-// newQuantizedAttentionProjections quantizes the four projection matrices of a
-// MultiHeadAttention layer.
 func newQuantizedAttentionProjections[T utils.Float](src *attentionpkg.MultiHeadAttention[T], cfg QuantizationConfig[T]) *QuantizedAttentionProjections[T] {
 	dmodel := src.Dmodel
 	cin := dmodel

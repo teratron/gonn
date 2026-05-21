@@ -58,14 +58,12 @@ func Evaluate[T utils.Float](
 	prefix := baseline.Config().ConvPrefix
 
 	for _, sample := range evalSet {
-		// Baseline forward.
 		floatOut, err := baseline.Query(sample.Input)
 		if err != nil {
 			return EvaluationResult{}, fmt.Errorf("evaluate: baseline query: %w", err)
 		}
 		metricSumFloat += metricFn(floatOut, sample.Expected)
 
-		// Quantized forward.
 		quantOut := quantized.Forward(sample.Input)
 		metricSumQuant += metricFn(quantOut, sample.Expected)
 

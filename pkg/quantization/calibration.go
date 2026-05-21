@@ -9,9 +9,8 @@ import (
 	"github.com/teratron/gonn/pkg/utils"
 )
 
-const calibHardFloor = 32 // ErrCalibTooFewSamples below this
+const calibHardFloor = 32
 
-// layerStats accumulates per-layer activation statistics during calibration.
 type layerStats struct {
 	vals []float64
 	min  float64
@@ -61,7 +60,6 @@ func (c *CalibrationRunner[T]) Run(samples [][]T) error {
 	return nil
 }
 
-// recordInput updates stats[i] with the values from an activation vector.
 func (c *CalibrationRunner[T]) recordInput(i int, x []T) {
 	s := &c.stats[i]
 	for _, v := range x {

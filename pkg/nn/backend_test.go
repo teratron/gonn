@@ -42,9 +42,9 @@ func TestWithBackend(t *testing.T) {
 
 	baseOpts := func() []Option[float64] {
 		return []Option[float64]{
-			WithInput(2),
-			WithHiddenLayer(4, activation.SIGMOID),
-			WithOutput(1, activation.SIGMOID),
+			WithInput[float64](2),
+			WithHiddenLayer[float64](4, activation.SIGMOID),
+			WithOutput[float64](1, activation.SIGMOID),
 		}
 	}
 
