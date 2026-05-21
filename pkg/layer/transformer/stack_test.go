@@ -9,7 +9,7 @@ import (
 
 func newTestStack(n int, seqLen, dmodel, numHeads, dff int) *Stack[float64] {
 	cfg := newTestCfg(seqLen, dmodel, numHeads, dff)
-	s := NewStack[float64](cfg, EncoderMode, n)
+	s := NewStack(cfg, EncoderMode, n)
 	s.Init(rand.New(rand.NewPCG(7, 7)))
 	return s
 }
@@ -39,7 +39,7 @@ func TestStack_ForwardShape(t *testing.T) {
 // TestStack_DecoderMode verifies that DecoderMode stack builds causal blocks.
 func TestStack_DecoderMode(t *testing.T) {
 	cfg := newTestCfg(4, 8, 2, 16)
-	s := NewStack[float64](cfg, DecoderMode, 2)
+	s := NewStack(cfg, DecoderMode, 2)
 	s.Init(rand.New(rand.NewPCG(5, 5)))
 	for i, blk := range s.Blocks {
 		dec, ok := blk.(*DecoderBlock[float64])
@@ -55,7 +55,7 @@ func TestStack_DecoderMode(t *testing.T) {
 // TestStack_EncoderMode verifies that EncoderMode stack builds non-causal blocks.
 func TestStack_EncoderMode(t *testing.T) {
 	cfg := newTestCfg(4, 8, 2, 16)
-	s := NewStack[float64](cfg, EncoderMode, 2)
+	s := NewStack(cfg, EncoderMode, 2)
 	s.Init(rand.New(rand.NewPCG(5, 5)))
 	for i, blk := range s.Blocks {
 		enc, ok := blk.(*EncoderBlock[float64])
@@ -251,7 +251,7 @@ func TestStack_JSONRoundTrip(t *testing.T) {
 // TestStack_DecoderJSONRoundTrip verifies DecoderMode stack JSON round-trip preserves causal flag.
 func TestStack_DecoderJSONRoundTrip(t *testing.T) {
 	cfg := newTestCfg(4, 8, 2, 16)
-	s := NewStack[float64](cfg, DecoderMode, 2)
+	s := NewStack(cfg, DecoderMode, 2)
 	s.Init(rand.New(rand.NewPCG(9, 9)))
 	s.SetTraining(false)
 

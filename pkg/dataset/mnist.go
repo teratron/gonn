@@ -350,7 +350,7 @@ func NewMNISTLoaderFiles[T utils.Float](imagePath, labelPath string, batchSize i
 	if err != nil {
 		return nil, err
 	}
-	ldr, err := NewMNISTLoader[T](imgR, lblR, batchSize, norm)
+	ldr, err := NewMNISTLoader(imgR, lblR, batchSize, norm)
 	if err != nil {
 		for _, c := range closers {
 			_ = c.Close()

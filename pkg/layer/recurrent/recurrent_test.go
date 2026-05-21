@@ -19,7 +19,7 @@ func TestCellHelpers(t *testing.T) {
 		copy(gates, inputs)
 		applySigmoidFused(gates, 0, len(gates))
 		for i, v := range inputs {
-			want := float64(activation.Activation[float64](v, activation.SIGMOID))
+			want := float64(activation.Activation(v, activation.SIGMOID))
 			if math.Abs(gates[i]-want) > 1e-12 {
 				t.Errorf("sigmoid[%d] got %.15g, want %.15g (diff %.3e)", i, gates[i], want, math.Abs(gates[i]-want))
 			}
@@ -32,7 +32,7 @@ func TestCellHelpers(t *testing.T) {
 		copy(gates, inputs)
 		applyTanhFused(gates, 0, len(gates))
 		for i, v := range inputs {
-			want := float64(activation.Activation[float64](v, activation.TanH))
+			want := float64(activation.Activation(v, activation.TanH))
 			if math.Abs(gates[i]-want) > 1e-12 {
 				t.Errorf("tanh[%d] got %.15g, want %.15g (diff %.3e)", i, gates[i], want, math.Abs(gates[i]-want))
 			}
@@ -54,7 +54,7 @@ func TestCellHelpers(t *testing.T) {
 			}
 		}
 		for i, v := range inputs {
-			want := float64(activation.Activation[float64](v, activation.SIGMOID))
+			want := float64(activation.Activation(v, activation.SIGMOID))
 			got := gates[len(inputs)+i]
 			if math.Abs(got-want) > 1e-12 {
 				t.Errorf("sigmoid offset[%d] got %.15g, want %.15g", i, got, want)
@@ -87,7 +87,7 @@ func TestCellHelpers(t *testing.T) {
 		}
 		applySigmoidFused(gates32, 0, len(gates32))
 		for i, v := range inputs {
-			want := float32(activation.Activation[float32](float32(v), activation.SIGMOID))
+			want := float32(activation.Activation(float32(v), activation.SIGMOID))
 			if math.Abs(float64(gates32[i]-want)) > 1e-6 {
 				t.Errorf("sigmoid float32[%d] got %v, want %v", i, gates32[i], want)
 			}

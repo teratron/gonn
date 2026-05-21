@@ -266,7 +266,7 @@ func TestBuildFromConfig(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ReadConfig: %v", err)
 	}
-	n, err := buildFromConfig[float32](doc)
+	n, err := buildFromConfig(doc)
 	if err != nil {
 		t.Fatalf("buildFromConfig: %v", err)
 	}
@@ -605,7 +605,7 @@ func TestBuildFromConfigBadActivation(t *testing.T) {
 		Output:       persistence.OutputDoc{Size: 1, Activation: "SIGMOID", Bias: true},
 		Training:     persistence.TrainingDoc[float32]{LearningRate: 0.1, Loss: "MSE", MaxIterations: 10},
 	}
-	_, err := buildFromConfig[float32](doc)
+	_, err := buildFromConfig(doc)
 	if err == nil {
 		t.Error("expected error for unknown activation")
 	}
@@ -618,7 +618,7 @@ func TestBuildFromConfigBadLoss(t *testing.T) {
 		Output:       persistence.OutputDoc{Size: 1, Activation: "SIGMOID", Bias: true},
 		Training:     persistence.TrainingDoc[float32]{LearningRate: 0.1, Loss: "NOSUCHLOSS", MaxIterations: 10},
 	}
-	_, err := buildFromConfig[float32](doc)
+	_, err := buildFromConfig(doc)
 	if err == nil {
 		t.Error("expected error for unknown loss")
 	}
@@ -631,7 +631,7 @@ func TestInstallLayerGCellCountMismatch(t *testing.T) {
 		Name:    "test",
 		Weights: [][]float32{{0.1}, {0.2}}, // 2 cells
 	}
-	err := installLayerG[float32]("test", false, 3, layer, // net has 3 cells
+	err := installLayerG("test", false, 3, layer, // net has 3 cells
 		func(ci, ai int, w float32) {},
 		func(ci int) int { return 1 },
 	)
@@ -646,7 +646,7 @@ func TestInstallLayerGBiasCountMismatch(t *testing.T) {
 		Weights: [][]float32{{0.1}, {0.2}},
 		Biases:  []float32{0.5}, // only 1 bias but 2 cells
 	}
-	err := installLayerG[float32]("test", true, 2, layer,
+	err := installLayerG("test", true, 2, layer,
 		func(ci, ai int, w float32) {},
 		func(ci int) int { return 2 },
 	)
@@ -660,7 +660,7 @@ func TestInstallLayerGRowWidthMismatch(t *testing.T) {
 		Name:    "test",
 		Weights: [][]float32{{0.1, 0.2}}, // 2 weights in row
 	}
-	err := installLayerG[float32]("test", false, 1, layer,
+	err := installLayerG("test", false, 1, layer,
 		func(ci, ai int, w float32) {},
 		func(ci int) int { return 3 }, // net cell has 3 axons
 	)

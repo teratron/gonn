@@ -11,7 +11,7 @@ import (
 // gamma=0 zero-rate, and SaveState/LoadState round-trip.
 func TestStepLRBoundary(t *testing.T) {
 	t.Run("decay at boundary", func(t *testing.T) {
-		sched := optimizer.NewStepLR[float64](1.0, 3, 0.5)
+		sched := optimizer.NewStepLR(1.0, 3, 0.5)
 		// step 1,2 → interval 0 → lr = 1.0
 		for i := range 2 {
 			if r := sched.Step(); math.Abs(r-1.0) > 1e-12 {
@@ -32,7 +32,7 @@ func TestStepLRBoundary(t *testing.T) {
 	})
 
 	t.Run("gamma=1 no-op", func(t *testing.T) {
-		sched := optimizer.NewStepLR[float64](0.1, 5, 1.0)
+		sched := optimizer.NewStepLR(0.1, 5, 1.0)
 		for i := range 20 {
 			if r := sched.Step(); math.Abs(r-0.1) > 1e-12 {
 				t.Errorf("step %d: got %v, want 0.1 (gamma=1 no-op)", i+1, r)
@@ -41,7 +41,7 @@ func TestStepLRBoundary(t *testing.T) {
 	})
 
 	t.Run("gamma=0 zero-rate after first interval", func(t *testing.T) {
-		sched := optimizer.NewStepLR[float64](1.0, 2, 0.0)
+		sched := optimizer.NewStepLR(1.0, 2, 0.0)
 		sched.Step()      // step 1 → interval 0 → 1.0
 		r := sched.Step() // step 2 → interval 1 → 0.0
 		if r != 0.0 {
@@ -50,7 +50,7 @@ func TestStepLRBoundary(t *testing.T) {
 	})
 
 	t.Run("SaveState/LoadState round-trip", func(t *testing.T) {
-		s1 := optimizer.NewStepLR[float64](1.0, 3, 0.5)
+		s1 := optimizer.NewStepLR(1.0, 3, 0.5)
 		s1.Step()
 		s1.Step()
 		blob, err := s1.SaveState()
@@ -70,7 +70,7 @@ func TestStepLRBoundary(t *testing.T) {
 	})
 
 	t.Run("Reset restores initial state", func(t *testing.T) {
-		sched := optimizer.NewStepLR[float64](1.0, 3, 0.5)
+		sched := optimizer.NewStepLR(1.0, 3, 0.5)
 		for range 6 {
 			sched.Step()
 		}
@@ -86,7 +86,7 @@ func TestStepLRBoundary(t *testing.T) {
 // TestWarmUpLRRamp verifies linear ramp, plateau after warmup, and round-trip.
 func TestWarmUpLRRamp(t *testing.T) {
 	t.Run("linear ramp", func(t *testing.T) {
-		sched := optimizer.NewWarmUpLR[float64](1.0, 4)
+		sched := optimizer.NewWarmUpLR(1.0, 4)
 		// step 1 → 1.0 × (1/4) = 0.25
 		if r := sched.Step(); math.Abs(r-0.25) > 1e-12 {
 			t.Errorf("step 1: got %v, want 0.25", r)
@@ -110,7 +110,7 @@ func TestWarmUpLRRamp(t *testing.T) {
 	})
 
 	t.Run("SaveState/LoadState round-trip", func(t *testing.T) {
-		s1 := optimizer.NewWarmUpLR[float64](0.5, 10)
+		s1 := optimizer.NewWarmUpLR(0.5, 10)
 		for range 5 {
 			s1.Step()
 		}
@@ -133,7 +133,7 @@ func TestWarmUpLRRamp(t *testing.T) {
 func TestCosineAnnealingLR(t *testing.T) {
 	t.Run("mid-point is halfway", func(t *testing.T) {
 		// At t = tMax/2: cos(π/2) = 0 → rate = lrMin + 0.5*(lr0-lrMin)
-		sched := optimizer.NewCosineAnnealingLR[float64](1.0, 0.0, 100)
+		sched := optimizer.NewCosineAnnealingLR(1.0, 0.0, 100)
 		for range 50 {
 			sched.Step()
 		}
@@ -145,7 +145,7 @@ func TestCosineAnnealingLR(t *testing.T) {
 	})
 
 	t.Run("plateau at lrMin after tMax", func(t *testing.T) {
-		sched := optimizer.NewCosineAnnealingLR[float64](1.0, 0.01, 10)
+		sched := optimizer.NewCosineAnnealingLR(1.0, 0.01, 10)
 		for range 15 {
 			sched.Step()
 		}
@@ -156,7 +156,7 @@ func TestCosineAnnealingLR(t *testing.T) {
 	})
 
 	t.Run("SaveState/LoadState round-trip", func(t *testing.T) {
-		s1 := optimizer.NewCosineAnnealingLR[float64](1.0, 0.001, 100)
+		s1 := optimizer.NewCosineAnnealingLR(1.0, 0.001, 100)
 		for range 40 {
 			s1.Step()
 		}
@@ -178,8 +178,8 @@ func TestCosineAnnealingLR(t *testing.T) {
 // TestChainSchedulerSequence verifies segment transitions and round-trip.
 func TestChainSchedulerSequence(t *testing.T) {
 	t.Run("warmup then step-decay", func(t *testing.T) {
-		warmup := optimizer.NewWarmUpLR[float64](1.0, 4)
-		decay := optimizer.NewStepLR[float64](1.0, 2, 0.5)
+		warmup := optimizer.NewWarmUpLR(1.0, 4)
+		decay := optimizer.NewStepLR(1.0, 2, 0.5)
 		chain := optimizer.NewChainScheduler([]optimizer.SchedulerSegment[float64]{
 			{Scheduler: warmup, Duration: 4},
 			{Scheduler: decay, Duration: 6},
@@ -205,7 +205,7 @@ func TestChainSchedulerSequence(t *testing.T) {
 	})
 
 	t.Run("exhausted chain holds last rate", func(t *testing.T) {
-		sched := optimizer.NewStepLR[float64](1.0, 1, 0.5)
+		sched := optimizer.NewStepLR(1.0, 1, 0.5)
 		chain := optimizer.NewChainScheduler([]optimizer.SchedulerSegment[float64]{
 			{Scheduler: sched, Duration: 2},
 		})
@@ -221,8 +221,8 @@ func TestChainSchedulerSequence(t *testing.T) {
 	})
 
 	t.Run("Reset propagates to all sub-schedulers", func(t *testing.T) {
-		warmup := optimizer.NewWarmUpLR[float64](1.0, 4)
-		decay := optimizer.NewStepLR[float64](1.0, 2, 0.5)
+		warmup := optimizer.NewWarmUpLR(1.0, 4)
+		decay := optimizer.NewStepLR(1.0, 2, 0.5)
 		chain := optimizer.NewChainScheduler([]optimizer.SchedulerSegment[float64]{
 			{Scheduler: warmup, Duration: 4},
 			{Scheduler: decay, Duration: 4},
@@ -239,10 +239,10 @@ func TestChainSchedulerSequence(t *testing.T) {
 	})
 
 	t.Run("SaveState/LoadState round-trip", func(t *testing.T) {
-		w1 := optimizer.NewWarmUpLR[float64](1.0, 4)
-		w2 := optimizer.NewWarmUpLR[float64](1.0, 4)
-		d1 := optimizer.NewStepLR[float64](1.0, 2, 0.5)
-		d2 := optimizer.NewStepLR[float64](1.0, 2, 0.5)
+		w1 := optimizer.NewWarmUpLR(1.0, 4)
+		w2 := optimizer.NewWarmUpLR(1.0, 4)
+		d1 := optimizer.NewStepLR(1.0, 2, 0.5)
+		d2 := optimizer.NewStepLR(1.0, 2, 0.5)
 
 		c1 := optimizer.NewChainScheduler([]optimizer.SchedulerSegment[float64]{
 			{Scheduler: w1, Duration: 4},
@@ -273,8 +273,8 @@ func TestChainSchedulerSequence(t *testing.T) {
 // TestBindSchedulerUpdatesOptimizer verifies that BindScheduler pushes new
 // rates into the optimizer after each Step call.
 func TestBindSchedulerUpdatesOptimizer(t *testing.T) {
-	opt := optimizer.NewSGD[float64](1.0)
-	sched := optimizer.BindScheduler[float64](opt, optimizer.NewStepLR[float64](1.0, 2, 0.5))
+	opt := optimizer.NewSGD(1.0)
+	sched := optimizer.BindScheduler(opt, optimizer.NewStepLR(1.0, 2, 0.5))
 
 	// Step 1: interval 0 → rate stays 1.0, optimizer unchanged.
 	r := sched.Step()
@@ -303,7 +303,7 @@ func TestGranularity(t *testing.T) {
 
 // BenchmarkStepLRStep measures allocations on the StepLR hot path.
 func BenchmarkStepLRStep(b *testing.B) {
-	sched := optimizer.NewStepLR[float64](0.1, 10, 0.9)
+	sched := optimizer.NewStepLR(0.1, 10, 0.9)
 	b.ResetTimer()
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -315,7 +315,7 @@ func BenchmarkStepLRStep(b *testing.B) {
 // gamma near-zero floor, SaveState/LoadState round-trip, and Reset.
 func TestExponentialLR(t *testing.T) {
 	t.Run("single step", func(t *testing.T) {
-		sched := optimizer.NewExponentialLR[float64](1.0, 0.9)
+		sched := optimizer.NewExponentialLR(1.0, 0.9)
 		// step 1 → lr₀ × 0.9^1 = 0.9
 		if r := sched.Step(); math.Abs(r-0.9) > 1e-12 {
 			t.Errorf("step 1: got %v, want 0.9", r)
@@ -323,7 +323,7 @@ func TestExponentialLR(t *testing.T) {
 	})
 
 	t.Run("accumulation", func(t *testing.T) {
-		sched := optimizer.NewExponentialLR[float64](1.0, 0.5)
+		sched := optimizer.NewExponentialLR(1.0, 0.5)
 		// step 1 → 0.5, step 2 → 0.25, step 3 → 0.125
 		want := []float64{0.5, 0.25, 0.125}
 		for i, w := range want {
@@ -334,7 +334,7 @@ func TestExponentialLR(t *testing.T) {
 	})
 
 	t.Run("gamma=1 no-op", func(t *testing.T) {
-		sched := optimizer.NewExponentialLR[float64](0.1, 1.0)
+		sched := optimizer.NewExponentialLR(0.1, 1.0)
 		for i := range 20 {
 			if r := sched.Step(); math.Abs(r-0.1) > 1e-12 {
 				t.Errorf("step %d: got %v, want 0.1 (gamma=1 no-op)", i+1, r)
@@ -343,7 +343,7 @@ func TestExponentialLR(t *testing.T) {
 	})
 
 	t.Run("gamma near-zero floor", func(t *testing.T) {
-		sched := optimizer.NewExponentialLR[float64](1.0, 1e-10)
+		sched := optimizer.NewExponentialLR(1.0, 1e-10)
 		// After enough steps the value should be effectively zero.
 		for range 50 {
 			sched.Step()
@@ -355,7 +355,7 @@ func TestExponentialLR(t *testing.T) {
 	})
 
 	t.Run("SaveState/LoadState round-trip", func(t *testing.T) {
-		s1 := optimizer.NewExponentialLR[float64](1.0, 0.9)
+		s1 := optimizer.NewExponentialLR(1.0, 0.9)
 		for range 7 {
 			s1.Step()
 		}
@@ -374,7 +374,7 @@ func TestExponentialLR(t *testing.T) {
 	})
 
 	t.Run("Reset restores lr0", func(t *testing.T) {
-		sched := optimizer.NewExponentialLR[float64](0.5, 0.9)
+		sched := optimizer.NewExponentialLR(0.5, 0.9)
 		for range 10 {
 			sched.Step()
 		}
@@ -395,7 +395,7 @@ func TestGranularityExponential(t *testing.T) {
 
 // BenchmarkExponentialLRStep measures allocations on the ExponentialLR hot path.
 func BenchmarkExponentialLRStep(b *testing.B) {
-	sched := optimizer.NewExponentialLR[float64](0.1, 0.95)
+	sched := optimizer.NewExponentialLR(0.1, 0.95)
 	b.ResetTimer()
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {

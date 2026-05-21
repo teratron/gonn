@@ -60,7 +60,7 @@ func TestSliceDatasetIteration(t *testing.T) {
 }
 
 func TestSliceDatasetReset(t *testing.T) {
-	ds, _ := NewSliceDataset[float32](
+	ds, _ := NewSliceDataset(
 		[][]float32{{1}, {2}}, [][]float32{{1}, {2}}, 1)
 	if _, _, err := drainAll(t, ds); err != nil {
 		t.Fatal(err)
@@ -78,7 +78,7 @@ func TestSliceDatasetReset(t *testing.T) {
 }
 
 func TestSliceDatasetPartialFinalBatch(t *testing.T) {
-	ds, _ := NewSliceDataset[float32](
+	ds, _ := NewSliceDataset(
 		[][]float32{{1}, {2}, {3}}, [][]float32{{1}, {2}, {3}}, 2)
 	b1, err := ds.Next(context.Background())
 	if err != nil {
@@ -100,16 +100,16 @@ func TestSliceDatasetPartialFinalBatch(t *testing.T) {
 }
 
 func TestSliceDatasetValidation(t *testing.T) {
-	if _, err := NewSliceDataset[float32]([][]float32{{1}}, [][]float32{}, 1); err == nil {
+	if _, err := NewSliceDataset([][]float32{{1}}, [][]float32{}, 1); err == nil {
 		t.Error("expected error on len mismatch")
 	}
-	if _, err := NewSliceDataset[float32]([][]float32{{1}}, [][]float32{{1}}, 0); err == nil {
+	if _, err := NewSliceDataset([][]float32{{1}}, [][]float32{{1}}, 0); err == nil {
 		t.Error("expected error on zero batch")
 	}
 }
 
 func TestSliceDatasetContextCancel(t *testing.T) {
-	ds, _ := NewSliceDataset[float32]([][]float32{{1}}, [][]float32{{1}}, 1)
+	ds, _ := NewSliceDataset([][]float32{{1}}, [][]float32{{1}}, 1)
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
 	if _, err := ds.Next(ctx); err == nil {
@@ -229,7 +229,7 @@ func TestPrefetchOrdering(t *testing.T) {
 	inputs := [][]float32{{1}, {2}, {3}, {4}, {5}}
 	targets := [][]float32{{1}, {2}, {3}, {4}, {5}}
 	inner, _ := NewSliceDataset(inputs, targets, 1)
-	ds, err := Prefetch[float32](inner, 2)
+	ds, err := Prefetch(inner, 2)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -252,7 +252,7 @@ func TestPrefetchBackpressure(t *testing.T) {
 	var counter atomic.Int32
 	inner := &countingDataset{counter: &counter, total: 100}
 
-	ds, err := Prefetch[float32](inner, 1) // capacity = 2
+	ds, err := Prefetch(inner, 1) // capacity = 2
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -312,7 +312,7 @@ func TestPrefetchValidation(t *testing.T) {
 	if _, err := Prefetch[float32](nil, 1); err == nil {
 		t.Error("expected error on nil inner")
 	}
-	inner, _ := NewSliceDataset[float32]([][]float32{{1}}, [][]float32{{1}}, 1)
+	inner, _ := NewSliceDataset([][]float32{{1}}, [][]float32{{1}}, 1)
 	if _, err := Prefetch(inner, -1); err == nil {
 		t.Error("expected error on negative prefetch")
 	}
@@ -320,7 +320,7 @@ func TestPrefetchValidation(t *testing.T) {
 
 func TestPrefetchContextCancel(t *testing.T) {
 	inner := &countingDataset{counter: &atomic.Int32{}, total: 1_000_000}
-	ds, _ := Prefetch[float32](inner, 0)
+	ds, _ := Prefetch(inner, 0)
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
 	_, err := ds.Next(ctx)
@@ -333,7 +333,7 @@ func TestPrefetchReset(t *testing.T) {
 	inputs := [][]float32{{1}, {2}}
 	targets := [][]float32{{1}, {2}}
 	inner, _ := NewSliceDataset(inputs, targets, 1)
-	ds, _ := Prefetch[float32](inner, 0)
+	ds, _ := Prefetch(inner, 0)
 	if _, _, err := drainAll(t, ds); err != nil {
 		t.Fatal(err)
 	}
@@ -351,7 +351,7 @@ func TestPrefetchReset(t *testing.T) {
 
 func TestPrefetchPropagatesError(t *testing.T) {
 	inner := &errorDataset{err: utils.Newf(utils.ErrInputData, "synthetic")}
-	ds, _ := Prefetch[float32](inner, 1)
+	ds, _ := Prefetch(inner, 1)
 	_, err := ds.Next(context.Background())
 	if err == nil || !errors.Is(err, utils.ErrInputData) {
 		t.Errorf("expected ErrInputData propagation, got %v", err)

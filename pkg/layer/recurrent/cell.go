@@ -11,14 +11,14 @@ var _ = utils.Orthogonal[float64]
 // applySigmoidFused applies sigmoid activation in-place to gates[offset:offset+count].
 func applySigmoidFused[T utils.Float](gates []T, offset, count int) {
 	for i := offset; i < offset+count; i++ {
-		gates[i] = activation.Activation[T](gates[i], activation.SIGMOID)
+		gates[i] = activation.Activation(gates[i], activation.SIGMOID)
 	}
 }
 
 // applyTanhFused applies tanh activation in-place to gates[offset:offset+count].
 func applyTanhFused[T utils.Float](gates []T, offset, count int) {
 	for i := offset; i < offset+count; i++ {
-		gates[i] = activation.Activation[T](gates[i], activation.TanH)
+		gates[i] = activation.Activation(gates[i], activation.TanH)
 	}
 }
 

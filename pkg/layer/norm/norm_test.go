@@ -119,7 +119,7 @@ func TestBatchNormSingleSampleGuard(t *testing.T) {
 }
 
 func TestBatchNormAffineDisabled(t *testing.T) {
-	bn := NewBatchNorm[float32](4, WithBatchNormAffine[float32](false))
+	bn := NewBatchNorm(4, WithBatchNormAffine[float32](false))
 	g, b := bn.GradSlots()
 	if g != nil || b != nil {
 		t.Error("GradSlots with affine=false should return (nil, nil)")
@@ -178,7 +178,7 @@ func TestLayerNormShapePreservation(t *testing.T) {
 }
 
 func TestLayerNormAffineDisabled(t *testing.T) {
-	ln := NewLayerNorm[float32](4, WithLayerNormAffine[float32](false))
+	ln := NewLayerNorm(4, WithLayerNormAffine[float32](false))
 	g, b := ln.GradSlots()
 	if g != nil || b != nil {
 		t.Error("GradSlots with affine=false should return (nil, nil)")
@@ -422,7 +422,7 @@ func TestLayerNorm_Backward(t *testing.T) {
 // TestLayerNorm_BackwardAffineDisabled verifies Backward returns non-zero ∂L/∂x
 // even when affine is disabled (no gamma/beta params to update).
 func TestLayerNorm_BackwardAffineDisabled(t *testing.T) {
-	ln := NewLayerNorm[float64](4, WithLayerNormAffine[float64](false))
+	ln := NewLayerNorm(4, WithLayerNormAffine[float64](false))
 	x := []float64{1, 2, 3, 4}
 	upstream := []float64{1, 1, 1, 1}
 	ln.Forward(x)

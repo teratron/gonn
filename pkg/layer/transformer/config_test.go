@@ -45,7 +45,7 @@ func TestApplyActivationInPlace(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			x := make([]float64, len(tc.input))
 			copy(x, tc.input)
-			applyActivationInPlace[float64](tc.mode, x)
+			applyActivationInPlace(tc.mode, x)
 			for i, v := range x {
 				if !tc.check(tc.input[i], v) {
 					// Use activation.Activation to get expected value for error message.
@@ -62,7 +62,7 @@ func TestApplyActivationInPlace(t *testing.T) {
 func TestApplyActivationInPlace_InPlace(t *testing.T) {
 	x := []float64{-1, 2, -3, 4}
 	ptr := &x[0]
-	applyActivationInPlace[float64](activation.ReLU, x)
+	applyActivationInPlace(activation.ReLU, x)
 	if &x[0] != ptr {
 		t.Error("applyActivationInPlace reallocated the slice")
 	}
@@ -78,7 +78,7 @@ func TestApplyActivationInPlace_MatchesScalar(t *testing.T) {
 	for _, mode := range modes {
 		x := make([]float64, len(input))
 		copy(x, input)
-		applyActivationInPlace[float64](mode, x)
+		applyActivationInPlace(mode, x)
 		for i, v := range input {
 			want := activation.Activation(v, mode)
 			if math.Abs(x[i]-want) > 1e-9 {

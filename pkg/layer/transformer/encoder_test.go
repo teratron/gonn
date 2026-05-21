@@ -21,7 +21,7 @@ func newTestCfg(seqLen, dmodel, numHeads, dff int) TransformerConfig[float64] {
 
 func newTestEncoder(seqLen, dmodel, numHeads, dff int) *EncoderBlock[float64] {
 	cfg := newTestCfg(seqLen, dmodel, numHeads, dff)
-	blk := NewEncoderBlock[float64](cfg)
+	blk := NewEncoderBlock(cfg)
 	blk.Init(rand.New(rand.NewPCG(7, 7)))
 	return blk
 }
@@ -107,7 +107,7 @@ func TestEncoderBlock_SetPaddingMask(t *testing.T) {
 func TestEncoderBlock_DefaultActivationReLU(t *testing.T) {
 	cfg := TransformerConfig[float64]{SeqLen: 2, Dmodel: 4, NumHeads: 1, Dff: 8}
 	// Activation is intentionally left zero.
-	blk := NewEncoderBlock[float64](cfg)
+	blk := NewEncoderBlock(cfg)
 	if blk.Cfg.Activation != activation.ReLU {
 		t.Errorf("default Activation=%v, want ReLU", blk.Cfg.Activation)
 	}
@@ -116,7 +116,7 @@ func TestEncoderBlock_DefaultActivationReLU(t *testing.T) {
 // TestEncoderBlock_DefaultDff verifies that Dff=0 is substituted to 4*Dmodel.
 func TestEncoderBlock_DefaultDff(t *testing.T) {
 	cfg := TransformerConfig[float64]{SeqLen: 2, Dmodel: 8, NumHeads: 2}
-	blk := NewEncoderBlock[float64](cfg)
+	blk := NewEncoderBlock(cfg)
 	if blk.Cfg.Dff != 32 {
 		t.Errorf("default Dff=%d, want 32 (4*8)", blk.Cfg.Dff)
 	}
@@ -152,7 +152,7 @@ func TestEncoderBlock_DropoutZeroEquivalence(t *testing.T) {
 func TestEncoderBlock_DropoutTrainingDiffers(t *testing.T) {
 	cfg := newTestCfg(4, 8, 2, 16)
 	cfg.DropoutRate = 0.5
-	blk := NewEncoderBlock[float64](cfg)
+	blk := NewEncoderBlock(cfg)
 	blk.Init(rand.New(rand.NewPCG(7, 7)))
 
 	x := make([]float64, 4*8)
@@ -185,7 +185,7 @@ func TestEncoderBlock_PreNorm_Shape(t *testing.T) {
 	seqLen, dmodel, numHeads, dff := 4, 8, 2, 16
 	cfg := newTestCfg(seqLen, dmodel, numHeads, dff)
 	cfg.PreNorm = true
-	blk := NewEncoderBlock[float64](cfg)
+	blk := NewEncoderBlock(cfg)
 	blk.Init(rand.New(rand.NewPCG(7, 7)))
 	blk.SetTraining(false)
 
@@ -219,7 +219,7 @@ func TestEncoderBlock_PreNorm_BackwardFD(t *testing.T) {
 
 	cfg := newTestCfg(seqLen, dmodel, numHeads, dff)
 	cfg.PreNorm = true
-	blk := NewEncoderBlock[float64](cfg)
+	blk := NewEncoderBlock(cfg)
 	blk.Init(rand.New(rand.NewPCG(13, 13)))
 	blk.SetTraining(false)
 

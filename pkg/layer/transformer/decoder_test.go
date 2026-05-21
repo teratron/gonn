@@ -9,7 +9,7 @@ import (
 
 func newTestDecoder(seqLen, dmodel, numHeads, dff int) *DecoderBlock[float64] {
 	cfg := newTestCfg(seqLen, dmodel, numHeads, dff)
-	blk := NewDecoderBlock[float64](cfg)
+	blk := NewDecoderBlock(cfg)
 	blk.Init(rand.New(rand.NewPCG(7, 7)))
 	return blk
 }
@@ -219,7 +219,7 @@ func TestDecoderBlock_PreNorm_Shape(t *testing.T) {
 	seqLen, dmodel, numHeads, dff := 4, 8, 2, 16
 	cfg := newTestCfg(seqLen, dmodel, numHeads, dff)
 	cfg.PreNorm = true
-	blk := NewDecoderBlock[float64](cfg)
+	blk := NewDecoderBlock(cfg)
 	blk.Init(rand.New(rand.NewPCG(7, 7)))
 	blk.SetTraining(false)
 
@@ -243,7 +243,7 @@ func TestDecoderBlock_PreNorm_Shape(t *testing.T) {
 // substituted to ReLU (TRANS-C4).
 func TestDecoderBlock_DefaultActivationReLU(t *testing.T) {
 	cfg := TransformerConfig[float64]{SeqLen: 2, Dmodel: 4, NumHeads: 1, Dff: 8}
-	blk := NewDecoderBlock[float64](cfg)
+	blk := NewDecoderBlock(cfg)
 	if blk.Cfg.Activation != defaultActivation {
 		t.Errorf("default Activation=%v, want ReLU", blk.Cfg.Activation)
 	}
@@ -252,7 +252,7 @@ func TestDecoderBlock_DefaultActivationReLU(t *testing.T) {
 // TestDecoderBlock_DefaultDff verifies that Dff=0 is substituted to 4*Dmodel.
 func TestDecoderBlock_DefaultDff(t *testing.T) {
 	cfg := TransformerConfig[float64]{SeqLen: 2, Dmodel: 8, NumHeads: 2}
-	blk := NewDecoderBlock[float64](cfg)
+	blk := NewDecoderBlock(cfg)
 	if blk.Cfg.Dff != 32 {
 		t.Errorf("default Dff=%d, want 32 (4*8)", blk.Cfg.Dff)
 	}

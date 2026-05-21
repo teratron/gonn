@@ -20,7 +20,7 @@ func loadNetwork[T utils.Float](cfgPath, weightsPath string) (*nn.NN[T], persist
 		return nil, doc, err
 	}
 
-	n, err := buildFromConfig[T](doc)
+	n, err := buildFromConfig(doc)
 	if err != nil {
 		return nil, doc, err
 	}

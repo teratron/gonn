@@ -9,7 +9,7 @@ import (
 
 // TestSGDGolden verifies SGD applies the correct weight update.
 func TestSGDGolden(t *testing.T) {
-	opt := optimizer.NewSGD[float64](0.1)
+	opt := optimizer.NewSGD(0.1)
 	weights := []float64{1.0, 2.0}
 	deltas := []float64{0.5, -1.0} // ∂L/∂w
 
@@ -55,8 +55,8 @@ func TestZeroLRNoOp(t *testing.T) {
 
 // TestAdamRoundTrip verifies SaveState → LoadState produces identical next Step.
 func TestAdamRoundTrip(t *testing.T) {
-	opt1 := optimizer.NewAdam[float64](0.01)
-	opt2 := optimizer.NewAdam[float64](0.01)
+	opt1 := optimizer.NewAdam(0.01)
+	opt2 := optimizer.NewAdam(0.01)
 
 	weights1 := []float64{1.0, 2.0, 3.0}
 	weights2 := make([]float64, len(weights1))
@@ -100,9 +100,9 @@ func TestResetIdempotent(t *testing.T) {
 		a    optimizer.Optimizer[float64]
 		b    optimizer.Optimizer[float64]
 	}{
-		{"SGDMomentum", optimizer.NewSGDMomentum[float64](0.01), optimizer.NewSGDMomentum[float64](0.01)},
-		{"Adam", optimizer.NewAdam[float64](0.01), optimizer.NewAdam[float64](0.01)},
-		{"RMSProp", optimizer.NewRMSProp[float64](0.01), optimizer.NewRMSProp[float64](0.01)},
+		{"SGDMomentum", optimizer.NewSGDMomentum(0.01), optimizer.NewSGDMomentum(0.01)},
+		{"Adam", optimizer.NewAdam(0.01), optimizer.NewAdam(0.01)},
+		{"RMSProp", optimizer.NewRMSProp(0.01), optimizer.NewRMSProp(0.01)},
 	}
 	deltas := []float64{0.3, -0.1, 0.5}
 
@@ -134,7 +134,7 @@ func TestResetIdempotent(t *testing.T) {
 
 // TestDefaultOptimizer verifies DefaultOptimizer returns a functioning SGD instance.
 func TestDefaultOptimizer(t *testing.T) {
-	opt := optimizer.DefaultOptimizer[float64](0.2)
+	opt := optimizer.DefaultOptimizer(0.2)
 	if opt.LearningRate() != 0.2 {
 		t.Fatalf("LearningRate: got %v, want 0.2", opt.LearningRate())
 	}
@@ -148,7 +148,7 @@ func TestDefaultOptimizer(t *testing.T) {
 
 // TestSGDInterface exercises Reset, LearningRate, SaveState, LoadState.
 func TestSGDInterface(t *testing.T) {
-	opt := optimizer.NewSGD[float64](0.5)
+	opt := optimizer.NewSGD(0.5)
 
 	if opt.LearningRate() != 0.5 {
 		t.Fatalf("LearningRate: got %v, want 0.5", opt.LearningRate())
@@ -177,7 +177,7 @@ func TestSGDInterface(t *testing.T) {
 
 // TestAdamHyperAndLearningRate covers NewAdamHyper and LearningRate.
 func TestAdamHyperAndLearningRate(t *testing.T) {
-	opt := optimizer.NewAdamHyper[float64](0.001, 0.8, 0.99, 1e-7)
+	opt := optimizer.NewAdamHyper(0.001, 0.8, 0.99, 1e-7)
 	if opt.LearningRate() != 0.001 {
 		t.Fatalf("LearningRate: got %v, want 0.001", opt.LearningRate())
 	}
@@ -191,7 +191,7 @@ func TestAdamHyperAndLearningRate(t *testing.T) {
 
 // TestRMSPropInterface covers NewRMSPropHyper, LearningRate, SaveState, LoadState.
 func TestRMSPropInterface(t *testing.T) {
-	opt := optimizer.NewRMSPropHyper[float64](0.01, 0.95, 1e-7)
+	opt := optimizer.NewRMSPropHyper(0.01, 0.95, 1e-7)
 	if opt.LearningRate() != 0.01 {
 		t.Fatalf("LearningRate: got %v, want 0.01", opt.LearningRate())
 	}
@@ -219,7 +219,7 @@ func TestRMSPropInterface(t *testing.T) {
 
 // TestSGDMomentumInterface covers NewSGDMomentumWithGamma, LearningRate, SaveState, LoadState.
 func TestSGDMomentumInterface(t *testing.T) {
-	opt := optimizer.NewSGDMomentumWithGamma[float64](0.05, 0.95)
+	opt := optimizer.NewSGDMomentumWithGamma(0.05, 0.95)
 	if opt.LearningRate() != 0.05 {
 		t.Fatalf("LearningRate: got %v, want 0.05", opt.LearningRate())
 	}
@@ -247,7 +247,7 @@ func TestSGDMomentumInterface(t *testing.T) {
 
 // BenchmarkSGDStep measures allocations on the SGD hot path — target 0 allocs/op.
 func BenchmarkSGDStep(b *testing.B) {
-	opt := optimizer.NewSGD[float64](0.01)
+	opt := optimizer.NewSGD(0.01)
 	weights := make([]float64, 256)
 	deltas := make([]float64, 256)
 	for i := range deltas {
@@ -262,7 +262,7 @@ func BenchmarkSGDStep(b *testing.B) {
 
 // BenchmarkAdamStep measures allocations on Adam after warm-up — target 0 allocs/op.
 func BenchmarkAdamStep(b *testing.B) {
-	opt := optimizer.NewAdam[float64](0.001)
+	opt := optimizer.NewAdam(0.001)
 	weights := make([]float64, 256)
 	deltas := make([]float64, 256)
 	for i := range deltas {

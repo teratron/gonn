@@ -2,8 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
-	"os"
 
 	"github.com/teratron/gonn/pkg/utils"
 )
@@ -41,10 +39,3 @@ func exitCode(err error) int {
 	}
 }
 
-// die prints err to stderr and calls os.Exit with the appropriate code.
-// Callers that cannot propagate the error up the call stack should call
-// die; all others should return the error for testability.
-func die(err error) {
-	fmt.Fprintf(os.Stderr, "gonn: %v\n", err)
-	os.Exit(exitCode(err))
-}
