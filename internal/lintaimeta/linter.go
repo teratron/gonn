@@ -355,7 +355,7 @@ func constOrVar(d *ast.GenDecl) declKind {
 // LintDir parses all non-test .go files in dir and returns every finding.
 func LintDir(dir string, tier Tier) ([]Finding, error) {
 	fset := token.NewFileSet()
-	pkgs, err := parser.ParseDir(fset, dir, func(fi os.FileInfo) bool { //nolint:staticcheck
+	pkgs, err := parser.ParseDir(fset, dir, func(fi os.FileInfo) bool {
 		return !strings.HasSuffix(fi.Name(), "_test.go")
 	}, parser.ParseComments)
 	if err != nil {

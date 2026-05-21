@@ -40,7 +40,7 @@ func TestBufferRoundTrip(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Allocate: %v", err)
 	}
-	defer b.Free(buf) //nolint:errcheck
+	defer b.Free(buf)
 
 	if err := b.Write(buf, src); err != nil {
 		t.Fatalf("Write: %v", err)
