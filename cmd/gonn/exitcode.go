@@ -38,4 +38,3 @@ func exitCode(err error) int {
 		return exitGeneric
 	}
 }
-
