@@ -150,7 +150,9 @@ func TestTokenEmbedding_BackwardSparseGrad(t *testing.T) {
 	te.Init(rng)
 
 	ids := []int{2, 5}
-	te.ForwardIDs(ids)
+	if _, err := te.ForwardIDs(ids); err != nil {
+		t.Fatal(err)
+	}
 	upstream := make([]float64, te.OutputSize())
 	for i := range upstream {
 		upstream[i] = 1.0
@@ -167,7 +169,9 @@ func TestTokenEmbedding_BackwardSparseGrad(t *testing.T) {
 
 func TestTokenEmbedding_ApplyGradSGD(t *testing.T) {
 	te := newTestTokenEmbedding(t)
-	te.ForwardIDs([]int{0, 1})
+	if _, err := te.ForwardIDs([]int{0, 1}); err != nil {
+		t.Fatal(err)
+	}
 	upstream := make([]float64, te.OutputSize())
 	for i := range upstream {
 		upstream[i] = 0.5
@@ -325,7 +329,9 @@ func TestEmbeddingStack_ForwardIDsShape(t *testing.T) {
 
 func TestEmbeddingStack_BackwardShape(t *testing.T) {
 	es := newTestStack(t)
-	es.ForwardIDs([]int{0, 1, 2, 3, 4})
+	if _, err := es.ForwardIDs([]int{0, 1, 2, 3, 4}); err != nil {
+		t.Fatal(err)
+	}
 	upstream := make([]float64, es.OutputSize())
 	result := es.Backward(upstream)
 	// Backward of embedding returns nil (no gradient for discrete input).
@@ -383,7 +389,9 @@ func TestTokenEmbedding_SparseFDCheck(t *testing.T) {
 	}
 
 	// Analytic gradient via Backward.
-	te.ForwardIDs(ids)
+	if _, err := te.ForwardIDs(ids); err != nil {
+		t.Fatal(err)
+	}
 	te.Backward(upstream)
 
 	// FD per touched row, per dimension.
@@ -394,7 +402,9 @@ func TestTokenEmbedding_SparseFDCheck(t *testing.T) {
 			orig := te.Table[id*te.Dmodel+d]
 
 			te.Table[id*te.Dmodel+d] = orig + eps
-			te.ForwardIDs(ids)
+			if _, err := te.ForwardIDs(ids); err != nil {
+				t.Fatal(err)
+			}
 			outp := te.lastOut
 			var fp float64
 			for i, u := range upstream {
@@ -402,7 +412,9 @@ func TestTokenEmbedding_SparseFDCheck(t *testing.T) {
 			}
 
 			te.Table[id*te.Dmodel+d] = orig - eps
-			te.ForwardIDs(ids)
+			if _, err := te.ForwardIDs(ids); err != nil {
+				t.Fatal(err)
+			}
 			outm := te.lastOut
 			var fm float64
 			for i, u := range upstream {

@@ -679,7 +679,7 @@ func TestRestoreWeightsBringsBackSnapshot(t *testing.T) {
 	n := MustNew(PresetXOR[float64]())
 	original := n.snapshotWeights(nil)
 	// Mutate every axon weight, then restore from snapshot.
-	for _, hb := range n.Network.Hiddens {
+	for _, hb := range n.Hiddens {
 		for _, h := range hb.Cells() {
 			for i := range h.Axons {
 				h.Axons[i].Weight = 99

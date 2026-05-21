@@ -37,7 +37,7 @@ func TestWeightInitRanges(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Compile: %v", err)
 			}
-			weights := n.Network.AppendFlatWeights(nil)
+			weights := n.AppendFlatWeights(nil)
 			if len(weights) == 0 {
 				t.Fatal("no weights found")
 			}

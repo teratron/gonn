@@ -45,7 +45,7 @@ func Check(pkgPath string, opts Options) ([]Violation, error) {
 	}
 
 	fset := token.NewFileSet()
-	pkgs, err := parser.ParseDir(fset, absPath, func(fi os.FileInfo) bool {
+	pkgs, err := parser.ParseDir(fset, absPath, func(fi os.FileInfo) bool { //nolint:staticcheck
 		return !strings.HasSuffix(fi.Name(), "_test.go")
 	}, parser.ParseComments)
 	if err != nil {

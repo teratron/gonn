@@ -87,7 +87,7 @@ func TestVersionCmdJSON(t *testing.T) {
 
 	code := versionCmd([]string{"--json"})
 
-	w.Close()
+	_ = w.Close()
 	os.Stdout = orig
 
 	buf := make([]byte, 4096)
@@ -355,7 +355,7 @@ func TestXOREndToEnd(t *testing.T) {
 		"--input", "0,1",
 		"--json",
 	})
-	w.Close()
+	_ = w.Close()
 	os.Stdout = orig
 
 	buf := make([]byte, 4096)
@@ -389,7 +389,7 @@ func TestXOREndToEnd(t *testing.T) {
 		"--data", csvPath,
 		"--json",
 	})
-	wv.Close()
+	_ = wv.Close()
 	os.Stdout = origV
 
 	bufV := make([]byte, 4096)
@@ -431,7 +431,7 @@ func TestTrainCmdJSONOutput(t *testing.T) {
 		"--out", weightsPath,
 		"--json",
 	})
-	w.Close()
+	_ = w.Close()
 	os.Stdout = orig
 
 	buf := make([]byte, 4096)
@@ -477,7 +477,7 @@ func TestPrintErrorJSON(t *testing.T) {
 
 	printErrorJSON(fmt.Errorf("test error"))
 
-	w.Close()
+	_ = w.Close()
 	os.Stdout = orig
 	buf := make([]byte, 1024)
 	n, _ := r.Read(buf)

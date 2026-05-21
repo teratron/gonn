@@ -63,49 +63,49 @@ func (n *NN[T]) trainStep(input, target []T) (T, error) {
 	if err != nil {
 		return 0, err
 	}
-	if err := n.Network.SetInputs(netInput); err != nil {
+	if err := n.SetInputs(netInput); err != nil {
 		return 0, err
 	}
-	if err := n.Network.SetTargets(target); err != nil {
+	if err := n.SetTargets(target); err != nil {
 		return 0, err
 	}
-	n.Network.CalculateValues()
+	n.CalculateValues()
 
 	// Apply dropout / mask after forward pass (training=true).
 	if n.reg != nil {
-		acts := n.Network.HiddenActivations()
+		acts := n.HiddenActivations()
 		acts = n.reg.ApplyMask(acts, true)
-		n.Network.SetHiddenActivations(acts)
+		n.SetHiddenActivations(acts)
 	}
 
-	lossVal := n.Network.CalculateLossDefault()
+	lossVal := n.CalculateLossDefault()
 
 	// Add regularization penalty to the reported loss.
 	if n.reg != nil {
-		n.weightBuf = n.Network.AppendFlatWeights(n.weightBuf)
+		n.weightBuf = n.AppendFlatWeights(n.weightBuf)
 		lossVal += regularizer.Penalty(n.reg, n.weightBuf)
 	}
 
-	n.Network.CalculateMisses()
+	n.CalculateMisses()
 
 	// Drive the conv backward pass BEFORE the optimizer overwrites the
 	// neuron axon weights — the input-gradient formula reads those weights
 	// to project the hidden-layer miss back onto the Input cells.
 	if len(n.convPrefix) > 0 {
-		n.convGradBuf = n.Network.AppendInputGradient(n.convGradBuf)
+		n.convGradBuf = n.AppendInputGradient(n.convGradBuf)
 		n.applyConvBackward(n.convGradBuf)
 	}
 
 	// Collect weights and gradients, delegate update to the optimizer.
-	n.weightBuf = n.Network.AppendFlatWeights(n.weightBuf)
-	n.gradBuf = n.Network.AppendFlatGradients(n.gradBuf)
+	n.weightBuf = n.AppendFlatWeights(n.weightBuf)
+	n.gradBuf = n.AppendFlatGradients(n.gradBuf)
 	if n.cfg.GradClipNorm > 0 {
 		optimizer.ClipByGlobalNorm([][]T{n.gradBuf}, n.cfg.GradClipNorm)
 	}
 	if err := n.opt.Step(n.weightBuf, n.gradBuf); err != nil {
 		return lossVal, err
 	}
-	n.Network.ApplyFlatWeights(n.weightBuf)
+	n.ApplyFlatWeights(n.weightBuf)
 
 	return lossVal, nil
 }
@@ -369,7 +369,7 @@ func (n *NN[T]) snapshotWeights(dst []T) []T {
 		dst = dst[:count]
 	}
 	idx := 0
-	for _, hb := range n.Network.Hiddens {
+	for _, hb := range n.Hiddens {
 		for _, h := range hb.Cells() {
 			for _, a := range h.Axons {
 				dst[idx] = a.Weight
@@ -391,7 +391,7 @@ func (n *NN[T]) snapshotWeights(dst []T) []T {
 // the same topology — Fit owns this invariant.
 func (n *NN[T]) restoreWeights(src []T) {
 	idx := 0
-	for _, hb := range n.Network.Hiddens {
+	for _, hb := range n.Hiddens {
 		for _, h := range hb.Cells() {
 			for i := range h.Axons {
 				h.Axons[i].Weight = src[idx]
@@ -411,7 +411,7 @@ func (n *NN[T]) restoreWeights(src []T) {
 // output axons. Used to size the snapshot buffer.
 func (n *NN[T]) weightCount() int {
 	count := 0
-	for _, hb := range n.Network.Hiddens {
+	for _, hb := range n.Hiddens {
 		for _, h := range hb.Cells() {
 			count += len(h.Axons)
 		}

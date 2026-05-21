@@ -69,7 +69,7 @@ func TestEncoderBlock_ForwardDifferentInputs(t *testing.T) {
 	blk2 := newTestEncoder(seqLen, dmodel, numHeads, dff)
 	out2 := blk2.Forward(x2)
 
-	var same bool = true
+	same := true
 	for i := range out1 {
 		if out1[i] != out2[i] {
 			same = false

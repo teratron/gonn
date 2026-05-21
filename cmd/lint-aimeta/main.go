@@ -36,13 +36,13 @@ func run(args []string, stdout, stderr io.Writer) int {
 	resolve := fs.Bool("resolve", false, "auto-fix LABEL/INDENT/LAST violations in-place")
 
 	if err := fs.Parse(args); err != nil {
-		fmt.Fprintf(stderr, "lint-aimeta: %v\n", err)
+		_, _ = fmt.Fprintf(stderr, "lint-aimeta: %v\n", err)
 		return exitUsage
 	}
 
 	paths := fs.Args()
 	if len(paths) == 0 {
-		fmt.Fprintln(stderr, "lint-aimeta: at least one package path required")
+		_, _ = fmt.Fprintln(stderr, "lint-aimeta: at least one package path required")
 		fs.Usage()
 		return exitUsage
 	}
@@ -61,7 +61,7 @@ func run(args []string, stdout, stderr io.Writer) int {
 	for _, p := range paths {
 		viols, err := aimeta.Check(p, opts)
 		if err != nil {
-			fmt.Fprintf(stderr, "lint-aimeta: %v\n", err)
+			_, _ = fmt.Fprintf(stderr, "lint-aimeta: %v\n", err)
 			return exitError
 		}
 		all = append(all, viols...)
@@ -69,7 +69,7 @@ func run(args []string, stdout, stderr io.Writer) int {
 
 	if *jsonOut {
 		if err := printJSON(stdout, all); err != nil {
-			fmt.Fprintf(stderr, "lint-aimeta: json encode: %v\n", err)
+			_, _ = fmt.Fprintf(stderr, "lint-aimeta: json encode: %v\n", err)
 			return exitError
 		}
 	} else {

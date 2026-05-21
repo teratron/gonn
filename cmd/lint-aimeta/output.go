@@ -17,7 +17,7 @@ func printText(w io.Writer, violations []aimeta.Violation) {
 		if pos == "-" || pos == "" {
 			pos = "<unknown>"
 		}
-		fmt.Fprintf(w, "%s [%s] %s: %s\n", pos, v.Rule, v.Symbol, v.Message)
+		_, _ = fmt.Fprintf(w, "%s [%s] %s: %s\n", pos, v.Rule, v.Symbol, v.Message)
 	}
 }
 

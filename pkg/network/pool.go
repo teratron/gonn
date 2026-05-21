@@ -25,10 +25,10 @@ import (
 // common XOR-sized case.
 var (
 	activationPoolF32 = sync.Pool{
-		New: func() any { return make([]float32, 0, 64) },
+		New: func() any { s := make([]float32, 0, 64); return &s },
 	}
 	activationPoolF64 = sync.Pool{
-		New: func() any { return make([]float64, 0, 64) },
+		New: func() any { s := make([]float64, 0, 64); return &s },
 	}
 )
 
@@ -48,7 +48,7 @@ func AcquireActivations[T utils.Float](size int) []T {
 	var z T
 	switch any(z).(type) {
 	case float32:
-		buf := activationPoolF32.Get().([]float32)
+		buf := *activationPoolF32.Get().(*[]float32)
 		if cap(buf) < size {
 			buf = make([]float32, size)
 		} else {
@@ -59,7 +59,7 @@ func AcquireActivations[T utils.Float](size int) []T {
 		}
 		return any(buf).([]T)
 	case float64:
-		buf := activationPoolF64.Get().([]float64)
+		buf := *activationPoolF64.Get().(*[]float64)
 		if cap(buf) < size {
 			buf = make([]float64, size)
 		} else {
@@ -90,9 +90,11 @@ func ReleaseActivations[T utils.Float](buf []T) {
 	}
 	switch raw := any(buf).(type) {
 	case []float32:
-		activationPoolF32.Put(raw[:0])
+		tmp := raw[:0]
+		activationPoolF32.Put(&tmp)
 	case []float64:
-		activationPoolF64.Put(raw[:0])
+		tmp := raw[:0]
+		activationPoolF64.Put(&tmp)
 	}
 }
 

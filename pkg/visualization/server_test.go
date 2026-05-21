@@ -37,7 +37,7 @@ func TestHealth_200(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusOK {
 		t.Errorf("health: want 200, got %d", resp.StatusCode)
 	}
@@ -49,7 +49,7 @@ func TestSnapshot_ContainsProtocolVersion(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusOK {
 		t.Fatalf("snapshot: want 200, got %d", resp.StatusCode)
 	}
@@ -68,7 +68,7 @@ func TestLoss_Returns200(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusOK {
 		t.Errorf("loss: want 200, got %d", resp.StatusCode)
 	}
@@ -80,7 +80,7 @@ func TestActivations_ValidLayerIdx(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusOK {
 		t.Errorf("activations/0: want 200, got %d", resp.StatusCode)
 	}
@@ -92,7 +92,7 @@ func TestActivations_BadLayerIdx(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusNotFound {
 		t.Errorf("activations/99: want 404, got %d", resp.StatusCode)
 	}
@@ -111,7 +111,7 @@ func TestAuth_MissingToken(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusUnauthorized {
 		t.Errorf("want 401 when token missing, got %d", resp.StatusCode)
 	}
@@ -132,7 +132,7 @@ func TestAuth_ValidToken(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusOK {
 		t.Errorf("valid token: want 200, got %d", resp.StatusCode)
 	}
@@ -151,7 +151,7 @@ func TestStop_NoPortLeak(t *testing.T) {
 	// After stop, the port should be free (connection refused)
 	resp, err := http.Get(fmt.Sprintf("http://%s/v1/health", addr))
 	if err == nil {
-		resp.Body.Close()
+		_ = resp.Body.Close()
 		t.Error("expected connection refused after Stop")
 	}
 }
@@ -162,7 +162,7 @@ func TestControl_Returns200(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusOK {
 		t.Errorf("control: want 200, got %d", resp.StatusCode)
 	}
@@ -181,7 +181,7 @@ func TestStats_Returns200(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusOK {
 		t.Errorf("stats: want 200, got %d", resp.StatusCode)
 	}
@@ -201,7 +201,7 @@ func TestSnapshot_MethodNotAllowed(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusMethodNotAllowed {
 		t.Errorf("snapshot POST: want 405, got %d", resp.StatusCode)
 	}
@@ -214,7 +214,7 @@ func TestLoss_MethodNotAllowed(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusMethodNotAllowed {
 		t.Errorf("loss POST: want 405, got %d", resp.StatusCode)
 	}
@@ -227,7 +227,7 @@ func TestActivations_MethodNotAllowed(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusMethodNotAllowed {
 		t.Errorf("activations POST: want 405, got %d", resp.StatusCode)
 	}
@@ -239,7 +239,7 @@ func TestActivations_InvalidIdx(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusBadRequest {
 		t.Errorf("activations/notanumber: want 400, got %d", resp.StatusCode)
 	}
@@ -260,7 +260,7 @@ func TestCORS_Headers(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if got := resp.Header.Get("Access-Control-Allow-Origin"); got != "*" {
 		t.Errorf("CORS header: want *, got %q", got)
 	}
@@ -280,7 +280,7 @@ func TestCORS_OptionsMethod(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusNoContent {
 		t.Errorf("OPTIONS: want 204, got %d", resp.StatusCode)
 	}
@@ -322,7 +322,7 @@ func TestHTTPTestServer_Snapshot(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	var env map[string]any
 	_ = json.NewDecoder(resp.Body).Decode(&env)
 	if env["protocol_version"] != "1.0.0" {

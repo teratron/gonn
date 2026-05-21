@@ -91,7 +91,7 @@ func compile[T utils.Float](n *NN[T], cfg *Config[T]) error {
 	// Wire the weight-init sampler before Build so axons receive the correct
 	// initial values (fixes the known axon.New U[-0.5,0.5] debt — T-6B06).
 	rng, _ := utils.NewRNG(0)
-	n.Network.SetWeightSampler(weightSamplerFor[T](cfg.WeightInit, rng))
+	n.SetWeightSampler(weightSamplerFor[T](cfg.WeightInit, rng))
 
 	if err := n.Build(); err != nil {
 		return utils.Wrap(utils.ErrUserConfig, err, "compile: Build failed")
@@ -115,7 +115,7 @@ func compile[T utils.Float](n *NN[T], cfg *Config[T]) error {
 	}
 	n.reg = cfg.Regularizer
 	n.sched = cfg.Scheduler
-	n.Network.SetTopologyMode(cfg.TopologyMode)
+	n.SetTopologyMode(cfg.TopologyMode)
 
 	// Resolve nil norm-layer entries inserted by WithBatchNorm/WithLayerNorm
 	// when the hidden layer sizes were not yet declared at option-apply time.

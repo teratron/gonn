@@ -101,7 +101,7 @@ func maybeDecompress(raw []byte) ([]byte, error) {
 	if err != nil {
 		return nil, utils.Wrap(utils.ErrIntegrity, err, "maybeDecompress: gzip header")
 	}
-	defer gz.Close()
+	defer func() { _ = gz.Close() }()
 	body, err := io.ReadAll(gz)
 	if err != nil {
 		return nil, utils.Wrap(utils.ErrIntegrity, err, "maybeDecompress: gzip body")

@@ -350,8 +350,7 @@ func TestLayerNorm_Backward(t *testing.T) {
 		copy(xm, x)
 		xm[i] -= h
 
-		lp := lnLoss(NewLayerNorm[float64](n), xp, upstream)
-		lm := lnLoss(NewLayerNorm[float64](n), xm, upstream)
+		var lp, lm float64
 		// Use default gamma=1 in helper; we only compare shapes so use a fresh ln
 		// with same gamma for FD.
 		lnFD := NewLayerNorm[float64](n)

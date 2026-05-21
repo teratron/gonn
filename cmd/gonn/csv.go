@@ -39,7 +39,7 @@ func loadSamplesFull[T utils.Float](path string, inputCols, outputCols int) ([]n
 	if err != nil {
 		return nil, utils.Wrap(utils.ErrIO, err, "loadSamplesFull: open %q", path)
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	r := csv.NewReader(f)
 	r.FieldsPerRecord = inputCols + outputCols

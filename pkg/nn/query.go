@@ -32,9 +32,9 @@ func (n *NN[T]) Query(input []T) ([]T, error) {
 
 	// Inference mask (training=false): L1/L2 are no-ops; Dropout passes through.
 	if n.reg != nil {
-		acts := n.Network.HiddenActivations()
+		acts := n.HiddenActivations()
 		acts = regularizer.Apply(n.reg, acts, false)
-		n.Network.SetHiddenActivations(acts)
+		n.SetHiddenActivations(acts)
 	}
 
 	out := make([]T, n.Network.Output.Len())
