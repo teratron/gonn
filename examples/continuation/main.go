@@ -72,9 +72,9 @@ func main() {
 		nn.WithInput[float64](2),
 		nn.WithHiddenLayer[float64](4, activation.SIGMOID),
 		nn.WithOutput[float64](1, activation.SIGMOID),
-		nn.WithLearningRate[float64](0.3),
+		nn.WithLearningRate(0.3),
 		nn.WithMaxIterations[float64](2000),
-		nn.WithLossLimit[float64](1e-3),
+		nn.WithLossLimit(1e-3),
 	)
 	if err != nil {
 		fmt.Println("compile failed:", err)
@@ -95,7 +95,7 @@ func main() {
 	// Phase 2: continue training with the negated targets at a smaller LR.
 	// The same weight slab is reused; FMT-6 only resets convergence state.
 	epochs2, loss2, err := net.AndTrain(negatedXOR(),
-		nn.WithLearningRate[float64](0.05),
+		nn.WithLearningRate(0.05),
 		nn.WithMaxIterations[float64](2000),
 	)
 	if err != nil {

@@ -95,7 +95,7 @@ func TestSliceParamSetShapeMismatch(t *testing.T) {
 // ── DefaultFeatureFunc ───────────────────────────────────────────────────────
 
 func TestDefaultFeatureFunc(t *testing.T) {
-	feats := DefaultFeatureFunc[float64](0.5, 50, 100)
+	feats := DefaultFeatureFunc(0.5, 50, 100)
 	if len(feats) != 2 {
 		t.Fatalf("expected 2 features, got %d", len(feats))
 	}
@@ -199,7 +199,7 @@ func TestWithMetaLearnerWiring(t *testing.T) {
 		WithInput[float64](2),
 		WithHiddenLayer[float64](4, activation.SIGMOID),
 		WithOutput[float64](1, activation.SIGMOID),
-		WithMetaLearner[float64](ml),
+		WithMetaLearner(ml),
 	)
 	if err != nil {
 		t.Fatalf("New with WithMetaLearner: %v", err)
@@ -267,9 +267,9 @@ func TestMetaLearnerConvergence(t *testing.T) {
 			WithInput[float64](2),
 			WithHiddenLayer[float64](4, activation.SIGMOID),
 			WithOutput[float64](1, activation.SIGMOID),
-			WithLearningRate[float64](0.3),
+			WithLearningRate(0.3),
 			WithMaxIterations[float64](maxIter),
-			WithLossLimit[float64](lossLimit),
+			WithLossLimit(lossLimit),
 		)
 		if err != nil {
 			t.Fatal(err)
@@ -298,10 +298,10 @@ func TestMetaLearnerConvergence(t *testing.T) {
 			WithInput[float64](2),
 			WithHiddenLayer[float64](4, activation.SIGMOID),
 			WithOutput[float64](1, activation.SIGMOID),
-			WithLearningRate[float64](0.3),
+			WithLearningRate(0.3),
 			WithMaxIterations[float64](maxIter),
-			WithLossLimit[float64](lossLimit),
-			WithMetaLearner[float64](ml),
+			WithLossLimit(lossLimit),
+			WithMetaLearner(ml),
 		)
 		if err != nil {
 			t.Fatal(err)
@@ -343,9 +343,9 @@ func TestTrainCallsMetaLearnerStep(t *testing.T) {
 		WithInput[float64](2),
 		WithHiddenLayer[float64](4, activation.SIGMOID),
 		WithOutput[float64](1, activation.SIGMOID),
-		WithLearningRate[float64](0.3),
+		WithLearningRate(0.3),
 		WithMaxIterations[float64](5),
-		WithMetaLearner[float64](ml),
+		WithMetaLearner(ml),
 	)
 	if err != nil {
 		t.Fatalf("New: %v", err)

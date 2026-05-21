@@ -39,7 +39,7 @@ func TestNewAssignsBothEndpoints(t *testing.T) {
 	t.Parallel()
 	in := &stubNucleus[float64]{v: 0.5}
 	out := &stubNeuron[float64]{}
-	a := New[float64](in, out)
+	a := New(in, out)
 	if a.Cell != neuron.Nucleus[float64](in) {
 		t.Errorf("New did not record the incoming endpoint")
 	}
@@ -53,7 +53,7 @@ func TestNewDefaultWeightInBaselineRange(t *testing.T) {
 	in := &stubNucleus[float64]{}
 	out := &stubNeuron[float64]{}
 	for range 1024 {
-		a := New[float64](in, out)
+		a := New(in, out)
 		if a.Weight < -0.5 || a.Weight > 0.5 {
 			t.Fatalf("default weight %v outside legacy [-0.5, 0.5] baseline", a.Weight)
 		}
@@ -64,7 +64,7 @@ func TestNewWithWeightHonoursCallerValue(t *testing.T) {
 	t.Parallel()
 	in := &stubNucleus[float64]{v: 1.0}
 	out := &stubNeuron[float64]{}
-	a := NewWithWeight[float64](0.42, in, out)
+	a := NewWithWeight(0.42, in, out)
 	if a.Weight != 0.42 {
 		t.Errorf("NewWithWeight stored %v; want 0.42", a.Weight)
 	}
@@ -74,7 +74,7 @@ func TestCalculateValue(t *testing.T) {
 	t.Parallel()
 	in := &stubNucleus[float64]{v: 3.0}
 	out := &stubNeuron[float64]{}
-	a := NewWithWeight[float64](0.5, in, out)
+	a := NewWithWeight(0.5, in, out)
 	if got := a.CalculateValue(); !approx(got, 1.5) {
 		t.Errorf("CalculateValue = %v; want 1.5 (3.0 * 0.5)", got)
 	}
@@ -84,7 +84,7 @@ func TestCalculateMissReadsOutgoing(t *testing.T) {
 	t.Parallel()
 	in := &stubNucleus[float64]{v: 0}
 	out := &stubNeuron[float64]{miss: 4.0}
-	a := NewWithWeight[float64](0.25, in, out)
+	a := NewWithWeight(0.25, in, out)
 	if got := a.CalculateMiss(); !approx(got, 1.0) {
 		t.Errorf("CalculateMiss = %v; want 1.0 (4 * 0.25)", got)
 	}
@@ -94,7 +94,7 @@ func TestCalculateWeightUpdatesInPlace(t *testing.T) {
 	t.Parallel()
 	in := &stubNucleus[float64]{v: 2.0}
 	out := &stubNeuron[float64]{}
-	a := NewWithWeight[float64](1.0, in, out)
+	a := NewWithWeight(1.0, in, out)
 	g := 0.1
 	a.CalculateWeight(&g)
 	if !approx(float64(a.Weight), 1.2) {
@@ -116,7 +116,7 @@ func TestNewIsConcurrencySafe(t *testing.T) {
 		go func() {
 			defer wg.Done()
 			for range perG {
-				a := New[float64](in, out)
+				a := New(in, out)
 				if a.Weight < -0.5 || a.Weight > 0.5 {
 					t.Errorf("concurrent New produced out-of-range weight %v", a.Weight)
 					return
@@ -131,7 +131,7 @@ func TestFloat32Path(t *testing.T) {
 	t.Parallel()
 	in := &stubNucleus[float32]{v: 1.5}
 	out := &stubNeuron[float32]{}
-	a := NewWithWeight[float32](2.0, in, out)
+	a := NewWithWeight(2.0, in, out)
 	if got := a.CalculateValue(); float64(got) != 3.0 {
 		t.Errorf("float32 CalculateValue = %v; want 3.0", got)
 	}

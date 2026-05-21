@@ -61,8 +61,8 @@ func TestWeightInitRanges(t *testing.T) {
 // deliberately loose — the goal is to confirm training runs without error
 // and that loss decreases, not to match unregularized speed.
 func TestRegularizerConvergence(t *testing.T) {
-	reg := regularizer.Compose[float64](
-		regularizer.NewL2[float64](0.001),
+	reg := regularizer.Compose(
+		regularizer.NewL2(0.001),
 		regularizer.NewDropoutSeeded[float64](0.9, 1),
 	)
 	n, err := New(
@@ -129,10 +129,10 @@ func TestOptimizerIntegration(t *testing.T) {
 		name string
 		opt  optimizer.Optimizer[float64]
 	}{
-		{"SGD", optimizer.NewSGD[float64](0.3)},
-		{"Adam", optimizer.NewAdam[float64](0.001)},
-		{"SGDMomentum", optimizer.NewSGDMomentum[float64](0.1)},
-		{"RMSProp", optimizer.NewRMSProp[float64](0.001)},
+		{"SGD", optimizer.NewSGD(0.3)},
+		{"Adam", optimizer.NewAdam(0.001)},
+		{"SGDMomentum", optimizer.NewSGDMomentum(0.1)},
+		{"RMSProp", optimizer.NewRMSProp(0.001)},
 	}
 
 	for _, tc := range opts {

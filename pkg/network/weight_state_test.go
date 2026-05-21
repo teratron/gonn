@@ -34,7 +34,7 @@ func TestSetWeightSampler(t *testing.T) {
 	const want = float64(0.25)
 	sampler := func(_, _ int) float64 { return want }
 
-	n, err := newTrainableWithSampler[float64](sampler)
+	n, err := newTrainableWithSampler(sampler)
 	if err != nil {
 		t.Fatalf("build: %v", err)
 	}
@@ -179,7 +179,7 @@ func TestBundleAdd(t *testing.T) {
 	if b.Len() != 0 {
 		t.Fatalf("initial Len = %d, want 0", b.Len())
 	}
-	c := cell.NewInput[float64](1.0)
+	c := cell.NewInput(1.0)
 	b.Add(c)
 	if b.Len() != 1 {
 		t.Fatalf("Len after Add = %d, want 1", b.Len())

@@ -151,7 +151,7 @@ func runE05(seed uint64) (trainAcc, testAcc, finalLoss float32, err error) {
 		nn.WithLoss[float32](loss.MSE),
 		nn.WithWeightInit[float32](nn.WeightInitXavier),
 		nn.WithMaxIterations[float32](5000),
-		nn.WithEpochCallback[float32](func(_ uint, lossValue float32) {
+		nn.WithEpochCallback(func(_ uint, lossValue float32) {
 			lastLoss = lossValue
 		}),
 	)

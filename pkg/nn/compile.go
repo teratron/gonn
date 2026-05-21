@@ -147,7 +147,7 @@ func compile[T utils.Float](n *NN[T], cfg *Config[T]) error {
 
 	// Wire compute backend. Probe the requested backend via Allocate(1);
 	// on ErrBackendUnavailable fall back to the CPU reference (COMP-3).
-	n.backend = resolveBackend[T](cfg.Backend)
+	n.backend = resolveBackend(cfg.Backend)
 
 	startProfilingServer(cfg.ProfilingAddr)
 	if err := startVisServer(n, cfg); err != nil {

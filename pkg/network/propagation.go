@@ -25,13 +25,13 @@ func (n *Network[T]) CalculateValues() {
 		for cellIdx, h := range hb.cells {
 			h.CalculateValue()
 			preact[cellIdx] = *h.GetValue()
-			*h.GetValue() = activation.Activation[T](preact[cellIdx], act)
+			*h.GetValue() = activation.Activation(preact[cellIdx], act)
 		}
 	}
 	for i, o := range n.Output.cells {
 		o.Dense.CalculateValue()
 		n.preactOutput[i] = *o.GetValue()
-		*o.GetValue() = activation.Activation[T](n.preactOutput[i], n.outputAct)
+		*o.GetValue() = activation.Activation(n.preactOutput[i], n.outputAct)
 		if t := o.GetTarget(); t != nil {
 			o.SetMiss(*t - *o.GetValue())
 		}
@@ -110,12 +110,12 @@ func (n *Network[T]) CalculateWeights(rate *T) {
 		act := n.hiddenActs[layerIdx]
 		preact := n.preactHiddens[layerIdx]
 		for cellIdx, h := range hb.cells {
-			eff := *rate * activation.Derivative[T](preact[cellIdx], act)
+			eff := *rate * activation.Derivative(preact[cellIdx], act)
 			h.CalculateWeight(&eff)
 		}
 	}
 	for cellIdx, o := range n.Output.cells {
-		eff := *rate * activation.Derivative[T](n.preactOutput[cellIdx], n.outputAct)
+		eff := *rate * activation.Derivative(n.preactOutput[cellIdx], n.outputAct)
 		o.CalculateWeight(&eff)
 	}
 }
@@ -153,7 +153,7 @@ func (n *Network[T]) AppendFlatGradients(dst []T) []T {
 		act := n.hiddenActs[layerIdx]
 		preact := n.preactHiddens[layerIdx]
 		for cellIdx, h := range hb.cells {
-			deriv := activation.Derivative[T](preact[cellIdx], act)
+			deriv := activation.Derivative(preact[cellIdx], act)
 			miss := *h.GetMiss()
 			for _, a := range h.Axons {
 				dst = append(dst, -deriv*miss**a.Cell.GetValue())
@@ -161,7 +161,7 @@ func (n *Network[T]) AppendFlatGradients(dst []T) []T {
 		}
 	}
 	for cellIdx, o := range n.Output.cells {
-		deriv := activation.Derivative[T](n.preactOutput[cellIdx], n.outputAct)
+		deriv := activation.Derivative(n.preactOutput[cellIdx], n.outputAct)
 		miss := *o.GetMiss()
 		for _, a := range o.Axons {
 			dst = append(dst, -deriv*miss**a.Cell.GetValue())
@@ -207,7 +207,7 @@ func (n *Network[T]) AppendInputGradient(dst []T) []T {
 	}
 	dst = append(dst, make([]T, inLen)...)
 	for cellIdx, h := range n.Hiddens[0].cells {
-		deriv := activation.Derivative[T](preact[cellIdx], act)
+		deriv := activation.Derivative(preact[cellIdx], act)
 		miss := *h.GetMiss()
 		coef := deriv * miss
 		for _, a := range h.Axons {

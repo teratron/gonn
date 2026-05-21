@@ -23,7 +23,7 @@ func almostEqual(a, b, tol float64) bool {
 // makeConv1DNet builds a small Conv1D network for testing.
 func makeConv1DNet(t *testing.T) *nn.NN[float64] {
 	t.Helper()
-	net, err := nn.New[float64](
+	net, err := nn.New(
 		nn.WithConv1D[float64](4, 3, 1, convpkg.PadValid, false),
 		nn.WithInput[float64](8),
 		nn.WithHiddenLayer[float64](8, 0),
@@ -117,7 +117,7 @@ func TestQuantizedDense_WeightShape(t *testing.T) {
 		w[i] = rng.Float64()*2 - 1
 	}
 	cfg := DefaultQuantizationConfig[float64]()
-	d := newQuantizedDense[float64](w, nil, cout, cin, cfg)
+	d := newQuantizedDense(w, nil, cout, cin, cfg)
 	if len(d.Weights) != cout*cin {
 		t.Errorf("Weights len = %d, want %d", len(d.Weights), cout*cin)
 	}
@@ -145,7 +145,7 @@ func TestQuantizedDense_Forward(t *testing.T) {
 		}
 	}
 	cfg := DefaultQuantizationConfig[float64]()
-	d := newQuantizedDense[float64](w, nil, cout, cin, cfg)
+	d := newQuantizedDense(w, nil, cout, cin, cfg)
 	yQuant := d.Forward(x)
 
 	var maxAbs float64
@@ -169,7 +169,7 @@ func TestQuantizedConv1D_WeightShape(t *testing.T) {
 	rng := rand.New(rand.NewPCG(1, 1))
 	src.Init(rng)
 	cfg := DefaultQuantizationConfig[float64]()
-	ql := newQuantizedConv1D[float64](src, cfg)
+	ql := newQuantizedConv1D(src, cfg)
 	if len(ql.Weights) != src.NumFilters*src.KernelSize {
 		t.Errorf("Weights len = %d, want %d", len(ql.Weights), src.NumFilters*src.KernelSize)
 	}
@@ -189,7 +189,7 @@ func TestQuantizedConv1D_Forward(t *testing.T) {
 	}
 	floatOut := src.Forward(x)
 	cfg := DefaultQuantizationConfig[float64]()
-	ql := newQuantizedConv1D[float64](src, cfg)
+	ql := newQuantizedConv1D(src, cfg)
 	quantOut := ql.Forward(x)
 	if len(quantOut) != len(floatOut) {
 		t.Fatalf("output length: float=%d quant=%d", len(floatOut), len(quantOut))
@@ -213,11 +213,11 @@ func TestQuantizedConv1D_Forward(t *testing.T) {
 func TestQNNRoundTrip(t *testing.T) {
 	net := makeConv1DNet(t)
 	cfg := DefaultQuantizationConfig[float64]()
-	qnet, err := Quantize[float64](net, nil, cfg)
+	qnet, err := Quantize(net, nil, cfg)
 	if err != nil {
 		t.Fatalf("Quantize: %v", err)
 	}
-	data, err := MarshalQNN[float64](qnet)
+	data, err := MarshalQNN(qnet)
 	if err != nil {
 		t.Fatalf("MarshalQNN: %v", err)
 	}
@@ -257,7 +257,7 @@ func TestQNNWrongType(t *testing.T) {
 func TestQNNSave(t *testing.T) {
 	net := makeConv1DNet(t)
 	cfg := DefaultQuantizationConfig[float64]()
-	qnet, err := Quantize[float64](net, nil, cfg)
+	qnet, err := Quantize(net, nil, cfg)
 	if err != nil {
 		t.Fatalf("Quantize: %v", err)
 	}
@@ -286,8 +286,8 @@ func TestQNNSave(t *testing.T) {
 func TestBaselineHashStable(t *testing.T) {
 	net := makeConv1DNet(t)
 	cfg := DefaultQuantizationConfig[float64]()
-	q1, _ := Quantize[float64](net, nil, cfg)
-	q2, _ := Quantize[float64](net, nil, cfg)
+	q1, _ := Quantize(net, nil, cfg)
+	q2, _ := Quantize(net, nil, cfg)
 	if q1.BaselineHash != q2.BaselineHash {
 		t.Errorf("BaselineHash not deterministic: %q != %q", q1.BaselineHash, q2.BaselineHash)
 	}
@@ -302,7 +302,7 @@ func TestBaselineHashStable(t *testing.T) {
 func TestCalibrationRunner_TooFewSamples(t *testing.T) {
 	net := makeConv1DNet(t)
 	cfg := DefaultQuantizationConfig[float64]()
-	runner := NewCalibrationRunner[float64](net, cfg)
+	runner := NewCalibrationRunner(net, cfg)
 	samples := make([][]float64, 10)
 	for i := range samples {
 		samples[i] = make([]float64, 8)
@@ -321,7 +321,7 @@ func TestCalibrationRunner_MinMax(t *testing.T) {
 	net := makeConv1DNet(t)
 	cfg := DefaultQuantizationConfig[float64]()
 	cfg.Strategy = MinMax
-	runner := NewCalibrationRunner[float64](net, cfg)
+	runner := NewCalibrationRunner(net, cfg)
 	rng := rand.New(rand.NewPCG(42, 42))
 	samples := make([][]float64, 50)
 	for i := range samples {
@@ -347,7 +347,7 @@ func TestCalibrationRunner_Percentile99p9(t *testing.T) {
 	cfg := DefaultQuantizationConfig[float64]()
 	cfg.Strategy = Percentile99p9
 	cfg.PercentileThreshold = 99.9
-	runner := NewCalibrationRunner[float64](net, cfg)
+	runner := NewCalibrationRunner(net, cfg)
 	rng := rand.New(rand.NewPCG(11, 11))
 	samples := make([][]float64, 200)
 	for i := range samples {
@@ -382,7 +382,7 @@ func TestDegenerateRange(t *testing.T) {
 func TestSideBySideEvaluator(t *testing.T) {
 	net := makeConv1DNet(t)
 	cfg := DefaultQuantizationConfig[float64]()
-	qnet, err := Quantize[float64](net, nil, cfg)
+	qnet, err := Quantize(net, nil, cfg)
 	if err != nil {
 		t.Fatalf("Quantize: %v", err)
 	}
@@ -406,7 +406,7 @@ func TestSideBySideEvaluator(t *testing.T) {
 		}
 		return s / float64(len(out))
 	}
-	result, err := Evaluate[float64](net, qnet, evalSet, mse)
+	result, err := Evaluate(net, qnet, evalSet, mse)
 	if err != nil {
 		t.Fatalf("Evaluate: %v", err)
 	}
@@ -422,8 +422,8 @@ func TestSideBySideEvaluator(t *testing.T) {
 func TestEvaluate_EmptySet(t *testing.T) {
 	net := makeConv1DNet(t)
 	cfg := DefaultQuantizationConfig[float64]()
-	qnet, _ := Quantize[float64](net, nil, cfg)
-	_, err := Evaluate[float64](net, qnet, nil, func(_, _ []float64) float64 { return 0 })
+	qnet, _ := Quantize(net, nil, cfg)
+	_, err := Evaluate(net, qnet, nil, func(_, _ []float64) float64 { return 0 })
 	if err == nil {
 		t.Fatal("expected error for empty eval set, got nil")
 	}
@@ -447,7 +447,7 @@ func TestFullInt8Forward(t *testing.T) {
 		x[i] = rng.Float64()*2 - 1
 	}
 	cfg := DefaultQuantizationConfig[float64]()
-	d := newQuantizedDense[float64](w, nil, cout, cin, cfg)
+	d := newQuantizedDense(w, nil, cout, cin, cfg)
 	d.SetActParams(computeSymmetric(-1.0, 1.0))
 	yQuant := d.Forward(x)
 
@@ -478,7 +478,7 @@ func TestFullInt8Forward(t *testing.T) {
 func TestQuantizedAttn_WeightShape(t *testing.T) {
 	src := makeAttnLayer(8, 16, 2)
 	cfg := DefaultQuantizationConfig[float64]()
-	qa := newQuantizedAttentionProjections[float64](src, cfg)
+	qa := newQuantizedAttentionProjections(src, cfg)
 	wantLen := src.Dmodel * src.Dmodel
 	for name, w := range map[string][]int8{"Wq": qa.Wq, "Wk": qa.Wk, "Wv": qa.Wv, "Wo": qa.Wo} {
 		if len(w) != wantLen {
@@ -500,7 +500,7 @@ func TestQuantizedAttentionForward(t *testing.T) {
 
 	floatOut := src.Forward(x)
 	cfg := DefaultQuantizationConfig[float64]()
-	qa := newQuantizedAttentionProjections[float64](src, cfg)
+	qa := newQuantizedAttentionProjections(src, cfg)
 	quantOut := qa.Forward(x)
 
 	if len(quantOut) != len(floatOut) {
@@ -527,7 +527,7 @@ func TestQuantizedAttentionForward(t *testing.T) {
 // TestQuantizeMHA verifies Quantize produces QuantizedAttentionProjections in layers.
 func TestQuantizeMHA(t *testing.T) {
 	const seqLen, dmodel, numHeads = 4, 8, 2
-	net, err := nn.New[float64](
+	net, err := nn.New(
 		nn.WithMultiHeadAttention[float64](seqLen, dmodel, numHeads),
 		nn.WithInput[float64](uint(seqLen*dmodel)),
 		nn.WithOutput[float64](uint(seqLen*dmodel), 0),
@@ -536,7 +536,7 @@ func TestQuantizeMHA(t *testing.T) {
 		t.Skipf("MHA network build failed (likely shape issue): %v", err)
 	}
 	cfg := DefaultQuantizationConfig[float64]()
-	qnet, err := Quantize[float64](net, nil, cfg)
+	qnet, err := Quantize(net, nil, cfg)
 	if err != nil {
 		t.Fatalf("Quantize: %v", err)
 	}
@@ -798,7 +798,7 @@ func TestDenseRoundTrip(t *testing.T) {
 	}
 	bias := []float64{1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0}
 	cfg := DefaultQuantizationConfig[float64]()
-	d := newQuantizedDense[float64](w, bias, cout, cin, cfg)
+	d := newQuantizedDense(w, bias, cout, cin, cfg)
 	qnet := &QuantizedNetwork[float64]{Layers: []quantizedLayer[float64]{d}}
 
 	data, err := MarshalQNN(qnet)

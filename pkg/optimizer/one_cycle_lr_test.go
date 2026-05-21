@@ -7,7 +7,7 @@ import (
 
 func TestOneCycleLR_PhaseAtWarmupBoundary(t *testing.T) {
 	// warmupSteps = int(0.3 * 100) = 30
-	sched := NewOneCycleLR[float64](0.1, 100)
+	sched := NewOneCycleLR(0.1, 100)
 	startLR := 0.1 / 25 // maxLR / divFactor = 0.004
 
 	// After warmupSteps steps, LR should equal maxLR
@@ -23,7 +23,7 @@ func TestOneCycleLR_PhaseAtWarmupBoundary(t *testing.T) {
 
 func TestOneCycleLR_PhaseAtDecayEnd(t *testing.T) {
 	// After totalSteps, LR should equal finalLR = maxLR / finalDiv = 0.1/1e4 = 1e-5
-	sched := NewOneCycleLR[float64](0.1, 100)
+	sched := NewOneCycleLR(0.1, 100)
 	finalLR := 0.1 / 1e4
 
 	var rate float64
@@ -36,7 +36,7 @@ func TestOneCycleLR_PhaseAtDecayEnd(t *testing.T) {
 }
 
 func TestOneCycleLR_LRS4HoldAfterTotalSteps(t *testing.T) {
-	sched := NewOneCycleLR[float64](0.1, 50)
+	sched := NewOneCycleLR(0.1, 50)
 	for range 50 {
 		sched.Step()
 	}
@@ -52,7 +52,7 @@ func TestOneCycleLR_LRS4HoldAfterTotalSteps(t *testing.T) {
 }
 
 func TestOneCycleLR_SaveLoadState(t *testing.T) {
-	orig := NewOneCycleLR[float64](0.05, 200,
+	orig := NewOneCycleLR(0.05, 200,
 		WithPctStart[float64](0.2),
 		WithDivFactor[float64](10),
 		WithFinalDiv[float64](1000),
@@ -65,7 +65,7 @@ func TestOneCycleLR_SaveLoadState(t *testing.T) {
 	if err != nil {
 		t.Fatalf("SaveState: %v", err)
 	}
-	restored := NewOneCycleLR[float64](0.999, 1)
+	restored := NewOneCycleLR(0.999, 1)
 	if err := restored.LoadState(blob); err != nil {
 		t.Fatalf("LoadState: %v", err)
 	}
@@ -85,14 +85,14 @@ func TestOneCycleLR_SaveLoadState(t *testing.T) {
 }
 
 func TestOneCycleLR_GranularityDefault(t *testing.T) {
-	sched := NewOneCycleLR[float64](0.1, 100)
+	sched := NewOneCycleLR(0.1, 100)
 	if sched.Granularity() != PerStep {
 		t.Errorf("expected PerStep, got %v", sched.Granularity())
 	}
 }
 
 func TestOneCycleLR_Reset(t *testing.T) {
-	sched := NewOneCycleLR[float64](0.1, 100)
+	sched := NewOneCycleLR(0.1, 100)
 	for range 30 {
 		sched.Step()
 	}
@@ -107,7 +107,7 @@ func TestOneCycleLR_Reset(t *testing.T) {
 }
 
 func TestOneCycleLR_WarmupLinear(t *testing.T) {
-	sched := NewOneCycleLR[float64](1.0, 100, WithPctStart[float64](0.5))
+	sched := NewOneCycleLR(1.0, 100, WithPctStart[float64](0.5))
 	// warmupSteps = 50; startLR = 1.0/25 = 0.04
 	// step 25 → progress = 25/50 = 0.5 → LR = 0.04 + 0.5*(1.0-0.04) = 0.04 + 0.48 = 0.52
 	var r float64
@@ -121,8 +121,8 @@ func TestOneCycleLR_WarmupLinear(t *testing.T) {
 }
 
 func TestOneCycleLR_StepWithMetricIgnoresMetric(t *testing.T) {
-	s1 := NewOneCycleLR[float64](0.1, 100)
-	s2 := NewOneCycleLR[float64](0.1, 100)
+	s1 := NewOneCycleLR(0.1, 100)
+	s2 := NewOneCycleLR(0.1, 100)
 	r1 := s1.Step()
 	r2 := s2.StepWithMetric(999.0)
 	if r1 != r2 {

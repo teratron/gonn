@@ -243,7 +243,7 @@ func TestOptionsAPIHappyPath(t *testing.T) {
 		WithBias[float64](true),
 		WithHiddenLayer[float64](4, activation.SIGMOID),
 		WithOutput[float64](1, activation.SIGMOID),
-		WithLearningRate[float64](0.3),
+		WithLearningRate(0.3),
 		WithLoss[float64](loss.MSE),
 	)
 	if err != nil {
@@ -330,7 +330,7 @@ func TestDeepNetworkHalvesWithFloor(t *testing.T) {
 func TestStandardSetupBundlesDefaults(t *testing.T) {
 	t.Parallel()
 	cfg := Config[float64]{}
-	StandardSetup[float64](0.42)(&cfg)
+	StandardSetup(0.42)(&cfg)
 	if cfg.LearningRate != 0.42 {
 		t.Errorf("rate = %v; want 0.42", cfg.LearningRate)
 	}
@@ -359,7 +359,7 @@ func TestBuilderAndOptionsConverge(t *testing.T) {
 		WithBias[float64](true),
 		WithHiddenLayer[float64](4, activation.SIGMOID),
 		WithOutput[float64](1, activation.SIGMOID),
-		WithLearningRate[float64](0.3),
+		WithLearningRate(0.3),
 		WithLoss[float64](loss.MSE),
 	)
 	if err != nil {
@@ -437,7 +437,7 @@ func TestFitConvergesXOR(t *testing.T) {
 	n := MustNew(
 		PresetXOR[float64](),
 		WithMaxIterations[float64](10_000),
-		WithLossLimit[float64](0.02),
+		WithLossLimit(0.02),
 	)
 	dataset := []Sample[float64]{
 		{Input: []float64{0, 0}, Target: []float64{0}},
@@ -474,7 +474,7 @@ func TestFitInvokesEpochCallback(t *testing.T) {
 		PresetXOR[float64](),
 		WithMaxIterations[float64](3),
 		WithLossLimit[float64](-1), // unreachable — force max iterations
-		WithEpochCallback[float64](func(epoch uint, lossValue float64) {
+		WithEpochCallback(func(epoch uint, lossValue float64) {
 			callCount++
 			lastEpoch = epoch
 		}),
@@ -521,7 +521,7 @@ func TestStopRequestsEarlyExit(t *testing.T) {
 		PresetXOR[float64](),
 		WithMaxIterations[float64](100_000),
 		WithLossLimit[float64](-1),
-		WithEpochCallback[float64](func(epoch uint, _ float64) {
+		WithEpochCallback(func(epoch uint, _ float64) {
 			firstEpoch.Do(func() {
 				close(started)
 				<-stopReady
@@ -637,7 +637,7 @@ func TestOptionFormConfigMethodsCoverage(t *testing.T) {
 	t.Parallel()
 	cfg := Config[float64]{}
 	WithWeightInit[float64](WeightInitHe)(&cfg)
-	WithBatchCallback[float64](func(uint, float64) {})(&cfg)
+	WithBatchCallback(func(uint, float64) {})(&cfg)
 	if cfg.WeightInit != WeightInitHe {
 		t.Errorf("WithWeightInit: got %v; want he", cfg.WeightInit)
 	}

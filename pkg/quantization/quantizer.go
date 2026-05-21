@@ -59,11 +59,11 @@ func Quantize[T utils.Float](net *nn.NN[T], calibSamples [][]T, cfg Quantization
 		var ql quantizedLayer[T]
 		switch l := cl.(type) {
 		case *convpkg.Conv1D[T]:
-			ql = newQuantizedConv1D[T](l, cfg)
+			ql = newQuantizedConv1D(l, cfg)
 		case *convpkg.Conv2D[T]:
-			ql = newQuantizedConv2D[T](l, cfg)
+			ql = newQuantizedConv2D(l, cfg)
 		case *attentionpkg.MultiHeadAttention[T]:
-			ql = newQuantizedAttentionProjections[T](l, cfg)
+			ql = newQuantizedAttentionProjections(l, cfg)
 		default:
 			// Unknown types pass through as float identity (QUANT-10).
 			ql = &floatPassthrough[T]{inner: cl}

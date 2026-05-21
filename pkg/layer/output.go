@@ -77,7 +77,7 @@ func (o *Output[T]) Init(size int, act activation.Type, lossKind loss.Type, useB
 // pointer.
 func (o *Output[T]) populate() {
 	for idx := range o.cells {
-		o.cells[idx] = cell.NewOutput[T](&o.targets[idx])
+		o.cells[idx] = cell.NewOutput(&o.targets[idx])
 	}
 }
 
