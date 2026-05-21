@@ -4,6 +4,39 @@ All notable changes to the GoNN library will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the
 release artifacts dictated by [.magic/run.md](.magic/run.md) Phase Completion / Plan Completion.
 
+## [0.17.0] — 2026-05-21
+
+### Post-Training Quantization (PTQ)
+
+Phase 19 delivers `pkg/quantization/` — a peer transformation layer that consumes a trained
+`*nn.NN[T]` and produces a deployable `QuantizedNetwork[T]` int8 artifact persisted as
+`.qnn.json`. Implements all 10 L1 invariants (QUANT-1..10) across three phases: α (weight-only
+Dense/Conv1D/Conv2D), β (activation calibration + full-int8 GEMM path), γ (attention projection
+matrices). No changes to `pkg/nn/`, `pkg/layer/`, or `pkg/compute/`.
+
+#### Added
+
+- **`pkg/quantization/config.go`** — `QuantMode` enum (`WeightOnly`, `FullInt8`); `QuantizationConfig[T]` with `Mode`, `WeightGranularity`, `ActGranularity`, `Strategy`, `PercentileThreshold`, `Seed`; `CalibrationProvenance` struct; `DefaultQuantizationConfig[T]()`.
+- **`pkg/quantization/params.go`** — `Granularity` (`PerTensor`, `PerChannel`); `CalibStrategy` (`MinMax`, `Percentile99p9`, `Entropy`); `QuantizationParams`; `dequantize`, `quantize` with banker's rounding (`roundHalfEven`); `computeSymmetric`, `computeAsymmetric`.
+- **`pkg/quantization/quantizer.go`** — `QuantizedNetwork[T]` struct; `Quantize[T](net, calibSamples, cfg)` entry point (type-switches on ConvPrefix: Conv1D, Conv2D, MultiHeadAttention, float pass-through for unknown types); `Load[T](path)` deserialisation entry point; SHA-256 `BaselineHash`.
+- **`pkg/quantization/dense.go`** — `QuantizedDense[T]`: weight-only and full-int8 forward paths; int32 accumulator GEMM with zero-point bias corrections; `SetActParams` setter.
+- **`pkg/quantization/conv.go`** — `QuantizedConv1D[T]`, `QuantizedConv2D[T]`: weight-only int8 convolutional layers; dequantize filter weights on the fly per output channel.
+- **`pkg/quantization/calibration.go`** — `CalibrationRunner[T]`: drives ConvPrefix manually; `Run` collects per-layer activation min/max + percentile-clip values; `Params()` returns per-layer `QuantizationParams`; hard floor 32 samples → `ErrCalibTooFewSamples`.
+- **`pkg/quantization/evaluator.go`** — `Evaluate[T]`: side-by-side float vs int8 comparison; `EvaluationResult` with `MetricFloat`, `MetricQuant`, `DeltaRelative`, `PerLayerL2`; informational only, no auto-accept gate (QUANT-C6).
+- **`pkg/quantization/attn.go`** — `QuantizedAttentionProjections[T]`: weight-only int8 Wq/Wk/Wv/Wo projections; scoring and softmax remain float (QUANT-10); full multi-head attention forward.
+- **`pkg/quantization/persistence.go`** — `.qnn.json` wire format; `MarshalQNN`/`UnmarshalQNN` (int8 weights as base64, float64 bias as IEEE-754 LE base64); `Save`; `Load` via `UnmarshalQNNFile`.
+
+#### Modified
+
+- **`pkg/utils/errors.go`** — `ErrCalibTooFewSamples`, `ErrDegenerateRange` quantization sentinels.
+- **`pkg/layer/conv/conv.go`** — exported `OutputLen`, `PadSamePadding`, `Isqrt` wrappers for shape-arithmetic helpers used by `pkg/quantization`.
+
+#### Coverage floors
+
+| Package              | Coverage |
+| -------------------- | -------- |
+| `pkg/quantization`   | 91.4 %   |
+
 ## [0.16.0] — 2026-05-20
 
 ### Transformer Block Implementation
@@ -1038,6 +1071,7 @@ Promotes three specs to Stable.
 
 
 
+
 - Updated task plan and task index (main)
 - Completed task `phase-11` (main)
 - Updated 2 specifications (main)
@@ -1054,4 +1088,5 @@ Promotes three specs to Stable.
 - Completed task `phase-18` (main)
 - Added specification `quantization-impl` (main)
 - Updated implementation plan (main)
+- Completed task `phase-19` (main)
 

@@ -77,6 +77,24 @@ type Layer[T utils.Float] interface {
 	GradSlots() (gradW, gradB []T)
 }
 
+// OutputLen is the exported form of the CONV-1 output-length formula.
+// See outputLen for full documentation.
+func OutputLen(inLen, kernelSize, stride int, pad PadMode) int {
+	return outputLen(inLen, kernelSize, stride, pad)
+}
+
+// PadSamePadding is the exported form of padSamePadding.
+// Returns (left, right) zero-padding amounts for PadSame mode.
+func PadSamePadding(inLen, kernelSize, stride int) (left, right int) {
+	return padSamePadding(inLen, kernelSize, stride)
+}
+
+// Isqrt is the exported form of isqrt.
+// Returns the integer square root of n (floor(sqrt(n))).
+func Isqrt(n int) int {
+	return isqrt(n)
+}
+
 // outputLen implements CONV-1: the canonical output-length formula for a
 // 1-D convolution / pooling operation. Returns 0 when the operation cannot
 // produce any output (inLen < kernelSize under PadValid).

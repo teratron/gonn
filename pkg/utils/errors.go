@@ -339,6 +339,29 @@ var ErrAttentionMaskLength = fmt.Errorf("attention-mask-length: %w", ErrCompute)
 //   - Stability: Stable.
 var ErrVocabOutOfRange = fmt.Errorf("vocab-out-of-range: %w", ErrUserConfig)
 
+// Quantization sentinels (QUANT-4, QUANT-C8, per l1-quantization).
+
+// ErrCalibTooFewSamples signals that CalibrationRunner.Run was called with
+// fewer than the hard minimum (32) calibration samples. Wraps ErrUserConfig.
+//
+// AI-Meta:
+//   - Purpose: Sentinel for calibration sample count below hard floor (QUANT-4).
+//   - Usage: errors.Is(err, utils.ErrCalibTooFewSamples).
+//   - Related: [ErrUserConfig].
+//   - Stability: Experimental.
+var ErrCalibTooFewSamples = fmt.Errorf("calib-too-few-samples: %w", ErrUserConfig)
+
+// ErrDegenerateRange signals that a calibrated layer had a range so small
+// (rMax−rMin < 1e-6) that a meaningful scale cannot be computed. Scale falls
+// back to 1.0, zero_point to 0. Wraps ErrCompute.
+//
+// AI-Meta:
+//   - Purpose: Sentinel for degenerate activation range during calibration (QUANT-C8).
+//   - Usage: errors.Is(err, utils.ErrDegenerateRange).
+//   - Related: [ErrCompute].
+//   - Stability: Experimental.
+var ErrDegenerateRange = fmt.Errorf("degenerate-range: %w", ErrCompute)
+
 // Newf builds a new error that wraps the given category sentinel and
 // carries the caller-supplied identifying fields. The format string MUST
 // be specific per C32 §1: it MUST identify the offending value (or its
