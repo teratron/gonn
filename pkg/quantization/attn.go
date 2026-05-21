@@ -15,18 +15,18 @@ import (
 //   - Purpose: Weight-only int8 attention projection layer for Phase γ (T-19A10).
 //   - Stability: Experimental.
 type QuantizedAttentionProjections[T utils.Float] struct {
-	WqParams QuantizationParams
-	WkParams QuantizationParams
-	WvParams QuantizationParams
-	WoParams QuantizationParams
-	Wq       []int8
-	Wk       []int8
-	Wv       []int8
-	Wo       []int8
 	Bq       []float64
 	Bk       []float64
-	Bv       []float64
 	Bo       []float64
+	Bv       []float64
+	Wq       []int8
+	Wk       []int8
+	Wo       []int8
+	Wv       []int8
+	WqParams QuantizationParams
+	WkParams QuantizationParams
+	WoParams QuantizationParams
+	WvParams QuantizationParams
 	Dmodel   int
 	NumHeads int
 	SeqLen   int

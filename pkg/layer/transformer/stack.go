@@ -27,8 +27,8 @@ import (
 //   - Related: [EncoderBlock], [DecoderBlock], [TransformerConfig], [Mode].
 //   - Stability: Experimental.
 type Stack[T utils.Float] struct {
-	Cfg    TransformerConfig[T]
 	Blocks []Block[T]
+	Cfg    TransformerConfig[T]
 	Mode   Mode
 }
 
@@ -179,9 +179,9 @@ func (s *Stack[T]) MarshalJSON() ([]byte, error) {
 		rawBlocks[i] = data
 	}
 	return json.Marshal(&struct {
-		Config TransformerConfig[T] `json:"Config"`
 		Type   string               `json:"Type"`
 		Blocks []json.RawMessage    `json:"Blocks"`
+		Config TransformerConfig[T] `json:"Config"`
 		Mode   Mode                 `json:"Mode"`
 	}{
 		Type:   "transformer.Stack",
@@ -201,9 +201,9 @@ func (s *Stack[T]) MarshalJSON() ([]byte, error) {
 //   - Stability: Experimental.
 func (s *Stack[T]) UnmarshalJSON(data []byte) error {
 	aux := &struct {
-		Config TransformerConfig[T] `json:"Config"`
 		Type   string               `json:"Type"`
 		Blocks []json.RawMessage    `json:"Blocks"`
+		Config TransformerConfig[T] `json:"Config"`
 		Mode   Mode                 `json:"Mode"`
 	}{}
 	if err := json.Unmarshal(data, aux); err != nil {

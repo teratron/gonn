@@ -25,10 +25,10 @@ type EvalSample[T utils.Float] struct {
 //   - Purpose: Output of Evaluate[T] — informational only, no auto-accept gate (QUANT-C6).
 //   - Stability: Experimental.
 type EvaluationResult struct {
-	MetricFloat   float64   // metricFn over baseline network
-	MetricQuant   float64   // metricFn over quantized network
-	DeltaRelative float64   // (MetricQuant - MetricFloat) / |MetricFloat|; 0 if MetricFloat == 0
-	PerLayerL2    []float64 // per ConvPrefix layer: ||y_float - y_quant||₂ / ||y_float||₂
+	PerLayerL2    []float64
+	MetricFloat   float64
+	MetricQuant   float64
+	DeltaRelative float64
 }
 
 // Evaluate runs baseline and quantized networks on every sample in evalSet,

@@ -16,42 +16,40 @@ import (
 // AI-Meta:
 //   - Purpose: JSON wire representation of one quantized layer inside .qnn.json.
 type QuantizedLayerJSON struct {
-	Type      string    `json:"type"`
-	Cout      int       `json:"cout,omitempty"`
-	Cin       int       `json:"cin,omitempty"`
-	Scale     []float64 `json:"scale"`
-	ZeroPoint []int32   `json:"zero_point"`
-	Weights   string    `json:"weights"`           // base64-encoded int8 bytes
-	Bias      string    `json:"bias,omitempty"`    // base64-encoded IEEE-754 float64 LE bytes
-	// Conv-specific fields
-	KernelSize  int    `json:"kernel_size,omitempty"`
-	KernelH     int    `json:"kernel_h,omitempty"`
-	KernelW     int    `json:"kernel_w,omitempty"`
-	InChannels  int    `json:"in_channels,omitempty"`
-	InLen       int    `json:"in_len,omitempty"`
-	Stride      int    `json:"stride,omitempty"`
-	StrideH     int    `json:"stride_h,omitempty"`
-	StrideW     int    `json:"stride_w,omitempty"`
-	Padding     int    `json:"padding,omitempty"`
-	UseBias     bool   `json:"use_bias,omitempty"`
-	Granularity int    `json:"granularity"`
-	Strategy    int    `json:"strategy"`
-	// AttentionProj-specific fields (Wq reuses Scale/ZeroPoint/Weights/Bias above)
-	NumHeads    int       `json:"num_heads,omitempty"`
-	SeqLen      int       `json:"seq_len,omitempty"`
-	Causal      bool      `json:"causal,omitempty"`
-	WkWeights   string    `json:"wk_weights,omitempty"`
-	WkScale     []float64 `json:"wk_scale,omitempty"`
-	WkZeroPoint []int32   `json:"wk_zero_point,omitempty"`
+	WoWeights   string    `json:"wo_weights,omitempty"`
+	WoBias      string    `json:"wo_bias,omitempty"`
 	WkBias      string    `json:"wk_bias,omitempty"`
 	WvWeights   string    `json:"wv_weights,omitempty"`
-	WvScale     []float64 `json:"wv_scale,omitempty"`
-	WvZeroPoint []int32   `json:"wv_zero_point,omitempty"`
+	WkWeights   string    `json:"wk_weights,omitempty"`
+	Weights     string    `json:"weights"`
+	Bias        string    `json:"bias,omitempty"`
 	WvBias      string    `json:"wv_bias,omitempty"`
-	WoWeights   string    `json:"wo_weights,omitempty"`
+	Type        string    `json:"type"`
+	ZeroPoint   []int32   `json:"zero_point"`
 	WoScale     []float64 `json:"wo_scale,omitempty"`
+	WvZeroPoint []int32   `json:"wv_zero_point,omitempty"`
+	WvScale     []float64 `json:"wv_scale,omitempty"`
+	Scale       []float64 `json:"scale"`
 	WoZeroPoint []int32   `json:"wo_zero_point,omitempty"`
-	WoBias      string    `json:"wo_bias,omitempty"`
+	WkZeroPoint []int32   `json:"wk_zero_point,omitempty"`
+	WkScale     []float64 `json:"wk_scale,omitempty"`
+	KernelH     int       `json:"kernel_h,omitempty"`
+	StrideH     int       `json:"stride_h,omitempty"`
+	NumHeads    int       `json:"num_heads,omitempty"`
+	SeqLen      int       `json:"seq_len,omitempty"`
+	Cout        int       `json:"cout,omitempty"`
+	Granularity int       `json:"granularity"`
+	Cin         int       `json:"cin,omitempty"`
+	Padding     int       `json:"padding,omitempty"`
+	StrideW     int       `json:"stride_w,omitempty"`
+	Strategy    int       `json:"strategy"`
+	Stride      int       `json:"stride,omitempty"`
+	InLen       int       `json:"in_len,omitempty"`
+	InChannels  int       `json:"in_channels,omitempty"`
+	KernelW     int       `json:"kernel_w,omitempty"`
+	KernelSize  int       `json:"kernel_size,omitempty"`
+	UseBias     bool      `json:"use_bias,omitempty"`
+	Causal      bool      `json:"causal,omitempty"`
 }
 
 // QuantizedNetworkJSON is the top-level .qnn.json wire format.
@@ -59,10 +57,10 @@ type QuantizedLayerJSON struct {
 // AI-Meta:
 //   - Purpose: Top-level JSON envelope for .qnn.json; "Type":"quantized" discriminator (QUANT-6).
 type QuantizedNetworkJSON struct {
-	Type            string               `json:"type"`
-	BaselineHash    string               `json:"baseline_hash"`
+	Type            string                `json:"type"`
+	BaselineHash    string                `json:"baseline_hash"`
+	Layers          []QuantizedLayerJSON  `json:"layers"`
 	CalibProvenance CalibrationProvenance `json:"calib_provenance"`
-	Layers          []QuantizedLayerJSON `json:"layers"`
 }
 
 // MarshalQNN serialises a QuantizedNetwork to .qnn.json bytes.
@@ -188,12 +186,12 @@ func marshalLayer[T utils.Float](l quantizedLayer[T]) (QuantizedLayerJSON, error
 		}, nil
 	case *QuantizedAttentionProjections[T]:
 		return QuantizedLayerJSON{
-			Type:        "AttentionProj",
-			Cout:        v.Dmodel,
-			Cin:         v.Dmodel,
-			NumHeads:    v.NumHeads,
-			SeqLen:      v.SeqLen,
-			Causal:      v.Causal,
+			Type:     "AttentionProj",
+			Cout:     v.Dmodel,
+			Cin:      v.Dmodel,
+			NumHeads: v.NumHeads,
+			SeqLen:   v.SeqLen,
+			Causal:   v.Causal,
 			// Wq reuses the top-level Scale/ZeroPoint/Weights/Bias fields
 			Scale:       v.WqParams.Scale,
 			ZeroPoint:   v.WqParams.ZeroPoint,

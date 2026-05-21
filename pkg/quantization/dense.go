@@ -15,10 +15,10 @@ import "github.com/teratron/gonn/pkg/utils"
 //   - Purpose: Int8 Dense layer for Phase α (weight-only) and Phase β (full-int8) inference (T-19A04/A08).
 //   - Stability: Experimental.
 type QuantizedDense[T utils.Float] struct {
-	WeightParams QuantizationParams
-	ActParams    QuantizationParams // nil Scale = weight-only mode
 	Weights      []int8
 	Bias         []float64
+	WeightParams QuantizationParams
+	ActParams    QuantizationParams
 	Cout         int
 	Cin          int
 }

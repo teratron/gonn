@@ -28,9 +28,9 @@ type quantizedLayer[T utils.Float] interface {
 //   - Purpose: Inference-only holder of quantized layers produced by Quantize[T].
 //   - Stability: Experimental.
 type QuantizedNetwork[T utils.Float] struct {
-	Config          QuantizationConfig[T]
-	Layers          []quantizedLayer[T]
 	BaselineHash    string
+	Layers          []quantizedLayer[T]
+	Config          QuantizationConfig[T]
 	CalibProvenance CalibrationProvenance
 }
 
@@ -112,12 +112,12 @@ func quantizeWeightsTensor(w []float64, cout, cin int, gran Granularity) ([]int8
 		scales := make([]float64, cout)
 		zps := make([]int32, cout)
 
-		for c := 0; c < cout; c++ {
+		for c := range cout {
 			rMin, rMax := rowMinMax(w, c, cin)
 			p := computeSymmetric(rMin, rMax)
 			scales[c] = p.Scale[0]
 			zps[c] = p.ZeroPoint[0]
-			for k := 0; k < cin; k++ {
+			for k := range cin {
 				row := QuantizationParams{
 					Scale:       []float64{scales[c]},
 					ZeroPoint:   []int32{zps[c]},

@@ -29,21 +29,18 @@ import (
 //   - Related: [DecoderBlock], [Stack], [TransformerConfig], [layer.Layer].
 //   - Stability: Experimental.
 type EncoderBlock[T utils.Float] struct {
-	Cfg   TransformerConfig[T]
-	Attn  *attention.MultiHeadAttention[T]
-	Norm1 *norm.LayerNorm[T]
-	Norm2 *norm.LayerNorm[T]
-	FFN   *ffn[T]
-	Drop1 *regularizer.Dropout[T] // post-attention dropout (TRANS-C7 position 1)
-	Drop2 *regularizer.Dropout[T] // post-FFN dropout (TRANS-C7 position 2)
-	// Forward-cache buffers reused across calls (PERF-4).
-	bufAttn []T // Attn output (SeqLen*Dmodel)
-	bufZ    []T // post-first-residual (SeqLen*Dmodel)
-	bufF    []T // FFN output (SeqLen*Dmodel)
-	// backward-cache
-	cacheX  []T // input to Forward
-	cacheZ1 []T // post-first-LN (pre-FFN input)
-	// training mode — controls Dropout.ApplyMask (false = inference, no dropout)
+	Drop2    *regularizer.Dropout[T]
+	Attn     *attention.MultiHeadAttention[T]
+	Norm1    *norm.LayerNorm[T]
+	Norm2    *norm.LayerNorm[T]
+	FFN      *ffn[T]
+	Drop1    *regularizer.Dropout[T]
+	bufAttn  []T
+	bufZ     []T
+	bufF     []T
+	cacheX   []T
+	cacheZ1  []T
+	Cfg      TransformerConfig[T]
 	training bool
 }
 
@@ -385,11 +382,11 @@ func (e *EncoderBlock[T]) MarshalJSON() ([]byte, error) {
 	}
 	return json.Marshal(&struct {
 		Type   string               `json:"Type"`
-		Config TransformerConfig[T] `json:"Config"`
 		Attn   json.RawMessage      `json:"Attn"`
 		Norm1  json.RawMessage      `json:"Norm1"`
 		Norm2  json.RawMessage      `json:"Norm2"`
 		FFN    json.RawMessage      `json:"FFN"`
+		Config TransformerConfig[T] `json:"Config"`
 	}{
 		Type:   "transformer.EncoderBlock",
 		Config: e.Cfg,
@@ -411,11 +408,11 @@ func (e *EncoderBlock[T]) MarshalJSON() ([]byte, error) {
 func (e *EncoderBlock[T]) UnmarshalJSON(data []byte) error {
 	aux := &struct {
 		Type   string               `json:"Type"`
-		Config TransformerConfig[T] `json:"Config"`
 		Attn   json.RawMessage      `json:"Attn"`
 		Norm1  json.RawMessage      `json:"Norm1"`
 		Norm2  json.RawMessage      `json:"Norm2"`
 		FFN    json.RawMessage      `json:"FFN"`
+		Config TransformerConfig[T] `json:"Config"`
 	}{}
 	if err := json.Unmarshal(data, aux); err != nil {
 		return err

@@ -13,8 +13,9 @@ const calibHardFloor = 32 // ErrCalibTooFewSamples below this
 
 // layerStats accumulates per-layer activation statistics during calibration.
 type layerStats struct {
-	min, max float64
-	vals     []float64 // raw values for percentile; cleared after Params()
+	vals []float64
+	min  float64
+	max  float64
 }
 
 // CalibrationRunner drives a source network's ConvPrefix layers sample-by-sample,
@@ -25,8 +26,8 @@ type layerStats struct {
 //   - Stability: Experimental.
 type CalibrationRunner[T utils.Float] struct {
 	net   *nn.NN[T]
+	stats []layerStats
 	cfg   QuantizationConfig[T]
-	stats []layerStats // indexed by ConvPrefix position
 }
 
 // NewCalibrationRunner constructs a CalibrationRunner for the given network and config.

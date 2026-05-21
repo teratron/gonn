@@ -28,21 +28,18 @@ import (
 //   - Related: [EncoderBlock], [Stack], [TransformerConfig], [layer.Layer].
 //   - Stability: Experimental.
 type DecoderBlock[T utils.Float] struct {
-	Cfg   TransformerConfig[T]
-	Attn  *attention.MultiHeadAttention[T]
-	Norm1 *norm.LayerNorm[T]
-	Norm2 *norm.LayerNorm[T]
-	FFN   *ffn[T]
-	Drop1 *regularizer.Dropout[T] // post-attention dropout (TRANS-C7 position 1)
-	Drop2 *regularizer.Dropout[T] // post-FFN dropout (TRANS-C7 position 2)
-	// Forward-cache buffers reused across calls (PERF-4).
-	bufAttn []T
-	bufZ    []T
-	bufF    []T
-	// backward-cache
-	cacheX  []T
-	cacheZ1 []T
-	// training mode
+	Drop2    *regularizer.Dropout[T]
+	Attn     *attention.MultiHeadAttention[T]
+	Norm1    *norm.LayerNorm[T]
+	Norm2    *norm.LayerNorm[T]
+	FFN      *ffn[T]
+	Drop1    *regularizer.Dropout[T]
+	bufAttn  []T
+	bufZ     []T
+	bufF     []T
+	cacheX   []T
+	cacheZ1  []T
+	Cfg      TransformerConfig[T]
 	training bool
 }
 
@@ -302,11 +299,11 @@ func (d *DecoderBlock[T]) MarshalJSON() ([]byte, error) {
 	}
 	return json.Marshal(&struct {
 		Type   string               `json:"Type"`
-		Config TransformerConfig[T] `json:"Config"`
 		Attn   json.RawMessage      `json:"Attn"`
 		Norm1  json.RawMessage      `json:"Norm1"`
 		Norm2  json.RawMessage      `json:"Norm2"`
 		FFN    json.RawMessage      `json:"FFN"`
+		Config TransformerConfig[T] `json:"Config"`
 	}{
 		Type:   "transformer.DecoderBlock",
 		Config: d.Cfg,
@@ -328,11 +325,11 @@ func (d *DecoderBlock[T]) MarshalJSON() ([]byte, error) {
 func (d *DecoderBlock[T]) UnmarshalJSON(data []byte) error {
 	aux := &struct {
 		Type   string               `json:"Type"`
-		Config TransformerConfig[T] `json:"Config"`
 		Attn   json.RawMessage      `json:"Attn"`
 		Norm1  json.RawMessage      `json:"Norm1"`
 		Norm2  json.RawMessage      `json:"Norm2"`
 		FFN    json.RawMessage      `json:"FFN"`
+		Config TransformerConfig[T] `json:"Config"`
 	}{}
 	if err := json.Unmarshal(data, aux); err != nil {
 		return err

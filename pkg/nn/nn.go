@@ -34,20 +34,20 @@ import (
 //   - Constraints: Topology is immutable after Compile; weights must not be mutated concurrently.
 //   - Stability: Stable.
 type NN[T utils.Float] struct {
-	cfg                Config[T]
+	backend            compute.Backend[T]
 	opt                optimizer.Optimizer[T]
 	sched              optimizer.Scheduler[T]
 	reg                regularizer.Regularizer[T]
 	vis                *visualization.VisServer
 	callbacks          *CallbackRegistry[T]
 	normLayers         map[int]norm.Normalizer[T]
-	backend            compute.Backend[T] // CPU by default; set by WithBackend; nil impossible after compile
 	convPrefix         []conv.Layer[T]
 	convBuf            []T
 	convGradBuf        []T
 	gradBuf            []T
 	weightBuf          []T
 	network.Network[T] `json:"network" xml:"network"`
+	cfg                Config[T]
 	rawInputSize       uint
 	control            atomic.Int32
 	stateField         state

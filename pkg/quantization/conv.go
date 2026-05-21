@@ -17,9 +17,9 @@ type convPadMode = convpkg.PadMode
 //   - Purpose: Weight-only int8 Conv1D layer for Phase α inference (T-19A05).
 //   - Stability: Experimental.
 type QuantizedConv1D[T utils.Float] struct {
-	WeightParams QuantizationParams
 	Weights      []int8
 	Bias         []float64
+	WeightParams QuantizationParams
 	NumFilters   int
 	KernelSize   int
 	InLen        int
@@ -99,14 +99,14 @@ func newQuantizedConv1D[T utils.Float](src *convpkg.Conv1D[T], cfg QuantizationC
 //   - Purpose: Weight-only int8 Conv2D layer for Phase α inference (T-19A05).
 //   - Stability: Experimental.
 type QuantizedConv2D[T utils.Float] struct {
-	WeightParams QuantizationParams
 	Weights      []int8
 	Bias         []float64
+	WeightParams QuantizationParams
 	NumFilters   int
 	InChannels   int
 	KernelH      int
 	KernelW      int
-	InLen        int // InH*InW (inferred from input on first Forward if 0)
+	InLen        int
 	StrideH      int
 	StrideW      int
 	Padding      convPadMode
