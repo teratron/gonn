@@ -79,7 +79,7 @@ func runE08(seed uint64, maxIter uint) (trainRMSE, testRMSE [3]float64, finalLos
 		samples[i] = nn.Sample[float32]{Input: s.x, Target: s.y}
 	}
 
-	net, err := nn.New[float32](
+	net, err := nn.New(
 		nn.WithInput[float32](5),
 		nn.WithBias[float32](true),
 		nn.WithHiddenLayer[float32](16, activation.ReLU),

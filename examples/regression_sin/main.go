@@ -60,7 +60,7 @@ func runE07(maxIter uint) (trainRMSE, testRMSE, finalLoss float32, err error) {
 		}
 	}
 
-	net, err := nn.New[float32](
+	net, err := nn.New(
 		nn.WithInput[float32](1),
 		nn.WithBias[float32](true),
 		nn.WithHiddenLayer[float32](16, activation.TanH),

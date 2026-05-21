@@ -42,9 +42,9 @@ func TestWithBackend(t *testing.T) {
 
 	baseOpts := func() []Option[float64] {
 		return []Option[float64]{
-			WithInput[float64](2),
-			WithHiddenLayer[float64](4, activation.SIGMOID),
-			WithOutput[float64](1, activation.SIGMOID),
+			WithInput(2),
+			WithHiddenLayer(4, activation.SIGMOID),
+			WithOutput(1, activation.SIGMOID),
 		}
 	}
 
@@ -64,7 +64,7 @@ func TestWithBackend(t *testing.T) {
 
 	t.Run("unavailable_backend_falls_back_to_cpu", func(t *testing.T) {
 		t.Parallel()
-		opts := append(baseOpts(), WithBackend[float64](&stubUnavailableBackend[float64]{}))
+		opts := append(baseOpts(), WithBackend(&stubUnavailableBackend[float64]{}))
 		n, err := New(opts...)
 		if err != nil {
 			t.Fatalf("New with unavailable backend: %v", err)
@@ -86,7 +86,7 @@ func TestWithBackend(t *testing.T) {
 		if err != nil {
 			t.Fatalf("New (CPU): %v", err)
 		}
-		opts2 := append(baseOpts(), WithBackend[float64](&stubUnavailableBackend[float64]{}))
+		opts2 := append(baseOpts(), WithBackend(&stubUnavailableBackend[float64]{}))
 		n2, err := New(opts2...)
 		if err != nil {
 			t.Fatalf("New (fallback): %v", err)

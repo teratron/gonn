@@ -106,7 +106,7 @@ func runE05(seed uint64) (trainAcc, testAcc, finalLoss float32, err error) {
 	}
 
 	var lastLoss float32
-	net, err := nn.New[float32](
+	net, err := nn.New(
 		nn.WithInput[float32](4),
 		nn.WithBias[float32](true),
 		nn.WithHiddenLayer[float32](16, activation.ReLU),

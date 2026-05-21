@@ -13,13 +13,13 @@ import (
 // the original XOR targets — proves the continuation actually shifted the
 // learned function.
 func TestAndTrainContinuation(t *testing.T) {
-	net, err := nn.New[float64](
+	net, err := nn.New(
 		nn.WithInput[float64](2),
 		nn.WithHiddenLayer[float64](4, activation.SIGMOID),
 		nn.WithOutput[float64](1, activation.SIGMOID),
-		nn.WithLearningRate[float64](0.3),
+		nn.WithLearningRate(0.3),
 		nn.WithMaxIterations[float64](3000),
-		nn.WithLossLimit[float64](1e-3),
+		nn.WithLossLimit(1e-3),
 	)
 	if err != nil {
 		t.Fatalf("New: %v", err)
@@ -28,7 +28,7 @@ func TestAndTrainContinuation(t *testing.T) {
 		t.Fatalf("Fit XOR: %v", err)
 	}
 	if _, _, err := net.AndTrain(negatedXOR(),
-		nn.WithLearningRate[float64](0.1),
+		nn.WithLearningRate(0.1),
 		nn.WithMaxIterations[float64](3000),
 	); err != nil {
 		t.Fatalf("AndTrain: %v", err)

@@ -15,7 +15,7 @@ import (
 func runOptions() float32 {
 	inputs, targets := xorDataset()
 
-	n, err := nn.New[float32](
+	n, err := nn.New(
 		nn.WithInput[float32](2),
 		nn.WithBias[float32](true),
 		nn.WithHiddenLayer[float32](4, activation.SIGMOID),

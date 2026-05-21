@@ -12,7 +12,7 @@ import (
 // newTestNN builds a minimal 2→2→1 network for use as an inner NN in meta tests.
 func newTestInnerNN(t *testing.T) *NN[float64] {
 	t.Helper()
-	inner, err := New[float64](
+	inner, err := New(
 		WithInput[float64](2),
 		WithHiddenLayer[float64](4, activation.SIGMOID),
 		WithOutput[float64](1, activation.SIGMOID),
@@ -166,7 +166,7 @@ func TestMetaLearnerStepShapeMismatch(t *testing.T) {
 
 func TestMetaLearnerStepInnerQueryError(t *testing.T) {
 	// inner network with wrong input size → Query will return ErrInputData.
-	inner, err := New[float64](
+	inner, err := New(
 		WithInput[float64](5), // expects 5 inputs
 		WithHiddenLayer[float64](4, activation.SIGMOID),
 		WithOutput[float64](1, activation.SIGMOID),
@@ -195,7 +195,7 @@ func TestWithMetaLearnerWiring(t *testing.T) {
 		inner:  inner,
 		params: []ParamAccessor[float64]{&ScalarParam[float64]{ptr: &v, name: "lr"}},
 	}
-	outer, err := New[float64](
+	outer, err := New(
 		WithInput[float64](2),
 		WithHiddenLayer[float64](4, activation.SIGMOID),
 		WithOutput[float64](1, activation.SIGMOID),
@@ -263,7 +263,7 @@ func TestMetaLearnerConvergence(t *testing.T) {
 			t.Skip("skipping convergence check: wall time > 25 s (CI low-power runner)")
 		}
 
-		static, err := New[float64](
+		static, err := New(
 			WithInput[float64](2),
 			WithHiddenLayer[float64](4, activation.SIGMOID),
 			WithOutput[float64](1, activation.SIGMOID),
@@ -281,7 +281,7 @@ func TestMetaLearnerConvergence(t *testing.T) {
 			t.Skip("skipping convergence check: wall time > 25 s (CI low-power runner)")
 		}
 
-		inner, err := New[float64](
+		inner, err := New(
 			WithInput[float64](2),
 			WithHiddenLayer[float64](4, activation.SIGMOID),
 			WithOutput[float64](1, activation.SIGMOID),
@@ -294,7 +294,7 @@ func TestMetaLearnerConvergence(t *testing.T) {
 			inner:  inner,
 			params: []ParamAccessor[float64]{&ScalarParam[float64]{ptr: &outerLR, name: "lr"}},
 		}
-		meta, err := New[float64](
+		meta, err := New(
 			WithInput[float64](2),
 			WithHiddenLayer[float64](4, activation.SIGMOID),
 			WithOutput[float64](1, activation.SIGMOID),
@@ -339,7 +339,7 @@ func TestTrainCallsMetaLearnerStep(t *testing.T) {
 		},
 	}
 
-	outer, err := New[float64](
+	outer, err := New(
 		WithInput[float64](2),
 		WithHiddenLayer[float64](4, activation.SIGMOID),
 		WithOutput[float64](1, activation.SIGMOID),

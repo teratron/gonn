@@ -23,11 +23,11 @@ func almostEqual(a, b, tol float64) bool {
 // makeConv1DNet builds a small Conv1D network for testing.
 func makeConv1DNet(t *testing.T) *nn.NN[float64] {
 	t.Helper()
-	net, err := nn.New[float64](
+	net, err := nn.New(
 		nn.WithConv1D[float64](4, 3, 1, convpkg.PadValid, false),
-		nn.WithInput[float64](8),
-		nn.WithHiddenLayer[float64](8, 0),
-		nn.WithOutput[float64](2, 0),
+		nn.WithInput(8),
+		nn.WithHiddenLayer(8, 0),
+		nn.WithOutput(2, 0),
 	)
 	if err != nil {
 		t.Fatalf("makeConv1DNet: %v", err)
@@ -527,10 +527,10 @@ func TestQuantizedAttentionForward(t *testing.T) {
 // TestQuantizeMHA verifies Quantize produces QuantizedAttentionProjections in layers.
 func TestQuantizeMHA(t *testing.T) {
 	const seqLen, dmodel, numHeads = 4, 8, 2
-	net, err := nn.New[float64](
+	net, err := nn.New(
 		nn.WithMultiHeadAttention[float64](seqLen, dmodel, numHeads),
-		nn.WithInput[float64](uint(seqLen*dmodel)),
-		nn.WithOutput[float64](uint(seqLen*dmodel), 0),
+		nn.WithInput(uint(seqLen*dmodel)),
+		nn.WithOutput(uint(seqLen*dmodel), 0),
 	)
 	if err != nil {
 		t.Skipf("MHA network build failed (likely shape issue): %v", err)

@@ -68,7 +68,7 @@ func predict(net *nn.NN[float64]) ([]float64, error) {
 }
 
 func main() {
-	net, err := nn.New[float64](
+	net, err := nn.New(
 		nn.WithInput[float64](2),
 		nn.WithHiddenLayer[float64](4, activation.SIGMOID),
 		nn.WithOutput[float64](1, activation.SIGMOID),

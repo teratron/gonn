@@ -106,7 +106,7 @@ func main() {
 
 	// 784 → 128 (ReLU) → BatchNorm → 64 (ReLU) → 10 (Sigmoid).
 	// WithBatchNorm(0) inserts a BatchNorm layer after the first hidden layer (index 0).
-	net, err := nn.New[float32](
+	net, err := nn.New(
 		nn.WithInput[float32](784),
 		nn.WithHiddenLayer[float32](128, activation.ReLU),
 		nn.WithBatchNorm[float32](0),

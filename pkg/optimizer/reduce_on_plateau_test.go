@@ -5,7 +5,7 @@ import (
 )
 
 func TestReduceOnPlateau_PatienceTrigger(t *testing.T) {
-	sched := NewReduceOnPlateau[float64](0.1, WithROPPatience[float64](3), WithROPFactor[float64](0.5))
+	sched := NewReduceOnPlateau[float64](0.1, WithROPPatience(3), WithROPFactor(0.5))
 
 	// 3 calls with no improvement should trigger reduction
 	for range 3 {
@@ -20,7 +20,7 @@ func TestReduceOnPlateau_PatienceTrigger(t *testing.T) {
 }
 
 func TestReduceOnPlateau_PatientceExact(t *testing.T) {
-	sched := NewReduceOnPlateau[float64](0.1, WithROPPatience[float64](2), WithROPFactor[float64](0.5))
+	sched := NewReduceOnPlateau[float64](0.1, WithROPPatience(2), WithROPFactor(0.5))
 
 	// First call is an improvement (0.5 < best=1e38), so patience doesn't start yet.
 	sched.StepWithMetric(0.5)         // improvement: best=0.5, patienceCount=0
@@ -34,9 +34,9 @@ func TestReduceOnPlateau_PatientceExact(t *testing.T) {
 
 func TestReduceOnPlateau_ModeMax(t *testing.T) {
 	sched := NewReduceOnPlateau[float64](0.1,
-		WithROPMode[float64]("max"),
-		WithROPPatience[float64](2),
-		WithROPFactor[float64](0.5),
+		WithROPMode("max"),
+		WithROPPatience(2),
+		WithROPFactor(0.5),
 	)
 
 	// Improvement means metric increasing
@@ -55,7 +55,7 @@ func TestReduceOnPlateau_ModeMax(t *testing.T) {
 }
 
 func TestReduceOnPlateau_Reset(t *testing.T) {
-	sched := NewReduceOnPlateau[float64](0.1, WithROPPatience[float64](1), WithROPFactor[float64](0.5))
+	sched := NewReduceOnPlateau[float64](0.1, WithROPPatience(1), WithROPFactor(0.5))
 	sched.StepWithMetric(0.5)
 	sched.StepWithMetric(0.5) // triggers reduction: current = 0.05
 	sched.Reset()
@@ -69,10 +69,10 @@ func TestReduceOnPlateau_Reset(t *testing.T) {
 
 func TestReduceOnPlateau_SaveLoadState(t *testing.T) {
 	orig := NewReduceOnPlateau[float64](0.1,
-		WithROPPatience[float64](5),
-		WithROPFactor[float64](0.2),
-		WithROPMinLR[float64](1e-5),
-		WithROPThreshold[float64](1e-3),
+		WithROPPatience(5),
+		WithROPFactor(0.2),
+		WithROPMinLR(1e-5),
+		WithROPThreshold(1e-3),
 	)
 	orig.StepWithMetric(0.5)
 	orig.StepWithMetric(0.5)
@@ -99,7 +99,7 @@ func TestReduceOnPlateau_SaveLoadState(t *testing.T) {
 }
 
 func TestReduceOnPlateau_StepDelegatesToStepWithMetric(t *testing.T) {
-	sched := NewReduceOnPlateau[float64](0.1, WithROPPatience[float64](1), WithROPFactor[float64](0.5))
+	sched := NewReduceOnPlateau[float64](0.1, WithROPPatience(1), WithROPFactor(0.5))
 	// Step() with metric=0 — triggers patience since 0 is NOT < best (best=1e38 for mode="min")
 	// First call: 0 < 1e38, so improvement → best=0, patienceCount=0
 	r1 := sched.Step()
@@ -116,9 +116,9 @@ func TestReduceOnPlateau_StepDelegatesToStepWithMetric(t *testing.T) {
 
 func TestReduceOnPlateau_MinLRFloor(t *testing.T) {
 	sched := NewReduceOnPlateau[float64](0.01,
-		WithROPPatience[float64](1),
-		WithROPFactor[float64](0.1),
-		WithROPMinLR[float64](0.005),
+		WithROPPatience(1),
+		WithROPFactor(0.1),
+		WithROPMinLR(0.005),
 	)
 	// Trigger multiple reductions — rate should never go below minLR
 	for range 20 {
@@ -138,7 +138,7 @@ func TestReduceOnPlateau_Granularity(t *testing.T) {
 
 func TestReduceOnPlateau_BindSchedulerForwards(t *testing.T) {
 	opt := NewSGD[float64](0.1)
-	inner := NewReduceOnPlateau[float64](0.1, WithROPPatience[float64](1), WithROPFactor[float64](0.5))
+	inner := NewReduceOnPlateau[float64](0.1, WithROPPatience(1), WithROPFactor(0.5))
 	bound := BindScheduler[float64](opt, inner)
 
 	ms, ok := bound.(MetricScheduler[float64])

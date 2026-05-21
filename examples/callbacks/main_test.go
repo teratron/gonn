@@ -17,12 +17,12 @@ func TestCallbacksFireDuringFit(t *testing.T) {
 		epochCalls atomic.Int64
 		batchCalls atomic.Int64
 	)
-	n, err := nn.New[float32](
+	n, err := nn.New(
 		nn.PresetXOR[float32](),
-		nn.WithMaxIterations[float32](200),
-		nn.WithLossLimit[float32](-1), // run the full loop
-		nn.WithEpochCallback[float32](func(uint, float32) { epochCalls.Add(1) }),
-		nn.WithBatchCallback[float32](func(uint, float32) { batchCalls.Add(1) }),
+		nn.WithMaxIterations(200),
+		nn.WithLossLimit(-1), // run the full loop
+		nn.WithEpochCallback(func(uint, float32) { epochCalls.Add(1) }),
+		nn.WithBatchCallback(func(uint, float32) { batchCalls.Add(1) }),
 	)
 	if err != nil {
 		t.Fatal(err)

@@ -18,12 +18,12 @@ import (
 var kernelSource string
 
 const (
-	kernelDenseF32    = "dense_forward_f32"
-	kernelDenseF64    = "dense_forward_f64"
-	kernelGradWF32    = "dense_grad_w_f32"
-	kernelGradXF32    = "dense_grad_x_f32"
-	kernelGradWF64    = "dense_grad_w_f64"
-	kernelGradXF64    = "dense_grad_x_f64"
+	kernelDenseF32 = "dense_forward_f32"
+	kernelDenseF64 = "dense_forward_f64"
+	kernelGradWF32 = "dense_grad_w_f32"
+	kernelGradXF32 = "dense_grad_x_f32"
+	kernelGradWF64 = "dense_grad_w_f64"
+	kernelGradXF64 = "dense_grad_x_f64"
 )
 
 // buildProgram compiles kernels.cl on the given context and device.

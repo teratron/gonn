@@ -99,9 +99,9 @@ func TestHiddenLayersBuilderReplacesPrevious(t *testing.T) {
 // TestRepeatOptionAppends verifies the Options API Repeat function appends layers.
 func TestRepeatOptionAppends(t *testing.T) {
 	n, err := nn.New(
-		nn.WithInput[float64](4),
+		nn.WithInput(4),
 		nn.Repeat[float64](3, 16, activation.ReLU),
-		nn.WithOutput[float64](1, activation.SIGMOID),
+		nn.WithOutput(1, activation.SIGMOID),
 	)
 	if err != nil {
 		t.Fatalf("New: %v", err)
@@ -118,9 +118,9 @@ func TestPatternOptionAppends(t *testing.T) {
 		{Size: 4, Activation: activation.SIGMOID, Bias: false},
 	}
 	n, err := nn.New(
-		nn.WithInput[float64](4),
+		nn.WithInput(4),
 		nn.Pattern(block, 4), // 2 × 4 = 8 layers
-		nn.WithOutput[float64](1, activation.SIGMOID),
+		nn.WithOutput(1, activation.SIGMOID),
 	)
 	if err != nil {
 		t.Fatalf("New: %v", err)
@@ -136,10 +136,10 @@ func TestWithHiddenLayersOptionAppends(t *testing.T) {
 		{Size: 16, Activation: activation.ReLU, Bias: true},
 		{Size: 8, Activation: activation.ReLU, Bias: true},
 	}
-	n, err := nn.New[float64](
-		nn.WithInput[float64](4),
-		nn.WithHiddenLayers[float64](layers),
-		nn.WithOutput[float64](1, activation.SIGMOID),
+	n, err := nn.New(
+		nn.WithInput(4),
+		nn.WithHiddenLayers(layers),
+		nn.WithOutput(1, activation.SIGMOID),
 	)
 	if err != nil {
 		t.Fatalf("New: %v", err)
@@ -195,9 +195,9 @@ func TestWithSchedulerBuilderSetsSched(t *testing.T) {
 func TestWithSchedulerOptionSetsSched(t *testing.T) {
 	sched := optimizer.NewCosineAnnealingLR(0.1, 0.001, 100)
 	n, err := nn.New(
-		nn.WithInput[float64](2),
-		nn.WithHiddenLayer[float64](4, activation.SIGMOID),
-		nn.WithOutput[float64](1, activation.SIGMOID),
+		nn.WithInput(2),
+		nn.WithHiddenLayer(4, activation.SIGMOID),
+		nn.WithOutput(1, activation.SIGMOID),
 		nn.WithScheduler(sched),
 	)
 	if err != nil {
@@ -215,16 +215,16 @@ func TestSchedulerStepsOnEpoch(t *testing.T) {
 	// StepLR: decay by 0.5 every 1 epoch — after 5 epochs LR should be 1.0 × 0.5^5.
 	sched := optimizer.BindScheduler[float64](opt, optimizer.NewStepLR[float64](1.0, 1, 0.5))
 
-	n, err := nn.New[float64](
-		nn.WithInput[float64](2),
-		nn.WithHiddenLayer[float64](4, activation.SIGMOID),
-		nn.WithOutput[float64](1, activation.SIGMOID),
-		nn.WithBias[float64](true),
-		nn.WithLearningRate[float64](1.0),
-		nn.WithOptimizer[float64](opt),
-		nn.WithScheduler[float64](sched),
-		nn.WithMaxIterations[float64](5),
-		nn.WithLossLimit[float64](0), // disable early stopping
+	n, err := nn.New(
+		nn.WithInput(2),
+		nn.WithHiddenLayer(4, activation.SIGMOID),
+		nn.WithOutput(1, activation.SIGMOID),
+		nn.WithBias(true),
+		nn.WithLearningRate(1.0),
+		nn.WithOptimizer(opt),
+		nn.WithScheduler(sched),
+		nn.WithMaxIterations(5),
+		nn.WithLossLimit(0), // disable early stopping
 	)
 	if err != nil {
 		t.Fatalf("New: %v", err)

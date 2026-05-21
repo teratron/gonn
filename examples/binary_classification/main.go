@@ -83,7 +83,7 @@ func runE04(seed uint64) (trainAcc, testAcc, finalLoss float32, err error) {
 		samples[i] = nn.Sample[float32]{Input: s.x, Target: []float32{s.label}}
 	}
 
-	n, err := nn.New[float32](
+	n, err := nn.New(
 		nn.WithInput[float32](2),
 		nn.WithBias[float32](true),
 		nn.WithHiddenLayer[float32](8, activation.ReLU),

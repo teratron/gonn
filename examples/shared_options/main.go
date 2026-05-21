@@ -60,7 +60,7 @@ type result struct {
 // formatting; opts is the full option set already resolved by the caller
 // so this function stays oblivious to which topology it is training.
 func train(label string, opts []nn.Option[float32]) result {
-	n, err := nn.New[float32](opts...)
+	n, err := nn.New(opts...)
 	if err != nil {
 		fmt.Printf("[%s] New failed: %v\n", label, err)
 		return result{label: label, loss: 1}

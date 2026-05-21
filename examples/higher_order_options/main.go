@@ -160,7 +160,7 @@ func runSequential(seed uint64, maxIter uint) (float32, error) {
 		return 0, err
 	}
 
-	net, err := nn.New[float32](
+	net, err := nn.New(
 		nn.WithInput[float32](4),
 		nn.WithBias[float32](true),
 		nn.Sequential[float32](2, 16, activation.SIGMOID),
@@ -187,7 +187,7 @@ func runDeepNetwork(seed uint64, maxIter uint) (float32, error) {
 		return 0, err
 	}
 
-	net, err := nn.New[float32](
+	net, err := nn.New(
 		nn.WithInput[float32](4),
 		nn.WithBias[float32](true),
 		nn.DeepNetwork[float32](32, 3, activation.SIGMOID),

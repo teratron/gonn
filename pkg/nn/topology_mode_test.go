@@ -16,7 +16,7 @@ import (
 // buildDynamic compiles a 2-hidden-layer Dynamic network.
 func buildDynamic(t *testing.T) *nn.NN[float64] {
 	t.Helper()
-	n, err := nn.New[float64](
+	n, err := nn.New(
 		nn.WithInput[float64](3),
 		nn.WithHiddenLayer[float64](4, activation.SIGMOID),
 		nn.WithHiddenLayer[float64](4, activation.SIGMOID),
@@ -33,7 +33,7 @@ func buildDynamic(t *testing.T) *nn.NN[float64] {
 // buildImmutable compiles a simple Immutable network (default mode).
 func buildImmutable(t *testing.T) *nn.NN[float64] {
 	t.Helper()
-	n, err := nn.New[float64](
+	n, err := nn.New(
 		nn.WithInput[float64](3),
 		nn.WithHiddenLayer[float64](4, activation.SIGMOID),
 		nn.WithOutput[float64](2, activation.SIGMOID),
@@ -76,7 +76,7 @@ func TestWithTopologyMode_Immutable_RejectsAddNeuron(t *testing.T) {
 func TestWithLogger_Accepted(t *testing.T) {
 	t.Parallel()
 	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
-	n, err := nn.New[float64](
+	n, err := nn.New(
 		nn.WithInput[float64](2),
 		nn.WithHiddenLayer[float64](3, activation.SIGMOID),
 		nn.WithOutput[float64](1, activation.SIGMOID),
@@ -97,7 +97,7 @@ func TestWithLogger_Accepted(t *testing.T) {
 
 func TestWithVisualizationEndpoint_StartsServer(t *testing.T) {
 	t.Parallel()
-	n, err := nn.New[float64](
+	n, err := nn.New(
 		nn.WithInput[float64](2),
 		nn.WithHiddenLayer[float64](3, activation.SIGMOID),
 		nn.WithOutput[float64](1, activation.SIGMOID),
@@ -114,7 +114,7 @@ func TestWithVisualizationEndpoint_StartsServer(t *testing.T) {
 
 func TestWithVisualizationToken_Applied(t *testing.T) {
 	t.Parallel()
-	n, err := nn.New[float64](
+	n, err := nn.New(
 		nn.WithInput[float64](2),
 		nn.WithHiddenLayer[float64](3, activation.SIGMOID),
 		nn.WithOutput[float64](1, activation.SIGMOID),
@@ -132,7 +132,7 @@ func TestWithVisualizationToken_Applied(t *testing.T) {
 
 func TestWithVisualizationCORS_Applied(t *testing.T) {
 	t.Parallel()
-	n, err := nn.New[float64](
+	n, err := nn.New(
 		nn.WithInput[float64](2),
 		nn.WithHiddenLayer[float64](3, activation.SIGMOID),
 		nn.WithOutput[float64](1, activation.SIGMOID),

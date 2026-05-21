@@ -34,8 +34,8 @@ import (
 	"os"
 
 	"github.com/teratron/gonn/pkg/activation"
-	convPkg "github.com/teratron/gonn/pkg/layer/conv"
 	"github.com/teratron/gonn/pkg/dataset"
+	convPkg "github.com/teratron/gonn/pkg/layer/conv"
 	"github.com/teratron/gonn/pkg/nn"
 )
 
@@ -118,7 +118,7 @@ func main() {
 	//
 	// WithInputShape(1, 28, 28) declares the CHW layout to compile(); the flat
 	// input width 784 = 1×28×28 is still passed to WithInput.
-	net, err := nn.New[float32](
+	net, err := nn.New(
 		nn.WithInput[float32](784),
 		nn.WithInputShape[float32](1, 28, 28),
 		nn.WithConv2D[float32](8, 1, 3, 3, 1, 1, convPkg.PadSame, true),

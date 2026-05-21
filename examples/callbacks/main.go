@@ -37,17 +37,17 @@ func train() float32 {
 		epochsLogged int
 		batchLogged  int
 	)
-	n, err := nn.New[float32](
+	n, err := nn.New(
 		nn.PresetXOR[float32](),
 		nn.WithMaxIterations[float32](2_000),
 		nn.WithLossLimit[float32](1e-4),
-		nn.WithEpochCallback[float32](func(epoch uint, loss float32) {
+		nn.WithEpochCallback(func(epoch uint, loss float32) {
 			if epoch%100 == 0 {
 				epochsLogged++
 				fmt.Printf("epoch=%4d  loss=%.6f\n", epoch, loss)
 			}
 		}),
-		nn.WithBatchCallback[float32](func(batch uint, loss float32) {
+		nn.WithBatchCallback(func(batch uint, loss float32) {
 			// One log per "first batch of a new epoch stripe" — keeps stdout
 			// useful without flooding it with N×4_000 lines.
 			if batch == 0 {

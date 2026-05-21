@@ -64,7 +64,7 @@ func buildBuilder() float32 {
 // option list mirrors the Builder chain field-for-field so a reviewer
 // can diff the two by line count.
 func buildOptions() float32 {
-	n, err := nn.New[float32](
+	n, err := nn.New(
 		nn.WithInput[float32](2),
 		nn.WithBias[float32](true),
 		nn.WithHiddenLayer[float32](4, activation.SIGMOID),
@@ -87,7 +87,7 @@ func buildOptions() float32 {
 // network — and demonstrates how presets compose with extra options
 // (WithMaxIterations / WithLossLimit override the preset defaults).
 func buildPreset() float32 {
-	n, err := nn.New[float32](
+	n, err := nn.New(
 		nn.PresetXOR[float32](),
 		nn.WithMaxIterations[float32](10_000),
 		nn.WithLossLimit[float32](1e-4),

@@ -238,7 +238,7 @@ func TestMustCompilePanicsOnInvalid(t *testing.T) {
 
 func TestOptionsAPIHappyPath(t *testing.T) {
 	t.Parallel()
-	n, err := New[float64](
+	n, err := New(
 		WithInput[float64](2),
 		WithBias[float64](true),
 		WithHiddenLayer[float64](4, activation.SIGMOID),
@@ -261,12 +261,12 @@ func TestMustNewPanicsOnInvalid(t *testing.T) {
 			t.Fatal("MustNew must panic on invalid config")
 		}
 	}()
-	_ = MustNew[float64](WithInput[float64](2))
+	_ = MustNew(WithInput[float64](2))
 }
 
 func TestPresetXORCompiles(t *testing.T) {
 	t.Parallel()
-	n, err := New[float64](PresetXOR[float64]())
+	n, err := New(PresetXOR[float64]())
 	if err != nil {
 		t.Fatalf("PresetXOR: %v", err)
 	}
@@ -280,7 +280,7 @@ func TestPresetMNISTCompiles(t *testing.T) {
 	// PresetMNIST is a 2-hidden classifier; Phase 5 / Track B (T-5B01)
 	// lifts the gate that previously rejected it in v0.5. Smoke-only —
 	// MNIST training is gated on the dataset-loader spec (E06).
-	n, err := New[float64](PresetMNIST[float64]())
+	n, err := New(PresetMNIST[float64]())
 	if err != nil {
 		t.Fatalf("PresetMNIST Compile must succeed in v0.6, got %v", err)
 	}
@@ -293,7 +293,7 @@ func TestPresetRegressionCompiles(t *testing.T) {
 	t.Parallel()
 	// PresetRegression also uses 2 hidden layers (size, size/2). Same
 	// gate lift as MNIST — assert the surface compiles cleanly.
-	n, err := New[float64](
+	n, err := New(
 		WithInput[float64](4),
 		WithOutput[float64](1, activation.Linear),
 		PresetRegression[float64](4, 16),
@@ -354,7 +354,7 @@ func TestBuilderAndOptionsConverge(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Builder: %v", err)
 	}
-	b, err := New[float64](
+	b, err := New(
 		WithInput[float64](2),
 		WithBias[float64](true),
 		WithHiddenLayer[float64](4, activation.SIGMOID),
@@ -391,7 +391,7 @@ func TestQueryRejectsUncompiled(t *testing.T) {
 
 func TestQueryReadsForward(t *testing.T) {
 	t.Parallel()
-	n := MustNew[float64](PresetXOR[float64]())
+	n := MustNew(PresetXOR[float64]())
 	out, err := n.Query([]float64{0, 1})
 	if err != nil {
 		t.Fatalf("Query: %v", err)
@@ -407,7 +407,7 @@ func TestQueryReadsForward(t *testing.T) {
 
 func TestVerifyDoesNotMutateWeights(t *testing.T) {
 	t.Parallel()
-	n := MustNew[float64](PresetXOR[float64]())
+	n := MustNew(PresetXOR[float64]())
 	before := n.snapshotWeights(nil)
 	if _, err := n.Verify([]float64{0, 1}, []float64{1}); err != nil {
 		t.Fatalf("Verify: %v", err)
@@ -434,7 +434,7 @@ func TestTrainRejectsUncompiled(t *testing.T) {
 
 func TestFitConvergesXOR(t *testing.T) {
 	t.Parallel()
-	n := MustNew[float64](
+	n := MustNew(
 		PresetXOR[float64](),
 		WithMaxIterations[float64](10_000),
 		WithLossLimit[float64](0.02),
@@ -470,7 +470,7 @@ func TestFitInvokesEpochCallback(t *testing.T) {
 	t.Parallel()
 	var callCount int
 	var lastEpoch uint
-	n := MustNew[float64](
+	n := MustNew(
 		PresetXOR[float64](),
 		WithMaxIterations[float64](3),
 		WithLossLimit[float64](-1), // unreachable — force max iterations
@@ -495,7 +495,7 @@ func TestFitInvokesEpochCallback(t *testing.T) {
 
 func TestFitRejectsEmptyDataset(t *testing.T) {
 	t.Parallel()
-	n := MustNew[float64](PresetXOR[float64]())
+	n := MustNew(PresetXOR[float64]())
 	_, _, err := n.Fit(nil)
 	if !errors.Is(err, utils.ErrInputData) {
 		t.Errorf("Fit on empty dataset must return ErrInputData, got %v", err)
@@ -517,7 +517,7 @@ func TestStopRequestsEarlyExit(t *testing.T) {
 	stopReady := make(chan struct{})
 	var firstEpoch sync.Once
 
-	n := MustNew[float64](
+	n := MustNew(
 		PresetXOR[float64](),
 		WithMaxIterations[float64](100_000),
 		WithLossLimit[float64](-1),
@@ -559,7 +559,7 @@ func TestStopRequestsEarlyExit(t *testing.T) {
 
 func TestPauseResumeCycle(t *testing.T) {
 	t.Parallel()
-	n := MustNew[float64](
+	n := MustNew(
 		PresetXOR[float64](),
 		WithMaxIterations[float64](2000),
 		WithLossLimit[float64](-1), // run full loop
@@ -603,7 +603,7 @@ func TestPauseResumeCycle(t *testing.T) {
 
 func TestPauseFromIdleErrors(t *testing.T) {
 	t.Parallel()
-	n := MustNew[float64](PresetXOR[float64]())
+	n := MustNew(PresetXOR[float64]())
 	if err := n.Pause(); !errors.Is(err, utils.ErrControl) {
 		t.Errorf("Pause on idle must return ErrControl, got %v", err)
 	}
@@ -611,7 +611,7 @@ func TestPauseFromIdleErrors(t *testing.T) {
 
 func TestResumeFromIdleErrors(t *testing.T) {
 	t.Parallel()
-	n := MustNew[float64](PresetXOR[float64]())
+	n := MustNew(PresetXOR[float64]())
 	if err := n.Resume(); !errors.Is(err, utils.ErrControl) {
 		t.Errorf("Resume on idle must return ErrControl, got %v", err)
 	}
@@ -619,7 +619,7 @@ func TestResumeFromIdleErrors(t *testing.T) {
 
 func TestStopIdempotent(t *testing.T) {
 	t.Parallel()
-	n := MustNew[float64](PresetXOR[float64]())
+	n := MustNew(PresetXOR[float64]())
 	if err := n.Stop(); err != nil {
 		t.Errorf("first Stop: %v", err)
 	}
@@ -676,7 +676,7 @@ func TestPresetRegressionHalfFloor(t *testing.T) {
 
 func TestRestoreWeightsBringsBackSnapshot(t *testing.T) {
 	t.Parallel()
-	n := MustNew[float64](PresetXOR[float64]())
+	n := MustNew(PresetXOR[float64]())
 	original := n.snapshotWeights(nil)
 	// Mutate every axon weight, then restore from snapshot.
 	for _, hb := range n.Network.Hiddens {
@@ -705,7 +705,7 @@ func TestFitDivergenceRollback(t *testing.T) {
 	// Configure a network with a wildly excessive learning rate so loss
 	// increases epoch-over-epoch. With min-loss snapshot, Fit must
 	// restore the best-observed weights and report the minimum loss.
-	n := MustNew[float64](
+	n := MustNew(
 		PresetXOR[float64](),
 		WithLearningRate[float64](50), // intentionally divergent
 		WithMaxIterations[float64](10),
@@ -731,7 +731,7 @@ func TestFitDivergenceRollback(t *testing.T) {
 
 func TestQueryRejectsLengthMismatch(t *testing.T) {
 	t.Parallel()
-	n := MustNew[float64](PresetXOR[float64]())
+	n := MustNew(PresetXOR[float64]())
 	_, err := n.Query([]float64{1, 2, 3})
 	if !errors.Is(err, utils.ErrInputData) {
 		t.Errorf("Query length mismatch must return ErrInputData, got %v", err)
@@ -740,7 +740,7 @@ func TestQueryRejectsLengthMismatch(t *testing.T) {
 
 func TestVerifyRejectsLengthMismatch(t *testing.T) {
 	t.Parallel()
-	n := MustNew[float64](PresetXOR[float64]())
+	n := MustNew(PresetXOR[float64]())
 	_, err := n.Verify([]float64{1, 2}, []float64{1, 2})
 	if !errors.Is(err, utils.ErrInputData) {
 		t.Errorf("Verify target mismatch must return ErrInputData, got %v", err)
