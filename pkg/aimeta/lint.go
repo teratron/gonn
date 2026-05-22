@@ -45,7 +45,7 @@ func Check(pkgPath string, opts Options) ([]Violation, error) {
 	}
 
 	fset := token.NewFileSet()
-	pkgs, err := parser.ParseDir(fset, absPath, func(fi os.FileInfo) bool {
+	files, err := parseDir(fset, absPath, func(fi os.FileInfo) bool {
 		return !strings.HasSuffix(fi.Name(), "_test.go")
 	}, parser.ParseComments)
 	if err != nil {
@@ -54,10 +54,8 @@ func Check(pkgPath string, opts Options) ([]Violation, error) {
 
 	tier := inferTier(absPath)
 	var all []Violation
-	for _, pkg := range pkgs {
-		for _, file := range pkg.Files {
-			all = append(all, checkFile(fset, file, tier, opts)...)
-		}
+	for _, file := range files {
+		all = append(all, checkFile(fset, file, tier, opts)...)
 	}
 	return all, nil
 }
@@ -173,6 +171,36 @@ func checkDoc(fset *token.FileSet, doc *ast.CommentGroup, sym string, tier Tier,
 	}
 
 	return violations
+}
+
+// parseDir is a build-tag-aware replacement for the deprecated parser.ParseDir.
+func parseDir(fset *token.FileSet, dir string, filter func(os.FileInfo) bool, mode parser.Mode) ([]*ast.File, error) {
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return nil, err
+	}
+	var files []*ast.File
+	for _, entry := range entries {
+		if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".go") {
+			continue
+		}
+		if filter != nil {
+			info, err := entry.Info()
+			if err != nil {
+				return nil, err
+			}
+			if !filter(info) {
+				continue
+			}
+		}
+		filename := filepath.Join(dir, entry.Name())
+		file, err := parser.ParseFile(fset, filename, nil, mode)
+		if err != nil {
+			return nil, err
+		}
+		files = append(files, file)
+	}
+	return files, nil
 }
 
 func tierName(t Tier) string {

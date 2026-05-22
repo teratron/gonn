@@ -355,7 +355,7 @@ func constOrVar(d *ast.GenDecl) declKind {
 // LintDir parses all non-test .go files in dir and returns every finding.
 func LintDir(dir string, tier Tier) ([]Finding, error) {
 	fset := token.NewFileSet()
-	pkgs, err := parser.ParseDir(fset, dir, func(fi os.FileInfo) bool {
+	files, err := parseDir(fset, dir, func(fi os.FileInfo) bool {
 		return !strings.HasSuffix(fi.Name(), "_test.go")
 	}, parser.ParseComments)
 	if err != nil {
@@ -363,10 +363,39 @@ func LintDir(dir string, tier Tier) ([]Finding, error) {
 	}
 
 	var findings []Finding
-	for _, pkg := range pkgs {
-		for _, file := range pkg.Files {
-			findings = append(findings, LintFile(fset, file, tier)...)
-		}
+	for _, file := range files {
+		findings = append(findings, LintFile(fset, file, tier)...)
 	}
 	return findings, nil
+}
+
+// parseDir is a build-tag-aware replacement for the deprecated parser.ParseDir.
+// It reads dir entries, applies filter, and parses each .go file individually.
+func parseDir(fset *token.FileSet, dir string, filter func(os.FileInfo) bool, mode parser.Mode) ([]*ast.File, error) {
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return nil, err
+	}
+	var files []*ast.File
+	for _, entry := range entries {
+		if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".go") {
+			continue
+		}
+		if filter != nil {
+			info, err := entry.Info()
+			if err != nil {
+				return nil, err
+			}
+			if !filter(info) {
+				continue
+			}
+		}
+		filename := filepath.Join(dir, entry.Name())
+		file, err := parser.ParseFile(fset, filename, nil, mode)
+		if err != nil {
+			return nil, err
+		}
+		files = append(files, file)
+	}
+	return files, nil
 }
