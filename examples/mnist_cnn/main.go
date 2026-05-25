@@ -16,22 +16,27 @@
 //
 // Usage:
 //
-//	go run ./examples/mnist_cnn/ \
-//	    -images train-images-idx3-ubyte \
-//	    -labels train-labels-idx1-ubyte \
-//	    -n 200
+//	# Download MNIST files first:
+//	go run ./examples/mnist_cnn/ -download
 //
-// The IDX files are not bundled in this repository. Download them from the
-// MNIST mirror listed in the README and place them in the working directory
-// (or pass their paths via -images / -labels).
+//	# Then train:
+//	go run ./examples/mnist_cnn/ -n 200
+//
+// The -download flag fetches train-images-idx3-ubyte and
+// train-labels-idx1-ubyte from the Google MNIST mirror, decompresses them
+// in-place, and exits. Re-running without -download proceeds to training.
+// Pass -images / -labels to override the default file paths.
 package main
 
 import (
+	"compress/gzip"
 	"context"
 	"flag"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
+	"path/filepath"
 
 	"github.com/teratron/gonn/pkg/activation"
 	"github.com/teratron/gonn/pkg/dataset"
@@ -40,6 +45,62 @@ import (
 )
 
 const numClasses = 10
+
+// mnistFiles lists the MNIST training files to fetch on -download.
+// Google's mirror is more reliable than yann.lecun.com for automated scripts.
+var mnistFiles = []struct{ url, name string }{
+	{
+		"https://storage.googleapis.com/cvdf-datasets/mnist/train-images-idx3-ubyte.gz",
+		"train-images-idx3-ubyte",
+	},
+	{
+		"https://storage.googleapis.com/cvdf-datasets/mnist/train-labels-idx1-ubyte.gz",
+		"train-labels-idx1-ubyte",
+	},
+}
+
+// downloadMNIST fetches and decompresses the MNIST training files into dir.
+// Files that already exist are skipped so re-running -download is safe.
+func downloadMNIST(dir string) error {
+	for _, f := range mnistFiles {
+		dest := filepath.Join(dir, f.name)
+		if _, err := os.Stat(dest); err == nil {
+			fmt.Printf("  %s already present, skipping\n", f.name)
+			continue
+		}
+		fmt.Printf("  downloading %s ...\n", f.url)
+		if err := fetchGZ(f.url, dest); err != nil {
+			return fmt.Errorf("%s: %w", f.name, err)
+		}
+		fmt.Printf("  wrote %s\n", dest)
+	}
+	return nil
+}
+
+// fetchGZ streams url through a gzip reader and writes the decompressed
+// content to dest. The destination file is created atomically on success.
+func fetchGZ(url, dest string) error {
+	resp, err := http.Get(url) //nolint:noctx
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("HTTP %s", resp.Status)
+	}
+	gz, err := gzip.NewReader(resp.Body)
+	if err != nil {
+		return err
+	}
+	defer gz.Close()
+	f, err := os.Create(dest)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	_, err = io.Copy(f, gz)
+	return err
+}
 
 // oneHot converts a raw class label (0–9) to a unit vector of length numClasses.
 func oneHot(label float32) []float32 {
@@ -91,12 +152,23 @@ func main() {
 	imgPath := flag.String("images", "train-images-idx3-ubyte", "path to MNIST training images IDX3 file")
 	lblPath := flag.String("labels", "train-labels-idx1-ubyte", "path to MNIST training labels IDX1 file")
 	maxSamples := flag.Int("n", 200, "number of training samples to load")
+	download := flag.Bool("download", false, "download MNIST IDX files into the current directory and exit")
 	flag.Parse()
+
+	if *download {
+		fmt.Println("Downloading MNIST training files...")
+		if err := downloadMNIST("."); err != nil {
+			fmt.Fprintf(os.Stderr, "download: %v\n", err)
+			os.Exit(1)
+		}
+		fmt.Println("Done. Run again without -download to train.")
+		return
+	}
 
 	loader, err := dataset.NewMNISTLoaderFiles[float32](*imgPath, *lblPath, 64, 255.0)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "open MNIST: %v\n", err)
-		fmt.Fprintln(os.Stderr, "Download train-images-idx3-ubyte and train-labels-idx1-ubyte (see README.md).")
+		fmt.Fprintln(os.Stderr, "Tip: run with -download to fetch the IDX files automatically.")
 		os.Exit(1)
 	}
 	defer loader.Close()

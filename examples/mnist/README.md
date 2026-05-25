@@ -14,36 +14,39 @@ Input: 784  (28×28 flattened pixels, normalised to [0, 1])
               └─ Output: 10 (Sigmoid, one node per digit class 0–9)
 ```
 
-## Prerequisites: downloading MNIST files
+## Quick start
 
-The IDX files are **not bundled** in this repository. Download them from one
-of the mirrors below and decompress them (`.gz`) before running.
+```sh
+# Step 1 — download IDX files (≈ 10 MB, one-time):
+go run ./examples/mnist/ -download
 
-| File | Description |
-|------|-------------|
-| `train-images-idx3-ubyte` | 60 000 training images (28×28 px, uint8) |
-| `train-labels-idx1-ubyte` | 60 000 training labels (0–9, uint8) |
-
-Mirror: <https://ossci-datasets.s3.amazonaws.com/mnist/>
-
-```bash
-# Example using curl (macOS / Linux):
-curl -O https://ossci-datasets.s3.amazonaws.com/mnist/train-images-idx3-ubyte.gz
-curl -O https://ossci-datasets.s3.amazonaws.com/mnist/train-labels-idx1-ubyte.gz
-gzip -d train-images-idx3-ubyte.gz train-labels-idx1-ubyte.gz
+# Step 2 — train on 500 samples:
+go run ./examples/mnist/ -n 500
 ```
 
-## Running the example
+`-download` fetches `train-images-idx3-ubyte` and `train-labels-idx1-ubyte`
+from the Google MNIST mirror, decompresses them in place, and exits.
+Re-running `-download` skips files that already exist.
 
-```bash
-go run ./examples/mnist/ \
-    -images train-images-idx3-ubyte \
-    -labels train-labels-idx1-ubyte \
-    -n 500
-```
+## Flags
 
-Flag `-n` controls how many training samples to load (default 500). Increase
-to 60 000 for the full training set (slower but higher accuracy).
+| Flag | Default | Description |
+| :--- | :--- | :--- |
+| `-download` | `false` | Fetch and decompress IDX files, then exit |
+| `-images` | `train-images-idx3-ubyte` | Path to the images IDX3 file |
+| `-labels` | `train-labels-idx1-ubyte` | Path to the labels IDX1 file |
+| `-n` | `500` | Number of training samples to load |
+
+Increase `-n` to 60 000 for the full training set (slower but higher accuracy).
+
+## Dataset
+
+The MNIST IDX files are not bundled in this repository.
+`-download` uses the Google MNIST mirror automatically. Alternative sources:
+
+- <http://yann.lecun.com/exdb/mnist/> (canonical; sometimes unavailable)
+- <https://storage.googleapis.com/cvdf-datasets/mnist/> (Google mirror; used by `-download`)
+- <https://ossci-datasets.s3.amazonaws.com/mnist/> (PyTorch mirror)
 
 Expected output (values will vary with random weight initialisation):
 

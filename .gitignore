@@ -116,6 +116,12 @@ copilot-instructions.md
 .design/.graph-cache/
 .design/wiki/
 
+# MNIST dataset files (downloaded via -download flag, not committed)
+*-idx1-ubyte
+*-idx3-ubyte
+*.idx1-ubyte
+*.idx3-ubyte
+
 # Misc
 *.txt
 *.tgz

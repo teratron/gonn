@@ -15,31 +15,41 @@ Dense   64  ReLU
 Output  10  Sigmoid
 ```
 
-## Running
+## Quick start
 
 ```sh
-go run ./examples/mnist_cnn/ \
-    -images train-images-idx3-ubyte \
-    -labels train-labels-idx1-ubyte \
-    -n 200
+# Step 1 — download IDX files (≈ 10 MB, one-time):
+go run ./examples/mnist_cnn/ -download
+
+# Step 2 — train on 200 samples:
+go run ./examples/mnist_cnn/ -n 200
 ```
 
-The `-n` flag limits the number of training samples loaded from the IDX file
-(default 200). Increase to 10 000–60 000 for meaningful accuracy.
+`-download` fetches `train-images-idx3-ubyte` and `train-labels-idx1-ubyte`
+from the Google MNIST mirror, decompresses them in place, and exits.
+Re-running `-download` skips files that already exist.
+
+## Flags
+
+| Flag | Default | Description |
+| :--- | :--- | :--- |
+| `-download` | `false` | Fetch and decompress IDX files, then exit |
+| `-images` | `train-images-idx3-ubyte` | Path to the images IDX3 file |
+| `-labels` | `train-labels-idx1-ubyte` | Path to the labels IDX1 file |
+| `-n` | `200` | Number of training samples to load |
+
+Increase `-n` to 10 000–60 000 for meaningful accuracy.
 
 ## Dataset
 
-The MNIST IDX files are not bundled in this repository. Download them from:
+The MNIST IDX files are not bundled in this repository.
+`-download` uses the Google mirror automatically. Alternative sources:
 
-- <http://yann.lecun.com/exdb/mnist/> (canonical mirror)
-- <https://storage.googleapis.com/cvdf-datasets/mnist/> (Google mirror)
+- <http://yann.lecun.com/exdb/mnist/> (canonical; sometimes unavailable)
+- <https://storage.googleapis.com/cvdf-datasets/mnist/> (Google mirror; used by `-download`)
 
-Required files (place in the working directory or pass via flags):
-
-| Flag | File |
-| :--- | :--- |
-| `-images` | `train-images-idx3-ubyte` |
-| `-labels` | `train-labels-idx1-ubyte` |
+To place files manually, download the `.gz` archives, decompress them, and
+pass the resulting paths via `-images` / `-labels`.
 
 ## Key API
 
