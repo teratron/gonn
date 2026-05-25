@@ -92,7 +92,7 @@ subsequent re-initialization.
 
 ## Agent Registry
 
-Agent configuration is defined in [`agents.json`](agents.json).
+Agent configuration is defined in [`agents.json`](scripts/agents.json).
 To add a new agent — edit only that file; the scripts read it automatically
 (once wired up for JSON parsing).
 
