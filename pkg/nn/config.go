@@ -159,16 +159,16 @@ type Config[T utils.Float] struct {
 	MetaLearner      *MetaLearner[T]
 	Logger           *slog.Logger
 	NormLayers       map[int]norm.Normalizer[T]
-	VisAddr          string
-	WeightInit       WeightInitMethod
-	WeightInitSeed   uint64
 	VisToken         string
+	WeightInit       WeightInitMethod
+	VisAddr          string
 	ProfilingAddr    string
-	HiddenLayers     []HiddenLayerSpec[T]
 	ConvPrefix       []conv.Layer[T]
+	HiddenLayers     []HiddenLayerSpec[T]
+	InputW           int
 	MaxIterations    uint
 	InputH           int
-	InputW           int
+	WeightInitSeed   uint64
 	InputC           int
 	InputSize        uint
 	OutputSize       uint

@@ -1,4 +1,4 @@
-# E06 — MNIST Digit Recognition
+# MNIST Digit Recognition
 
 Demonstrates loading the MNIST dataset via `IDXReader`/`MNISTLoader`,
 building a multi-hidden-layer network with BatchNorm, and using `AndTrain`

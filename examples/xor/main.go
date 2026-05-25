@@ -1,7 +1,6 @@
-// Example E01 — XOR (Both styles).
+// XOR example (both styles).
 //
-// See [.design/specifications/l2-usage-examples.md] §5.2 / E01:
-// the smallest non-linear classification proves that backprop wires the
+// The smallest non-linear classification proves that backprop wires the
 // hidden layer correctly. The dataset is hard-coded; the same network
 // is built twice (Builder + Functional Options) so the per-style code
 // can be diffed line-for-line.

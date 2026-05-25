@@ -1,6 +1,4 @@
-// Example E08 — Multi-output regression on synthetic 5-dimensional data.
-//
-// See [.design/specifications/l2-usage-examples.md] §5.2 / E08.
+// Multi-output regression on synthetic 5-dimensional data.
 //
 // Topology: 5 → ReLU(16) → ReLU(8) → Linear(3), bias on every layer.
 // Dataset: 500 samples, inputs drawn from U[-1, 1]^5, targets are three
@@ -21,7 +19,7 @@ import (
 )
 
 func main() {
-	trainRMSE, testRMSE, finalLoss, err := runE08(42, 5000)
+	trainRMSE, testRMSE, finalLoss, err := run(42, 5000)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -64,9 +62,9 @@ func generateMulti(seed uint64, n int) []multiSample {
 	return out
 }
 
-// runE08 builds the network, trains on the first 80 % of the dataset,
-// and reports per-dimension RMSE plus the final mean-epoch loss.
-func runE08(seed uint64, maxIter uint) (trainRMSE, testRMSE [3]float64, finalLoss float32, err error) {
+// run builds the network, trains on the first 80 % of the dataset, and
+// reports per-dimension RMSE plus the final mean-epoch loss.
+func run(seed uint64, maxIter uint) (trainRMSE, testRMSE [3]float64, finalLoss float32, err error) {
 	const n = 500
 	all := generateMulti(seed, n)
 

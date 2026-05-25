@@ -1,8 +1,4 @@
-// Example E04 — Binary classification on a Gaussian-blob dataset.
-//
-// See [.design/specifications/l2-usage-examples.md] §5.2 / E04. Phase 5
-// promotes this example from the v0.2-deferred bucket once
-// [l2-multihidden-impl] lifts the single-hidden gate.
+// Binary classification on a Gaussian-blob dataset.
 //
 // Topology: 2 → ReLU(8) → ReLU(8) → Sigmoid(1), bias on every layer.
 // Dataset: 200 points sampled from two well-separated 2-D Gaussian
@@ -27,7 +23,7 @@ import (
 )
 
 func main() {
-	trainAcc, testAcc, finalLoss, err := runE04(1234)
+	trainAcc, testAcc, finalLoss, err := run(1234)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -66,10 +62,10 @@ func generateBlobs(seed uint64, n int) []labelledSample {
 	return out
 }
 
-// runE04 builds the network, runs Fit, and reports train / test
-// accuracy plus the final mean-epoch loss. seed is forwarded to the
-// data generator so smoke tests can pin a deterministic split.
-func runE04(seed uint64) (trainAcc, testAcc, finalLoss float32, err error) {
+// run builds the network, runs Fit, and reports train / test accuracy
+// plus the final mean-epoch loss. seed is forwarded to the data
+// generator so smoke tests can pin a deterministic split.
+func run(seed uint64) (trainAcc, testAcc, finalLoss float32, err error) {
 	const totalPerClass = 100
 	all := generateBlobs(seed, totalPerClass)
 

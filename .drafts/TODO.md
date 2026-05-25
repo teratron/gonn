@@ -30,4 +30,4 @@
 - [x] сделать GoNN skills для разработчиков: Use our GoNN skills with your AI tools to generate high-performance GoNN code that follows best practices. → [l2-gonn-skills.md](.design/specifications/l2-gonn-skills.md) (skills/ directory at project root)
 - [x] нужен этот файл pkg\nn.json?
 - [x] нужен этот файл pkg\network\phase6_test.go?
-- [ ] убрать из комментариев примеров упоминание названия артефактов .design/, нумирацию примеров убрать, везде и в examples\README.md, или пример examples\regression_sin\main.go `func runE07(maxIter uint) (trainRMSE, testRMSE, finalLoss float32, err error) {` - странное название функции
+- [x] убрать из комментариев примеров упоминание названия артефактов .design/, нумирацию примеров убрать, везде и в examples\README.md, или пример examples\regression_sin\main.go `func runE07(maxIter uint) (trainRMSE, testRMSE, finalLoss float32, err error) {` - странное название функции

@@ -1,12 +1,10 @@
-// Example: AndTrain continuation.
+// AndTrain continuation.
 //
-// See [.design/main/specifications/l2-dataset-loader-impl.md] §5.4
-// (FMT-6 / FMT-7 / FMT-8). The example demonstrates the AndTrain method:
+// Demonstrates the AndTrain method:
 //
 //  1. Build an XOR network and train it to convergence on the standard
 //     truth table.
-//  2. Capture the post-Fit predictions for evidence the network learned
-//     XOR.
+//  2. Capture the post-Fit predictions for evidence the network learned XOR.
 //  3. Call AndTrain with a NEGATED XOR dataset (1↔0) and a lower learning
 //     rate. AndTrain preserves the existing weights — only convergence
 //     counters reset — so the network's existing knowledge of "two-input
@@ -14,10 +12,10 @@
 //  4. Show the post-AndTrain predictions; the network now outputs the
 //     negated relationship while having reused (not reset) its weights.
 //
-// The example proves three contract guarantees:
-//   - FMT-6: AndTrain resets convergence counters but not weights.
-//   - FMT-7: callbacks (if any were registered) remain active across the call.
-//   - FMT-8: AndTrain refuses to run if a prior Train / Fit is still active.
+// Contract guarantees exercised:
+//   - AndTrain resets convergence counters but not weights.
+//   - Callbacks (if any were registered) remain active across the call.
+//   - AndTrain refuses to run if a prior Train / Fit is still active.
 package main
 
 import (
@@ -93,7 +91,7 @@ func main() {
 	fmt.Printf("Phase 1 predictions: %.3f\n", preds)
 
 	// Phase 2: continue training with the negated targets at a smaller LR.
-	// The same weight slab is reused; FMT-6 only resets convergence state.
+	// The same weight slab is reused; AndTrain only resets convergence state.
 	epochs2, loss2, err := net.AndTrain(negatedXOR(),
 		nn.WithLearningRate(0.05),
 		nn.WithMaxIterations[float64](2000),

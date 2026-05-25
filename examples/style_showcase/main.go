@@ -1,10 +1,9 @@
-// Example E12 — Three styles, identical network.
+// Three styles, identical network.
 //
-// See [.design/specifications/l2-usage-examples.md] §5.2 / E12: a side-by-side
-// proof that the Builder API, the Functional Options API, and the Preset bundle
-// converge on the same Network[T] for the canonical XOR topology. The catalog
-// spec calls for the three final losses to land within 1e-3 of each other —
-// the smoke test asserts a looser bound that still catches drift.
+// Side-by-side proof that the Builder API, the Functional Options API,
+// and the Preset bundle converge on the same Network[T] for the canonical
+// XOR topology. The three final losses should land within 1e-3 of each
+// other — the smoke test asserts a looser bound that still catches drift.
 package main
 
 import (

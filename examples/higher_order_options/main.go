@@ -1,6 +1,4 @@
-// Example E13 — Higher-order options: Sequential and DeepNetwork.
-//
-// See [.design/specifications/l2-usage-examples.md] §5.2 / E13.
+// Higher-order options: Sequential and DeepNetwork.
 //
 // Demonstrates that Sequential and DeepNetwork are ordinary Option[T]
 // values and compose freely with the rest of the Options API.

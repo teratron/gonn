@@ -7,13 +7,13 @@ existing weights are reused — `AndTrain` only resets convergence counters,
 not weights — so the post-`AndTrain` predictions shift toward the negated
 relationship without rebuilding the network or losing learned structure.
 
-## Spec coverage
+## Contract guarantees
 
 | Invariant | Where demonstrated |
 | :--- | :--- |
-| FMT-6 — AndTrain resets convergence counters but preserves weights | Phase 2 in `main.go`: same `*NN[T]` instance, no weight reinit |
-| FMT-7 — Callbacks remain active across AndTrain | If `WithOnIterationEnd` is added to the base network, it stays live during `AndTrain` |
-| FMT-8 — AndTrain refuses while training is running | Returns `utils.ErrNetworkRunning` (covered by `pkg/nn/andtrain_test.go::TestAndTrainRejectsRunning`) |
+| AndTrain resets convergence counters but preserves weights | Phase 2 in `main.go`: same `*NN[T]` instance, no weight reinit |
+| Callbacks remain active across AndTrain | If `WithOnIterationEnd` is added to the base network, it stays live during `AndTrain` |
+| AndTrain refuses while training is running | Returns `utils.ErrNetworkRunning` (covered by `pkg/nn/andtrain_test.go::TestAndTrainRejectsRunning`) |
 | Base config restored on return | `nn.cfg.LearningRate` is back to 0.3 after the `AndTrain(...WithLearningRate(0.05))` call |
 
 ## Run

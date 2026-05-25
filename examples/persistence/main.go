@@ -1,22 +1,17 @@
-// Example E09 — Save / reload (round-trip integrity).
+// Save / reload (round-trip integrity).
 //
-// See [.design/specifications/l2-usage-examples.md] §5.2 / E09 — ungated
-// after Phase 3 promoted l1-network-persistence to Stable. This example
-// trains the canonical XOR network, writes its config + weights to disk
+// Trains the canonical XOR network, writes its config + weights to disk
 // via pkg/persistence, builds a fresh network, copies the loaded weights
 // into it, and asserts the post-reload Query output matches the original
-// within float-32 tolerance (PERS-4).
+// within float-32 tolerance.
 //
-// The example also documents the v0.5 conversion seam — pkg/nn does not
-// yet expose dump / load hooks, so the bundle accessors on
-// network.Network[T] are walked manually. Future versions of the facade
-// are expected to fold this glue into nn.Save / nn.Load.
+// pkg/nn does not yet expose dump / load hooks, so the bundle accessors
+// on network.Network[T] are walked manually. Future versions of the
+// facade are expected to fold this glue into nn.Save / nn.Load.
 //
-// Phase 5 / Track C generalises the extract / install helpers across the
-// Hiddens slice. The default run still uses XOR (single hidden, the v0.1
-// regression baseline); the smoke test in main_test.go exercises a
-// 2-hidden round-trip via the same code path so the multi-hidden seam
-// is covered.
+// The extract / install helpers walk the full Hiddens slice. The default
+// run uses XOR (single hidden); the smoke test in main_test.go exercises
+// a 2-hidden round-trip via the same code path.
 package main
 
 import (
@@ -243,8 +238,7 @@ func buildConfigDoc(tc trainConfig) persistence.ConfigDoc[float32] {
 // Bias state is read from tc — when bias is false the cell carries no
 // bias axon, so the row width and Biases slice shape change accordingly.
 //
-// Layer naming convention (matches l2-multihidden-impl §5.4): hidden_0,
-// hidden_1, …, output.
+// Layer naming convention: hidden_0, hidden_1, …, output.
 func extractWeights(n *nn.NN[float32], tc trainConfig) persistence.WeightsDoc[float32] {
 	layers := make([]persistence.LayerWeights[float32], 0, len(tc.hidden)+1)
 	for i, h := range tc.hidden {

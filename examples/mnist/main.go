@@ -200,7 +200,7 @@ func main() {
 	fmt.Printf("Epoch 1 (Fit):     %d iteration(s), loss=%.4f\n", epochs, loss)
 
 	// Epoch 2 — AndTrain at a reduced learning rate.
-	// The weight slab is preserved from epoch 1 (FMT-6); only the convergence
+	// The weight slab is preserved from epoch 1; only the convergence
 	// counters reset, so the second pass can fine-tune rather than relearn from scratch.
 	epochs2, loss2, err := net.AndTrain(samples, nn.WithLearningRate[float32](0.001))
 	if err != nil {

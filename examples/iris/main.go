@@ -1,6 +1,4 @@
-// Example E05 — Iris multi-class classification.
-//
-// See [.design/specifications/l2-usage-examples.md] §5.2 / E05.
+// Iris multi-class classification.
 //
 // Topology: 4 → ReLU(16) → ReLU(8) → SoftMax(3), bias on every layer.
 // Dataset: Fisher iris (150 samples, 4 features, 3 classes).
@@ -26,7 +24,7 @@ import (
 var irisCSV string
 
 func main() {
-	trainAcc, testAcc, finalLoss, err := runE05(2024)
+	trainAcc, testAcc, finalLoss, err := run(2024)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -115,10 +113,10 @@ func minMaxNorm(recs []irisRecord) {
 	}
 }
 
-// runE05 builds the network, trains on an 80 % split, and reports
-// train / test accuracy plus the final mean-epoch loss. seed is
-// forwarded to the shuffle so smoke tests can pin a deterministic split.
-func runE05(seed uint64) (trainAcc, testAcc, finalLoss float32, err error) {
+// run builds the network, trains on an 80 % split, and reports train /
+// test accuracy plus the final mean-epoch loss. seed is forwarded to
+// the shuffle so smoke tests can pin a deterministic split.
+func run(seed uint64) (trainAcc, testAcc, finalLoss float32, err error) {
 	all, err := loadIris()
 	if err != nil {
 		return 0, 0, 0, err

@@ -1,11 +1,10 @@
-// Example E15 — float32 vs float64 parity.
+// float32 vs float64 parity.
 //
-// See [.design/specifications/l2-usage-examples.md] §5.2 / E15. Builds the
-// XOR network twice (once at each numeric precision) and reports the
-// final loss + elapsed time per run. Both runs share the same topology
-// and hyperparameters; the only difference is the type parameter T flowing
-// through the generics, so any drift between them comes from float
-// precision alone.
+// Builds the XOR network twice (once at each numeric precision) and
+// reports the final loss + elapsed time per run. Both runs share the
+// same topology and hyperparameters; the only difference is the type
+// parameter T flowing through the generics, so any drift between them
+// comes from float precision alone.
 package main
 
 import (

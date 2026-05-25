@@ -1,21 +1,16 @@
-// Example E03 — Perceptron (legacy continuity).
+// Perceptron (legacy continuity).
 //
-// Restored to the spec-canonical 4-hidden topology after Phase 5 lifted
-// the v0.1 single-hidden gate per [l2-multihidden-impl] §5.5:
+// 4-hidden mixed-activation topology:
 //
 //	3 → Sigmoid(5) → ReLU(10) → Sigmoid(5) → Linear(2)
 //
-// Mixed bias per spec — first three hidden layers carry bias, the
-// pre-output Sigmoid layer does not. Loss = ARCTAN, rate = 0.3, max
-// iterations 100000, loss limit 1e-6, weight init Xavier (Random init
-// on a 4-deep stack triggers the deep-stack soft warning, which is
-// covered by pkg/nn/multihidden_test.go separately).
+// Mixed bias — first three hidden layers carry bias, the pre-output
+// Sigmoid layer does not. Loss = ARCTAN, rate = 0.3, max iterations
+// 100000, loss limit 1e-6, weight init Xavier.
 //
-// The example uses the Builder API to mirror the [l2-usage-examples]
-// §5.2 / E03 reference walk-through. The published reference query
-// `[-0.52, 0.66, 0.81] → ≈ [-0.13, 0.2]` is asserted in main_test.go
-// with a loose tolerance — random init drift makes ULP-precision
-// comparison meaningless on this topology.
+// The published reference query `[-0.52, 0.66, 0.81] → ≈ [-0.13, 0.2]`
+// is asserted in main_test.go with a loose tolerance — random init drift
+// makes ULP-precision comparison meaningless on this topology.
 package main
 
 import (
@@ -27,8 +22,8 @@ import (
 	"github.com/teratron/gonn/pkg/nn"
 )
 
-// dataSet is the legacy E03 stream — eleven float32 values fed
-// through a sliding window of three inputs and two targets.
+// dataSet is the legacy stream — eleven float32 values fed through a
+// sliding window of three inputs and two targets.
 func dataSet() []float32 {
 	return []float32{.27, -.31, -.52, .66, .81, -.13, .2, .49, .11, -.73, .28}
 }

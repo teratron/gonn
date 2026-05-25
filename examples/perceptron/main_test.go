@@ -19,8 +19,8 @@ import (
 // dataSet()
 // ============================================================================
 
-// TestDataSetExactValues verifies the canonical E03 stream is byte-identical
-// to the spec table. Any accidental edit of the literal would break the
+// TestDataSetExactValues verifies the canonical stream is byte-identical
+// to the expected literal. Any accidental edit would break the
 // sliding-window math downstream.
 func TestDataSetExactValues(t *testing.T) {
 	t.Parallel()
@@ -97,8 +97,8 @@ func TestBuildStateIsOperational(t *testing.T) {
 }
 
 // TestBuildTopology verifies the canonical 3 → Sigmoid(5) → ReLU(10) →
-// Sigmoid(5, no-bias) → SoftMax(2) topology from the E03 spec. Mixed bias
-// is the distinguishing feature — the pre-output Sigmoid layer carries no bias.
+// Sigmoid(5, no-bias) → SoftMax(2) topology. Mixed bias is the
+// distinguishing feature — the pre-output Sigmoid layer carries no bias.
 func TestBuildTopology(t *testing.T) {
 	t.Parallel()
 	n, err := build()
@@ -148,7 +148,7 @@ func TestBuildTopology(t *testing.T) {
 }
 
 // TestBuildHyperparameters verifies that all training-control fields are
-// populated exactly as documented in the E03 spec comments.
+// populated exactly as documented in the package comment.
 func TestBuildHyperparameters(t *testing.T) {
 	t.Parallel()
 	n, err := build()
@@ -330,8 +330,8 @@ func captureStdout(f func()) string {
 	return buf.String()
 }
 
-// TestMainOutput captures the stdout written by main() and asserts all three
-// lines documented in the E03 spec:
+// TestMainOutput captures the stdout written by main() and asserts the
+// three expected output lines:
 //
 //  1. "Elapsed: …"         — timing line confirms training completed.
 //  2. "Query([-0.52, 0.66, 0.81]) = …" — result line includes the reference input.

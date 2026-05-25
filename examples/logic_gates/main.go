@@ -1,10 +1,9 @@
-// Example E02 — Logical gates suite (AND / OR / NAND).
+// Logical gates suite (AND / OR / NAND).
 //
-// See [.design/specifications/l2-usage-examples.md] §5.2 / E02: the same
-// 2-input topology learns three different functions in turn, illustrating
-// how trainable parameters specialise to whatever task the loss demands.
-// XOR is intentionally excluded — it needs the larger XOR example (E01)
-// because two-neuron hidden layers cannot represent it.
+// The same 2-input topology learns three different functions in turn,
+// illustrating how trainable parameters specialise to whatever task the
+// loss demands. XOR is intentionally excluded — two-neuron hidden layers
+// cannot represent it; see the xor example for that.
 package main
 
 import (

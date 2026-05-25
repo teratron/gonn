@@ -1,10 +1,9 @@
-// Example E11 — Progress callbacks.
+// Progress callbacks.
 //
-// See [.design/specifications/l2-usage-examples.md] §5.2 / E11: trains the
-// canonical XOR network with both WithEpochCallback and WithBatchCallback
-// wired up. The epoch hook prints a heartbeat every 100 iterations; the
-// batch hook is throttled to one line at the start of each new epoch
-// stripe so stdout stays readable on small datasets.
+// Trains the canonical XOR network with both WithEpochCallback and
+// WithBatchCallback wired up. The epoch hook prints a heartbeat every
+// 100 iterations; the batch hook is throttled to one line at the start
+// of each new epoch stripe so stdout stays readable on small datasets.
 package main
 
 import (

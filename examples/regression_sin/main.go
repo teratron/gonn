@@ -1,6 +1,4 @@
-// Example E07 — Sine-wave regression.
-//
-// See [.design/specifications/l2-usage-examples.md] §5.2 / E07.
+// Sine-wave regression.
 //
 // Topology: 1 → TanH(16) → TanH(16) → Linear(1), bias on every layer.
 // Dataset: 200 evenly-spaced points with y = sin(x), x ∈ [0, 2π].
@@ -23,7 +21,7 @@ import (
 )
 
 func main() {
-	trainRMSE, testRMSE, finalLoss, err := runE07(42, 10000)
+	trainRMSE, testRMSE, finalLoss, err := run(42, 10000)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -47,11 +45,11 @@ func generateSin(n int) []sinPoint {
 	return pts
 }
 
-// runE07 builds the network, trains on a randomly shuffled 80 % split,
-// and reports train / test RMSE plus the final mean-epoch loss.
-// Shuffling ensures both partitions cover the full [0, 2π] range so the
-// evaluation is interpolation rather than tail-extrapolation.
-func runE07(seed uint64, maxIter uint) (trainRMSE, testRMSE, finalLoss float32, err error) {
+// run builds the network, trains on a randomly shuffled 80 % split, and
+// reports train / test RMSE plus the final mean-epoch loss. Shuffling
+// ensures both partitions cover the full [0, 2π] range so evaluation is
+// interpolation rather than tail-extrapolation.
+func run(seed uint64, maxIter uint) (trainRMSE, testRMSE, finalLoss float32, err error) {
 	const n = 200
 	all := generateSin(n)
 

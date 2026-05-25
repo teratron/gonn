@@ -12,8 +12,7 @@ import (
 )
 
 // roundTripPreservesQuery is the shared assertion used by single- and
-// multi-hidden round-trip smoke tests below. Threshold uses
-// cpu.ToleranceF32 (1e-5) per PERS-4.
+// multi-hidden round-trip smoke tests below. Threshold: cpu.ToleranceF32 (1e-5).
 func roundTripPreservesQuery(t *testing.T, tc trainConfig, label string) {
 	t.Helper()
 	original, err := train(tc)
@@ -58,7 +57,7 @@ func roundTripPreservesQuery(t *testing.T, tc trainConfig, label string) {
 		for j := range originalOutputs[i] {
 			d := absDiff(originalOutputs[i][j], rebuiltOutputs[i][j])
 			if d > cpu.ToleranceF32 {
-				t.Errorf("[%s] Query[%d][%d] drift = %v, want ≤ %v (PERS-4)",
+				t.Errorf("[%s] Query[%d][%d] drift = %v, want ≤ %v",
 					label, i, j, d, cpu.ToleranceF32)
 			}
 		}

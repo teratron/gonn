@@ -12,9 +12,8 @@ import (
 // returns the final mean-epoch loss so smoke tests can assert on the
 // number without re-parsing stdout.
 //
-// Topology and hyperparameters mirror E01 in the catalog spec exactly so
-// the example also serves as a reference implementation other examples
-// (E11, E12, E15, E14-adapted) can clone.
+// Topology and hyperparameters are the canonical XOR setup used as a
+// reference implementation across the other XOR-shaped examples.
 func runBuilder() float32 {
 	inputs, targets := xorDataset()
 

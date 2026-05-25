@@ -38,9 +38,8 @@ func TestCallbacksFireDuringFit(t *testing.T) {
 	}
 }
 
-// TestTrainConverges keeps the smoke-test parity with E01 — the network
-// should still cross the loose convergence threshold even with the
-// callback overhead.
+// TestTrainConverges verifies the network still crosses the loose
+// convergence threshold even with the callback overhead.
 func TestTrainConverges(t *testing.T) {
 	if l := train(); l > 0.15 {
 		t.Errorf("final loss = %v, want < 0.15", l)

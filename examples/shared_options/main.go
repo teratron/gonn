@@ -1,11 +1,8 @@
-// Example E14 — Shared options across multiple networks (v0.5 adapted).
+// Shared options across multiple networks.
 //
-// See [.design/specifications/l2-usage-examples.md] §5.2 / E14. The spec's
-// Topology B uses two hidden layers, which v0.5 compile() rejects (the
-// multi-hidden patch lands in v0.6). The pedagogical point — pass a
-// shared []Option[T] slice to two distinct networks — survives by
-// substituting two single-hidden widths instead. Both are XOR-shaped so
-// the example trains in well under a second.
+// Demonstrates passing a shared []Option[T] slice to two distinct
+// networks. Both are XOR-shaped (single hidden, different widths) so the
+// example trains in well under a second.
 package main
 
 import (
