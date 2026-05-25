@@ -90,7 +90,7 @@ func compile[T utils.Float](n *NN[T], cfg *Config[T]) error {
 
 	// Wire the weight-init sampler before Build so axons receive the correct
 	// initial values (fixes the known axon.New U[-0.5,0.5] debt — T-6B06).
-	rng, _ := utils.NewRNG(0)
+	rng, _ := utils.NewRNG(cfg.WeightInitSeed)
 	n.SetWeightSampler(weightSamplerFor[T](cfg.WeightInit, rng))
 
 	if err := n.Build(); err != nil {

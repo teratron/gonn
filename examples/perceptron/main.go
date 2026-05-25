@@ -3,7 +3,7 @@
 // Restored to the spec-canonical 4-hidden topology after Phase 5 lifted
 // the v0.1 single-hidden gate per [l2-multihidden-impl] §5.5:
 //
-//	3 → Sigmoid(5) → ReLU(10) → Sigmoid(5) → SoftMax(2)
+//	3 → Sigmoid(5) → ReLU(10) → Sigmoid(5) → Linear(2)
 //
 // Mixed bias per spec — first three hidden layers carry bias, the
 // pre-output Sigmoid layer does not. Loss = ARCTAN, rate = 0.3, max
@@ -46,7 +46,7 @@ func build() (*nn.NN[float32], error) {
 		Dense(5, activation.SIGMOID, true).
 		Dense(10, activation.ReLU, true).
 		Dense(5, activation.SIGMOID, false).
-		Output(lenOutput, activation.SOFTMAX, true).
+		Output(lenOutput, activation.Linear, true).
 		WithLoss(loss.ARCTAN).
 		WithLearningRate(0.3).
 		WithMaxIterations(100_000).

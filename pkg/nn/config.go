@@ -161,6 +161,7 @@ type Config[T utils.Float] struct {
 	NormLayers       map[int]norm.Normalizer[T]
 	VisAddr          string
 	WeightInit       WeightInitMethod
+	WeightInitSeed   uint64
 	VisToken         string
 	ProfilingAddr    string
 	HiddenLayers     []HiddenLayerSpec[T]

@@ -3,8 +3,10 @@
 // See [.design/specifications/l2-usage-examples.md] §5.2 / E07.
 //
 // Topology: 1 → TanH(16) → TanH(16) → Linear(1), bias on every layer.
-// Dataset: 200 evenly-spaced points on x ∈ [0, 2π] with y = sin(x).
-// Loss: MSE, rate = 0.005, init = Xavier, max iterations = 10000.
+// Dataset: 200 evenly-spaced points with y = sin(x), x ∈ [0, 2π].
+// The network receives x normalised to [0, 1] (x_net = x / 2π) so that
+// the TanH hidden layers start in a non-saturated regime.
+// Optimizer: Adam (lr=0.001), Loss: MSE, init = Xavier, max iterations = 10000.
 // A 20 % hold-out split feeds the final RMSE report.
 // Target: test RMSE ≤ 0.10.
 package main
@@ -12,14 +14,16 @@ package main
 import (
 	"fmt"
 	"math"
+	"math/rand/v2"
 
 	"github.com/teratron/gonn/pkg/activation"
 	"github.com/teratron/gonn/pkg/loss"
 	"github.com/teratron/gonn/pkg/nn"
+	"github.com/teratron/gonn/pkg/optimizer"
 )
 
 func main() {
-	trainRMSE, testRMSE, finalLoss, err := runE07(10000)
+	trainRMSE, testRMSE, finalLoss, err := runE07(42, 10000)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -36,17 +40,23 @@ func generateSin(n int) []sinPoint {
 	pts := make([]sinPoint, n)
 	for i := range n {
 		x := float64(i) / float64(n-1) * 2 * math.Pi
-		pts[i] = sinPoint{x: float32(x), y: float32(math.Sin(x))}
+		// Normalise x to [0, 1] so TanH hidden layers stay in a non-saturated
+		// regime from the first forward pass. The target is the true sin(x).
+		pts[i] = sinPoint{x: float32(x / (2 * math.Pi)), y: float32(math.Sin(x))}
 	}
 	return pts
 }
 
-// runE07 builds the network, trains on the first 80 % of the dataset
-// (in-order, no shuffle — the x-grid is already uniformly spaced), and
-// reports train / test RMSE plus the final mean-epoch loss.
-func runE07(maxIter uint) (trainRMSE, testRMSE, finalLoss float32, err error) {
+// runE07 builds the network, trains on a randomly shuffled 80 % split,
+// and reports train / test RMSE plus the final mean-epoch loss.
+// Shuffling ensures both partitions cover the full [0, 2π] range so the
+// evaluation is interpolation rather than tail-extrapolation.
+func runE07(seed uint64, maxIter uint) (trainRMSE, testRMSE, finalLoss float32, err error) {
 	const n = 200
 	all := generateSin(n)
+
+	rng := rand.New(rand.NewPCG(seed, seed^0x9E3779B97F4A7C15))
+	rng.Shuffle(len(all), func(i, j int) { all[i], all[j] = all[j], all[i] })
 
 	splitAt := n * 8 / 10
 	trainSet := all[:splitAt]
@@ -66,9 +76,11 @@ func runE07(maxIter uint) (trainRMSE, testRMSE, finalLoss float32, err error) {
 		nn.WithHiddenLayer[float32](16, activation.TanH),
 		nn.WithHiddenLayer[float32](16, activation.TanH),
 		nn.WithOutput[float32](1, activation.Linear),
-		nn.WithLearningRate[float32](0.005),
+		nn.WithOptimizer[float32](optimizer.NewAdam[float32](0.001)),
 		nn.WithLoss[float32](loss.MSE),
 		nn.WithWeightInit[float32](nn.WeightInitXavier),
+		nn.WithWeightInitSeed[float32](10),
+		nn.WithLossLimit[float32](1e-4),
 		nn.WithMaxIterations[float32](maxIter),
 	)
 	if err != nil {

@@ -203,6 +203,23 @@ func WithWeightInit[T utils.Float](method WeightInitMethod) Option[T] {
 	}
 }
 
+// WithWeightInitSeed pins the random seed used by the weight-init sampler,
+// making compilation deterministic. When seed is 0 (the default), the sampler
+// falls back to time.Now().UnixNano() so each New call produces a unique init.
+// Pass any non-zero value to reproduce a training run exactly.
+//
+// AI-Meta:
+//   - Purpose: Fix the weight-init seed for reproducible compilation in the Options API.
+//   - Usage: nn.New[float32](WithWeightInitSeed[float32](42), ...).
+//   - Concurrency: Safe.
+//   - Related: [Option], [WithWeightInit].
+//   - Stability: Stable.
+func WithWeightInitSeed[T utils.Float](seed uint64) Option[T] {
+	return func(cfg *Config[T]) {
+		cfg.WeightInitSeed = seed
+	}
+}
+
 // WithLossLimit is the option-form mirror of (*NN[T]).WithLossLimit.
 //
 // AI-Meta:
