@@ -1,6 +1,7 @@
 package visualization
 
 import (
+	"crypto/subtle"
 	"net/http"
 	"strings"
 )
@@ -8,14 +9,17 @@ import (
 // authMiddleware returns a handler that enforces bearer-token authentication
 // when token is non-empty. Requests without a matching "Authorization: Bearer
 // <token>" header receive 401 Unauthorized. When token is empty the handler
-// passes through unconditionally.
+// passes through unconditionally. The token comparison is constant-time
+// (crypto/subtle) so it does not leak the secret through response timing.
 func authMiddleware(token string, next http.Handler) http.Handler {
 	if token == "" {
 		return next
 	}
+	want := []byte(token)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		auth := r.Header.Get("Authorization")
-		if !strings.HasPrefix(auth, "Bearer ") || strings.TrimPrefix(auth, "Bearer ") != token {
+		got := []byte(strings.TrimPrefix(auth, "Bearer "))
+		if !strings.HasPrefix(auth, "Bearer ") || subtle.ConstantTimeCompare(got, want) != 1 {
 			w.Header().Set("WWW-Authenticate", `Bearer realm="gonn-vis"`)
 			http.Error(w, "unauthorized", http.StatusUnauthorized)
 			return

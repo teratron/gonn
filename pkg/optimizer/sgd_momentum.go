@@ -54,7 +54,11 @@ func (s *SGDMomentum[T]) Step(weights, deltas []T) error {
 	if s.lr == 0 {
 		return nil
 	}
-	if s.velocity == nil {
+	if len(s.velocity) != len(weights) {
+		if s.velocity != nil {
+			utils.Logger.Warn("SGDMomentum.Step: weight count changed — resetting velocity",
+				"old", len(s.velocity), "new", len(weights))
+		}
 		s.velocity = make([]float64, len(weights))
 	}
 	for i := range weights {

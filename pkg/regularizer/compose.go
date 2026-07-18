@@ -37,6 +37,15 @@ func (c *compose[T]) Penalty(weights []T) T {
 	return total
 }
 
+// WeightGrad sums each member's per-weight gradient contribution (REG-6).
+func (c *compose[T]) WeightGrad(w T) T {
+	var total T
+	for _, r := range c.members {
+		total += r.WeightGrad(w)
+	}
+	return total
+}
+
 // ApplyMask chains members left-to-right, passing the output of each as input
 // to the next (REG-6). Returns acts unchanged when the member list is empty.
 func (c *compose[T]) ApplyMask(acts []T, training bool) []T {

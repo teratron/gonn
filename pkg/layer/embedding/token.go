@@ -98,16 +98,40 @@ func (te *TokenEmbedding[T]) ApplyGradSGD(lr T) {
 // ids must have length SeqLen; extra IDs are silently ignored, missing IDs
 // produce zero-vector rows.
 func (te *TokenEmbedding[T]) ForwardIDs(ids []int) ([]T, error) {
+	te.ensureBuffers()
 	n := min(te.SeqLen, len(ids))
 	copy(te.lastIDs, ids[:n])
-	for t := range n {
+	for t := 0; t < n; t++ {
 		id := ids[t]
 		if id < 0 || id >= te.VocabSize {
 			return nil, utils.ErrVocabOutOfRange
 		}
-		copy(te.lastOut[t*te.Dmodel:(t+1)*te.Dmodel], te.Table[id*te.Dmodel:(id+1)*te.Dmodel])
+		dst := te.lastOut[t*te.Dmodel : (t+1)*te.Dmodel]
+		if (id+1)*te.Dmodel <= len(te.Table) {
+			copy(dst, te.Table[id*te.Dmodel:(id+1)*te.Dmodel])
+		} else {
+			// Table not yet initialised (compile-time shape resolution walk):
+			// emit a zero row so the output length is still correct.
+			clear(dst)
+		}
 	}
 	return te.lastOut, nil
+}
+
+// ensureBuffers lazily allocates the per-call caches and sparse gradient
+// accumulator. Called by ForwardIDs so a Forward invoked before Init (e.g. the
+// compile-time shape-resolution walk) allocates instead of panicking on nil
+// caches (audit C3).
+func (te *TokenEmbedding[T]) ensureBuffers() {
+	if len(te.lastIDs) < te.SeqLen {
+		te.lastIDs = make([]int, te.SeqLen)
+	}
+	if len(te.lastOut) < te.SeqLen*te.Dmodel {
+		te.lastOut = make([]T, te.SeqLen*te.Dmodel)
+	}
+	if te.gradTable.Buf == nil {
+		te.gradTable = newSparseGrad[T](te.VocabSize, te.Dmodel)
+	}
 }
 
 // Forward converts x to integer IDs (truncating to int) and delegates to
@@ -118,7 +142,14 @@ func (te *TokenEmbedding[T]) Forward(x []T) []T {
 	for i, v := range x {
 		ids[i] = int(v)
 	}
-	out, _ := te.ForwardIDs(ids)
+	out, err := te.ForwardIDs(ids)
+	if err != nil {
+		utils.Logger.Warn("TokenEmbedding.Forward: token id out of range — emitting zero rows",
+			"vocabSize", te.VocabSize, "err", err)
+		te.ensureBuffers()
+		clear(te.lastOut)
+		return te.lastOut
+	}
 	return out
 }
 

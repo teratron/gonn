@@ -3,17 +3,13 @@ package nn
 import (
 	"slices"
 
-	"github.com/teratron/gonn/pkg/layer/attention"
-	"github.com/teratron/gonn/pkg/layer/conv"
-	"github.com/teratron/gonn/pkg/layer/embedding"
-	"github.com/teratron/gonn/pkg/layer/transformer"
 	"github.com/teratron/gonn/pkg/optimizer"
 	"github.com/teratron/gonn/pkg/regularizer"
 	"github.com/teratron/gonn/pkg/utils"
 )
 
 // libVersion is the GoNN library version embedded in structured log events.
-const libVersion = "0.8.0"
+const libVersion = "0.11.0"
 
 // Sample is one (input, target) pair for use with Fit. Two parallel slices
 // keep the type signature simple while preserving the generic parameter T.
@@ -48,6 +44,8 @@ func (n *NN[T]) Train(input, target []T) (T, error) {
 		return 0, utils.Newf(utils.ErrUserConfig,
 			"Train: network is %s, must be Operational", n.stateField.String())
 	}
+	n.mu.Lock()
+	defer n.mu.Unlock()
 	return n.trainStep(input, target)
 }
 
@@ -99,13 +97,19 @@ func (n *NN[T]) trainStep(input, target []T) (T, error) {
 	// Collect weights and gradients, delegate update to the optimizer.
 	n.weightBuf = n.AppendFlatWeights(n.weightBuf)
 	n.gradBuf = n.AppendFlatGradients(n.gradBuf)
+	// Fold the regularizer's weight-decay term into the gradient so L1/L2
+	// actually shrink the weights (previously the penalty only inflated the
+	// reported loss and never affected the update).
+	regularizer.AddWeightGrad(n.reg, n.weightBuf, n.gradBuf)
 	if n.cfg.GradClipNorm > 0 {
 		optimizer.ClipByGlobalNorm([][]T{n.gradBuf}, n.cfg.GradClipNorm)
 	}
 	if err := n.opt.Step(n.weightBuf, n.gradBuf); err != nil {
 		return lossVal, err
 	}
-	n.ApplyFlatWeights(n.weightBuf)
+	if err := n.ApplyFlatWeights(n.weightBuf); err != nil {
+		return lossVal, err
+	}
 
 	return lossVal, nil
 }
@@ -135,64 +139,32 @@ func (n *NN[T]) runConvForward(input []T) ([]T, error) {
 	return cur, nil
 }
 
-// applyConvBackward walks the conv chain in reverse, propagating the
-// upstream gradient and updating Conv1D kernel weights via an inline SGD
-// step against the network's learning rate. Pool and Flatten layers carry
-// no parameters — their Backward implementations just reshape / route the
-// gradient through. Wiring the conv weights through optimizer.Optimizer
-// is deferred to a future minor (v0.11) so this v0.10 release keeps the
-// integration small and observable.
+// gradApplier is the capability every trainable prefix layer implements to
+// receive an inline SGD update from the network learning rate. Parameter-free
+// layers (Pool, Flatten, LastStep, sinusoidal PositionalEncoding) simply do not
+// implement it and are skipped. Replacing the former hand-maintained type
+// switch with this interface is what unfroze Conv2D and the recurrent layers
+// (audit C1/C2): a layer no longer has to be enumerated here to be trained.
+type gradApplier[T utils.Float] interface{ ApplyGradSGD(lr T) }
+
+// applyConvBackward walks the prefix chain in reverse, propagating the upstream
+// gradient through each layer's Backward and applying an inline SGD step to any
+// layer that carries trainable parameters (via gradApplier). Wiring these
+// weights through the full optimizer.Optimizer path is deferred to a future
+// minor; inline SGD keeps the integration small and observable.
 //
 // AI-Meta:
-//   - Purpose: Backward-pass conv stack with inline SGD weight update on Conv1D layers.
-//   - Concurrency: NotSafe; reads gradient slices and mutates conv weights.
-//   - Related: [trainStep], [conv.Conv1D.Backward], [conv.Conv1D.GradSlots].
+//   - Purpose: Backward-pass the prefix stack and update every trainable layer via ApplyGradSGD.
+//   - Concurrency: NotSafe; reads gradient slices and mutates layer weights.
+//   - Related: [trainStep], [gradApplier], [conv.Conv1D.ApplyGradSGD].
 func (n *NN[T]) applyConvBackward(gradOut []T) {
 	upstream := gradOut
 	for _, v := range slices.Backward(n.convPrefix) {
 		next := v.Backward(upstream)
-		switch l := v.(type) {
-		case *conv.Conv1D[T]:
-			gW, gB := l.GradSlots()
-			applyConvSGD(l.Weights, gW, n.LearningRate)
-			if l.UseBias && len(gB) > 0 {
-				applyConvSGD(l.Biases, gB, n.LearningRate)
-			}
-		case *attention.MultiHeadAttention[T]:
-			l.ApplyGradSGD(n.LearningRate)
-		case *embedding.TokenEmbedding[T]:
-			applyTokenEmbeddingSGD(l, n.LearningRate)
-		case *embedding.EmbeddingStack[T]:
-			applyTokenEmbeddingSGD(l.Token, n.LearningRate)
-			if l.Positional.Mode == embedding.Learnable {
-				gW, _ := l.Positional.GradSlots()
-				applyConvSGD(l.Positional.Table, gW, n.LearningRate)
-			}
-		case *transformer.EncoderBlock[T]:
-			l.ApplyGradSGD(n.LearningRate)
-		case *transformer.DecoderBlock[T]:
-			l.ApplyGradSGD(n.LearningRate)
-		case *transformer.Stack[T]:
-			l.ApplyGradSGD(n.LearningRate)
+		if applier, ok := v.(gradApplier[T]); ok {
+			applier.ApplyGradSGD(n.LearningRate)
 		}
 		upstream = next
-	}
-}
-
-// applyTokenEmbeddingSGD delegates the sparse SGD update to the embedding's
-// own ApplyGradSGD method, which walks only touched rows (EMB-9).
-func applyTokenEmbeddingSGD[T utils.Float](te *embedding.TokenEmbedding[T], lr T) {
-	te.ApplyGradSGD(lr)
-}
-
-// applyConvSGD performs w -= lr · g elementwise. Length parity is the
-// caller's invariant — Conv1D.GradSlots guarantees identical lengths.
-func applyConvSGD[T utils.Float](w, g []T, lr T) {
-	if len(g) == 0 {
-		return
-	}
-	for i := range w {
-		w[i] -= lr * g[i]
 	}
 }
 
@@ -221,6 +193,13 @@ func (n *NN[T]) Fit(dataset []Sample[T]) (uint, T, error) {
 		return 0, 0, utils.Newf(utils.ErrInputData,
 			"Fit: dataset must contain at least one sample")
 	}
+
+	// Hold the write lock for the whole run so concurrent Query calls block
+	// until training completes (they would otherwise read weights mid-update).
+	// Do not call Query/Verify from inside a training callback — it would
+	// deadlock on this lock; observe state via the callback context instead.
+	n.mu.Lock()
+	defer n.mu.Unlock()
 
 	log := utils.NewGoLogger(n.cfg.Logger, libVersion, "")
 	log.Info("training started", "max_iterations", n.cfg.MaxIterations)

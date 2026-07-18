@@ -21,7 +21,18 @@ func (n *NN[T]) Verify(input, target []T) (T, error) {
 		return 0, utils.Newf(utils.ErrUserConfig,
 			"Verify: network is %s, must be Operational", n.stateField.String())
 	}
-	if err := n.SetInputs(input); err != nil {
+	// Verify mutates cell values (and prefix caches), so it takes the write
+	// lock rather than sharing the read lock with Query.
+	n.mu.Lock()
+	defer n.mu.Unlock()
+	// Run the conv/recurrent/embedding prefix first so Verify accepts the same
+	// raw input shape as Train and Query (audit D9: previously Verify fed the
+	// raw vector straight into the Dense head and failed on prefixed networks).
+	netInput, err := n.runConvForward(input)
+	if err != nil {
+		return 0, err
+	}
+	if err := n.SetInputs(netInput); err != nil {
 		return 0, err
 	}
 	if err := n.SetTargets(target); err != nil {

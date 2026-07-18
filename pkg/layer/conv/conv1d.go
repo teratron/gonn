@@ -245,6 +245,24 @@ func (c *Conv1D[T]) GradSlots() (gradW, gradB []T) {
 	return c.gradW, c.gradB
 }
 
+// ApplyGradSGD applies an in-place SGD step to the kernel weights (and biases
+// when present) from the gradients accumulated by the most recent Backward.
+// This is the hook the training loop calls to update the layer.
+func (c *Conv1D[T]) ApplyGradSGD(lr T) {
+	applyConvGrad(c.Weights, c.gradW, lr)
+	if c.UseBias {
+		applyConvGrad(c.Biases, c.gradB, lr)
+	}
+}
+
+// applyConvGrad performs w[i] -= lr·g[i] over the shared prefix of w and g.
+func applyConvGrad[T utils.Float](w, g []T, lr T) {
+	n := min(len(w), len(g))
+	for i := 0; i < n; i++ {
+		w[i] -= lr * g[i]
+	}
+}
+
 // Validate verifies the layer is well-formed at compile time. Returns an
 // error wrapping [utils.ErrUserConfig] when shape constraints are violated
 // (CONV-1, CONV-2).

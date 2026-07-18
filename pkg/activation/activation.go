@@ -139,7 +139,7 @@ func Derivative[T utils.Float](value T, mode Type, params ...float64) T {
 		return T(reluDerivative(value, 0.0))
 	case SELU:
 		scale := 1.0507009873554804934193349852946
-		alpha := 1.673263242354372848170429916717
+		alpha := 1.6732632423543772848170429916717
 		if len(params) > 0 {
 			scale = params[0]
 		}

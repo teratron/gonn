@@ -2,6 +2,8 @@ package network
 
 import (
 	"github.com/teratron/gonn/pkg/activation"
+	"github.com/teratron/gonn/pkg/neuron"
+	"github.com/teratron/gonn/pkg/neuron/axon"
 	"github.com/teratron/gonn/pkg/neuron/cell"
 	"github.com/teratron/gonn/pkg/utils"
 )
@@ -292,46 +294,75 @@ func (n *Network[T]) RemoveHiddenLayer(position uint) error {
 	return nil
 }
 
-// rebalance re-wires all incoming axons for Hiddens[layerIdx]. Called after
-// any structural change to a layer or its predecessor.
+// rebalance re-wires all incoming axons for Hiddens[layerIdx]. Called after any
+// structural change to a layer or its predecessor. Weights for source cells that
+// survive the rewire are PRESERVED — only genuinely new (source→cell) edges are
+// sampled fresh. The historical implementation resampled every weight, which
+// discarded all prior learning on a grow/shrink (audit D4).
 func (n *Network[T]) rebalance(layerIdx int) {
 	hb := &n.Hiddens[layerIdx]
 	bias := n.hiddenBiases[layerIdx]
 	fanOut := hb.Len()
 
+	var sources []neuron.Nucleus[T]
+	if layerIdx == 0 {
+		for _, src := range n.Input.cells {
+			sources = append(sources, src)
+		}
+	} else {
+		for _, src := range n.Hiddens[layerIdx-1].cells {
+			sources = append(sources, src)
+		}
+	}
+	fanIn := len(sources)
+
 	for _, h := range hb.cells {
-		h.Axons = h.Axons[:0]
-		if layerIdx == 0 {
-			fanIn := n.Input.Len()
-			for _, src := range n.Input.cells {
-				h.Axons = append(h.Axons, n.newAxon(src, h, fanIn, fanOut))
-			}
-		} else {
-			prev := &n.Hiddens[layerIdx-1]
-			fanIn := prev.Len()
-			for _, src := range prev.cells {
-				h.Axons = append(h.Axons, n.newAxon(src, h, fanIn, fanOut))
-			}
-		}
-		if bias != nil {
-			h.Axons = append(h.Axons, n.newAxon(bias, h, 1, fanOut))
-		}
+		n.rewireCell(&h.Axons, h, sources, bias, fanIn, fanOut)
 	}
 }
 
-// rebalanceOutput re-wires all incoming axons for the Output bundle from
-// the last hidden layer. Called after mutations that affect the last hidden.
+// rebalanceOutput re-wires all incoming axons for the Output bundle from the
+// last hidden layer, preserving surviving weights (see rebalance).
 func (n *Network[T]) rebalanceOutput() {
 	lastHidden := &n.Hiddens[len(n.Hiddens)-1]
 	fanIn := lastHidden.Len()
 	fanOut := n.Output.Len()
+	sources := make([]neuron.Nucleus[T], 0, len(lastHidden.cells))
+	for _, src := range lastHidden.cells {
+		sources = append(sources, src)
+	}
 	for _, o := range n.Output.cells {
-		o.Axons = o.Axons[:0]
-		for _, src := range lastHidden.cells {
-			o.Axons = append(o.Axons, n.newAxon(src, o, fanIn, fanOut))
+		n.rewireCell(&o.Axons, o, sources, n.outputBias, fanIn, fanOut)
+	}
+}
+
+// rewireCell rebuilds dst's incoming axon bundle from sources (+ optional bias),
+// reusing the existing weight for any source that was already connected and
+// sampling a fresh weight only for new connections.
+func (n *Network[T]) rewireCell(
+	bundle *axon.Bundle[T],
+	dst neuron.Neuron[T],
+	sources []neuron.Nucleus[T],
+	bias *cell.Bias[T], // concrete type: a nil *Bias wrapped in an interface reads non-nil
+	fanIn, fanOut int,
+) {
+	prev := make(map[neuron.Nucleus[T]]T, len(*bundle))
+	for _, a := range *bundle {
+		prev[a.Cell] = a.Weight
+	}
+	*bundle = (*bundle)[:0]
+	for _, src := range sources {
+		if w, ok := prev[src]; ok {
+			*bundle = append(*bundle, axon.NewWithWeight(w, src, dst))
+		} else {
+			*bundle = append(*bundle, n.newAxon(src, dst, fanIn, fanOut))
 		}
-		if n.outputBias != nil {
-			o.Axons = append(o.Axons, n.newAxon(n.outputBias, o, 1, fanOut))
+	}
+	if bias != nil {
+		if w, ok := prev[bias]; ok {
+			*bundle = append(*bundle, axon.NewWithWeight(w, bias, dst))
+		} else {
+			*bundle = append(*bundle, n.newAxon(bias, dst, 1, fanOut))
 		}
 	}
 }

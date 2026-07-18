@@ -217,6 +217,13 @@ func (m *MultiHeadAttention[T]) GradBuffers() (gWq, gWk, gWv, gWo, gBq, gBk, gBv
 //   - Related: [MultiHeadAttention.Backward], [MultiHeadAttention.SetPaddingMask].
 //   - Stability: Stable.
 func (m *MultiHeadAttention[T]) Forward(input []T) []T {
+	// Shape guard: a wrong-length input (e.g. WithInput(8) feeding a
+	// SeqLen*Dmodel=12 attention layer) must yield an empty output so the
+	// compile-time shape walk reports ErrConvShapeMismatch instead of panicking
+	// with an index-out-of-range escaping nn.New (audit D2).
+	if len(input) != m.SeqLen*m.Dmodel {
+		return []T{}
+	}
 	// Lazy-allocate caches when Forward is called before Init (e.g. during
 	// compile-time shape resolution via a dummy Forward pass).
 	if m.lastQ == nil {

@@ -114,7 +114,12 @@ func compile[T utils.Float](n *NN[T], cfg *Config[T]) error {
 		n.opt = optimizer.DefaultOptimizer(cfg.LearningRate)
 	}
 	n.reg = cfg.Regularizer
-	n.sched = cfg.Scheduler
+	// Auto-bind the scheduler to the resolved optimizer so its Step updates the
+	// optimizer's effective learning rate. Without this the schedule advanced
+	// but the optimizer's rate never changed unless the user manually wrapped it
+	// in BindScheduler (audit: WithScheduler was decorative). BindScheduler is
+	// idempotent, so a pre-bound scheduler passes through unchanged.
+	n.sched = optimizer.BindScheduler(n.opt, cfg.Scheduler)
 	n.SetTopologyMode(cfg.TopologyMode)
 
 	// Resolve nil norm-layer entries inserted by WithBatchNorm/WithLayerNorm
@@ -459,6 +464,10 @@ func validate[T utils.Float](cfg *Config[T]) error {
 			return utils.Newf(utils.ErrUserConfig,
 				"compile: hidden layer %d uses unregistered activation %d", i, uint8(h.Activation))
 		}
+		if h.Activation == activation.SOFTMAX {
+			return utils.Newf(utils.ErrUserConfig,
+				"compile: hidden layer %d uses SOFTMAX — softmax is a whole-vector output activation, not a per-neuron hidden activation", i)
+		}
 	}
 	if cfg.LearningRate <= 0 {
 		return utils.Newf(utils.ErrUserConfig,
@@ -475,6 +484,12 @@ func validate[T utils.Float](cfg *Config[T]) error {
 	if !isKnownLoss(cfg.LossType) {
 		return utils.Newf(utils.ErrUserConfig,
 			"compile: loss symbol %d is not registered in the loss dispatcher", uint8(cfg.LossType))
+	}
+	if cfg.OutputActivation == activation.SOFTMAX &&
+		cfg.LossType != loss.CCE && cfg.LossType != loss.CROSS_ENTROPY {
+		return utils.Newf(utils.ErrUserConfig,
+			"compile: SOFTMAX output requires CCE/CROSS_ENTROPY loss (got %s) — softmax gradients are only well-defined with cross-entropy; use SIGMOID for other losses",
+			cfg.LossType.String())
 	}
 	if !isKnownWeightInit(cfg.WeightInit) {
 		return utils.Newf(utils.ErrUserConfig,

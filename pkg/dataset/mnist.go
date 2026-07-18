@@ -22,6 +22,11 @@ const (
 	idxDTypeDouble byte = 0x0E
 )
 
+// maxIDXRecordLen caps the per-record element count parsed from an IDX header
+// (256 Mi elements) so a hostile header cannot trigger a huge allocation or an
+// integer overflow.
+const maxIDXRecordLen = 256 << 20
+
 // idxHeader is the parsed form of the leading bytes of an IDX file.
 // dtype identifies the element type (0x08 = uint8 for MNIST images and
 // labels), ndim is the number of dimensions, dims holds the per-dimension
@@ -86,9 +91,17 @@ func readIDXHeader(r io.Reader) (idxHeader, error) {
 				dims[i], i, utils.ErrIDXMagic)
 		}
 	}
+	// Compute the per-record element count with an overflow/size guard so a
+	// crafted header (e.g. from `-download`ed data) cannot make NewIDXReader
+	// allocate a gigantic per-record buffer or overflow int (audit E).
 	recLen := 1
 	for i := 1; i < int(ndim); i++ {
 		recLen *= int(dims[i])
+		if recLen < 0 || recLen > maxIDXRecordLen {
+			return idxHeader{}, fmt.Errorf(
+				"IDX: record length overflows sane bound (dim product > %d): %w",
+				maxIDXRecordLen, utils.ErrIDXMagic)
+		}
 	}
 	return idxHeader{
 		dtype:  dtype,

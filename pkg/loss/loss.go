@@ -60,6 +60,40 @@ func CalculateTotalLoss[T utils.Float](misses *[]*T, mode Type) (loss T) {
 	return
 }
 
+// Aggregate computes the scalar training loss over the full output vector,
+// dispatching vector losses (CCE, COSINE, CAT_HINGE) to VectorLoss and summing
+// element-wise losses over the outputs. RMSE reports sqrt(mean squared). This
+// is the reporting counterpart to the residual built from Derivative — it takes
+// the real (predicted, target) pairs, unlike the historical CalculateTotalLoss
+// which fed (0, residual) and silently mis-scored every non-MSE loss.
+//
+// AI-Meta:
+//   - Purpose: Correct scalar training-loss over an output vector for logging and early stopping.
+//   - Usage: l := loss.Aggregate[float32](y, target, mode).
+//   - Related: [Loss], [Derivative], [VectorLoss].
+//   - Stability: Stable.
+func Aggregate[T utils.Float](predicted, target []T, mode Type) T {
+	switch mode {
+	case CCE, CROSS_ENTROPY, COSINE, CAT_HINGE:
+		return VectorLoss(predicted, target, mode)
+	case RMSE:
+		var sq T
+		for i := range predicted {
+			d := predicted[i] - target[i]
+			sq += d * d
+		}
+		if len(predicted) > 0 {
+			sq /= T(len(predicted))
+		}
+		return T(math.Sqrt(float64(sq)))
+	}
+	var s T
+	for i := range predicted {
+		s += Loss(predicted[i], target[i], mode)
+	}
+	return s
+}
+
 // Loss computes the loss between a predicted and a target scalar value, dispatching by mode.
 //
 // AI-Meta:

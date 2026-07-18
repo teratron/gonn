@@ -45,6 +45,11 @@ func TestWithBackend(t *testing.T) {
 			WithInput[float64](2),
 			WithHiddenLayer[float64](4, activation.SIGMOID),
 			WithOutput[float64](1, activation.SIGMOID),
+			// Explicit seed so the parity subtest's two networks get identical
+			// weights deterministically. Without it both use the default seed 0
+			// (wall-clock) and parity only held when both compiles landed in the
+			// same clock tick.
+			WithWeightInitSeed[float64](42),
 		}
 	}
 

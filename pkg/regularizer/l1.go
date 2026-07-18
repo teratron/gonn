@@ -41,5 +41,17 @@ func (r *L1[T]) Penalty(weights []T) T {
 	return r.lambda * sum
 }
 
+// WeightGrad returns λ·sign(w), the L1 contribution to ∂L/∂w.
+func (r *L1[T]) WeightGrad(w T) T {
+	switch {
+	case w > 0:
+		return r.lambda
+	case w < 0:
+		return -r.lambda
+	default:
+		return 0
+	}
+}
+
 // ApplyMask returns acts unchanged — L1 has no mask effect.
 func (r *L1[T]) ApplyMask(acts []T, _ bool) []T { return acts }

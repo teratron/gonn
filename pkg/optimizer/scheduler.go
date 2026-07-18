@@ -84,6 +84,14 @@ type LearningRateSetter[T utils.Float] interface {
 //   - Related: [Scheduler], [LearningRateSetter], [Optimizer].
 //   - Stability: Stable.
 func BindScheduler[T utils.Float](opt Optimizer[T], sched Scheduler[T]) Scheduler[T] {
+	if sched == nil {
+		return nil
+	}
+	// Idempotent: an already-bound scheduler is returned unchanged so callers
+	// (and compile's auto-bind) can invoke this without risk of double-wrapping.
+	if _, already := sched.(*boundScheduler[T]); already {
+		return sched
+	}
 	setter, ok := opt.(LearningRateSetter[T])
 	if !ok {
 		return sched

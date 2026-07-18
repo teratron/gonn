@@ -310,6 +310,25 @@ func (r *SimpleRNN[T]) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// ApplyGradSGD applies an in-place SGD step to every trainable buffer
+// (Wxh, Whh, Bh) from the gradients accumulated by the most recent Backward,
+// then leaves the accumulators as-is (Backward zeroes them at entry). This is
+// the hook the training loop calls to actually update the layer — without it
+// the recurrent weights stayed frozen (audit C2).
+func (r *SimpleRNN[T]) ApplyGradSGD(lr T) {
+	sgdApply(r.Wxh, r.gradWxh, lr)
+	sgdApply(r.Whh, r.gradWhh, lr)
+	sgdApply(r.Bh, r.gradBh, lr)
+}
+
+// sgdApply performs w[i] -= lr·g[i] over the shared prefix of w and g.
+func sgdApply[T utils.Float](w, g []T, lr T) {
+	n := min(len(w), len(g))
+	for i := 0; i < n; i++ {
+		w[i] -= lr * g[i]
+	}
+}
+
 // zeroSlice returns a slice of length n backed by cap(dst) when possible;
 // otherwise allocates. All elements are zeroed.
 func zeroSlice[T utils.Float](dst []T, n int) []T {

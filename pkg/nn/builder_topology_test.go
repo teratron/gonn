@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/teratron/gonn/pkg/activation"
+	"github.com/teratron/gonn/pkg/loss"
 	"github.com/teratron/gonn/pkg/nn"
 	"github.com/teratron/gonn/pkg/optimizer"
 )
@@ -157,6 +158,7 @@ func TestRepeatBuilderBenchmark100Layer(t *testing.T) {
 		Input(784).
 		Repeat(100, 256, activation.ReLU, true).
 		Output(10, activation.SOFTMAX, true).
+		WithLoss(loss.CCE).
 		Compile()
 	elapsed := time.Since(start)
 	if err != nil {

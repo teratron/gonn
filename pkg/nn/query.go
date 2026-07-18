@@ -1,7 +1,6 @@
 package nn
 
 import (
-	"github.com/teratron/gonn/pkg/regularizer"
 	"github.com/teratron/gonn/pkg/utils"
 )
 
@@ -21,25 +20,33 @@ func (n *NN[T]) Query(input []T) ([]T, error) {
 		return nil, utils.Newf(utils.ErrUserConfig,
 			"Query: network is %s, must be Operational (call Compile or use New)", n.stateField.String())
 	}
-	netInput, err := n.runConvForward(input)
-	if err != nil {
-		return nil, err
-	}
-	if err := n.SetInputs(netInput); err != nil {
-		return nil, err
-	}
-	n.CalculateValues()
 
-	// Inference mask (training=false): L1/L2 are no-ops; Dropout passes through.
-	if n.reg != nil {
-		acts := n.HiddenActivations()
-		acts = regularizer.Apply(n.reg, acts, false)
-		n.SetHiddenActivations(acts)
+	// Conv/recurrent/embedding prefixes cache per-call state in their layer
+	// structs (lastInput, argmax, …), so a prefixed forward is not read-safe.
+	// Serialise those Query calls with the exclusive lock and use the mutating
+	// dense path. Regularizer inference masks are no-ops (L1/L2 unchanged,
+	// Dropout passes through), so they are skipped.
+	if len(n.convPrefix) > 0 {
+		n.mu.Lock()
+		defer n.mu.Unlock()
+		netInput, err := n.runConvForward(input)
+		if err != nil {
+			return nil, err
+		}
+		if err := n.SetInputs(netInput); err != nil {
+			return nil, err
+		}
+		n.CalculateValues()
+		out := make([]T, n.Network.Output.Len())
+		for i, c := range n.Network.Output.Cells() {
+			out[i] = *c.GetValue()
+		}
+		return out, nil
 	}
 
-	out := make([]T, n.Network.Output.Len())
-	for i, c := range n.Network.Output.Cells() {
-		out[i] = *c.GetValue()
-	}
-	return out, nil
+	// Pure dense network: run the stateless forward under a read lock so any
+	// number of goroutines may Query in parallel without racing (audit D1).
+	n.mu.RLock()
+	defer n.mu.RUnlock()
+	return n.Network.InferDense(input)
 }

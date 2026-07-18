@@ -8,6 +8,7 @@
 package network
 
 import (
+	"math"
 	"sync/atomic"
 
 	"github.com/teratron/gonn/pkg/activation"
@@ -53,12 +54,30 @@ type Network[T utils.Float] struct {
 	hiddenActs      []activation.Type
 	preactHiddens   [][]T
 	preactOutput    []T
+	outActBuf       []T
 	Output          bundle[T, *cell.Output[T]]   `json:"output" xml:"output"`
 	Hiddens         []bundle[T, *cell.Hidden[T]] `json:"hiddens" xml:"hiddens"`
 	topologyVersion atomic.Uint64
 	outputAct       activation.Type
 	lossMode        loss.Type
 	topologyMode    TopologyMode
+	// fusedOutput is true when (outputAct, lossMode) is a fused pair
+	// (SIGMOID+BCE or SOFTMAX+CCE) whose analytic ∂L/∂z simplifies to
+	// (y − t). In that case the output-layer activation derivative is folded
+	// into the loss gradient and outputEffDeriv returns 1.
+	fusedOutput bool
+}
+
+// outputEffDeriv returns the effective derivative multiplier applied to output
+// cell oi's miss when it is (a) folded into hidden-layer gradients by
+// CalculateMisses and (b) used to form the output-layer weight gradient. For a
+// fused (activation, loss) pair the value is 1 because σ′ is already folded into
+// the miss = (t − y); otherwise it is σ′(preact) for the output activation.
+func (n *Network[T]) outputEffDeriv(oi int) T {
+	if n.fusedOutput {
+		return 1
+	}
+	return activation.Derivative(n.preactOutput[oi], n.outputAct)
 }
 
 // New returns a freshly constructed Network with empty bundles and the
@@ -157,7 +176,24 @@ func (n *Network[T]) SetLayers(in *layer.Input[T], hiddens []*layer.Dense[T], ou
 	n.outputAct = out.Activation
 	n.lossMode = out.Loss
 	n.preactOutput = make([]T, out.Size)
+	n.outActBuf = make([]T, out.Size)
+	n.fusedOutput = isFusedPair(out.Activation, out.Loss)
 	return nil
+}
+
+// isFusedPair reports whether (act, mode) is a loss/activation combination
+// whose analytic ∂L/∂z collapses to (y − t), letting the engine skip the
+// output activation derivative entirely. This is both faster and numerically
+// stabler (it avoids the 1/(y(1−y)) blow-up of BCE and the softmax Jacobian).
+func isFusedPair(act activation.Type, mode loss.Type) bool {
+	switch {
+	case act == activation.SIGMOID && mode == loss.BCE:
+		return true
+	case act == activation.SOFTMAX && (mode == loss.CCE || mode == loss.CROSS_ENTROPY):
+		return true
+	default:
+		return false
+	}
 }
 
 // LossMode reports the loss-function symbol the Output layer was built with.
@@ -258,9 +294,21 @@ func (n *Network[T]) SetInputs(data []T) error {
 		)
 	}
 	for idx, v := range data {
+		if !isFinite(v) {
+			return utils.Newf(utils.ErrInputData,
+				"SetInputs: non-finite value at index %d (%v) — NaN/Inf inputs would poison every weight", idx, float64(v))
+		}
 		n.Input.cells[idx].SetValue(v)
 	}
 	return nil
+}
+
+// isFinite reports whether v is neither NaN nor ±Inf. Rejecting non-finite
+// inputs and targets prevents a single bad sample from silently corrupting the
+// whole network (audit D6).
+func isFinite[T utils.Float](v T) bool {
+	f := float64(v)
+	return !math.IsNaN(f) && !math.IsInf(f, 0)
 }
 
 // SetTargets writes the label vector into Output cell target pointers.
@@ -278,6 +326,10 @@ func (n *Network[T]) SetTargets(data []T) error {
 		)
 	}
 	for idx, v := range data {
+		if !isFinite(v) {
+			return utils.Newf(utils.ErrInputData,
+				"SetTargets: non-finite value at index %d (%v)", idx, float64(v))
+		}
 		// cell.Output stores its target via pointer; assign through the
 		// pointer to keep the cell's existing reference valid.
 		*n.Output.cells[idx].GetTarget() = v
@@ -335,21 +387,25 @@ func (n *Network[T]) AppendFlatWeights(dst []T) []T {
 }
 
 // ApplyFlatWeights writes a flat weight slice back in the same canonical order
-// produced by FlatWeights / AppendFlatWeights. The slice must have the same
-// length; a length mismatch silently truncates (caller invariant).
+// produced by FlatWeights / AppendFlatWeights. The slice length must equal the
+// network's weight count; a mismatch returns ErrInputData instead of silently
+// applying a partial update (the historical behavior, which corrupted the
+// network on a caller bug without any signal).
 //
 // AI-Meta:
 //   - Purpose: Write optimizer-updated weights back into the network graph.
+//   - Errors: ErrInputData (length != weightCount).
 //   - Related: [FlatWeights], [AppendFlatWeights].
 //   - Stability: Stable.
-func (n *Network[T]) ApplyFlatWeights(weights []T) {
+func (n *Network[T]) ApplyFlatWeights(weights []T) error {
+	if want := n.weightCount(); len(weights) != want {
+		return utils.Newf(utils.ErrInputData,
+			"ApplyFlatWeights: expected %d weights, got %d", want, len(weights))
+	}
 	idx := 0
 	for _, hb := range n.Hiddens {
 		for _, h := range hb.cells {
 			for i := range h.Axons {
-				if idx >= len(weights) {
-					return
-				}
 				h.Axons[i].Weight = weights[idx]
 				idx++
 			}
@@ -357,13 +413,11 @@ func (n *Network[T]) ApplyFlatWeights(weights []T) {
 	}
 	for _, o := range n.Output.cells {
 		for i := range o.Axons {
-			if idx >= len(weights) {
-				return
-			}
 			o.Axons[i].Weight = weights[idx]
 			idx++
 		}
 	}
+	return nil
 }
 
 // weightCount totals all learnable axon weights across hidden and output layers.

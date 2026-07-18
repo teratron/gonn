@@ -2,6 +2,7 @@ package nn
 
 import (
 	"context"
+	"sync"
 	"sync/atomic"
 	"time"
 
@@ -51,6 +52,11 @@ type NN[T utils.Float] struct {
 	rawInputSize       uint
 	control            atomic.Int32
 	stateField         state
+	// mu serialises weight-mutating operations (Train/Fit/AndTrain, topology
+	// changes, SetTrain/SetEval) against read-only Query/Verify. Training takes
+	// the write lock; concurrent Query calls share the read lock and run a
+	// stateless forward, so parallel inference is race-free (audit D1).
+	mu sync.RWMutex
 }
 
 // NewBuilder is the entry point for the Builder API. Returns an *NN[T] in
@@ -148,6 +154,8 @@ func (n *NN[T]) Config() Config[T] {
 //   - Related: [SetEval], [norm.NormTrain], [norm.Normalizer].
 //   - Stability: Stable.
 func (n *NN[T]) SetTrain() {
+	n.mu.Lock()
+	defer n.mu.Unlock()
 	for _, nl := range n.normLayers {
 		if nl != nil {
 			nl.SetMode(norm.NormTrain)
@@ -166,6 +174,8 @@ func (n *NN[T]) SetTrain() {
 //   - Related: [SetTrain], [norm.NormEval], [norm.Normalizer].
 //   - Stability: Stable.
 func (n *NN[T]) SetEval() {
+	n.mu.Lock()
+	defer n.mu.Unlock()
 	for _, nl := range n.normLayers {
 		if nl != nil {
 			nl.SetMode(norm.NormEval)

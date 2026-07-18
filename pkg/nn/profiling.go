@@ -8,6 +8,7 @@
 package nn
 
 import (
+	"net"
 	"net/http"
 	_ "net/http/pprof" // pprof handler registration side effect
 	"sync"
@@ -26,6 +27,25 @@ var (
 	profilingStarted = make(map[string]bool)
 	listenAndServeFn = defaultListenAndServe
 )
+
+// isLoopbackAddr reports whether addr binds only the loopback interface. Blank
+// host (":6060") binds all interfaces and is treated as non-loopback.
+func isLoopbackAddr(addr string) bool {
+	host, _, err := net.SplitHostPort(addr)
+	if err != nil {
+		host = addr
+	}
+	if host == "" {
+		return false
+	}
+	if host == "localhost" {
+		return true
+	}
+	if ip := net.ParseIP(host); ip != nil {
+		return ip.IsLoopback()
+	}
+	return false
+}
 
 // defaultListenAndServe is production's bind. Tests swap a stub via
 // setListenAndServe.
@@ -63,6 +83,13 @@ func getListenAndServe() func(string, http.Handler) error {
 func startProfilingServer(addr string) {
 	if addr == "" {
 		return
+	}
+	// pprof exposes heap/goroutine profiles that can contain training data.
+	// Warn loudly when it is bound to a non-loopback address so an operator
+	// does not unknowingly expose it to the network (audit E).
+	if !isLoopbackAddr(addr) {
+		utils.Logger.Warn("pprof profiling endpoint bound to a non-loopback address — "+
+			"exposes /debug/pprof to the network; prefer 127.0.0.1", "addr", addr)
 	}
 	profilingMu.Lock()
 	if profilingStarted[addr] {

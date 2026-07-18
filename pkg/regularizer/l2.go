@@ -37,5 +37,8 @@ func (r *L2[T]) Penalty(weights []T) T {
 	return r.lambda * sum
 }
 
+// WeightGrad returns 2λw, the L2 contribution to ∂L/∂w (weight decay).
+func (r *L2[T]) WeightGrad(w T) T { return 2 * r.lambda * w }
+
 // ApplyMask returns acts unchanged — L2 has no mask effect.
 func (r *L2[T]) ApplyMask(acts []T, _ bool) []T { return acts }

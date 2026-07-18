@@ -67,9 +67,18 @@ func (a *Adam[T]) Step(weights, deltas []T) error {
 		return nil
 	}
 	n := len(weights)
-	if a.m == nil {
+	// Re-allocate the moment slices when the weight count changes (e.g. after a
+	// dynamic topology mutation). The historical `== nil` guard kept stale
+	// short slices and panicked on the next Step with an index-out-of-range
+	// (audit D3); resizing degrades gracefully to a fresh-moment restart.
+	if len(a.m) != n {
+		if a.m != nil {
+			utils.Logger.Warn("Adam.Step: weight count changed — resetting moments",
+				"old", len(a.m), "new", n)
+		}
 		a.m = make([]float64, n)
 		a.v = make([]float64, n)
+		a.t = 0
 	}
 	a.t++
 	b1t := math.Pow(a.beta1, float64(a.t))

@@ -561,7 +561,11 @@ func TestPauseResumeCycle(t *testing.T) {
 	t.Parallel()
 	n := MustNew(
 		PresetXOR[float64](),
-		WithMaxIterations[float64](2000),
+		// A very high iteration cap with early-stop disabled keeps the worker
+		// Running long enough for Pause to catch it reliably; Stop terminates
+		// the loop at the end of the test. (With a small cap the tiny XOR loop
+		// could finish before the main goroutine called Pause — a test race.)
+		WithMaxIterations[float64](50_000_000),
 		WithLossLimit[float64](-1), // run full loop
 	)
 	dataset := []Sample[float64]{

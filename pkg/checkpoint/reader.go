@@ -102,12 +102,24 @@ func maybeDecompress(raw []byte) ([]byte, error) {
 		return nil, utils.Wrap(utils.ErrIntegrity, err, "maybeDecompress: gzip header")
 	}
 	defer func() { _ = gz.Close() }()
-	body, err := io.ReadAll(gz)
+	// Bound the decompressed size so a maliciously crafted "gzip bomb" snapshot
+	// cannot exhaust memory. maxDecompressedSnapshot is generous for real
+	// checkpoints (which are JSON of network weights) but caps the blast radius.
+	limited := io.LimitReader(gz, maxDecompressedSnapshot+1)
+	body, err := io.ReadAll(limited)
 	if err != nil {
 		return nil, utils.Wrap(utils.ErrIntegrity, err, "maybeDecompress: gzip body")
 	}
+	if int64(len(body)) > maxDecompressedSnapshot {
+		return nil, utils.Newf(utils.ErrIntegrity,
+			"maybeDecompress: decompressed snapshot exceeds %d bytes — refusing (possible gzip bomb)",
+			maxDecompressedSnapshot)
+	}
 	return body, nil
 }
+
+// maxDecompressedSnapshot bounds the size of a decompressed checkpoint (512 MiB).
+const maxDecompressedSnapshot = 512 << 20
 
 // migrate is the (from, to) → migrator dispatcher invoked by loadFile
 // when on-disk schema_version differs from SchemaVersion. v1.0 is the

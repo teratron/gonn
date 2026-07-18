@@ -5,7 +5,9 @@ import (
 
 	"github.com/teratron/gonn/pkg/activation"
 	"github.com/teratron/gonn/pkg/loss"
+	"github.com/teratron/gonn/pkg/neuron"
 	"github.com/teratron/gonn/pkg/neuron/cell"
+	"github.com/teratron/gonn/pkg/utils"
 )
 
 // CalculateValues runs the forward pass left-to-right: each hidden layer
@@ -28,12 +30,35 @@ func (n *Network[T]) CalculateValues() {
 			*h.GetValue() = activation.Activation(preact[cellIdx], act)
 		}
 	}
+	// Output pre-activations first (needed whole-vector for softmax).
 	for i, o := range n.Output.cells {
 		o.Dense.CalculateValue()
 		n.preactOutput[i] = *o.GetValue()
-		*o.GetValue() = activation.Activation(n.preactOutput[i], n.outputAct)
-		if t := o.GetTarget(); t != nil {
-			o.SetMiss(*t - *o.GetValue())
+	}
+	// Output activation: true vector softmax, else element-wise dispatch.
+	if n.outputAct == activation.SOFTMAX {
+		activation.SoftmaxInto(n.outActBuf, n.preactOutput)
+		for i, o := range n.Output.cells {
+			o.SetValue(n.outActBuf[i])
+		}
+	} else {
+		for i, o := range n.Output.cells {
+			o.SetValue(activation.Activation(n.preactOutput[i], n.outputAct))
+		}
+	}
+	// Residual miss = −∂ℓ/∂y so backprop drives the CONFIGURED loss (not MSE
+	// for everyone). Fused pairs use the (t − y) shortcut whose σ′ is folded
+	// analytically; outputEffDeriv returns 1 for them.
+	for _, o := range n.Output.cells {
+		t := o.GetTarget()
+		if t == nil {
+			continue
+		}
+		y := *o.GetValue()
+		if n.fusedOutput {
+			o.SetMiss(*t - y)
+		} else {
+			o.SetMiss(-loss.Derivative(y, *t, n.lossMode))
 		}
 	}
 }
@@ -46,11 +71,16 @@ func (n *Network[T]) CalculateValues() {
 //   - Concurrency: ReadSafe.
 //   - Related: [CalculateLossDefault], [CalculateValues], [loss.CalculateTotalLoss].
 func (n *Network[T]) CalculateLoss(mode loss.Type) T {
-	misses := make([]*T, n.Output.Len())
+	np := n.Output.Len()
+	y := make([]T, np)
+	tgt := make([]T, np)
 	for i, o := range n.Output.cells {
-		misses[i] = o.GetMiss()
+		y[i] = *o.GetValue()
+		if tp := o.GetTarget(); tp != nil {
+			tgt[i] = *tp
+		}
 	}
-	return loss.CalculateTotalLoss(&misses, mode)
+	return loss.Aggregate(y, tgt, mode)
 }
 
 // CalculateMisses runs the backward pass right-to-left across the hidden
@@ -70,25 +100,31 @@ func (n *Network[T]) CalculateMisses() {
 		for _, h := range hb.cells {
 			h.SetMiss(0)
 		}
-		// Aggregate raw upstream contribution: Σ next.miss × axon.weight
-		// over each axon in the next layer pointing back to a cell in
-		// Hiddens[i]. The type filter to *cell.Hidden[T] excludes bias
-		// cells (which also appear in *.Axons but never receive miss).
+		// Aggregate the upstream error signal: for each source cell k in the
+		// next layer, propagate its effective delta δ_k = σ′(preact_k)·miss_k
+		// back through every axon k→j, accumulating δ_k·weight into miss_j.
+		// Folding the SOURCE layer's activation derivative here is the chain
+		// rule — omitting it (the historical bug) dropped one σ′ factor per
+		// layer crossed and corrupted every multi-layer gradient. The type
+		// filter to *cell.Hidden[T] excludes bias cells (present in *.Axons
+		// but never receiving miss).
 		if i == len(n.Hiddens)-1 {
-			for _, o := range n.Output.cells {
-				ms := *o.GetMiss()
+			for oi, o := range n.Output.cells {
+				delta := *o.GetMiss() * n.outputEffDeriv(oi)
 				for _, a := range o.Axons {
 					if h, ok := any(a.Cell).(*cell.Hidden[T]); ok {
-						h.AddMiss(ms * a.Weight)
+						h.AddMiss(delta * a.Weight)
 					}
 				}
 			}
 		} else {
-			for _, c := range n.Hiddens[i+1].cells {
-				ms := *c.GetMiss()
+			nextAct := n.hiddenActs[i+1]
+			nextPreact := n.preactHiddens[i+1]
+			for ci, c := range n.Hiddens[i+1].cells {
+				delta := *c.GetMiss() * activation.Derivative(nextPreact[ci], nextAct)
 				for _, a := range c.Axons {
 					if h, ok := any(a.Cell).(*cell.Hidden[T]); ok {
-						h.AddMiss(ms * a.Weight)
+						h.AddMiss(delta * a.Weight)
 					}
 				}
 			}
@@ -115,9 +151,76 @@ func (n *Network[T]) CalculateWeights(rate *T) {
 		}
 	}
 	for cellIdx, o := range n.Output.cells {
-		eff := *rate * activation.Derivative(n.preactOutput[cellIdx], n.outputAct)
+		eff := *rate * n.outputEffDeriv(cellIdx)
 		o.CalculateWeight(&eff)
 	}
+}
+
+// InferDense runs a stateless forward pass over the dense graph and returns a
+// freshly allocated output slice. Unlike CalculateValues it never writes cell
+// value or miss fields — every intermediate activation lives in a local map —
+// so any number of goroutines may call it concurrently under a read lock
+// without racing (audit D1: the old Query mutated shared cells and returned
+// wrong answers under load). Weights and bias values are only read; the caller
+// guarantees no concurrent Train via the facade's RWMutex.
+//
+// AI-Meta:
+//   - Purpose: Read-only forward pass for concurrent inference; no shared cell mutation (bias values are read-only after Build).
+//   - Concurrency: ReadSafe.
+//   - Related: [CalculateValues], [nn.NN.Query].
+func (n *Network[T]) InferDense(input []T) ([]T, error) {
+	if len(input) != n.Input.Len() {
+		return nil, utils.Newf(utils.ErrInputData,
+			"InferDense: expected %d values, got %d", n.Input.Len(), len(input))
+	}
+	total := n.Input.Len()
+	for _, hb := range n.Hiddens {
+		total += hb.Len()
+	}
+	values := make(map[neuron.Nucleus[T]]T, total)
+	for j, c := range n.Input.cells {
+		if !isFinite(input[j]) {
+			return nil, utils.Newf(utils.ErrInputData,
+				"InferDense: non-finite input at index %d", j)
+		}
+		values[c] = input[j]
+	}
+	// sourceValue reads a cell's activation from the local map, falling back to
+	// the cell's stored value for bias cells (immutable after Build, safe to
+	// read concurrently).
+	sourceValue := func(c neuron.Nucleus[T]) T {
+		if v, ok := values[c]; ok {
+			return v
+		}
+		return *c.GetValue()
+	}
+	for i, hb := range n.Hiddens {
+		act := n.hiddenActs[i]
+		for _, h := range hb.cells {
+			var sum T
+			for _, a := range h.Axons {
+				sum += a.Weight * sourceValue(a.Cell)
+			}
+			values[h] = activation.Activation(sum, act)
+		}
+	}
+	preout := make([]T, n.Output.Len())
+	for i, o := range n.Output.cells {
+		var sum T
+		for _, a := range o.Axons {
+			sum += a.Weight * sourceValue(a.Cell)
+		}
+		preout[i] = sum
+	}
+	out := make([]T, n.Output.Len())
+	if n.outputAct == activation.SOFTMAX {
+		activation.SoftmaxInto(out, preout)
+	} else {
+		for i := range preout {
+			out[i] = activation.Activation(preout[i], n.outputAct)
+		}
+	}
+	return out, nil
 }
 
 // CalculateLossDefault calls CalculateLoss with the mode captured during
@@ -161,7 +264,7 @@ func (n *Network[T]) AppendFlatGradients(dst []T) []T {
 		}
 	}
 	for cellIdx, o := range n.Output.cells {
-		deriv := activation.Derivative(n.preactOutput[cellIdx], n.outputAct)
+		deriv := n.outputEffDeriv(cellIdx)
 		miss := *o.GetMiss()
 		for _, a := range o.Axons {
 			dst = append(dst, -deriv*miss**a.Cell.GetValue())

@@ -134,18 +134,23 @@ func invokeOne[T utils.Float](fn CallbackFn[T], ctx CallbackContext[T]) (err err
 }
 
 // fireEvent iterates fns in registration order (CB-7), invoking each via
-// invokeOne. Returns immediately on the first ErrStopTraining (or wrapped
-// form) — remaining callbacks in the slice are NOT called. Returns nil when
-// all callbacks return nil or when fns is nil (CB-3 zero-overhead path).
+// invokeOne. Returns immediately on the first non-nil callback error —
+// remaining callbacks in the slice are NOT called. Any non-nil error stops
+// training (the documented CB-6 contract); ErrStopTraining is the idiomatic
+// sentinel but a plain error is honored too, rather than being silently
+// swallowed (audit D10). Returns nil when all callbacks return nil or when fns
+// is nil (CB-3 zero-overhead path).
 func fireEvent[T utils.Float](fns []CallbackFn[T], ctx CallbackContext[T]) error {
 	if fns == nil {
 		return nil
 	}
 	for _, fn := range fns {
 		if err := invokeOne(fn, ctx); err != nil {
-			if errors.Is(err, ErrStopTraining) {
-				return err
+			if !errors.Is(err, ErrStopTraining) {
+				utils.Logger.Warn("training callback returned an error — stopping",
+					"error", err)
 			}
+			return err
 		}
 	}
 	return nil

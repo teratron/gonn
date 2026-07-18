@@ -89,16 +89,14 @@ func (n *NN[T]) transitionToRunning() {
 	n.control.CompareAndSwap(controlIdle, controlRunning)
 }
 
-// transitionToIdle is invoked by Fit's deferred cleanup. Mirrors the
-// pattern used in net/http: every Run() / Fit() must restore the Idle
-// state so subsequent Train / Fit calls succeed.
+// transitionToIdle is invoked by Fit's deferred cleanup. Every Fit must restore
+// the Idle state so subsequent Train / Fit / AndTrain calls succeed. Earlier
+// code preserved a Stopped flag here, which left the network permanently sterile
+// after the first Stop() — the next Fit saw Stopped at its first safe-point and
+// exited with zero epochs (audit D5). The stop reason is already reported to
+// OnTrainEnd callbacks, so no state trace is needed.
 func (n *NN[T]) transitionToIdle() {
-	// Preserve Stopped flag if the user set it explicitly — leaves a
-	// trace for tests that want to assert "this run was stopped". The
-	// next Fit() call will reset to Running anyway.
-	if n.control.Load() != controlStopped {
-		n.control.Store(controlIdle)
-	}
+	n.control.Store(controlIdle)
 }
 
 // awaitSafePoint is the inner loop's check that runs between epochs.

@@ -351,6 +351,16 @@ func (c *Conv2D[T]) GradSlots() (gradW, gradB []T) {
 	return c.gradW, c.gradB
 }
 
+// ApplyGradSGD applies an in-place SGD step to the kernel weights (and biases
+// when present) from the gradients accumulated by the most recent Backward.
+// Without this hook Conv2D kernels stayed frozen during training (audit C1).
+func (c *Conv2D[T]) ApplyGradSGD(lr T) {
+	applyConvGrad(c.Weights, c.gradW, lr)
+	if c.UseBias {
+		applyConvGrad(c.Biases, c.gradB, lr)
+	}
+}
+
 // Validate verifies the layer is well-formed at compile time given a
 // concrete (inC, inH, inW) shape. Returns an error wrapping
 // [utils.ErrUserConfig] for parameter mistakes and

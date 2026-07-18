@@ -116,6 +116,15 @@ func (l *LSTM[T]) GradSlots() (gradW, gradB []T) { return l.gradWx, l.gradB }
 // GradWh returns the recurrent-weight gradient accumulator.
 func (l *LSTM[T]) GradWh() []T { return l.gradWh }
 
+// ApplyGradSGD updates all four gate weight blocks (Wx, Wh, B) in place from the
+// gradients accumulated by the most recent Backward. Without this hook the LSTM
+// stayed frozen during training (audit C2).
+func (l *LSTM[T]) ApplyGradSGD(lr T) {
+	sgdApply(l.Wx, l.gradWx, lr)
+	sgdApply(l.Wh, l.gradWh, lr)
+	sgdApply(l.B, l.gradB, lr)
+}
+
 // Forward computes all SeqLen (h_t, c_t) pairs and returns hidden states flat as
 // [SeqLen*Hidden]. Input must be [SeqLen*InSize]. Caches activations for Backward.
 //

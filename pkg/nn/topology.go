@@ -5,6 +5,21 @@ import (
 	"github.com/teratron/gonn/pkg/utils"
 )
 
+// onTopologyChanged runs after a successful runtime topology mutation. The
+// trainable weight count has changed, so the optimizer's moment/velocity state
+// and the cached flat weight/gradient buffers are stale. Reset the optimizer
+// and drop the buffers so the next training step rebuilds them at the new size,
+// preventing the index-out-of-range panic the old code hit (audit D3/D4).
+// Callers hold n.mu.
+func (n *NN[T]) onTopologyChanged() {
+	if n.opt != nil {
+		n.opt.Reset()
+	}
+	n.weightBuf = nil
+	n.gradBuf = nil
+	n.convGradBuf = nil
+}
+
 // requireIdleOrPaused returns ErrControl when training is actively running.
 // Topology mutations are only safe when the training loop is not executing.
 func (n *NN[T]) requireIdleOrPaused() error {
@@ -29,7 +44,13 @@ func (n *NN[T]) AddNeuron(layerIdx, count uint) error {
 	if err := n.requireIdleOrPaused(); err != nil {
 		return err
 	}
-	return n.Network.AddNeuron(layerIdx, count)
+	n.mu.Lock()
+	defer n.mu.Unlock()
+	if err := n.Network.AddNeuron(layerIdx, count); err != nil {
+		return err
+	}
+	n.onTopologyChanged()
+	return nil
 }
 
 // RemoveNeuron removes count neurons from the end of the hidden layer at layerIdx.
@@ -44,7 +65,13 @@ func (n *NN[T]) RemoveNeuron(layerIdx, count uint) error {
 	if err := n.requireIdleOrPaused(); err != nil {
 		return err
 	}
-	return n.Network.RemoveNeuron(layerIdx, count)
+	n.mu.Lock()
+	defer n.mu.Unlock()
+	if err := n.Network.RemoveNeuron(layerIdx, count); err != nil {
+		return err
+	}
+	n.onTopologyChanged()
+	return nil
 }
 
 // AddHiddenLayer inserts a new hidden layer at position in the chain.
@@ -59,7 +86,13 @@ func (n *NN[T]) AddHiddenLayer(position, size uint, act activation.Type, bias bo
 	if err := n.requireIdleOrPaused(); err != nil {
 		return err
 	}
-	return n.Network.AddHiddenLayer(position, size, act, bias)
+	n.mu.Lock()
+	defer n.mu.Unlock()
+	if err := n.Network.AddHiddenLayer(position, size, act, bias); err != nil {
+		return err
+	}
+	n.onTopologyChanged()
+	return nil
 }
 
 // RemoveHiddenLayer removes the hidden layer at position.
@@ -74,5 +107,11 @@ func (n *NN[T]) RemoveHiddenLayer(position uint) error {
 	if err := n.requireIdleOrPaused(); err != nil {
 		return err
 	}
-	return n.Network.RemoveHiddenLayer(position)
+	n.mu.Lock()
+	defer n.mu.Unlock()
+	if err := n.Network.RemoveHiddenLayer(position); err != nil {
+		return err
+	}
+	n.onTopologyChanged()
+	return nil
 }

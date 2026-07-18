@@ -90,13 +90,21 @@ func TestFlatWeightsRoundTrip(t *testing.T) {
 	for i := range sentinel {
 		sentinel[i] = float64(i) * 0.01
 	}
-	n.ApplyFlatWeights(sentinel)
+	if err := n.ApplyFlatWeights(sentinel); err != nil {
+		t.Fatalf("ApplyFlatWeights: %v", err)
+	}
 
 	got := n.FlatWeights()
 	for i, v := range got {
 		if math.Abs(float64(v)-sentinel[i]) > 1e-12 {
 			t.Errorf("ApplyFlatWeights[%d] = %v, want %v", i, v, sentinel[i])
 		}
+	}
+
+	// Length mismatch must now surface as an error rather than a silent
+	// partial write (audit D8).
+	if err := n.ApplyFlatWeights(sentinel[:len(sentinel)-1]); err == nil {
+		t.Error("ApplyFlatWeights with short slice returned nil error — should reject")
 	}
 }
 

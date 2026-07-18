@@ -23,6 +23,13 @@ type Regularizer[T utils.Float] interface {
 	// weights is the flat weight slice from the network.
 	Penalty(weights []T) T
 
+	// WeightGrad returns the regularization contribution to ∂L/∂w for a single
+	// weight w: L2 → 2λw, L1 → λ·sign(w), Dropout → 0. The training loop adds
+	// this to the data gradient before the optimizer step, so the penalty
+	// actually decays the weights instead of only inflating the reported loss
+	// (audit B/L2: regularization previously never reached the gradient).
+	WeightGrad(w T) T
+
 	// ApplyMask optionally modifies activations in-place.
 	// training=true: Dropout samples the mask; L1/L2 return acts unchanged.
 	// training=false: all implementations are strict no-ops (REG-3).
@@ -56,4 +63,23 @@ func Penalty[T utils.Float](reg Regularizer[T], weights []T) T {
 		return 0
 	}
 	return reg.Penalty(weights)
+}
+
+// AddWeightGrad adds the regularizer's per-weight gradient contribution into
+// grads in place (grads[i] += reg.WeightGrad(weights[i])). Nil-safe no-op when
+// reg is nil. Called by the training loop after the data gradient is computed
+// and before the optimizer step.
+//
+// AI-Meta:
+//   - Purpose: Fold L1/L2 weight-decay into the gradient so regularization affects training.
+//   - Related: [Regularizer.WeightGrad], [Penalty].
+//   - Stability: Stable.
+func AddWeightGrad[T utils.Float](reg Regularizer[T], weights, grads []T) {
+	if reg == nil {
+		return
+	}
+	n := min(len(weights), len(grads))
+	for i := 0; i < n; i++ {
+		grads[i] += reg.WeightGrad(weights[i])
+	}
 }

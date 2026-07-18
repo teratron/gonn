@@ -1,8 +1,20 @@
 package loss
 
-import "github.com/teratron/gonn/pkg/utils"
+import (
+	"math"
 
-// For single value, return 0 as CCE requires vectors
+	"github.com/teratron/gonn/pkg/utils"
+)
+
+// cceLossSingle is the per-output contribution to categorical cross-entropy,
+// −t·log(y), with y floored to keep the log finite. Summed across the output
+// vector by CalculateTotalLoss it yields the standard CCE. (The historical
+// implementation returned a constant 0, which made every CCE run report zero
+// loss and "converge" at epoch 1.)
 func cceLossSingle[T utils.Float](predicted, target T) T {
-	return 0
+	p := predicted
+	if p < T(1e-7) {
+		p = T(1e-7)
+	}
+	return -target * T(math.Log(float64(p)))
 }

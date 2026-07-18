@@ -110,6 +110,15 @@ func (g *GRU[T]) GradSlots() (gradW, gradB []T) { return g.gradWx, g.gradB }
 // GradWh returns the recurrent-weight gradient accumulator.
 func (g *GRU[T]) GradWh() []T { return g.gradWh }
 
+// ApplyGradSGD updates all three gate weight blocks (Wx, Wh, B) in place from
+// the gradients accumulated by the most recent Backward. Without this hook the
+// GRU stayed frozen during training (audit C2).
+func (g *GRU[T]) ApplyGradSGD(lr T) {
+	sgdApply(g.Wx, g.gradWx, lr)
+	sgdApply(g.Wh, g.gradWh, lr)
+	sgdApply(g.B, g.gradB, lr)
+}
+
 // Forward computes all SeqLen h_t vectors and returns hidden states flat as
 // [SeqLen*Hidden]. Input must be [SeqLen*InSize]. Caches activations for Backward.
 //

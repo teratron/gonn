@@ -58,6 +58,10 @@ func NewDropoutSeeded[T utils.Float](p float64, seed uint64) *Dropout[T] {
 // Penalty returns zero — Dropout has no weight penalty term.
 func (d *Dropout[T]) Penalty(_ []T) T { return 0 }
 
+// WeightGrad returns zero — Dropout regularizes via activation masking, not
+// weight decay.
+func (d *Dropout[T]) WeightGrad(_ T) T { return 0 }
+
 // ApplyMask applies the inverted Bernoulli mask when training=true.
 // Each element is zeroed with probability (1-p); retained elements are
 // scaled by 1/p (REG-5). Returns acts unchanged when training=false (REG-3).

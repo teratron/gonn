@@ -58,6 +58,14 @@ func (es *EmbeddingStack[T]) GradSlots() (gradW, gradB []T) {
 	return es.Token.GradSlots()
 }
 
+// ApplyGradSGD updates both sub-layers: the sparse token table and the
+// learnable positional table (a no-op for the sinusoidal variant). Each
+// sub-layer resets its own accumulator.
+func (es *EmbeddingStack[T]) ApplyGradSGD(lr T) {
+	es.Token.ApplyGradSGD(lr)
+	es.Positional.ApplyGradSGD(lr)
+}
+
 // ForwardIDs runs the full embedding pipeline: lookup → positional encoding.
 func (es *EmbeddingStack[T]) ForwardIDs(ids []int) ([]T, error) {
 	embedded, err := es.Token.ForwardIDs(ids)

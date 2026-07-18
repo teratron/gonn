@@ -3,6 +3,7 @@ package nn
 import (
 	"fmt"
 
+	"github.com/teratron/gonn/pkg/optimizer"
 	"github.com/teratron/gonn/pkg/utils"
 )
 
@@ -49,11 +50,13 @@ func (n *NN[T]) AndTrain(samples []Sample[T], opts ...Option[T]) (uint, T, error
 	originalOpt := n.opt
 	originalSched := n.sched
 	originalReg := n.reg
+	originalLR := n.LearningRate
 	defer func() {
 		n.cfg = originalCfg
 		n.opt = originalOpt
 		n.sched = originalSched
 		n.reg = originalReg
+		n.LearningRate = originalLR
 	}()
 
 	// Apply opts to the live config. We re-resolve runtime pointers below
@@ -72,6 +75,13 @@ func (n *NN[T]) AndTrain(samples []Sample[T], opts ...Option[T]) (uint, T, error
 	}
 	if n.cfg.Regularizer != nil {
 		n.reg = n.cfg.Regularizer
+	}
+	// Re-sync the learning rate so WithLearningRate actually takes effect for
+	// this call (audit D7): the conv-prefix inline SGD reads n.LearningRate,
+	// and the optimizer's own rate must be pushed via LearningRateSetter.
+	n.LearningRate = n.cfg.LearningRate
+	if setter, ok := n.opt.(optimizer.LearningRateSetter[T]); ok {
+		setter.SetLearningRate(n.cfg.LearningRate)
 	}
 
 	// Fit owns the state-machine transitions (transitionToRunning /

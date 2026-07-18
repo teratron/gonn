@@ -58,7 +58,11 @@ func (r *RMSProp[T]) Step(weights, deltas []T) error {
 	if r.lr == 0 {
 		return nil
 	}
-	if r.sqGrad == nil {
+	if len(r.sqGrad) != len(weights) {
+		if r.sqGrad != nil {
+			utils.Logger.Warn("RMSProp.Step: weight count changed — resetting state",
+				"old", len(r.sqGrad), "new", len(weights))
+		}
 		r.sqGrad = make([]float64, len(weights))
 	}
 	lr := float64(r.lr)

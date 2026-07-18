@@ -82,14 +82,37 @@ func (pe *PositionalEncoding[T]) GradSlots() (gradW, gradB []T) {
 	return pe.gradTable, nil
 }
 
+// ApplyGradSGD updates the learnable positional table in place, then zeroes the
+// gradient accumulator. Sinusoidal mode is a no-op (fixed table). Resetting the
+// accumulator here fixes the unbounded accumulation bug (audit C4) where the
+// gradient grew every step because it was applied but never cleared.
+func (pe *PositionalEncoding[T]) ApplyGradSGD(lr T) {
+	if pe.Mode != Learnable || pe.gradTable == nil {
+		return
+	}
+	n := min(len(pe.Table), len(pe.gradTable))
+	for i := 0; i < n; i++ {
+		pe.Table[i] -= lr * pe.gradTable[i]
+	}
+	clear(pe.gradTable)
+}
+
 // Forward adds the positional table to x element-wise. x must be [SeqLen×Dmodel].
 // The result is written into a fresh slice; x is cached for Backward.
 func (pe *PositionalEncoding[T]) Forward(x []T) []T {
 	sz := pe.SeqLen * pe.Dmodel
+	if len(pe.lastIn) < sz {
+		pe.lastIn = make([]T, sz)
+	}
 	copy(pe.lastIn, x)
 	out := make([]T, sz)
-	for i := range sz {
-		out[i] = x[i] + pe.Table[i]
+	for i := 0; i < sz && i < len(x); i++ {
+		out[i] = x[i]
+		// Table is nil during the compile-time shape-resolution walk (before
+		// Init); treat the positional offset as zero there.
+		if i < len(pe.Table) {
+			out[i] += pe.Table[i]
+		}
 	}
 	return out
 }
