@@ -68,12 +68,13 @@ type Dataset[T utils.Float] interface {
 var ErrUnsupported = utils.Newf(utils.ErrInputData, "dataset: Reset not supported")
 
 // ImageShaper is an optional interface for Dataset implementations that carry
-// a known (channels, height, width) image shape. pkg/nn/compile detects this
-// interface via type assertion to auto-populate Config.InputC/InputH/InputW
-// when WithInputShape was not called explicitly.
+// a known (channels, height, width) image shape. Pass such a dataset to
+// nn.WithInputShapeFrom to populate the network's input shape from the data
+// source instead of hard-coding WithInputShape(c, h, w). (Compile cannot
+// detect this automatically — it never sees the dataset.)
 //
 // AI-Meta:
-//   - Purpose: Optional shape-carrier interface for image datasets; detected by compile().
+//   - Purpose: Optional shape-carrier interface for image datasets; consumed by nn.WithInputShapeFrom.
 //   - Usage: if s, ok := ds.(dataset.ImageShaper); ok { c, h, w := s.ImageShape() }.
 //   - Implementations: [MNISTLoader] (when WithImageShape is applied).
 //   - Stability: Stable.

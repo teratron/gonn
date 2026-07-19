@@ -9,7 +9,7 @@ import (
 )
 
 // libVersion is the GoNN library version embedded in structured log events.
-const libVersion = "0.11.0"
+const libVersion = "0.18.0"
 
 // Sample is one (input, target) pair for use with Fit. Two parallel slices
 // keep the type signature simple while preserving the generic parameter T.
@@ -67,14 +67,13 @@ func (n *NN[T]) trainStep(input, target []T) (T, error) {
 	if err := n.SetTargets(target); err != nil {
 		return 0, err
 	}
-	n.CalculateValues()
+	// Training mode arms the in-graph dropout mask for this step (the mask
+	// gates values BEFORE the next layer consumes them — the old post-forward
+	// flat mask never influenced the output and was removed, audit B3).
+	n.Network.SetTrainingMode(true)
+	defer n.Network.SetTrainingMode(false)
 
-	// Apply dropout / mask after forward pass (training=true).
-	if n.reg != nil {
-		acts := n.HiddenActivations()
-		acts = n.reg.ApplyMask(acts, true)
-		n.SetHiddenActivations(acts)
-	}
+	n.CalculateValues()
 
 	lossVal := n.CalculateLossDefault()
 
@@ -109,6 +108,13 @@ func (n *NN[T]) trainStep(input, target []T) (T, error) {
 	}
 	if err := n.ApplyFlatWeights(n.weightBuf); err != nil {
 		return lossVal, err
+	}
+
+	// Norm-layer affine parameters (γ, β) train via the same inline-SGD
+	// capability the conv prefix uses; CalculateMisses accumulated their
+	// gradients when it routed the miss through Normalizer.Backward.
+	for _, nl := range n.normLayers {
+		nl.ApplyGradSGD(n.LearningRate)
 	}
 
 	return lossVal, nil
@@ -226,6 +232,7 @@ func (n *NN[T]) Fit(dataset []Sample[T]) (uint, T, error) {
 
 	minLoss := T(0)
 	minLossSet := false
+	var bestEpoch uint
 	var snapshot []T
 
 	for epoch := uint(1); epoch <= n.cfg.MaxIterations; epoch++ {
@@ -262,6 +269,9 @@ func (n *NN[T]) Fit(dataset []Sample[T]) (uint, T, error) {
 		lastLoss = mean
 		completedEpochs = epoch
 		log.Debug("epoch completed", "epoch", epoch, "loss", float64(mean))
+		// Publish the epoch-end state for the visualization server (no-op
+		// when WithVisualizationEndpoint is not configured).
+		n.publishVisSnapshot(float64(mean), uint64(epoch), uint64(epoch)*uint64(len(dataset)))
 		if cb := n.cfg.EpochCallback; cb != nil {
 			cb(epoch, mean)
 		}
@@ -280,6 +290,7 @@ func (n *NN[T]) Fit(dataset []Sample[T]) (uint, T, error) {
 		if !minLossSet || mean < minLoss {
 			minLoss = mean
 			minLossSet = true
+			bestEpoch = epoch
 			snapshot = n.snapshotWeights(snapshot)
 
 			// Dispatch OnImprovementFound before OnIterationEnd (CB-9).
@@ -301,6 +312,10 @@ func (n *NN[T]) Fit(dataset []Sample[T]) (uint, T, error) {
 				return completedEpochs, mean, nil
 			}
 		}
+
+		// Periodic checkpoint (no-op unless WithCheckpoint armed a directory).
+		// Runs after the min-loss update so MinLossState is current.
+		n.maybeWriteCheckpoint(epoch, mean, minLoss, bestEpoch)
 
 		// Meta-learner hook: advisory per-epoch hyperparameter update.
 		// Executes after opt.Step (inside trainStep) and before OnIterationEnd.

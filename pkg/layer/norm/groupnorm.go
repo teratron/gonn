@@ -64,6 +64,9 @@ type GroupNorm[T utils.Float] struct {
 	beta      []T
 	gammaGrad []T
 	betaGrad  []T
+	// xHat and invSd (one per group) are cached by Forward for Backward.
+	xHat  []T
+	invSd []T
 	features  int
 	groups    int
 	mode      atomic.Int32
@@ -122,6 +125,43 @@ func (g *GroupNorm[T]) Forward(x []T) []T {
 		return x
 	}
 	groupSize := g.features / g.groups
+	if cap(g.xHat) < len(x) {
+		g.xHat = make([]T, len(x))
+	} else {
+		g.xHat = g.xHat[:len(x)]
+	}
+	if cap(g.invSd) < g.groups {
+		g.invSd = make([]T, g.groups)
+	} else {
+		g.invSd = g.invSd[:g.groups]
+	}
+	for grp := range g.groups {
+		start := grp * groupSize
+		end := start + groupSize
+		slice := x[start:end]
+		mean, variance := batchStats(slice)
+		sd := stddev(variance, g.eps)
+		for i, v := range slice {
+			g.xHat[start+i] = (v - mean) / sd
+		}
+		g.invSd[grp] = 1 / sd
+	}
+	return applyAffine(g.xHat, g.gamma, g.beta)
+}
+
+// ForwardInference computes the same output as Forward without touching any
+// layer state, so concurrent inference goroutines can share one instance.
+//
+// AI-Meta:
+//   - Purpose: Pure, mutation-free forward for concurrent inference.
+//   - Concurrency: ReadSafe.
+//   - Related: [GroupNorm], [Forward], [Normalizer.ForwardInference].
+//   - Stability: Stable.
+func (g *GroupNorm[T]) ForwardInference(x []T) []T {
+	if len(x) == 0 {
+		return x
+	}
+	groupSize := g.features / g.groups
 	xHat := make([]T, len(x))
 	for grp := range g.groups {
 		start := grp * groupSize
@@ -134,6 +174,77 @@ func (g *GroupNorm[T]) Forward(x []T) []T {
 		}
 	}
 	return applyAffine(xHat, g.gamma, g.beta)
+}
+
+// Backward computes ∂L/∂x from the upstream gradient ∂L/∂y, accumulating
+// ∂L/∂γ and ∂L/∂β into the GradSlots buffers. Each group applies the
+// standard normalization gradient independently over its slice (mean and
+// variance are functions of the group's inputs):
+//
+//	dL/dxHat_i = upstream_i · γ_i        (or upstream_i when affine disabled)
+//	dL/dx_i    = invSd/G · (G·dxHat_i − Σ dxHat_j − xHat_i·Σ(dxHat_j·xHat_j))
+//
+// where G is the group size and the sums run over the group.
+// Must be called after Forward on the same input (uses cached xHat, invSd).
+//
+// AI-Meta:
+//   - Purpose: Backprop through GroupNorm; accumulates affine gradients, returns ∂L/∂x.
+//   - Concurrency: NotSafe; reads cached Forward state.
+//   - Related: [GroupNorm], [Forward], [GradSlots], [ApplyGradSGD].
+//   - Stability: Stable.
+func (g *GroupNorm[T]) Backward(upstream []T) []T {
+	n := len(upstream)
+	dx := make([]T, n)
+	if n == 0 || len(g.xHat) < n {
+		return dx
+	}
+	groupSize := g.features / g.groups
+	for grp := range g.groups {
+		start := grp * groupSize
+		end := start + groupSize
+		var sumDxHat, sumDxHatXHat T
+		dxHat := make([]T, groupSize)
+		for i := start; i < end; i++ {
+			u := upstream[i]
+			if g.affine {
+				g.gammaGrad[i] += u * g.xHat[i]
+				g.betaGrad[i] += u
+				u *= g.gamma[i]
+			}
+			dxHat[i-start] = u
+			sumDxHat += u
+			sumDxHatXHat += u * g.xHat[i]
+		}
+		scale := g.invSd[grp] / T(groupSize)
+		for i := start; i < end; i++ {
+			d := dxHat[i-start]
+			dx[i] = scale * (T(groupSize)*d - sumDxHat - g.xHat[i]*sumDxHatXHat)
+		}
+	}
+	return dx
+}
+
+// ApplyGradSGD updates γ and β in-place (w -= lr·grad) and zeroes the
+// gradient buffers, matching the inline-SGD convention shared by the conv
+// prefix and the dense norm path. No-op when affine is disabled.
+//
+// AI-Meta:
+//   - Purpose: Inline SGD update for GroupNorm affine params.
+//   - Concurrency: NotSafe.
+//   - Related: [GroupNorm], [Backward], [GradSlots].
+//   - Stability: Stable.
+func (g *GroupNorm[T]) ApplyGradSGD(lr T) {
+	if !g.affine {
+		return
+	}
+	for i := range g.gamma {
+		g.gamma[i] -= lr * g.gammaGrad[i]
+		g.gammaGrad[i] = 0
+	}
+	for i := range g.beta {
+		g.beta[i] -= lr * g.betaGrad[i]
+		g.betaGrad[i] = 0
+	}
 }
 
 // SetMode is accepted for Normalizer interface compatibility; GroupNorm's

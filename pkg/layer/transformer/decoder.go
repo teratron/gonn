@@ -34,7 +34,6 @@ type DecoderBlock[T utils.Float] struct {
 	Norm2    *norm.LayerNorm[T]
 	FFN      *ffn[T]
 	Drop1    *regularizer.Dropout[T]
-	bufAttn  []T
 	bufZ     []T
 	bufF     []T
 	cacheX   []T
@@ -86,7 +85,6 @@ func (d *DecoderBlock[T]) Init(rng *rand.Rand) {
 	d.Attn.Init(rand.New(rand.NewPCG(s0, s0^0x9E3779B9)))
 	d.FFN.Init(rand.New(rand.NewPCG(s1, s1^0x9E3779B9)))
 	size := d.Cfg.SeqLen * d.Cfg.Dmodel
-	d.bufAttn = make([]T, size)
 	d.bufZ = make([]T, size)
 	d.bufF = make([]T, size)
 	d.cacheX = make([]T, size)
@@ -110,8 +108,7 @@ func (d *DecoderBlock[T]) Forward(x []T) []T {
 	// Lazy-allocate cache buffers if Init has not been called yet.
 	if d.bufZ == nil {
 		size := d.Cfg.SeqLen * d.Cfg.Dmodel
-		d.bufAttn = make([]T, size)
-		d.bufZ = make([]T, size)
+			d.bufZ = make([]T, size)
 		d.bufF = make([]T, size)
 		d.cacheX = make([]T, size)
 		d.cacheZ1 = make([]T, size)
@@ -361,7 +358,6 @@ func (d *DecoderBlock[T]) UnmarshalJSON(data []byte) error {
 	d.Drop2 = regularizer.NewDropout[T](p)
 
 	size := d.Cfg.SeqLen * d.Cfg.Dmodel
-	d.bufAttn = make([]T, size)
 	d.bufZ = make([]T, size)
 	d.bufF = make([]T, size)
 	d.cacheX = make([]T, size)

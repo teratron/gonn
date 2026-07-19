@@ -29,6 +29,12 @@ func newTrainable[T utils.Float](inSize, hiddenSize, outSize int, withBias bool)
 // activations and the same bias setting on every layer. Used by Phase 5
 // Track A regression tests for two- and three-hidden topologies.
 func newTrainableChain[T utils.Float](inSize int, hiddenSizes []int, outSize int, withBias bool) (*Network[T], error) {
+	return newTrainableChainSampled[T](inSize, hiddenSizes, outSize, withBias, nil)
+}
+
+// newTrainableChainSampled is newTrainableChain with an explicit weight
+// sampler for tests that need deterministic initialisation.
+func newTrainableChainSampled[T utils.Float](inSize int, hiddenSizes []int, outSize int, withBias bool, sampler WeightSampler[T]) (*Network[T], error) {
 	in := layer.NewInput[T](inSize)
 	hiddens := make([]*layer.Dense[T], len(hiddenSizes))
 	for i, sz := range hiddenSizes {
@@ -36,6 +42,9 @@ func newTrainableChain[T utils.Float](inSize int, hiddenSizes []int, outSize int
 	}
 	out := layer.NewOutput[T](outSize, activation.SIGMOID, loss.MSE, withBias)
 	n := New[T]()
+	if sampler != nil {
+		n.SetWeightSampler(sampler)
+	}
 	if err := n.SetLayers(in, hiddens, out); err != nil {
 		return nil, err
 	}

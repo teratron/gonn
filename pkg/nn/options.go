@@ -6,6 +6,7 @@ import (
 
 	"github.com/teratron/gonn/pkg/activation"
 	"github.com/teratron/gonn/pkg/compute"
+	"github.com/teratron/gonn/pkg/dataset"
 	"github.com/teratron/gonn/pkg/layer/attention"
 	"github.com/teratron/gonn/pkg/layer/conv"
 	"github.com/teratron/gonn/pkg/layer/embedding"
@@ -221,6 +222,8 @@ func WithWeightInitSeed[T utils.Float](seed uint64) Option[T] {
 }
 
 // WithLossLimit is the option-form mirror of (*NN[T]).WithLossLimit.
+// A negative threshold disables early stopping entirely (no positive epoch
+// loss can undercut it); exactly zero selects DefaultLossLimit.
 //
 // AI-Meta:
 //   - Purpose: Set the early-stopping loss threshold in the Options API.
@@ -577,6 +580,33 @@ func WithInputShape[T utils.Float](channels, height, width int) Option[T] {
 	}
 }
 
+// WithInputShapeFrom populates the (channels, height, width) input shape from
+// a dataset that knows its own image layout — the explicit bridge promised by
+// the dataset.ImageShaper doc. A nil shaper or an unknown (0,0,0) shape
+// leaves the configuration unchanged, falling back to WithInputShape or the
+// square auto-inference in compile.
+//
+// AI-Meta:
+//   - Purpose: Derive the network input shape from an ImageShaper dataset instead of hard-coding it.
+//   - Usage: nn.New[float32](WithInput[float32](784), WithInputShapeFrom[float32](mnist), ...).
+//   - Concurrency: Safe.
+//   - Related: [WithInputShape], [dataset.ImageShaper].
+//   - Stability: Stable.
+func WithInputShapeFrom[T utils.Float](shaper dataset.ImageShaper) Option[T] {
+	return func(cfg *Config[T]) {
+		if shaper == nil {
+			return
+		}
+		c, h, w := shaper.ImageShape()
+		if c == 0 || h == 0 || w == 0 {
+			return
+		}
+		cfg.InputC = c
+		cfg.InputH = h
+		cfg.InputW = w
+	}
+}
+
 // WithConv2D appends a 2-D convolutional layer to the prefix stack. CHW
 // layout per CONV2D-C9. Input must satisfy InChannels*InH*InW = previous
 // layer's flat output (or the raw input length declared via WithInput +
@@ -689,11 +719,12 @@ func WithBatchNorm[T utils.Float](idx int) Option[T] {
 				return
 			}
 		}
-		// Layer not defined yet or size=0 — register a sentinel to be resolved at compile.
+		// Layer not defined yet or size=0 — register a typed sentinel so
+		// compile resolves it to a BatchNorm of the right size.
 		if cfg.NormLayers == nil {
 			cfg.NormLayers = make(map[int]norm.Normalizer[T])
 		}
-		cfg.NormLayers[idx] = nil // resolved in compile
+		cfg.NormLayers[idx] = (*norm.BatchNorm[T])(nil) // resolved in compile
 	}
 }
 
@@ -718,10 +749,12 @@ func WithLayerNorm[T utils.Float](idx int) Option[T] {
 				return
 			}
 		}
+		// Typed sentinel: the pre-v0.11 untyped nil was resolved to a
+		// BatchNorm at compile even when the user asked for LayerNorm.
 		if cfg.NormLayers == nil {
 			cfg.NormLayers = make(map[int]norm.Normalizer[T])
 		}
-		cfg.NormLayers[idx] = nil
+		cfg.NormLayers[idx] = (*norm.LayerNorm[T])(nil) // resolved in compile
 	}
 }
 

@@ -114,6 +114,12 @@ func compile[T utils.Float](n *NN[T], cfg *Config[T]) error {
 		n.opt = optimizer.DefaultOptimizer(cfg.LearningRate)
 	}
 	n.reg = cfg.Regularizer
+	// Wire honest in-graph dropout: when the regularizer can mask per layer
+	// (Dropout, or a Compose containing one), the dense engine applies the
+	// mask inside the forward pass on training steps (audit B3).
+	if lm, ok := any(cfg.Regularizer).(network.LayerMask[T]); ok {
+		n.Network.SetLayerMasker(lm)
+	}
 	// Auto-bind the scheduler to the resolved optimizer so its Step updates the
 	// optimizer's effective learning rate. Without this the schedule advanced
 	// but the optimizer's rate never changed unless the user manually wrapped it
@@ -123,23 +129,44 @@ func compile[T utils.Float](n *NN[T], cfg *Config[T]) error {
 	n.SetTopologyMode(cfg.TopologyMode)
 
 	// Resolve nil norm-layer entries inserted by WithBatchNorm/WithLayerNorm
-	// when the hidden layer sizes were not yet declared at option-apply time.
+	// when the hidden layer sizes were not yet declared at option-apply time,
+	// then wire the resolved map into the network's propagation hooks
+	// (audit B1: normalization was configured but never applied).
 	if len(cfg.NormLayers) > 0 {
 		resolved := make(map[int]normPkg.Normalizer[T], len(cfg.NormLayers))
+		hooks := make(map[int]network.FeatureNorm[T], len(cfg.NormLayers))
 		for idx, nl := range cfg.NormLayers {
-			if nl != nil {
-				resolved[idx] = nl
-				continue
+			if idx < 0 || idx >= len(cfg.HiddenLayers) {
+				return utils.Newf(utils.ErrUserConfig,
+					"compile: norm layer index %d out of range (hidden chain has %d layers)",
+					idx, len(cfg.HiddenLayers))
 			}
-			// nil sentinel: create a default BatchNorm using the hidden layer size.
-			if idx < len(cfg.HiddenLayers) {
-				size := int(cfg.HiddenLayers[idx].Size)
-				if size > 0 {
-					resolved[idx] = normPkg.NewBatchNorm[T](size)
+			size := int(cfg.HiddenLayers[idx].Size)
+			// Sentinels (untyped nil or typed-nil pointer) come from
+			// WithBatchNorm / WithLayerNorm calls made before the hidden
+			// layer size was known; resolve them to the requested kind here.
+			switch v := nl.(type) {
+			case nil:
+				nl = normPkg.NewBatchNorm[T](size)
+			case *normPkg.BatchNorm[T]:
+				if v == nil {
+					nl = normPkg.NewBatchNorm[T](size)
+				}
+			case *normPkg.LayerNorm[T]:
+				if v == nil {
+					nl = normPkg.NewLayerNorm[T](size)
 				}
 			}
+			if nl.InputSize() != size {
+				return utils.Newf(utils.ErrUserConfig,
+					"compile: norm layer at index %d expects %d features but hidden layer has %d",
+					idx, nl.InputSize(), size)
+			}
+			resolved[idx] = nl
+			hooks[idx] = nl
 		}
 		n.normLayers = resolved
+		n.Network.SetNormLayers(hooks)
 	}
 	n.callbacks = cfg.Callbacks
 
@@ -185,12 +212,10 @@ func startVisServer[T utils.Float](n *NN[T], cfg *Config[T]) error {
 		return nil
 	}
 	vs := visualization.NewVisServer(cfg.VisAddr, cfg.VisToken, cfg.VisCORS)
-	vs.RegisterNetwork(func() visualization.NetworkState {
-		return visualization.NetworkState{
-			TopologyVersion: n.Network.TopologyVersion(),
-			Control:         "idle",
-		}
-	})
+	// The SnapFn serves the last epoch-end snapshot published by Fit and
+	// degrades to a topology-only view before training starts (audit B7:
+	// previously this returned a hardcoded stub regardless of state).
+	vs.RegisterNetwork(n.visSnapshot)
 	if err := vs.Start(); err != nil {
 		return utils.Wrap(utils.ErrIO, err, "compile: visualization server start failed on %q", cfg.VisAddr)
 	}
@@ -494,6 +519,10 @@ func validate[T utils.Float](cfg *Config[T]) error {
 	if !isKnownWeightInit(cfg.WeightInit) {
 		return utils.Newf(utils.ErrUserConfig,
 			"compile: weight-init method %q is not in {xavier, he, random}", string(cfg.WeightInit))
+	}
+	if cfg.CheckpointDir != "" && len(cfg.ConvPrefix) > 0 {
+		return utils.Newf(utils.ErrUserConfig,
+			"compile: WithCheckpoint covers dense topologies only — conv/recurrent prefix layers are not captured by the snapshot schema")
 	}
 	return nil
 }

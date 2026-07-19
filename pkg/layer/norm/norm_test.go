@@ -32,21 +32,19 @@ func TestBatchNormShapePreservation(t *testing.T) {
 	}
 }
 
-func TestBatchNormIdentityAffine(t *testing.T) {
-	// With gamma=1 and beta=0 (default init), output should equal the
-	// normalized values exactly.
+func TestBatchNormFirstForwardNearIdentity(t *testing.T) {
+	// Virgin stats are mean=0, var=1 per feature, and train-mode Forward
+	// normalizes with the PRE-update stats — so the very first forward is
+	// x/sqrt(1+eps) (≈ identity with the default gamma=1, beta=0).
 	bn := NewBatchNorm[float32](4)
 	x := []float32{1, 2, 3, 4}
 	out := bn.Forward(x)
 	if len(out) != 4 {
 		t.Fatalf("unexpected output length %d", len(out))
 	}
-	// Manually compute expected normalized values.
-	mean := float32(2.5)
-	variance := float32(1.25)
-	sd := float32(math.Sqrt(float64(variance + 1e-5)))
+	sd := float32(math.Sqrt(1 + 1e-5))
 	for i, v := range x {
-		want := (v - mean) / sd
+		want := v / sd
 		if !approxEqual(float64(out[i]), float64(want)) {
 			t.Errorf("out[%d]=%v, want %v", i, out[i], want)
 		}
@@ -55,25 +53,29 @@ func TestBatchNormIdentityAffine(t *testing.T) {
 
 func TestBatchNormEMAUpdate(t *testing.T) {
 	bn := NewBatchNorm[float32](4)
-	// runningMean starts at 0, runningVar starts at 1 per NewBatchNorm.
-	if bn.runningMean != 0 {
-		t.Fatalf("initial runningMean want 0, got %v", bn.runningMean)
-	}
-	if bn.runningVar != 1 {
-		t.Fatalf("initial runningVar want 1, got %v", bn.runningVar)
+	// Per-feature stats: runningMean starts at 0, runningVar at 1.
+	for i := range 4 {
+		if bn.runningMean[i] != 0 {
+			t.Fatalf("initial runningMean[%d] want 0, got %v", i, bn.runningMean[i])
+		}
+		if bn.runningVar[i] != 1 {
+			t.Fatalf("initial runningVar[%d] want 1, got %v", i, bn.runningVar[i])
+		}
 	}
 	x := []float32{1, 2, 3, 4}
 	bn.Forward(x)
-	// batchMean=2.5, batchVar=1.25; momentum=0.1
-	// newRunningMean = (1-0.1)*0 + 0.1*2.5 = 0.25
-	wantMean := float32(0.25)
-	// newRunningVar = (1-0.1)*1 + 0.1*1.25 = 1.025
-	wantVar := float32(1.025)
-	if !approxEqual(float64(bn.runningMean), float64(wantMean)) {
-		t.Errorf("runningMean after forward: got %v, want %v", bn.runningMean, wantMean)
-	}
-	if !approxEqual(float64(bn.runningVar), float64(wantVar)) {
-		t.Errorf("runningVar after forward: got %v, want %v", bn.runningVar, wantVar)
+	// momentum=0.1, sample-stream EMA per feature i:
+	//   mean_i = 0.9·0 + 0.1·x_i
+	//   var_i  = 0.9·1 + 0.1·(x_i − 0)²
+	for i, v := range x {
+		wantMean := 0.1 * v
+		wantVar := 0.9 + 0.1*v*v
+		if !approxEqual(float64(bn.runningMean[i]), float64(wantMean)) {
+			t.Errorf("runningMean[%d]: got %v, want %v", i, bn.runningMean[i], wantMean)
+		}
+		if !approxEqual(float64(bn.runningVar[i]), float64(wantVar)) {
+			t.Errorf("runningVar[%d]: got %v, want %v", i, bn.runningVar[i], wantVar)
+		}
 	}
 }
 
@@ -82,17 +84,21 @@ func TestBatchNormEvalFrozenStats(t *testing.T) {
 	x := []float32{1, 2, 3, 4}
 	// First forward in NormTrain — updates running stats.
 	bn.Forward(x)
-	gotMean := bn.runningMean
-	gotVar := bn.runningVar
+	gotMean := make([]float32, 4)
+	gotVar := make([]float32, 4)
+	copy(gotMean, bn.runningMean)
+	copy(gotVar, bn.runningVar)
 
 	// Switch to eval mode; stats must not change.
 	bn.SetMode(NormEval)
 	bn.Forward([]float32{10, 20, 30, 40})
-	if bn.runningMean != gotMean {
-		t.Errorf("runningMean changed in NormEval: before %v, after %v", gotMean, bn.runningMean)
-	}
-	if bn.runningVar != gotVar {
-		t.Errorf("runningVar changed in NormEval: before %v, after %v", gotVar, bn.runningVar)
+	for i := range 4 {
+		if bn.runningMean[i] != gotMean[i] {
+			t.Errorf("runningMean[%d] changed in NormEval: before %v, after %v", i, gotMean[i], bn.runningMean[i])
+		}
+		if bn.runningVar[i] != gotVar[i] {
+			t.Errorf("runningVar[%d] changed in NormEval: before %v, after %v", i, gotVar[i], bn.runningVar[i])
+		}
 	}
 
 	// Verify second eval-mode forward with same input as first gives identical output.
@@ -100,21 +106,122 @@ func TestBatchNormEvalFrozenStats(t *testing.T) {
 	bn2.Forward(x)
 	bn2.SetMode(NormEval)
 	out1 := bn2.Forward(x)
+	got1 := make([]float32, len(out1))
+	copy(got1, out1)
 	out2 := bn2.Forward(x)
-	for i := range out1 {
-		if out1[i] != out2[i] {
-			t.Errorf("eval output not deterministic at index %d: %v vs %v", i, out1[i], out2[i])
+	for i := range got1 {
+		if got1[i] != out2[i] {
+			t.Errorf("eval output not deterministic at index %d: %v vs %v", i, got1[i], out2[i])
 		}
 	}
 }
 
-func TestBatchNormSingleSampleGuard(t *testing.T) {
+func TestBatchNormSingleFeatureWorks(t *testing.T) {
+	// The pre-v0.11 whole-vector implementation degenerated on single-feature
+	// layers; per-feature stats have no such failure mode.
 	bn := NewBatchNorm[float32](1)
 	x := []float32{42}
 	out := bn.Forward(x)
-	// Guard: single-element returns x unchanged.
-	if len(out) != 1 || out[0] != x[0] {
-		t.Errorf("single-sample guard: got %v, want %v", out, x)
+	if len(out) != 1 {
+		t.Fatalf("output length: got %d, want 1", len(out))
+	}
+	want := float32(42) / float32(math.Sqrt(1+1e-5))
+	if !approxEqual(float64(out[0]), float64(want)) {
+		t.Errorf("single-feature forward: got %v, want %v", out[0], want)
+	}
+}
+
+// bnLoss computes L = Σ upstream_i · BatchNorm(x)_i on a FRESH layer so
+// finite differences see a pure function of the perturbed argument.
+func bnLoss(mk func() *BatchNorm[float64], x, upstream []float64) float64 {
+	out := mk().Forward(x)
+	var s float64
+	for i, u := range upstream {
+		s += u * out[i]
+	}
+	return s
+}
+
+// TestBatchNormBackwardFD verifies ∂L/∂x, ∂L/∂γ, ∂L/∂β via central
+// differences. Exact because Forward normalizes with pre-update stats.
+func TestBatchNormBackwardFD(t *testing.T) {
+	const (
+		n   = 5
+		h   = 1e-5
+		tol = 1e-4
+	)
+	x := []float64{0.5, -1.2, 0.3, 2.1, -0.8}
+	upstream := []float64{1.0, -0.5, 0.3, 0.7, -0.2}
+	mk := func() *BatchNorm[float64] {
+		bn := NewBatchNorm[float64](n)
+		for i := range bn.gamma {
+			bn.gamma[i] = float64(i+1) * 0.3
+		}
+		return bn
+	}
+
+	bn := mk()
+	bn.Forward(x)
+	dx := bn.Backward(upstream)
+	dg := make([]float64, n)
+	db := make([]float64, n)
+	copy(dg, bn.gammaGrad)
+	copy(db, bn.betaGrad)
+
+	for i := range x {
+		xp := append([]float64(nil), x...)
+		xm := append([]float64(nil), x...)
+		xp[i] += h
+		xm[i] -= h
+		fd := (bnLoss(mk, xp, upstream) - bnLoss(mk, xm, upstream)) / (2 * h)
+		if err := math.Abs(dx[i] - fd); err > tol {
+			t.Errorf("∂L/∂x[%d]: analytic=%v FD=%v err=%v", i, dx[i], fd, err)
+		}
+	}
+	for i := range x {
+		mkP := func(delta float64, idx int) func() *BatchNorm[float64] {
+			return func() *BatchNorm[float64] {
+				bn := mk()
+				bn.gamma[idx] += delta
+				return bn
+			}
+		}
+		fd := (bnLoss(mkP(h, i), x, upstream) - bnLoss(mkP(-h, i), x, upstream)) / (2 * h)
+		if err := math.Abs(dg[i] - fd); err > tol {
+			t.Errorf("∂L/∂γ[%d]: analytic=%v FD=%v err=%v", i, dg[i], fd, err)
+		}
+	}
+	for i := range x {
+		mkP := func(delta float64, idx int) func() *BatchNorm[float64] {
+			return func() *BatchNorm[float64] {
+				bn := mk()
+				bn.beta[idx] += delta
+				return bn
+			}
+		}
+		fd := (bnLoss(mkP(h, i), x, upstream) - bnLoss(mkP(-h, i), x, upstream)) / (2 * h)
+		if err := math.Abs(db[i] - fd); err > tol {
+			t.Errorf("∂L/∂β[%d]: analytic=%v FD=%v err=%v", i, db[i], fd, err)
+		}
+	}
+}
+
+func TestBatchNormForwardInferencePure(t *testing.T) {
+	bn := NewBatchNorm[float64](3)
+	bn.Forward([]float64{1, 2, 3}) // move stats off the identity
+	meanBefore := append([]float64(nil), bn.runningMean...)
+	x := []float64{5, -2, 0.5}
+	out1 := bn.ForwardInference(x)
+	out2 := bn.ForwardInference(x)
+	for i := range out1 {
+		if out1[i] != out2[i] {
+			t.Errorf("ForwardInference not deterministic at %d", i)
+		}
+	}
+	for i := range meanBefore {
+		if bn.runningMean[i] != meanBefore[i] {
+			t.Errorf("ForwardInference mutated runningMean[%d]", i)
+		}
 	}
 }
 
@@ -144,11 +251,13 @@ func TestBatchNormJSONRoundTrip(t *testing.T) {
 	if bn2.features != bn.features {
 		t.Errorf("features: got %d, want %d", bn2.features, bn.features)
 	}
-	if bn2.runningMean != bn.runningMean {
-		t.Errorf("runningMean: got %v, want %v", bn2.runningMean, bn.runningMean)
-	}
-	if bn2.runningVar != bn.runningVar {
-		t.Errorf("runningVar: got %v, want %v", bn2.runningVar, bn.runningVar)
+	for i := range bn.runningMean {
+		if bn2.runningMean[i] != bn.runningMean[i] {
+			t.Errorf("runningMean[%d]: got %v, want %v", i, bn2.runningMean[i], bn.runningMean[i])
+		}
+		if bn2.runningVar[i] != bn.runningVar[i] {
+			t.Errorf("runningVar[%d]: got %v, want %v", i, bn2.runningVar[i], bn.runningVar[i])
+		}
 	}
 	if NormMode(bn2.mode.Load()) != NormEval {
 		t.Errorf("mode: got %v, want NormEval", bn2.mode.Load())
@@ -306,6 +415,52 @@ func TestGroupNormJSONRoundTrip(t *testing.T) {
 	}
 	if gn2.features != gn.features || gn2.groups != gn.groups {
 		t.Errorf("features/groups mismatch after round-trip")
+	}
+}
+
+// ─── GroupNorm Backward Tests ────────────────────────────────────────────────
+
+// TestGroupNormBackwardFD verifies ∂L/∂x through GroupNorm via central
+// differences: 6 features in 2 groups, non-trivial gamma.
+func TestGroupNormBackwardFD(t *testing.T) {
+	const (
+		n   = 6
+		h   = 1e-5
+		tol = 1e-4
+	)
+	x := []float64{0.5, -1.2, 0.3, 2.1, -0.8, 1.6}
+	upstream := []float64{1.0, -0.5, 0.3, 0.7, -0.2, 0.9}
+	mk := func() *GroupNorm[float64] {
+		gn, err := NewGroupNorm[float64](n, 2)
+		if err != nil {
+			t.Fatalf("NewGroupNorm: %v", err)
+		}
+		for i := range gn.gamma {
+			gn.gamma[i] = float64(i+1) * 0.3
+		}
+		return gn
+	}
+	gnLoss := func(xIn []float64) float64 {
+		out := mk().Forward(xIn)
+		var s float64
+		for i, u := range upstream {
+			s += u * out[i]
+		}
+		return s
+	}
+
+	gn := mk()
+	gn.Forward(x)
+	dx := gn.Backward(upstream)
+	for i := range x {
+		xp := append([]float64(nil), x...)
+		xm := append([]float64(nil), x...)
+		xp[i] += h
+		xm[i] -= h
+		fd := (gnLoss(xp) - gnLoss(xm)) / (2 * h)
+		if err := math.Abs(dx[i] - fd); err > tol {
+			t.Errorf("∂L/∂x[%d]: analytic=%v FD=%v err=%v", i, dx[i], fd, err)
+		}
 	}
 }
 

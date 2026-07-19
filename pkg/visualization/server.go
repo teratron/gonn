@@ -141,9 +141,11 @@ func (vs *VisServer) Start() error {
 	}
 	vs.listener = ln
 	vs.srv = &http.Server{
-		Handler:      authMiddleware(vs.token, corsMiddleware(vs.cors, mux)),
-		ReadTimeout:  5 * time.Second,
-		WriteTimeout: 10 * time.Second,
+		Handler:        authMiddleware(vs.token, corsMiddleware(vs.cors, mux)),
+		ReadTimeout:    5 * time.Second,
+		WriteTimeout:   10 * time.Second,
+		IdleTimeout:    60 * time.Second,
+		MaxHeaderBytes: 1 << 16, // 64 KiB — the API takes no large headers
 	}
 	go func() { _ = vs.srv.Serve(ln) }()
 	return nil

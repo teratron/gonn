@@ -135,3 +135,22 @@ func (p *prefetchDataset[T]) Reset(ctx context.Context) error {
 // Len delegates to the inner dataset; prefetching does not change the
 // epoch length.
 func (p *prefetchDataset[T]) Len() (int, bool) { return p.inner.Len() }
+
+// Close stops the producer goroutine and releases the inner dataset when it
+// implements io.Closer. Idempotent. Callers that abandon a prefetch-wrapped
+// dataset mid-epoch must Close it, otherwise the producer goroutine (and any
+// file descriptor held by the inner source) leaks until process exit
+// (audit B10).
+func (p *prefetchDataset[T]) Close() error {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	if p.cancel != nil {
+		p.cancel()
+		p.cancel = nil
+	}
+	p.wg.Wait()
+	if c, ok := p.inner.(io.Closer); ok {
+		return c.Close()
+	}
+	return nil
+}

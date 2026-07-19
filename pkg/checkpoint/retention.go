@@ -131,7 +131,12 @@ func StartSweeper(ctx context.Context, dir string, cfg SweepConfig, interval tim
 			case <-s.stop:
 				return
 			case <-ticker.C:
-				_, _, _, _ = Sweep(dir, cfg)
+				if _, _, _, sweepErr := Sweep(dir, cfg); sweepErr != nil {
+					// Never abort the sweeper loop — retention is best-effort —
+					// but a silent failure would let the directory grow unbounded
+					// (audit B6: sweeper errors were discarded).
+					utils.Logger.Warn("checkpoint sweep failed", "dir", dir, "err", sweepErr.Error())
+				}
 			}
 		}
 	})

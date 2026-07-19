@@ -36,6 +36,27 @@ type Regularizer[T utils.Float] interface {
 	ApplyMask(activations []T, training bool) []T
 }
 
+// LayerMasker is the optional per-layer masking capability. Implementations
+// (Dropout, Compose-wrapping-Dropout) sample one retain-mask per hidden layer
+// during the forward pass and route each layer's miss vector through the same
+// mask during backprop. The dense engine detects this interface at compile
+// and calls it INSIDE the forward pass — before the next layer consumes the
+// activations — replacing the dishonest post-forward flat mask (audit B3).
+//
+// AI-Meta:
+//   - Purpose: Optional capability interface for honest per-layer activation masking.
+//   - Implementations: [Dropout], [Compose] (delegating).
+//   - Related: [Regularizer], [NewDropout].
+//   - Stability: Stable.
+type LayerMasker[T utils.Float] interface {
+	// MaskForwardLayer samples and applies the mask for hidden layer `layer`
+	// in place. Called only on training passes.
+	MaskForwardLayer(layer int, acts []T) []T
+	// MaskBackwardLayer applies the retain mask sampled by the matching
+	// MaskForwardLayer call to the layer's upstream gradient in place.
+	MaskBackwardLayer(layer int, upstream []T) []T
+}
+
 // Apply is a nil-safe wrapper around Regularizer.ApplyMask and Regularizer.Penalty.
 // When reg is nil it returns activations unchanged and a zero penalty.
 // Callers in the training loop use this to avoid guarding at every call site.
@@ -79,7 +100,7 @@ func AddWeightGrad[T utils.Float](reg Regularizer[T], weights, grads []T) {
 		return
 	}
 	n := min(len(weights), len(grads))
-	for i := 0; i < n; i++ {
+	for i := range n {
 		grads[i] += reg.WeightGrad(weights[i])
 	}
 }

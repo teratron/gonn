@@ -126,6 +126,29 @@ func (l *LayerNorm[T]) Forward(x []T) []T {
 	return applyAffine(l.xHat, l.gamma, l.beta)
 }
 
+// ForwardInference computes the same output as Forward without touching any
+// layer state — no xHat/invSd caches are written, so concurrent inference
+// goroutines can share one instance under a read lock (NORM concurrency
+// contract for the stateless Query path).
+//
+// AI-Meta:
+//   - Purpose: Pure, mutation-free forward for concurrent inference.
+//   - Concurrency: ReadSafe (reads gamma/beta only; both are stable outside training).
+//   - Related: [LayerNorm], [Forward], [Normalizer.ForwardInference].
+//   - Stability: Stable.
+func (l *LayerNorm[T]) ForwardInference(x []T) []T {
+	if len(x) == 0 {
+		return x
+	}
+	mean, variance := batchStats(x)
+	sd := stddev(variance, l.eps)
+	xHat := make([]T, len(x))
+	for i, v := range x {
+		xHat[i] = (v - mean) / sd
+	}
+	return applyAffine(xHat, l.gamma, l.beta)
+}
+
 // SetMode is accepted for Normalizer interface compatibility; LayerNorm's
 // computation is always per-sample regardless of mode.
 //

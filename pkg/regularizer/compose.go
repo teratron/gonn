@@ -54,3 +54,25 @@ func (c *compose[T]) ApplyMask(acts []T, training bool) []T {
 	}
 	return acts
 }
+
+// MaskForwardLayer chains the per-layer forward masks of every member that
+// implements LayerMasker (REG-6). Members without masking pass through.
+func (c *compose[T]) MaskForwardLayer(layer int, acts []T) []T {
+	for _, r := range c.members {
+		if lm, ok := r.(LayerMasker[T]); ok {
+			acts = lm.MaskForwardLayer(layer, acts)
+		}
+	}
+	return acts
+}
+
+// MaskBackwardLayer chains the per-layer backward masks in REVERSE member
+// order (the inverse of MaskForwardLayer's composition).
+func (c *compose[T]) MaskBackwardLayer(layer int, upstream []T) []T {
+	for i := len(c.members) - 1; i >= 0; i-- {
+		if lm, ok := c.members[i].(LayerMasker[T]); ok {
+			upstream = lm.MaskBackwardLayer(layer, upstream)
+		}
+	}
+	return upstream
+}

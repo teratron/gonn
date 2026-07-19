@@ -4,6 +4,115 @@ All notable changes to the GoNN library will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the
 release artifacts dictated by [.magic/run.md](.magic/run.md) Phase Completion / Plan Completion.
 
+## [0.18.0] — 2026-07-19
+
+### Full Restoration — training-math correctness release
+
+A two-pass engineering audit (static review of all packages + 25 live
+simulations with numeric gradient checks) found that the composition layer
+broke what the leaf layers computed correctly: backprop dropped one
+activation-derivative factor per layer crossed, the configured loss never
+reached the gradient, several layer families never received weight updates,
+and half a dozen configured subsystems were silently disconnected. This
+release fixes all of it behind a numeric safety net.
+
+**BREAKING (numerics):** every network trains along the mathematically
+correct gradient now. Models trained with earlier versions will converge
+differently (typically better); retraining is recommended. Checkpoints and
+weight files from ≤0.17 load, but `BatchNorm` running statistics from old
+JSON payloads are reset to identity (the scalar-stat schema was replaced by
+per-feature slices).
+
+#### Fixed — core training math (audit block A)
+
+- **Chain rule restored in `Network.CalculateMisses`** — the miss propagated
+  from layer *i+1* (or Output) into layer *i* now folds the SOURCE layer's
+  σ′(preact). The historical omission corrupted every multi-hidden gradient;
+  a central-difference oracle over 5 topologies × 8 activations
+  (`internal/verification/`) now gates the training path (worst rel. err < 1e-4).
+- **`tanhDerivative`** returns `1 − tanh²(z)` (was a broken post-activation
+  formula), **SELU** derivative alpha typo fixed.
+- **All 18 loss functions have true derivatives** (`loss.Derivative`,
+  `loss.VectorLoss`, `loss.Aggregate`); the output residual is
+  `−∂ℓ/∂y` for the CONFIGURED loss (previously every loss trained as MSE).
+  `cceLossSingle` no longer returns a constant 0. `MSE` uses the ½ convention
+  so the (t − y) residual remains its exact derivative.
+- **True vector softmax** at the output (`activation.SoftmaxInto`, stable),
+  fused (SIGMOID, BCE) and (SOFTMAX, CCE) gradient shortcuts; SOFTMAX with a
+  non-cross-entropy loss and SOFTMAX on hidden layers are compile errors.
+
+#### Fixed — frozen layers & embeddings (audit block C)
+
+- `Conv2D`, `SimpleRNN`, `LSTM`, `GRU`, and learnable `PositionalEncoding`
+  now train: the hand-maintained type switch in the prefix backward pass was
+  replaced by an `ApplyGradSGD(lr)` capability interface.
+- `TokenEmbedding` lazy-initialises its buffers (compile-time panic fixed);
+  `PositionalEncoding` gradient accumulator resets after each apply.
+
+#### Fixed — lifecycle, concurrency, robustness (audit block D)
+
+- **`Query` is race-free**: dense inference runs a stateless forward
+  (`Network.InferDense`) under an `RWMutex` read lock — verified with a
+  16-goroutine storm under `-race`.
+- `Stop` no longer sterilises the network (a stopped network can Fit again);
+  `AndTrain` applies and restores its learning-rate override; topology
+  mutations preserve surviving weights and reset optimizer moments (no more
+  Adam panic); NaN/Inf inputs are rejected; `ApplyFlatWeights` errors on
+  length mismatch; callbacks abort training on ANY error as documented.
+
+#### Added — subsystem wiring (audit block B)
+
+- **Normalization in the dense path**: `BatchNorm` / `LayerNorm` /
+  `GroupNorm` participate in forward, backward (exact gradients, oracle-
+  checked), and γ/β training. `BatchNorm` was reworked to per-feature
+  running statistics with sample-stream EMA semantics; `ForwardInference`
+  provides a mutation-free path for concurrent Query.
+- **Honest Dropout**: the mask now gates activations INSIDE the forward pass
+  (per layer, before the next layer consumes them) and routes the backward
+  miss through the same mask. Inference never masks.
+- **L1/L2 reach the gradient** (`Regularizer.WeightGrad`); **LR schedulers
+  auto-bind** to the optimizer at compile.
+- **`nn.Save` / `nn.Load`** — public persistence API (config + weights,
+  hash-linked); the CLI and `examples/persistence` now use it.
+- **Checkpointing wired into `Fit`** via `WithCheckpoint(dir, everyN, sweep)`
+  and `nn.Resume(dir)` (weights + optimizer state, retention sweep, sweeper
+  errors logged).
+- **`FitDataset(ctx, ds)`** — managed training over streaming
+  `dataset.Dataset` sources with context cancellation; `Prefetch` and CSV
+  datasets implement `io.Closer`; `WithInputShapeFrom(ImageShaper)`.
+- **Visualization server is real**: `/v1/snapshot` serves live loss/epoch/
+  layer/activation state published by Fit; `NN.VisAddr()` exposes the bound
+  address.
+- **Dense-head quantization**: `quantization.Quantize` now covers the MLP
+  head (per-layer activations included) in addition to the conv prefix;
+  `baselineHash` digests the actual weights (previously hashed `{}`).
+
+#### Security & hardening (audit block E)
+
+- Constant-time bearer-token comparison in the visualization server;
+  HTTP timeouts (`IdleTimeout`, `MaxHeaderBytes`) on the vis server;
+  pprof on a DEDICATED mux (no more `DefaultServeMux` leakage) with graceful
+  shutdown via `NN.Close` and a Warn on non-loopback binds; gzip-bomb limit
+  in the checkpoint reader; IDX record-length overflow cap in the MNIST loader.
+
+#### Changed
+
+- `applyDefaults` substitutes only exactly-zero values: a negative
+  `WithLearningRate` is now a compile error (was silently 0.3); a negative
+  `WithLossLimit` documented as "never stop early".
+- `Pause` parks the training goroutine on a `sync.Cond` (zero CPU) instead
+  of a `runtime.Gosched` busy-wait.
+- Dead code removed: `topologyTx` snapshot machinery, transformer `bufAttn`
+  buffers, `PositionalEncoding.lastIn`, the attention backward placeholder
+  double-pass, empty `pkg/nn/api/`.
+
+#### Added — regression infrastructure
+
+- `internal/verification/` — the numeric safety net: gradient-check oracle
+  (central differences vs `AppendFlatGradients`), convergence goldens,
+  lifecycle/concurrency/wiring scenario tests. `.github/workflows/ci.yml`
+  runs vet + full suite with `-race`.
+
 ## [0.17.0] — 2026-05-21
 
 ### Post-Training Quantization (PTQ)
@@ -1057,21 +1166,6 @@ Promotes three specs to Stable.
 
 ### Changed
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 - Updated task plan and task index (main)
 - Completed task `phase-11` (main)
 - Updated 2 specifications (main)
@@ -1089,4 +1183,3 @@ Promotes three specs to Stable.
 - Added specification `quantization-impl` (main)
 - Updated implementation plan (main)
 - Completed task `phase-19` (main)
-

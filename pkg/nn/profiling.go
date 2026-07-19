@@ -1,30 +1,31 @@
 // Package nn — pprof opt-in hook.
 //
-// Implements [l2-perf-impl] §5.4 (PERF-5). Importing net/http/pprof for
-// its side effects registers /debug/pprof/* handlers on
-// http.DefaultServeMux. WithProfiling stores the listen address;
-// startProfilingServer is called from compile() at the end of a
-// successful build.
+// Implements [l2-perf-impl] §5.4 (PERF-5). WithProfiling stores the listen
+// address; startProfilingServer is called from compile() at the end of a
+// successful build. The handlers are registered on a dedicated mux — NOT
+// http.DefaultServeMux — so enabling GoNN profiling never exposes whatever
+// else the host process may have registered globally (audit E). Server
+// handles are retained so NN.Close can shut the listener down gracefully.
 package nn
 
 import (
+	"context"
 	"net"
 	"net/http"
-	_ "net/http/pprof" // pprof handler registration side effect
+	"net/http/pprof"
 	"sync"
 	"time"
 
 	"github.com/teratron/gonn/pkg/utils"
 )
 
-// profilingOnce guarantees a single listener per address across the
-// process — repeated New / Compile calls with the same addr never spawn
-// duplicate goroutines or hit "address in use" errors. The same mutex
-// also protects the listenAndServe function pointer so tests can swap
-// in a stub without racing the worker goroutines.
+// profilingMu guards the servers map and the listen hook so tests can swap
+// in a stub without racing the worker goroutines. One server is kept per
+// address across the process — repeated New / Compile calls with the same
+// addr never spawn duplicate goroutines or hit "address in use" errors.
 var (
 	profilingMu      sync.Mutex
-	profilingStarted = make(map[string]bool)
+	profilingServers = make(map[string]*http.Server)
 	listenAndServeFn = defaultListenAndServe
 )
 
@@ -47,20 +48,26 @@ func isLoopbackAddr(addr string) bool {
 	return false
 }
 
+// pprofMux builds a fresh mux carrying only the /debug/pprof handlers.
+func pprofMux() *http.ServeMux {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/debug/pprof/", pprof.Index)
+	mux.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)
+	mux.HandleFunc("/debug/pprof/profile", pprof.Profile)
+	mux.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
+	mux.HandleFunc("/debug/pprof/trace", pprof.Trace)
+	return mux
+}
+
 // defaultListenAndServe is production's bind. Tests swap a stub via
 // setListenAndServe.
-func defaultListenAndServe(addr string, handler http.Handler) error {
-	srv := &http.Server{
-		Addr:              addr,
-		Handler:           handler,
-		ReadHeaderTimeout: 5 * time.Second,
-	}
+func defaultListenAndServe(srv *http.Server) error {
 	return srv.ListenAndServe()
 }
 
 // setListenAndServe replaces the bind hook under the same mutex that
 // guards reads. Returns the previous hook so tests can restore it.
-func setListenAndServe(fn func(string, http.Handler) error) func(string, http.Handler) error {
+func setListenAndServe(fn func(*http.Server) error) func(*http.Server) error {
 	profilingMu.Lock()
 	defer profilingMu.Unlock()
 	prev := listenAndServeFn
@@ -70,7 +77,7 @@ func setListenAndServe(fn func(string, http.Handler) error) func(string, http.Ha
 
 // getListenAndServe loads the current hook under the mutex so the
 // goroutine's read happens-before any concurrent setListenAndServe.
-func getListenAndServe() func(string, http.Handler) error {
+func getListenAndServe() func(*http.Server) error {
 	profilingMu.Lock()
 	defer profilingMu.Unlock()
 	return listenAndServeFn
@@ -92,17 +99,43 @@ func startProfilingServer(addr string) {
 			"exposes /debug/pprof to the network; prefer 127.0.0.1", "addr", addr)
 	}
 	profilingMu.Lock()
-	if profilingStarted[addr] {
+	if _, running := profilingServers[addr]; running {
 		profilingMu.Unlock()
 		return
 	}
-	profilingStarted[addr] = true
+	srv := &http.Server{
+		Addr:              addr,
+		Handler:           pprofMux(),
+		ReadHeaderTimeout: 5 * time.Second,
+	}
+	profilingServers[addr] = srv
 	profilingMu.Unlock()
 
 	go func() {
 		fn := getListenAndServe()
-		if err := fn(addr, nil); err != nil {
+		if err := fn(srv); err != nil && err != http.ErrServerClosed {
 			utils.Logger.Warn("pprof listener exited", "addr", addr, "err", err.Error())
 		}
 	}()
+}
+
+// stopProfilingServer gracefully shuts down the pprof listener bound to addr
+// (no-op for "" or an address never started). The map entry is removed so a
+// later Compile with the same addr can restart it. Called by NN.Close; note
+// that NN instances sharing one profiling address share one listener, so the
+// first Close wins — pprof is process-level observability, not per-network.
+func stopProfilingServer(ctx context.Context, addr string) error {
+	if addr == "" {
+		return nil
+	}
+	profilingMu.Lock()
+	srv, ok := profilingServers[addr]
+	if ok {
+		delete(profilingServers, addr)
+	}
+	profilingMu.Unlock()
+	if !ok {
+		return nil
+	}
+	return srv.Shutdown(ctx)
 }

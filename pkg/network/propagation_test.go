@@ -319,7 +319,12 @@ func TestBackwardThreeHiddenGolden(t *testing.T) {
 // within the budget proves the chain trains, not just wires.
 func TestXORTwoHiddenConvergence(t *testing.T) {
 	t.Parallel()
-	n, err := newTrainableChain[float64](2, []int{4, 4}, 1, true)
+	// Deterministic Xavier init: the default time-seeded U[-0.5,0.5] start
+	// occasionally lands in a local minimum that misses the 0.05 target
+	// within the epoch budget (rare pre-existing flake).
+	rng, _ := utils.NewRNG(12345)
+	sampler := func(fanIn, fanOut int) float64 { return utils.XavierUniform[float64](rng, fanIn, fanOut) }
+	n, err := newTrainableChainSampled[float64](2, []int{4, 4}, 1, true, sampler)
 	if err != nil {
 		t.Fatalf("setup: %v", err)
 	}

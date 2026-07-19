@@ -43,17 +43,27 @@ func (q *QuantizedNetwork[T]) Forward(x []T) []T {
 	return cur
 }
 
-// Quantize transforms the ConvPrefix layers of net into a QuantizedNetwork.
-// The source network is NOT mutated (GC-3). calibSamples may be nil for
-// WeightOnly mode — activation calibration is skipped in that case.
+// Quantize transforms the ConvPrefix layers AND the dense MLP head of net
+// into a QuantizedNetwork whose Forward reproduces the full float inference
+// path (activations included). The source network is NOT mutated (GC-3).
+// calibSamples may be nil for WeightOnly mode — activation calibration is
+// skipped in that case.
+//
+// Networks with normalization layers are rejected: the quantized chain has
+// no norm stage, so quantizing would silently change the model function.
 //
 // AI-Meta:
 //   - Purpose: Top-level PTQ entry point; produces a QuantizedNetwork from a trained NN[T].
-//   - Errors: ErrUserConfig for unsupported configurations.
+//   - Errors: ErrUserConfig for unsupported configurations (norm layers).
 //   - Stability: Experimental.
 func Quantize[T utils.Float](net *nn.NN[T], calibSamples [][]T, cfg QuantizationConfig[T]) (*QuantizedNetwork[T], error) {
-	prefix := net.Config().ConvPrefix
-	layers := make([]quantizedLayer[T], 0, len(prefix))
+	netCfg := net.Config()
+	if len(netCfg.NormLayers) > 0 {
+		return nil, utils.Newf(utils.ErrUserConfig,
+			"quantize: networks with normalization layers are not supported — the quantized chain would drop the norm stage")
+	}
+	prefix := netCfg.ConvPrefix
+	layers := make([]quantizedLayer[T], 0, len(prefix)+len(netCfg.HiddenLayers)+1)
 
 	for _, cl := range prefix {
 		var ql quantizedLayer[T]
@@ -71,6 +81,11 @@ func Quantize[T utils.Float](net *nn.NN[T], calibSamples [][]T, cfg Quantization
 		layers = append(layers, ql)
 	}
 
+	// Dense head: one QuantizedDense per hidden layer plus the output layer,
+	// each carrying its activation so the chain reproduces the float forward
+	// (audit B9: QuantizedDense existed but MLPs were never quantized).
+	layers = append(layers, quantizeDenseHead(net, cfg)...)
+
 	hash, err := baselineHash(net)
 	if err != nil {
 		return nil, fmt.Errorf("quantize: baseline hash: %w", err)
@@ -87,6 +102,60 @@ func Quantize[T utils.Float](net *nn.NN[T], calibSamples [][]T, cfg Quantization
 		BaselineHash:    hash,
 		CalibProvenance: prov,
 	}, nil
+}
+
+// quantizeDenseHead extracts every dense layer's weight matrix (bias axons
+// split into the float Bias slice) and returns the quantized layer chain
+// with per-layer activations attached.
+func quantizeDenseHead[T utils.Float](net *nn.NN[T], cfg QuantizationConfig[T]) []quantizedLayer[T] {
+	netCfg := net.Config()
+	out := make([]quantizedLayer[T], 0, len(netCfg.HiddenLayers)+1)
+	prev := net.Network.Input.Len()
+
+	for i := range net.Network.Hiddens {
+		cells := net.Network.Hiddens[i].Cells()
+		hasBias := i < len(netCfg.HiddenLayers) && netCfg.HiddenLayers[i].Bias
+		w, b := extractDenseMatrix(len(cells), prev, hasBias, func(ci, ai int) float64 {
+			return float64(cells[ci].Axons[ai].Weight)
+		})
+		qd := newQuantizedDense[T](w, b, len(cells), prev, cfg)
+		if i < len(netCfg.HiddenLayers) {
+			qd.Act = netCfg.HiddenLayers[i].Activation
+			qd.ApplyAct = true
+		}
+		out = append(out, qd)
+		prev = len(cells)
+	}
+
+	outCells := net.Network.Output.Cells()
+	w, b := extractDenseMatrix(len(outCells), prev, netCfg.OutputBias, func(ci, ai int) float64 {
+		return float64(outCells[ci].Axons[ai].Weight)
+	})
+	qd := newQuantizedDense[T](w, b, len(outCells), prev, cfg)
+	qd.Act = netCfg.OutputActivation
+	qd.ApplyAct = true
+	out = append(out, qd)
+	return out
+}
+
+// extractDenseMatrix reads a layer's axon weights into a row-major Cout×Cin
+// matrix. The bias axon is the LAST axon of each cell when hasBias is true
+// (Build's wiring order) and lands in the returned bias slice.
+func extractDenseMatrix(cout, cin int, hasBias bool, weightAt func(cellIdx, axonIdx int) float64) ([]float64, []float64) {
+	w := make([]float64, cout*cin)
+	var b []float64
+	if hasBias {
+		b = make([]float64, cout)
+	}
+	for c := range cout {
+		for k := range cin {
+			w[c*cin+k] = weightAt(c, k)
+		}
+		if hasBias {
+			b[c] = weightAt(c, cin)
+		}
+	}
+	return w, b
 }
 
 // Load deserialises a .qnn.json file from disk.
@@ -150,8 +219,28 @@ type floatPassthrough[T utils.Float] struct {
 
 func (f *floatPassthrough[T]) Forward(x []T) []T { return f.inner.Forward(x) }
 
+// baselineHash digests the network's actual trained state: topology sizes
+// plus the flat weight vector. The previous implementation hashed
+// json.Marshal(net), which serialised the cell bundles as "{}" — two
+// networks with identical shape but different weights collided (audit B9).
 func baselineHash[T utils.Float](net *nn.NN[T]) (string, error) {
-	data, err := json.Marshal(net)
+	cfg := net.Config()
+	hidden := make([]uint, len(cfg.HiddenLayers))
+	for i, h := range cfg.HiddenLayers {
+		hidden[i] = h.Size
+	}
+	payload := struct {
+		Hidden     []uint    `json:"hidden"`
+		Weights    []float64 `json:"weights"`
+		InputSize  uint      `json:"input_size"`
+		OutputSize uint      `json:"output_size"`
+	}{
+		Hidden:     hidden,
+		Weights:    toFloat64Slice(net.FlatWeights()),
+		InputSize:  cfg.InputSize,
+		OutputSize: cfg.OutputSize,
+	}
+	data, err := json.Marshal(payload)
 	if err != nil {
 		return "", err
 	}

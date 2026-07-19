@@ -1,8 +1,6 @@
 package nn
 
 import (
-	"runtime"
-
 	"github.com/teratron/gonn/pkg/utils"
 )
 
@@ -47,6 +45,7 @@ func (n *NN[T]) Pause() error {
 //   - Stability: Stable.
 func (n *NN[T]) Resume() error {
 	if n.control.CompareAndSwap(controlPaused, controlRunning) {
+		n.wakePaused()
 		utils.Logger.Debug("Resume signalled")
 		return nil
 	}
@@ -74,10 +73,26 @@ func (n *NN[T]) Stop() error {
 			return nil
 		}
 		if n.control.CompareAndSwap(cur, controlStopped) {
+			// A worker parked in awaitSafePoint's paused wait must observe
+			// the transition immediately.
+			n.wakePaused()
 			utils.Logger.Debug("Stop signalled", "from", cur)
 			return nil
 		}
 	}
+}
+
+// wakePaused broadcasts the pause condition under its mutex so a worker
+// blocked in awaitSafePoint re-checks the control state. Broadcasting under
+// pauseMu (not just after the CAS) closes the missed-wakeup window: the
+// worker only Waits while holding pauseMu and after re-checking the state.
+func (n *NN[T]) wakePaused() {
+	if n.pauseCond == nil {
+		return
+	}
+	n.pauseMu.Lock()
+	n.pauseCond.Broadcast()
+	n.pauseMu.Unlock()
 }
 
 // transitionToRunning is the worker-side counterpart to Pause/Resume —
@@ -106,10 +121,9 @@ func (n *NN[T]) transitionToIdle() {
 //   - (_, err)     — never returned in v0.5; reserved for future
 //     timeout-based safe-points.
 //
-// While the state is Paused the goroutine yields via runtime.Gosched
-// in a short busy-wait. The cost is acceptable because pauses are
-// expected to be rare and short; a sync.Cond would add complexity for
-// no visible gain on the typical training workload.
+// While the state is Paused the worker parks on pauseCond — zero CPU until
+// Resume or Stop broadcasts (audit F: the historical runtime.Gosched loop
+// burned a full core for the duration of every pause).
 func (n *NN[T]) awaitSafePoint() (bool, error) {
 	for {
 		switch n.control.Load() {
@@ -118,7 +132,16 @@ func (n *NN[T]) awaitSafePoint() (bool, error) {
 		case controlStopped:
 			return true, nil
 		case controlPaused:
-			runtime.Gosched()
+			if n.pauseCond == nil {
+				// Zero-value NN outside the builder path — nothing can ever
+				// broadcast, so do not park; treat as still running.
+				return false, nil
+			}
+			n.pauseMu.Lock()
+			for n.control.Load() == controlPaused {
+				n.pauseCond.Wait()
+			}
+			n.pauseMu.Unlock()
 			continue
 		case controlIdle:
 			// Worker entered the loop without transitionToRunning —

@@ -11,6 +11,7 @@ import (
 	"github.com/teratron/gonn/pkg/layer/norm"
 	"github.com/teratron/gonn/pkg/network"
 	"github.com/teratron/gonn/pkg/optimizer"
+	"github.com/teratron/gonn/pkg/persistence"
 	"github.com/teratron/gonn/pkg/regularizer"
 	"github.com/teratron/gonn/pkg/utils"
 	"github.com/teratron/gonn/pkg/visualization"
@@ -49,14 +50,26 @@ type NN[T utils.Float] struct {
 	weightBuf          []T
 	network.Network[T] `json:"network" xml:"network"`
 	cfg                Config[T]
-	rawInputSize       uint
-	control            atomic.Int32
-	stateField         state
+	// persistDoc caches the on-disk config document (set by Load, or lazily
+	// by Save) so re-saving emits byte-identical canonical config bytes and
+	// the weights-doc hash chain stays intact.
+	persistDoc   *persistence.ConfigDoc[T]
+	rawInputSize uint
+	control      atomic.Int32
+	// visState holds the last epoch-end snapshot published for the optional
+	// visualization server. Written by Fit, read lock-free by HTTP handlers.
+	visState   atomic.Pointer[visualization.NetworkState]
+	stateField state
 	// mu serialises weight-mutating operations (Train/Fit/AndTrain, topology
 	// changes, SetTrain/SetEval) against read-only Query/Verify. Training takes
 	// the write lock; concurrent Query calls share the read lock and run a
 	// stateless forward, so parallel inference is race-free (audit D1).
 	mu sync.RWMutex
+	// pauseMu/pauseCond park the Fit worker while control == controlPaused so
+	// a pause costs zero CPU (the historical runtime.Gosched busy-wait burned
+	// a core for the whole pause). Resume/Stop broadcast under pauseMu.
+	pauseMu   sync.Mutex
+	pauseCond *sync.Cond
 }
 
 // NewBuilder is the entry point for the Builder API. Returns an *NN[T] in
@@ -82,6 +95,7 @@ func NewBuilder[T utils.Float]() *NN[T] {
 		Network:    network.New[T](),
 		stateField: stateConfiguring,
 	}
+	n.pauseCond = sync.NewCond(&n.pauseMu)
 	utils.Logger.Debug("NN builder initialised", "state", n.stateField.String())
 	return n
 }
@@ -183,22 +197,44 @@ func (n *NN[T]) SetEval() {
 	}
 }
 
-// Close stops the optional visualization HTTP server and releases its port.
-// Safe to call on networks without a visualization server (no-op). Returns
-// the first error encountered during shutdown; the shutdown timeout is 5 s.
+// Close stops the optional visualization and pprof HTTP servers and releases
+// their ports. Safe to call on networks without either server (no-op).
+// Returns the first error encountered during shutdown; the shutdown timeout
+// is 5 s. Note that NN instances sharing one profiling address share one
+// pprof listener — the first Close shuts it down for all of them.
 //
 // AI-Meta:
-//   - Purpose: Release resources held by the optional visualization server.
+//   - Purpose: Release resources held by the optional visualization and pprof servers.
 //   - Concurrency: Safe; can be called from any goroutine after Compile.
-//   - Related: [WithVisualizationEndpoint], [visualization.VisServer].
+//   - Related: [WithVisualizationEndpoint], [WithProfiling], [visualization.VisServer].
 //   - Stability: Stable.
 func (n *NN[T]) Close() error {
-	if n.vis == nil {
-		return nil
-	}
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	return n.vis.Stop(ctx)
+	var firstErr error
+	if n.vis != nil {
+		firstErr = n.vis.Stop(ctx)
+	}
+	if err := stopProfilingServer(ctx, n.cfg.ProfilingAddr); err != nil && firstErr == nil {
+		firstErr = err
+	}
+	return firstErr
+}
+
+// VisAddr returns the actual bound address of the optional visualization
+// server ("" when WithVisualizationEndpoint was not configured). Useful for
+// ":0" listeners where the OS picks the port.
+//
+// AI-Meta:
+//   - Purpose: Expose the visualization server's bound address for clients and tests.
+//   - Concurrency: ReadSafe; the server is bound once during Compile.
+//   - Related: [WithVisualizationEndpoint], [visualization.VisServer.Addr].
+//   - Stability: Stable.
+func (n *NN[T]) VisAddr() string {
+	if n.vis == nil {
+		return ""
+	}
+	return n.vis.Addr()
 }
 
 // TopologyVersion returns the monotonic counter incremented by every successful

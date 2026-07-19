@@ -11,6 +11,7 @@ import (
 	"log/slog"
 
 	"github.com/teratron/gonn/pkg/activation"
+	"github.com/teratron/gonn/pkg/checkpoint"
 	"github.com/teratron/gonn/pkg/compute"
 	"github.com/teratron/gonn/pkg/layer/conv"
 	"github.com/teratron/gonn/pkg/layer/norm"
@@ -163,6 +164,9 @@ type Config[T utils.Float] struct {
 	WeightInit       WeightInitMethod
 	VisAddr          string
 	ProfilingAddr    string
+	CheckpointDir    string
+	CheckpointEvery  uint
+	CheckpointSweep  checkpoint.SweepConfig
 	ConvPrefix       []conv.Layer[T]
 	HiddenLayers     []HiddenLayerSpec[T]
 	InputW           int
@@ -180,18 +184,22 @@ type Config[T utils.Float] struct {
 	OutputBias       bool
 }
 
-// applyDefaults fills any zero-valued fields with the Defaults constants.
-// Called by compile() exactly once, immediately before validation, so
-// downstream code can rely on every field being normalised.
+// applyDefaults fills EXACTLY-ZERO fields with the Defaults constants.
+// Called by compile() exactly once, immediately before validation.
+//
+// Substitution is deliberately `== 0`, not `<= 0` (audit F1): a negative
+// LearningRate previously became the 0.3 default silently — now it reaches
+// validate and errors. A negative LossLimit is preserved as the documented
+// "never stop early" sentinel (no positive loss can undercut it).
 //
 // Note: LossType has zero value loss.MSE (the iota-zero entry in the
 // dispatcher), so an unset LossType already defaults to MSE without
 // special handling — that is the intended spec behaviour.
 func (c *Config[T]) applyDefaults() {
-	if c.LearningRate <= 0 {
+	if c.LearningRate == 0 {
 		c.LearningRate = T(DefaultLearningRate)
 	}
-	if c.LossLimit <= 0 {
+	if c.LossLimit == 0 {
 		c.LossLimit = T(DefaultLossLimit)
 	}
 	if c.MaxIterations == 0 {

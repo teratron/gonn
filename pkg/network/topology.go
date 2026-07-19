@@ -25,49 +25,6 @@ const (
 	Dynamic
 )
 
-// topologyTx is a shallow snapshot of topology-owned slices taken before a
-// mutation begins. Rollback restores all slices to their pre-mutation values;
-// Commit increments the topology version counter.
-type topologyTx[T utils.Float] struct {
-	n             *Network[T]
-	hiddens       []bundle[T, *cell.Hidden[T]]
-	hiddenBiases  []*cell.Bias[T]
-	hiddenActs    []activation.Type
-	preactHiddens [][]T
-}
-
-// beginTx snapshots the current topology state and returns a transaction handle.
-func (n *Network[T]) beginTx() topologyTx[T] {
-	hCopy := make([]bundle[T, *cell.Hidden[T]], len(n.Hiddens))
-	copy(hCopy, n.Hiddens)
-	bCopy := make([]*cell.Bias[T], len(n.hiddenBiases))
-	copy(bCopy, n.hiddenBiases)
-	aCopy := make([]activation.Type, len(n.hiddenActs))
-	copy(aCopy, n.hiddenActs)
-	pCopy := make([][]T, len(n.preactHiddens))
-	copy(pCopy, n.preactHiddens)
-	return topologyTx[T]{
-		n:             n,
-		hiddens:       hCopy,
-		hiddenBiases:  bCopy,
-		hiddenActs:    aCopy,
-		preactHiddens: pCopy,
-	}
-}
-
-// Commit increments the topology version after a successful mutation.
-func (tx *topologyTx[T]) Commit() {
-	tx.n.topologyVersion.Add(1)
-}
-
-// Rollback restores all topology slices to their pre-mutation values.
-func (tx *topologyTx[T]) Rollback() {
-	tx.n.Hiddens = tx.hiddens
-	tx.n.hiddenBiases = tx.hiddenBiases
-	tx.n.hiddenActs = tx.hiddenActs
-	tx.n.preactHiddens = tx.preactHiddens
-}
-
 // SetTopologyMode sets the topology mode at compile time. Called by nn.compile
 // after Build completes so the network begins life in the configured mode.
 //
@@ -125,8 +82,6 @@ func (n *Network[T]) AddNeuron(layerIdx, count uint) error {
 	if count == 0 {
 		return utils.Newf(utils.ErrEmptyLayer, "AddNeuron: count must be > 0")
 	}
-	tx := n.beginTx()
-
 	oldCells := n.Hiddens[layerIdx].cells
 	newCells := make([]*cell.Hidden[T], len(oldCells)+int(count))
 	copy(newCells, oldCells)
@@ -142,7 +97,7 @@ func (n *Network[T]) AddNeuron(layerIdx, count uint) error {
 	} else {
 		n.rebalanceOutput()
 	}
-	tx.Commit()
+	n.topologyVersion.Add(1)
 	return nil
 }
 
@@ -178,8 +133,6 @@ func (n *Network[T]) RemoveNeuron(layerIdx, count uint) error {
 			"RemoveNeuron: removing %d from layer %d (size %d) would leave it empty",
 			count, layerIdx, cur)
 	}
-	tx := n.beginTx()
-
 	n.Hiddens[layerIdx].cells = n.Hiddens[layerIdx].cells[:cur-int(count)]
 	n.preactHiddens[layerIdx] = make([]T, len(n.Hiddens[layerIdx].cells))
 
@@ -189,7 +142,7 @@ func (n *Network[T]) RemoveNeuron(layerIdx, count uint) error {
 	} else {
 		n.rebalanceOutput()
 	}
-	tx.Commit()
+	n.topologyVersion.Add(1)
 	return nil
 }
 
@@ -217,8 +170,6 @@ func (n *Network[T]) AddHiddenLayer(position, size uint, act activation.Type, bi
 	if size == 0 {
 		return utils.Newf(utils.ErrEmptyLayer, "AddHiddenLayer: size must be > 0")
 	}
-	tx := n.beginTx()
-
 	// Build new cells for the inserted layer.
 	newCells := make([]*cell.Hidden[T], int(size))
 	for i := range newCells {
@@ -247,7 +198,7 @@ func (n *Network[T]) AddHiddenLayer(position, size uint, act activation.Type, bi
 	} else {
 		n.rebalanceOutput()
 	}
-	tx.Commit()
+	n.topologyVersion.Add(1)
 	return nil
 }
 
@@ -275,8 +226,6 @@ func (n *Network[T]) RemoveHiddenLayer(position uint) error {
 		return utils.Newf(utils.ErrInvalidPosition,
 			"RemoveHiddenLayer: position %d out of range [0, %d)", position, len(n.Hiddens))
 	}
-	tx := n.beginTx()
-
 	pos := int(position)
 	n.Hiddens = append(n.Hiddens[:pos], n.Hiddens[pos+1:]...)
 	n.hiddenBiases = append(n.hiddenBiases[:pos], n.hiddenBiases[pos+1:]...)
@@ -290,7 +239,7 @@ func (n *Network[T]) RemoveHiddenLayer(position uint) error {
 		// Removed last hidden layer; rebalance Output from new last hidden.
 		n.rebalanceOutput()
 	}
-	tx.Commit()
+	n.topologyVersion.Add(1)
 	return nil
 }
 

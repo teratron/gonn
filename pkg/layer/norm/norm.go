@@ -46,13 +46,26 @@ const (
 //   - Related: [BatchNorm], [LayerNorm], [GroupNorm], [NormMode].
 //   - Stability: Stable.
 type Normalizer[T utils.Float] interface {
-	// Forward applies normalization to x and returns a new slice of the same length.
+	// Forward applies normalization to x and returns a new slice of the same
+	// length, caching whatever state Backward needs.
 	Forward(x []T) []T
+	// Backward converts the upstream gradient ∂L/∂y into ∂L/∂x, accumulating
+	// ∂L/∂γ and ∂L/∂β into the GradSlots buffers. Must follow a Forward on
+	// the same input (reads the cached normalization state).
+	Backward(upstream []T) []T
+	// ForwardInference is the pure inference path: it computes the same
+	// output as an eval-mode Forward but never mutates layer state (no
+	// running-stat updates, no caches), so concurrent Query goroutines can
+	// share one instance under a read lock.
+	ForwardInference(x []T) []T
 	// SetMode switches between NormTrain and NormEval. Safe to call concurrently.
 	SetMode(m NormMode)
 	// GradSlots returns the gradient-accumulation slices for gamma and beta.
 	// Returns (nil, nil) when affine is disabled (identity path).
 	GradSlots() (gamma, beta []T)
+	// ApplyGradSGD applies the accumulated γ/β gradients in-place
+	// (w -= lr·grad) and zeroes the buffers. No-op when affine is disabled.
+	ApplyGradSGD(lr T)
 	// InputSize returns the expected input feature count.
 	InputSize() int
 	// OutputSize always equals InputSize; output shape is preserved (NORM-1).

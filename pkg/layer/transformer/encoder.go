@@ -35,7 +35,6 @@ type EncoderBlock[T utils.Float] struct {
 	Norm2    *norm.LayerNorm[T]
 	FFN      *ffn[T]
 	Drop1    *regularizer.Dropout[T]
-	bufAttn  []T
 	bufZ     []T
 	bufF     []T
 	cacheX   []T
@@ -109,7 +108,6 @@ func (e *EncoderBlock[T]) Init(rng *rand.Rand) {
 	e.FFN.Init(rand.New(rand.NewPCG(s1, s1^0x9E3779B9)))
 	// Pre-allocate cache buffers once (PERF-4).
 	size := e.Cfg.SeqLen * e.Cfg.Dmodel
-	e.bufAttn = make([]T, size)
 	e.bufZ = make([]T, size)
 	e.bufF = make([]T, size)
 	e.cacheX = make([]T, size)
@@ -140,8 +138,7 @@ func (e *EncoderBlock[T]) Forward(x []T) []T {
 	// compile-time shape inference via computeConvChainOutput).
 	if e.bufZ == nil {
 		size := e.Cfg.SeqLen * e.Cfg.Dmodel
-		e.bufAttn = make([]T, size)
-		e.bufZ = make([]T, size)
+			e.bufZ = make([]T, size)
 		e.bufF = make([]T, size)
 		e.cacheX = make([]T, size)
 		e.cacheZ1 = make([]T, size)
@@ -444,7 +441,6 @@ func (e *EncoderBlock[T]) UnmarshalJSON(data []byte) error {
 	e.Drop2 = regularizer.NewDropout[T](p)
 
 	size := e.Cfg.SeqLen * e.Cfg.Dmodel
-	e.bufAttn = make([]T, size)
 	e.bufZ = make([]T, size)
 	e.bufF = make([]T, size)
 	e.cacheX = make([]T, size)

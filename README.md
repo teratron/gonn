@@ -6,7 +6,9 @@
 
 ## Description
 
-GoNN is a generic, zero-dependency Go library for building and training feedforward neural networks. It supports multi-hidden topologies, pluggable optimizers (SGD, Adam, RMSProp, SGD+Momentum), and regularization (L1, L2, Dropout, Compose). The public API uses Go generics (`float32` / `float64`).
+GoNN is a generic, zero-dependency Go library for building and training feedforward neural networks. It supports multi-hidden topologies, pluggable optimizers (SGD, Adam, RMSProp, SGD+Momentum), regularization (L1, L2, honest per-layer Dropout, Compose), normalization layers (BatchNorm, LayerNorm, GroupNorm), LR schedulers, conv/recurrent/attention prefix layers, persistence (`Save`/`Load`), training checkpoints, streaming datasets, and an HTTP observability endpoint. The public API uses Go generics (`float32` / `float64`).
+
+Training numerics are guarded by a numeric gradient-check suite (`internal/verification/`): analytic gradients are validated against central differences across topologies, activations, and normalization layers on every CI run.
 
 ## Installation
 
@@ -144,9 +146,31 @@ nn.WithEpochCallback[float32](func(epoch uint, loss float32) {
 Concurrency controls (safe to call from another goroutine while Fit is running):
 
 ```go
-n.Pause()   // block before next epoch
+n.Pause()   // park the training goroutine before the next epoch (zero CPU)
 n.Resume()  // unblock
-n.Stop()    // terminate loop, return completed epochs
+n.Stop()    // terminate loop, return completed epochs; the network stays usable
+```
+
+Concurrent inference is race-free: any number of goroutines may `Query` a
+compiled dense network in parallel (stateless forward under a read lock).
+
+## Persistence, Checkpoints, Streaming
+
+```go
+// Save / reload a trained network (config + weights, hash-linked).
+err := n.Save("config.json", "weights.json")
+n2, err := nn.Load[float32]("config.json", "weights.json")
+
+// Periodic training snapshots with retention, and resume:
+n, _ := nn.New[float32](
+    /* topology... */
+    nn.WithCheckpoint[float32]("ckpts", 10, checkpoint.SweepConfig{}),
+)
+resumed, epoch, err := nn.Resume[float32]("ckpts")
+
+// Streaming training over a dataset source (epoch = drain + Reset):
+ds, _ := dataset.NewCSVDataset[float32]("train.csv", inSize, outSize, batchSize)
+epochs, loss, err := n.FitDataset(ctx, ds)
 ```
 
 ## Example Catalog
@@ -160,31 +184,40 @@ n.Stop()    // terminate loop, return completed epochs
 | E05 | `examples/iris/` | 3-class Iris CSV, SoftMax, EpochCallback | Options |
 | E07 | `examples/regression_sin/` | Sine regression, TanH, RMSE ≤ 0.10 | Builder |
 | E08 | `examples/regression_multi/` | 5-input 3-output ReLU + He | Options |
-| E09 | `examples/persistence/` | Save / reload weights via `pkg/persistence` | Options |
+| E09 | `examples/persistence/` | Save / reload round-trip via `nn.Save` / `nn.Load` | Builder |
 | E10 | `examples/continuation/` | Continuation training — `AndTrain` parity | Options |
 | E11 | `examples/callbacks/` | EpochCallback + BatchCallback | Options |
 | E12 | `examples/style_showcase/` | Same XOR built three ways | Both |
 | E13 | `examples/higher_order_options/` | Sequential + DeepNetwork preset | Options |
 | E14 | `examples/shared_options/` | Shared `[]Option[T]` across topologies | Options |
 | E15 | `examples/precision/` | float32 vs float64 comparison | Both |
-| E06 | _(deferred)_ | MNIST — awaits dataset-loader spec | — |
+| E06 | `examples/mnist/` | MNIST dense classifier (IDX loader, `-download` flag) | Options |
+| E16 | `examples/mnist_cnn/` | MNIST with a Conv2D prefix stack | Options |
 
 
 ## Package Overview
 
 | Package | Purpose |
 | --- | --- |
-| `pkg/nn` | Public facade — `NN[T]`, Builder API, Options API, `Fit`, `Train`, `Query` |
-| `pkg/optimizer` | Weight-update strategies: SGD, Adam, RMSProp, SGDMomentum |
-| `pkg/regularizer` | Regularization: L1, L2, Dropout, Compose |
-| `pkg/network` | Multi-hidden network graph, forward/backward propagation |
+| `pkg/nn` | Public facade — `NN[T]`, Builder API, Options API, `Fit`, `FitDataset`, `Train`, `Query`, `Save`/`Load`, `Resume` |
+| `pkg/optimizer` | Weight-update strategies (SGD, Adam, RMSProp, SGDMomentum) + LR schedulers |
+| `pkg/regularizer` | Regularization: L1, L2, per-layer Dropout, Compose |
+| `pkg/network` | Multi-hidden network graph, forward/backward propagation, norm/mask hooks |
 | `pkg/layer` | Input, Dense, Output layer constructors |
+| `pkg/layer/conv` | Conv1D/Conv2D, pooling, flatten prefix layers |
+| `pkg/layer/recurrent` | SimpleRNN, LSTM, GRU, LastStep prefix layers |
+| `pkg/layer/attention` | Multi-head attention |
+| `pkg/layer/transformer` | Encoder/Decoder blocks and stacks |
+| `pkg/layer/embedding` | Token embedding + positional encoding |
+| `pkg/layer/norm` | BatchNorm, LayerNorm, GroupNorm (dense-path integrated) |
 | `pkg/neuron` | Cell and axon primitives |
-| `pkg/activation` | Activation functions and derivatives |
-| `pkg/loss` | Loss functions (MSE, BCE, CCE, MAE, Huber, …) |
+| `pkg/activation` | Activation functions, derivatives, vector softmax |
+| `pkg/loss` | Loss functions and true derivatives (MSE, BCE, CCE, Huber, …) |
 | `pkg/persistence` | JSON config + weight persistence (schema 1.1.0) |
 | `pkg/checkpoint` | Resumable training snapshots with gzip cold tier |
-| `pkg/dataset` | Slice, CSV, and prefetch dataset sources |
+| `pkg/dataset` | Slice, CSV, MNIST IDX, and prefetch dataset sources |
+| `pkg/quantization` | Post-training int8 quantization (conv prefix + dense head) |
+| `pkg/visualization` | Read-only HTTP observability endpoint (`/v1/*`) |
 | `pkg/compute` | Pluggable backend interface + CPU reference backend |
 
 ## License

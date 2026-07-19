@@ -24,7 +24,10 @@ import (
 type Dropout[T utils.Float] struct {
 	rng  *rand.Rand
 	mask []bool
-	p    float64
+	// layerMasks holds one retain-mask per hidden layer for the per-layer
+	// path (MaskForwardLayer / MaskBackwardLayer). Grown on demand.
+	layerMasks [][]bool
+	p          float64
 }
 
 // compile-time interface verification (C26).
@@ -105,4 +108,54 @@ func (d *Dropout[T]) BackwardMask(upstream []T) []T {
 		}
 	}
 	return out
+}
+
+// MaskForwardLayer samples a fresh inverted-Bernoulli mask for hidden layer
+// `layer` and applies it to acts in place: retained positions scale by 1/p,
+// dropped positions become zero — BEFORE the next layer consumes them. This
+// is the honest per-layer path (audit B3: the old flat mask ran after the
+// whole forward pass, so the output never saw a dropped unit). Only called
+// on training passes; inference never masks.
+func (d *Dropout[T]) MaskForwardLayer(layer int, acts []T) []T {
+	for len(d.layerMasks) <= layer {
+		d.layerMasks = append(d.layerMasks, nil)
+	}
+	m := d.layerMasks[layer]
+	if cap(m) < len(acts) {
+		m = make([]bool, len(acts))
+	} else {
+		m = m[:len(acts)]
+	}
+	scale := T(1.0 / d.p)
+	for i, a := range acts {
+		if d.rng.Float64() < d.p {
+			acts[i] = a * scale
+			m[i] = true
+		} else {
+			acts[i] = 0
+			m[i] = false
+		}
+	}
+	d.layerMasks[layer] = m
+	return acts
+}
+
+// MaskBackwardLayer routes the layer's miss vector through the retain mask
+// sampled by the matching MaskForwardLayer call: dropped positions get zero
+// gradient, retained positions scale by 1/p. Returns upstream unchanged when
+// no mask was sampled for the layer on this pass.
+func (d *Dropout[T]) MaskBackwardLayer(layer int, upstream []T) []T {
+	if layer >= len(d.layerMasks) || len(d.layerMasks[layer]) == 0 {
+		return upstream
+	}
+	m := d.layerMasks[layer]
+	scale := T(1.0 / d.p)
+	for i := range upstream {
+		if i < len(m) && m[i] {
+			upstream[i] *= scale
+		} else {
+			upstream[i] = 0
+		}
+	}
+	return upstream
 }

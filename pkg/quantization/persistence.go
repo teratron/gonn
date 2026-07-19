@@ -8,6 +8,7 @@ import (
 	"math"
 	"os"
 
+	"github.com/teratron/gonn/pkg/activation"
 	"github.com/teratron/gonn/pkg/utils"
 )
 
@@ -50,6 +51,9 @@ type QuantizedLayerJSON struct {
 	KernelSize  int       `json:"kernel_size,omitempty"`
 	UseBias     bool      `json:"use_bias,omitempty"`
 	Causal      bool      `json:"causal,omitempty"`
+	// Act / ApplyAct carry the dense-head activation (QuantizedDense only).
+	Act      uint8 `json:"act,omitempty"`
+	ApplyAct bool  `json:"apply_act,omitempty"`
 }
 
 // QuantizedNetworkJSON is the top-level .qnn.json wire format.
@@ -145,6 +149,8 @@ func marshalLayer[T utils.Float](l quantizedLayer[T]) (QuantizedLayerJSON, error
 			Bias:        encodeFloat64(v.Bias),
 			Granularity: int(v.WeightParams.Granularity),
 			Strategy:    int(v.WeightParams.Strategy),
+			Act:         uint8(v.Act),
+			ApplyAct:    v.ApplyAct,
 		}, nil
 	case *QuantizedConv1D[T]:
 		return QuantizedLayerJSON{
@@ -245,6 +251,8 @@ func unmarshalLayer[T utils.Float](rec QuantizedLayerJSON) (quantizedLayer[T], e
 			Bias:         bias,
 			Cout:         rec.Cout,
 			Cin:          rec.Cin,
+			Act:          activation.Type(rec.Act),
+			ApplyAct:     rec.ApplyAct,
 		}, nil
 	case "Conv1D":
 		return &QuantizedConv1D[T]{

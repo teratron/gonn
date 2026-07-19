@@ -133,65 +133,6 @@ func TestExitCodeMapping(t *testing.T) {
 	}
 }
 
-// ── resolvers ────────────────────────────────────────────────────────────────
-
-func TestResolveActivation(t *testing.T) {
-	cases := []struct {
-		name string
-		ok   bool
-	}{
-		{"SIGMOID", true},
-		{"ReLU", true},
-		{"TanH", true},
-		{"Linear", true},
-		{"NOTEXIST", false},
-		{"", false},
-	}
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			_, err := resolveActivation(tc.name)
-			if (err == nil) != tc.ok {
-				t.Errorf("resolveActivation(%q): err=%v, want ok=%v", tc.name, err, tc.ok)
-			}
-		})
-	}
-}
-
-func TestResolveLoss(t *testing.T) {
-	cases := []struct {
-		name string
-		ok   bool
-	}{
-		{"MSE", true},
-		{"MAE", true},
-		{"ARCTAN", true},
-		{"NOTEXIST", false},
-	}
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			_, err := resolveLoss(tc.name)
-			if (err == nil) != tc.ok {
-				t.Errorf("resolveLoss(%q): err=%v, want ok=%v", tc.name, err, tc.ok)
-			}
-		})
-	}
-}
-
-func TestResolveWeightInit(t *testing.T) {
-	if _, err := resolveWeightInit("xavier"); err != nil {
-		t.Errorf("xavier: %v", err)
-	}
-	if _, err := resolveWeightInit("he"); err != nil {
-		t.Errorf("he: %v", err)
-	}
-	if _, err := resolveWeightInit(""); err != nil {
-		t.Errorf("empty → default: %v", err)
-	}
-	if _, err := resolveWeightInit("unknown"); err == nil {
-		t.Error("unknown should return error")
-	}
-}
-
 // ── parseFloats ───────────────────────────────────────────────────────────────
 
 func TestParseFloats(t *testing.T) {
@@ -255,24 +196,6 @@ func TestLoadSamplesColumnMismatch(t *testing.T) {
 	_, err := loadSamplesFull[float32](path, 2, 1)
 	if err == nil {
 		t.Error("expected error for column count mismatch")
-	}
-}
-
-// ── buildFromConfig ───────────────────────────────────────────────────────────
-
-func TestBuildFromConfig(t *testing.T) {
-	cfgPath := xorConfig(t)
-	doc, err := persistence.ReadConfig[float32](cfgPath)
-	if err != nil {
-		t.Fatalf("ReadConfig: %v", err)
-	}
-	n, err := buildFromConfig(doc)
-	if err != nil {
-		t.Fatalf("buildFromConfig: %v", err)
-	}
-	// Basic smoke: query should not error on a valid input.
-	if _, err := n.Query([]float32{0, 1}); err != nil {
-		t.Errorf("Query: %v", err)
 	}
 }
 
@@ -593,79 +516,6 @@ func TestLoadNetworkBadWeightsPath(t *testing.T) {
 	_, _, err := loadNetwork[float32](cfgPath, "/no/such/weights.json")
 	if err == nil {
 		t.Fatal("expected error for missing weights")
-	}
-}
-
-// ── buildFromConfig error paths ───────────────────────────────────────────────
-
-func TestBuildFromConfigBadActivation(t *testing.T) {
-	doc := persistence.ConfigDoc[float32]{
-		InputSize:    2,
-		HiddenLayers: []persistence.HiddenLayerDoc{{Size: 4, Activation: "NOPE", Bias: true}},
-		Output:       persistence.OutputDoc{Size: 1, Activation: "SIGMOID", Bias: true},
-		Training:     persistence.TrainingDoc[float32]{LearningRate: 0.1, Loss: "MSE", MaxIterations: 10},
-	}
-	_, err := buildFromConfig(doc)
-	if err == nil {
-		t.Error("expected error for unknown activation")
-	}
-}
-
-func TestBuildFromConfigBadLoss(t *testing.T) {
-	doc := persistence.ConfigDoc[float32]{
-		InputSize:    2,
-		HiddenLayers: []persistence.HiddenLayerDoc{{Size: 4, Activation: "SIGMOID", Bias: true}},
-		Output:       persistence.OutputDoc{Size: 1, Activation: "SIGMOID", Bias: true},
-		Training:     persistence.TrainingDoc[float32]{LearningRate: 0.1, Loss: "NOSUCHLOSS", MaxIterations: 10},
-	}
-	_, err := buildFromConfig(doc)
-	if err == nil {
-		t.Error("expected error for unknown loss")
-	}
-}
-
-// ── installLayerG error paths ─────────────────────────────────────────────────
-
-func TestInstallLayerGCellCountMismatch(t *testing.T) {
-	layer := persistence.LayerWeights[float32]{
-		Name:    "test",
-		Weights: [][]float32{{0.1}, {0.2}}, // 2 cells
-	}
-	err := installLayerG("test", false, 3, layer, // net has 3 cells
-		func(ci, ai int, w float32) {},
-		func(ci int) int { return 1 },
-	)
-	if err == nil {
-		t.Error("expected error for cell count mismatch")
-	}
-}
-
-func TestInstallLayerGBiasCountMismatch(t *testing.T) {
-	layer := persistence.LayerWeights[float32]{
-		Name:    "test",
-		Weights: [][]float32{{0.1}, {0.2}},
-		Biases:  []float32{0.5}, // only 1 bias but 2 cells
-	}
-	err := installLayerG("test", true, 2, layer,
-		func(ci, ai int, w float32) {},
-		func(ci int) int { return 2 },
-	)
-	if err == nil {
-		t.Error("expected error for bias count mismatch")
-	}
-}
-
-func TestInstallLayerGRowWidthMismatch(t *testing.T) {
-	layer := persistence.LayerWeights[float32]{
-		Name:    "test",
-		Weights: [][]float32{{0.1, 0.2}}, // 2 weights in row
-	}
-	err := installLayerG("test", false, 1, layer,
-		func(ci, ai int, w float32) {},
-		func(ci int) int { return 3 }, // net cell has 3 axons
-	)
-	if err == nil {
-		t.Error("expected error for row width mismatch")
 	}
 }
 

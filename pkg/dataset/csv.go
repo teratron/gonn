@@ -146,6 +146,14 @@ func (c *csvDataset[T]) Reset(ctx context.Context) error {
 // without scanning the whole file (DAT-1).
 func (c *csvDataset[T]) Len() (int, bool) { return -1, false }
 
+// Close releases the file descriptor held by the dataset. Idempotent; the
+// dataset can be revived with Reset. Callers that abandon iteration before
+// io.EOF must Close to avoid leaking the descriptor.
+func (c *csvDataset[T]) Close() error {
+	c.closeFile()
+	return nil
+}
+
 // parseRow splits one CSV record into the input vector and target vector
 // using the configured widths and parses each cell with strconv.ParseFloat.
 // All errors are wrapped with utils.ErrInputData so callers route via

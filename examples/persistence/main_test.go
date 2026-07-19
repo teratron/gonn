@@ -8,7 +8,7 @@ import (
 	"github.com/teratron/gonn/pkg/activation"
 	"github.com/teratron/gonn/pkg/compute/cpu"
 	"github.com/teratron/gonn/pkg/loss"
-	"github.com/teratron/gonn/pkg/persistence"
+	"github.com/teratron/gonn/pkg/nn"
 )
 
 // roundTripPreservesQuery is the shared assertion used by single- and
@@ -28,34 +28,21 @@ func roundTripPreservesQuery(t *testing.T, tc trainConfig, label string) {
 	cfgPath := filepath.Join(dir, "config.json")
 	wPath := filepath.Join(dir, "weights.json")
 
-	cfg := buildConfigDoc(tc)
-	if err := persistence.WriteConfig(cfgPath, cfg); err != nil {
-		t.Fatalf("[%s] WriteConfig: %v", label, err)
+	if err := original.Save(cfgPath, wPath); err != nil {
+		t.Fatalf("[%s] Save: %v", label, err)
 	}
-	if err := persistence.WriteWeights(wPath, cfg, extractWeights(original, tc)); err != nil {
-		t.Fatalf("[%s] WriteWeights: %v", label, err)
-	}
-
-	_, loaded, err := persistence.ReadWeights[float32](cfgPath, wPath)
+	reloaded, err := nn.Load[float32](cfgPath, wPath)
 	if err != nil {
-		t.Fatalf("[%s] ReadWeights: %v", label, err)
+		t.Fatalf("[%s] Load: %v", label, err)
 	}
-
-	rebuilt, err := buildBlank(tc)
+	reloadedOutputs, err := queryAll(reloaded)
 	if err != nil {
-		t.Fatalf("[%s] buildBlank: %v", label, err)
-	}
-	if err := installWeights(rebuilt, tc, loaded); err != nil {
-		t.Fatalf("[%s] installWeights: %v", label, err)
-	}
-	rebuiltOutputs, err := queryAll(rebuilt)
-	if err != nil {
-		t.Fatalf("[%s] queryAll(rebuilt): %v", label, err)
+		t.Fatalf("[%s] queryAll(reloaded): %v", label, err)
 	}
 
 	for i := range originalOutputs {
 		for j := range originalOutputs[i] {
-			d := absDiff(originalOutputs[i][j], rebuiltOutputs[i][j])
+			d := absDiff(originalOutputs[i][j], reloadedOutputs[i][j])
 			if d > cpu.ToleranceF32 {
 				t.Errorf("[%s] Query[%d][%d] drift = %v, want ≤ %v",
 					label, i, j, d, cpu.ToleranceF32)
@@ -70,10 +57,10 @@ func TestRoundTripPreservesQuery(t *testing.T) {
 	roundTripPreservesQuery(t, xorTopology(), "single-hidden XOR")
 }
 
-// TestRoundTripMultiHidden exercises Track C's multi-hidden seam:
-// extract / install must walk every Hiddens[i] entry, with mixed bias
-// settings across the chain. Convergence isn't asserted — Fit's tiny
-// epoch budget mirrors the smoke style of the v0.1 example.
+// TestRoundTripMultiHidden exercises the multi-hidden seam: Save / Load
+// must walk every Hiddens[i] entry, with mixed bias settings across the
+// chain. Convergence isn't asserted — Fit's tiny epoch budget mirrors the
+// smoke style of the v0.1 example.
 func TestRoundTripMultiHidden(t *testing.T) {
 	tc := trainConfig{
 		inputSize: 2,

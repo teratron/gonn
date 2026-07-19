@@ -82,17 +82,18 @@ reverses it on the output side to recover the predicted digit.
 ### BatchNorm and why it helps
 
 `WithBatchNorm(0)` inserts a BatchNorm layer after hidden layer 0 (the 128-
-neuron layer). During training BatchNorm normalises each activation to zero
-mean and unit variance across the current mini-batch, then applies learnable
-affine parameters (scale γ, shift β). Benefits:
+neuron layer). GoNN trains one sample at a time, so there is no mini-batch
+axis: BatchNorm keeps PER-FEATURE running statistics as exponential moving
+averages over the sample stream, normalises each activation with them, and
+applies learnable affine parameters (scale γ, shift β). Benefits:
 
 - **Faster convergence**: the gradient signal is less sensitive to weight
   scale, so larger learning rates can be used safely.
 - **Regularisation effect**: normalisation adds noise that acts similarly to
   dropout, reducing overfitting.
-- **Training/eval distinction**: `BatchNorm` tracks exponential moving
-  averages of mean and variance during training; at inference it uses these
-  frozen statistics (switched via `SetTrain(false)`).
+- **Training/eval distinction**: call `n.SetTrain()` before training so the
+  EMA statistics update, and `n.SetEval()` before inference so the frozen
+  statistics are applied without update.
 
 ### AndTrain for epoch continuation
 

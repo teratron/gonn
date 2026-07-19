@@ -31,7 +31,6 @@ const (
 type PositionalEncoding[T utils.Float] struct {
 	Table     []T `json:"table"`
 	gradTable []T
-	lastIn    []T
 	SeqLen    int            `json:"seqLen"`
 	Dmodel    int            `json:"dmodel"`
 	Mode      PositionalMode `json:"mode"`
@@ -68,7 +67,6 @@ func (pe *PositionalEncoding[T]) Init(rng *rand.Rand) {
 		}
 		pe.gradTable = make([]T, sz)
 	}
-	pe.lastIn = make([]T, sz)
 }
 
 // InputSize returns SeqLen*Dmodel.
@@ -91,20 +89,17 @@ func (pe *PositionalEncoding[T]) ApplyGradSGD(lr T) {
 		return
 	}
 	n := min(len(pe.Table), len(pe.gradTable))
-	for i := 0; i < n; i++ {
+	for i := range n {
 		pe.Table[i] -= lr * pe.gradTable[i]
 	}
 	clear(pe.gradTable)
 }
 
 // Forward adds the positional table to x element-wise. x must be [SeqLen×Dmodel].
-// The result is written into a fresh slice; x is cached for Backward.
+// The result is written into a fresh slice. (No input cache is kept — the
+// additive Backward never needs x; the historical lastIn buffer was dead.)
 func (pe *PositionalEncoding[T]) Forward(x []T) []T {
 	sz := pe.SeqLen * pe.Dmodel
-	if len(pe.lastIn) < sz {
-		pe.lastIn = make([]T, sz)
-	}
-	copy(pe.lastIn, x)
 	out := make([]T, sz)
 	for i := 0; i < sz && i < len(x); i++ {
 		out[i] = x[i]
@@ -167,6 +162,5 @@ func (pe *PositionalEncoding[T]) UnmarshalJSON(data []byte) error {
 	if pe.Mode == Learnable {
 		pe.gradTable = make([]T, sz)
 	}
-	pe.lastIn = make([]T, sz)
 	return nil
 }

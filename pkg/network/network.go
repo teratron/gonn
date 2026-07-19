@@ -34,6 +34,43 @@ const defaultLearningRate = 0.3
 //   - Stability: Stable.
 type WeightSampler[T utils.Float] func(fanIn, fanOut int) T
 
+// FeatureNorm is the minimal contract a per-layer normalizer must satisfy to
+// participate in the dense forward/backward pass. Deliberately narrower than
+// norm.Normalizer so this package does not import pkg/layer/norm — the facade
+// adapts its Normalizer instances to this interface via SetNormLayers.
+//
+// AI-Meta:
+//   - Purpose: Decoupled hook type letting CalculateValues/CalculateMisses route through a normalizer.
+//   - Implementations: norm.BatchNorm, norm.LayerNorm, norm.GroupNorm (via pkg/nn).
+//   - Related: [Network.SetNormLayers], [Network.CalculateValues], [Network.CalculateMisses].
+//   - Stability: Stable.
+type FeatureNorm[T utils.Float] interface {
+	// Forward normalizes the layer's post-activation vector (training path;
+	// may cache state for Backward and update running statistics).
+	Forward(x []T) []T
+	// Backward maps ∂L/∂(norm output) to ∂L/∂(activation), accumulating any
+	// affine-parameter gradients internally.
+	Backward(upstream []T) []T
+	// ForwardInference is the pure eval-path forward used by InferDense; it
+	// must not mutate any layer state so concurrent readers are safe.
+	ForwardInference(x []T) []T
+}
+
+// LayerMask is the per-layer activation-mask hook (Dropout). Applied by
+// CalculateValues after the norm hook — but only on training passes — and
+// reversed by CalculateMisses before the norm backward. Mirrors
+// regularizer.LayerMasker without importing that package.
+//
+// AI-Meta:
+//   - Purpose: Decoupled hook type for honest in-graph dropout masking.
+//   - Implementations: regularizer.Dropout (via pkg/nn).
+//   - Related: [Network.SetLayerMasker], [Network.SetTrainingMode].
+//   - Stability: Stable.
+type LayerMask[T utils.Float] interface {
+	MaskForwardLayer(layer int, x []T) []T
+	MaskBackwardLayer(layer int, upstream []T) []T
+}
+
 // Network is the typed computational graph. Embedded by nn.NN so the
 // public facade delegates forward/backward passes without an extra heap
 // allocation. Owns three bundle groups (Input, Hiddens chain, Output),
@@ -57,6 +94,14 @@ type Network[T utils.Float] struct {
 	outActBuf       []T
 	Output          bundle[T, *cell.Output[T]]   `json:"output" xml:"output"`
 	Hiddens         []bundle[T, *cell.Hidden[T]] `json:"hiddens" xml:"hiddens"`
+	// normLayers maps hidden-layer index → normalizer applied to that layer's
+	// post-activation output before the next layer consumes it. Installed by
+	// the facade via SetNormLayers; nil for networks without normalization.
+	normLayers map[int]FeatureNorm[T]
+	// masker is the optional per-layer dropout hook; applied only while
+	// training is true (set around each trainStep by the facade).
+	masker          LayerMask[T]
+	training        bool
 	topologyVersion atomic.Uint64
 	outputAct       activation.Type
 	lossMode        loss.Type
@@ -96,6 +141,46 @@ func New[T utils.Float]() Network[T] {
 		Hiddens:      nil,
 		Output:       newBundle[T, *cell.Output[T]](),
 	}
+}
+
+// SetNormLayers installs the per-hidden-layer normalizers consumed by
+// CalculateValues (Forward), CalculateMisses (Backward), and InferDense
+// (ForwardInference). Passing nil clears normalization. Keys are hidden-layer
+// indices; entries beyond the hidden chain are ignored.
+//
+// AI-Meta:
+//   - Purpose: Wire normalization layers into the dense forward/backward pass.
+//   - Concurrency: NotSafe; call during compile, before training starts.
+//   - Related: [FeatureNorm], [CalculateValues], [CalculateMisses], [InferDense].
+//   - Stability: Stable.
+func (n *Network[T]) SetNormLayers(m map[int]FeatureNorm[T]) {
+	n.normLayers = m
+}
+
+// SetLayerMasker installs the per-layer dropout hook consumed by
+// CalculateValues / CalculateMisses on training passes. nil disables masking.
+//
+// AI-Meta:
+//   - Purpose: Wire honest in-graph dropout into the dense pass.
+//   - Concurrency: NotSafe; call during compile.
+//   - Related: [LayerMask], [SetTrainingMode].
+//   - Stability: Stable.
+func (n *Network[T]) SetLayerMasker(m LayerMask[T]) {
+	n.masker = m
+}
+
+// SetTrainingMode flags the engine as running a training pass. While true,
+// CalculateValues applies the dropout mask and CalculateMisses routes misses
+// through it; while false (Verify, legacy mutating Query paths) the mask is
+// skipped entirely — inference must never drop units (REG-3).
+//
+// AI-Meta:
+//   - Purpose: Toggle dropout masking on the shared forward/backward entry points.
+//   - Concurrency: NotSafe; toggled around trainStep under the facade's write lock.
+//   - Related: [SetLayerMasker], [CalculateValues], [CalculateMisses].
+//   - Stability: Stable.
+func (n *Network[T]) SetTrainingMode(on bool) {
+	n.training = on
 }
 
 // SetWeightSampler configures the weight-initialization function applied by

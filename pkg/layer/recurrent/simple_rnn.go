@@ -324,7 +324,7 @@ func (r *SimpleRNN[T]) ApplyGradSGD(lr T) {
 // sgdApply performs w[i] -= lr·g[i] over the shared prefix of w and g.
 func sgdApply[T utils.Float](w, g []T, lr T) {
 	n := min(len(w), len(g))
-	for i := 0; i < n; i++ {
+	for i := range n {
 		w[i] -= lr * g[i]
 	}
 }

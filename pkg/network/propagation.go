@@ -29,6 +29,34 @@ func (n *Network[T]) CalculateValues() {
 			preact[cellIdx] = *h.GetValue()
 			*h.GetValue() = activation.Activation(preact[cellIdx], act)
 		}
+		// Per-layer normalization: the next layer consumes the NORMALIZED
+		// values, so the norm output is written back into the cells. The
+		// pre-activation buffer keeps the un-normalized linear sum — σ′ in
+		// the backward pass applies to the activation, not the norm output.
+		if nl, ok := n.normLayers[i]; ok {
+			x := make([]T, len(hb.cells))
+			for j, h := range hb.cells {
+				x[j] = *h.GetValue()
+			}
+			out := nl.Forward(x)
+			for j, h := range hb.cells {
+				*h.GetValue() = out[j]
+			}
+		}
+		// Honest dropout: the mask gates the values the NEXT layer consumes
+		// (audit B3: the old flat mask ran after the whole forward pass and
+		// never influenced the output). Training passes only — inference
+		// keeps every unit (REG-3).
+		if n.training && n.masker != nil {
+			x := make([]T, len(hb.cells))
+			for j, h := range hb.cells {
+				x[j] = *h.GetValue()
+			}
+			x = n.masker.MaskForwardLayer(i, x)
+			for j, h := range hb.cells {
+				*h.GetValue() = x[j]
+			}
+		}
 	}
 	// Output pre-activations first (needed whole-vector for softmax).
 	for i, o := range n.Output.cells {
@@ -129,6 +157,36 @@ func (n *Network[T]) CalculateMisses() {
 				}
 			}
 		}
+		// Reverse of the forward's post-processing chain (norm → mask):
+		// first undo the dropout gate — dropped units get zero miss,
+		// retained units scale by 1/p. Elementwise scaling is sign-agnostic,
+		// so the miss convention passes through unchanged.
+		if n.training && n.masker != nil {
+			up := make([]T, len(hb.cells))
+			for j, h := range hb.cells {
+				up[j] = *h.GetMiss()
+			}
+			up = n.masker.MaskBackwardLayer(i, up)
+			for j, h := range hb.cells {
+				h.SetMiss(up[j])
+			}
+		}
+		// Route the accumulated miss through the layer's normalizer: what
+		// arrived is −∂L/∂(norm output); downstream consumers (the next
+		// boundary, CalculateWeights, AppendFlatGradients) need
+		// −∂L/∂(activation). FeatureNorm.Backward works in the true-gradient
+		// convention (it also accumulates ∂L/∂γ, ∂L/∂β), so the miss is
+		// negated on the way in and the result negated on the way out.
+		if nl, ok := n.normLayers[i]; ok {
+			up := make([]T, len(hb.cells))
+			for j, h := range hb.cells {
+				up[j] = -*h.GetMiss()
+			}
+			dx := nl.Backward(up)
+			for j, h := range hb.cells {
+				h.SetMiss(-dx[j])
+			}
+		}
 	}
 }
 
@@ -202,6 +260,19 @@ func (n *Network[T]) InferDense(input []T) ([]T, error) {
 				sum += a.Weight * sourceValue(a.Cell)
 			}
 			values[h] = activation.Activation(sum, act)
+		}
+		// Normalization in the read-only path uses ForwardInference — pure by
+		// contract (no running-stat updates, no caches) so concurrent Query
+		// goroutines can share the normalizer instance.
+		if nl, ok := n.normLayers[i]; ok {
+			x := make([]T, len(hb.cells))
+			for j, h := range hb.cells {
+				x[j] = values[h]
+			}
+			out := nl.ForwardInference(x)
+			for j, h := range hb.cells {
+				values[h] = out[j]
+			}
 		}
 	}
 	preout := make([]T, n.Output.Len())

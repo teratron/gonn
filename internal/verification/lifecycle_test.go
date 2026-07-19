@@ -50,11 +50,9 @@ func TestConcurrentQueryRaceFree(t *testing.T) {
 	var wg sync.WaitGroup
 	var wrong int64
 	var mu sync.Mutex
-	for g := 0; g < 16; g++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			for iter := 0; iter < 400; iter++ {
+	for range 16 {
+		wg.Go(func() {
+			for iter := range 400 {
 				i := iter % len(inputs)
 				out, err := n.Query(inputs[i])
 				if err != nil || math.Abs(out[0]-refs[i][0]) > 1e-12 {
@@ -63,7 +61,7 @@ func TestConcurrentQueryRaceFree(t *testing.T) {
 					mu.Unlock()
 				}
 			}
-		}()
+		})
 	}
 	wg.Wait()
 	if wrong != 0 {

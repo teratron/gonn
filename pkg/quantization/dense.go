@@ -1,6 +1,9 @@
 package quantization
 
-import "github.com/teratron/gonn/pkg/utils"
+import (
+	"github.com/teratron/gonn/pkg/activation"
+	"github.com/teratron/gonn/pkg/utils"
+)
 
 // QuantizedDense is a weight-only (Phase α) or full-int8 (Phase β) quantized
 // fully-connected layer. Weights are stored row-major (Cout×Cin).
@@ -21,6 +24,13 @@ type QuantizedDense[T utils.Float] struct {
 	ActParams    QuantizationParams
 	Cout         int
 	Cin          int
+	// Act is the activation applied to the accumulated output when ApplyAct
+	// is true. Set by Quantize for MLP-head layers so the quantized chain
+	// reproduces the full float forward (activation.SOFTMAX is applied
+	// whole-vector). Zero-value (ApplyAct=false) keeps the raw linear output —
+	// the historical behaviour for standalone use.
+	Act      activation.Type
+	ApplyAct bool
 }
 
 // SetActParams wires activation quantization params (called by Quantize[T]
@@ -29,12 +39,25 @@ func (d *QuantizedDense[T]) SetActParams(p QuantizationParams) {
 	d.ActParams = p
 }
 
-// Forward dispatches to weight-only or full-int8 path depending on ActParams.
+// Forward dispatches to weight-only or full-int8 path depending on ActParams,
+// then applies the configured activation when ApplyAct is set.
 func (d *QuantizedDense[T]) Forward(x []T) []T {
+	var out []T
 	if len(d.ActParams.Scale) > 0 {
-		return d.forwardFullInt8(x)
+		out = d.forwardFullInt8(x)
+	} else {
+		out = d.forwardWeightOnly(x)
 	}
-	return d.forwardWeightOnly(x)
+	if d.ApplyAct {
+		if d.Act == activation.SOFTMAX {
+			activation.SoftmaxInto(out, out)
+		} else {
+			for i, v := range out {
+				out[i] = activation.Activation(v, d.Act)
+			}
+		}
+	}
+	return out
 }
 
 // forwardWeightOnly dequantizes each weight row on the fly, float64 accumulation.

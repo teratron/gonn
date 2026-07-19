@@ -315,6 +315,16 @@ func (m *MultiHeadAttention[T]) Backward(upstream []T) []T {
 	// dWo[d, i] += sum_t upstream[t, d] * merged[t, i]
 	// dBo[d]    += sum_t upstream[t, d]
 	// dCtxMerged[t, i] = sum_d upstream[t, d] * Wo[d, i]  (Wo^T multiply)
+	//
+	// merged (the pre-output-projection context) is recomputed from the
+	// forward caches: ctx = lastWeights × lastV, heads joined. (The historical
+	// first pass accumulated gradWo against lastInput and then re-did the
+	// whole loop — the discarded placeholder pass was removed, audit F.)
+	ctx := make([]T, m.NumHeads*m.SeqLen*m.Dk)
+	contextMul(m.lastWeights, m.lastV, ctx, m.NumHeads, m.SeqLen, m.Dk)
+	merged := make([]T, m.SeqLen*m.Dmodel)
+	joinHeads(ctx, merged, m.NumHeads, m.SeqLen, m.Dk)
+
 	dCtxMerged := make([]T, m.SeqLen*m.Dmodel)
 	for t := range m.SeqLen {
 		for d := range m.Dmodel {
@@ -322,27 +332,8 @@ func (m *MultiHeadAttention[T]) Backward(upstream []T) []T {
 			m.gradBo[d] += u
 			row := d * m.Dmodel
 			for i := range m.Dmodel {
-				m.gradWo[row+i] += u * m.lastInput[t*m.Dmodel+i] // placeholder: need merged
-				dCtxMerged[t*m.Dmodel+i] += u * m.Wo[row+i]
-			}
-		}
-	}
-	// Note: gradWo should use the merged (pre-output-proj) value, not lastInput.
-	// We need to recompute merged from the forward caches.
-	// Recompute ctx from lastWeights × lastV, then join heads.
-	ctx := make([]T, m.NumHeads*m.SeqLen*m.Dk)
-	contextMul(m.lastWeights, m.lastV, ctx, m.NumHeads, m.SeqLen, m.Dk)
-	merged := make([]T, m.SeqLen*m.Dmodel)
-	joinHeads(ctx, merged, m.NumHeads, m.SeqLen, m.Dk)
-
-	// Recompute gradWo correctly using merged.
-	clear(m.gradWo)
-	for t := range m.SeqLen {
-		for d := range m.Dmodel {
-			u := upstream[t*m.Dmodel+d]
-			row := d * m.Dmodel
-			for i := range m.Dmodel {
 				m.gradWo[row+i] += u * merged[t*m.Dmodel+i]
+				dCtxMerged[t*m.Dmodel+i] += u * m.Wo[row+i]
 			}
 		}
 	}

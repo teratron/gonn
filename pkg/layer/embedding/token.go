@@ -101,7 +101,7 @@ func (te *TokenEmbedding[T]) ForwardIDs(ids []int) ([]T, error) {
 	te.ensureBuffers()
 	n := min(te.SeqLen, len(ids))
 	copy(te.lastIDs, ids[:n])
-	for t := 0; t < n; t++ {
+	for t := range n {
 		id := ids[t]
 		if id < 0 || id >= te.VocabSize {
 			return nil, utils.ErrVocabOutOfRange

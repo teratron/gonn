@@ -53,6 +53,7 @@ type Snapshot[T utils.Float] struct {
 	SchemaVersion   string                    `json:"schema_version"`
 	Weights         persistence.WeightsDoc[T] `json:"weights"`
 	RNGState        []byte                    `json:"rng_state,omitempty"`
+	OptState        []byte                    `json:"opt_state,omitempty"`
 	Config          persistence.ConfigDoc[T]  `json:"config"`
 	Iter            uint64                    `json:"iter"`
 	Timestamp       int64                     `json:"timestamp"`
