@@ -106,6 +106,55 @@ per-feature slices).
   buffers, `PositionalEncoding.lastIn`, the attention backward placeholder
   double-pass, empty `pkg/nn/api/`.
 
+#### Changed — weight storage is now structure-of-arrays
+
+The dense engine no longer chases pointers to read weights. Each layer owns a
+contiguous row-major `[out][in]` run carved out of one network-wide array, and
+`axon.Axon` became a VIEW over it (`W()` / `SetW()` replace the old exported
+`Weight` field; `Bind` attaches an axon to a slot). The bias is folded in as the
+last input column, pinned to 1, so no kernel special-cases it.
+
+This is what makes `WithBackend` real, and it falls out of an invariant that was
+already true: the canonical flat-weight order (layer → cell → axon) *was*
+row-major matrix order all along, so `FlatWeights` / `ApplyFlatWeights`
+collapsed into a single copy.
+
+- **BREAKING (API):** `axon.Axon[T].Weight` (field) → `W()` / `SetW(v)`.
+  The type is never JSON-serialised directly, so no on-disk format changed.
+- Topology mutations repack storage and rebind every axon, carrying learned
+  weights across; the store is rebuilt in one place, so a reallocation can never
+  leave a stale weight reference behind.
+- `InferDense` dropped its per-call `map[Nucleus]T` for plain slices — the
+  concurrent-inference path got both simpler and faster.
+
+#### Added — the compute backend actually computes
+
+`nn.WithBackend` selected a backend that was then stored and never consulted
+(audit B8). The dense passes now route their matrix primitives through it.
+
+- **`compute.DenseKernels[T]`** — optional capability interface (`MatVec`,
+  `MatVecT`, `GradOuter`) alongside `compute.DenseMatrix[T]`. Implemented by
+  `cpu.Backend`, which is therefore live by default.
+- The split is deliberate: kernels are pure linear algebra with no notion of
+  activations, losses, optimizers, normalization, or dropout. That orchestration
+  stays in the engine, so choosing a backend can never silently bypass the
+  configured optimizer or regularizer — only the inner products move.
+- **Graceful degradation, both directions.** A backend that does not implement
+  `DenseKernels` logs a Warn and runs on the engine's internal reference loops.
+  A backend whose kernel *errors* is disabled after one logged Warn and the run
+  finishes on correct math — a failing accelerator never becomes silently wrong
+  training. Both paths are regression-tested, including a bit-exact parity test
+  between the delegated and reference runs.
+- `Network.SetBackend` / `Network.KernelsActive` expose the wiring.
+- **OpenCL remains, by design, NOT an accelerated training path.** It does not
+  implement `DenseKernels`, so selecting it yields correct training on the
+  reference loops plus a Warn. The reason is structural: every call there
+  allocates device buffers, uploads the full weight matrix, launches, blocks,
+  and reads back, while `DenseKernels` runs once per layer per sample — the
+  transfer cost would dominate the arithmetic by orders of magnitude. Making it
+  real needs device-resident weights and mini-batching, both engine-level
+  changes. The package documents this instead of shipping a slower "accelerator".
+
 #### Added — regression infrastructure
 
 - `internal/verification/` — the numeric safety net: gradient-check oracle

@@ -42,16 +42,16 @@ func TestSetWeightSampler(t *testing.T) {
 	for _, hb := range n.Hiddens {
 		for _, h := range hb.cells {
 			for _, a := range h.Axons {
-				if float64(a.Weight) != want {
-					t.Errorf("hidden weight = %v, want %v", a.Weight, want)
+				if float64(a.W()) != want {
+					t.Errorf("hidden weight = %v, want %v", a.W(), want)
 				}
 			}
 		}
 	}
 	for _, o := range n.Output.cells {
 		for _, a := range o.Axons {
-			if float64(a.Weight) != want {
-				t.Errorf("output weight = %v, want %v", a.Weight, want)
+			if float64(a.W()) != want {
+				t.Errorf("output weight = %v, want %v", a.W(), want)
 			}
 		}
 	}

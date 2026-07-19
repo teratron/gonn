@@ -154,6 +154,32 @@ n.Stop()    // terminate loop, return completed epochs; the network stays usable
 Concurrent inference is race-free: any number of goroutines may `Query` a
 compiled dense network in parallel (stateless forward under a read lock).
 
+## Compute Backends
+
+Weights are stored structure-of-arrays: one contiguous row-major `[out][in]`
+matrix per layer, with the bias folded in as a pinned trailing column. A
+`compute.Backend` that implements the optional `compute.DenseKernels` interface
+(`MatVec`, `MatVecT`, `GradOuter`) has those primitives drive every forward and
+backward pass. The CPU backend does, and is active by default.
+
+```go
+n, _ := nn.New[float32](
+    /* topology... */
+    nn.WithBackend[float32](myBackend),
+)
+active := n.Network.KernelsActive() // false → running on the internal reference loops
+```
+
+Only the inner products are delegated — activations, losses, optimizers,
+normalization, and dropout stay in the engine, so a backend can never bypass the
+configured training machinery. A backend without `DenseKernels` (or one whose
+kernel reports an error) degrades to the engine's reference loops with a logged
+warning; training stays correct either way.
+
+The OpenCL backend (`-tags opencl`) is **not** an accelerated training path: its
+per-call upload/launch/read-back model cannot satisfy a per-sample kernel
+contract without device-resident weights and mini-batching. See the package docs.
+
 ## Persistence, Checkpoints, Streaming
 
 ```go
@@ -193,7 +219,6 @@ epochs, loss, err := n.FitDataset(ctx, ds)
 | E15 | `examples/precision/` | float32 vs float64 comparison | Both |
 | E06 | `examples/mnist/` | MNIST dense classifier (IDX loader, `-download` flag) | Options |
 | E16 | `examples/mnist_cnn/` | MNIST with a Conv2D prefix stack | Options |
-
 
 ## Package Overview
 

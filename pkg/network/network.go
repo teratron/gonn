@@ -9,9 +9,11 @@ package network
 
 import (
 	"math"
+	"slices"
 	"sync/atomic"
 
 	"github.com/teratron/gonn/pkg/activation"
+	"github.com/teratron/gonn/pkg/compute"
 	"github.com/teratron/gonn/pkg/layer"
 	"github.com/teratron/gonn/pkg/loss"
 	"github.com/teratron/gonn/pkg/neuron"
@@ -100,7 +102,19 @@ type Network[T utils.Float] struct {
 	normLayers map[int]FeatureNorm[T]
 	// masker is the optional per-layer dropout hook; applied only while
 	// training is true (set around each trainStep by the facade).
-	masker          LayerMask[T]
+	masker LayerMask[T]
+	// weights is the network-wide contiguous weight array; dense[i].store.W
+	// are non-overlapping views into it, in canonical flat order. Built by
+	// buildStore and rebuilt after every topology mutation.
+	weights []T
+	// dense holds the structure-of-arrays view of each fully connected layer:
+	// Hiddens[0..n-1] followed by Output. This is what the forward/backward
+	// kernels operate on; the axon graph only defines the wiring.
+	dense []denseLayer[T]
+	// kernels is the optional accelerated matrix path supplied by the compute
+	// backend. nil means "use the internal reference loops" — identical math,
+	// just not delegated.
+	kernels         compute.DenseKernels[T]
 	training        bool
 	topologyVersion atomic.Uint64
 	outputAct       activation.Type
@@ -348,7 +362,47 @@ func (n *Network[T]) Build() error {
 			o.Axons = append(o.Axons, n.newAxon(n.outputBias, o, 1, fanOut))
 		}
 	}
-	return nil
+	// Pack the freshly sampled weights into contiguous per-layer storage and
+	// rebind every axon as a view into it. From here on the store is the single
+	// source of truth; the axon graph carries topology only.
+	return n.buildStore()
+}
+
+// SetBackend installs a compute backend. When the backend also implements
+// [compute.DenseKernels] its matrix primitives drive every forward and backward
+// pass; otherwise the engine keeps using its internal reference loops and the
+// backend is inert for the dense path. Passing nil restores the reference path.
+//
+// The engine deliberately delegates only the inner products — activations,
+// losses, optimizers, normalization, and dropout stay here — so selecting a
+// backend can never bypass the configured training machinery.
+//
+// AI-Meta:
+//   - Purpose: Route the dense matrix primitives through a compute backend.
+//   - Usage: n.SetBackend(cpuBackend); called by nn.compile from WithBackend.
+//   - Concurrency: NotSafe; call during compile, before training starts.
+//   - Related: [compute.Backend], [compute.DenseKernels].
+//   - Stability: Stable.
+func (n *Network[T]) SetBackend(b compute.Backend[T]) {
+	if k, ok := b.(compute.DenseKernels[T]); ok {
+		n.kernels = k
+		return
+	}
+	n.kernels = nil
+}
+
+// KernelsActive reports whether an accelerated dense path is currently driving
+// the forward/backward passes. False means the internal reference loops are in
+// use — either no backend was set, the backend does not implement
+// [compute.DenseKernels], or a kernel failed and the engine fell back.
+//
+// AI-Meta:
+//   - Purpose: Introspect whether backend kernels are live; used by tests and diagnostics.
+//   - Concurrency: ReadSafe.
+//   - Related: [SetBackend].
+//   - Stability: Stable.
+func (n *Network[T]) KernelsActive() bool {
+	return n.kernels != nil
 }
 
 // newAxon creates an axon with a weight drawn from initWeight when set,
@@ -431,17 +485,21 @@ func (n *Network[T]) SetTargets(data []T) error {
 //   - Related: [ApplyFlatWeights], [FlatGradients].
 //   - Stability: Stable.
 func (n *Network[T]) FlatWeights() []T {
+	if n.storeReady() {
+		// The store is laid out in exactly this order, so the export is a copy.
+		return slices.Clone(n.weights)
+	}
 	out := make([]T, 0, n.weightCount())
 	for _, hb := range n.Hiddens {
 		for _, h := range hb.cells {
 			for _, a := range h.Axons {
-				out = append(out, a.Weight)
+				out = append(out, a.W())
 			}
 		}
 	}
 	for _, o := range n.Output.cells {
 		for _, a := range o.Axons {
-			out = append(out, a.Weight)
+			out = append(out, a.W())
 		}
 	}
 	return out
@@ -455,17 +513,20 @@ func (n *Network[T]) FlatWeights() []T {
 //   - Related: [FlatWeights], [ApplyFlatWeights].
 //   - Stability: Stable.
 func (n *Network[T]) AppendFlatWeights(dst []T) []T {
+	if n.storeReady() {
+		return append(dst[:0], n.weights...)
+	}
 	dst = dst[:0]
 	for _, hb := range n.Hiddens {
 		for _, h := range hb.cells {
 			for _, a := range h.Axons {
-				dst = append(dst, a.Weight)
+				dst = append(dst, a.W())
 			}
 		}
 	}
 	for _, o := range n.Output.cells {
 		for _, a := range o.Axons {
-			dst = append(dst, a.Weight)
+			dst = append(dst, a.W())
 		}
 	}
 	return dst
@@ -487,18 +548,22 @@ func (n *Network[T]) ApplyFlatWeights(weights []T) error {
 		return utils.Newf(utils.ErrInputData,
 			"ApplyFlatWeights: expected %d weights, got %d", want, len(weights))
 	}
+	if n.storeReady() {
+		copy(n.weights, weights)
+		return nil
+	}
 	idx := 0
 	for _, hb := range n.Hiddens {
 		for _, h := range hb.cells {
 			for i := range h.Axons {
-				h.Axons[i].Weight = weights[idx]
+				h.Axons[i].SetW(weights[idx])
 				idx++
 			}
 		}
 	}
 	for _, o := range n.Output.cells {
 		for i := range o.Axons {
-			o.Axons[i].Weight = weights[idx]
+			o.Axons[i].SetW(weights[idx])
 			idx++
 		}
 	}

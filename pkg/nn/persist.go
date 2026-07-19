@@ -189,7 +189,7 @@ func installWeightsDoc[T utils.Float](n *NN[T], doc persistence.ConfigDoc[T], w 
 	for i, h := range doc.HiddenLayers {
 		cells := n.Network.Hiddens[i].Cells()
 		if err := installLayerDoc(fmt.Sprintf("hidden_%d", i), h.Bias, len(cells), w.Layers[i],
-			func(ci, ai int, val T) { cells[ci].Axons[ai].Weight = val },
+			func(ci, ai int, val T) { cells[ci].Axons[ai].SetW(val) },
 			func(ci int) int { return len(cells[ci].Axons) },
 		); err != nil {
 			return err
@@ -198,7 +198,7 @@ func installWeightsDoc[T utils.Float](n *NN[T], doc persistence.ConfigDoc[T], w 
 
 	outCells := n.Network.Output.Cells()
 	return installLayerDoc("output", doc.Output.Bias, len(outCells), w.Layers[len(w.Layers)-1],
-		func(ci, ai int, val T) { outCells[ci].Axons[ai].Weight = val },
+		func(ci, ai int, val T) { outCells[ci].Axons[ai].SetW(val) },
 		func(ci int) int { return len(outCells[ci].Axons) },
 	)
 }
@@ -216,7 +216,7 @@ func extractWeightsDoc[T utils.Float](n *NN[T], doc persistence.ConfigDoc[T]) pe
 			func(ci int) []T {
 				w := make([]T, len(cells[ci].Axons))
 				for j, a := range cells[ci].Axons {
-					w[j] = a.Weight
+					w[j] = a.W()
 				}
 				return w
 			},
@@ -229,7 +229,7 @@ func extractWeightsDoc[T utils.Float](n *NN[T], doc persistence.ConfigDoc[T]) pe
 		func(ci int) []T {
 			w := make([]T, len(outCells[ci].Axons))
 			for j, a := range outCells[ci].Axons {
-				w[j] = a.Weight
+				w[j] = a.W()
 			}
 			return w
 		},

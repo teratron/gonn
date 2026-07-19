@@ -366,14 +366,14 @@ func (n *NN[T]) snapshotWeights(dst []T) []T {
 	for _, hb := range n.Hiddens {
 		for _, h := range hb.Cells() {
 			for _, a := range h.Axons {
-				dst[idx] = a.Weight
+				dst[idx] = a.W()
 				idx++
 			}
 		}
 	}
 	for _, o := range n.Network.Output.Cells() {
 		for _, a := range o.Axons {
-			dst[idx] = a.Weight
+			dst[idx] = a.W()
 			idx++
 		}
 	}
@@ -388,14 +388,14 @@ func (n *NN[T]) restoreWeights(src []T) {
 	for _, hb := range n.Hiddens {
 		for _, h := range hb.Cells() {
 			for i := range h.Axons {
-				h.Axons[i].Weight = src[idx]
+				h.Axons[i].SetW(src[idx])
 				idx++
 			}
 		}
 	}
 	for _, o := range n.Network.Output.Cells() {
 		for i := range o.Axons {
-			o.Axons[i].Weight = src[idx]
+			o.Axons[i].SetW(src[idx])
 			idx++
 		}
 	}

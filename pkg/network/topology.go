@@ -97,6 +97,11 @@ func (n *Network[T]) AddNeuron(layerIdx, count uint) error {
 	} else {
 		n.rebalanceOutput()
 	}
+	// Rewiring produced fresh, unbound axons: repack contiguous storage so the
+	// SoA view matches the new shape before anything reads weights again.
+	if err := n.buildStore(); err != nil {
+		return err
+	}
 	n.topologyVersion.Add(1)
 	return nil
 }
@@ -141,6 +146,11 @@ func (n *Network[T]) RemoveNeuron(layerIdx, count uint) error {
 		n.rebalance(int(layerIdx) + 1)
 	} else {
 		n.rebalanceOutput()
+	}
+	// Rewiring produced fresh, unbound axons: repack contiguous storage so the
+	// SoA view matches the new shape before anything reads weights again.
+	if err := n.buildStore(); err != nil {
+		return err
 	}
 	n.topologyVersion.Add(1)
 	return nil
@@ -198,6 +208,11 @@ func (n *Network[T]) AddHiddenLayer(position, size uint, act activation.Type, bi
 	} else {
 		n.rebalanceOutput()
 	}
+	// Rewiring produced fresh, unbound axons: repack contiguous storage so the
+	// SoA view matches the new shape before anything reads weights again.
+	if err := n.buildStore(); err != nil {
+		return err
+	}
 	n.topologyVersion.Add(1)
 	return nil
 }
@@ -238,6 +253,11 @@ func (n *Network[T]) RemoveHiddenLayer(position uint) error {
 	} else {
 		// Removed last hidden layer; rebalance Output from new last hidden.
 		n.rebalanceOutput()
+	}
+	// Rewiring produced fresh, unbound axons: repack contiguous storage so the
+	// SoA view matches the new shape before anything reads weights again.
+	if err := n.buildStore(); err != nil {
+		return err
 	}
 	n.topologyVersion.Add(1)
 	return nil
@@ -297,7 +317,7 @@ func (n *Network[T]) rewireCell(
 ) {
 	prev := make(map[neuron.Nucleus[T]]T, len(*bundle))
 	for _, a := range *bundle {
-		prev[a.Cell] = a.Weight
+		prev[a.Cell] = a.W()
 	}
 	*bundle = (*bundle)[:0]
 	for _, src := range sources {

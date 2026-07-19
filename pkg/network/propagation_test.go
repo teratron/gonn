@@ -38,7 +38,7 @@ func linearChain[T utils.Float](inSize int, hiddenSizes []int, outSize int) (*Ne
 func setHiddenWeights[T utils.Float](n *Network[T], layerIdx int, weights [][]T) {
 	for cellIdx, h := range n.Hiddens[layerIdx].Cells() {
 		for srcIdx, w := range weights[cellIdx] {
-			h.Axons[srcIdx].Weight = w
+			h.Axons[srcIdx].SetW(w)
 		}
 	}
 }
@@ -47,7 +47,7 @@ func setHiddenWeights[T utils.Float](n *Network[T], layerIdx int, weights [][]T)
 func setOutputWeights[T utils.Float](n *Network[T], weights [][]T) {
 	for cellIdx, o := range n.Output.Cells() {
 		for srcIdx, w := range weights[cellIdx] {
-			o.Axons[srcIdx].Weight = w
+			o.Axons[srcIdx].SetW(w)
 		}
 	}
 }
@@ -226,24 +226,24 @@ func TestBackwardWeightUpdateTwoHiddenGolden(t *testing.T) {
 	for cellIdx, h := range n.Hiddens[0].Cells() {
 		for srcIdx, a := range h.Axons {
 			want := wantW1[cellIdx][srcIdx]
-			if !approxEqual(a.Weight, want, tol) {
-				t.Errorf("W1[%d][%d] = %v; want %v", cellIdx, srcIdx, a.Weight, want)
+			if !approxEqual(a.W(), want, tol) {
+				t.Errorf("W1[%d][%d] = %v; want %v", cellIdx, srcIdx, a.W(), want)
 			}
 		}
 	}
 	for cellIdx, h := range n.Hiddens[1].Cells() {
 		for srcIdx, a := range h.Axons {
 			want := wantW2[cellIdx][srcIdx]
-			if !approxEqual(a.Weight, want, tol) {
-				t.Errorf("W2[%d][%d] = %v; want %v", cellIdx, srcIdx, a.Weight, want)
+			if !approxEqual(a.W(), want, tol) {
+				t.Errorf("W2[%d][%d] = %v; want %v", cellIdx, srcIdx, a.W(), want)
 			}
 		}
 	}
 	for cellIdx, o := range n.Output.Cells() {
 		for srcIdx, a := range o.Axons {
 			want := wantWo[cellIdx][srcIdx]
-			if !approxEqual(a.Weight, want, tol) {
-				t.Errorf("Wo[%d][%d] = %v; want %v", cellIdx, srcIdx, a.Weight, want)
+			if !approxEqual(a.W(), want, tol) {
+				t.Errorf("Wo[%d][%d] = %v; want %v", cellIdx, srcIdx, a.W(), want)
 			}
 		}
 	}
@@ -305,8 +305,8 @@ func TestBackwardThreeHiddenGolden(t *testing.T) {
 	for cellIdx, h := range n.Hiddens[0].Cells() {
 		for srcIdx, a := range h.Axons {
 			want := wantW1[cellIdx][srcIdx]
-			if !approxEqual(a.Weight, want, tol) {
-				t.Errorf("W1[%d][%d] = %v; want %v", cellIdx, srcIdx, a.Weight, want)
+			if !approxEqual(a.W(), want, tol) {
+				t.Errorf("W1[%d][%d] = %v; want %v", cellIdx, srcIdx, a.W(), want)
 			}
 		}
 	}

@@ -54,8 +54,8 @@ func TestNewDefaultWeightInBaselineRange(t *testing.T) {
 	out := &stubNeuron[float64]{}
 	for range 1024 {
 		a := New(in, out)
-		if a.Weight < -0.5 || a.Weight > 0.5 {
-			t.Fatalf("default weight %v outside legacy [-0.5, 0.5] baseline", a.Weight)
+		if a.W() < -0.5 || a.W() > 0.5 {
+			t.Fatalf("default weight %v outside legacy [-0.5, 0.5] baseline", a.W())
 		}
 	}
 }
@@ -65,8 +65,8 @@ func TestNewWithWeightHonoursCallerValue(t *testing.T) {
 	in := &stubNucleus[float64]{v: 1.0}
 	out := &stubNeuron[float64]{}
 	a := NewWithWeight(0.42, in, out)
-	if a.Weight != 0.42 {
-		t.Errorf("NewWithWeight stored %v; want 0.42", a.Weight)
+	if a.W() != 0.42 {
+		t.Errorf("NewWithWeight stored %v; want 0.42", a.W())
 	}
 }
 
@@ -97,8 +97,8 @@ func TestCalculateWeightUpdatesInPlace(t *testing.T) {
 	a := NewWithWeight(1.0, in, out)
 	g := 0.1
 	a.CalculateWeight(&g)
-	if !approx(float64(a.Weight), 1.2) {
-		t.Errorf("weight after gradient step = %v; want 1.2 (1.0 + 0.1 * 2.0)", a.Weight)
+	if !approx(float64(a.W()), 1.2) {
+		t.Errorf("weight after gradient step = %v; want 1.2 (1.0 + 0.1 * 2.0)", a.W())
 	}
 }
 
@@ -117,8 +117,8 @@ func TestNewIsConcurrencySafe(t *testing.T) {
 			defer wg.Done()
 			for range perG {
 				a := New(in, out)
-				if a.Weight < -0.5 || a.Weight > 0.5 {
-					t.Errorf("concurrent New produced out-of-range weight %v", a.Weight)
+				if a.W() < -0.5 || a.W() > 0.5 {
+					t.Errorf("concurrent New produced out-of-range weight %v", a.W())
 					return
 				}
 			}

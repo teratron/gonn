@@ -57,3 +57,52 @@ type Backend[T utils.Float] interface {
 	Allocate(size int) (Buffer[T], error)
 	Free(buf Buffer[T]) error
 }
+
+// DenseMatrix is the structure-of-arrays view of one fully connected layer:
+// a single contiguous weight run in row-major [Out][In] order, so slot (o, j)
+// lives at W[o*In+j]. When the layer has a bias, it occupies the LAST input
+// column (input[In-1] is pinned to 1) — kernels therefore never special-case
+// bias, they just multiply one wider matrix.
+//
+// AI-Meta:
+//   - Purpose: Contiguous matrix view of a dense layer passed to accelerated kernels.
+//   - Concurrency: NotSafe; the caller owns W for the duration of the call.
+//   - Related: [DenseKernels], [Backend].
+//   - Stability: Stable.
+type DenseMatrix[T utils.Float] struct {
+	W   []T
+	In  int
+	Out int
+}
+
+// DenseKernels is the OPTIONAL accelerated linear-algebra path a [Backend] may
+// implement. The training engine type-asserts for it: a backend that provides
+// these three primitives has its kernels driven for every forward and backward
+// pass, and one that does not falls back to the engine's internal reference
+// loops — identical math, simply not delegated.
+//
+// The split is deliberate. These are pure primitives with no notion of
+// activations, losses, optimizers, normalization, or dropout: that orchestration
+// stays in the engine, so plugging in a backend can never silently bypass the
+// configured optimizer or regularizer. Only the inner products move.
+//
+// AI-Meta:
+//   - Purpose: Optional capability interface letting a backend supply the dense matrix primitives.
+//   - Implementations: [cpu.Backend]; OpenCL when built with the opencl tag.
+//   - Usage: type-asserted by pkg/network; absence is not an error.
+//   - Concurrency: NotSafe; one call at a time per layer.
+//   - Related: [DenseMatrix], [Backend].
+//   - Stability: Stable.
+type DenseKernels[T utils.Float] interface {
+	// MatVec computes preact[o] = Σ_j m.W[o*In+j] * input[j].
+	MatVec(m DenseMatrix[T], input, preact []T) error
+
+	// MatVecT computes dInput[j] = Σ_o delta[o] * m.W[o*In+j] — the transpose
+	// product that carries the error signal to the previous layer.
+	MatVecT(m DenseMatrix[T], delta, dInput []T) error
+
+	// GradOuter computes grad[o*In+j] = scale * delta[o] * input[j], the
+	// per-weight gradient of one sample. scale lets the caller fold in a sign
+	// convention without a second pass over the array.
+	GradOuter(m DenseMatrix[T], delta, input, grad []T, scale T) error
+}

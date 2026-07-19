@@ -98,8 +98,8 @@ func TestDenseCalculateWeightAppliesGradient(t *testing.T) {
 	d.CalculateWeight(&rate)
 	// gradient = rate * miss = 0.05
 	// new weight = 1.0 + gradient * cell.value = 1.0 + 0.05 * 2.0 = 1.1
-	if got := d.Axons[0].Weight; !approxEqual(got, 1.1) {
-		t.Errorf("axon.Weight after backward = %v; want 1.1", got)
+	if got := d.Axons[0].W(); !approxEqual(got, 1.1) {
+		t.Errorf("axon.W() after backward = %v; want 1.1", got)
 	}
 }
 

@@ -116,7 +116,7 @@ func quantizeDenseHead[T utils.Float](net *nn.NN[T], cfg QuantizationConfig[T]) 
 		cells := net.Network.Hiddens[i].Cells()
 		hasBias := i < len(netCfg.HiddenLayers) && netCfg.HiddenLayers[i].Bias
 		w, b := extractDenseMatrix(len(cells), prev, hasBias, func(ci, ai int) float64 {
-			return float64(cells[ci].Axons[ai].Weight)
+			return float64(cells[ci].Axons[ai].W())
 		})
 		qd := newQuantizedDense[T](w, b, len(cells), prev, cfg)
 		if i < len(netCfg.HiddenLayers) {
@@ -129,7 +129,7 @@ func quantizeDenseHead[T utils.Float](net *nn.NN[T], cfg QuantizationConfig[T]) 
 
 	outCells := net.Network.Output.Cells()
 	w, b := extractDenseMatrix(len(outCells), prev, netCfg.OutputBias, func(ci, ai int) float64 {
-		return float64(outCells[ci].Axons[ai].Weight)
+		return float64(outCells[ci].Axons[ai].W())
 	})
 	qd := newQuantizedDense[T](w, b, len(outCells), prev, cfg)
 	qd.Act = netCfg.OutputActivation

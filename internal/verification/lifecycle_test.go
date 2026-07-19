@@ -118,11 +118,11 @@ func TestAndTrainLearningRateApplies(t *testing.T) {
 // the learned weights of the surviving neurons.
 func TestTopologyPreservesWeights(t *testing.T) {
 	n := trainedXOR(t, nn.WithTopologyMode[float64](network.Dynamic), nn.WithMaxIterations[float64](500))
-	before := n.Network.Hiddens[0].Cells()[0].Axons[0].Weight
+	before := n.Network.Hiddens[0].Cells()[0].Axons[0].W()
 	if err := n.AddNeuron(0, 1); err != nil {
 		t.Fatalf("AddNeuron: %v", err)
 	}
-	after := n.Network.Hiddens[0].Cells()[0].Axons[0].Weight
+	after := n.Network.Hiddens[0].Cells()[0].Axons[0].W()
 	if before != after {
 		t.Errorf("surviving weight changed on grow: %.6f -> %.6f", before, after)
 	}

@@ -8,12 +8,34 @@
 //
 // Build with -tags opencl (and cgo enabled, which is the default).
 //
+// # Status: not an accelerated training path
+//
+// This backend deliberately does NOT implement [compute.DenseKernels], so it
+// does not drive the dense forward/backward passes. Selecting it via
+// nn.WithBackend yields correct training on the engine's internal reference
+// loops plus a Warn saying so — it does not silently make training slower or
+// wrong.
+//
+// The reason is structural, not a missing kernel. Every call here allocates
+// device buffers, uploads the full weight matrix, creates a kernel, launches,
+// blocks on clFinish, and reads back. DenseKernels is invoked once per layer
+// PER SAMPLE, and GoNN trains one sample at a time, so that transfer cost
+// would dominate the arithmetic by orders of magnitude: the "accelerated"
+// path would be far slower than the CPU one it replaced.
+//
+// Making this real needs two things this package cannot supply alone:
+// device-resident weights that survive across steps, and mini-batching so one
+// launch covers many samples. Both are engine-level changes. Until then the
+// per-call [compute.Backend] methods (Forward) remain available for callers
+// that explicitly want them, and Backward/UpdateWeights report
+// ErrBackendUnavailable rather than pretending.
+//
 // AI-Meta:
 //   - Purpose: OpenCL 1.2 Backend[T] implementation; registers under gpu.VendorOpenCL at init.
 //   - Usage: import _ "github.com/teratron/gonn/pkg/compute/gpu/opencl"; gpu.New[float32](gpu.VendorOpenCL).
-//   - Errors: ErrBackendUnavailable (no device), ErrBackendKernel (kernel launch failed), ErrBackendTransfer.
+//   - Errors: ErrBackendUnavailable (no device or unimplemented op), ErrBackendKernel (kernel launch failed), ErrBackendTransfer.
 //   - Concurrency: NotSafe; each Backend instance owns its queue.
-//   - Related: [compute.Backend], [gpu.New], [gpu.VendorOpenCL].
+//   - Related: [compute.Backend], [compute.DenseKernels], [gpu.New], [gpu.VendorOpenCL].
 //   - Stability: Experimental.
 package opencl
 

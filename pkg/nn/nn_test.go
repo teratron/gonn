@@ -686,13 +686,13 @@ func TestRestoreWeightsBringsBackSnapshot(t *testing.T) {
 	for _, hb := range n.Hiddens {
 		for _, h := range hb.Cells() {
 			for i := range h.Axons {
-				h.Axons[i].Weight = 99
+				h.Axons[i].SetW(99)
 			}
 		}
 	}
 	for _, o := range n.Network.Output.Cells() {
 		for i := range o.Axons {
-			o.Axons[i].Weight = 99
+			o.Axons[i].SetW(99)
 		}
 	}
 	n.restoreWeights(original)

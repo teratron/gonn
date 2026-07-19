@@ -179,7 +179,16 @@ func compile[T utils.Float](n *NN[T], cfg *Config[T]) error {
 
 	// Wire compute backend. Probe the requested backend via Allocate(1);
 	// on ErrBackendUnavailable fall back to the CPU reference (COMP-3).
+	// SetBackend routes the dense matrix primitives through it when the backend
+	// implements compute.DenseKernels — until v0.18 the resolved backend was
+	// stored and never consulted, so WithBackend was decorative (audit B8).
 	n.backend = resolveBackend(cfg.Backend)
+	n.Network.SetBackend(n.backend)
+	if !n.Network.KernelsActive() {
+		utils.Logger.Warn("compute backend does not implement DenseKernels; "+
+			"the dense path uses the internal reference loops",
+			"backend", n.backend.Name())
+	}
 
 	startProfilingServer(cfg.ProfilingAddr)
 	if err := startVisServer(n, cfg); err != nil {
