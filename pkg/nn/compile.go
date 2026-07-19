@@ -118,7 +118,7 @@ func compile[T utils.Float](n *NN[T], cfg *Config[T]) error {
 	// (Dropout, or a Compose containing one), the dense engine applies the
 	// mask inside the forward pass on training steps (audit B3).
 	if lm, ok := any(cfg.Regularizer).(network.LayerMask[T]); ok {
-		n.Network.SetLayerMasker(lm)
+		n.SetLayerMasker(lm)
 	}
 	// Auto-bind the scheduler to the resolved optimizer so its Step updates the
 	// optimizer's effective learning rate. Without this the schedule advanced
@@ -166,7 +166,7 @@ func compile[T utils.Float](n *NN[T], cfg *Config[T]) error {
 			hooks[idx] = nl
 		}
 		n.normLayers = resolved
-		n.Network.SetNormLayers(hooks)
+		n.SetNormLayers(hooks)
 	}
 	n.callbacks = cfg.Callbacks
 
@@ -183,8 +183,8 @@ func compile[T utils.Float](n *NN[T], cfg *Config[T]) error {
 	// implements compute.DenseKernels — until v0.18 the resolved backend was
 	// stored and never consulted, so WithBackend was decorative (audit B8).
 	n.backend = resolveBackend(cfg.Backend)
-	n.Network.SetBackend(n.backend)
-	if !n.Network.KernelsActive() {
+	n.SetBackend(n.backend)
+	if !n.KernelsActive() {
 		utils.Logger.Warn("compute backend does not implement DenseKernels; "+
 			"the dense path uses the internal reference loops",
 			"backend", n.backend.Name())

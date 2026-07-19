@@ -21,10 +21,14 @@ var (
 //   - Purpose: Hidden-layer cell that performs forward (dot product) and backward (weight update) steps.
 //   - Concurrency: NotSafe; CalculateValue and CalculateWeight mutate internal state.
 //   - Related: [NewDense], [neuron.Neuron], [axon.Bundle].
+//
+// Field order is GC-scan-optimal: the pointer-bearing fields (core, Axons)
+// come before the pointer-free miss, shrinking the scan range for the most
+// numerous struct in the graph — one instance per hidden/output neuron.
 type Dense[T utils.Float] struct {
 	*core[T]
-	miss  T
 	Axons axon.Bundle[T] `json:"axons" xml:"axons"`
+	miss  T
 }
 
 // NewDense allocates a Dense cell at position number within its layer.

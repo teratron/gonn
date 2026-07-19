@@ -48,5 +48,5 @@ func (n *NN[T]) Query(input []T) ([]T, error) {
 	// number of goroutines may Query in parallel without racing (audit D1).
 	n.mu.RLock()
 	defer n.mu.RUnlock()
-	return n.Network.InferDense(input)
+	return n.InferDense(input)
 }

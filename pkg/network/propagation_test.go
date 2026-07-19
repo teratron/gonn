@@ -324,7 +324,7 @@ func TestXORTwoHiddenConvergence(t *testing.T) {
 	// within the epoch budget (rare pre-existing flake).
 	rng, _ := utils.NewRNG(12345)
 	sampler := func(fanIn, fanOut int) float64 { return utils.XavierUniform[float64](rng, fanIn, fanOut) }
-	n, err := newTrainableChainSampled[float64](2, []int{4, 4}, 1, true, sampler)
+	n, err := newTrainableChainSampled(2, []int{4, 4}, 1, true, sampler)
 	if err != nil {
 		t.Fatalf("setup: %v", err)
 	}

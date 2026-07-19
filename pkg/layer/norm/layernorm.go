@@ -49,18 +49,22 @@ func WithLayerNormAffine[T utils.Float](a bool) LayerNormOption[T] {
 //   - Concurrency: SetMode is goroutine-safe; Forward must be called from a single goroutine.
 //   - Related: [NewLayerNorm], [Normalizer], [BatchNorm], [GroupNorm].
 //   - Stability: Stable.
+//
+// Field order is GC-scan-optimal: the mixed slice-header fields come first,
+// then the pointer-free scalars.
 type LayerNorm[T utils.Float] struct {
-	eps       T
 	gamma     []T
 	beta      []T
 	gammaGrad []T
 	betaGrad  []T
-	// xHat and invSd are cached by Forward for use in Backward.
-	xHat  []T
-	invSd T
+	// xHat is cached by Forward for use in Backward.
+	xHat []T
 	// xHatBuf and invSdBuf store per-position caches for ForwardSeq/BackwardSeq.
 	xHatBuf  []T
 	invSdBuf []T
+
+	eps      T
+	invSd    T
 	features int
 	mode     atomic.Int32
 	affine   bool

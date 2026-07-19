@@ -1,5 +1,7 @@
 package regularizer
 
+import "slices"
+
 import "github.com/teratron/gonn/pkg/utils"
 
 // compose holds a slice of member regularizers.
@@ -69,8 +71,8 @@ func (c *compose[T]) MaskForwardLayer(layer int, acts []T) []T {
 // MaskBackwardLayer chains the per-layer backward masks in REVERSE member
 // order (the inverse of MaskForwardLayer's composition).
 func (c *compose[T]) MaskBackwardLayer(layer int, upstream []T) []T {
-	for i := len(c.members) - 1; i >= 0; i-- {
-		if lm, ok := c.members[i].(LayerMasker[T]); ok {
+	for _, v := range slices.Backward(c.members) {
+		if lm, ok := v.(LayerMasker[T]); ok {
 			upstream = lm.MaskBackwardLayer(layer, upstream)
 		}
 	}

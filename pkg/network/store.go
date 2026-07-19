@@ -20,19 +20,22 @@ import (
 // The trailing input column is the bias when hasBias is set: input[in-1] is
 // pinned to 1, which folds the bias term into the same matrix-vector product
 // instead of special-casing it in every kernel.
+// Field order is GC-scan-optimal: the pure pointer first, then the mixed
+// slice-header fields grouped together, then the pointer-free scalars last.
 type denseLayer[T utils.Float] struct {
-	store   *axon.Store[T]
+	store *axon.Store[T]
+
+	// Scratch buffers, allocated once per topology and reused every sample.
+	act    []T // post-activation → post-norm → post-mask values, length out
+	dInput []T // −∂L/∂input propagated to the previous layer, length in
+	delta  []T // −∂L/∂preact = σ′(preact) ⊙ miss, length out
+	input  []T // source activations, length in (input[in-1] == 1 when hasBias)
+	miss   []T // −∂L/∂act, length out
+	preact []T // pre-activation sums, length out (aliases preactHiddens[i] / preactOutput)
+
 	in      int // fan-in INCLUDING the bias column when hasBias
 	out     int
 	hasBias bool
-
-	// Scratch buffers, allocated once per topology and reused every sample.
-	input  []T // source activations, length in (input[in-1] == 1 when hasBias)
-	preact []T // pre-activation sums, length out (aliases preactHiddens[i] / preactOutput)
-	act    []T // post-activation → post-norm → post-mask values, length out
-	miss   []T // −∂L/∂act, length out
-	delta  []T // −∂L/∂preact = σ′(preact) ⊙ miss, length out
-	dInput []T // −∂L/∂input propagated to the previous layer, length in
 }
 
 // buildStore (re)allocates contiguous weight storage for every dense layer and

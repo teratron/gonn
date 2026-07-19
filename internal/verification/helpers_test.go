@@ -99,10 +99,14 @@ func gradcheckDense(t *testing.T, n *nn.NN[float64], input, target []float64, mo
 	for i := range w0 {
 		copy(w, w0)
 		w[i] = w0[i] + h
-		n.ApplyFlatWeights(w)
+		if err := n.ApplyFlatWeights(w); err != nil {
+			t.Fatalf("ApplyFlatWeights(+h): %v", err)
+		}
 		lp := refLossScalar(t, n, input, target, mode)
 		w[i] = w0[i] - h
-		n.ApplyFlatWeights(w)
+		if err := n.ApplyFlatWeights(w); err != nil {
+			t.Fatalf("ApplyFlatWeights(-h): %v", err)
+		}
 		lm := refLossScalar(t, n, input, target, mode)
 		num := (lp - lm) / (2 * h)
 		scale := math.Abs(num) + math.Abs(ana[i])
@@ -114,7 +118,9 @@ func gradcheckDense(t *testing.T, n *nn.NN[float64], input, target []float64, mo
 			worst = rel
 		}
 	}
-	n.ApplyFlatWeights(w0)
+	if err := n.ApplyFlatWeights(w0); err != nil {
+		t.Fatalf("ApplyFlatWeights(restore): %v", err)
+	}
 	return worst
 }
 

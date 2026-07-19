@@ -88,9 +88,10 @@ func WithBatchNormAffine[T utils.Float](a bool) BatchNormOption[T] {
 //   - Concurrency: SetMode is goroutine-safe; Forward/Backward must be called from a single goroutine; ForwardInference is ReadSafe.
 //   - Related: [NewBatchNorm], [Normalizer], [LayerNorm], [GroupNorm].
 //   - Stability: Stable.
+//
+// Field order is GC-scan-optimal: the mixed slice-header fields come first,
+// then the pointer-free scalars.
 type BatchNorm[T utils.Float] struct {
-	eps         T
-	momentum    T
 	runningMean []T
 	runningVar  []T
 	gamma       []T
@@ -98,8 +99,11 @@ type BatchNorm[T utils.Float] struct {
 	gammaGrad   []T
 	betaGrad    []T
 	// xHat and invSd are cached by Forward for Backward.
-	xHat     []T
-	invSd    []T
+	xHat  []T
+	invSd []T
+
+	eps      T
+	momentum T
 	features int
 	mode     atomic.Int32
 	affine   bool

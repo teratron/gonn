@@ -25,8 +25,11 @@ import (
 //   - Concurrency: NotSafe; Forward/Backward mutate per-call caches.
 //   - Related: [MaskedLayer], [layer.Layer], [utils.XavierUniform].
 //   - Stability: Stable.
+//
+// scale sits with the other pointer-free scalars at the end, not at offset 0,
+// so the struct's GC-scanned range is the contiguous run of slice headers
+// (GC-scan-optimal).
 type MultiHeadAttention[T utils.Float] struct {
-	scale       T
 	lastQ       []T
 	gradBk      []T
 	gradX       []T
@@ -54,6 +57,7 @@ type MultiHeadAttention[T utils.Float] struct {
 	NumHeads    int
 	Dk          int
 	Dmodel      int
+	scale       T
 	Causal      bool
 }
 

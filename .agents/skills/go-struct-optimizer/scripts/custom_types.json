@@ -83,5 +83,215 @@
     "size": 24,
     "align": 8,
     "ptr": "mixed"
+  },
+  "T": {
+    "size": 8,
+    "align": 8,
+    "ptr": "none"
+  },
+  "neuron.Nucleus[T]": {
+    "size": 16,
+    "align": 8,
+    "ptr": "pure"
+  },
+  "neuron.Neuron[T]": {
+    "size": 16,
+    "align": 8,
+    "ptr": "pure"
+  },
+  "FeatureNorm[T]": {
+    "size": 16,
+    "align": 8,
+    "ptr": "pure"
+  },
+  "LayerMask[T]": {
+    "size": 16,
+    "align": 8,
+    "ptr": "pure"
+  },
+  "compute.Backend[T]": {
+    "size": 16,
+    "align": 8,
+    "ptr": "pure"
+  },
+  "compute.DenseKernels[T]": {
+    "size": 16,
+    "align": 8,
+    "ptr": "pure"
+  },
+  "regularizer.Regularizer[T]": {
+    "size": 16,
+    "align": 8,
+    "ptr": "pure"
+  },
+  "optimizer.Optimizer[T]": {
+    "size": 16,
+    "align": 8,
+    "ptr": "pure"
+  },
+  "optimizer.Scheduler[T]": {
+    "size": 16,
+    "align": 8,
+    "ptr": "pure"
+  },
+  "Scheduler[T]": {
+    "size": 16,
+    "align": 8,
+    "ptr": "pure"
+  },
+  "LearningRateSetter[T]": {
+    "size": 16,
+    "align": 8,
+    "ptr": "pure"
+  },
+  "dataset.Dataset[T]": {
+    "size": 16,
+    "align": 8,
+    "ptr": "pure"
+  },
+  "io.Reader": {
+    "size": 16,
+    "align": 8,
+    "ptr": "pure"
+  },
+  "net.Listener": {
+    "size": 16,
+    "align": 8,
+    "ptr": "pure"
+  },
+  "error": {
+    "size": 16,
+    "align": 8,
+    "ptr": "pure"
+  },
+  "WeightSampler[T]": {
+    "size": 8,
+    "align": 8,
+    "ptr": "pure"
+  },
+  "SnapFn": {
+    "size": 8,
+    "align": 8,
+    "ptr": "pure"
+  },
+  "FeatureFunc[T]": {
+    "size": 8,
+    "align": 8,
+    "ptr": "pure"
+  },
+  "context.CancelFunc": {
+    "size": 8,
+    "align": 8,
+    "ptr": "pure"
+  },
+  "activation.Type": {
+    "size": 1,
+    "align": 1,
+    "ptr": "none"
+  },
+  "loss.Type": {
+    "size": 1,
+    "align": 1,
+    "ptr": "none"
+  },
+  "TopologyMode": {
+    "size": 1,
+    "align": 1,
+    "ptr": "none"
+  },
+  "network.TopologyMode": {
+    "size": 1,
+    "align": 1,
+    "ptr": "none"
+  },
+  "PadMode": {
+    "size": 1,
+    "align": 1,
+    "ptr": "none"
+  },
+  "convPadMode": {
+    "size": 1,
+    "align": 1,
+    "ptr": "none"
+  },
+  "PositionalMode": {
+    "size": 1,
+    "align": 1,
+    "ptr": "none"
+  },
+  "Mode": {
+    "size": 1,
+    "align": 1,
+    "ptr": "none"
+  },
+  "state": {
+    "size": 1,
+    "align": 1,
+    "ptr": "none"
+  },
+  "QuantMode": {
+    "size": 8,
+    "align": 8,
+    "ptr": "none"
+  },
+  "Granularity": {
+    "size": 8,
+    "align": 8,
+    "ptr": "none"
+  },
+  "CalibStrategy": {
+    "size": 8,
+    "align": 8,
+    "ptr": "none"
+  },
+  "WeightInitMethod": {
+    "size": 16,
+    "align": 8,
+    "ptr": "mixed"
+  },
+  "atomic.Uint64": {
+    "size": 8,
+    "align": 8,
+    "ptr": "none"
+  },
+  "atomic.Int32": {
+    "size": 4,
+    "align": 4,
+    "ptr": "none"
+  },
+  "atomic.Pointer[visualization.NetworkState]": {
+    "size": 8,
+    "align": 8,
+    "ptr": "pure"
+  },
+  "bundle[T, *cell.Input[T]]": {
+    "size": 24,
+    "align": 8,
+    "ptr": "mixed"
+  },
+  "bundle[T, *cell.Output[T]]": {
+    "size": 24,
+    "align": 8,
+    "ptr": "mixed"
+  },
+  "TransformerConfig[T]": {
+    "size": 48,
+    "align": 8,
+    "ptr": "none"
+  },
+  "sparseGrad[T]": {
+    "size": 72,
+    "align": 8,
+    "ptr": "mixed"
+  },
+  "QuantizationParams": {
+    "size": 64,
+    "align": 8,
+    "ptr": "mixed"
+  },
+  "Batch[T]": {
+    "size": 48,
+    "align": 8,
+    "ptr": "mixed"
   }
 }

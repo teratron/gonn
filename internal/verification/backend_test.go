@@ -33,7 +33,7 @@ func backendNet(t *testing.T, opts ...nn.Option[float64]) *nn.NN[float64] {
 // CPU backend's dense kernels must actually be driving the passes.
 func TestBackendKernelsLiveByDefault(t *testing.T) {
 	n := backendNet(t)
-	if !n.Network.KernelsActive() {
+	if !n.KernelsActive() {
 		t.Error("compute kernels inactive after default compile — WithBackend is decorative again")
 	}
 }
@@ -43,13 +43,13 @@ func TestBackendKernelsLiveByDefault(t *testing.T) {
 // reference loops. Same seed, same samples, same epoch count → same net.
 func TestBackendParityWithReferenceLoops(t *testing.T) {
 	withKernels := backendNet(t)
-	if !withKernels.Network.KernelsActive() {
+	if !withKernels.KernelsActive() {
 		t.Fatal("precondition: kernels must be active for the accelerated run")
 	}
 
 	reference := backendNet(t)
-	reference.Network.SetBackend(nil) // force the internal reference path
-	if reference.Network.KernelsActive() {
+	reference.SetBackend(nil) // force the internal reference path
+	if reference.KernelsActive() {
 		t.Fatal("SetBackend(nil) must disable the accelerated path")
 	}
 
@@ -61,8 +61,8 @@ func TestBackendParityWithReferenceLoops(t *testing.T) {
 		t.Fatalf("Fit (reference): %v", err)
 	}
 
-	a := withKernels.Network.FlatWeights()
-	b := reference.Network.FlatWeights()
+	a := withKernels.FlatWeights()
+	b := reference.FlatWeights()
 	if len(a) != len(b) {
 		t.Fatalf("weight count differs: kernels %d, reference %d", len(a), len(b))
 	}
@@ -97,7 +97,7 @@ func (noKernelBackend[T]) Free(compute.Buffer[T]) error { return nil }
 // silently skipping the math or failing the compile.
 func TestBackendWithoutKernelsStillTrains(t *testing.T) {
 	n := backendNet(t, nn.WithBackend[float64](noKernelBackend[float64]{}))
-	if n.Network.KernelsActive() {
+	if n.KernelsActive() {
 		t.Error("a backend without DenseKernels must not report an active accelerated path")
 	}
 	_, finalLoss, err := n.Fit(xorSamples())
@@ -130,14 +130,14 @@ func (brokenKernelBackend[T]) GradOuter(compute.DenseMatrix[T], []T, []T, []T, T
 // a failing accelerator must never become silently wrong training.
 func TestBrokenKernelFallsBackAndStillTrains(t *testing.T) {
 	n := backendNet(t, nn.WithBackend[float64](brokenKernelBackend[float64]{}))
-	if !n.Network.KernelsActive() {
+	if !n.KernelsActive() {
 		t.Fatal("precondition: the broken backend does implement DenseKernels")
 	}
 	_, finalLoss, err := n.Fit(xorSamples())
 	if err != nil {
 		t.Fatalf("Fit: %v", err)
 	}
-	if n.Network.KernelsActive() {
+	if n.KernelsActive() {
 		t.Error("engine kept using kernels after they reported errors")
 	}
 	if finalLoss >= 0.25 {
@@ -146,11 +146,11 @@ func TestBrokenKernelFallsBackAndStillTrains(t *testing.T) {
 
 	// And the fallback result must equal a run that never had kernels at all.
 	reference := backendNet(t)
-	reference.Network.SetBackend(nil)
+	reference.SetBackend(nil)
 	if _, _, err := reference.Fit(xorSamples()); err != nil {
 		t.Fatalf("Fit (reference): %v", err)
 	}
-	a, b := n.Network.FlatWeights(), reference.Network.FlatWeights()
+	a, b := n.FlatWeights(), reference.FlatWeights()
 	for i := range a {
 		if a[i] != b[i] {
 			t.Fatalf("weight %d: fallback %.17g != reference %.17g", i, a[i], b[i])

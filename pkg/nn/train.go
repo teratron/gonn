@@ -70,8 +70,8 @@ func (n *NN[T]) trainStep(input, target []T) (T, error) {
 	// Training mode arms the in-graph dropout mask for this step (the mask
 	// gates values BEFORE the next layer consumes them — the old post-forward
 	// flat mask never influenced the output and was removed, audit B3).
-	n.Network.SetTrainingMode(true)
-	defer n.Network.SetTrainingMode(false)
+	n.SetTrainingMode(true)
+	defer n.SetTrainingMode(false)
 
 	n.CalculateValues()
 

@@ -138,7 +138,7 @@ func (e *EncoderBlock[T]) Forward(x []T) []T {
 	// compile-time shape inference via computeConvChainOutput).
 	if e.bufZ == nil {
 		size := e.Cfg.SeqLen * e.Cfg.Dmodel
-			e.bufZ = make([]T, size)
+		e.bufZ = make([]T, size)
 		e.bufF = make([]T, size)
 		e.cacheX = make([]T, size)
 		e.cacheZ1 = make([]T, size)

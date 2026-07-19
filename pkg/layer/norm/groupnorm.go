@@ -58,8 +58,10 @@ func WithGroupNormAffine[T utils.Float](a bool) GroupNormOption[T] {
 //   - Errors: NewGroupNorm returns ErrGroupSizeMismatch if features % groups != 0.
 //   - Related: [NewGroupNorm], [Normalizer], [BatchNorm], [LayerNorm].
 //   - Stability: Stable.
+//
+// Field order is GC-scan-optimal: the mixed slice-header fields come first,
+// then the pointer-free scalars.
 type GroupNorm[T utils.Float] struct {
-	eps       T
 	gamma     []T
 	beta      []T
 	gammaGrad []T
@@ -67,10 +69,12 @@ type GroupNorm[T utils.Float] struct {
 	// xHat and invSd (one per group) are cached by Forward for Backward.
 	xHat  []T
 	invSd []T
-	features  int
-	groups    int
-	mode      atomic.Int32
-	affine    bool
+
+	eps      T
+	features int
+	groups   int
+	mode     atomic.Int32
+	affine   bool
 }
 
 // NewGroupNorm constructs a GroupNorm layer. Returns ErrGroupSizeMismatch if

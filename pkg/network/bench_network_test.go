@@ -13,7 +13,7 @@ import "testing"
 // pool is warm.
 func BenchmarkAcquireRelease_F32(b *testing.B) {
 	b.ReportAllocs()
-	for range b.N {
+	for b.Loop() {
 		buf := AcquireActivations[float32](64)
 		ReleaseActivations(buf)
 	}
@@ -23,7 +23,7 @@ func BenchmarkAcquireRelease_F32(b *testing.B) {
 // pool to guard parity between the two specialisations.
 func BenchmarkAcquireRelease_F64(b *testing.B) {
 	b.ReportAllocs()
-	for range b.N {
+	for b.Loop() {
 		buf := AcquireActivations[float64](64)
 		ReleaseActivations(buf)
 	}
@@ -34,7 +34,7 @@ func BenchmarkAcquireRelease_F64(b *testing.B) {
 // regressions surface even before training kicks in.
 func BenchmarkPreallocStorage_DeepNetwork_F32(b *testing.B) {
 	b.ReportAllocs()
-	for range b.N {
+	for b.Loop() {
 		_ = NewPreallocStorage[float32](16_384, 256, 64)
 	}
 }
@@ -44,9 +44,8 @@ func BenchmarkPreallocStorage_DeepNetwork_F32(b *testing.B) {
 func BenchmarkWorkerPool_Submit(b *testing.B) {
 	pool := NewWorkerPool()
 	defer pool.Stop()
-	b.ResetTimer()
 	b.ReportAllocs()
-	for range b.N {
+	for b.Loop() {
 		done := make(chan struct{})
 		pool.Submit(func() { close(done) })
 		<-done

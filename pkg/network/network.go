@@ -79,30 +79,40 @@ type LayerMask[T utils.Float] interface {
 // their bias cells, activation tags, and pre-activation scratch buffers
 // for backprop.
 //
+// Field order is GC-scan-optimal: pure-pointer/interface fields first
+// (kernels, masker, initWeight, normLayers, outputBias), then mixed
+// slice-header fields, then the pointer-free scalars last. Interfaces are
+// two GC-scanned words (16 bytes) — grouping them with the other pointer
+// fields instead of scattering them among scalars is what shrinks the scan
+// range on the single instance every forward/backward call dereferences.
+//
 // AI-Meta:
 //   - Purpose: Internal engine owning the full neural graph; forward, backward, and weight-update steps.
 //   - Lifecycle: Zero → populated via SetLayers + Build → operational via Train/CalculateValues.
 //   - Concurrency: NotSafe; Train mutates cells, weights, and pre-activation buffers in place.
 //   - Related: [New], [SetLayers], [Build], [Train], [CalculateValues].
 type Network[T utils.Float] struct {
-	LearningRate    T `json:"learningRate" xml:"learningRate"`
-	outputBias      *cell.Bias[T]
-	initWeight      WeightSampler[T]
-	hiddenBiases    []*cell.Bias[T]
-	Input           bundle[T, *cell.Input[T]] `json:"input" xml:"input"`
-	hiddenActs      []activation.Type
-	preactHiddens   [][]T
-	preactOutput    []T
-	outActBuf       []T
-	Output          bundle[T, *cell.Output[T]]   `json:"output" xml:"output"`
-	Hiddens         []bundle[T, *cell.Hidden[T]] `json:"hiddens" xml:"hiddens"`
+	// kernels is the optional accelerated matrix path supplied by the compute
+	// backend. nil means "use the internal reference loops" — identical math,
+	// just not delegated.
+	kernels compute.DenseKernels[T]
+	// masker is the optional per-layer dropout hook; applied only while
+	// training is true (set around each trainStep by the facade).
+	masker     LayerMask[T]
+	initWeight WeightSampler[T]
 	// normLayers maps hidden-layer index → normalizer applied to that layer's
 	// post-activation output before the next layer consumes it. Installed by
 	// the facade via SetNormLayers; nil for networks without normalization.
-	normLayers map[int]FeatureNorm[T]
-	// masker is the optional per-layer dropout hook; applied only while
-	// training is true (set around each trainStep by the facade).
-	masker LayerMask[T]
+	normLayers    map[int]FeatureNorm[T]
+	outputBias    *cell.Bias[T]
+	Hiddens       []bundle[T, *cell.Hidden[T]] `json:"hiddens" xml:"hiddens"`
+	Input         bundle[T, *cell.Input[T]]    `json:"input" xml:"input"`
+	Output        bundle[T, *cell.Output[T]]   `json:"output" xml:"output"`
+	hiddenActs    []activation.Type
+	hiddenBiases  []*cell.Bias[T]
+	outActBuf     []T
+	preactHiddens [][]T
+	preactOutput  []T
 	// weights is the network-wide contiguous weight array; dense[i].store.W
 	// are non-overlapping views into it, in canonical flat order. Built by
 	// buildStore and rebuilt after every topology mutation.
@@ -110,21 +120,18 @@ type Network[T utils.Float] struct {
 	// dense holds the structure-of-arrays view of each fully connected layer:
 	// Hiddens[0..n-1] followed by Output. This is what the forward/backward
 	// kernels operate on; the axon graph only defines the wiring.
-	dense []denseLayer[T]
-	// kernels is the optional accelerated matrix path supplied by the compute
-	// backend. nil means "use the internal reference loops" — identical math,
-	// just not delegated.
-	kernels         compute.DenseKernels[T]
-	training        bool
+	dense           []denseLayer[T]
+	LearningRate    T `json:"learningRate" xml:"learningRate"`
 	topologyVersion atomic.Uint64
-	outputAct       activation.Type
-	lossMode        loss.Type
-	topologyMode    TopologyMode
 	// fusedOutput is true when (outputAct, lossMode) is a fused pair
 	// (SIGMOID+BCE or SOFTMAX+CCE) whose analytic ∂L/∂z simplifies to
 	// (y − t). In that case the output-layer activation derivative is folded
 	// into the loss gradient and outputEffDeriv returns 1.
-	fusedOutput bool
+	fusedOutput  bool
+	lossMode     loss.Type
+	outputAct    activation.Type
+	topologyMode TopologyMode
+	training     bool
 }
 
 // outputEffDeriv returns the effective derivative multiplier applied to output

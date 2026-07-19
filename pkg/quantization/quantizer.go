@@ -112,7 +112,7 @@ func quantizeDenseHead[T utils.Float](net *nn.NN[T], cfg QuantizationConfig[T]) 
 	out := make([]quantizedLayer[T], 0, len(netCfg.HiddenLayers)+1)
 	prev := net.Network.Input.Len()
 
-	for i := range net.Network.Hiddens {
+	for i := range net.Hiddens {
 		cells := net.Network.Hiddens[i].Cells()
 		hasBias := i < len(netCfg.HiddenLayers) && netCfg.HiddenLayers[i].Bias
 		w, b := extractDenseMatrix(len(cells), prev, hasBias, func(ci, ai int) float64 {
