@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Specification Knowledge Graph</title>
+  <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #1a1a2e;
+      color: #e0e0e0;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      overflow: hidden;
+    }
+
+    #graph {
+      width: 100vw;
+      height: 100vh;
+    }
+
+    .panel {
+      position: fixed;
+      background: rgba(22, 22, 42, 0.95);
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 14px;
+      font-size: 13px;
+      z-index: 10;
+    }
+
+    #legend {
+      top: 14px;
+      left: 14px;
+    }
+
+    #legend h3 {
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: #aaa;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 4px 0;
+    }
+
+    .legend-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    #search-box {
+      top: 14px;
+      right: 320px;
+    }
+
+    #search-box input {
+      background: #222;
+      border: 1px solid #555;
+      color: #e0e0e0;
+      padding: 6px 10px;
+      border-radius: 4px;
+      width: 200px;
+      font-size: 13px;
+    }
+
+    #inspector {
+      top: 14px;
+      right: 14px;
+      width: 290px;
+      max-height: calc(100vh - 28px);
+      overflow-y: auto;
+    }
+
+    #inspector h3 {
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: #ccc;
+      border-bottom: 1px solid #444;
+      padding-bottom: 6px;
+    }
+
+    .prop {
+      margin: 3px 0;
+    }
+
+    .prop-key {
+      color: #888;
+    }
+
+    .prop-val {
+      color: #e0e0e0;
+    }
+
+    .conn-group {
+      margin-top: 10px;
+    }
+
+    .conn-group h4 {
+      color: #aaa;
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+
+    .conn-group li {
+      margin-left: 12px;
+      font-size: 12px;
+      color: #ccc;
+      list-style: disc;
+    }
+
+    #stats {
+      position: fixed;
+      bottom: 14px;
+      left: 14px;
+      background: rgba(22, 22, 42, 0.95);
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 14px;
+      font-size: 12px;
+      max-width: 420px;
+      max-height: 50vh;
+      overflow-y: auto;
+      z-index: 10;
+    }
+
+    #stats h3 {
+      margin-bottom: 6px;
+      font-size: 14px;
+      color: #aaa;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      margin: 2px 0;
+    }
+
+    .stat-label {
+      color: #888;
+    }
+
+    .stat-value {
+      color: #e0e0e0;
+      font-weight: 600;
+    }
+
+    .finding {
+      margin-top: 8px;
+    }
+
+    .finding h4 {
+      color: #F5A623;
+      font-size: 12px;
+      margin-bottom: 3px;
+    }
+
+    .finding li {
+      margin-left: 12px;
+      font-size: 11px;
+      color: #ccc;
+      list-style: disc;
+    }
+
+    .finding .ok {
+      color: #50C878;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="graph"></div>
+
+  <div id="legend" class="panel">
+    <h3>Node Types</h3>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#4A90D9"></div> Workspace
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#50C878"></div> Specification
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#A0A0A0"></div> File
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#F5A623"></div> Convention
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#9B59B6"></div> Phase
+    </div>
+  </div>
+
+  <div id="search-box" class="panel">
+    <input type="text" id="search" placeholder="Search nodes..." />
+  </div>
+
+  <div id="inspector" class="panel">
+    <h3>Inspector</h3>
+    <div id="inspector-content">
+      <p style="color:#666">Click a node to inspect</p>
+    </div>
+  </div>
+
+  <div id="stats" class="panel">
+    <h3>Summary</h3>
+    <div id="stats-content"></div>
+  </div>
+
+  <script>
+    (function () {
+      var rawNodes = [{ "id": "ws:main", "label": "main", "type": "workspace", "group": "workspace", "workspace": "main", "degree": 51 }, { "id": "file:pkg", "label": "pkg", "type": "file", "group": "file", "workspace": "main", "degree": 1 }, { "id": "file:examples", "label": "examples", "type": "file", "group": "file", "workspace": "main", "degree": 1 }, { "id": "conv:C1", "label": "C1 — `.magic/` Engine Safety", "type": "convention", "group": "convention", "num": 1, "degree": 0 }, { "id": "conv:C2", "label": "C2 — Workflow Minimalism", "type": "convention", "group": "convention", "num": 2, "degree": 0 }, { "id": "conv:C3", "label": "C3 — Parallel Task Execution Mode", "type": "convention", "group": "convention", "num": 3, "degree": 0 }, { "id": "conv:C4", "label": "C4 — Automate User Story Priorities", "type": "convention", "group": "convention", "num": 4, "degree": 0 }, { "id": "conv:C6", "label": "C6 — Selective Planning", "type": "convention", "group": "convention", "num": 6, "degree": 0 }, { "id": "conv:C7", "label": "C7 — Universal Script Executor", "type": "convention", "group": "convention", "num": 7, "degree": 0 }, { "id": "conv:C8", "label": "C8 — Phase Archival", "type": "convention", "group": "convention", "num": 8, "degree": 0 }, { "id": "conv:C9", "label": "C9 — Zero-Prompt Automation (Trust Mode)", "type": "convention", "group": "convention", "num": 9, "degree": 16 }, { "id": "conv:C10", "label": "C10 — Task Architecture & Status Truth", "type": "convention", "group": "convention", "num": 10, "degree": 0 }, { "id": "conv:C11", "label": "C11 — Simulation Workflow (C2 Exception)", "type": "convention", "group": "convention", "num": 11, "degree": 0 }, { "id": "conv:C12", "label": "C12 — Quarantine Cascade", "type": "convention", "group": "convention", "num": 12, "degree": 1 }, { "id": "conv:C13", "label": "C13 — Agent Cognitive Discipline", "type": "convention", "group": "convention", "num": 13, "degree": 0 }, { "id": "conv:C14", "label": "C14 — Engine Versioning Protocol", "type": "convention", "group": "convention", "num": 14, "degree": 0 }, { "id": "conv:C15", "label": "C15 — Workspace Scope Isolation", "type": "convention", "group": "convention", "num": 15, "degree": 0 }, { "id": "conv:C16", "label": "C16 — Micro-spec Convention", "type": "convention", "group": "convention", "num": 16, "degree": 0 }, { "id": "conv:C17", "label": "C17 — Adapter Registry", "type": "convention", "group": "convention", "num": 17, "degree": 0 }, { "id": "conv:C18", "label": "C18 — Payload Security", "type": "convention", "group": "convention", "num": 18, "degree": 0 }, { "id": "conv:C19", "label": "C19 — Cross-Env CLI Parity", "type": "convention", "group": "convention", "num": 19, "degree": 0 }, { "id": "conv:C20", "label": "C20 — Auto-Heal Recovery", "type": "convention", "group": "convention", "num": 20, "degree": 0 }, { "id": "conv:C21", "label": "C21 — Project Ventilation (Analyze)", "type": "convention", "group": "convention", "num": 21, "degree": 0 }, { "id": "conv:C22", "label": "C22 — Workspace Rule Inheritance", "type": "convention", "group": "convention", "num": 22, "degree": 0 }, { "id": "conv:C23", "label": "C23 — Context Economy & Validation Caching", "type": "convention", "group": "convention", "num": 23, "degree": 0 }, { "id": "conv:C24", "label": "C24 — Role-Switching Gates", "type": "convention", "group": "convention", "num": 24, "degree": 0 }, { "id": "conv:C25", "label": "C25 — Generic Float Constraint", "type": "convention", "group": "convention", "num": 25, "degree": 1 }, { "id": "conv:C26", "label": "C26 — Compile-Time Interface Verification", "type": "convention", "group": "convention", "num": 26, "degree": 1 }, { "id": "conv:C27", "label": "C27 — Dispatcher Pattern Convention", "type": "convention", "group": "convention", "num": 27, "degree": 1 }, { "id": "conv:C28", "label": "C28 — Composition via Embedding", "type": "convention", "group": "convention", "num": 28, "degree": 1 }, { "id": "conv:C29", "label": "C29 — Zero External Dependencies", "type": "convention", "group": "convention", "num": 29, "degree": 10 }, { "id": "conv:C30", "label": "C30 — Test Coverage and Benchmarks", "type": "convention", "group": "convention", "num": 30, "degree": 2 }, { "id": "conv:C31", "label": "C31 — Doc-comment Verbosity", "type": "convention", "group": "convention", "num": 31, "degree": 1 }, { "id": "conv:C32", "label": "C32 — Error Informativeness", "type": "convention", "group": "convention", "num": 32, "degree": 3 }, { "id": "conv:C33", "label": "C33 — AI-Meta Annotation", "type": "convention", "group": "convention", "num": 33, "degree": 1 }, { "id": "spec:main/l1-neural-network-architecture", "label": "l1-neural-network-architecture.md", "type": "spec", "group": "spec", "workspace": "main", "status": "Stable", "layer": 0, "version": "2.0.0", "degree": 16 }, { "id": "spec:main/l1-math-functions", "label": "l1-math-functions.md", "type": "spec", "group": "spec", "workspace": "main", "status": "Stable", "layer": 0, "version": "1.0.0", "degree": 5 }, { "id": "spec:main/l1-training-semantics", "label": "l1-training-semantics.md", "type": "spec", "group": "spec", "workspace": "main", "status": "Stable", "layer": 0, "version": "1.0.0", "degree": 6 }, { "id": "spec:main/l1-weight-initialization", "label": "l1-weight-initialization.md", "type": "spec", "group": "spec", "workspace": "main", "status": "Stable", "layer": 0, "version": "1.0.0", "degree": 4 }, { "id": "spec:main/l1-network-persistence", "label": "l1-network-persistence.md", "type": "spec", "group": "spec", "workspace": "main", "status": "Stable", "layer": 0, "version": "1.0.0", "degree": 7 }, { "id": "spec:main/l1-training-control", "label": "l1-training-control.md", "type": "spec", "group": "spec", "workspace": "main", "status": "Stable", "layer": 0, "version": "1.0.0", "degree": 5 }, { "id": "spec:main/l1-checkpointing", "label": "l1-checkpointing.md", "type": "spec", "group": "spec", "workspace": "main", "status": "Stable", "layer": 0, "version": "1.0.0", "degree": 5 }, { "id": "spec:main/l1-error-taxonomy", "label": "l1-error-taxonomy.md", "type": "spec", "group": "spec", "workspace": "main", "status": "Stable", "layer": 0, "version": "1.0.0", "degree": 4 }, { "id": "spec:main/l1-observability-protocol", "label": "l1-observability-protocol.md", "type": "spec", "group": "spec", "workspace": "main", "status": "Stable", "layer": 0, "version": "1.0.0", "degree": 5 }, { "id": "spec:main/l1-performance-contract", "label": "l1-performance-contract.md", "type": "spec", "group": "spec", "workspace": "main", "status": "Stable", "layer": 0, "version": "1.0.0", "degree": 4 }, { "id": "spec:main/l1-data-streaming", "label": "l1-data-streaming.md", "type": "spec", "group": "spec", "workspace": "main", "status": "Stable", "layer": 0, "version": "1.0.0", "degree": 4 }, { "id": "spec:main/l1-compute-backend", "label": "l1-compute-backend.md", "type": "spec", "group": "spec", "workspace": "main", "status": "Stable", "layer": 0, "version": "1.0.0", "degree": 5 }, { "id": "spec:main/l1-dynamic-topology", "label": "l1-dynamic-topology.md", "type": "spec", "group": "spec", "workspace": "main", "status": "Stable", "layer": 0, "version": "0.2.0", "degree": 5 }, { "id": "spec:main/l1-meta-learning-hooks", "label": "l1-meta-learning-hooks.md", "type": "spec", "group": "spec", "workspace": "main", "status": "Draft", "layer": 0, "version": "0.2.0", "degree": 4 }, { "id": "spec:main/l2-nn-facade", "label": "l2-nn-facade.md", "type": "spec", "group": "spec", "workspace": "main", "status": "Stable", "layer": 0, "version": "2.0.0", "degree": 12 }, { "id": "spec:main/l2-network-graph", "label": "l2-network-graph.md", "type": "spec", "group": "spec", "workspace": "main", "status": "Stable", "layer": 0, "version": "1.1.0", "degree": 5 }, { "id": "spec:main/l2-layer-types", "label": "l2-layer-types.md", "type": "spec", "group": "spec", "workspace": "main", "status": "Stable", "layer": 0, "version": "1.1.0", "degree": 7 }, { "id": "spec:main/l2-neuron-model", "label": "l2-neuron-model.md", "type": "spec", "group": "spec", "workspace": "main", "status": "Stable", "layer": 0, "version": "1.1.0", "degree": 9 }, { "id": "spec:main/l2-activation-functions", "label": "l2-activation-functions.md", "type": "spec", "group": "spec", "workspace": "main", "status": "Stable", "layer": 0, "version": "1.0.0", "degree": 6 }, { "id": "spec:main/l2-loss-functions", "label": "l2-loss-functions.md", "type": "spec", "group": "spec", "workspace": "main", "status": "Stable", "layer": 0, "version": "1.0.0", "degree": 6 }, { "id": "spec:main/l2-usage-examples", "label": "l2-usage-examples.md", "type": "spec", "group": "spec", "workspace": "main", "status": "Stable", "layer": 0, "version": "1.0.0", "degree": 9 }, { "id": "spec:main/l2-cli-client", "label": "l2-cli-client.md", "type": "spec", "group": "spec", "workspace": "main", "status": "RFC", "layer": 0, "version": "0.1.0", "degree": 5 }, { "id": "spec:main/l2-visualization-api", "label": "l2-visualization-api.md", "type": "spec", "group": "spec", "workspace": "main", "status": "Stable", "layer": 0, "version": "0.1.0", "degree": 5 }, { "id": "spec:main/l2-logging-strategy", "label": "l2-logging-strategy.md", "type": "spec", "group": "spec", "workspace": "main", "status": "Stable", "layer": 0, "version": "0.1.0", "degree": 5 }, { "id": "spec:main/l2-training-loop", "label": "l2-training-loop.md", "type": "spec", "group": "spec", "workspace": "main", "status": "Stable", "layer": 0, "version": "1.0.0", "degree": 5 }, { "id": "spec:main/l2-persistence-impl", "label": "l2-persistence-impl.md", "type": "spec", "group": "spec", "workspace": "main", "status": "Stable", "layer": 0, "version": "1.0.0", "degree": 5 }, { "id": "spec:main/l2-errors-impl", "label": "l2-errors-impl.md", "type": "spec", "group": "spec", "workspace": "main", "status": "Stable", "layer": 0, "version": "1.0.0", "degree": 5 }, { "id": "spec:main/l2-init-impl", "label": "l2-init-impl.md", "type": "spec", "group": "spec", "workspace": "main", "status": "Stable", "layer": 0, "version": "1.0.0", "degree": 4 }, { "id": "spec:main/l2-control-impl", "label": "l2-control-impl.md", "type": "spec", "group": "spec", "workspace": "main", "status": "Stable", "layer": 0, "version": "1.0.0", "degree": 4 }, { "id": "spec:main/l2-checkpointing-impl", "label": "l2-checkpointing-impl.md", "type": "spec", "group": "spec", "workspace": "main", "status": "Stable", "layer": 0, "version": "1.0.0", "degree": 5 }, { "id": "spec:main/l2-perf-impl", "label": "l2-perf-impl.md", "type": "spec", "group": "spec", "workspace": "main", "status": "Stable", "layer": 0, "version": "1.0.0", "degree": 7 }, { "id": "spec:main/l2-streaming-impl", "label": "l2-streaming-impl.md", "type": "spec", "group": "spec", "workspace": "main", "status": "Stable", "layer": 0, "version": "1.0.0", "degree": 6 }, { "id": "spec:main/l2-backend-cpu", "label": "l2-backend-cpu.md", "type": "spec", "group": "spec", "workspace": "main", "status": "Stable", "layer": 0, "version": "1.0.0", "degree": 7 }, { "id": "spec:main/l2-multihidden-impl", "label": "l2-multihidden-impl.md", "type": "spec", "group": "spec", "workspace": "main", "status": "Stable", "layer": 0, "version": "1.0.0", "degree": 8 }, { "id": "spec:main/l1-optimizer-strategies", "label": "l1-optimizer-strategies.md", "type": "spec", "group": "spec", "workspace": "main", "status": "Stable", "layer": 0, "version": "1.0.0", "degree": 4 }, { "id": "spec:main/l2-optimizer-impl", "label": "l2-optimizer-impl.md", "type": "spec", "group": "spec", "workspace": "main", "status": "Stable", "layer": 0, "version": "1.0.0", "degree": 5 }, { "id": "spec:main/l1-regularization", "label": "l1-regularization.md", "type": "spec", "group": "spec", "workspace": "main", "status": "Stable", "layer": 0, "version": "1.0.0", "degree": 4 }, { "id": "spec:main/l2-regularization-impl", "label": "l2-regularization-impl.md", "type": "spec", "group": "spec", "workspace": "main", "status": "Stable", "layer": 0, "version": "1.0.0", "degree": 5 }, { "id": "spec:main/l1-release-policy", "label": "l1-release-policy.md", "type": "spec", "group": "spec", "workspace": "main", "status": "Stable", "layer": 0, "version": "1.0.0", "degree": 4 }, { "id": "spec:main/l2-ai-doc-metadata", "label": "l2-ai-doc-metadata.md", "type": "spec", "group": "spec", "workspace": "main", "status": "RFC", "layer": 0, "version": "0.1.0", "degree": 1 }, { "id": "spec:main/l1-lr-scheduling", "label": "l1-lr-scheduling.md", "type": "spec", "group": "spec", "workspace": "main", "status": "Stable", "layer": 0, "version": "1.0.0", "degree": 3 }, { "id": "spec:main/l2-deep-builder", "label": "l2-deep-builder.md", "type": "spec", "group": "spec", "workspace": "main", "status": "Stable", "layer": 0, "version": "1.0.0", "degree": 7 }, { "id": "spec:main/l2-gonn-skills", "label": "l2-gonn-skills.md", "type": "spec", "group": "spec", "workspace": "main", "status": "Stable", "layer": 0, "version": "1.0.0", "degree": 15 }, { "id": "file:.references/gonn_old/pkg/nn/write.go", "label": ".references/gonn_old/pkg/nn/write.go", "type": "file", "group": "file", "degree": 2 }, { "id": "file:pkg/compute/ (new)", "label": "pkg/compute/ (new)", "type": "file", "group": "file", "degree": 1 }, { "id": "file:pkg/dataset/ (new)", "label": "pkg/dataset/ (new)", "type": "file", "group": "file", "degree": 2 }, { "id": "file:.design/main/specifications/l1-neural-network-architecture.md", "label": ".design/main/specifications/l1-neural-network-architecture.md", "type": "file", "group": "file", "degree": 2 }, { "id": "file:.design/main/specifications/l1-weight-initialization.md", "label": ".design/main/specifications/l1-weight-initialization.md", "type": "file", "group": "file", "degree": 2 }, { "id": "file:.design/main/specifications/l1-training-control.md", "label": ".design/main/specifications/l1-training-control.md", "type": "file", "group": "file", "degree": 1 }, { "id": "file:.design/main/specifications/l1-checkpointing.md", "label": ".design/main/specifications/l1-checkpointing.md", "type": "file", "group": "file", "degree": 1 }, { "id": "file:pkg/utils/errors.go (new)", "label": "pkg/utils/errors.go (new)", "type": "file", "group": "file", "degree": 2 }, { "id": "file:.design/main/specifications/l1-optimizer-strategies.md", "label": ".design/main/specifications/l1-optimizer-strategies.md", "type": "file", "group": "file", "degree": 1 }, { "id": "file:.design/main/specifications/l1-training-semantics.md", "label": ".design/main/specifications/l1-training-semantics.md", "type": "file", "group": "file", "degree": 3 }, { "id": "file:pkg/activation/activation.go", "label": "pkg/activation/activation.go", "type": "file", "group": "file", "degree": 2 }, { "id": "file:pkg/loss/loss.go", "label": "pkg/loss/loss.go", "type": "file", "group": "file", "degree": 2 }, { "id": "file:pkg/nn/tunable.go (new)", "label": "pkg/nn/tunable.go (new)", "type": "file", "group": "file", "degree": 1 }, { "id": "file:pkg/nn/param.go (new)", "label": "pkg/nn/param.go (new)", "type": "file", "group": "file", "degree": 1 }, { "id": "file:pkg/nn/meta.go (new)", "label": "pkg/nn/meta.go (new)", "type": "file", "group": "file", "degree": 1 }, { "id": "file:pkg/persistence/ (new)", "label": "pkg/persistence/ (new)", "type": "file", "group": "file", "degree": 2 }, { "id": "file:.references/rustunumic/cells.json", "label": ".references/rustunumic/cells.json", "type": "file", "group": "file", "degree": 1 }, { "id": "file:pkg/nn/nn.go", "label": "pkg/nn/nn.go", "type": "file", "group": "file", "degree": 2 }, { "id": "file:pkg/network/network.go", "label": "pkg/network/network.go", "type": "file", "group": "file", "degree": 3 }, { "id": "file:pkg/neuron/neuron.go", "label": "pkg/neuron/neuron.go", "type": "file", "group": "file", "degree": 2 }, { "id": "file:pkg/utils/float.go", "label": "pkg/utils/float.go", "type": "file", "group": "file", "degree": 1 }, { "id": "file:.references/rustunumic/lib.rs", "label": ".references/rustunumic/lib.rs", "type": "file", "group": "file", "degree": 2 }, { "id": "file:pkg/*/bench_*_test.go", "label": "pkg/*/bench_*_test.go", "type": "file", "group": "file", "degree": 2 }, { "id": "file:.design/main/specifications/l1-math-functions.md", "label": ".design/main/specifications/l1-math-functions.md", "type": "file", "group": "file", "degree": 1 }, { "id": "file:.design/main/specifications/l1-network-persistence.md", "label": ".design/main/specifications/l1-network-persistence.md", "type": "file", "group": "file", "degree": 1 }, { "id": "file:CHANGELOG.md", "label": "CHANGELOG.md", "type": "file", "group": "file", "degree": 1 }, { "id": "file:pkg/nn/train.go", "label": "pkg/nn/train.go", "type": "file", "group": "file", "degree": 7 }, { "id": "file:.references/rustunumic/train.rs", "label": ".references/rustunumic/train.rs", "type": "file", "group": "file", "degree": 5 }, { "id": "file:.references/gonn_old/pkg/nn/train.go", "label": ".references/gonn_old/pkg/nn/train.go", "type": "file", "group": "file", "degree": 1 }, { "id": "file:pkg/utils/init.go (new)", "label": "pkg/utils/init.go (new)", "type": "file", "group": "file", "degree": 2 }, { "id": "file:.design/main/specifications/l2-nn-facade.md#56-weight-initialization-methods", "label": ".design/main/specifications/l2-nn-facade.md#56-weight-initialization-methods", "type": "file", "group": "file", "degree": 2 }, { "id": "file:pkg/activation/sigmoid.go", "label": "pkg/activation/sigmoid.go", "type": "file", "group": "file", "degree": 1 }, { "id": "file:pkg/activation/activation_test.go", "label": "pkg/activation/activation_test.go", "type": "file", "group": "file", "degree": 1 }, { "id": "file:pkg/activation/README.md", "label": "pkg/activation/README.md", "type": "file", "group": "file", "degree": 1 }, { "id": "file:pkg/compute/cpu/ (new)", "label": "pkg/compute/cpu/ (new)", "type": "file", "group": "file", "degree": 1 }, { "id": "file:pkg/compute/backend.go (new)", "label": "pkg/compute/backend.go (new)", "type": "file", "group": "file", "degree": 1 }, { "id": "file:pkg/compute/registry.go (new)", "label": "pkg/compute/registry.go (new)", "type": "file", "group": "file", "degree": 1 }, { "id": "file:pkg/checkpoint/ (new)", "label": "pkg/checkpoint/ (new)", "type": "file", "group": "file", "degree": 1 }, { "id": "file:cmd/gonn/", "label": "cmd/gonn/", "type": "file", "group": "file", "degree": 1 }, { "id": "file:pkg/nn/", "label": "pkg/nn/", "type": "file", "group": "file", "degree": 1 }, { "id": "file:pkg/nn/control.go (new)", "label": "pkg/nn/control.go (new)", "type": "file", "group": "file", "degree": 1 }, { "id": "file:.design/main/specifications/l2-nn-facade.md", "label": ".design/main/specifications/l2-nn-facade.md", "type": "file", "group": "file", "degree": 3 }, { "id": "file:pkg/nn/config.go", "label": "pkg/nn/config.go", "type": "file", "group": "file", "degree": 1 }, { "id": "file:pkg/nn/presets.go", "label": "pkg/nn/presets.go", "type": "file", "group": "file", "degree": 2 }, { "id": "file:pkg/nn/builder.go", "label": "pkg/nn/builder.go", "type": "file", "group": "file", "degree": 2 }, { "id": "file:pkg/nn/options.go", "label": "pkg/nn/options.go", "type": "file", "group": "file", "degree": 3 }, { "id": "file:.design/RULES.md#c32-error-informativeness", "label": ".design/RULES.md#c32-error-informativeness", "type": "file", "group": "file", "degree": 1 }, { "id": "file:skills/gonn/SKILL.md", "label": "skills/gonn/SKILL.md", "type": "file", "group": "file", "degree": 1 }, { "id": "file:examples/", "label": "examples/", "type": "file", "group": "file", "degree": 2 }, { "id": "file:README.md", "label": "README.md", "type": "file", "group": "file", "degree": 1 }, { "id": "file:pkg/layer/core.go", "label": "pkg/layer/core.go", "type": "file", "group": "file", "degree": 1 }, { "id": "file:pkg/layer/base.go", "label": "pkg/layer/base.go", "type": "file", "group": "file", "degree": 1 }, { "id": "file:pkg/layer/input.go", "label": "pkg/layer/input.go", "type": "file", "group": "file", "degree": 1 }, { "id": "file:pkg/layer/dense.go", "label": "pkg/layer/dense.go", "type": "file", "group": "file", "degree": 1 }, { "id": "file:pkg/layer/output.go", "label": "pkg/layer/output.go", "type": "file", "group": "file", "degree": 1 }, { "id": "file:pkg/utils/logger.go", "label": "pkg/utils/logger.go", "type": "file", "group": "file", "degree": 1 }, { "id": "file:pkg/loss/loss_test.go", "label": "pkg/loss/loss_test.go", "type": "file", "group": "file", "degree": 1 }, { "id": "file:pkg/loss/mse.go", "label": "pkg/loss/mse.go", "type": "file", "group": "file", "degree": 1 }, { "id": "file:pkg/loss/README.md", "label": "pkg/loss/README.md", "type": "file", "group": "file", "degree": 1 }, { "id": "file:pkg/nn/compile.go", "label": "pkg/nn/compile.go", "type": "file", "group": "file", "degree": 2 }, { "id": "file:pkg/persistence/weights.go", "label": "pkg/persistence/weights.go", "type": "file", "group": "file", "degree": 1 }, { "id": "file:examples/E03..E13", "label": "examples/E03..E13", "type": "file", "group": "file", "degree": 1 }, { "id": "file:pkg/network/bundle.go", "label": "pkg/network/bundle.go", "type": "file", "group": "file", "degree": 1 }, { "id": "file:pkg/network/propagation.go", "label": "pkg/network/propagation.go", "type": "file", "group": "file", "degree": 2 }, { "id": "file:pkg/neuron/cell/core.go", "label": "pkg/neuron/cell/core.go", "type": "file", "group": "file", "degree": 1 }, { "id": "file:pkg/neuron/cell/input.go", "label": "pkg/neuron/cell/input.go", "type": "file", "group": "file", "degree": 1 }, { "id": "file:pkg/neuron/cell/dense.go", "label": "pkg/neuron/cell/dense.go", "type": "file", "group": "file", "degree": 1 }, { "id": "file:pkg/neuron/cell/output.go", "label": "pkg/neuron/cell/output.go", "type": "file", "group": "file", "degree": 1 }, { "id": "file:pkg/neuron/cell/bias.go", "label": "pkg/neuron/cell/bias.go", "type": "file", "group": "file", "degree": 1 }, { "id": "file:pkg/neuron/axon/axon.go", "label": "pkg/neuron/axon/axon.go", "type": "file", "group": "file", "degree": 1 }, { "id": "file:pkg/nn/query.go", "label": "pkg/nn/query.go", "type": "file", "group": "file", "degree": 1 }, { "id": "file:pkg/nn/verify.go", "label": "pkg/nn/verify.go", "type": "file", "group": "file", "degree": 1 }, { "id": "file:.references/fluent_api/fluent_api_v1.go", "label": ".references/fluent_api/fluent_api_v1.go", "type": "file", "group": "file", "degree": 2 }, { "id": "file:.references/fluent_api/fluent_api_v3.go", "label": ".references/fluent_api/fluent_api_v3.go", "type": "file", "group": "file", "degree": 2 }, { "id": "file:pkg/optimizer/", "label": "pkg/optimizer/", "type": "file", "group": "file", "degree": 1 }, { "id": "file:pkg/network/pool.go (new)", "label": "pkg/network/pool.go (new)", "type": "file", "group": "file", "degree": 1 }, { "id": "file:pkg/persistence/", "label": "pkg/persistence/", "type": "file", "group": "file", "degree": 1 }, { "id": "file:pkg/utils/errors.go", "label": "pkg/utils/errors.go", "type": "file", "group": "file", "degree": 2 }, { "id": "file:pkg/regularizer/", "label": "pkg/regularizer/", "type": "file", "group": "file", "degree": 1 }, { "id": "file:pkg/utils/init.go", "label": "pkg/utils/init.go", "type": "file", "group": "file", "degree": 1 }, { "id": "file:.references/gonn_old/examples/", "label": ".references/gonn_old/examples/", "type": "file", "group": "file", "degree": 1 }, { "id": "file:pkg/nn/ (or new pkg/visualization/)", "label": "pkg/nn/ (or new pkg/visualization/)", "type": "file", "group": "file", "degree": 1 }, { "id": "file:(external — TBD URL)", "label": "(external — TBD URL)", "type": "file", "group": "file", "degree": 1 }, { "id": "phase:main/phase-1", "label": "Phase 1: Foundation Rewrite (Track A) — `pkg/utils/{errors,init}`, `pkg/neuron`, `pkg/layer`, `pkg/network`", "type": "phase", "group": "phase", "workspace": "main", "status": "Done (2026-04-29)", "degree": 1 }, { "id": "phase:main/phase-2", "label": "Phase 2: Public Facade Restoration (Track B) — `pkg/nn`", "type": "phase", "group": "phase", "workspace": "main", "status": "Done (2026-04-30)", "degree": 1 }, { "id": "phase:main/phase-3", "label": "Phase 3: New Capability Packages (Track C) — persistence, checkpoint, dataset, compute, perf", "type": "phase", "group": "phase", "workspace": "main", "status": "Done (2026-05-01)", "degree": 1 }, { "id": "phase:main/phase-4", "label": "Phase 4: Examples Catalog (Track D) — `examples/E01..E15` (v0.5 scope: 7 entries)", "type": "phase", "group": "phase", "workspace": "main", "status": "Done (2026-05-02)", "degree": 1 }, { "id": "phase:main/phase-5", "label": "Phase 5: Multi-Hidden Topology (v0.6) — `pkg/network` chain + compile() lift + weights 1.1.0 + 6 catalog examples", "type": "phase", "group": "phase", "workspace": "main", "status": "Done (2026-05-06)", "degree": 1 }, { "id": "phase:main/phase-6", "label": "Phase 6: Feature Expansion + v0.6 Release — `pkg/optimizer/`, `pkg/regularizer/`, axon WeightInit fix, CHANGELOG, v0.6.0 tag", "type": "phase", "group": "phase", "workspace": "main", "status": "Active (decomposed 2026-05-07; 15 tasks + 2 validation + 2 gate)", "degree": 1 }];
+      var rawEdges = [{ "from": "ws:main", "to": "file:pkg", "relation": "scopes" }, { "from": "ws:main", "to": "file:examples", "relation": "scopes" }, { "from": "ws:main", "to": "spec:main/l1-neural-network-architecture", "relation": "contains" }, { "from": "ws:main", "to": "spec:main/l1-math-functions", "relation": "contains" }, { "from": "ws:main", "to": "spec:main/l1-training-semantics", "relation": "contains" }, { "from": "ws:main", "to": "spec:main/l1-weight-initialization", "relation": "contains" }, { "from": "ws:main", "to": "spec:main/l1-network-persistence", "relation": "contains" }, { "from": "ws:main", "to": "spec:main/l1-training-control", "relation": "contains" }, { "from": "ws:main", "to": "spec:main/l1-checkpointing", "relation": "contains" }, { "from": "ws:main", "to": "spec:main/l1-error-taxonomy", "relation": "contains" }, { "from": "ws:main", "to": "spec:main/l1-observability-protocol", "relation": "contains" }, { "from": "ws:main", "to": "spec:main/l1-performance-contract", "relation": "contains" }, { "from": "ws:main", "to": "spec:main/l1-data-streaming", "relation": "contains" }, { "from": "ws:main", "to": "spec:main/l1-compute-backend", "relation": "contains" }, { "from": "ws:main", "to": "spec:main/l1-dynamic-topology", "relation": "contains" }, { "from": "ws:main", "to": "spec:main/l1-meta-learning-hooks", "relation": "contains" }, { "from": "ws:main", "to": "spec:main/l2-nn-facade", "relation": "contains" }, { "from": "ws:main", "to": "spec:main/l2-network-graph", "relation": "contains" }, { "from": "ws:main", "to": "spec:main/l2-layer-types", "relation": "contains" }, { "from": "ws:main", "to": "spec:main/l2-neuron-model", "relation": "contains" }, { "from": "ws:main", "to": "spec:main/l2-activation-functions", "relation": "contains" }, { "from": "ws:main", "to": "spec:main/l2-loss-functions", "relation": "contains" }, { "from": "ws:main", "to": "spec:main/l2-usage-examples", "relation": "contains" }, { "from": "ws:main", "to": "spec:main/l2-cli-client", "relation": "contains" }, { "from": "ws:main", "to": "spec:main/l2-visualization-api", "relation": "contains" }, { "from": "ws:main", "to": "spec:main/l2-logging-strategy", "relation": "contains" }, { "from": "ws:main", "to": "spec:main/l2-training-loop", "relation": "contains" }, { "from": "ws:main", "to": "spec:main/l2-persistence-impl", "relation": "contains" }, { "from": "ws:main", "to": "spec:main/l2-errors-impl", "relation": "contains" }, { "from": "ws:main", "to": "spec:main/l2-init-impl", "relation": "contains" }, { "from": "ws:main", "to": "spec:main/l2-control-impl", "relation": "contains" }, { "from": "ws:main", "to": "spec:main/l2-checkpointing-impl", "relation": "contains" }, { "from": "ws:main", "to": "spec:main/l2-perf-impl", "relation": "contains" }, { "from": "ws:main", "to": "spec:main/l2-streaming-impl", "relation": "contains" }, { "from": "ws:main", "to": "spec:main/l2-backend-cpu", "relation": "contains" }, { "from": "ws:main", "to": "spec:main/l2-multihidden-impl", "relation": "contains" }, { "from": "ws:main", "to": "spec:main/l1-optimizer-strategies", "relation": "contains" }, { "from": "ws:main", "to": "spec:main/l2-optimizer-impl", "relation": "contains" }, { "from": "ws:main", "to": "spec:main/l1-regularization", "relation": "contains" }, { "from": "ws:main", "to": "spec:main/l2-regularization-impl", "relation": "contains" }, { "from": "ws:main", "to": "spec:main/l1-release-policy", "relation": "contains" }, { "from": "ws:main", "to": "spec:main/l2-ai-doc-metadata", "relation": "contains" }, { "from": "ws:main", "to": "spec:main/l1-lr-scheduling", "relation": "contains" }, { "from": "ws:main", "to": "spec:main/l2-deep-builder", "relation": "contains" }, { "from": "ws:main", "to": "spec:main/l2-gonn-skills", "relation": "contains" }, { "from": "spec:main/l1-checkpointing", "to": "file:.references/gonn_old/pkg/nn/write.go", "relation": "covers" }, { "from": "spec:main/l1-checkpointing", "to": "conv:C9", "relation": "enforces" }, { "from": "spec:main/l1-checkpointing", "to": "conv:C29", "relation": "enforces" }, { "from": "spec:main/l1-compute-backend", "to": "file:pkg/compute/ (new)", "relation": "covers" }, { "from": "spec:main/l1-compute-backend", "to": "conv:C9", "relation": "enforces" }, { "from": "spec:main/l1-compute-backend", "to": "conv:C29", "relation": "enforces" }, { "from": "spec:main/l1-data-streaming", "to": "file:pkg/dataset/ (new)", "relation": "covers" }, { "from": "spec:main/l1-data-streaming", "to": "conv:C9", "relation": "enforces" }, { "from": "spec:main/l1-dynamic-topology", "to": "file:.design/main/specifications/l1-neural-network-architecture.md", "relation": "covers" }, { "from": "spec:main/l1-dynamic-topology", "to": "file:.design/main/specifications/l1-weight-initialization.md", "relation": "covers" }, { "from": "spec:main/l1-dynamic-topology", "to": "file:.design/main/specifications/l1-training-control.md", "relation": "covers" }, { "from": "spec:main/l1-dynamic-topology", "to": "file:.design/main/specifications/l1-checkpointing.md", "relation": "covers" }, { "from": "spec:main/l1-error-taxonomy", "to": "file:pkg/utils/errors.go (new)", "relation": "covers" }, { "from": "spec:main/l1-error-taxonomy", "to": "conv:C32", "relation": "enforces" }, { "from": "spec:main/l1-lr-scheduling", "to": "file:.design/main/specifications/l1-optimizer-strategies.md", "relation": "covers" }, { "from": "spec:main/l1-lr-scheduling", "to": "file:.design/main/specifications/l1-training-semantics.md", "relation": "covers" }, { "from": "spec:main/l1-math-functions", "to": "file:pkg/activation/activation.go", "relation": "covers" }, { "from": "spec:main/l1-math-functions", "to": "file:pkg/loss/loss.go", "relation": "covers" }, { "from": "spec:main/l1-meta-learning-hooks", "to": "file:pkg/nn/tunable.go (new)", "relation": "covers" }, { "from": "spec:main/l1-meta-learning-hooks", "to": "file:pkg/nn/param.go (new)", "relation": "covers" }, { "from": "spec:main/l1-meta-learning-hooks", "to": "file:pkg/nn/meta.go (new)", "relation": "covers" }, { "from": "spec:main/l1-network-persistence", "to": "file:pkg/persistence/ (new)", "relation": "covers" }, { "from": "spec:main/l1-network-persistence", "to": "file:.references/gonn_old/pkg/nn/write.go", "relation": "covers" }, { "from": "spec:main/l1-network-persistence", "to": "file:.references/rustunumic/cells.json", "relation": "covers" }, { "from": "spec:main/l1-network-persistence", "to": "conv:C9", "relation": "enforces" }, { "from": "spec:main/l1-network-persistence", "to": "conv:C29", "relation": "enforces" }, { "from": "spec:main/l1-neural-network-architecture", "to": "file:pkg/nn/nn.go", "relation": "covers" }, { "from": "spec:main/l1-neural-network-architecture", "to": "file:pkg/network/network.go", "relation": "covers" }, { "from": "spec:main/l1-neural-network-architecture", "to": "file:pkg/neuron/neuron.go", "relation": "covers" }, { "from": "spec:main/l1-neural-network-architecture", "to": "file:pkg/utils/float.go", "relation": "covers" }, { "from": "spec:main/l1-neural-network-architecture", "to": "conv:C9", "relation": "enforces" }, { "from": "spec:main/l1-neural-network-architecture", "to": "conv:C12", "relation": "enforces" }, { "from": "spec:main/l1-observability-protocol", "to": "file:.references/rustunumic/lib.rs", "relation": "covers" }, { "from": "spec:main/l1-observability-protocol", "to": "conv:C9", "relation": "enforces" }, { "from": "spec:main/l1-optimizer-strategies", "to": "file:.design/main/specifications/l1-training-semantics.md", "relation": "covers" }, { "from": "spec:main/l1-optimizer-strategies", "to": "file:.design/main/specifications/l1-weight-initialization.md", "relation": "covers" }, { "from": "spec:main/l1-performance-contract", "to": "file:pkg/*/bench_*_test.go", "relation": "covers" }, { "from": "spec:main/l1-performance-contract", "to": "conv:C9", "relation": "enforces" }, { "from": "spec:main/l1-regularization", "to": "file:.design/main/specifications/l1-training-semantics.md", "relation": "covers" }, { "from": "spec:main/l1-regularization", "to": "file:.design/main/specifications/l1-math-functions.md", "relation": "covers" }, { "from": "spec:main/l1-release-policy", "to": "file:.design/main/specifications/l1-neural-network-architecture.md", "relation": "covers" }, { "from": "spec:main/l1-release-policy", "to": "file:.design/main/specifications/l1-network-persistence.md", "relation": "covers" }, { "from": "spec:main/l1-release-policy", "to": "file:CHANGELOG.md", "relation": "covers" }, { "from": "spec:main/l1-training-control", "to": "file:pkg/nn/train.go", "relation": "covers" }, { "from": "spec:main/l1-training-control", "to": "file:.references/rustunumic/train.rs", "relation": "covers" }, { "from": "spec:main/l1-training-control", "to": "conv:C9", "relation": "enforces" }, { "from": "spec:main/l1-training-semantics", "to": "file:pkg/nn/train.go", "relation": "covers" }, { "from": "spec:main/l1-training-semantics", "to": "file:.references/rustunumic/train.rs", "relation": "covers" }, { "from": "spec:main/l1-training-semantics", "to": "file:.references/gonn_old/pkg/nn/train.go", "relation": "covers" }, { "from": "spec:main/l1-training-semantics", "to": "conv:C9", "relation": "enforces" }, { "from": "spec:main/l1-weight-initialization", "to": "file:pkg/utils/init.go (new)", "relation": "covers" }, { "from": "spec:main/l1-weight-initialization", "to": "file:.design/main/specifications/l2-nn-facade.md#56-weight-initialization-methods", "relation": "covers" }, { "from": "spec:main/l2-activation-functions", "to": "file:pkg/activation/activation.go", "relation": "covers" }, { "from": "spec:main/l2-activation-functions", "to": "file:pkg/activation/sigmoid.go", "relation": "covers" }, { "from": "spec:main/l2-activation-functions", "to": "file:pkg/activation/activation_test.go", "relation": "covers" }, { "from": "spec:main/l2-activation-functions", "to": "file:pkg/activation/README.md", "relation": "covers" }, { "from": "spec:main/l2-activation-functions", "to": "spec:main/l1-math-functions", "relation": "implements" }, { "from": "spec:main/l2-backend-cpu", "to": "file:pkg/compute/cpu/ (new)", "relation": "covers" }, { "from": "spec:main/l2-backend-cpu", "to": "file:pkg/compute/backend.go (new)", "relation": "covers" }, { "from": "spec:main/l2-backend-cpu", "to": "file:pkg/compute/registry.go (new)", "relation": "covers" }, { "from": "spec:main/l2-backend-cpu", "to": "spec:main/l1-compute-backend", "relation": "implements" }, { "from": "spec:main/l2-backend-cpu", "to": "conv:C9", "relation": "enforces" }, { "from": "spec:main/l2-backend-cpu", "to": "conv:C29", "relation": "enforces" }, { "from": "spec:main/l2-checkpointing-impl", "to": "file:pkg/checkpoint/ (new)", "relation": "covers" }, { "from": "spec:main/l2-checkpointing-impl", "to": "file:pkg/persistence/ (new)", "relation": "covers" }, { "from": "spec:main/l2-checkpointing-impl", "to": "spec:main/l1-checkpointing", "relation": "implements" }, { "from": "spec:main/l2-checkpointing-impl", "to": "conv:C9", "relation": "enforces" }, { "from": "spec:main/l2-cli-client", "to": "file:cmd/gonn/", "relation": "covers" }, { "from": "spec:main/l2-cli-client", "to": "file:pkg/nn/", "relation": "covers" }, { "from": "spec:main/l2-cli-client", "to": "spec:main/l1-neural-network-architecture", "relation": "implements" }, { "from": "spec:main/l2-cli-client", "to": "conv:C29", "relation": "enforces" }, { "from": "spec:main/l2-control-impl", "to": "file:pkg/nn/control.go (new)", "relation": "covers" }, { "from": "spec:main/l2-control-impl", "to": "file:pkg/nn/train.go", "relation": "covers" }, { "from": "spec:main/l2-control-impl", "to": "spec:main/l1-training-control", "relation": "implements" }, { "from": "spec:main/l2-deep-builder", "to": "file:.design/main/specifications/l2-nn-facade.md", "relation": "covers" }, { "from": "spec:main/l2-deep-builder", "to": "file:pkg/nn/config.go", "relation": "covers" }, { "from": "spec:main/l2-deep-builder", "to": "file:pkg/nn/presets.go", "relation": "covers" }, { "from": "spec:main/l2-deep-builder", "to": "file:pkg/nn/builder.go", "relation": "covers" }, { "from": "spec:main/l2-deep-builder", "to": "file:pkg/nn/options.go", "relation": "covers" }, { "from": "spec:main/l2-deep-builder", "to": "spec:main/l1-neural-network-architecture", "relation": "implements" }, { "from": "spec:main/l2-errors-impl", "to": "file:pkg/utils/errors.go (new)", "relation": "covers" }, { "from": "spec:main/l2-errors-impl", "to": "file:.design/RULES.md#c32-error-informativeness", "relation": "covers" }, { "from": "spec:main/l2-errors-impl", "to": "spec:main/l1-error-taxonomy", "relation": "implements" }, { "from": "spec:main/l2-errors-impl", "to": "conv:C32", "relation": "enforces" }, { "from": "spec:main/l2-gonn-skills", "to": "file:skills/gonn/SKILL.md", "relation": "covers" }, { "from": "spec:main/l2-gonn-skills", "to": "file:.design/main/specifications/l2-nn-facade.md", "relation": "covers" }, { "from": "spec:main/l2-gonn-skills", "to": "file:examples/", "relation": "covers" }, { "from": "spec:main/l2-gonn-skills", "to": "file:README.md", "relation": "covers" }, { "from": "spec:main/l2-gonn-skills", "to": "spec:main/l1-neural-network-architecture", "relation": "implements" }, { "from": "spec:main/l2-gonn-skills", "to": "conv:C25", "relation": "enforces" }, { "from": "spec:main/l2-gonn-skills", "to": "conv:C26", "relation": "enforces" }, { "from": "spec:main/l2-gonn-skills", "to": "conv:C27", "relation": "enforces" }, { "from": "spec:main/l2-gonn-skills", "to": "conv:C28", "relation": "enforces" }, { "from": "spec:main/l2-gonn-skills", "to": "conv:C29", "relation": "enforces" }, { "from": "spec:main/l2-gonn-skills", "to": "conv:C30", "relation": "enforces" }, { "from": "spec:main/l2-gonn-skills", "to": "conv:C31", "relation": "enforces" }, { "from": "spec:main/l2-gonn-skills", "to": "conv:C32", "relation": "enforces" }, { "from": "spec:main/l2-gonn-skills", "to": "conv:C33", "relation": "enforces" }, { "from": "spec:main/l2-init-impl", "to": "file:pkg/utils/init.go (new)", "relation": "covers" }, { "from": "spec:main/l2-init-impl", "to": "file:.design/main/specifications/l2-nn-facade.md#56-weight-initialization-methods", "relation": "covers" }, { "from": "spec:main/l2-init-impl", "to": "spec:main/l1-weight-initialization", "relation": "implements" }, { "from": "spec:main/l2-layer-types", "to": "file:pkg/layer/core.go", "relation": "covers" }, { "from": "spec:main/l2-layer-types", "to": "file:pkg/layer/base.go", "relation": "covers" }, { "from": "spec:main/l2-layer-types", "to": "file:pkg/layer/input.go", "relation": "covers" }, { "from": "spec:main/l2-layer-types", "to": "file:pkg/layer/dense.go", "relation": "covers" }, { "from": "spec:main/l2-layer-types", "to": "file:pkg/layer/output.go", "relation": "covers" }, { "from": "spec:main/l2-layer-types", "to": "spec:main/l1-neural-network-architecture", "relation": "implements" }, { "from": "spec:main/l2-logging-strategy", "to": "file:pkg/utils/logger.go", "relation": "covers" }, { "from": "spec:main/l2-logging-strategy", "to": "file:.references/rustunumic/lib.rs", "relation": "covers" }, { "from": "spec:main/l2-logging-strategy", "to": "spec:main/l1-observability-protocol", "relation": "implements" }, { "from": "spec:main/l2-logging-strategy", "to": "conv:C29", "relation": "enforces" }, { "from": "spec:main/l2-loss-functions", "to": "file:pkg/loss/loss.go", "relation": "covers" }, { "from": "spec:main/l2-loss-functions", "to": "file:pkg/loss/loss_test.go", "relation": "covers" }, { "from": "spec:main/l2-loss-functions", "to": "file:pkg/loss/mse.go", "relation": "covers" }, { "from": "spec:main/l2-loss-functions", "to": "file:pkg/loss/README.md", "relation": "covers" }, { "from": "spec:main/l2-loss-functions", "to": "spec:main/l1-math-functions", "relation": "implements" }, { "from": "spec:main/l2-multihidden-impl", "to": "file:pkg/network/network.go", "relation": "covers" }, { "from": "spec:main/l2-multihidden-impl", "to": "file:pkg/nn/compile.go", "relation": "covers" }, { "from": "spec:main/l2-multihidden-impl", "to": "file:pkg/persistence/weights.go", "relation": "covers" }, { "from": "spec:main/l2-multihidden-impl", "to": "file:examples/E03..E13", "relation": "covers" }, { "from": "spec:main/l2-multihidden-impl", "to": "spec:main/l1-neural-network-architecture", "relation": "implements" }, { "from": "spec:main/l2-multihidden-impl", "to": "conv:C9", "relation": "enforces" }, { "from": "spec:main/l2-multihidden-impl", "to": "conv:C29", "relation": "enforces" }, { "from": "spec:main/l2-network-graph", "to": "file:pkg/network/network.go", "relation": "covers" }, { "from": "spec:main/l2-network-graph", "to": "file:pkg/network/bundle.go", "relation": "covers" }, { "from": "spec:main/l2-network-graph", "to": "file:pkg/network/propagation.go", "relation": "covers" }, { "from": "spec:main/l2-network-graph", "to": "spec:main/l1-neural-network-architecture", "relation": "implements" }, { "from": "spec:main/l2-neuron-model", "to": "file:pkg/neuron/neuron.go", "relation": "covers" }, { "from": "spec:main/l2-neuron-model", "to": "file:pkg/neuron/cell/core.go", "relation": "covers" }, { "from": "spec:main/l2-neuron-model", "to": "file:pkg/neuron/cell/input.go", "relation": "covers" }, { "from": "spec:main/l2-neuron-model", "to": "file:pkg/neuron/cell/dense.go", "relation": "covers" }, { "from": "spec:main/l2-neuron-model", "to": "file:pkg/neuron/cell/output.go", "relation": "covers" }, { "from": "spec:main/l2-neuron-model", "to": "file:pkg/neuron/cell/bias.go", "relation": "covers" }, { "from": "spec:main/l2-neuron-model", "to": "file:pkg/neuron/axon/axon.go", "relation": "covers" }, { "from": "spec:main/l2-neuron-model", "to": "spec:main/l1-neural-network-architecture", "relation": "implements" }, { "from": "spec:main/l2-nn-facade", "to": "file:pkg/nn/nn.go", "relation": "covers" }, { "from": "spec:main/l2-nn-facade", "to": "file:pkg/nn/builder.go", "relation": "covers" }, { "from": "spec:main/l2-nn-facade", "to": "file:pkg/nn/options.go", "relation": "covers" }, { "from": "spec:main/l2-nn-facade", "to": "file:pkg/nn/presets.go", "relation": "covers" }, { "from": "spec:main/l2-nn-facade", "to": "file:pkg/nn/query.go", "relation": "covers" }, { "from": "spec:main/l2-nn-facade", "to": "file:pkg/nn/train.go", "relation": "covers" }, { "from": "spec:main/l2-nn-facade", "to": "file:pkg/nn/verify.go", "relation": "covers" }, { "from": "spec:main/l2-nn-facade", "to": "file:.references/fluent_api/fluent_api_v1.go", "relation": "covers" }, { "from": "spec:main/l2-nn-facade", "to": "file:.references/fluent_api/fluent_api_v3.go", "relation": "covers" }, { "from": "spec:main/l2-nn-facade", "to": "file:.references/rustunumic/train.rs", "relation": "covers" }, { "from": "spec:main/l2-nn-facade", "to": "spec:main/l1-neural-network-architecture", "relation": "implements" }, { "from": "spec:main/l2-optimizer-impl", "to": "file:pkg/optimizer/", "relation": "covers" }, { "from": "spec:main/l2-optimizer-impl", "to": "file:pkg/nn/train.go", "relation": "covers" }, { "from": "spec:main/l2-optimizer-impl", "to": "file:pkg/nn/compile.go", "relation": "covers" }, { "from": "spec:main/l2-optimizer-impl", "to": "spec:main/l1-optimizer-strategies", "relation": "implements" }, { "from": "spec:main/l2-perf-impl", "to": "file:pkg/network/pool.go (new)", "relation": "covers" }, { "from": "spec:main/l2-perf-impl", "to": "file:pkg/*/bench_*_test.go", "relation": "covers" }, { "from": "spec:main/l2-perf-impl", "to": "file:pkg/nn/options.go", "relation": "covers" }, { "from": "spec:main/l2-perf-impl", "to": "spec:main/l1-performance-contract", "relation": "implements" }, { "from": "spec:main/l2-perf-impl", "to": "conv:C9", "relation": "enforces" }, { "from": "spec:main/l2-perf-impl", "to": "conv:C30", "relation": "enforces" }, { "from": "spec:main/l2-persistence-impl", "to": "file:pkg/persistence/", "relation": "covers" }, { "from": "spec:main/l2-persistence-impl", "to": "file:pkg/utils/errors.go", "relation": "covers" }, { "from": "spec:main/l2-persistence-impl", "to": "spec:main/l1-network-persistence", "relation": "implements" }, { "from": "spec:main/l2-persistence-impl", "to": "conv:C9", "relation": "enforces" }, { "from": "spec:main/l2-regularization-impl", "to": "file:pkg/regularizer/", "relation": "covers" }, { "from": "spec:main/l2-regularization-impl", "to": "file:pkg/nn/train.go", "relation": "covers" }, { "from": "spec:main/l2-regularization-impl", "to": "file:pkg/utils/init.go", "relation": "covers" }, { "from": "spec:main/l2-regularization-impl", "to": "spec:main/l1-regularization", "relation": "implements" }, { "from": "spec:main/l2-streaming-impl", "to": "file:pkg/dataset/ (new)", "relation": "covers" }, { "from": "spec:main/l2-streaming-impl", "to": "file:pkg/utils/errors.go", "relation": "covers" }, { "from": "spec:main/l2-streaming-impl", "to": "spec:main/l1-data-streaming", "relation": "implements" }, { "from": "spec:main/l2-streaming-impl", "to": "conv:C9", "relation": "enforces" }, { "from": "spec:main/l2-streaming-impl", "to": "conv:C29", "relation": "enforces" }, { "from": "spec:main/l2-training-loop", "to": "file:pkg/nn/train.go", "relation": "covers" }, { "from": "spec:main/l2-training-loop", "to": "file:pkg/network/propagation.go", "relation": "covers" }, { "from": "spec:main/l2-training-loop", "to": "file:.references/rustunumic/train.rs", "relation": "covers" }, { "from": "spec:main/l2-training-loop", "to": "spec:main/l1-training-semantics", "relation": "implements" }, { "from": "spec:main/l2-usage-examples", "to": "file:.design/main/specifications/l2-nn-facade.md", "relation": "covers" }, { "from": "spec:main/l2-usage-examples", "to": "file:examples/", "relation": "covers" }, { "from": "spec:main/l2-usage-examples", "to": "file:.references/fluent_api/fluent_api_v1.go", "relation": "covers" }, { "from": "spec:main/l2-usage-examples", "to": "file:.references/fluent_api/fluent_api_v3.go", "relation": "covers" }, { "from": "spec:main/l2-usage-examples", "to": "file:.references/gonn_old/examples/", "relation": "covers" }, { "from": "spec:main/l2-usage-examples", "to": "file:.references/rustunumic/train.rs", "relation": "covers" }, { "from": "spec:main/l2-usage-examples", "to": "spec:main/l1-neural-network-architecture", "relation": "implements" }, { "from": "spec:main/l2-usage-examples", "to": "conv:C9", "relation": "enforces" }, { "from": "spec:main/l2-visualization-api", "to": "file:pkg/nn/ (or new pkg/visualization/)", "relation": "covers" }, { "from": "spec:main/l2-visualization-api", "to": "file:(external — TBD URL)", "relation": "covers" }, { "from": "spec:main/l2-visualization-api", "to": "spec:main/l1-observability-protocol", "relation": "implements" }, { "from": "spec:main/l2-visualization-api", "to": "conv:C29", "relation": "enforces" }, { "from": "ws:main", "to": "phase:main/phase-1", "relation": "contains" }, { "from": "ws:main", "to": "phase:main/phase-2", "relation": "contains" }, { "from": "ws:main", "to": "phase:main/phase-3", "relation": "contains" }, { "from": "ws:main", "to": "phase:main/phase-4", "relation": "contains" }, { "from": "ws:main", "to": "phase:main/phase-5", "relation": "contains" }, { "from": "ws:main", "to": "phase:main/phase-6", "relation": "contains" }];
+      var analysis = { "god_nodes": [{ "id": "ws:main", "label": "main", "type": "workspace", "degree": 51 }, { "id": "conv:C9", "label": "C9 — Zero-Prompt Automation (Trust Mode)", "type": "convention", "degree": 16 }, { "id": "spec:main/l1-neural-network-architecture", "label": "l1-neural-network-architecture.md", "type": "spec", "degree": 16 }, { "id": "spec:main/l2-gonn-skills", "label": "l2-gonn-skills.md", "type": "spec", "degree": 15 }, { "id": "spec:main/l2-nn-facade", "label": "l2-nn-facade.md", "type": "spec", "degree": 12 }], "orphaned_files": ["file:pkg", "file:examples"], "missing_implements": [], "convention_coverage": { "enforced": ["conv:C9", "conv:C12", "conv:C25", "conv:C26", "conv:C27", "conv:C28", "conv:C29", "conv:C30", "conv:C31", "conv:C32", "conv:C33"], "orphaned": ["conv:C1", "conv:C2", "conv:C3", "conv:C4", "conv:C6", "conv:C7", "conv:C8", "conv:C10", "conv:C11", "conv:C13", "conv:C14", "conv:C15", "conv:C16", "conv:C17", "conv:C18", "conv:C19", "conv:C20", "conv:C21", "conv:C22", "conv:C23", "conv:C24"] }, "bridge_specs": [], "coverage_stats": { "main": { "specs": 43, "files_covered": 83, "total_scope": 2, "coverage_pct": 4150 } }, "summary": { "total_nodes": 167, "total_edges": 236, "workspaces": 1, "specs": 43, "files": 85, "conventions": 32, "phases": 6 } };
+
+      var TYPE_COLORS = {
+        workspace: '#4A90D9', spec: '#50C878', file: '#A0A0A0',
+        convention: '#F5A623', phase: '#9B59B6'
+      };
+      var TYPE_SHAPES = {
+        workspace: 'diamond', spec: 'dot', file: 'square',
+        convention: 'triangle', phase: 'star'
+      };
+
+      var maxDeg = 1;
+      rawNodes.forEach(function (n) { if ((n.degree || 0) > maxDeg) maxDeg = n.degree; });
+
+      var visNodes = rawNodes.map(function (n) {
+        var deg = n.degree || 0;
+        var size = 15 + (deg / maxDeg) * 35;
+        return {
+          id: n.id, label: n.label, group: n.type, title: n.id,
+          color: {
+            background: TYPE_COLORS[n.type] || '#888', border: '#444',
+            highlight: { background: '#fff', border: TYPE_COLORS[n.type] || '#888' }
+          },
+          shape: TYPE_SHAPES[n.type] || 'dot',
+          size: size,
+          font: { color: '#ccc', size: 11 },
+          _raw: n
+        };
+      });
+
+      var EDGE_STYLES = {
+        contains: { color: '#555', dashes: false, width: 1.5 },
+        covers: { color: '#444', dashes: false, width: 1 },
+        implements: { color: '#50C878', dashes: [8, 4], width: 2, arrows: 'to' },
+        enforces: { color: '#F5A623', dashes: [3, 3], width: 1.5 },
+        scopes: { color: '#333', dashes: false, width: 0.5 },
+        plans: { color: '#9B59B6', dashes: [6, 3], width: 1.5, arrows: 'to' }
+      };
+
+      var visEdges = rawEdges.map(function (e, i) {
+        var s = EDGE_STYLES[e.relation] || { color: '#555', dashes: false, width: 1 };
+        return {
+          id: i, from: e.from, to: e.to,
+          color: { color: s.color, highlight: '#fff' },
+          dashes: s.dashes, width: s.width,
+          arrows: s.arrows ? { to: { enabled: true, scaleFactor: 0.6 } } : undefined,
+          title: e.relation,
+          _relation: e.relation
+        };
+      });
+
+      var container = document.getElementById('graph');
+      var data = { nodes: new vis.DataSet(visNodes), edges: new vis.DataSet(visEdges) };
+      var options = {
+        physics: {
+          solver: 'barnesHut',
+          barnesHut: { gravitationalConstant: -3000, centralGravity: 0.15, springLength: 120, springConstant: 0.02, damping: 0.15 },
+          stabilization: { iterations: 200 }
+        },
+        interaction: { hover: true, tooltipDelay: 200, navigationButtons: false },
+        edges: { smooth: { type: 'continuous' } }
+      };
+      var network = new vis.Network(container, data, options);
+
+      // Search
+      var searchInput = document.getElementById('search');
+      searchInput.addEventListener('input', function () {
+        var q = this.value.toLowerCase().trim();
+        if (!q) {
+          data.nodes.forEach(function (n) { data.nodes.update({ id: n.id, opacity: 1, font: { color: '#ccc', size: 11 } }); });
+          return;
+        }
+        data.nodes.forEach(function (n) {
+          var match = n.label.toLowerCase().includes(q) || n.id.toLowerCase().includes(q);
+          data.nodes.update({ id: n.id, opacity: match ? 1 : 0.15, font: { color: match ? '#fff' : '#444', size: match ? 13 : 10 } });
+        });
+      });
+
+      // Inspector
+      network.on('click', function (params) {
+        var el = document.getElementById('inspector-content');
+        if (!params.nodes.length) { el.innerHTML = '<p style="color:#666">Click a node to inspect</p>'; return; }
+        var nodeId = params.nodes[0];
+        var node = data.nodes.get(nodeId);
+        if (!node || !node._raw) return;
+        var r = node._raw;
+        var html = '';
+        html += '<div class="prop"><span class="prop-key">Type: </span><span class="prop-val">' + (r.type || '-') + '</span></div>';
+        html += '<div class="prop"><span class="prop-key">Label: </span><span class="prop-val">' + (r.label || '-') + '</span></div>';
+        if (r.workspace) html += '<div class="prop"><span class="prop-key">Workspace: </span><span class="prop-val">' + r.workspace + '</span></div>';
+        if (r.status) html += '<div class="prop"><span class="prop-key">Status: </span><span class="prop-val">' + r.status + '</span></div>';
+        if (r.layer !== undefined) html += '<div class="prop"><span class="prop-key">Layer: </span><span class="prop-val">' + r.layer + '</span></div>';
+        if (r.version) html += '<div class="prop"><span class="prop-key">Version: </span><span class="prop-val">' + r.version + '</span></div>';
+        html += '<div class="prop"><span class="prop-key">Degree: </span><span class="prop-val">' + (r.degree || 0) + '</span></div>';
+
+        var connByType = {};
+        rawEdges.forEach(function (e) {
+          if (e.from === nodeId) {
+            if (!connByType[e.relation]) connByType[e.relation] = [];
+            connByType[e.relation].push(e.to);
+          }
+          if (e.to === nodeId) {
+            var inv = e.relation + ' (incoming)';
+            if (!connByType[inv]) connByType[inv] = [];
+            connByType[inv].push(e.from);
+          }
+        });
+
+        for (var rel in connByType) {
+          html += '<div class="conn-group"><h4>' + rel + '</h4><ul>';
+          connByType[rel].forEach(function (id) {
+            var cn = rawNodes.find(function (n) { return n.id === id; });
+            html += '<li>' + (cn ? cn.label : id) + '</li>';
+          });
+          html += '</ul></div>';
+        }
+        el.innerHTML = html;
+      });
+
+      // Stats
+      var s = analysis.summary;
+      var statsHtml = '';
+      statsHtml += '<div class="stat-row"><span class="stat-label">Nodes</span><span class="stat-value">' + s.total_nodes + '</span></div>';
+      statsHtml += '<div class="stat-row"><span class="stat-label">Edges</span><span class="stat-value">' + s.total_edges + '</span></div>';
+      statsHtml += '<div class="stat-row"><span class="stat-label">Workspaces</span><span class="stat-value">' + s.workspaces + '</span></div>';
+      statsHtml += '<div class="stat-row"><span class="stat-label">Specs</span><span class="stat-value">' + s.specs + '</span></div>';
+      statsHtml += '<div class="stat-row"><span class="stat-label">Files</span><span class="stat-value">' + s.files + '</span></div>';
+      statsHtml += '<div class="stat-row"><span class="stat-label">Conventions</span><span class="stat-value">' + s.conventions + '</span></div>';
+      statsHtml += '<div class="stat-row"><span class="stat-label">Phases</span><span class="stat-value">' + s.phases + '</span></div>';
+
+      if (analysis.god_nodes && analysis.god_nodes.length) {
+        statsHtml += '<div class="finding"><h4>God Nodes (top by degree)</h4><ul>';
+        analysis.god_nodes.forEach(function (g) {
+          statsHtml += '<li>' + g.label + ' (' + g.type + ', degree ' + g.degree + ')</li>';
+        });
+        statsHtml += '</ul></div>';
+      }
+
+      if (analysis.orphaned_files && analysis.orphaned_files.length) {
+        statsHtml += '<div class="finding"><h4>Orphaned Files (scoped but uncovered)</h4><ul>';
+        analysis.orphaned_files.forEach(function (f) {
+          statsHtml += '<li>' + f.replace('file:', '') + '</li>';
+        });
+        statsHtml += '</ul></div>';
+      } else {
+        statsHtml += '<div class="finding"><h4 class="ok">No orphaned files</h4></div>';
+      }
+
+      if (analysis.missing_implements && analysis.missing_implements.length) {
+        statsHtml += '<div class="finding"><h4>Missing Implements (L2 without parent)</h4><ul>';
+        analysis.missing_implements.forEach(function (m) {
+          statsHtml += '<li>' + m.label + ' (' + m.workspace + ')</li>';
+        });
+        statsHtml += '</ul></div>';
+      } else {
+        statsHtml += '<div class="finding"><h4 class="ok">All L2 specs declare Implements</h4></div>';
+      }
+
+      if (analysis.convention_coverage) {
+        var cc = analysis.convention_coverage;
+        statsHtml += '<div class="finding"><h4>Convention Coverage</h4>';
+        statsHtml += '<div class="stat-row"><span class="stat-label">Enforced</span><span class="stat-value">' + cc.enforced.length + '</span></div>';
+        statsHtml += '<div class="stat-row"><span class="stat-label">Orphaned</span><span class="stat-value">' + cc.orphaned.length + '</span></div>';
+        if (cc.orphaned.length) {
+          statsHtml += '<ul>';
+          cc.orphaned.forEach(function (o) { statsHtml += '<li>' + o + '</li>'; });
+          statsHtml += '</ul>';
+        }
+        statsHtml += '</div>';
+      }
+
+      document.getElementById('stats-content').innerHTML = statsHtml;
+    })();
+  </script>
+</body>
+
+</html>

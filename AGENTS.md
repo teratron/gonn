@@ -1,0 +1,59 @@
+# Agent Rules
+
+## 1. Technology Stack
+
+- **Language**: Go (latest stable version).
+- **Dependencies**: Prefer standard library. After the local standard library, the next in priority is the remote standard library <https://cs.opensource.google/go>, <https://pkg.go.dev/golang.org/x>. Third-party packages require explicit justification.
+
+## 2. Go Development Rules
+
+### 2.1 Fundamentals & Best Practices
+
+- **Idiomatic Go**: Follow *Effective Go* and community standards.
+- **Simplicity**: Prioritize readability over cleverness.
+- **Explicit Errors**: Handle all errors immediately; return them as the last value. Use `fmt.Errorf("%w", err)` for wrapping.
+- **Composition**: Prefer composition over inheritance. Use interfaces for flexibility.
+- **Project Layout**: Follow standard Go project structure (`/cmd`, `/pkg`, `/internal`).
+- **Formatting**: Always use `gofmt` and `goimports` to maintain consistent code style.
+- **Linting**: Ensure code passes `golangci-lint` with the project's configuration before submission.
+- **Modernization**: Run `$(go env GOPATH)/bin/modernize ./...` after writing or refactoring Go code to ensure current idioms are used (e.g., `any` over `interface{}`, `slices.Contains`, `strings.Cut`, `sync.WaitGroup.Go`, `t.Context()` in tests). Apply fixes with `-fix`. No output means the code is already up to date.
+
+### 2.2 Concurrency (Goroutines & Channels)
+
+- **Communication**: Share memory by communicating (via channels); do not communicate by sharing memory.
+- **Lifecycle**: Always manage goroutine lifecycles to avoid leaks. Use `sync.WaitGroup` or `context.Context` for synchronization/cancellation.
+- **Safety**: Protect shared state with `sync.Mutex`/`sync.RWMutex` or atomic operations. Always run tests with `-race`.
+
+### 2.3 Testing & Quality
+
+- **Coverage**: Maintain a minimum of **80% code coverage** for all new Go files and packages. Focus on critical logic and edge cases.
+- **Table-Driven Tests**: Use for covering multiple scenarios efficiently.
+- **Benchmarks**: Write benchmarks for performance-critical paths using `testing.B`.
+- **Fuzzing**: Use Go native fuzzing for input validation testing.
+
+### 2.4 Performance Optimization
+
+- **Profiling**: Use `pprof` to identify bottlenecks (CPU, Memory, Block).
+- **Memory**: Minimize heap allocations; use `sync.Pool` for object reuse where applicable.
+- **Preallocation**: Preallocate slices and maps if the size is known.
+- **Struct Optimization**: Periodically run `python .agents/skills/go-struct-optimizer/scripts/analyze.py` or use the `go-struct-optimizer` skill to optimize memory layout (padding and GC scan range) of critical ECS structures.
+
+### 2.5 Integration & Architecture
+
+- **gRPC/Protobuf**: Use for high-performance internal RPC.
+- **Database**: Use connection pooling. Prevent SQL injection by using prepared statements or proper ORM/sqlx patterns.
+- **Microservices**: Decouple by domain. Use lightweight communication and implement observability (tracing, metrics, logs).
+- **Web**: Use `net/http` for simple services; use frameworks like Gin or Echo for complex routing/middleware while maintaining clean architecture.
+
+## Completion Protocol (Mandatory Checklist)
+
+Before finishing any task, the agent MUST verify the following:
+
+- [ ] **Technology Stack**: Code is written in Go (latest stable), prioritizing the standard library.
+- [ ] **Cognitive Discipline**: No steps skipped, no assumptions made without asking.
+- [ ] **Visual Excellence**: Web/UI components (if any) follow premium design guidelines.
+- [ ] **Code Quality**:
+  - [ ] All new Go files have at least 80% test coverage.
+  - [ ] Code is formatted with `gofmt` and follows standard linting rules.
+  - [ ] **Modernization**: `$(go env GOPATH)/bin/modernize ./...` reports no suggestions (or fixes have been applied with `-fix`).
+  - [ ] **Struct Optimization**: Memory layouts of new/modified structs are optimized (via `go-struct-optimizer`).

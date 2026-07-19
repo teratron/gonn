@@ -1,0 +1,70 @@
+{
+    "claude": {
+        "dir": ".claude",
+        "workflows": "commands",
+        "skills": "skills",
+        "rules": "rules",
+        "files": [
+            "CLAUDE.md"
+        ],
+        "description": "Claude Code (Anthropic)"
+    },
+    "gemini": {
+        "dir": ".agents",
+        "workflows": null,
+        "skills": null,
+        "rules": null,
+        "files": [
+            "GEMINI.md"
+        ],
+        "description": "Gemini CLI (Google)"
+    },
+    "qwen": {
+        "dir": ".qwen",
+        "workflows": "commands",
+        "skills": "skills",
+        "rules": "rules",
+        "files": [
+            "QWEN.md"
+        ],
+        "description": "Qwen Code (Alibaba)"
+    },
+    "copilot": {
+        "dir": ".github",
+        "workflows": "prompts",
+        "skills": "skills",
+        "rules": "rules",
+        "files": [
+            "copilot-instructions.md"
+        ],
+        "description": "GitHub Copilot"
+    },
+    "codex": {
+        "dir": ".codex",
+        "workflows": "prompts",
+        "skills": "skills",
+        "rules": "rules",
+        "files": [
+            "CODEX.md"
+        ],
+        "description": "Codex CLI (OpenAI)"
+    },
+    "kilocode": {
+        "dir": ".kilocode",
+        "workflows": "workflows",
+        "skills": "skills",
+        "rules": "rules",
+        "files": [],
+        "description": "Kilo Code"
+    },
+    "lingma": {
+        "dir": ".lingma",
+        "workflows": "commands",
+        "skills": "skills",
+        "rules": "rules",
+        "files": [
+            "LINGMA.md"
+        ],
+        "description": "Lingma Code (Alibaba)"
+    }
+}

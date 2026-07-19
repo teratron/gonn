@@ -9,17 +9,15 @@
 *.prof
 .coverprofile
 coverage.out
-go.mod
-go.sum
+*.out
+*_cov
+cov
+cov.*
 vendor/
 
-# Environment variables
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-.env.staging.local
+# Dotenv files (local secrets — never commit)
+.env*
+!.env.example
 
 # IDE - VSCode
 .vscode/
@@ -62,6 +60,9 @@ coverage/
 # Temporary folders
 tmp/
 temp/
+cache/
+.cache/
+.references/
 
 # Build outputs
 dist/
@@ -69,10 +70,61 @@ build/
 *.min.js
 *.min.css
 
-# Git
-.git/
-
 # Editor backup files
-*~
 *.bak
 *.tmp
+
+.gemini/
+gha-creds-*.json
+
+# Local settings
+*/settings.json
+*/settings.*.json
+
+# Agents
+CLAUDE.md
+GEMINI.md
+CODEX.md
+QWEN.md
+copilot-instructions.md
+
+## Workflows
+.*/commands/
+.*/prompts/
+.*/workflows/
+!.agents/workflows/
+!.github/workflows/
+.agents/workflows/magic*.md
+
+## Skills
+.*/skills/
+!.agents/skills/
+.agents/skills/magic*
+
+## Rules
+.*/rules/
+!.agents/rules/
+.agents/rules/magic*.md
+.agents/rules/MAGIC.md
+
+# Magic Spec
+.magic/
+
+## Generated graph artifacts
+.design/spec-graph.html
+.design/spec-graph.json
+.design/graph-before.json
+.design/.graph-cache/
+.design/wiki/
+
+# MNIST dataset files (downloaded via -download flag, not committed)
+*-idx1-ubyte
+*-idx3-ubyte
+*.idx1-ubyte
+*.idx3-ubyte
+
+# Misc
+*.txt
+*.tgz
+*.zip
+cover*

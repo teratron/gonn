@@ -1,0 +1,633 @@
+// Package network — the internal computational graph.
+//
+// Network[T] is the value-typed engine that owns three cell groups
+// (Input, a chain of Hiddens, Output), wires axons between them, and
+// runs the forward / backward / weight-update pipeline. Public entry
+// points (Builder, NN[T]) are out of scope for Phase 1 — the facade
+// layer is restored in Phase 2 and the multi-hidden chain in Phase 5.
+package network
+
+import (
+	"math"
+	"slices"
+	"sync/atomic"
+
+	"github.com/teratron/gonn/pkg/activation"
+	"github.com/teratron/gonn/pkg/compute"
+	"github.com/teratron/gonn/pkg/layer"
+	"github.com/teratron/gonn/pkg/loss"
+	"github.com/teratron/gonn/pkg/neuron"
+	"github.com/teratron/gonn/pkg/neuron/axon"
+	"github.com/teratron/gonn/pkg/neuron/cell"
+	"github.com/teratron/gonn/pkg/utils"
+)
+
+// defaultLearningRate matches [l2-network-graph] §2 — 0.3 baseline.
+const defaultLearningRate = 0.3
+
+// WeightSampler is the function signature used by SetWeightSampler.
+// fanIn is the previous-layer size; fanOut is the current-layer size.
+// Returning T(0) is valid (e.g., zero-init for bias connections).
+//
+// AI-Meta:
+//   - Purpose: Callback type for weight initialisation strategies supplied via SetWeightSampler.
+//   - Usage: n.SetWeightSampler(func(fanIn, fanOut int) float32 { return utils.XavierUniform[float32](rng, fanIn, fanOut) }).
+//   - Related: [Network.SetWeightSampler], [Network.Build].
+//   - Stability: Stable.
+type WeightSampler[T utils.Float] func(fanIn, fanOut int) T
+
+// FeatureNorm is the minimal contract a per-layer normalizer must satisfy to
+// participate in the dense forward/backward pass. Deliberately narrower than
+// norm.Normalizer so this package does not import pkg/layer/norm — the facade
+// adapts its Normalizer instances to this interface via SetNormLayers.
+//
+// AI-Meta:
+//   - Purpose: Decoupled hook type letting CalculateValues/CalculateMisses route through a normalizer.
+//   - Implementations: norm.BatchNorm, norm.LayerNorm, norm.GroupNorm (via pkg/nn).
+//   - Related: [Network.SetNormLayers], [Network.CalculateValues], [Network.CalculateMisses].
+//   - Stability: Stable.
+type FeatureNorm[T utils.Float] interface {
+	// Forward normalizes the layer's post-activation vector (training path;
+	// may cache state for Backward and update running statistics).
+	Forward(x []T) []T
+	// Backward maps ∂L/∂(norm output) to ∂L/∂(activation), accumulating any
+	// affine-parameter gradients internally.
+	Backward(upstream []T) []T
+	// ForwardInference is the pure eval-path forward used by InferDense; it
+	// must not mutate any layer state so concurrent readers are safe.
+	ForwardInference(x []T) []T
+}
+
+// LayerMask is the per-layer activation-mask hook (Dropout). Applied by
+// CalculateValues after the norm hook — but only on training passes — and
+// reversed by CalculateMisses before the norm backward. Mirrors
+// regularizer.LayerMasker without importing that package.
+//
+// AI-Meta:
+//   - Purpose: Decoupled hook type for honest in-graph dropout masking.
+//   - Implementations: regularizer.Dropout (via pkg/nn).
+//   - Related: [Network.SetLayerMasker], [Network.SetTrainingMode].
+//   - Stability: Stable.
+type LayerMask[T utils.Float] interface {
+	MaskForwardLayer(layer int, x []T) []T
+	MaskBackwardLayer(layer int, upstream []T) []T
+}
+
+// Network is the typed computational graph. Embedded by nn.NN so the
+// public facade delegates forward/backward passes without an extra heap
+// allocation. Owns three bundle groups (Input, Hiddens chain, Output),
+// their bias cells, activation tags, and pre-activation scratch buffers
+// for backprop.
+//
+// Field order is GC-scan-optimal: pure-pointer/interface fields first
+// (kernels, masker, initWeight, normLayers, outputBias), then mixed
+// slice-header fields, then the pointer-free scalars last. Interfaces are
+// two GC-scanned words (16 bytes) — grouping them with the other pointer
+// fields instead of scattering them among scalars is what shrinks the scan
+// range on the single instance every forward/backward call dereferences.
+//
+// AI-Meta:
+//   - Purpose: Internal engine owning the full neural graph; forward, backward, and weight-update steps.
+//   - Lifecycle: Zero → populated via SetLayers + Build → operational via Train/CalculateValues.
+//   - Concurrency: NotSafe; Train mutates cells, weights, and pre-activation buffers in place.
+//   - Related: [New], [SetLayers], [Build], [Train], [CalculateValues].
+type Network[T utils.Float] struct {
+	// kernels is the optional accelerated matrix path supplied by the compute
+	// backend. nil means "use the internal reference loops" — identical math,
+	// just not delegated.
+	kernels compute.DenseKernels[T]
+	// masker is the optional per-layer dropout hook; applied only while
+	// training is true (set around each trainStep by the facade).
+	masker     LayerMask[T]
+	initWeight WeightSampler[T]
+	// normLayers maps hidden-layer index → normalizer applied to that layer's
+	// post-activation output before the next layer consumes it. Installed by
+	// the facade via SetNormLayers; nil for networks without normalization.
+	normLayers    map[int]FeatureNorm[T]
+	outputBias    *cell.Bias[T]
+	Hiddens       []bundle[T, *cell.Hidden[T]] `json:"hiddens" xml:"hiddens"`
+	Input         bundle[T, *cell.Input[T]]    `json:"input" xml:"input"`
+	Output        bundle[T, *cell.Output[T]]   `json:"output" xml:"output"`
+	hiddenActs    []activation.Type
+	hiddenBiases  []*cell.Bias[T]
+	outActBuf     []T
+	preactHiddens [][]T
+	preactOutput  []T
+	// weights is the network-wide contiguous weight array; dense[i].store.W
+	// are non-overlapping views into it, in canonical flat order. Built by
+	// buildStore and rebuilt after every topology mutation.
+	weights []T
+	// dense holds the structure-of-arrays view of each fully connected layer:
+	// Hiddens[0..n-1] followed by Output. This is what the forward/backward
+	// kernels operate on; the axon graph only defines the wiring.
+	dense           []denseLayer[T]
+	LearningRate    T `json:"learningRate" xml:"learningRate"`
+	topologyVersion atomic.Uint64
+	// fusedOutput is true when (outputAct, lossMode) is a fused pair
+	// (SIGMOID+BCE or SOFTMAX+CCE) whose analytic ∂L/∂z simplifies to
+	// (y − t). In that case the output-layer activation derivative is folded
+	// into the loss gradient and outputEffDeriv returns 1.
+	fusedOutput  bool
+	lossMode     loss.Type
+	outputAct    activation.Type
+	topologyMode TopologyMode
+	training     bool
+}
+
+// outputEffDeriv returns the effective derivative multiplier applied to output
+// cell oi's miss when it is (a) folded into hidden-layer gradients by
+// CalculateMisses and (b) used to form the output-layer weight gradient. For a
+// fused (activation, loss) pair the value is 1 because σ′ is already folded into
+// the miss = (t − y); otherwise it is σ′(preact) for the output activation.
+func (n *Network[T]) outputEffDeriv(oi int) T {
+	if n.fusedOutput {
+		return 1
+	}
+	return activation.Derivative(n.preactOutput[oi], n.outputAct)
+}
+
+// New returns a freshly constructed Network with empty bundles and the
+// default learning rate (0.3). Returned by value so nn.NN can embed it
+// directly; pointer-receiver methods are reachable once the value is
+// addressable.
+//
+// AI-Meta:
+//   - Purpose: Allocate an empty Network ready for SetLayers + Build.
+//   - Usage: n := network.New[float32](); n.SetLayers(...); n.Build(); n.Train(...).
+//   - Related: [Network], [SetLayers], [Build].
+func New[T utils.Float]() Network[T] {
+	return Network[T]{
+		LearningRate: T(defaultLearningRate),
+		Input:        newBundle[T, *cell.Input[T]](),
+		Hiddens:      nil,
+		Output:       newBundle[T, *cell.Output[T]](),
+	}
+}
+
+// SetNormLayers installs the per-hidden-layer normalizers consumed by
+// CalculateValues (Forward), CalculateMisses (Backward), and InferDense
+// (ForwardInference). Passing nil clears normalization. Keys are hidden-layer
+// indices; entries beyond the hidden chain are ignored.
+//
+// AI-Meta:
+//   - Purpose: Wire normalization layers into the dense forward/backward pass.
+//   - Concurrency: NotSafe; call during compile, before training starts.
+//   - Related: [FeatureNorm], [CalculateValues], [CalculateMisses], [InferDense].
+//   - Stability: Stable.
+func (n *Network[T]) SetNormLayers(m map[int]FeatureNorm[T]) {
+	n.normLayers = m
+}
+
+// SetLayerMasker installs the per-layer dropout hook consumed by
+// CalculateValues / CalculateMisses on training passes. nil disables masking.
+//
+// AI-Meta:
+//   - Purpose: Wire honest in-graph dropout into the dense pass.
+//   - Concurrency: NotSafe; call during compile.
+//   - Related: [LayerMask], [SetTrainingMode].
+//   - Stability: Stable.
+func (n *Network[T]) SetLayerMasker(m LayerMask[T]) {
+	n.masker = m
+}
+
+// SetTrainingMode flags the engine as running a training pass. While true,
+// CalculateValues applies the dropout mask and CalculateMisses routes misses
+// through it; while false (Verify, legacy mutating Query paths) the mask is
+// skipped entirely — inference must never drop units (REG-3).
+//
+// AI-Meta:
+//   - Purpose: Toggle dropout masking on the shared forward/backward entry points.
+//   - Concurrency: NotSafe; toggled around trainStep under the facade's write lock.
+//   - Related: [SetLayerMasker], [CalculateValues], [CalculateMisses].
+//   - Stability: Stable.
+func (n *Network[T]) SetTrainingMode(on bool) {
+	n.training = on
+}
+
+// SetWeightSampler configures the weight-initialization function applied by
+// subsequent Build calls. nil reverts to the axon.New default (U[-0.5, 0.5]).
+// Call this after SetLayers and before Build.
+//
+// AI-Meta:
+//   - Purpose: Override the default weight initializer; enables Xavier/He/Uniform sampling.
+//   - Usage: n.SetWeightSampler(func(fanIn, fanOut int) float32 { return utils.XavierUniform[float32](rng, fanIn, fanOut) }).
+//   - Related: [WeightSampler], [Build].
+//   - Stability: Stable.
+func (n *Network[T]) SetWeightSampler(fn WeightSampler[T]) {
+	n.initWeight = fn
+}
+
+// SetLayers installs the constructed layer values into the network bundles.
+// Layer types own the cells; the network mirrors their slices so propagation
+// methods can reach them. Bias cells are stored positionally and used as axon
+// sources by Build.
+//
+// hiddens is the left-to-right hidden chain; must contain at least one layer.
+//
+// AI-Meta:
+//   - Purpose: Wire layer cells into the network graph before calling Build.
+//   - Errors: ErrUserConfig (nil layer, empty hiddens, zero-size layer).
+//   - Concurrency: NotSafe; must complete before Build.
+//   - Related: [Network], [Build], [layer.Input], [layer.Dense], [layer.Output].
+func (n *Network[T]) SetLayers(in *layer.Input[T], hiddens []*layer.Dense[T], out *layer.Output[T]) error {
+	if in == nil || out == nil {
+		return utils.Newf(utils.ErrUserConfig,
+			"SetLayers: input and output layers must be non-nil (in=%v out=%v)",
+			in != nil, out != nil,
+		)
+	}
+	if len(hiddens) == 0 {
+		return utils.Newf(utils.ErrUserConfig,
+			"SetLayers: hiddens slice must contain at least one layer (got 0)")
+	}
+	for i, h := range hiddens {
+		if h == nil {
+			return utils.Newf(utils.ErrUserConfig,
+				"SetLayers: hiddens[%d] is nil — every chain entry must be a constructed Dense layer", i)
+		}
+		if h.Size == 0 {
+			return utils.Newf(utils.ErrUserConfig,
+				"SetLayers: hiddens[%d] has zero size — every Dense layer must declare Size > 0", i)
+		}
+	}
+	if in.Size == 0 || out.Size == 0 {
+		return utils.Newf(utils.ErrUserConfig,
+			"SetLayers: input and output layers must have positive size (in=%d out=%d)",
+			in.Size, out.Size,
+		)
+	}
+
+	n.Input.Replace(in.Cells())
+	n.Output.Replace(out.Cells())
+
+	// Resize positional metadata to match the new chain. Allocating
+	// fresh slices (rather than mutating in place) keeps SetLayers
+	// idempotent under retries — a previous call's longer chain does
+	// not leak into the new one.
+	n.Hiddens = make([]bundle[T, *cell.Hidden[T]], len(hiddens))
+	n.hiddenBiases = make([]*cell.Bias[T], len(hiddens))
+	n.hiddenActs = make([]activation.Type, len(hiddens))
+	n.preactHiddens = make([][]T, len(hiddens))
+	for i, h := range hiddens {
+		// Hidden[T] is a generic alias of Dense[T]; the slice element
+		// types are identical so the slice rebind is type-safe.
+		n.Hiddens[i] = newBundle[T, *cell.Hidden[T]]()
+		n.Hiddens[i].Replace(h.Cells())
+		n.hiddenBiases[i] = h.BiasCell()
+		n.hiddenActs[i] = h.Activation
+		n.preactHiddens[i] = make([]T, h.Size)
+	}
+
+	n.outputBias = out.BiasCell()
+	n.outputAct = out.Activation
+	n.lossMode = out.Loss
+	n.preactOutput = make([]T, out.Size)
+	n.outActBuf = make([]T, out.Size)
+	n.fusedOutput = isFusedPair(out.Activation, out.Loss)
+	return nil
+}
+
+// isFusedPair reports whether (act, mode) is a loss/activation combination
+// whose analytic ∂L/∂z collapses to (y − t), letting the engine skip the
+// output activation derivative entirely. This is both faster and numerically
+// stabler (it avoids the 1/(y(1−y)) blow-up of BCE and the softmax Jacobian).
+func isFusedPair(act activation.Type, mode loss.Type) bool {
+	switch {
+	case act == activation.SIGMOID && mode == loss.BCE:
+		return true
+	case act == activation.SOFTMAX && (mode == loss.CCE || mode == loss.CROSS_ENTROPY):
+		return true
+	default:
+		return false
+	}
+}
+
+// LossMode reports the loss-function symbol the Output layer was built with.
+//
+// AI-Meta:
+//   - Purpose: Expose the configured loss type so callers can pass it to CalculateLoss explicitly.
+//   - Concurrency: Safe; read-only after SetLayers.
+//   - Related: [CalculateLoss], [CalculateLossDefault].
+func (n *Network[T]) LossMode() loss.Type {
+	return n.lossMode
+}
+
+// Build wires axons across the Input → Hiddens → Output chain. Each cell
+// in Hiddens[i] receives one incoming axon per cell in the previous layer
+// (Input for i=0, Hiddens[i-1] otherwise) plus one from its bias cell if
+// present; Output cells connect from the last hidden layer plus bias.
+// Subsequent calls overwrite existing axon bundles — idempotent.
+//
+// AI-Meta:
+//   - Purpose: Wire all axons after SetLayers; required before any forward pass.
+//   - Errors: ErrUserConfig (empty bundles, not called after SetLayers).
+//   - Concurrency: NotSafe; must complete before Train or CalculateValues.
+//   - Related: [SetLayers], [Network], [axon.New].
+func (n *Network[T]) Build() error {
+	if n.Input.Len() == 0 || len(n.Hiddens) == 0 || n.Output.Len() == 0 {
+		return utils.Newf(utils.ErrUserConfig,
+			"Build: empty bundle (in=%d hiddenChain=%d out=%d) — call SetLayers first",
+			n.Input.Len(), len(n.Hiddens), n.Output.Len(),
+		)
+	}
+	for i := range n.Hiddens {
+		if n.Hiddens[i].Len() == 0 {
+			return utils.Newf(utils.ErrUserConfig,
+				"Build: Hiddens[%d] has zero cells — call SetLayers with non-empty layers", i)
+		}
+	}
+	for i, hb := range n.Hiddens {
+		bias := n.hiddenBiases[i]
+		fanOut := hb.Len()
+		for _, h := range hb.cells {
+			h.Axons = h.Axons[:0]
+			if i == 0 {
+				fanIn := n.Input.Len()
+				for _, src := range n.Input.cells {
+					h.Axons = append(h.Axons, n.newAxon(src, h, fanIn, fanOut))
+				}
+			} else {
+				fanIn := n.Hiddens[i-1].Len()
+				for _, src := range n.Hiddens[i-1].cells {
+					h.Axons = append(h.Axons, n.newAxon(src, h, fanIn, fanOut))
+				}
+			}
+			if bias != nil {
+				h.Axons = append(h.Axons, n.newAxon(bias, h, 1, fanOut))
+			}
+		}
+	}
+	lastHidden := n.Hiddens[len(n.Hiddens)-1].cells
+	fanIn := n.Hiddens[len(n.Hiddens)-1].Len()
+	fanOut := n.Output.Len()
+	for _, o := range n.Output.cells {
+		o.Axons = o.Axons[:0]
+		for _, src := range lastHidden {
+			o.Axons = append(o.Axons, n.newAxon(src, o, fanIn, fanOut))
+		}
+		if n.outputBias != nil {
+			o.Axons = append(o.Axons, n.newAxon(n.outputBias, o, 1, fanOut))
+		}
+	}
+	// Pack the freshly sampled weights into contiguous per-layer storage and
+	// rebind every axon as a view into it. From here on the store is the single
+	// source of truth; the axon graph carries topology only.
+	return n.buildStore()
+}
+
+// SetBackend installs a compute backend. When the backend also implements
+// [compute.DenseKernels] its matrix primitives drive every forward and backward
+// pass; otherwise the engine keeps using its internal reference loops and the
+// backend is inert for the dense path. Passing nil restores the reference path.
+//
+// The engine deliberately delegates only the inner products — activations,
+// losses, optimizers, normalization, and dropout stay here — so selecting a
+// backend can never bypass the configured training machinery.
+//
+// AI-Meta:
+//   - Purpose: Route the dense matrix primitives through a compute backend.
+//   - Usage: n.SetBackend(cpuBackend); called by nn.compile from WithBackend.
+//   - Concurrency: NotSafe; call during compile, before training starts.
+//   - Related: [compute.Backend], [compute.DenseKernels].
+//   - Stability: Stable.
+func (n *Network[T]) SetBackend(b compute.Backend[T]) {
+	if k, ok := b.(compute.DenseKernels[T]); ok {
+		n.kernels = k
+		return
+	}
+	n.kernels = nil
+}
+
+// KernelsActive reports whether an accelerated dense path is currently driving
+// the forward/backward passes. False means the internal reference loops are in
+// use — either no backend was set, the backend does not implement
+// [compute.DenseKernels], or a kernel failed and the engine fell back.
+//
+// AI-Meta:
+//   - Purpose: Introspect whether backend kernels are live; used by tests and diagnostics.
+//   - Concurrency: ReadSafe.
+//   - Related: [SetBackend].
+//   - Stability: Stable.
+func (n *Network[T]) KernelsActive() bool {
+	return n.kernels != nil
+}
+
+// newAxon creates an axon with a weight drawn from initWeight when set,
+// or falls back to axon.New (U[-0.5, 0.5]) for backward compatibility.
+func (n *Network[T]) newAxon(
+	src neuron.Nucleus[T],
+	dst neuron.Neuron[T],
+	fanIn, fanOut int,
+) *axon.Axon[T] {
+	if n.initWeight != nil {
+		return axon.NewWithWeight(n.initWeight(fanIn, fanOut), src, dst)
+	}
+	return axon.New(src, dst)
+}
+
+// SetInputs writes one sample into the Input bundle. Slice length must
+// match the bundle size.
+//
+// AI-Meta:
+//   - Purpose: Load one feature vector into input cells before CalculateValues.
+//   - Errors: ErrInputData (length mismatch).
+//   - Concurrency: NotSafe; must complete before CalculateValues.
+//   - Related: [SetTargets], [Train].
+func (n *Network[T]) SetInputs(data []T) error {
+	if len(data) != n.Input.Len() {
+		return utils.Newf(utils.ErrInputData,
+			"SetInputs: expected %d values, got %d", n.Input.Len(), len(data),
+		)
+	}
+	for idx, v := range data {
+		if !isFinite(v) {
+			return utils.Newf(utils.ErrInputData,
+				"SetInputs: non-finite value at index %d (%v) — NaN/Inf inputs would poison every weight", idx, float64(v))
+		}
+		n.Input.cells[idx].SetValue(v)
+	}
+	return nil
+}
+
+// isFinite reports whether v is neither NaN nor ±Inf. Rejecting non-finite
+// inputs and targets prevents a single bad sample from silently corrupting the
+// whole network (audit D6).
+func isFinite[T utils.Float](v T) bool {
+	f := float64(v)
+	return !math.IsNaN(f) && !math.IsInf(f, 0)
+}
+
+// SetTargets writes the label vector into Output cell target pointers.
+// Slice length must match the output bundle size.
+//
+// AI-Meta:
+//   - Purpose: Load ground-truth labels for the current sample before CalculateValues.
+//   - Errors: ErrInputData (length mismatch).
+//   - Concurrency: NotSafe; must complete before CalculateValues.
+//   - Related: [SetInputs], [Train].
+func (n *Network[T]) SetTargets(data []T) error {
+	if len(data) != n.Output.Len() {
+		return utils.Newf(utils.ErrInputData,
+			"SetTargets: expected %d values, got %d", n.Output.Len(), len(data),
+		)
+	}
+	for idx, v := range data {
+		if !isFinite(v) {
+			return utils.Newf(utils.ErrInputData,
+				"SetTargets: non-finite value at index %d (%v)", idx, float64(v))
+		}
+		// cell.Output stores its target via pointer; assign through the
+		// pointer to keep the cell's existing reference valid.
+		*n.Output.cells[idx].GetTarget() = v
+	}
+	return nil
+}
+
+// FlatWeights collects every learnable weight (hidden + output axons) into a
+// newly allocated flat slice in the canonical order: Hiddens[0] → Hiddens[n-1]
+// → Output. Used by the optimizer integration in pkg/nn.
+//
+// AI-Meta:
+//   - Purpose: Export a flat weight copy for optimizer Step calls.
+//   - Related: [ApplyFlatWeights], [FlatGradients].
+//   - Stability: Stable.
+func (n *Network[T]) FlatWeights() []T {
+	if n.storeReady() {
+		// The store is laid out in exactly this order, so the export is a copy.
+		return slices.Clone(n.weights)
+	}
+	out := make([]T, 0, n.weightCount())
+	for _, hb := range n.Hiddens {
+		for _, h := range hb.cells {
+			for _, a := range h.Axons {
+				out = append(out, a.W())
+			}
+		}
+	}
+	for _, o := range n.Output.cells {
+		for _, a := range o.Axons {
+			out = append(out, a.W())
+		}
+	}
+	return out
+}
+
+// AppendFlatWeights is like FlatWeights but appends into dst (reusing its
+// backing array when capacity is sufficient). Returns the extended slice.
+//
+// AI-Meta:
+//   - Purpose: Zero-alloc variant of FlatWeights for hot-path training loops.
+//   - Related: [FlatWeights], [ApplyFlatWeights].
+//   - Stability: Stable.
+func (n *Network[T]) AppendFlatWeights(dst []T) []T {
+	if n.storeReady() {
+		return append(dst[:0], n.weights...)
+	}
+	dst = dst[:0]
+	for _, hb := range n.Hiddens {
+		for _, h := range hb.cells {
+			for _, a := range h.Axons {
+				dst = append(dst, a.W())
+			}
+		}
+	}
+	for _, o := range n.Output.cells {
+		for _, a := range o.Axons {
+			dst = append(dst, a.W())
+		}
+	}
+	return dst
+}
+
+// ApplyFlatWeights writes a flat weight slice back in the same canonical order
+// produced by FlatWeights / AppendFlatWeights. The slice length must equal the
+// network's weight count; a mismatch returns ErrInputData instead of silently
+// applying a partial update (the historical behavior, which corrupted the
+// network on a caller bug without any signal).
+//
+// AI-Meta:
+//   - Purpose: Write optimizer-updated weights back into the network graph.
+//   - Errors: ErrInputData (length != weightCount).
+//   - Related: [FlatWeights], [AppendFlatWeights].
+//   - Stability: Stable.
+func (n *Network[T]) ApplyFlatWeights(weights []T) error {
+	if want := n.weightCount(); len(weights) != want {
+		return utils.Newf(utils.ErrInputData,
+			"ApplyFlatWeights: expected %d weights, got %d", want, len(weights))
+	}
+	if n.storeReady() {
+		copy(n.weights, weights)
+		return nil
+	}
+	idx := 0
+	for _, hb := range n.Hiddens {
+		for _, h := range hb.cells {
+			for i := range h.Axons {
+				h.Axons[i].SetW(weights[idx])
+				idx++
+			}
+		}
+	}
+	for _, o := range n.Output.cells {
+		for i := range o.Axons {
+			o.Axons[i].SetW(weights[idx])
+			idx++
+		}
+	}
+	return nil
+}
+
+// weightCount totals all learnable axon weights across hidden and output layers.
+func (n *Network[T]) weightCount() int {
+	count := 0
+	for _, hb := range n.Hiddens {
+		for _, h := range hb.cells {
+			count += len(h.Axons)
+		}
+	}
+	for _, o := range n.Output.cells {
+		count += len(o.Axons)
+	}
+	return count
+}
+
+// HiddenActivations collects all hidden-layer post-activation values into a flat
+// slice: Hiddens[0] cells → Hiddens[n-1] cells. Used by the regularizer mask path.
+//
+// AI-Meta:
+//   - Purpose: Export hidden activations for ApplyMask calls in the training loop.
+//   - Related: [SetHiddenActivations].
+//   - Stability: Stable.
+func (n *Network[T]) HiddenActivations() []T {
+	total := 0
+	for _, hb := range n.Hiddens {
+		total += hb.Len()
+	}
+	out := make([]T, 0, total)
+	for _, hb := range n.Hiddens {
+		for _, h := range hb.cells {
+			out = append(out, *h.GetValue())
+		}
+	}
+	return out
+}
+
+// SetHiddenActivations writes a flat activation slice back in the same order
+// as HiddenActivations. Called after ApplyMask to persist dropout masks.
+//
+// AI-Meta:
+//   - Purpose: Write regularizer-masked hidden activations back into cell values.
+//   - Related: [HiddenActivations].
+//   - Stability: Stable.
+func (n *Network[T]) SetHiddenActivations(acts []T) {
+	idx := 0
+	for _, hb := range n.Hiddens {
+		for _, h := range hb.cells {
+			if idx >= len(acts) {
+				return
+			}
+			*h.GetValue() = acts[idx]
+			idx++
+		}
+	}
+}
